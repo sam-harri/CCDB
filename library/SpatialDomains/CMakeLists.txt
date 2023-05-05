@@ -14,6 +14,7 @@ MeshPartition.cpp
 PrismGeom.cpp
 PyrGeom.cpp
 QuadGeom.cpp
+RefRegion.cpp
 SegGeom.cpp
 PointGeom.cpp
 TetGeom.cpp
@@ -40,6 +41,7 @@ MeshPartition.h
 PrismGeom.h
 PyrGeom.h
 QuadGeom.h
+RefRegion.h
 SegGeom.h
 PointGeom.h
 SpatialDomainsDeclspec.h
