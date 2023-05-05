@@ -179,6 +179,9 @@ struct RefRegionInfo
     } disc;
 };
 
+// Forward declaration
+class RefRegion;
+
 typedef std::map<std::string, std::string> MeshMetaDataMap;
 
 class MeshGraph;
@@ -322,7 +325,7 @@ public:
 
     // Perform the p-refinement in the selected elements
     SPATIAL_DOMAINS_EXPORT void PRefinementElmts(
-        ExpansionInfoMapShPtr &expansionMap, RefRegionInfo &region,
+        ExpansionInfoMapShPtr &expansionMap, RefRegion *&region,
         GeometrySharedPtr geomVecIter);
 
     SPATIAL_DOMAINS_EXPORT bool CheckIfVertIsInsideLine(
@@ -525,7 +528,7 @@ protected:
     // Refinement attributes (class members)
     std::map<int, CompositeMap> m_refComposite;
     // std::map<int, LibUtilities::BasisKeyVector> m_refBasis;
-    std::map<int, RefRegionInfo> m_refRegion;
+    std::map<int, RefRegion *> m_refRegion;
     bool m_refFlag = false;
 
     CompositeMap m_meshComposites;
