@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-//  File: RefRegion.h
+//  File: RefRegionCylinder.h
 //
 //  For more information, please see: http://www.nektar.info/
 //
@@ -32,42 +32,37 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifndef NEKTAR_SPATIALDOMAINS_REFREGION_H
-#define NEKTAR_SPATIALDOMAINS_REFREGION_H
+#ifndef NEKTAR_SPATIALDOMAINS_REFREGIONCYLINDER_H
+#define NEKTAR_SPATIALDOMAINS_REFREGIONCYLINDER_H
 
+#include <SpatialDomains/RefRegion.h>
+#include <vector>
+
+#include <LibUtilities/BasicConst/NektarUnivTypeDefs.hpp>
 #include <LibUtilities/BasicUtils/SessionReader.h>
 #include <SpatialDomains/SpatialDomainsDeclspec.h>
-#include <vector>
 
 namespace Nektar
 {
 namespace SpatialDomains
 {
 
-class RefRegion
+class RefRegionCylinder : public RefRegion
 {
 public:
-    SPATIAL_DOMAINS_EXPORT RefRegion() = default; // default Constructor
-    SPATIAL_DOMAINS_EXPORT RefRegion(
-        const unsigned int coordim, NekDouble m_radius,
+    SPATIAL_DOMAINS_EXPORT RefRegionCylinder() = default;
+    SPATIAL_DOMAINS_EXPORT RefRegionCylinder(
+        const unsigned int coordim, NekDouble radius,
         std::vector<NekDouble> coord1, std::vector<NekDouble> coord2,
         std::vector<unsigned int> numModes,
-        std::vector<unsigned int> numPoints);    // Constructor
-    SPATIAL_DOMAINS_EXPORT virtual ~RefRegion(); // Destructor
+        std::vector<unsigned int> numPoints);
+    SPATIAL_DOMAINS_EXPORT virtual ~RefRegionCylinder();
 
-    SPATIAL_DOMAINS_EXPORT virtual bool v_Contains(
-        const Array<OneD,
-                    NekDouble> &coords) = 0; // pure virtual function
-
-    unsigned int m_coordim;
-    NekDouble m_radius;
-    std::vector<NekDouble> m_coord1;
-    std::vector<NekDouble> m_coord2;
-    std::vector<unsigned int> m_numModes;
-    std::vector<unsigned int> m_numPoints;
+    SPATIAL_DOMAINS_EXPORT bool v_Contains(
+        const Array<OneD, NekDouble> &coords);
 };
 
 } // namespace SpatialDomains
 } // namespace Nektar
 
-#endif // NEKTAR_SPATIALDOMAINS_REFREGION_H
+#endif // NEKTAR_SPATIALDOMAINS_REFREGIONCYLINDER_H

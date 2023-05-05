@@ -15,6 +15,7 @@ PrismGeom.cpp
 PyrGeom.cpp
 QuadGeom.cpp
 RefRegion.cpp
+RefRegionCylinder.cpp
 SegGeom.cpp
 PointGeom.cpp
 TetGeom.cpp
@@ -42,6 +43,7 @@ PrismGeom.h
 PyrGeom.h
 QuadGeom.h
 RefRegion.h
+RefRegionCylinder.h
 SegGeom.h
 PointGeom.h
 SpatialDomainsDeclspec.h
