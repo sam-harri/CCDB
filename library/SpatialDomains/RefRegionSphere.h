@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-//  File: RefRegion.cpp
+//  File: RefRegionSphere.h
 //
 //  For more information, please see: http://www.nektar.info/
 //
@@ -32,30 +32,38 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
+#ifndef NEKTAR_SPATIALDOMAINS_REFREGIONSPHERE_H
+#define NEKTAR_SPATIALDOMAINS_REFREGIONSPHERE_H
+
 #include <SpatialDomains/RefRegion.h>
-#include <SpatialDomains/RefRegionCylinder.h>
-#include <SpatialDomains/RefRegionLine.h>
-#include <SpatialDomains/RefRegionParallelogram.h>
-#include <SpatialDomains/RefRegionSphere.h>
+#include <vector>
+
+#include <LibUtilities/BasicConst/NektarUnivTypeDefs.hpp>
+#include <LibUtilities/BasicUtils/SessionReader.h>
+#include <SpatialDomains/SpatialDomainsDeclspec.h>
 
 namespace Nektar
 {
 namespace SpatialDomains
 {
 
-RefRegion::RefRegion(const unsigned int coordim, NekDouble radius,
-                     std::vector<NekDouble> coord1,
-                     std::vector<NekDouble> coord2,
-                     std::vector<unsigned int> numModes,
-                     std::vector<unsigned int> numPoints)
-    : m_coordim(coordim), m_radius(radius), m_coord1(coord1), m_coord2(coord2),
-      m_numModes(numModes), m_numPoints(numPoints)
+class RefRegionSphere : public RefRegion
 {
-}
+public:
+    SPATIAL_DOMAINS_EXPORT RefRegionSphere() = default;
+    SPATIAL_DOMAINS_EXPORT RefRegionSphere(const unsigned int coordim,
+                                           NekDouble radius,
+                                           std::vector<NekDouble> coord1,
+                                           std::vector<NekDouble> coord2,
+                                           std::vector<unsigned int> numModes,
+                                           std::vector<unsigned int> numPoints);
+    SPATIAL_DOMAINS_EXPORT virtual ~RefRegionSphere();
 
-RefRegion::~RefRegion()
-{
-}
+    SPATIAL_DOMAINS_EXPORT bool v_Contains(
+        const Array<OneD, NekDouble> &coords);
+};
 
 } // namespace SpatialDomains
 } // namespace Nektar
+
+#endif // NEKTAR_SPATIALDOMAINS_REFREGIONSPHERE_H

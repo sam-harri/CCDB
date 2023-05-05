@@ -18,6 +18,7 @@ RefRegion.cpp
 RefRegionLine.cpp
 RefRegionParallelogram.cpp
 RefRegionCylinder.cpp
+RefRegionSphere.cpp
 SegGeom.cpp
 PointGeom.cpp
 TetGeom.cpp
@@ -48,6 +49,7 @@ RefRegion.h
 RefRegionLine.h
 RefRegionParallelogram.h
 RefRegionCylinder.h
+RefRegionSphere.h
 SegGeom.h
 PointGeom.h
 SpatialDomainsDeclspec.h

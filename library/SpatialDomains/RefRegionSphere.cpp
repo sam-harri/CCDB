@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-//  File: RefRegion.cpp
+//  File: RefRegionSphere.cpp
 //
 //  For more information, please see: http://www.nektar.info/
 //
@@ -32,29 +32,33 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <SpatialDomains/RefRegion.h>
-#include <SpatialDomains/RefRegionCylinder.h>
-#include <SpatialDomains/RefRegionLine.h>
-#include <SpatialDomains/RefRegionParallelogram.h>
 #include <SpatialDomains/RefRegionSphere.h>
+
+using namespace std;
 
 namespace Nektar
 {
 namespace SpatialDomains
 {
 
-RefRegion::RefRegion(const unsigned int coordim, NekDouble radius,
-                     std::vector<NekDouble> coord1,
-                     std::vector<NekDouble> coord2,
-                     std::vector<unsigned int> numModes,
-                     std::vector<unsigned int> numPoints)
-    : m_coordim(coordim), m_radius(radius), m_coord1(coord1), m_coord2(coord2),
-      m_numModes(numModes), m_numPoints(numPoints)
+RefRegionSphere::RefRegionSphere(const unsigned int coordim, NekDouble radius,
+                                 std::vector<NekDouble> coord1,
+                                 std::vector<NekDouble> coord2,
+                                 std::vector<unsigned int> numModes,
+                                 std::vector<unsigned int> numPoints)
+    : RefRegion(coordim, radius, coord1, coord2, numModes, numPoints)
 {
 }
 
-RefRegion::~RefRegion()
+RefRegionSphere::~RefRegionSphere()
 {
+}
+
+bool RefRegionSphere::v_Contains(const Array<OneD, NekDouble> &coords)
+{
+    const size_t dim = coords.size();
+
+    return false;
 }
 
 } // namespace SpatialDomains
