@@ -15,6 +15,7 @@ PrismGeom.cpp
 PyrGeom.cpp
 QuadGeom.cpp
 RefRegion.cpp
+RefRegionLine.cpp
 RefRegionParallelogram.cpp
 RefRegionCylinder.cpp
 SegGeom.cpp
@@ -44,6 +45,7 @@ PrismGeom.h
 PyrGeom.h
 QuadGeom.h
 RefRegion.h
+RefRegionLine.h
 RefRegionParallelogram.h
 RefRegionCylinder.h
 SegGeom.h

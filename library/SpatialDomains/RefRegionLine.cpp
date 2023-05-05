@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-//  File: RefRegion.cpp
+//  File: RefRegionLine.cpp
 //
 //  For more information, please see: http://www.nektar.info/
 //
@@ -32,28 +32,50 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <SpatialDomains/RefRegion.h>
-#include <SpatialDomains/RefRegionCylinder.h>
 #include <SpatialDomains/RefRegionLine.h>
-#include <SpatialDomains/RefRegionParallelogram.h>
+
+using namespace std;
 
 namespace Nektar
 {
 namespace SpatialDomains
 {
 
-RefRegion::RefRegion(const unsigned int coordim, NekDouble radius,
-                     std::vector<NekDouble> coord1,
-                     std::vector<NekDouble> coord2,
-                     std::vector<unsigned int> numModes,
-                     std::vector<unsigned int> numPoints)
-    : m_coordim(coordim), m_radius(radius), m_coord1(coord1), m_coord2(coord2),
-      m_numModes(numModes), m_numPoints(numPoints)
+RefRegionLine::RefRegionLine(const unsigned int coordim, NekDouble radius,
+                             std::vector<NekDouble> coord1,
+                             std::vector<NekDouble> coord2,
+                             std::vector<unsigned int> numModes,
+                             std::vector<unsigned int> numPoints)
+    : RefRegion(coordim, radius, coord1, coord2, numModes, numPoints)
 {
 }
 
-RefRegion::~RefRegion()
+RefRegionLine::~RefRegionLine()
 {
+}
+
+bool RefRegionLine::v_Contains(const Array<OneD, NekDouble> &coords)
+{
+    // Is P between the region below?
+    // xa, xb plus the radius
+    if (m_coord1[0] < m_coord2[0])
+    {
+        if ((m_coord1[0] - m_radius < coords[0]) &&
+            (m_coord2[0] + m_radius > coords[0]))
+        {
+            return true;
+        }
+    }
+    else
+    {
+        if ((m_coord1[0] + m_radius > coords[0]) &&
+            (m_coord2[0] - m_radius < coords[0]))
+        {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 } // namespace SpatialDomains
