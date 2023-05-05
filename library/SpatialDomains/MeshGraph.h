@@ -167,18 +167,6 @@ typedef std::map<std::string, std::string> GeomInfoMap;
 typedef std::shared_ptr<std::vector<std::pair<GeometrySharedPtr, int>>>
     GeometryLinkSharedPtr;
 
-struct RefRegionInfo
-{
-    NekDouble radius;
-    std::vector<NekDouble> coord1;
-    std::vector<NekDouble> coord2;
-    struct Discretisation
-    {
-        std::vector<unsigned int> numModes;
-        std::vector<unsigned int> numPoints;
-    } disc;
-};
-
 // Forward declaration
 class RefRegion;
 
@@ -327,15 +315,6 @@ public:
     SPATIAL_DOMAINS_EXPORT void PRefinementElmts(
         ExpansionInfoMapShPtr &expansionMap, RefRegion *&region,
         GeometrySharedPtr geomVecIter);
-
-    SPATIAL_DOMAINS_EXPORT bool CheckIfVertIsInsideLine(
-        const RefRegionInfo &region, const Array<OneD, NekDouble> &coords);
-
-    SPATIAL_DOMAINS_EXPORT bool CheckIfVertIsInsideParallelogram(
-        const RefRegionInfo &region, const Array<OneD, NekDouble> &coords);
-
-    SPATIAL_DOMAINS_EXPORT bool CheckIfVertIsInsideCylinder(
-        const RefRegionInfo &region, const Array<OneD, NekDouble> &coords);
 
     inline void SetExpansionInfo(const std::string variable,
                                  ExpansionInfoMapShPtr &exp);
