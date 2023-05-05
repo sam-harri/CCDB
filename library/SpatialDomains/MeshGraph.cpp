@@ -49,6 +49,7 @@
 #include <SpatialDomains/MeshGraph.h>
 #include <SpatialDomains/Movement/Movement.h>
 #include <SpatialDomains/RefRegion.h>
+#include <SpatialDomains/RefRegionParallelogram.h>
 #include <SpatialDomains/RefRegionCylinder.h>
 
 // These are required for the Write(...) and Import(...) functions.
@@ -2862,8 +2863,7 @@ void MeshGraph::PRefinementElmts(ExpansionInfoMapShPtr &expansionMap,
             }
             case 2:
             {
-                // updateExpansion =
-                //     CheckIfVertIsInsideParallelogram(region, coords);
+                updateExpansion = region->v_Contains(coords);
                 break;
             }
             case 1:
@@ -3057,6 +3057,18 @@ void MeshGraph::ReadRefinementInfo()
                             coord2Vector, nModesVector, nPointsVector);
                         // Map: refinement ID, refinement region object
                         m_refRegion[id] = refInfo;
+                        break;
+                    }
+                    case 2:
+                    {
+                        RefRegion *refInfo = new RefRegionParallelogram(
+                            m_spaceDimension, radius, coord1Vector,
+                            coord2Vector, nModesVector, nPointsVector);
+                        m_refRegion[id] = refInfo;
+                        break;
+                    }
+                    case 1:
+                    {
                         break;
                     }
                 }
