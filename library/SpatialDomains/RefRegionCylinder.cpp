@@ -158,7 +158,7 @@ bool RefRegionCylinder::v_Contains(const Array<OneD, NekDouble> &coords)
 
     // 4. Check that point Q between A and B by making sure the baricentric
     // coordinates are between 0 and 1.
-    if (wa >= 0 and wa <= 1 and wb >= 0 and wb <= 1)
+    if ((wa >= 0) && (wa <= 1) && (wb >= 0) && (wb <= 1))
     {
         return true;
     }
