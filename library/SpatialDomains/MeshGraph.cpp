@@ -2747,7 +2747,7 @@ void MeshGraph::ReadRefinementInfo()
                     ParseUtils::GenerateVector(coord1String, coord1Vector);
                 ASSERTL0(valid, "Unable to correctly parse the axes "
                                 "values for COORDINATE1");
-                std::cout << coord1Vector.size() << std::endl;
+                
                 ASSERTL0(coord1Vector.size() == m_spaceDimension,
                          "Number of coordinates do not match the space "
                          "dimension for COORDINATE1");
@@ -2782,7 +2782,7 @@ void MeshGraph::ReadRefinementInfo()
                 else if (strcmp(rType, "SPHERE") == 0) 
                 {
                     // COORDINATE2 is not necessary for this TYPE.
-                    ASSERTL0(c2Str, "COORDINATE2 should not be defined in "
+                    ASSERTL0(!c2Str, "COORDINATE2 should not be defined in "
                                     "REFINEMENT section of input for the "
                                     "SPHERE TYPE");
 
@@ -2843,7 +2843,7 @@ void MeshGraph::ReadRefinementInfo()
                 }
  
                 // Instantiate an object
-                if (strcmp(rType, "SPHERE") == 0)
+                if (strcmp(rType, "STANDARD") == 0)
                 {
                     switch (m_spaceDimension)
                     {
