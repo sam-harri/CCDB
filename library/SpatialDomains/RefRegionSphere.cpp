@@ -56,9 +56,15 @@ RefRegionSphere::~RefRegionSphere()
 
 bool RefRegionSphere::v_Contains(const Array<OneD, NekDouble> &coords)
 {
-    const size_t dim = coords.size();
-
-    return false;
+    if (pow(m_coord1[0]-coords[0],2) + pow(m_coord1[1]-coords[1],2)
+        + pow(m_coord1[2]-coords[2],2) <= pow(m_radius,2))
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }
 
 } // namespace SpatialDomains
