@@ -2762,8 +2762,8 @@ void MeshGraph::ReadRefinementInfo()
 
                 if (strcmp(rType, "STANDARD") == 0) 
                 {
-                    ASSERTL0(c2Str, "COORDINATE2 was not defined in REFINEMENT"
-                                    "section of input");
+                    ASSERTL0(c2Str, "COORDINATE2 was not defined in REFINEMENT "
+                            "section of input");
 
                     std::string coord2String = c2Str;
                     valid = ParseUtils::GenerateVector(coord2String, coord2Vector);
