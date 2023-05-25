@@ -58,13 +58,13 @@ bool RefRegionSphere::v_Contains(const Array<OneD, NekDouble> &coords)
 {
     const size_t dim = coords.size(); // get space dimension.
 
-    if (dim == 1) 
+    if (dim == 3) 
     {
-        if (pow(m_coord1[0]-coords[0],2) + pow(m_coord1[1],2)
-            + pow(m_coord1[2],2) <= pow(m_radius,2))
+        if (pow(m_coord1[0]-coords[0],2) + pow(m_coord1[1]-coords[1],2)
+            + pow(m_coord1[2]-coords[2],2) <= pow(m_radius,2))
         {
             return true;
-        }    
+        }
     }
     else if (dim == 2) 
     {
@@ -76,11 +76,11 @@ bool RefRegionSphere::v_Contains(const Array<OneD, NekDouble> &coords)
     }
     else
     {
-        if (pow(m_coord1[0]-coords[0],2) + pow(m_coord1[1]-coords[1],2)
-            + pow(m_coord1[2]-coords[2],2) <= pow(m_radius,2))
+        if (pow(m_coord1[0]-coords[0],2) + pow(m_coord1[1],2)
+            + pow(m_coord1[2],2) <= pow(m_radius,2))
         {
             return true;
-        }
+        }    
     }
     
     return false;
