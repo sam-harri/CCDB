@@ -127,14 +127,10 @@ bool RefRegionCylinder::v_Contains(const Array<OneD, NekDouble> &coords)
     NekDouble wb = 0.0;
 
     // ||m||
-    NekDouble delta = 1e-12;
-    // An additional parameter delta was added to calculate the ||m||
-    // in order to make the algorithm always run. Although, an ASSERTL0
-    // check if ||m|| >0.
-    NekDouble m_mod = sqrt(pow(m[0], 2) + pow(m[1], 2) + pow(m[2], 2) + delta);
+    NekDouble m_mod = sqrt(pow(m[0], 2) + pow(m[1], 2) + pow(m[2], 2));
     // m_mod > 0: condition
     ASSERTL0(m_mod, "The cylinder axis must not go through the origin");
-
+   
     // ||rq x rb||
     Array<OneD, NekDouble> rqxrb(dim, 0.0);
     rqxrb[0] = rq[1] * m_coord2[2] - rq[2] * m_coord2[1];
