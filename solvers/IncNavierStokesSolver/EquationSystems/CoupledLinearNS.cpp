@@ -49,6 +49,10 @@ string CoupledLinearNS::className =
     SolverUtils::GetEquationSystemFactory().RegisterCreatorFunction(
         "CoupledLinearisedNS", CoupledLinearNS::create);
 
+string CoupledLinearNS::solverTypeLookupId =
+    LibUtilities::SessionReader::RegisterEnumValue(
+        "SolverType", "CoupledLinearisedNS", eCoupledLinearisedNS);
+
 /**
  *  @class CoupledLinearNS
  *
@@ -2467,6 +2471,7 @@ void CoupledLinearNS::v_Output(void)
         }
         WriteFld(newdir + "/" + m_sessionName + "_" +
                      boost::lexical_cast<std::string>(
+                         m_windowPIT * m_comm->GetTimeComm()->GetSize() +
                          m_comm->GetTimeComm()->GetRank() + 1) +
                      ".fld",
                  m_fields[0], fieldcoeffs, variables);

@@ -2,24 +2,43 @@ Changelog
 =========
 v5.4.0
 ------
-**Library:**
+**Library**
 - Add unit tests for Polylib (!1533)
+- Redesign of Parareal driver (!1509) 
 - Add local p-refinement functionality (!508)
 - Fix compilation against TetGen 1.6 (!1547)
+- Tidy-up SDC schemes (!1550)
 - Add min/max and fmin/fmax function to the interpretor registry (!1552)
 - Fix a _m128d to _m128i conversion bug in sse2.hpp (!1551)
+- Register TimeIntegrationMethod to SessionReader (!1539)
+- Remove unecessary for loop in NekLinSysIterGMRES (!1554)
+- Generalize the use of size_t in TimeIntegration (!1555)
+- Remove unused Kernel directory (!1560)
+- Remove unused files in BasicUtils (!1564)
+- Fix convergence error in Fixed-point Jacobi algorithm (!1561)
+- Update parallel-in-time code base in fieldconvert (!1565)
+- Remove unused function GetKey in NekFactory (!1567)
 
 **CompressibleFlowSolver**
 - Fix AUSM3 Riemann solver and add tests to the CI (!1537)
-- Set initial condition check points files to zero (0) (!1535)
+- Set initial condition check points files to zero (0) (!1535) 
 - Prevent file overwrite with restart for the Compressible flow solver (!1540)
+- Register Projection and GJPStabilisation in SessionReader (!1542)
 
 **FieldConvert**
 - Add option to use .csv files in pointdatatofld module (!1545)
 
+**IncNavierStokesSolver**
+- Register SolverType in SessionReader (!1541)
+- Prevent file overwrite with restart for the IsentropicVortex solver (!1543)
+
 **Miscellaneous**
+- Fix compilation against TetGen 1.6 (!1547)
 - Tidy-up Parareal initial condition output (!1534)
 - Remove double entry in documentation and slightly tidy-up code (!1530)
+
+**NekMesh**
+- Changed CMake to set NEKTAR_USE_THREAD_SAFETY to ON when MeshGen is set to ON (!1546)
 
 v5.3.0
 ------

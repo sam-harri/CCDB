@@ -68,6 +68,23 @@ std::string EquationSystem::equationSystemTypeLookupIds[2] = {
     LibUtilities::SessionReader::RegisterEnumValue("DEALIASING", "True", 0),
     LibUtilities::SessionReader::RegisterEnumValue("DEALIASING", "False", 1)};
 
+std::string EquationSystem::projectionTypeLookupIds[7] = {
+    LibUtilities::SessionReader::RegisterEnumValue("Projection", "Continuous",
+                                                   MultiRegions::eGalerkin),
+    LibUtilities::SessionReader::RegisterEnumValue("Projection", "CONTINUOUS",
+                                                   MultiRegions::eGalerkin),
+    LibUtilities::SessionReader::RegisterEnumValue("Projection", "Galerkin",
+                                                   MultiRegions::eGalerkin),
+    LibUtilities::SessionReader::RegisterEnumValue("Projection", "GALERKIN",
+                                                   MultiRegions::eGalerkin),
+    LibUtilities::SessionReader::RegisterEnumValue(
+        "Projection", "DisContinuous", MultiRegions::eDiscontinuous),
+    LibUtilities::SessionReader::RegisterEnumValue(
+        "Projection", "Mixed_CG_Discontinuous",
+        MultiRegions::eMixed_CG_Discontinuous),
+    LibUtilities::SessionReader::RegisterEnumValue(
+        "Projection", "MixedCGDG", MultiRegions::eMixed_CG_Discontinuous),
+};
 /**
  * @class EquationSystem
  *
@@ -698,8 +715,8 @@ void EquationSystem::v_InitObject(bool DeclareFields)
              "should be set!");
     m_session->LoadParameter("TimeIncrementFactor", m_TimeIncrementFactor, 1.0);
 
-    m_nchk         = 0;
-    m_pararealIter = 0;
+    m_nchk    = 0;
+    m_iterPIT = 0;
 }
 
 /**
@@ -1115,6 +1132,7 @@ void EquationSystem::v_Output(void)
         }
         WriteFld(newdir + "/" + m_sessionName + "_" +
                  boost::lexical_cast<std::string>(
+                     m_windowPIT * m_comm->GetTimeComm()->GetSize() +
                      m_comm->GetTimeComm()->GetRank() + 1) +
                  ".fld");
     }
@@ -1161,7 +1179,7 @@ void EquationSystem::Checkpoint_Output(const int n)
     {
         // Parallel-in-time
         std::string paradir = m_sessionName + "_" +
-                              boost::lexical_cast<std::string>(m_pararealIter) +
+                              boost::lexical_cast<std::string>(m_iterPIT) +
                               ".pit";
         if (!fs::is_directory(paradir))
         {
@@ -1193,7 +1211,7 @@ void EquationSystem::Checkpoint_Output(
     {
         // Parallel-in-time
         std::string paradir = m_sessionName + "_" +
-                              boost::lexical_cast<std::string>(m_pararealIter) +
+                              boost::lexical_cast<std::string>(m_iterPIT) +
                               ".pit";
         if (!fs::is_directory(paradir))
         {

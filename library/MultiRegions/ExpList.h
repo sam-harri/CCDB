@@ -41,7 +41,6 @@
 #include <LibUtilities/BasicUtils/SessionReader.h>
 #include <LibUtilities/Communication/Comm.h>
 #include <LibUtilities/Communication/Transposition.h>
-#include <LibUtilities/Kernel/kernel.h>
 #include <LocalRegions/Expansion.h>
 #include <MultiRegions/AssemblyMap/AssemblyMap.h>
 #include <MultiRegions/AssemblyMap/LocTraceToTraceMap.h>
@@ -108,6 +107,11 @@ public:
     /// The copy constructor.
     MULTI_REGIONS_EXPORT ExpList(const ExpList &in,
                                  const bool DeclareCoeffPhysArrays = true);
+
+    /// The copy constructor.
+    MULTI_REGIONS_EXPORT ExpList(const ExpListSharedPtr &in,
+                                 const bool DeclareCoeffArrays = true,
+                                 const bool DeclarePhysArrays  = true);
 
     /// Constructor copying only elements defined in eIds.
     MULTI_REGIONS_EXPORT ExpList(const ExpList &in,
