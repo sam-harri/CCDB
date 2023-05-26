@@ -3,24 +3,28 @@ This section explains how to define a local $p$-refinement in a specific region 
 \begin{lstlisting}[style=XMLStyle]
 <E COMPOSITE="C[0]" NUMMODES="3" FIELDS="u" TYPE="MODIFIED" REFIDS="0" />
 \end{lstlisting}
-Then, in the REFINEMENTS section under \inltt{NEKTAR} tag as shown below, the local p-refinements are defined.
+Then, in the \inltt{REFINEMENTS} section under \inltt{NEKTAR} tag as shown below, the local p-refinements are defined.
 \begin{lstlisting}[style=XMLStyle]
 <REFINEMENTS>
    ...
 </REFINEMENTS>
 \end{lstlisting}
 
-The refinements entries are the reference ID (\inltt{REF}) which must match the one determined in the list of elements, the radius and two coordinates that define a cylindrical surface in a three-dimensional space and the number of modes. The example below shows the entries when only  the expansion type is provided.  Note that the local $p$-refinements are set as a list of \inltt{<R>} refinement regions.
+The refinements entries are the reference ID (\inltt{REF}) which must match the one determined in the list of elements, the type of the method (\inltt{TYPE}) to be used, the radius, the coordinates and the number of modes. The example below shows the entries when only  the expansion type is provided.  Note that the local $p$-refinements are set as a list of \inltt{<R>} refinement regions. 
 \begin{lstlisting}[style=XMLStyle]
 <R REF="0" 
+   TYPE="STANDARD"
    RADIUS="0.1" 
    COORDINATE1="0.1,0.2,0.1" 
    COORDINATE2="0.5,1.0,0.8" 
    NUMMODES="5" />
 \end{lstlisting}
-Thus, the elements which the vertices lay within this cylindrical surface (region) are refined based on the number of modes provided.  Note that this definition is for a three-dimensional mesh. For a two-dimensional mesh, a parallelogram surface is defined based on the same entries. The radius entry, in two-dimension, gives the length (diameter of a circle) of one pair of parallel sides. In a one-dimensional problem, a line is created and the radius entry gives the extra length in both coordinates. One important aspect to notice of this functionality is that the mesh dimension must match the space dimension.
 
-When the expasion basis is specified in details as a combination of one-dimensional bases in the list of elements under the \inltt{EXPANSIONS} tag as shown below. The user also defines the number of quadrature points as explained in the previous section.
+There are currently two methods implemented. The methods are \texttt{STANDARD} and \texttt{SPHERE}.  In these methods, the elements which the vertices lay within the surface (region) are refined based on the number of modes  provided.  Note that the example above is for the \texttt{STANDARD} method which creates a cylindrical surface for three-dimensional space problems. The \inltt{COORDINATE1} and \inltt{COORDINATE2} give the bottom and the top of the cylindrical surface and the \inltt{RADIUS} provides its radius. For two-dimensional meshes in the $xy$-plane, a parallelogram surface is defined based on the same entries. The radius entry, in two-dimension, gives the length (diameter of a circle) of one pair of parallel sides. In a one-dimensional problem (mesh in the $x$-axis only), a line is created and the radius entry gives a extra length in both coordinates. Also, one important aspect to notice of this method is that the mesh dimension must match the space dimension. In order to set up a two- or one-dimensional surface, the user must provide the number of coordinates in \inltt{COORDINATE1} and \inltt{COORDINATE2} which match the space dimension.
+
+One the other hand, the \texttt{SPHERE} method does not require that the space dimension matches the mesh dimension. In addition, two- and one-dimensional meshes can be refined even if they exist in a three-dimensional space. Thus, although the  \texttt{STANDARD}  method has additional geometrical flexibility to define the desired surface in the domain, the \texttt{SPHERE} method is more general so that the user can apply it in any mesh. Regarding the set up for the \texttt{SPHERE} method, the user must provide only \inltt{COORDINATE1} which defines the center of the sphere.
+
+When the expansion basis is specified in detail as a combination of one-dimensional bases in the list of elements under the \inltt{EXPANSIONS} tag as shown below. The user also defines the number of quadrature points as explained in the previous section.
 \begin{lstlisting}[style=XMLStyle]
 <E COMPOSITE="C[0]" 
    BASISTYPE="Modified_A,Modified_A,Modified_A" 
@@ -31,17 +35,17 @@ When the expasion basis is specified in details as a combination of one-dimensio
    REFIDS="0" />
 \end{lstlisting}
 
-Thus, an additional entry must be provided in the list of refinement regions when a detailed description of the expasion basis is given. In this case, the number of quadrature points have to be also given as follows 
+Thus, an additional entry must be provided in the list of refinement regions when a detailed description of the expansion basis is given. In this case, the number of quadrature points have to be also provided as follows 
 \begin{lstlisting}[style=XMLStyle]
 <R REF="0" 
    RADIUS="0.1" 
+   TYPE="SPHERE"
    COORDINATE1="0.1,0.2,0.1" 
-   COORDINATE2="0.5,1.0,0.8"  
    NUMMODES="5,5,5"  
    NUMPOINTS="7,7,7" />
 \end{lstlisting}
 
-The $p$-refinement capability also allows the user to define multiple reference IDs (refienement regions) for each composite (see below). In other words, one can change the polynomial order in many locations in a mesh for a specific composite. It should be noted that if the user defines a region which is outside of the corresponding composite, the mesh is not going to be refined in the specified region. 
+The $p$-refinement capability also allows the user to define multiple reference IDs (refinement regions) for each composite (see below). In other words, one can change the polynomial order in many locations in a mesh for a specific composite. It should be noted that if the user defines a region which is outside of the corresponding composite, the mesh is not going to be refined in the specified region. 
 \begin{lstlisting}[style=XMLStyle]
 <E COMPOSITE="C[0]" NUMMODES="3" FIELDS="u" TYPE="MODIFIED" REFIDS="0,1,2" />
 <E COMPOSITE="C[1]" NUMMODES="5" FIELDS="u" TYPE="MODIFIED" REFIDS="3,4" />
