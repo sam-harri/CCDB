@@ -49,9 +49,9 @@
 #include <SpatialDomains/MeshGraph.h>
 #include <SpatialDomains/Movement/Movement.h>
 #include <SpatialDomains/RefRegion.h>
+#include <SpatialDomains/RefRegionCylinder.h>
 #include <SpatialDomains/RefRegionLine.h>
 #include <SpatialDomains/RefRegionParallelogram.h>
-#include <SpatialDomains/RefRegionCylinder.h>
 #include <SpatialDomains/RefRegionSphere.h>
 
 // These are required for the Write(...) and Import(...) functions.
@@ -2637,8 +2637,8 @@ void MeshGraph::PRefinementElmts(ExpansionInfoMapShPtr &expansionMap,
         // Get coordinates from the vertex
         geomVecIter->GetVertex(i)->GetCoords(coords);
         updateExpansion = region->v_Contains(coords);
-        
-        // Update expansion 
+
+        // Update expansion
         // Change number of modes and number of points (if needed).
         if (updateExpansion)
         {
@@ -2747,7 +2747,7 @@ void MeshGraph::ReadRefinementInfo()
                     ParseUtils::GenerateVector(coord1String, coord1Vector);
                 ASSERTL0(valid, "Unable to correctly parse the axes "
                                 "values for COORDINATE1");
-                
+
                 ASSERTL0(coord1Vector.size() == m_spaceDimension,
                          "Number of coordinates do not match the space "
                          "dimension for COORDINATE1");
@@ -2760,40 +2760,41 @@ void MeshGraph::ReadRefinementInfo()
                 // Extract Coordinate 2
                 const char *c2Str = refinement->Attribute("COORDINATE2");
 
-                if (strcmp(rType, "STANDARD") == 0) 
+                if (strcmp(rType, "STANDARD") == 0)
                 {
                     ASSERTL0(c2Str, "COORDINATE2 was not defined in REFINEMENT "
-                            "section of input");
+                                    "section of input");
 
                     std::string coord2String = c2Str;
-                    valid = ParseUtils::GenerateVector(coord2String, coord2Vector);
+                    valid =
+                        ParseUtils::GenerateVector(coord2String, coord2Vector);
                     ASSERTL0(valid, "Unable to correctly parse the axes "
                                     "values for COORDINATE2");
                     ASSERTL0(coord2Vector.size() == m_spaceDimension,
-                            "Number of coordinates do not match the space "
-                            "dimension for COORDINATE2");
-                    
-                    // The STANDARD TYPE approach only accepts meshes that have the
-                    // same dimension as the space dimension.
-                    ASSERTL0(m_spaceDimension == m_meshDimension,
-                            "The mesh dimension must match the space dimension");
+                             "Number of coordinates do not match the space "
+                             "dimension for COORDINATE2");
 
+                    // The STANDARD TYPE approach only accepts meshes that have
+                    // the same dimension as the space dimension.
+                    ASSERTL0(
+                        m_spaceDimension == m_meshDimension,
+                        "The mesh dimension must match the space dimension");
                 }
-                else if (strcmp(rType, "SPHERE") == 0) 
+                else if (strcmp(rType, "SPHERE") == 0)
                 {
                     // COORDINATE2 is not necessary for this TYPE.
                     ASSERTL0(!c2Str, "COORDINATE2 should not be defined in "
-                                    "REFINEMENT section of input for the "
-                                    "SPHERE TYPE");
+                                     "REFINEMENT section of input for the "
+                                     "SPHERE TYPE");
 
-                    coord2Vector.empty(); 
+                    coord2Vector.empty();
                 }
                 else
                 {
-                    NEKERROR(Nektar::ErrorUtil::efatal, 
-                        "Invalid refinement type");
+                    NEKERROR(Nektar::ErrorUtil::efatal,
+                             "Invalid refinement type");
                 }
- 
+
                 // Extract number of modes
                 // Check if the expansion was defined individually
                 if (m_useExpansionType == false)
@@ -2841,7 +2842,7 @@ void MeshGraph::ReadRefinementInfo()
                     nModesVector.push_back(n_modesRef);
                     nPointsVector.empty(); // No points.
                 }
- 
+
                 // Instantiate an object
                 if (strcmp(rType, "STANDARD") == 0)
                 {
@@ -2877,10 +2878,10 @@ void MeshGraph::ReadRefinementInfo()
                 }
                 else
                 {
-                       RefRegion *refInfo = new RefRegionSphere(
-                            m_spaceDimension, radius, coord1Vector,
-                            coord2Vector, nModesVector, nPointsVector);
-                        m_refRegion[id] = refInfo;                  
+                    RefRegion *refInfo = new RefRegionSphere(
+                        m_spaceDimension, radius, coord1Vector, coord2Vector,
+                        nModesVector, nPointsVector);
+                    m_refRegion[id] = refInfo;
                 }
 
                 refinement = refinement->NextSiblingElement("R");
