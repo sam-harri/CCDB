@@ -22,71 +22,71 @@
     </GEOMETRY>
 
     <EXPANSIONS>
-         <E COMPOSITE="C[7]" 
-         NUMMODES="5" 
-         TYPE="MODIFIED" 
-         FIELDS="u"   
-         REFIDS="0,1,2,3,4,5,6,7" />
+        <E COMPOSITE="C[7]"
+            NUMMODES="5"
+            TYPE="MODIFIED"
+            FIELDS="u"
+            REFIDS="0,1,2,3,4,5,6,7" />
     </EXPANSIONS>
 
     <REFINEMENTS>
-	 <R REF="0"
-	 TYPE="SPHERE"
-         RADIUS="0.3"
-         COORDINATE1="0.0,0.0,0.0"
-         NUMMODES="7" />
-	 
-         <R REF="1"
-         TYPE="SPHERE"
-	 RADIUS="0.3"
-         COORDINATE1="0.0,1.0,0.0"
-         NUMMODES="7" />
+        <R REF="0"
+            TYPE="SPHERE"
+            RADIUS="0.3"
+            COORDINATE1="0.0,0.0,0.0"
+            NUMMODES="7" />
 
-         <R REF="2"
-         TYPE="SPHERE"
-         RADIUS="0.3"
-         COORDINATE1="0.0,1.0,1.0"
-         NUMMODES="7" />
+        <R REF="1"
+            TYPE="SPHERE"
+            RADIUS="0.3"
+            COORDINATE1="0.0,1.0,0.0"
+            NUMMODES="7" />
 
-         <R REF="3"
-         TYPE="SPHERE"
-         RADIUS="0.3"
-         COORDINATE1="0.0,0.0,1.0"
-         NUMMODES="7" />
-         	
-         <R REF="4"
-         TYPE="STANDARD"
-         RADIUS="0.25"
-         COORDINATE1="1.0,0.0,0.0"
-         COORDINATE2="0.85,0.15,0.15"
-         NUMMODES="7" />
-         
-         <R REF="5"
-         TYPE="STANDARD"
-         RADIUS="0.25"
-         COORDINATE1="1.0,0.0,1.0"
-         COORDINATE2="0.85,0.15,0.85"
-         NUMMODES="7" /> 
+        <R REF="2"
+            TYPE="SPHERE"
+            RADIUS="0.3"
+            COORDINATE1="0.0,1.0,1.0"
+            NUMMODES="7" />
 
-         <R REF="6"
-         TYPE="STANDARD"
-         RADIUS="0.25"
-         COORDINATE1="1.0,1.0,0.0"
-         COORDINATE2="0.85,0.85,0.15"
-         NUMMODES="7" />
-              
-         <R REF="7"
-         TYPE="STANDARD"
-         RADIUS="0.25"
-         COORDINATE1="1.0,1.0,1.0"
-         COORDINATE2="0.86,0.85,0.85"
-         NUMMODES="7" />
+        <R REF="3"
+            TYPE="SPHERE"
+            RADIUS="0.3"
+            COORDINATE1="0.0,0.0,1.0"
+            NUMMODES="7" />
+
+        <R REF="4"
+            TYPE="STANDARD"
+            RADIUS="0.25"
+            COORDINATE1="1.0,0.0,0.0"
+            COORDINATE2="0.85,0.15,0.15"
+            NUMMODES="7" />
+
+        <R REF="5"
+            TYPE="STANDARD"
+            RADIUS="0.25"
+            COORDINATE1="1.0,0.0,1.0"
+            COORDINATE2="0.85,0.15,0.85"
+            NUMMODES="7" />
+
+        <R REF="6"
+            TYPE="STANDARD"
+            RADIUS="0.25"
+            COORDINATE1="1.0,1.0,0.0"
+            COORDINATE2="0.85,0.85,0.15"
+            NUMMODES="7" />
+
+        <R REF="7"
+            TYPE="STANDARD"
+            RADIUS="0.25"
+            COORDINATE1="1.0,1.0,1.0"
+            COORDINATE2="0.86,0.85,0.85"
+            NUMMODES="7" />
     </REFINEMENTS>
-    
+
     <CONDITIONS>
         <SOLVERINFO>
             <I PROPERTY="EQTYPE"         VALUE="Helmholtz"           />
-	    <I PROPERTY="Projection"     VALUE="Continuous"          />
+            <I PROPERTY="Projection"     VALUE="Continuous"          />
         </SOLVERINFO>
 
         <PARAMETERS>
@@ -126,7 +126,7 @@
             <REGION REF="5">
                 <D VAR="u" VALUE="cos(PI*x)*cos(PI*y)*cos(PI*z)" />
             </REGION>
-       </BOUNDARYCONDITIONS>
+        </BOUNDARYCONDITIONS>
 
         <FUNCTION NAME="Forcing">
             <E VAR="u" VALUE="-(Lambda+3*PI*PI)*cos(PI*x)*cos(PI*y)*cos(PI*z)" />

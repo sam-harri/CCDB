@@ -20,31 +20,31 @@
     </GEOMETRY>
 
     <EXPANSIONS>
-        <E COMPOSITE="C[17]" 
-	   NUMMODES="5" 
-	   TYPE="MODIFIED" 
-	   FIELDS="u"
-	   REFIDS="0,1,2" />
-    </EXPANSIONS>    
+        <E COMPOSITE="C[17]"
+            NUMMODES="5"
+            TYPE="MODIFIED"
+            FIELDS="u"
+            REFIDS="0,1,2" />
+    </EXPANSIONS>
 
     <REFINEMENTS>
-         <R REF="0"
-         TYPE="SPHERE"
-         RADIUS="0.1"
-         COORDINATE1="0.0,0.5,0.5"
-         NUMMODES="7" />
-         
-         <R REF="1"
-         TYPE="SPHERE"
-         RADIUS="0.1"
-         COORDINATE1="0.0,-0.5,0.5"
-         NUMMODES="9" />
+        <R REF="0"
+            TYPE="SPHERE"
+            RADIUS="0.1"
+            COORDINATE1="0.0,0.5,0.5"
+            NUMMODES="7" />
 
-         <R REF="2"
-         TYPE="SPHERE"
-         RADIUS="0.1"
-         COORDINATE1="0.0,-0.5,-0.5"
-         NUMMODES="11" />	 
+        <R REF="1"
+            TYPE="SPHERE"
+            RADIUS="0.1"
+            COORDINATE1="0.0,-0.5,0.5"
+            NUMMODES="9" />
+
+        <R REF="2"
+            TYPE="SPHERE"
+            RADIUS="0.1"
+            COORDINATE1="0.0,-0.5,-0.5"
+            NUMMODES="11" />
     </REFINEMENTS>
 
     <CONDITIONS>
