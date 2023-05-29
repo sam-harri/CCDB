@@ -44,16 +44,16 @@
             RADIUS="0.05"
             COORDINATE1="0.2,0.025"
             COORDINATE2="0.8,0.025"
-            NUMMODES="6,6"
-            NUMPOINTS="8,8" />
+            NUMMODES="5,5"
+            NUMPOINTS="7,7" />
 
         <R REF="1"
             TYPE="STANDARD"
             RADIUS="0.05"
             COORDINATE1="0.025,0.975"
             COORDINATE2="0.975,0.975"
-            NUMMODES="5,5"
-            NUMPOINTS="7,6" />
+            NUMMODES="4,4"
+            NUMPOINTS="6,5" />
     </REFINEMENTS>
 
     <CONDITIONS>
@@ -72,7 +72,7 @@
             <P> IO_CheckSteps = 1000      </P>
             <P> IO_InfoSteps  = 1000      </P>
             <P> Kinvis        = 1         </P>
-            <P> HomModesZ     = 8        </P>
+            <P> HomModesZ     = 4        </P>
             <P> LZ            = 1.0       </P>
         </PARAMETERS>
 
