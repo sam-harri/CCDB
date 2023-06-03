@@ -36,10 +36,6 @@
 #define NEKTAR_SPATIALDOMAINS_REFREGIONCYLINDER_H
 
 #include <SpatialDomains/RefRegion.h>
-#include <vector>
-
-#include <LibUtilities/BasicConst/NektarUnivTypeDefs.hpp>
-#include <LibUtilities/BasicUtils/SessionReader.h>
 #include <SpatialDomains/SpatialDomainsDeclspec.h>
 
 namespace Nektar

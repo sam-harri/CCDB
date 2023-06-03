@@ -35,7 +35,8 @@
 #ifndef NEKTAR_SPATIALDOMAINS_REFREGION_H
 #define NEKTAR_SPATIALDOMAINS_REFREGION_H
 
-#include <LibUtilities/BasicUtils/SessionReader.h>
+#include <LibUtilities/BasicConst/NektarUnivTypeDefs.hpp>
+#include <LibUtilities/BasicUtils/SharedArray.hpp>
 #include <SpatialDomains/SpatialDomainsDeclspec.h>
 #include <vector>
 
