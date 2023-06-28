@@ -43,18 +43,24 @@ namespace Nektar
 namespace SpatialDomains
 {
 
+/**
+ * @class RefRegionSphere
+ * @brief Derived class for the refinement surface region.
+ */
 class RefRegionSphere : public RefRegion
 {
 public:
     SPATIAL_DOMAINS_EXPORT RefRegionSphere() = default;
+    /// Constructor
     SPATIAL_DOMAINS_EXPORT RefRegionSphere(const unsigned int coordim,
                                            NekDouble radius,
                                            std::vector<NekDouble> coord1,
                                            std::vector<NekDouble> coord2,
                                            std::vector<unsigned int> numModes,
                                            std::vector<unsigned int> numPoints);
+    /// Destructor
     SPATIAL_DOMAINS_EXPORT virtual ~RefRegionSphere();
-
+    /// Check if vertex is inside the surface region
     SPATIAL_DOMAINS_EXPORT bool v_Contains(
         const Array<OneD, NekDouble> &coords);
 };

@@ -43,17 +43,23 @@ namespace Nektar
 namespace SpatialDomains
 {
 
+/**
+ * @class RefRegionCylinder
+ * @brief Derived class for the refinement surface region.
+ */
 class RefRegionCylinder : public RefRegion
 {
 public:
     SPATIAL_DOMAINS_EXPORT RefRegionCylinder() = default;
+    /// Constructor
     SPATIAL_DOMAINS_EXPORT RefRegionCylinder(
         const unsigned int coordim, NekDouble radius,
         std::vector<NekDouble> coord1, std::vector<NekDouble> coord2,
         std::vector<unsigned int> numModes,
         std::vector<unsigned int> numPoints);
+    /// Destructor
     SPATIAL_DOMAINS_EXPORT virtual ~RefRegionCylinder();
-
+    /// Check if vertex is inside the surface region
     SPATIAL_DOMAINS_EXPORT bool v_Contains(
         const Array<OneD, NekDouble> &coords);
 };

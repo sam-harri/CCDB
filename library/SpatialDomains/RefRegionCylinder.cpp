@@ -55,6 +55,13 @@ RefRegionCylinder::~RefRegionCylinder()
 {
 }
 
+/**
+ * @brief Check if vertex is inside the cylinder.
+ *
+ * @param coords    coordinates of the vertex
+ * @return          true or false depending on if the vertex is inside
+ *                  or not of the surface defined by the user.
+ */
 bool RefRegionCylinder::v_Contains(const Array<OneD, NekDouble> &coords)
 {
     const size_t dim = coords.size();

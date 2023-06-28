@@ -505,11 +505,11 @@ protected:
     bool m_useExpansionType;
 
     // Refinement attributes (class members)
-    /// Link the refinement id with the composites 
+    /// Link the refinement id with the composites
     std::map<int, CompositeMap> m_refComposite;
     // std::map<int, LibUtilities::BasisKeyVector> m_refBasis;
     /// Link the refinement id with the surface region data
-    std::map<int, RefRegion *> m_refRegion; 
+    std::map<int, RefRegion *> m_refRegion;
     bool m_refFlag = false;
 
     CompositeMap m_meshComposites;

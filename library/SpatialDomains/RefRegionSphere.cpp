@@ -54,6 +54,13 @@ RefRegionSphere::~RefRegionSphere()
 {
 }
 
+/**
+ * @brief Check if vertex is inside the sphere.
+ *
+ * @param coords    coordinates of the vertex
+ * @return          true or false depending on if the vertex is inside
+ *                  or not of the surface defined by the user.
+ */
 bool RefRegionSphere::v_Contains(const Array<OneD, NekDouble> &coords)
 {
     const size_t dim = coords.size(); // get space dimension.

@@ -53,6 +53,13 @@ RefRegionParallelogram::~RefRegionParallelogram()
 {
 }
 
+/**
+ * @brief Check if vertex is inside the Parallelogram.
+ *
+ * @param coords    coordinates of the vertex
+ * @return          true or false depending on if the vertex is inside
+ *                  or not of the surface defined by the user.
+ */
 bool RefRegionParallelogram::v_Contains(const Array<OneD, NekDouble> &coords)
 {
     // This is simplification for a two-dimenion domain of the algorithm in the

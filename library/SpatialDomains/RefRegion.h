@@ -28,7 +28,7 @@
 //  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 //  DEALINGS IN THE SOFTWARE.
 //
-//  Description:
+//  Description: Abstract base class for the refinement region.
 //
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -45,26 +45,39 @@ namespace Nektar
 namespace SpatialDomains
 {
 
+/**
+ * @class RefRegion
+ * @brief Abstract base class for the refinement surface region.
+ */
 class RefRegion
 {
 public:
     SPATIAL_DOMAINS_EXPORT RefRegion() = default; // default Constructor
-    SPATIAL_DOMAINS_EXPORT RefRegion(
-        const unsigned int coordim, NekDouble m_radius,
-        std::vector<NekDouble> coord1, std::vector<NekDouble> coord2,
-        std::vector<unsigned int> numModes,
-        std::vector<unsigned int> numPoints);    // Constructor
-    SPATIAL_DOMAINS_EXPORT virtual ~RefRegion(); // Destructor
+    /// Constructor
+    SPATIAL_DOMAINS_EXPORT RefRegion(const unsigned int coordim,
+                                     NekDouble m_radius,
+                                     std::vector<NekDouble> coord1,
+                                     std::vector<NekDouble> coord2,
+                                     std::vector<unsigned int> numModes,
+                                     std::vector<unsigned int> numPoints);
+    /// Destructor
+    SPATIAL_DOMAINS_EXPORT virtual ~RefRegion();
 
+    /// Pure virtual class
     SPATIAL_DOMAINS_EXPORT virtual bool v_Contains(
-        const Array<OneD,
-                    NekDouble> &coords) = 0; // pure virtual function
+        const Array<OneD, NekDouble> &coords) = 0;
 
+    /// Dimension of the coordinate (space dimension)
     unsigned int m_coordim;
+    /// Radius of the surface region
     NekDouble m_radius;
+    /// Coordinate 1
     std::vector<NekDouble> m_coord1;
+    /// Coordinate 2
     std::vector<NekDouble> m_coord2;
+    /// Number of modes
     std::vector<unsigned int> m_numModes;
+    /// Number of quadrature points
     std::vector<unsigned int> m_numPoints;
 };
 

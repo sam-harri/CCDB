@@ -54,6 +54,13 @@ RefRegionLine::~RefRegionLine()
 {
 }
 
+/**
+ * @brief Check if vertex is inside the line.
+ *
+ * @param coords    coordinates of the vertex
+ * @return          true or false depending on if the vertex is inside
+ *                  or not of the surface defined by the user.
+ */
 bool RefRegionLine::v_Contains(const Array<OneD, NekDouble> &coords)
 {
     // Is P between the region below?
