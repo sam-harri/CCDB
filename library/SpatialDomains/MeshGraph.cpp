@@ -2625,6 +2625,15 @@ std::string MeshGraph::GetCompositeString(CompositeSharedPtr comp)
     return s.str();
 }
 
+/**
+ * @brief Refine the elements wihch has at least one vertex inside the 
+ *        surface region.
+ *           
+ * @param expansionMap    shared pointer for the ExpansionInfoMap.
+ * @param region          Object which holds the information provided by the user.
+ *                        For example, the radius, coordinates, etc.  
+ * @param geomVecIter     shared pointer for the Geometry.
+ */
 void MeshGraph::PRefinementElmts(ExpansionInfoMapShPtr &expansionMap,
                                  RefRegion *&region,
                                  GeometrySharedPtr geomVecIter)
@@ -2676,18 +2685,32 @@ void MeshGraph::PRefinementElmts(ExpansionInfoMapShPtr &expansionMap,
     }
 }
 
+/**
+ * @brief Set the refinement information. This function selects the 
+ *        composites and the corresponding surface regions that must 
+ *        be used to refine the elements. 
+ * 
+ * @param expansionMap    shared pointer for the ExpansionInfoMap
+ */
 void MeshGraph::SetRefinementInfo(ExpansionInfoMapShPtr &expansionMap)
 {
+    // Loop over the refinement ids 
     for (auto pRefinement = m_refComposite.begin();
          pRefinement != m_refComposite.end(); ++pRefinement)
     {
+        // For each refinement id, there might be more than one composite,
+        // since each refinement id can be related to more than one 
+        // composite. 
         for (auto compVecIter = pRefinement->second.begin();
              compVecIter != pRefinement->second.end(); ++compVecIter)
-        {
+        {   
             for (auto geomVecIter = compVecIter->second->m_geomVec.begin();
                  geomVecIter != compVecIter->second->m_geomVec.end();
                  ++geomVecIter)
             {
+                // Loop over the refinements provided by the user storage
+                // in the m_refRegion in order to provide the correct 
+                // refinement region data to PRefinementElmts function.
                 for (auto region = m_refRegion.begin();
                      region != m_refRegion.end(); ++region)
                 {
@@ -2704,6 +2727,12 @@ void MeshGraph::SetRefinementInfo(ExpansionInfoMapShPtr &expansionMap)
     }
 }
 
+/**
+ * @brief Read refinement information provided by the user in the xml file. 
+ *        In this function, it reads the reference id, the radius, the 
+ *        coordinates, the type of the method, number of modes, and number
+ *        of quadrature points if necessary.        
+ */
 void MeshGraph::ReadRefinementInfo()
 {
     // Find the Refinement tag

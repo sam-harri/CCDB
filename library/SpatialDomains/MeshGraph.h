@@ -212,7 +212,7 @@ public:
     ////////////////////
     SPATIAL_DOMAINS_EXPORT void ReadExpansionInfo();
 
-    // Read refinement info.
+    /// Read refinement info.
     SPATIAL_DOMAINS_EXPORT void ReadRefinementInfo();
 
     /* ---- Helper functions ---- */
@@ -307,11 +307,11 @@ public:
     /// This function sets the expansion #exp in map with
     /// entry #variable
 
-    // Set refinement info.
+    /// Set refinement info.
     SPATIAL_DOMAINS_EXPORT void SetRefinementInfo(
         ExpansionInfoMapShPtr &expansionMap);
 
-    // Perform the p-refinement in the selected elements
+    /// Perform the p-refinement in the selected elements
     SPATIAL_DOMAINS_EXPORT void PRefinementElmts(
         ExpansionInfoMapShPtr &expansionMap, RefRegion *&region,
         GeometrySharedPtr geomVecIter);
@@ -505,9 +505,11 @@ protected:
     bool m_useExpansionType;
 
     // Refinement attributes (class members)
+    /// Link the refinement id with the composites 
     std::map<int, CompositeMap> m_refComposite;
     // std::map<int, LibUtilities::BasisKeyVector> m_refBasis;
-    std::map<int, RefRegion *> m_refRegion;
+    /// Link the refinement id with the surface region data
+    std::map<int, RefRegion *> m_refRegion; 
     bool m_refFlag = false;
 
     CompositeMap m_meshComposites;
