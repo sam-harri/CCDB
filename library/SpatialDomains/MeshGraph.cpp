@@ -2655,27 +2655,30 @@ void MeshGraph::PRefinementElmts(ExpansionInfoMapShPtr &expansionMap,
             auto expInfoID = expansionMap->find(geomVecIter->GetGlobalID());
             if (m_useExpansionType)
             {
+                std::vector<unsigned int> nModes = region->GetNumModes();
                 (expInfoID->second)->m_basisKeyVector =
                     MeshGraph::DefineBasisKeyFromExpansionType(
                         geomVecIter,
                         (ExpansionType)(expInfoID->second)
                             ->m_basisKeyVector.begin()
                             ->GetBasisType(),
-                        region->m_numModes[0]);
+                        nModes[0]);
             }
             else
             {
                 int cnt = 0;
                 LibUtilities::BasisKeyVector updatedBasisKey;
+                std::vector<unsigned int> nModes  = region->GetNumModes();
+                std::vector<unsigned int> nPoints = region->GetNumPoints();
                 for (auto basis = expInfoID->second->m_basisKeyVector.begin();
                      basis != expInfoID->second->m_basisKeyVector.end();
                      ++basis)
                 {
                     // Generate Basis key using information
-                    const LibUtilities::PointsKey pkey(region->m_numPoints[cnt],
+                    const LibUtilities::PointsKey pkey(nPoints[cnt],
                                                        basis->GetPointsType());
                     updatedBasisKey.push_back(LibUtilities::BasisKey(
-                        basis->GetBasisType(), region->m_numModes[cnt], pkey));
+                        basis->GetBasisType(), nModes[cnt], pkey));
                     cnt++;
                 }
                 (expInfoID->second)->m_basisKeyVector = updatedBasisKey;

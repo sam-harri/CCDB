@@ -32,6 +32,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
+#include "RefRegion.h"
 #include <SpatialDomains/RefRegion.h>
 #include <SpatialDomains/RefRegionCylinder.h>
 #include <SpatialDomains/RefRegionLine.h>

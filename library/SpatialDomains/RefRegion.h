@@ -52,7 +52,6 @@ namespace SpatialDomains
 class RefRegion
 {
 public:
-    SPATIAL_DOMAINS_EXPORT RefRegion() = default; // default Constructor
     /// Constructor
     SPATIAL_DOMAINS_EXPORT RefRegion(const unsigned int coordim,
                                      NekDouble m_radius,
@@ -67,6 +66,19 @@ public:
     SPATIAL_DOMAINS_EXPORT virtual bool v_Contains(
         const Array<OneD, NekDouble> &coords) = 0;
 
+    /// Get the number of modes to update expansion
+    SPATIAL_DOMAINS_EXPORT std::vector<unsigned int> GetNumModes()
+    {
+        return m_numModes;
+    }
+
+    /// Get the number of quadrature points to update expansion
+    SPATIAL_DOMAINS_EXPORT std::vector<unsigned int> GetNumPoints()
+    {
+        return m_numPoints;
+    }
+
+protected:
     /// Dimension of the coordinate (space dimension)
     unsigned int m_coordim;
     /// Radius of the surface region
