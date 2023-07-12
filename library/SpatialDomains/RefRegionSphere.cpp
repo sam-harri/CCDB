@@ -67,27 +67,28 @@ bool RefRegionSphere::v_Contains(const Array<OneD, NekDouble> &coords)
 
     if (dim == 3)
     {
-        if (pow(m_coord1[0] - coords[0], 2) + pow(m_coord1[1] - coords[1], 2) +
-                pow(m_coord1[2] - coords[2], 2) <=
-            pow(m_radius, 2))
+        if (((m_coord1[0] - coords[0]) * (m_coord1[0] - coords[0]) +
+             (m_coord1[1] - coords[1]) * (m_coord1[1] - coords[1]) +
+             (m_coord1[2] - coords[2]) * (m_coord1[2] - coords[2])) <=
+            (m_radius * m_radius))
         {
             return true;
         }
     }
     else if (dim == 2)
     {
-        if (pow(m_coord1[0] - coords[0], 2) + pow(m_coord1[1] - coords[1], 2) +
-                pow(m_coord1[2], 2) <=
-            pow(m_radius, 2))
+        if (((m_coord1[0] - coords[0]) * (m_coord1[0] - coords[0]) +
+             (m_coord1[1] - coords[1]) * (m_coord1[1] - coords[1]) +
+             m_coord1[2] * m_coord1[2]) <= (m_radius * m_radius))
         {
             return true;
         }
     }
     else
     {
-        if (pow(m_coord1[0] - coords[0], 2) + pow(m_coord1[1], 2) +
-                pow(m_coord1[2], 2) <=
-            pow(m_radius, 2))
+        if (((m_coord1[0] - coords[0]) * (m_coord1[0] - coords[0]) +
+             m_coord1[1] * m_coord1[1] + m_coord1[2] * m_coord1[2]) <=
+            (m_radius * m_radius))
         {
             return true;
         }

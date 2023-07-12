@@ -86,13 +86,13 @@ bool RefRegionParallelogram::v_Contains(const Array<OneD, NekDouble> &coords)
     rpa[1] = coords[1] - m_coord1[1];
 
     // || e ||
-    NekDouble e_mod = sqrt(pow(e[0], 2) + pow(e[1], 2));
+    NekDouble e_mod = sqrt(e[0] * e[0] + e[1] * e[1]);
 
     // || e x (rp - ra) ||
     Array<OneD, NekDouble> exrpa(dim - 1, 0.0);
     exrpa[0] = e[0] * rpa[1] - e[1] * rpa[0];
 
-    NekDouble exrpa_mod = sqrt(pow(exrpa[0], 2));
+    NekDouble exrpa_mod = sqrt(exrpa[0] * exrpa[0]);
 
     d = exrpa_mod / e_mod;
     if (d >= m_radius)

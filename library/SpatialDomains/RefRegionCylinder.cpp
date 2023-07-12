@@ -90,7 +90,7 @@ bool RefRegionCylinder::v_Contains(const Array<OneD, NekDouble> &coords)
     rpa[2] = coords[2] - m_coord1[2];
 
     // || e ||
-    NekDouble e_mod = sqrt(pow(e[0], 2) + pow(e[1], 2) + pow(e[2], 2));
+    NekDouble e_mod = sqrt(e[0] * e[0] + e[1] * e[1] + e[2] * e[2]);
 
     // || e x (rp - ra) ||
     Array<OneD, NekDouble> exrpa(dim, 0.0);
@@ -99,7 +99,7 @@ bool RefRegionCylinder::v_Contains(const Array<OneD, NekDouble> &coords)
     exrpa[2] = e[0] * rpa[1] - e[1] * rpa[0];
 
     NekDouble exrpa_mod =
-        sqrt(pow(exrpa[0], 2) + pow(exrpa[1], 2) + pow(exrpa[2], 2));
+        sqrt(exrpa[0] * exrpa[0] + exrpa[1] * exrpa[1] + exrpa[2] * exrpa[2]);
 
     d = exrpa_mod / e_mod;
     if (d >= m_radius)
@@ -134,7 +134,7 @@ bool RefRegionCylinder::v_Contains(const Array<OneD, NekDouble> &coords)
     NekDouble wb = 0.0;
 
     // ||m||
-    NekDouble m_mod = sqrt(pow(m[0], 2) + pow(m[1], 2) + pow(m[2], 2));
+    NekDouble m_mod = sqrt(m[0] * m[0] + m[1] * m[1] + m[2] * m[2]);
     // m_mod > 0: condition
     ASSERTL0(m_mod, "The cylinder axis must not go through the origin");
 
@@ -144,7 +144,7 @@ bool RefRegionCylinder::v_Contains(const Array<OneD, NekDouble> &coords)
     rqxrb[1] = rq[2] * m_coord2[0] - rq[0] * m_coord2[2];
     rqxrb[2] = rq[0] * m_coord2[1] - rq[1] * m_coord2[0];
     NekDouble rqxrb_mod =
-        sqrt(pow(rqxrb[0], 2) + pow(rqxrb[1], 2) + pow(rqxrb[2], 2));
+        sqrt(rqxrb[0] * rqxrb[0] + rqxrb[1] * rqxrb[1] + rqxrb[2] * rqxrb[2]);
 
     // ||rq x ra||
     Array<OneD, NekDouble> rqxra(dim, 0.0);
@@ -152,7 +152,7 @@ bool RefRegionCylinder::v_Contains(const Array<OneD, NekDouble> &coords)
     rqxra[1] = rq[2] * m_coord1[0] - rq[0] * m_coord1[2];
     rqxra[2] = rq[0] * m_coord1[1] - rq[1] * m_coord1[0];
     NekDouble rqxra_mod =
-        sqrt(pow(rqxra[0], 2) + pow(rqxra[1], 2) + pow(rqxra[2], 2));
+        sqrt(rqxra[0] * rqxra[0] + rqxra[1] * rqxra[1] + rqxra[2] * rqxra[2]);
 
     // wa
     wa = rqxrb_mod / m_mod;
