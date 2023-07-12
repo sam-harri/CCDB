@@ -18,6 +18,7 @@ v5.4.0
 - Fix convergence error in Fixed-point Jacobi algorithm (!1561)
 - Update parallel-in-time code base in fieldconvert (!1565)
 - Remove unused function GetKey in NekFactory (!1567)
+- Add new functionality and code improvements for the local p-refinement (!1571)
 
 **CompressibleFlowSolver**
 - Fix AUSM3 Riemann solver and add tests to the CI (!1537)
