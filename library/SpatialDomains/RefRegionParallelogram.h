@@ -28,7 +28,7 @@
 //  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 //  DEALINGS IN THE SOFTWARE.
 //
-//  Description:
+//  Description: Parallelogram surface for the refinement region.
 //
 ////////////////////////////////////////////////////////////////////////////////
 
