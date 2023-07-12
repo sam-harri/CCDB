@@ -2626,12 +2626,12 @@ std::string MeshGraph::GetCompositeString(CompositeSharedPtr comp)
 }
 
 /**
- * @brief Refine the elements wihch has at least one vertex inside the
+ * @brief Refine the elements which has at least one vertex inside the
  *        surface region.
  *
  * @param expansionMap    shared pointer for the ExpansionInfoMap.
  * @param region          Object which holds the information provided by the
- * user. For example, the radius, coordinates, etc.
+ *                        user. For example, the radius, coordinates, etc.
  * @param geomVecIter     shared pointer for the Geometry.
  */
 void MeshGraph::PRefinementElmts(ExpansionInfoMapShPtr &expansionMap,
@@ -2721,6 +2721,8 @@ void MeshGraph::SetRefinementInfo(ExpansionInfoMapShPtr &expansionMap)
                     // the region.
                     if (region->first == pRefinement->first)
                     {
+                        // The geomVecIter corresponds the geometry information
+                        // of the composite to be refined.
                         PRefinementElmts(expansionMap, region->second,
                                          *geomVecIter);
                     }
@@ -2883,6 +2885,7 @@ void MeshGraph::ReadRefinementInfo()
                         case 3:
                         {
                             // Polymorphism of object
+                            // Instantiate RefRegionCylinder object
                             RefRegion *refInfo = new RefRegionCylinder(
                                 m_spaceDimension, radius, coord1Vector,
                                 coord2Vector, nModesVector, nPointsVector);

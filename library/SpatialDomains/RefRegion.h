@@ -62,7 +62,7 @@ public:
     /// Destructor
     SPATIAL_DOMAINS_EXPORT virtual ~RefRegion();
 
-    /// Pure virtual class
+    /// Pure virtual fuction
     SPATIAL_DOMAINS_EXPORT virtual bool v_Contains(
         const Array<OneD, NekDouble> &coords) = 0;
 
