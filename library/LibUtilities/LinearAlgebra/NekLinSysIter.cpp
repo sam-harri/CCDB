@@ -55,9 +55,9 @@ NekLinSysIterFactory &GetNekLinSysIterFactory()
 
 NekLinSysIter::NekLinSysIter(
     const LibUtilities::SessionReaderSharedPtr &pSession,
-    const LibUtilities::CommSharedPtr &vComm, const int nDimen,
+    const LibUtilities::CommSharedPtr &vRowComm, const int nDimen,
     const NekSysKey &pKey)
-    : NekSys(pSession, vComm, nDimen, pKey)
+    : NekSys(pSession, vRowComm, nDimen, pKey)
 {
     std::vector<std::string> variables(1);
     variables[0]    = pSession->GetVariable(0);
@@ -135,7 +135,7 @@ void NekLinSysIter::Set_Rhs_Magnitude(const NekVector<NekDouble> &pIn)
         vExchange =
             Vmath::Dot2(pIn.GetDimension(), &pIn[0], &pIn[0], &m_map[0]);
     }
-    m_Comm->AllReduce(vExchange, LibUtilities::ReduceSum);
+    m_rowComm->AllReduce(vExchange, LibUtilities::ReduceSum);
 
     // To ensure that very different rhs values are not being
     // used in subsequent solvers such as the velocit solve in
@@ -161,7 +161,7 @@ void NekLinSysIter::Set_Rhs_Magnitude(const Array<OneD, NekDouble> &pIn)
     Array<OneD, NekDouble> wk(pIn.size());
     m_operator.DoAssembleLoc(pIn, wk);
     vExchange[0] = Vmath::Dot(pIn.size(), wk, pIn);
-    m_Comm->AllReduce(vExchange, LibUtilities::ReduceSum);
+    m_rowComm->AllReduce(vExchange, LibUtilities::ReduceSum);
 
     // To ensure that very different rhs values are not being
     // used in subsequent solvers such as the velocit solve in

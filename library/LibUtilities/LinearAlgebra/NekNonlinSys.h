@@ -58,7 +58,7 @@ class NekNonlinSys : public NekSys
 public:
     LIB_UTILITIES_EXPORT NekNonlinSys(
         const LibUtilities::SessionReaderSharedPtr &pSession,
-        const LibUtilities::CommSharedPtr &vComm, const int nDimen,
+        const LibUtilities::CommSharedPtr &vRowComm, const int nDimen,
         const NekSysKey &pKey);
     LIB_UTILITIES_EXPORT ~NekNonlinSys();
 

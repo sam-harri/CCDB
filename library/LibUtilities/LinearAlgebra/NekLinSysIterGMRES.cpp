@@ -53,9 +53,9 @@ string NekLinSysIterGMRES::className =
 
 NekLinSysIterGMRES::NekLinSysIterGMRES(
     const LibUtilities::SessionReaderSharedPtr &pSession,
-    const LibUtilities::CommSharedPtr &vComm, const int nDimen,
+    const LibUtilities::CommSharedPtr &vRowComm, const int nDimen,
     const NekSysKey &pKey)
-    : NekLinSysIter(pSession, vComm, nDimen, pKey)
+    : NekLinSysIter(pSession, vRowComm, nDimen, pKey)
 {
     std::vector<std::string> variables(1);
     variables[0]    = pSession->GetVariable(0);
@@ -190,7 +190,7 @@ int NekLinSysIterGMRES::DoGMRES(const int nGlobal,
                      &r0[0] + nDir, 1);
         NekDouble vExchange = Vmath::Dot2(nNonDir, &r0[0] + nDir, &r0[0] + nDir,
                                           &m_map[0] + nDir);
-        m_Comm->AllReduce(vExchange, LibUtilities::ReduceSum);
+        m_rowComm->AllReduce(vExchange, LibUtilities::ReduceSum);
         NekDouble eps1 = vExchange;
 
         if (m_root)
@@ -298,7 +298,7 @@ NekDouble NekLinSysIterGMRES::DoGmresRestart(
     // The m_map tells how to connect
     vExchange =
         Vmath::Dot2(nNonDir, &r0[0] + nDir, &r0[0] + nDir, &m_map[0] + nDir);
-    m_Comm->AllReduce(vExchange, LibUtilities::ReduceSum);
+    m_rowComm->AllReduce(vExchange, LibUtilities::ReduceSum);
     eps = vExchange;
 
     // Detect zero input array
@@ -321,7 +321,7 @@ NekDouble NekLinSysIterGMRES::DoGmresRestart(
             // Evaluate initial residual error for exit check
             vExchange = Vmath::Dot2(nNonDir, &pInput[0] + nDir,
                                     &pInput[0] + nDir, &m_map[0] + nDir);
-            m_Comm->AllReduce(vExchange, LibUtilities::ReduceSum);
+            m_rowComm->AllReduce(vExchange, LibUtilities::ReduceSum);
             m_prec_factor = vExchange / eps;
         }
         else
@@ -497,7 +497,7 @@ void NekLinSysIterGMRES::DoArnoldi(const int starttem, const int endtem,
         vExchange =
             Vmath::Dot2(nNonDir, &w[0] + nDir, &V_local[numbertem][0] + nDir,
                         &m_map[0] + nDir);
-        m_Comm->AllReduce(vExchange, LibUtilities::ReduceSum);
+        m_rowComm->AllReduce(vExchange, LibUtilities::ReduceSum);
 
         hsingle[i] = vExchange;
 
@@ -512,7 +512,7 @@ void NekLinSysIterGMRES::DoArnoldi(const int starttem, const int endtem,
     vExchange =
         Vmath::Dot2(nNonDir, &w[0] + nDir, &w[0] + nDir, &m_map[0] + nDir);
 
-    m_Comm->AllReduce(vExchange, LibUtilities::ReduceSum);
+    m_rowComm->AllReduce(vExchange, LibUtilities::ReduceSum);
 
     hsingle[endtem] = sqrt(vExchange);
 

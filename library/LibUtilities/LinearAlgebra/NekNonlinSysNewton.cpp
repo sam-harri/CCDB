@@ -53,9 +53,9 @@ string NekNonlinSysNewton::className =
 
 NekNonlinSysNewton::NekNonlinSysNewton(
     const LibUtilities::SessionReaderSharedPtr &pSession,
-    const LibUtilities::CommSharedPtr &vComm, const int nscale,
+    const LibUtilities::CommSharedPtr &vRowComm, const int nscale,
     const NekSysKey &pKey)
-    : NekNonlinSys(pSession, vComm, nscale, pKey)
+    : NekNonlinSys(pSession, vRowComm, nscale, pKey)
 {
 }
 
@@ -138,7 +138,7 @@ bool NekNonlinSysNewton::v_ConvergenceCheck(
     int ntotal         = Residual.size();
 
     m_SysResNorm = Vmath::Dot(ntotal, Residual, Residual);
-    m_Comm->AllReduce(m_SysResNorm, Nektar::LibUtilities::ReduceSum);
+    m_rowComm->AllReduce(m_SysResNorm, Nektar::LibUtilities::ReduceSum);
 
     if (nIteration == 0)
     {

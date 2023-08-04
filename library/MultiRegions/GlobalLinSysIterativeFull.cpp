@@ -270,7 +270,7 @@ void GlobalLinSysIterativeFull::v_SolveLinearSystem(
 
     if (!m_linsol)
     {
-        LibUtilities::CommSharedPtr vComm =
+        LibUtilities::CommSharedPtr vRowComm =
             m_expList.lock()->GetComm()->GetRowComm();
         LibUtilities::SessionReaderSharedPtr pSession =
             m_expList.lock()->GetSession();
@@ -281,7 +281,7 @@ void GlobalLinSysIterativeFull::v_SolveLinearSystem(
                  "NekLinSysIter '" + m_linSysIterSolver +
                      "' is not defined.\n");
         m_linsol = LibUtilities::GetNekLinSysIterFactory().CreateInstance(
-            m_linSysIterSolver, pSession, vComm, nGlobal - nDir,
+            m_linSysIterSolver, pSession, vRowComm, nGlobal - nDir,
             LibUtilities::NekSysKey());
 
         m_linsol->SetSysOperators(m_NekSysOp);

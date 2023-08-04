@@ -48,17 +48,17 @@ namespace LibUtilities
  */
 
 NekSys::NekSys(const LibUtilities::SessionReaderSharedPtr &pSession,
-               const LibUtilities::CommSharedPtr &vComm, const int nDimen,
+               const LibUtilities::CommSharedPtr &vRowComm, const int nDimen,
                const NekSysKey &pKey)
 {
     m_tolerance = pKey.m_Tolerance;
     m_verbose   = false;
     m_root      = false;
-    m_Comm      = vComm;
+    m_rowComm   = vRowComm;
 
     m_FlagWarnings = true;
 
-    if (0 == m_Comm->GetRank())
+    if (0 == m_rowComm->GetRank())
     {
         m_root = true;
     }
@@ -82,7 +82,7 @@ bool NekSys::v_ConvergenceCheck(const int nIteration,
     boost::ignore_unused(nIteration);
 
     NekDouble SysResNorm = Vmath::Dot(ntotal, Residual, Residual);
-    m_Comm->AllReduce(SysResNorm, Nektar::LibUtilities::ReduceSum);
+    m_rowComm->AllReduce(SysResNorm, Nektar::LibUtilities::ReduceSum);
 
     if (SysResNorm < tol * tol)
     {

@@ -54,9 +54,9 @@ string NekLinSysIterFixedpointJacobi::className =
 
 NekLinSysIterFixedpointJacobi::NekLinSysIterFixedpointJacobi(
     const LibUtilities::SessionReaderSharedPtr &pSession,
-    const LibUtilities::CommSharedPtr &vComm, const int nDimen,
+    const LibUtilities::CommSharedPtr &vRowComm, const int nDimen,
     const NekSysKey &pKey)
-    : NekLinSysIter(pSession, vComm, nDimen, pKey)
+    : NekLinSysIter(pSession, vRowComm, nDimen, pKey)
 {
 }
 

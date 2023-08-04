@@ -61,17 +61,17 @@ public:
 
     LIB_UTILITIES_EXPORT static NekLinSysIterSharedPtr CreateInstance(
         const LibUtilities::SessionReaderSharedPtr &pSession,
-        const LibUtilities::CommSharedPtr &vComm, const int nDimen,
+        const LibUtilities::CommSharedPtr &vRowComm, const int nDimen,
         const NekSysKey &pKey)
     {
         NekLinSysIterSharedPtr p =
-            MemoryManager<NekLinSysIter>::AllocateSharedPtr(pSession, vComm,
+            MemoryManager<NekLinSysIter>::AllocateSharedPtr(pSession, vRowComm,
                                                             nDimen, pKey);
         return p;
     }
     LIB_UTILITIES_EXPORT NekLinSysIter(
         const LibUtilities::SessionReaderSharedPtr &pSession,
-        const LibUtilities::CommSharedPtr &vComm, const int nDimen,
+        const LibUtilities::CommSharedPtr &vRowComm, const int nDimen,
         const NekSysKey &pKey);
     LIB_UTILITIES_EXPORT virtual ~NekLinSysIter();
 
