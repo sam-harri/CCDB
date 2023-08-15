@@ -74,23 +74,6 @@ public:
     Array<OneD, NekDouble> GetStabilityLimitVector(
         const Array<OneD, int> &ExpOrder);
 
-    virtual void v_GetPressure(
-        const Array<OneD, const Array<OneD, NekDouble>> &physfield,
-        Array<OneD, NekDouble> &pressure) override;
-
-    virtual void v_GetDensity(
-        const Array<OneD, const Array<OneD, NekDouble>> &physfield,
-        Array<OneD, NekDouble> &density) override;
-
-    virtual bool v_HasConstantDensity() override
-    {
-        return false;
-    }
-
-    virtual void v_GetVelocity(
-        const Array<OneD, const Array<OneD, NekDouble>> &physfield,
-        Array<OneD, Array<OneD, NekDouble>> &velocity) override;
-
 protected:
     SolverUtils::DiffusionSharedPtr m_diffusion;
     ArtificialDiffusionSharedPtr m_artificialDiffusion;
@@ -128,6 +111,23 @@ protected:
                            const SpatialDomains::MeshGraphSharedPtr &pGraph);
 
     virtual void v_InitObject(bool DeclareFields = true) override;
+
+    virtual void v_GetPressure(
+        const Array<OneD, const Array<OneD, NekDouble>> &physfield,
+        Array<OneD, NekDouble> &pressure) override;
+
+    virtual void v_GetDensity(
+        const Array<OneD, const Array<OneD, NekDouble>> &physfield,
+        Array<OneD, NekDouble> &density) override;
+
+    virtual bool v_HasConstantDensity() override
+    {
+        return false;
+    }
+
+    virtual void v_GetVelocity(
+        const Array<OneD, const Array<OneD, NekDouble>> &physfield,
+        Array<OneD, Array<OneD, NekDouble>> &velocity) override;
 
     void InitialiseParameters();
 
