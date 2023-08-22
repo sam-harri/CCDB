@@ -314,11 +314,14 @@ void UnsteadyAdvectionDiffusion::DoOdeProjection(
         case MultiRegions::eDiscontinuous:
         {
             // Just copy over array
-            int npoints = GetNpoints();
-
-            for (i = 0; i < nvariables; ++i)
+            if (inarray != outarray)
             {
-                Vmath::Vcopy(npoints, inarray[i], 1, outarray[i], 1);
+                int npoints = GetNpoints();
+
+                for (i = 0; i < nvariables; ++i)
+                {
+                    Vmath::Vcopy(npoints, inarray[i], 1, outarray[i], 1);
+                }
             }
             break;
         }
@@ -532,8 +535,7 @@ void UnsteadyAdvectionDiffusion::SubStepAdvance(int nstep, NekDouble time)
 
         for (n = 0; n < nsubsteps; ++n)
         {
-            fields = m_subStepIntegrationScheme->TimeIntegrate(
-                n, dt, m_subStepIntegrationOps);
+            fields = m_subStepIntegrationScheme->TimeIntegrate(n, dt);
         }
 
         // Reset time integrated solution in m_intScheme

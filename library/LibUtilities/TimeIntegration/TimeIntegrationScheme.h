@@ -114,12 +114,12 @@ public:
     /**
      * \brief Gets the solution vector of the ODE
      */
-    const TripleArray &GetSolutionVector() const
+    LUE const TripleArray &GetSolutionVector() const
     {
         return v_GetSolutionVector();
     }
 
-    TripleArray &UpdateSolutionVector()
+    LUE TripleArray &UpdateSolutionVector()
     {
         return v_UpdateSolutionVector();
     }
@@ -127,7 +127,7 @@ public:
     /**
      * \brief Sets the solution vector of the ODE
      */
-    void SetSolutionVector(const size_t Offset, const DoubleArray &y)
+    LUE void SetSolutionVector(const size_t Offset, const DoubleArray &y)
     {
         v_SetSolutionVector(Offset, y);
     }
@@ -164,11 +164,10 @@ public:
         v_InitializeScheme(deltaT, y_0, time, op);
     }
 
-    LUE ConstDoubleArray &TimeIntegrate(
-        const size_t timestep, const NekDouble delta_t,
-        const TimeIntegrationSchemeOperators &op)
+    LUE ConstDoubleArray &TimeIntegrate(const size_t timestep,
+                                        const NekDouble delta_t)
     {
-        return v_TimeIntegrate(timestep, delta_t, op);
+        return v_TimeIntegrate(timestep, delta_t);
     }
 
     LUE void print(std::ostream &os) const
@@ -193,21 +192,20 @@ protected:
     LUE virtual size_t v_GetOrder() const                      = 0;
     LUE virtual std::vector<NekDouble> v_GetFreeParams() const = 0;
     LUE virtual TimeIntegrationSchemeType v_GetIntegrationSchemeType()
-        const                                              = 0;
-    LUE virtual NekDouble v_GetTimeStability() const       = 0;
-    LUE virtual size_t v_GetNumIntegrationPhases() const   = 0;
-    virtual const TripleArray &v_GetSolutionVector() const = 0;
-    virtual TripleArray &v_UpdateSolutionVector()          = 0;
-    virtual void v_SetSolutionVector(const size_t Offset,
-                                     const DoubleArray &y) = 0;
+        const                                                  = 0;
+    LUE virtual NekDouble v_GetTimeStability() const           = 0;
+    LUE virtual size_t v_GetNumIntegrationPhases() const       = 0;
+    LUE virtual const TripleArray &v_GetSolutionVector() const = 0;
+    LUE virtual TripleArray &v_UpdateSolutionVector()          = 0;
+    LUE virtual void v_SetSolutionVector(const size_t Offset,
+                                         const DoubleArray &y) = 0;
     LUE virtual void v_InitializeScheme(
         const NekDouble deltaT, ConstDoubleArray &y_0, const NekDouble time,
-        const TimeIntegrationSchemeOperators &op) = 0;
-    LUE virtual ConstDoubleArray &v_TimeIntegrate(
-        const size_t timestep, const NekDouble delta_t,
-        const TimeIntegrationSchemeOperators &op)        = 0;
-    LUE virtual void v_print(std::ostream &os) const     = 0;
-    LUE virtual void v_printFull(std::ostream &os) const = 0;
+        const TimeIntegrationSchemeOperators &op)                          = 0;
+    LUE virtual ConstDoubleArray &v_TimeIntegrate(const size_t timestep,
+                                                  const NekDouble delta_t) = 0;
+    LUE virtual void v_print(std::ostream &os) const                       = 0;
+    LUE virtual void v_printFull(std::ostream &os) const                   = 0;
 
     // These methods should never be used directly, only used by child classes.
     LUE TimeIntegrationScheme(std::string variant, size_t order,
@@ -216,14 +214,7 @@ protected:
         boost::ignore_unused(variant, order, freeParams);
     }
 
-    LUE TimeIntegrationScheme(const TimeIntegrationScheme &in)
-    {
-        boost::ignore_unused(in);
-
-        NEKERROR(ErrorUtil::efatal, "Copy Constructor for the "
-                                    "TimeIntegrationScheme class should not be "
-                                    "called");
-    }
+    LUE TimeIntegrationScheme(const TimeIntegrationScheme &in) = delete;
 
     virtual ~TimeIntegrationScheme()
     {
@@ -233,7 +224,6 @@ protected:
 
 LUE std::ostream &operator<<(std::ostream &os,
                              const TimeIntegrationScheme &rhs);
-
 LUE std::ostream &operator<<(std::ostream &os,
                              const TimeIntegrationSchemeSharedPtr &rhs);
 

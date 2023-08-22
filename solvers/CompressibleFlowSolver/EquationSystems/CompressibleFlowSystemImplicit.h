@@ -101,8 +101,15 @@ protected:
 
     int m_nPadding = 1;
 
+    /// Estimate the magnitude of each conserved varibles
+    Array<OneD, NekDouble> m_magnitdEstimat;
+
     Array<OneD, Array<OneD, NekDouble>> m_solutionPhys;
 
+    /// coefff of spacial derivatives(rhs or m_F in GLM) in calculating the
+    /// residual of the whole equation(used in unsteady time integrations)
+    NekDouble m_TimeIntegLambda = 0.0;
+    NekDouble m_inArrayNorm     = -1.0;
     NekDouble m_jacobiFreeEps;
     NekDouble m_newtonAbsoluteIteTol;
 
@@ -111,7 +118,7 @@ protected:
 
     LibUtilities::NekNonlinSysSharedPtr m_nonlinsol;
 
-    PreconCfsOpSharedPtr m_preconCfs;
+    PreconCfsSharedPtr m_preconCfs;
 
     // flag to update shock capturing artificial viscosity. this flag is
     // switched on/off in DoImplicitSolve() to ensure that the AV is only

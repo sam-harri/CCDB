@@ -35,7 +35,7 @@
 #include <IncNavierStokesSolver/EquationSystems/IncNavierStokes.h>
 #include <MultiRegions/ExpList.h>
 #include <MultiRegions/GlobalLinSysKey.h>
-#include <SolverUtils/Driver.h>
+#include <SolverUtils/DriverModifiedArnoldi.h>
 #include <VortexWaveInteraction/VortexWaveInteraction.h>
 
 using namespace std;
@@ -548,8 +548,10 @@ void VortexWaveInteraction::ExecuteWave(void)
     std::string vDriverModule;
     m_sessionWave->LoadSolverInfo("Driver", vDriverModule, "ModifiedArnoldi");
     cout << "Setting up linearised NS Solver" << endl;
-    DriverSharedPtr solverWave = GetDriverFactory().CreateInstance(
-        vDriverModule, m_sessionWave, m_graphWave);
+    std::shared_ptr<DriverArnoldi> solverWave =
+        std::dynamic_pointer_cast<SolverUtils::DriverArnoldi>(
+            GetDriverFactory().CreateInstance(vDriverModule, m_sessionWave,
+                                              m_graphWave));
 
     /// Do linearised NavierStokes Session  with Modified Arnoldi
     cout << "Executing wave solution " << endl;
@@ -2052,9 +2054,7 @@ Array<OneD, int> VortexWaveInteraction::GetReflectionIndex(void)
     //-> Dermine the point which is on coordinate (x -> -x + Lx/2, y-> -y)
     m_waveVelocities[0]->GetPlane(0)->GetCoords(coord_x, coord_y);
     NekDouble xmax = Vmath::Vmax(npts, coord_x, 1);
-    // NekDouble tol =
-    // NekConstants::kGeomFactorsTol*NekConstants::kGeomFactorsTol;
-    NekDouble tol = 1e-5;
+    NekDouble tol  = 1e-5;
     NekDouble xnew, ynew;
 
     int start = npts - 1;

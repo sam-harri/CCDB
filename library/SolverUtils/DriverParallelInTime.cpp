@@ -42,6 +42,7 @@ namespace Nektar
 {
 namespace SolverUtils
 {
+
 /**
  *
  */
@@ -66,29 +67,12 @@ void DriverParallelInTime::v_InitObject(std::ostream &out)
 {
     try
     {
-        // Retrieve the equation system to solve.
-        ASSERTL0(m_session->DefinesSolverInfo("EqType"),
-                 "EqType SolverInfo tag must be defined.");
-        std::string vEquation = m_session->GetSolverInfo("EqType");
-        if (m_session->DefinesSolverInfo("SolverType"))
-        {
-            vEquation = m_session->GetSolverInfo("SolverType");
-        }
-
-        // Check such a module exists for this equation.
-        ASSERTL0(
-            GetEquationSystemFactory().ModuleExists(vEquation),
-            "EquationSystem '" + vEquation +
-                "' is not defined.\n"
-                "Ensure equation name is correct and module is compiled.\n");
-
         // Retrieve the type of evolution operator to use
-        /// @todo At the moment this is Navier-Stokes specific - generalise?
         m_EvolutionOperator =
             m_session->GetSolverInfoAsEnum<EvolutionOperatorType>(
                 "EvolutionOperator");
 
-        m_nequ = 2;
+        m_nequ = 2; // Only two time levels currently implemented.
 
         m_equ = Array<OneD, EquationSystemSharedPtr>(m_nequ);
 
@@ -96,68 +80,16 @@ void DriverParallelInTime::v_InitObject(std::ostream &out)
         switch (m_EvolutionOperator)
         {
             case eNonlinear:
-                // Set coarse parallel-in-time session file.
-                SetParallelInTimeSessionFile();
-
-                // Set fine parallel-in-time solver.
-                m_session->SetTag("AdvectiveType", "Convective");
-                m_session->SetTag("ParallelInTimeSolver", "FineSolver");
-                m_equ[0] = GetEquationSystemFactory().CreateInstance(
-                    vEquation, m_session, m_graph);
-
-                // Set coarse parallel-in-time solver.
-                m_sessionCoarse->SetTag("AdvectiveType", "Convective");
-                m_sessionCoarse->SetTag("ParallelInTimeSolver", "CoarseSolver");
-                m_equ[1] = GetEquationSystemFactory().CreateInstance(
-                    vEquation, m_sessionCoarse, m_graphCoarse);
+                SetParallelInTimeEquationSystem("Convective");
                 break;
             case eDirect:
-                // Set coarse parallel-in-time session file.
-                SetParallelInTimeSessionFile();
-
-                // Set fine parallel-in-time solver.
-                m_session->SetTag("AdvectiveType", "Linearised");
-                m_session->SetTag("ParallelInTimeSolver", "FineSolver");
-                m_equ[0] = GetEquationSystemFactory().CreateInstance(
-                    vEquation, m_session, m_graph);
-
-                // Set coarse parallel-in-time solver.
-                m_sessionCoarse->SetTag("AdvectiveType", "Linearised");
-                m_sessionCoarse->SetTag("ParallelInTimeSolver", "CoarseSolver");
-                m_equ[1] = GetEquationSystemFactory().CreateInstance(
-                    vEquation, m_sessionCoarse, m_graphCoarse);
+                SetParallelInTimeEquationSystem("Linearised");
                 break;
             case eAdjoint:
-                // Set coarse parallel-in-time session file.
-                SetParallelInTimeSessionFile();
-
-                // Set fine parallel-in-time solver.
-                m_session->SetTag("AdvectiveType", "Adjoint");
-                m_session->SetTag("ParallelInTimeSolver", "FineSolver");
-                m_equ[0] = GetEquationSystemFactory().CreateInstance(
-                    vEquation, m_session, m_graph);
-
-                // Set coarse parallel-in-time solver.
-                m_sessionCoarse->SetTag("AdvectiveType", "Adjoint");
-                m_sessionCoarse->SetTag("ParallelInTimeSolver", "CoarseSolver");
-                m_equ[1] = GetEquationSystemFactory().CreateInstance(
-                    vEquation, m_sessionCoarse, m_graphCoarse);
+                SetParallelInTimeEquationSystem("Adjoint");
                 break;
             case eSkewSymmetric:
-                // Set coarse parallel-in-time session file.
-                SetParallelInTimeSessionFile();
-
-                // Set fine parallel-in-time solver.
-                m_session->SetTag("AdvectiveType", "SkewSymmetric");
-                m_session->SetTag("ParallelInTimeSolver", "FineSolver");
-                m_equ[0] = GetEquationSystemFactory().CreateInstance(
-                    vEquation, m_session, m_graph);
-
-                // Set coarse parallel-in-time solver.
-                m_sessionCoarse->SetTag("AdvectiveType", "SkewSymmetric");
-                m_sessionCoarse->SetTag("ParallelInTimeSolver", "CoarseSolver");
-                m_equ[1] = GetEquationSystemFactory().CreateInstance(
-                    vEquation, m_sessionCoarse, m_graphCoarse);
+                SetParallelInTimeEquationSystem("SkewSymmetric");
                 break;
             default:
                 ASSERTL0(false, "Unrecognised evolution operator.");
@@ -176,6 +108,9 @@ void DriverParallelInTime::v_InitObject(std::ostream &out)
     }
 }
 
+/**
+ *
+ */
 void DriverParallelInTime::v_Execute(std::ostream &out)
 {
     boost::ignore_unused(out);
@@ -261,31 +196,30 @@ NekDouble DriverParallelInTime::v_ComputeSpeedUp(
     return 0.0;
 }
 
-/// Set the ParallelInTime (coarse solver) session file
-void DriverParallelInTime::SetParallelInTimeSessionFile(void)
+/**
+ * Set the ParallelInTime (coarse solver) session file
+ */
+void DriverParallelInTime::SetParallelInTimeEquationSystem(
+    std::string AdvectiveType)
 {
-    // Get the coarse solver session file.
-    std::string meshFile;
-    std::string coarseSolverFile;
-    std::vector<std::string> coarseSolverFilenames;
-    bool opt         = (m_session->GetFilenames()[0].substr(
-                    m_session->GetFilenames()[0].size() - 3) == "opt");
-    meshFile         = m_session->GetFilenames()[0 + opt];
-    coarseSolverFile = m_session->GetFilenames().size() > 1 + opt
-                           ? m_session->GetFilenames()[1 + opt]
-                           : m_session->GetFilenames()[0 + opt];
-    coarseSolverFile = coarseSolverFile.substr(0, coarseSolverFile.size() - 4);
-    coarseSolverFile += "_coarseSolver.xml";
-    std::ifstream f(coarseSolverFile);
+    // Retrieve the equation system to solve.
+    ASSERTL0(m_session->DefinesSolverInfo("EqType"),
+             "EqType SolverInfo tag must be defined.");
+    std::string vEquation = m_session->DefinesSolverInfo("SolverType")
+                                ? m_session->GetSolverInfo("SolverType")
+                                : m_session->GetSolverInfo("EqType");
 
-    ASSERTL0(f.good(), "Coarse solver xml file not provided!");
+    // Check such a module exists for this equation.
+    ASSERTL0(GetEquationSystemFactory().ModuleExists(vEquation),
+             "EquationSystem '" + vEquation +
+                 "' is not defined.\n"
+                 "Ensure equation name is correct and module is compiled.\n");
 
-    // if _coarseSolver.xml exit, read session file
-    if (m_session->GetFilenames().size() > 1 + opt)
-    {
-        coarseSolverFilenames.push_back(meshFile);
-    }
-    coarseSolverFilenames.push_back(coarseSolverFile);
+    // Set fine parallel-in-time solver.
+    m_session->SetTag("AdvectiveType", AdvectiveType);
+    m_session->SetTag("ParallelInTimeSolver", "TimeLevel0");
+    m_equ[0] = GetEquationSystemFactory().CreateInstance(vEquation, m_session,
+                                                         m_graph);
 
     // Define argument for the coarse parallel-in-time solver.
     int npx = m_session->DefinesCmdLineArgument("npx")
@@ -310,6 +244,7 @@ void DriverParallelInTime::SetParallelInTimeSessionFile(void)
     std::string npz_string = std::to_string(npz);
     std::string nsz_string = std::to_string(nsz);
     std::string npt_string = std::to_string(npt);
+    std::string optfile    = m_session->GetSessionName() + ".opt";
 
     char *argv[] = {const_cast<char *>("Solver"), // this is just a place holder
                     const_cast<char *>("--npx"),
@@ -322,20 +257,49 @@ void DriverParallelInTime::SetParallelInTimeSessionFile(void)
                     const_cast<char *>(nsz_string.c_str()),
                     const_cast<char *>("--npt"),
                     const_cast<char *>(npt_string.c_str()),
+                    const_cast<char *>("--useoptfile"),
+                    const_cast<char *>(optfile.c_str()),
                     nullptr};
 
+    int argc = m_session->DefinesCmdLineArgument("useoptfile") ? 11 : 13;
+
     // Set session for coarse solver.
-    m_sessionCoarse = LibUtilities::SessionReader::CreateInstance(
-        11, argv, coarseSolverFilenames, m_session->GetComm());
+    std::vector<std::string> sessionFileNames(m_session->GetFilenames());
+    for (size_t timeLevel = 1; timeLevel < m_nequ; timeLevel++)
+    {
+        auto session = LibUtilities::SessionReader::CreateInstance(
+            argc, argv, sessionFileNames, m_session->GetComm(), timeLevel);
 
-    // Set graph for coarse solver.
-    m_graphCoarse = SpatialDomains::MeshGraph::Read(m_sessionCoarse);
+        // Set graph for coarse solver.
+        auto graph = SpatialDomains::MeshGraph::Read(session);
 
-    // Set BndRegionOrdering (necessary for DG with periodic BC) FIXME
-    m_graphCoarse->SetBndRegionOrdering(m_graph->GetBndRegionOrdering());
+        // Set BndRegionOrdering (necessary for DG with periodic BC) FIXME
+        graph->SetBndRegionOrdering(m_graph->GetBndRegionOrdering());
 
-    // Set CompositeOrdering (necessary for DG with periodic BC) FIXME
-    m_graphCoarse->SetCompositeOrdering(m_graph->GetCompositeOrdering());
+        // Set CompositeOrdering (necessary for DG with periodic BC) FIXME
+        graph->SetCompositeOrdering(m_graph->GetCompositeOrdering());
+
+        // Retrieve the equation system to solve.
+        ASSERTL0(session->DefinesSolverInfo("EqType"),
+                 "EqType SolverInfo tag must be defined.");
+        auto vEquation = session->DefinesSolverInfo("SolverType")
+                             ? session->GetSolverInfo("SolverType")
+                             : session->GetSolverInfo("EqType");
+
+        // Check such a module exists for this equation.
+        ASSERTL0(
+            GetEquationSystemFactory().ModuleExists(vEquation),
+            "EquationSystem '" + vEquation +
+                "' is not defined.\n"
+                "Ensure equation name is correct and module is compiled.\n");
+
+        // Set coarse parallel-in-time solver.
+        session->SetTag("AdvectiveType", AdvectiveType);
+        session->SetTag("ParallelInTimeSolver",
+                        "TimeLevel" + std::to_string(timeLevel));
+        m_equ[timeLevel] = GetEquationSystemFactory().CreateInstance(
+            vEquation, session, graph);
+    }
 }
 
 /**
@@ -351,14 +315,14 @@ void DriverParallelInTime::GetParametersFromSession(void)
                           : m_numWindowsPIT;
 
     // Time stepping parameters.
-    m_fineTimeStep   = m_session->GetParameter("TimeStep");
-    m_coarseTimeStep = m_sessionCoarse->GetParameter("TimeStep");
-    m_fineSteps      = m_session->GetParameter("NumSteps");
-    m_coarseSteps    = m_sessionCoarse->GetParameter("NumSteps");
+    m_fineTimeStep   = m_equ[0]->GetTimeStep();
+    m_coarseTimeStep = m_equ[1]->GetTimeStep();
+    m_fineSteps      = m_equ[0]->GetSteps();
+    m_coarseSteps    = m_equ[1]->GetSteps();
 
     // I/O parameters.
-    m_infoSteps  = m_session->GetParameter("IO_InfoSteps");
-    m_checkSteps = m_session->GetParameter("IO_CheckSteps");
+    m_infoSteps  = m_fineEqSys->GetInfoSteps();
+    m_checkSteps = m_fineEqSys->GetCheckpointSteps();
 
     // Other parameters.
     m_exactSolution = m_session->DefinesParameter("ExactSolution")
@@ -366,6 +330,9 @@ void DriverParallelInTime::GetParametersFromSession(void)
                           : m_exactSolution;
 }
 
+/**
+ *
+ */
 void DriverParallelInTime::InitialiseEqSystem(bool turnoff_output)
 {
     // Initialize fine solver.
@@ -679,6 +646,9 @@ void DriverParallelInTime::SolutionConvergenceMonitoring(
     PrintComputationalTime(CPUtime);
 }
 
+/**
+ *
+ */
 void DriverParallelInTime::SolutionConvergenceSummary(const NekDouble &CPUtime)
 {
     UpdateErrorNorm(false);
@@ -764,7 +734,7 @@ void DriverParallelInTime::Interpolator(
             m_fineFields[i]->UpdatePhys()   = inarray[i];
             m_coarseFields[i]->UpdatePhys() = outarray[i];
         }
-        m_interp.InterpExp1ToExp2(m_fineFields, m_coarseFields);
+        InterpExp1ToExp2(m_fineFields, m_coarseFields);
     }
     // Interpolate from coarse to fine
     else
@@ -774,7 +744,7 @@ void DriverParallelInTime::Interpolator(
             m_coarseFields[i]->UpdatePhys() = inarray[i];
             m_fineFields[i]->UpdatePhys()   = outarray[i];
         }
-        m_interp.InterpExp1ToExp2(m_coarseFields, m_fineFields);
+        InterpExp1ToExp2(m_coarseFields, m_fineFields);
     }
 }
 
@@ -918,6 +888,74 @@ NekDouble DriverParallelInTime::EstimateCommunicationTime(
         }
         timer.Stop();
         return timer.Elapsed().count() / niter;
+    }
+}
+
+/**
+ *
+ */
+void InterpExp1ToExp2(const Array<OneD, MultiRegions::ExpListSharedPtr> exp1,
+                      Array<OneD, MultiRegions::ExpListSharedPtr> &exp2)
+{
+
+    // Interpolation from exp1 -> exp2 assuming that exp1 and exp2 are the
+    // same explists, but at potentially different polynomial orders.
+    if (exp1.size() != exp2.size())
+    {
+        NEKERROR(ErrorUtil::efatal, "not the same mesh")
+    }
+
+    for (int n = 0; n < exp1.size(); ++n)
+    {
+        // Interpolation from exp1 -> exp2 assuming that exp1 and exp2 are the
+        // same explists, but at potentially different polynomial orders.
+        if (exp1[n]->GetExpSize() != exp2[n]->GetExpSize())
+        {
+            NEKERROR(ErrorUtil::efatal, "not the same mesh")
+        }
+
+        // If same polynomial orders, simply copy solution
+        if (exp1[n]->GetTotPoints() == exp2[n]->GetTotPoints())
+        {
+            Vmath::Vcopy(exp1[n]->GetTotPoints(), exp1[n]->GetPhys(), 1,
+                         exp2[n]->UpdatePhys(), 1);
+        }
+        // If different polynomial orders, interpolate solution
+        else
+        {
+            // Transform solution from physical to coefficient space
+            exp1[n]->FwdTrans(exp1[n]->GetPhys(), exp1[n]->UpdateCoeffs());
+
+            for (int i = 0; i < exp1[n]->GetExpSize(); ++i)
+            {
+                // Get the elements
+                LocalRegions::ExpansionSharedPtr elmt1 = exp1[n]->GetExp(i),
+                                                 elmt2 = exp2[n]->GetExp(i);
+
+                // Get the offset of elements in the storage arrays.
+                int offset1 = exp1[n]->GetCoeff_Offset(i);
+                int offset2 = exp2[n]->GetCoeff_Offset(i);
+
+                // Get number of modes
+                Array<OneD, LibUtilities::BasisSharedPtr> base1 =
+                    elmt1->GetBase();
+                std::vector<unsigned int> nummodes1(base1.size());
+                std::vector<LibUtilities::BasisType> btype1(base1.size());
+                for (int j = 0; j < nummodes1.size(); ++j)
+                {
+                    nummodes1[j] = base1[j]->GetNumModes();
+                    btype1[j]    = base1[j]->GetBasisType();
+                }
+
+                // Extract data from exp1 -> exp2.
+                elmt2->ExtractDataToCoeffs(
+                    &exp1[n]->GetCoeffs()[offset1], nummodes1, 0,
+                    &exp2[n]->UpdateCoeffs()[offset2], btype1);
+            }
+
+            // Transform solution back to physical space
+            exp2[n]->BwdTrans(exp2[n]->GetCoeffs(), exp2[n]->UpdatePhys());
+        }
     }
 }
 

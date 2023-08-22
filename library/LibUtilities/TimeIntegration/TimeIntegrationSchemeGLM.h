@@ -73,19 +73,19 @@ protected:
     LUE virtual size_t v_GetNumIntegrationPhases() const override;
 
     // Gets the solution Vector
-    virtual const TripleArray &v_GetSolutionVector() const override
+    LUE virtual const TripleArray &v_GetSolutionVector() const override
     {
         return m_solVector->GetSolutionVector();
     }
 
-    virtual TripleArray &v_UpdateSolutionVector() override
+    LUE virtual TripleArray &v_UpdateSolutionVector() override
     {
         return m_solVector->UpdateSolutionVector();
     }
 
     // Sets the solution Vector
-    virtual void v_SetSolutionVector(const size_t Offset,
-                                     const DoubleArray &y) override
+    LUE virtual void v_SetSolutionVector(const size_t Offset,
+                                         const DoubleArray &y) override
     {
         m_solVector->SetSolutionVector(Offset, y);
     }
@@ -96,8 +96,7 @@ protected:
         const TimeIntegrationSchemeOperators &op) override;
 
     LUE virtual ConstDoubleArray &v_TimeIntegrate(
-        const size_t timestep, const NekDouble delta_t,
-        const TimeIntegrationSchemeOperators &op) override;
+        const size_t timestep, const NekDouble delta_t) override;
 
     LUE virtual void v_InitializeSecondaryData(
         TimeIntegrationAlgorithmGLM *phase, NekDouble deltaT) const;

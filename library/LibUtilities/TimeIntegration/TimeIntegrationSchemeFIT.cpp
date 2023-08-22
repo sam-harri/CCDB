@@ -62,7 +62,7 @@ FractionalInTimeIntegrationScheme::FractionalInTimeIntegrationScheme(
     m_freeParams = freeParams;
 
     // Currently up to 4th order is implemented.
-    ASSERTL1(0 < order && order <= 4,
+    ASSERTL1(1 <= order && order <= 4,
              "FractionalInTime Time integration scheme bad order: " +
                  std::to_string(order));
 
@@ -103,8 +103,7 @@ void FractionalInTimeIntegrationScheme::v_InitializeScheme(
     const TimeIntegrationSchemeOperators &op)
 
 {
-    boost::ignore_unused(op);
-
+    m_op      = op;
     m_nvars   = y_0.size();
     m_npoints = y_0[0].size();
 
@@ -118,9 +117,10 @@ void FractionalInTimeIntegrationScheme::v_InitializeScheme(
     m_Lmax = computeL(m_base, m_maxTimeSteps) + 2;
 
     // Demarcation integers - one array that is re-used
-    m_qml = Array<OneD, int>(m_Lmax - 1, 0);
+    m_qml = Array<OneD, size_t>(m_Lmax - 1, size_t(0));
+
     // Demarcation interval markers - one array that is re-used
-    m_taus = Array<OneD, int>(m_Lmax + 1, 0);
+    m_taus = Array<OneD, size_t>(m_Lmax + 1, size_t(0));
 
     // Storage of the initial values.
     m_u0 = y_0;
@@ -279,8 +279,7 @@ void FractionalInTimeIntegrationScheme::v_InitializeScheme(
  * @brief Worker method that performs the time integration.
  */
 ConstDoubleArray &FractionalInTimeIntegrationScheme::v_TimeIntegrate(
-    const size_t timestep, const NekDouble delta_t,
-    const TimeIntegrationSchemeOperators &op)
+    const size_t timestep, const NekDouble delta_t)
 {
     boost::ignore_unused(delta_t);
 
@@ -299,7 +298,7 @@ ConstDoubleArray &FractionalInTimeIntegrationScheme::v_TimeIntegrate(
 
     // Compute u update to time timeStep * m_deltaT.  Stored in
     // m_uNext.
-    finalIncrement(timeStep, op);
+    finalIncrement(timeStep);
 
     // Contributions to the current integral
     size_t L = computeTaus(m_base, timeStep);
@@ -342,27 +341,11 @@ ConstDoubleArray &FractionalInTimeIntegrationScheme::v_TimeIntegrate(
         }
     }
 
-    // Dump the current solution.
-    // std::cout << "timeStep  " << timeStep << std::endl;
-    // for( size_t j=0; j<m_npoints; ++j )
-    // {
-    //     for( size_t i=0; i<m_nvars; ++i )
-    //     {
-    //         for( size_t m=0; m<m_order+1; ++m )
-    //         {
-    //             std::cout << m_u[m][i][j] << "  ";
-    //         }
-    //         std::cout << std::endl;
-    //     }
-    //     std::cout << std::endl;
-    // }
-    // std::cout << std::endl;
-
     // Update the storage and counters for integral classes to
     // time timeStep * m_deltaT. Also time-steps the sandboxes and stashes.
     for (size_t i = 0; i < m_Lmax; ++i)
     {
-        advanceSandbox(timeStep, op, m_integral_classes[i]);
+        advanceSandbox(timeStep, m_integral_classes[i]);
     }
 
     return m_u[0];
@@ -730,18 +713,6 @@ void FractionalInTimeIntegrationScheme::integralClassInitialize(
                 // scenarios.
             default:
                 ASSERTL1(false, "No matrix inverse.");
-
-                // Ainv = zeros(counter);
-                // Ainv(1,:) = 1;
-                // Ainv(2,1) = 1;
-
-                // for( size_t j = 3; j<=counter; ++j )
-                // {
-                //          Ainv(j,:) = pow((j-2)., (0:counter));
-                //          Ainv(j,:) = Ainv(j,:). * pow((-1)., (0:counter));
-                // }
-
-                // As[m] = inv(Ainv);
                 break;
         }
     }
@@ -863,14 +834,13 @@ void FractionalInTimeIntegrationScheme::updateStage(const size_t timeStep,
  * Using a time-stepping scheme of a particular order. Here, k depends
  * on alpha, the derivative order.
  */
-void FractionalInTimeIntegrationScheme::finalIncrement(
-    const size_t timeStep, const TimeIntegrationSchemeOperators &op)
+void FractionalInTimeIntegrationScheme::finalIncrement(const size_t timeStep)
 {
     // Note: m_uNext is initialized to zero and then reset to zero
     // after it is used to update the current solution in TimeIntegrate.
     for (size_t m = 0; m < m_order; ++m)
     {
-        op.DoOdeRhs(m_u[m], m_F, m_deltaT * (timeStep - m));
+        m_op.DoOdeRhs(m_u[m], m_F, m_deltaT * (timeStep - m));
 
         for (size_t i = 0; i < m_nvars; ++i)
         {
@@ -921,9 +891,9 @@ void FractionalInTimeIntegrationScheme::integralContribution(
  * exponential integrator with implicit order (m_order + 1)
  * interpolation of the f(u) term.
  */
-void FractionalInTimeIntegrationScheme::timeAdvance(
-    const size_t timeStep, const TimeIntegrationSchemeOperators &op,
-    Instance &instance, ComplexTripleArray &y)
+void FractionalInTimeIntegrationScheme::timeAdvance(const size_t timeStep,
+                                                    Instance &instance,
+                                                    ComplexTripleArray &y)
 {
     size_t order;
 
@@ -957,7 +927,7 @@ void FractionalInTimeIntegrationScheme::timeAdvance(
     // y = y * instance.E + F * instance.AtEh;
     for (size_t m = 0; m <= order; ++m)
     {
-        op.DoOdeRhs(m_u[m], m_F, m_deltaT * (timeStep - m));
+        m_op.DoOdeRhs(m_u[m], m_F, m_deltaT * (timeStep - m));
 
         for (size_t i = 0; i < m_nvars; ++i)
         {
@@ -986,13 +956,12 @@ void FractionalInTimeIntegrationScheme::timeAdvance(
  * (4) advances floor sandbox
  * (5) moves floor sandbox ---> stash
  */
-void FractionalInTimeIntegrationScheme::advanceSandbox(
-    const size_t timeStep, const TimeIntegrationSchemeOperators &op,
-    Instance &instance)
+void FractionalInTimeIntegrationScheme::advanceSandbox(const size_t timeStep,
+                                                       Instance &instance)
 {
     // (1)
     // update(instance.csandbox.y)
-    timeAdvance(timeStep, op, instance, instance.csandbox_y);
+    timeAdvance(timeStep, instance, instance.csandbox_y);
     instance.csandbox_ind.second = timeStep;
 
     // (2)
@@ -1024,7 +993,7 @@ void FractionalInTimeIntegrationScheme::advanceSandbox(
     if (instance.fsandbox_active)
     {
         // (4)
-        timeAdvance(timeStep, op, instance, instance.fsandbox_y);
+        timeAdvance(timeStep, instance, instance.fsandbox_y);
 
         instance.fsandbox_ind.second = timeStep;
 

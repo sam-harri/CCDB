@@ -21,6 +21,7 @@ SET(SOLVER_UTILS_SOURCES
   DriverModifiedArnoldi.cpp
   DriverParallelInTime.cpp
   DriverParareal.cpp
+  DriverPFASST.cpp
   DriverStandard.cpp
   DriverSteadyState.cpp	
   EquationSystem.cpp
@@ -43,7 +44,6 @@ SET(SOLVER_UTILS_SOURCES
   Filters/FilterBodyFittedVelocity.cpp
   RiemannSolvers/RiemannSolver.cpp
   RiemannSolvers/UpwindSolver.cpp
-  RiemannSolvers/UpwindLDGSolver.cpp
   UnsteadySystem.cpp
   MMFSystem.cpp
   Forcing/Forcing.cpp
@@ -77,6 +77,7 @@ SET(SOLVER_UTILS_HEADERS
   DriverModifiedArnoldi.h
   DriverParallelInTime.h
   DriverParareal.h
+  DriverPFASST.h
   DriverStandard.h
   DriverSteadyState.h
   EquationSystem.h
@@ -100,7 +101,6 @@ SET(SOLVER_UTILS_HEADERS
   Filters/FilterBodyFittedVelocity.h
   RiemannSolvers/RiemannSolver.h
   RiemannSolvers/UpwindSolver.h
-  RiemannSolvers/UpwindLDGSolver.h
   SolverUtils.hpp
   SolverUtilsDeclspec.h
   UnsteadySystem.h

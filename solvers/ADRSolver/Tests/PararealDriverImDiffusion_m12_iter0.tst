@@ -6,7 +6,6 @@
     <processes>10</processes>
     <files>
         <file description="Session File"> PararealDriverImDiffusion_m12_iter0.xml </file>
-        <file description="Session File"> PararealDriverImDiffusion_m12_iter0_coarseSolver.xml </file>
     </files>
     <metrics>
         <metric type="L2" id="1">

@@ -216,7 +216,7 @@ SessionReader::SessionReader(int argc, char *argv[])
  */
 SessionReader::SessionReader(int argc, char *argv[],
                              const std::vector<std::string> &pFilenames,
-                             const CommSharedPtr &pComm)
+                             const CommSharedPtr &pComm, const int &timelevel)
 {
     ASSERTL0(pFilenames.size() > 0, "No filenames specified.");
 
@@ -251,6 +251,9 @@ SessionReader::SessionReader(int argc, char *argv[],
 
     // Split up the communicator
     PartitionComm();
+
+    // Set time level (Parallel-in-Time)
+    m_timeLevel = timelevel;
 }
 
 /**
@@ -1463,11 +1466,36 @@ bool SessionReader::DefinesCmdLineArgument(const std::string &pName) const
 /**
  *
  */
-void SessionReader::SubstituteExpressions(std::string &pExpr)
+void SessionReader::GetXMLElementTimeLevel(TiXmlElement *&Element,
+                                           const int timeLevel)
 {
-    for (auto &exprIter : m_expressions)
+    if (Element->FirstChildElement("TIMELEVEL"))
     {
-        boost::replace_all(pExpr, exprIter.first, exprIter.second);
+        Element = Element->FirstChildElement("TIMELEVEL");
+        std::string timeLevelStr;
+        while (Element)
+        {
+            std::stringstream tagcontent;
+            tagcontent << *Element;
+            ASSERTL0(Element->Attribute("VALUE"),
+                     "Missing LEVEL attribute in solver info "
+                     "XML element: \n\t'" +
+                         tagcontent.str() + "'");
+            timeLevelStr = Element->Attribute("VALUE");
+            ASSERTL0(!timeLevelStr.empty(),
+                     "LEVEL attribute must be non-empty in XML "
+                     "element: \n\t'" +
+                         tagcontent.str() + "'");
+            if (stoi(timeLevelStr) == timeLevel)
+            {
+                break;
+            }
+            Element = Element->NextSiblingElement("TIMELEVEL");
+        }
+        ASSERTL0(stoi(timeLevelStr) == timeLevel,
+                 "TIMELEVEL value " + std::to_string(timeLevel) +
+                     " not found in solver info "
+                     "XML element: \n\t'");
     }
 }
 
@@ -1607,7 +1635,6 @@ void SessionReader::ParseDocument()
     ReadSolverInfo(e);
     ReadGlobalSysSolnInfo(e);
     ReadTimeIntScheme(e);
-    ReadExpressions(e);
     ReadVariables(e);
     ReadFunctions(e);
 
@@ -1724,6 +1751,8 @@ void SessionReader::ReadParameters(TiXmlElement *conditions)
     // if not.
     if (parametersElement)
     {
+        GetXMLElementTimeLevel(parametersElement, m_timeLevel);
+
         TiXmlElement *parameter = parametersElement->FirstChildElement("P");
 
         ParameterMap caseSensitiveParameters;
@@ -1807,6 +1836,8 @@ void SessionReader::ReadSolverInfo(TiXmlElement *conditions)
 
     if (solverInfoElement)
     {
+        GetXMLElementTimeLevel(solverInfoElement, m_timeLevel);
+
         TiXmlElement *solverInfo = solverInfoElement->FirstChildElement("I");
 
         while (solverInfo)
@@ -1880,6 +1911,10 @@ void SessionReader::ReadGlobalSysSolnInfo(TiXmlElement *conditions)
     if (!GlobalSys)
     {
         return;
+    }
+    else
+    {
+        GetXMLElementTimeLevel(GlobalSys, m_timeLevel);
     }
 
     TiXmlElement *VarInfo = GlobalSys->FirstChildElement("V");
@@ -2006,6 +2041,10 @@ void SessionReader::ReadTimeIntScheme(TiXmlElement *conditions)
     {
         return;
     }
+    else
+    {
+        GetXMLElementTimeLevel(timeInt, m_timeLevel);
+    }
 
     TiXmlElement *method  = timeInt->FirstChildElement("METHOD");
     TiXmlElement *variant = timeInt->FirstChildElement("VARIANT");
@@ -2090,58 +2129,6 @@ void SessionReader::ReadTimeIntScheme(TiXmlElement *conditions)
                 }
                 cout << endl;
             }
-        }
-    }
-}
-
-/**
- *
- */
-void SessionReader::ReadExpressions(TiXmlElement *conditions)
-{
-    m_expressions.clear();
-
-    if (!conditions)
-    {
-        return;
-    }
-
-    TiXmlElement *expressionsElement =
-        conditions->FirstChildElement("EXPRESSIONS");
-
-    if (expressionsElement)
-    {
-        TiXmlElement *expr = expressionsElement->FirstChildElement("E");
-
-        while (expr)
-        {
-            stringstream tagcontent;
-            tagcontent << *expr;
-            ASSERTL0(expr->Attribute("NAME"),
-                     "Missing NAME attribute in expression "
-                     "definition: \n\t'" +
-                         tagcontent.str() + "'");
-            std::string nameString = expr->Attribute("NAME");
-            ASSERTL0(!nameString.empty(),
-                     "Expressions must have a non-empty name: \n\t'" +
-                         tagcontent.str() + "'");
-
-            ASSERTL0(expr->Attribute("VALUE"),
-                     "Missing VALUE attribute in expression "
-                     "definition: \n\t'" +
-                         tagcontent.str() + "'");
-            std::string valString = expr->Attribute("VALUE");
-            ASSERTL0(!valString.empty(),
-                     "Expressions must have a non-empty value: \n\t'" +
-                         tagcontent.str() + "'");
-
-            auto exprIter = m_expressions.find(nameString);
-            ASSERTL0(exprIter == m_expressions.end(),
-                     std::string("Expression '") + nameString +
-                         std::string("' already specified."));
-
-            m_expressions[nameString] = valString;
-            expr                      = expr->NextSiblingElement("E");
         }
     }
 }
@@ -2324,8 +2311,6 @@ void SessionReader::ReadFunctions(TiXmlElement *conditions)
                          (std::string("Expression for var: ") + variableStr +
                           std::string(" must be specified."))
                              .c_str());
-
-                SubstituteExpressions(fcnStr);
 
                 // set expression
                 funcDef.m_expression =

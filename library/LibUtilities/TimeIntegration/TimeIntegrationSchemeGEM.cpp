@@ -28,33 +28,16 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 //
-// Description: implementation of time integration scheme GEM class
+// Description: Implementation of time integration scheme GEM class
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <LibUtilities/BasicUtils/VmathArray.hpp>
 #include <LibUtilities/TimeIntegration/TimeIntegrationSchemeGEM.h>
 
 namespace Nektar
 {
 namespace LibUtilities
 {
-
-const TripleArray &TimeIntegrationSchemeGEM::v_GetSolutionVector() const
-{
-    return m_Y;
-}
-
-TripleArray &TimeIntegrationSchemeGEM::v_UpdateSolutionVector()
-{
-    return m_Y;
-}
-
-void TimeIntegrationSchemeGEM::v_SetSolutionVector(const size_t Offset,
-                                                   const DoubleArray &y)
-{
-    m_Y[Offset] = y;
-}
 
 std::string TimeIntegrationSchemeGEM::v_GetName() const
 {
@@ -92,6 +75,22 @@ size_t TimeIntegrationSchemeGEM::v_GetNumIntegrationPhases() const
     return 1;
 }
 
+const TripleArray &TimeIntegrationSchemeGEM::v_GetSolutionVector() const
+{
+    return m_Y;
+}
+
+TripleArray &TimeIntegrationSchemeGEM::v_UpdateSolutionVector()
+{
+    return m_Y;
+}
+
+void TimeIntegrationSchemeGEM::v_SetSolutionVector(const size_t Offset,
+                                                   const DoubleArray &y)
+{
+    m_Y[Offset] = y;
+}
+
 /**
  * @brief Worker method to initialize the integration scheme.
  */
@@ -100,7 +99,6 @@ void TimeIntegrationSchemeGEM::v_InitializeScheme(
     const TimeIntegrationSchemeOperators &op)
 
 {
-    boost::ignore_unused(op);
     boost::ignore_unused(deltaT);
 
     if (m_initialized)
@@ -114,6 +112,7 @@ void TimeIntegrationSchemeGEM::v_InitializeScheme(
     }
     else
     {
+        m_op      = op;
         m_time    = time;
         m_nvars   = y_0.size();
         m_npoints = y_0[0].size();
@@ -148,7 +147,7 @@ void TimeIntegrationSchemeGEM::v_InitializeScheme(
         if (m_variant == "" || m_variant == "ExplicitEuler" ||
             m_variant == "ExplicitMidpoint")
         {
-            op.DoProjection(m_Y[0], m_Y[0], m_time);
+            m_op.DoProjection(m_Y[0], m_Y[0], m_time);
         }
 
         for (size_t m = 0; m < nodes; ++m)
@@ -182,8 +181,7 @@ void TimeIntegrationSchemeGEM::v_InitializeScheme(
  * @brief Worker method that performs the time integration.
  */
 ConstDoubleArray &TimeIntegrationSchemeGEM::v_TimeIntegrate(
-    const size_t timestep, const NekDouble delta_t,
-    const TimeIntegrationSchemeOperators &op)
+    const size_t timestep, const NekDouble delta_t)
 {
 
     boost::ignore_unused(timestep);
@@ -192,7 +190,7 @@ ConstDoubleArray &TimeIntegrationSchemeGEM::v_TimeIntegrate(
     if (m_variant == "" || m_variant == "ExplicitEuler" ||
         m_variant == "ExplicitMidpoint" || m_variant == "IMEXEuler")
     {
-        op.DoOdeRhs(m_Y[0], m_F0, m_time);
+        m_op.DoOdeRhs(m_Y[0], m_F0, m_time);
     }
 
     // Euler approach
@@ -207,8 +205,9 @@ ConstDoubleArray &TimeIntegrationSchemeGEM::v_TimeIntegrate(
                 // Implicit schemes
                 if (m_variant == "ImplicitEuler")
                 {
-                    op.DoImplicitSolve(m_Y[k - 1], m_Y[k],
-                                       m_time + k * (delta_t / m), delta_t / m);
+                    m_op.DoImplicitSolve(m_Y[k - 1], m_Y[k],
+                                         m_time + k * (delta_t / m),
+                                         delta_t / m);
                 }
 
                 // Explicit schemes
@@ -227,8 +226,8 @@ ConstDoubleArray &TimeIntegrationSchemeGEM::v_TimeIntegrate(
                     // For other stages, compute new rhs
                     else
                     {
-                        op.DoOdeRhs(m_Y[k - 1], m_F,
-                                    m_time + (k - 1) * (delta_t / m));
+                        m_op.DoOdeRhs(m_Y[k - 1], m_F,
+                                      m_time + (k - 1) * (delta_t / m));
                         for (size_t i = 0; i < m_nvars; ++i)
                         {
                             Vmath::Svtvp(m_npoints, delta_t / m, m_F[i], 1,
@@ -238,14 +237,16 @@ ConstDoubleArray &TimeIntegrationSchemeGEM::v_TimeIntegrate(
                 }
                 if (m_variant == "" || m_variant == "ExplicitEuler")
                 {
-                    op.DoProjection(m_Y[k], m_Y[k], m_time + k * (delta_t / m));
+                    m_op.DoProjection(m_Y[k], m_Y[k],
+                                      m_time + k * (delta_t / m));
                 }
 
                 // IMEX schemes (NOTE: Order reduction problems)
                 if (m_variant == "IMEXEuler")
                 {
-                    op.DoImplicitSolve(m_Y[k], m_Y[k],
-                                       m_time + k * (delta_t / m), delta_t / m);
+                    m_op.DoImplicitSolve(m_Y[k], m_Y[k],
+                                         m_time + k * (delta_t / m),
+                                         delta_t / m);
                 }
             }
 
@@ -310,18 +311,19 @@ ConstDoubleArray &TimeIntegrationSchemeGEM::v_TimeIntegrate(
             {
                 for (size_t k = 1; k <= m; ++k)
                 {
-                    op.DoImplicitSolve(m_Y[2 * k - 2], m_Y[2 * k - 1],
-                                       m_time + (k - 1 + 0.25) * (delta_t / m),
-                                       0.25 * delta_t / m);
+                    m_op.DoImplicitSolve(m_Y[2 * k - 2], m_Y[2 * k - 1],
+                                         m_time +
+                                             (k - 1 + 0.25) * (delta_t / m),
+                                         0.25 * delta_t / m);
                     for (size_t i = 0; i < m_nvars; ++i)
                     {
                         Vmath::Svtsvtp(m_npoints, 2.0, m_Y[2 * k - 1][i], 1,
                                        -1.0, m_Y[2 * k - 2][i], 1,
                                        m_Y[2 * k][i], 1);
                     }
-                    op.DoImplicitSolve(m_Y[2 * k], m_F,
-                                       m_time + (k - 0.25) * (delta_t / m),
-                                       0.25 * delta_t / m);
+                    m_op.DoImplicitSolve(m_Y[2 * k], m_F,
+                                         m_time + (k - 0.25) * (delta_t / m),
+                                         0.25 * delta_t / m);
                     for (size_t i = 0; i < m_nvars; ++i)
                     {
                         Vmath::Vsub(m_npoints, m_F[i], 1, m_Y[2 * k][i], 1,
@@ -341,20 +343,20 @@ ConstDoubleArray &TimeIntegrationSchemeGEM::v_TimeIntegrate(
                     Vmath::Svtvp(m_npoints, delta_t / (2 * m), m_F0[i], 1,
                                  m_Y[0][i], 1, m_Y[1][i], 1);
                 }
-                op.DoProjection(m_Y[1], m_Y[1], m_time + delta_t / (2 * m));
+                m_op.DoProjection(m_Y[1], m_Y[1], m_time + delta_t / (2 * m));
 
                 // Compute new rhs for midpoint stage
                 for (size_t k = 2; k <= 2 * m; ++k)
                 {
-                    op.DoOdeRhs(m_Y[k - 1], m_F,
-                                m_time + (k - 1) * (delta_t / (2 * m)));
+                    m_op.DoOdeRhs(m_Y[k - 1], m_F,
+                                  m_time + (k - 1) * (delta_t / (2 * m)));
                     for (size_t i = 0; i < m_nvars; ++i)
                     {
                         Vmath::Svtvp(m_npoints, delta_t / m, m_F[i], 1,
                                      m_Y[k - 2][i], 1, m_Y[k][i], 1);
                     }
-                    op.DoProjection(m_Y[k], m_Y[k],
-                                    m_time + k * (delta_t / (2 * m)));
+                    m_op.DoProjection(m_Y[k], m_Y[k],
+                                      m_time + k * (delta_t / (2 * m)));
                 }
             }
 
