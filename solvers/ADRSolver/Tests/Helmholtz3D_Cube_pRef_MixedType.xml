@@ -26,92 +26,60 @@
             NUMMODES="4"
             TYPE="MODIFIED"
             FIELDS="u"
-            REFIDS="0,1,2,3,4,5,6,7,8,9,10,11" />
+            REFIDS="0,1,2,3,4,5,6,7" />
     </EXPANSIONS>
 
     <REFINEMENTS>
         <R REF="0"
-            TYPE="STANDARD"
-            RADIUS="0.1"
-            COORDINATE1="0.01,0.0,0.01"
-            COORDINATE2="0.01,1.0,0.01"
+            TYPE="SPHERE"
+            RADIUS="0.3"
+            COORDINATE1="0.0,0.0,0.0"
             NUMMODES="6" />
 
         <R REF="1"
-            TYPE="STANDARD"
-            RADIUS="0.1"
-            COORDINATE1="0.0,1.0,0.01"
-            COORDINATE2="1.0,1.0,0.01"
+            TYPE="SPHERE"
+            RADIUS="0.3"
+            COORDINATE1="0.0,1.0,0.0"
             NUMMODES="6" />
 
         <R REF="2"
-            TYPE="STANDARD"
-            RADIUS="0.1"
-            COORDINATE1="1.0,1.0,0.01"
-            COORDINATE2="1.0,0.0,0.01"
+            TYPE="SPHERE"
+            RADIUS="0.3"
+            COORDINATE1="0.0,1.0,1.0"
             NUMMODES="6" />
 
         <R REF="3"
-            TYPE="STANDARD"
-            RADIUS="0.1"
-            COORDINATE1="1.0,0.01,0.01"
-            COORDINATE2="0.0,0.01,0.01"
+            TYPE="SPHERE"
+            RADIUS="0.3"
+            COORDINATE1="0.0,0.0,1.0"
             NUMMODES="6" />
 
         <R REF="4"
             TYPE="STANDARD"
-            RADIUS="0.1"
-            COORDINATE1="0.01,0.0,1.0"
-            COORDINATE2="0.01,1.0,1.0"
+            RADIUS="0.25"
+            COORDINATE1="1.0,0.0,0.0"
+            COORDINATE2="0.85,0.15,0.15"
             NUMMODES="6" />
 
         <R REF="5"
             TYPE="STANDARD"
-            RADIUS="0.1"
-            COORDINATE1="0.0,1.0,1.0"
-            COORDINATE2="1.0,1.0,1.0"
+            RADIUS="0.25"
+            COORDINATE1="1.0,0.0,1.0"
+            COORDINATE2="0.85,0.15,0.85"
             NUMMODES="6" />
 
         <R REF="6"
             TYPE="STANDARD"
-            RADIUS="0.1"
-            COORDINATE1="1.0,1.0,1.0"
-            COORDINATE2="1.0,0.0,1.0"
+            RADIUS="0.25"
+            COORDINATE1="1.0,1.0,0.0"
+            COORDINATE2="0.85,0.85,0.15"
             NUMMODES="6" />
 
         <R REF="7"
             TYPE="STANDARD"
-            RADIUS="0.1"
-            COORDINATE1="1.0,0.01,1.0"
-            COORDINATE2="0.0,0.01,1.0"
-            NUMMODES="6" />
-
-        <R REF="8"
-            TYPE="STANDARD"
-            RADIUS="0.1"
-            COORDINATE1="0.01,0.01,0.0"
-            COORDINATE2="0.01,0.01,1.0"
-            NUMMODES="6" />
-
-        <R REF="9"
-            TYPE="STANDARD"
-            RADIUS="0.1"
-            COORDINATE1="1.0,0.01,0.0"
-            COORDINATE2="1.0,0.01,1.0"
-            NUMMODES="6" />
-
-        <R REF="10"
-            TYPE="STANDARD"
-            RADIUS="0.1"
-            COORDINATE1="1.0,1.0,0.0"
-            COORDINATE2="1.0,1.0,1.0"
-            NUMMODES="6" />
-
-        <R REF="11"
-            TYPE="STANDARD"
-            RADIUS="0.1"
-            COORDINATE1="0.01,1.0,0.0"
-            COORDINATE2="0.01,1.0,1.0"
+            RADIUS="0.25"
+            COORDINATE1="1.0,1.0,1.0"
+            COORDINATE2="0.86,0.85,0.85"
             NUMMODES="6" />
     </REFINEMENTS>
 

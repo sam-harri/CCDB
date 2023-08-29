@@ -48,6 +48,11 @@
 
 #include <SpatialDomains/MeshGraph.h>
 #include <SpatialDomains/Movement/Movement.h>
+#include <SpatialDomains/RefRegion.h>
+#include <SpatialDomains/RefRegionCylinder.h>
+#include <SpatialDomains/RefRegionLine.h>
+#include <SpatialDomains/RefRegionParallelogram.h>
+#include <SpatialDomains/RefRegionSphere.h>
 
 // These are required for the Write(...) and Import(...) functions.
 #include <boost/archive/iterators/base64_from_binary.hpp>
@@ -2620,285 +2625,60 @@ std::string MeshGraph::GetCompositeString(CompositeSharedPtr comp)
     return s.str();
 }
 
-bool MeshGraph::CheckIfVertIsInsideLine(const RefRegionInfo &region,
-                                        const Array<OneD, NekDouble> &coords)
-{
-    // Is P between the region below?
-    // xa, xb plus the radius
-    if (region.coord1[0] < region.coord2[0])
-    {
-        if ((region.coord1[0] - region.radius < coords[0]) &&
-            (region.coord2[0] + region.radius > coords[0]))
-        {
-            return true;
-        }
-    }
-    else
-    {
-        if ((region.coord1[0] + region.radius > coords[0]) &&
-            (region.coord2[0] - region.radius < coords[0]))
-        {
-            return true;
-        }
-    }
-
-    return false;
-}
-
-bool MeshGraph::CheckIfVertIsInsideParallelogram(
-    const RefRegionInfo &region, const Array<OneD, NekDouble> &coords)
-{
-    // Simplification for a two-dimenion domain of the algorithm in the
-    // function CheckIfVertIsInsideCylinder.
-
-    const size_t dim = coords.size();
-    Array<OneD, NekDouble> e(dim, 0.0);     // direction: rb - ra
-    Array<OneD, NekDouble> m(dim - 1, 0.0); // momentum: ra x rb
-    NekDouble d = 0.0;                      // distance
-
-    // Direction
-    e[0] = region.coord2[0] - region.coord1[0];
-    e[1] = region.coord2[1] - region.coord1[1];
-
-    // Cross product of vectors 'coord1'(ra) and 'coord2' (rb)
-    m[0] = region.coord1[0] * region.coord2[1] -
-           region.coord1[1] * region.coord2[0];
-
-    // Distance of P (coords) to line AB (coord1coord2) is equal or less than R
-    // d = || e x (rp - ra) || / || e ||
-
-    // rA - rP
-    Array<OneD, NekDouble> rpa(dim, 0.0);
-    rpa[0] = coords[0] - region.coord1[0];
-    rpa[1] = coords[1] - region.coord1[1];
-
-    // || e ||
-    NekDouble e_mod = sqrt(pow(e[0], 2) + pow(e[1], 2));
-
-    // || e x (rp - ra) ||
-    Array<OneD, NekDouble> exrpa(dim - 1, 0.0);
-    exrpa[0] = e[0] * rpa[1] - e[1] * rpa[0];
-
-    NekDouble exrpa_mod = sqrt(pow(exrpa[0], 2));
-
-    d = exrpa_mod / e_mod;
-    if (d >= region.radius)
-    {
-        return false;
-    }
-
-    // Is P between the regions below?
-    // xa, xb plus the radius
-    // ya, yb plus the radius
-    Array<OneD, bool> insideFlag(dim, false);
-    for (int i = 0; i < dim; ++i)
-    {
-        if (region.coord1[i] < region.coord2[i])
-        {
-            if ((region.coord1[i] - region.radius < coords[i]) &&
-                (region.coord2[i] + region.radius > coords[i]))
-            {
-                insideFlag[i] = true;
-            }
-        }
-        else
-        {
-            if ((region.coord1[i] + region.radius > coords[i]) &&
-                (region.coord2[i] - region.radius < coords[i]))
-            {
-                insideFlag[i] = true;
-            }
-        }
-    }
-
-    if ((insideFlag[0] == true) && (insideFlag[1] == true))
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
-}
-
-bool MeshGraph::CheckIfVertIsInsideCylinder(
-    const RefRegionInfo &region, const Array<OneD, NekDouble> &coords)
-{
-    const size_t dim = coords.size();
-    Array<OneD, NekDouble> e(dim, 0.0); // direction: rb - ra
-    Array<OneD, NekDouble> m(dim, 0.0); // momentum: ra x rb
-    NekDouble d = 0.0;                  // distance
-
-    // Direction
-    e[0] = region.coord2[0] - region.coord1[0];
-    e[1] = region.coord2[1] - region.coord1[1];
-    e[2] = region.coord2[2] - region.coord1[2];
-
-    // Cross product of vectors 'coord1' and 'coord2'
-    m[0] = region.coord1[1] * region.coord2[2] -
-           region.coord1[2] * region.coord2[1];
-    m[1] = region.coord1[2] * region.coord2[0] -
-           region.coord1[0] * region.coord2[2];
-    m[2] = region.coord1[0] * region.coord2[1] -
-           region.coord1[1] * region.coord2[0];
-
-    // 1. Distance of P (coords) to line AB (coord1coord2) is equal or less than
-    // R
-    //  d = || e x (rp - ra) || / || e ||
-
-    // rA - rP
-    Array<OneD, NekDouble> rpa(dim, 0.0);
-    rpa[0] = coords[0] - region.coord1[0];
-    rpa[1] = coords[1] - region.coord1[1];
-    rpa[2] = coords[2] - region.coord1[2];
-
-    // || e ||
-    NekDouble e_mod = sqrt(pow(e[0], 2) + pow(e[1], 2) + pow(e[2], 2));
-
-    // || e x (rp - ra) ||
-    Array<OneD, NekDouble> exrpa(dim, 0.0);
-    exrpa[0] = e[1] * rpa[2] - e[2] * rpa[1];
-    exrpa[1] = e[2] * rpa[0] - e[0] * rpa[2];
-    exrpa[2] = e[0] * rpa[1] - e[1] * rpa[0];
-
-    NekDouble exrpa_mod =
-        sqrt(pow(exrpa[0], 2) + pow(exrpa[1], 2) + pow(exrpa[2], 2));
-
-    d = exrpa_mod / e_mod;
-    if (d >= region.radius)
-    {
-        return false;
-    }
-
-    // 2. Closest point Q on line AB to P
-    // rq = rp + (e x (m + e x rp)) / ||e||^{2}
-
-    // (m + e x rp)
-    Array<OneD, NekDouble> mpexrp(dim, 0.0);
-    mpexrp[0] = m[0] + e[1] * coords[2] - e[2] * coords[1];
-    mpexrp[1] = m[1] + e[2] * coords[0] - e[0] * coords[2];
-    mpexrp[2] = m[2] + e[0] * coords[1] - e[1] * coords[0];
-
-    // e x (m + e x rp) = numerator
-    Array<OneD, NekDouble> numerator(dim, 0.0);
-    numerator[0] = e[1] * mpexrp[2] - e[2] * mpexrp[1];
-    numerator[1] = e[2] * mpexrp[0] - e[0] * mpexrp[2];
-    numerator[2] = e[0] * mpexrp[1] - e[1] * mpexrp[0];
-
-    // rq
-    Array<OneD, NekDouble> rq(dim, 0.0);
-    rq[0] = coords[0] + (numerator[0] / pow(e_mod, 2));
-    rq[1] = coords[1] + (numerator[1] / pow(e_mod, 2));
-    rq[2] = coords[2] + (numerator[2] / pow(e_mod, 2));
-
-    // 3. The baricentric coordinates of Q(wa,wb) such that rq = wa*ra+wb*rb
-    //  wa = ||rq x rb||/||m||, wb = ||rq x ra||/||m||
-    NekDouble wa = 0.0;
-    NekDouble wb = 0.0;
-
-    // ||m||
-    NekDouble delta = 1e-12;
-    // An additional parameter delta was added to calculate the ||m||
-    // in order to make the algorithm always run. Although, an ASSERTL0
-    // check if ||m|| >0.
-    NekDouble m_mod = sqrt(pow(m[0], 2) + pow(m[1], 2) + pow(m[2], 2) + delta);
-    // m_mod > 0: condition
-    ASSERTL0(m_mod, "The cylinder axis must not go through the origin");
-
-    // ||rq x rb||
-    Array<OneD, NekDouble> rqxrb(dim, 0.0);
-    rqxrb[0] = rq[1] * region.coord2[2] - rq[2] * region.coord2[1];
-    rqxrb[1] = rq[2] * region.coord2[0] - rq[0] * region.coord2[2];
-    rqxrb[2] = rq[0] * region.coord2[1] - rq[1] * region.coord2[0];
-    NekDouble rqxrb_mod =
-        sqrt(pow(rqxrb[0], 2) + pow(rqxrb[1], 2) + pow(rqxrb[2], 2));
-
-    // ||rq x ra||
-    Array<OneD, NekDouble> rqxra(dim, 0.0);
-    rqxra[0] = rq[1] * region.coord1[2] - rq[2] * region.coord1[1];
-    rqxra[1] = rq[2] * region.coord1[0] - rq[0] * region.coord1[2];
-    rqxra[2] = rq[0] * region.coord1[1] - rq[1] * region.coord1[0];
-    NekDouble rqxra_mod =
-        sqrt(pow(rqxra[0], 2) + pow(rqxra[1], 2) + pow(rqxra[2], 2));
-
-    // wa
-    wa = rqxrb_mod / m_mod;
-    // wb
-    wb = rqxra_mod / m_mod;
-
-    // 4. Check that point Q between A and B by making sure the baricentric
-    // coordinates are between 0 and 1.
-    if ((wa >= 0) && (wa <= 1) && (wb >= 0) && (wb <= 1))
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
-}
-
+/**
+ * @brief Refine the elements which has at least one vertex inside the
+ *        surface region.
+ *
+ * @param expansionMap    shared pointer for the ExpansionInfoMap.
+ * @param region          Object which holds the information provided by the
+ *                        user. For example, the radius, coordinates, etc.
+ * @param geomVecIter     shared pointer for the Geometry.
+ */
 void MeshGraph::PRefinementElmts(ExpansionInfoMapShPtr &expansionMap,
-                                 RefRegionInfo &region,
+                                 RefRegion *&region,
                                  GeometrySharedPtr geomVecIter)
 {
     bool updateExpansion = false;
     Array<OneD, NekDouble> coords(m_spaceDimension, 0.0);
-    ASSERTL0(coords.size() == m_meshDimension,
-             "The mesh dimension must match the space dimension");
 
     for (int i = 0; i < geomVecIter->GetNumVerts(); ++i)
     {
         // Get coordinates from the vertex
         geomVecIter->GetVertex(i)->GetCoords(coords);
-        switch (m_spaceDimension)
-        {
-            case 3:
-            {
-                updateExpansion = CheckIfVertIsInsideCylinder(region, coords);
-                break;
-            }
-            case 2:
-            {
-                updateExpansion =
-                    CheckIfVertIsInsideParallelogram(region, coords);
-                break;
-            }
-            case 1:
-            {
-                updateExpansion = CheckIfVertIsInsideLine(region, coords);
-                break;
-            }
-        }
-        // Update expansion.
+        updateExpansion = region->v_Contains(coords);
+
+        // Update expansion
+        // Change number of modes and number of points (if needed).
         if (updateExpansion)
         {
             // Information of the expansion for a specific element
             auto expInfoID = expansionMap->find(geomVecIter->GetGlobalID());
             if (m_useExpansionType)
             {
+                std::vector<unsigned int> nModes = region->GetNumModes();
                 (expInfoID->second)->m_basisKeyVector =
                     MeshGraph::DefineBasisKeyFromExpansionType(
                         geomVecIter,
                         (ExpansionType)(expInfoID->second)
                             ->m_basisKeyVector.begin()
                             ->GetBasisType(),
-                        region.disc.numModes[0]);
+                        nModes[0]);
             }
             else
             {
                 int cnt = 0;
                 LibUtilities::BasisKeyVector updatedBasisKey;
+                std::vector<unsigned int> nModes  = region->GetNumModes();
+                std::vector<unsigned int> nPoints = region->GetNumPoints();
                 for (auto basis = expInfoID->second->m_basisKeyVector.begin();
                      basis != expInfoID->second->m_basisKeyVector.end();
                      ++basis)
                 {
                     // Generate Basis key using information
-                    const LibUtilities::PointsKey pkey(
-                        region.disc.numPoints[cnt], basis->GetPointsType());
+                    const LibUtilities::PointsKey pkey(nPoints[cnt],
+                                                       basis->GetPointsType());
                     updatedBasisKey.push_back(LibUtilities::BasisKey(
-                        basis->GetBasisType(), region.disc.numModes[cnt],
-                        pkey));
+                        basis->GetBasisType(), nModes[cnt], pkey));
                     cnt++;
                 }
                 (expInfoID->second)->m_basisKeyVector = updatedBasisKey;
@@ -2908,11 +2688,22 @@ void MeshGraph::PRefinementElmts(ExpansionInfoMapShPtr &expansionMap,
     }
 }
 
+/**
+ * @brief Set the refinement information. This function selects the
+ *        composites and the corresponding surface regions that must
+ *        be used to refine the elements.
+ *
+ * @param expansionMap    shared pointer for the ExpansionInfoMap
+ */
 void MeshGraph::SetRefinementInfo(ExpansionInfoMapShPtr &expansionMap)
 {
+    // Loop over the refinement ids
     for (auto pRefinement = m_refComposite.begin();
          pRefinement != m_refComposite.end(); ++pRefinement)
     {
+        // For each refinement id, there might be more than one composite,
+        // since each refinement id can be related to more than one
+        // composite.
         for (auto compVecIter = pRefinement->second.begin();
              compVecIter != pRefinement->second.end(); ++compVecIter)
         {
@@ -2920,6 +2711,9 @@ void MeshGraph::SetRefinementInfo(ExpansionInfoMapShPtr &expansionMap)
                  geomVecIter != compVecIter->second->m_geomVec.end();
                  ++geomVecIter)
             {
+                // Loop over the refinements provided by the user storage
+                // in the m_refRegion in order to provide the correct
+                // refinement region data to PRefinementElmts function.
                 for (auto region = m_refRegion.begin();
                      region != m_refRegion.end(); ++region)
                 {
@@ -2927,6 +2721,8 @@ void MeshGraph::SetRefinementInfo(ExpansionInfoMapShPtr &expansionMap)
                     // the region.
                     if (region->first == pRefinement->first)
                     {
+                        // The geomVecIter corresponds the geometry information
+                        // of the composite to be refined.
                         PRefinementElmts(expansionMap, region->second,
                                          *geomVecIter);
                     }
@@ -2936,6 +2732,12 @@ void MeshGraph::SetRefinementInfo(ExpansionInfoMapShPtr &expansionMap)
     }
 }
 
+/**
+ * @brief Read refinement information provided by the user in the xml file.
+ *        In this function, it reads the reference id, the radius, the
+ *        coordinates, the type of the method, number of modes, and number
+ *        of quadrature points if necessary.
+ */
 void MeshGraph::ReadRefinementInfo()
 {
     // Find the Refinement tag
@@ -2952,54 +2754,80 @@ void MeshGraph::ReadRefinementInfo()
         {
             while (refinement)
             {
-                RefRegionInfo refInfo;
+                std::vector<NekDouble> coord1Vector, coord2Vector;
+                std::vector<unsigned int> nModesVector, nPointsVector;
 
-                /// Extract Refinement ID
+                // Extract Refinement ID
                 const char *idStr = refinement->Attribute("REF");
                 ASSERTL0(idStr, "REF was not defined in REFINEMENT section "
                                 "of input");
 
-                unsigned int id = boost::lexical_cast<unsigned int>(idStr);
+                unsigned id = boost::lexical_cast<unsigned int>(idStr);
 
-                /// Extract Radius
+                // Extract Radius
                 const char *radiusStr = refinement->Attribute("RADIUS");
                 ASSERTL0(radiusStr, "RADIUS was not defined in REFINEMENT "
                                     "section of input");
 
-                refInfo.radius = boost::lexical_cast<NekDouble>(radiusStr);
+                NekDouble radius = boost::lexical_cast<NekDouble>(radiusStr);
 
-                /// Extract Coordinate 1
+                // Extract Coordinate 1
                 const char *c1Str = refinement->Attribute("COORDINATE1");
                 ASSERTL0(c1Str, "COORDINATE1 was not defined in REFINEMENT"
                                 "section of input");
 
-                std::vector<NekDouble> coord1Vector;
                 std::string coord1String = c1Str;
                 bool valid =
                     ParseUtils::GenerateVector(coord1String, coord1Vector);
                 ASSERTL0(valid, "Unable to correctly parse the axes "
                                 "values for COORDINATE1");
+
                 ASSERTL0(coord1Vector.size() == m_spaceDimension,
                          "Number of coordinates do not match the space "
                          "dimension for COORDINATE1");
 
-                refInfo.coord1 = coord1Vector;
-
-                /// Extract Coordinate 2
-                const char *c2Str = refinement->Attribute("COORDINATE2");
-                ASSERTL0(c2Str, "COORDINATE2 was not defined in REFINEMENT"
+                // Refinement Type
+                const char *rType = refinement->Attribute("TYPE");
+                ASSERTL0(rType, "TYPE was not defined in REFINEMENT "
                                 "section of input");
 
-                std::vector<NekDouble> coord2Vector;
-                std::string coord2String = c2Str;
-                valid = ParseUtils::GenerateVector(coord2String, coord2Vector);
-                ASSERTL0(valid, "Unable to correctly parse the axes "
-                                "values for COORDINATE2");
-                ASSERTL0(coord2Vector.size() == m_spaceDimension,
-                         "Number of coordinates do not match the space "
-                         "dimension for COORDINATE2");
+                // Extract Coordinate 2
+                const char *c2Str = refinement->Attribute("COORDINATE2");
 
-                refInfo.coord2 = coord2Vector;
+                if (strcmp(rType, "STANDARD") == 0)
+                {
+                    ASSERTL0(c2Str, "COORDINATE2 was not defined in REFINEMENT "
+                                    "section of input");
+
+                    std::string coord2String = c2Str;
+                    valid =
+                        ParseUtils::GenerateVector(coord2String, coord2Vector);
+                    ASSERTL0(valid, "Unable to correctly parse the axes "
+                                    "values for COORDINATE2");
+                    ASSERTL0(coord2Vector.size() == m_spaceDimension,
+                             "Number of coordinates do not match the space "
+                             "dimension for COORDINATE2");
+
+                    // The STANDARD TYPE approach only accepts meshes that have
+                    // the same dimension as the space dimension.
+                    ASSERTL0(
+                        m_spaceDimension == m_meshDimension,
+                        "The mesh dimension must match the space dimension");
+                }
+                else if (strcmp(rType, "SPHERE") == 0)
+                {
+                    // COORDINATE2 is not necessary for this TYPE.
+                    ASSERTL0(!c2Str, "COORDINATE2 should not be defined in "
+                                     "REFINEMENT section of input for the "
+                                     "SPHERE TYPE");
+
+                    coord2Vector.empty();
+                }
+                else
+                {
+                    NEKERROR(Nektar::ErrorUtil::efatal,
+                             "Invalid refinement type");
+                }
 
                 // Extract number of modes
                 // Check if the expansion was defined individually
@@ -3009,36 +2837,22 @@ void MeshGraph::ReadRefinementInfo()
                     ASSERTL0(nModesStr, "NUMMODES was not defined in "
                                         "Refinement section of input");
 
-                    std::vector<unsigned int> nModesVector;
                     std::string numModesStr = nModesStr;
                     valid =
                         ParseUtils::GenerateVector(numModesStr, nModesVector);
                     ASSERTL0(valid,
                              "Unable to correctly parse the number of modes");
 
-                    for (auto iter = nModesVector.begin();
-                         iter != nModesVector.end(); ++iter)
-                    {
-                        refInfo.disc.numModes.push_back(*iter);
-                    }
-
                     // Extract number of points
                     const char *nPointsStr = refinement->Attribute("NUMPOINTS");
                     ASSERTL0(nPointsStr, "NUMPOINTS was not defined in "
                                          "Refinement section of input");
 
-                    std::vector<unsigned int> nPointsVector;
                     std::string numPointsStr = nPointsStr;
                     valid =
                         ParseUtils::GenerateVector(numPointsStr, nPointsVector);
                     ASSERTL0(valid,
                              "Unable to correctly parse the number of modes");
-
-                    for (auto iter = nPointsVector.begin();
-                         iter != nPointsVector.end(); ++iter)
-                    {
-                        refInfo.disc.numPoints.push_back(*iter);
-                    }
                 }
                 else // if m_useExpansionType=true
                 {
@@ -3059,12 +2873,51 @@ void MeshGraph::ReadRefinementInfo()
                     {
                         n_modesRef = boost::lexical_cast<int>(numModesStr);
                     }
-                    refInfo.disc.numModes.push_back(n_modesRef);
-                    refInfo.disc.numPoints.push_back(0); // No points.
+                    nModesVector.push_back(n_modesRef);
+                    nPointsVector.empty(); // No points.
                 }
 
-                // Map: refinement ID, refinement Region
-                m_refRegion[id] = refInfo;
+                // Instantiate an object
+                if (strcmp(rType, "STANDARD") == 0)
+                {
+                    switch (m_spaceDimension)
+                    {
+                        case 3:
+                        {
+                            // Polymorphism of object
+                            // Instantiate RefRegionCylinder object
+                            RefRegion *refInfo = new RefRegionCylinder(
+                                m_spaceDimension, radius, coord1Vector,
+                                coord2Vector, nModesVector, nPointsVector);
+                            // Map: refinement ID, refinement region object
+                            m_refRegion[id] = refInfo;
+                            break;
+                        }
+                        case 2:
+                        {
+                            RefRegion *refInfo = new RefRegionParallelogram(
+                                m_spaceDimension, radius, coord1Vector,
+                                coord2Vector, nModesVector, nPointsVector);
+                            m_refRegion[id] = refInfo;
+                            break;
+                        }
+                        case 1:
+                        {
+                            RefRegion *refInfo = new RefRegionLine(
+                                m_spaceDimension, radius, coord1Vector,
+                                coord2Vector, nModesVector, nPointsVector);
+                            m_refRegion[id] = refInfo;
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    RefRegion *refInfo = new RefRegionSphere(
+                        m_spaceDimension, radius, coord1Vector, coord2Vector,
+                        nModesVector, nPointsVector);
+                    m_refRegion[id] = refInfo;
+                }
 
                 refinement = refinement->NextSiblingElement("R");
             }

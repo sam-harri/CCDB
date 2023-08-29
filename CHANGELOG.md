@@ -24,6 +24,7 @@ v5.4.0
 - Update parallel-in-time code base in fieldconvert (!1565)
 - Tidy-up Basis and Points classes (!1568)
 - Remove unused function GetKey in NekFactory (!1567)
+- Add new functionality and code improvements for the local p-refinement (!1571)
 - Fix v_Exscan compilation bug (!1566)
 - Tidy-up of comm class (!1572)
 - Tidy-up Nektar tolerances (!1570)

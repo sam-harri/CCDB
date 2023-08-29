@@ -167,17 +167,8 @@ typedef std::map<std::string, std::string> GeomInfoMap;
 typedef std::shared_ptr<std::vector<std::pair<GeometrySharedPtr, int>>>
     GeometryLinkSharedPtr;
 
-struct RefRegionInfo
-{
-    NekDouble radius;
-    std::vector<NekDouble> coord1;
-    std::vector<NekDouble> coord2;
-    struct Discretisation
-    {
-        std::vector<unsigned int> numModes;
-        std::vector<unsigned int> numPoints;
-    } disc;
-};
+// Forward declaration
+class RefRegion;
 
 typedef std::map<std::string, std::string> MeshMetaDataMap;
 
@@ -221,7 +212,7 @@ public:
     ////////////////////
     SPATIAL_DOMAINS_EXPORT void ReadExpansionInfo();
 
-    // Read refinement info.
+    /// Read refinement info.
     SPATIAL_DOMAINS_EXPORT void ReadRefinementInfo();
 
     /* ---- Helper functions ---- */
@@ -316,23 +307,14 @@ public:
     /// This function sets the expansion #exp in map with
     /// entry #variable
 
-    // Set refinement info.
+    /// Set refinement info.
     SPATIAL_DOMAINS_EXPORT void SetRefinementInfo(
         ExpansionInfoMapShPtr &expansionMap);
 
-    // Perform the p-refinement in the selected elements
+    /// Perform the p-refinement in the selected elements
     SPATIAL_DOMAINS_EXPORT void PRefinementElmts(
-        ExpansionInfoMapShPtr &expansionMap, RefRegionInfo &region,
+        ExpansionInfoMapShPtr &expansionMap, RefRegion *&region,
         GeometrySharedPtr geomVecIter);
-
-    SPATIAL_DOMAINS_EXPORT bool CheckIfVertIsInsideLine(
-        const RefRegionInfo &region, const Array<OneD, NekDouble> &coords);
-
-    SPATIAL_DOMAINS_EXPORT bool CheckIfVertIsInsideParallelogram(
-        const RefRegionInfo &region, const Array<OneD, NekDouble> &coords);
-
-    SPATIAL_DOMAINS_EXPORT bool CheckIfVertIsInsideCylinder(
-        const RefRegionInfo &region, const Array<OneD, NekDouble> &coords);
 
     inline void SetExpansionInfo(const std::string variable,
                                  ExpansionInfoMapShPtr &exp);
@@ -523,9 +505,11 @@ protected:
     bool m_useExpansionType;
 
     // Refinement attributes (class members)
+    /// Link the refinement id with the composites
     std::map<int, CompositeMap> m_refComposite;
     // std::map<int, LibUtilities::BasisKeyVector> m_refBasis;
-    std::map<int, RefRegionInfo> m_refRegion;
+    /// Link the refinement id with the surface region data
+    std::map<int, RefRegion *> m_refRegion;
     bool m_refFlag = false;
 
     CompositeMap m_meshComposites;
