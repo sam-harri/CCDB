@@ -59,6 +59,7 @@ v5.4.0
 - Redesign of AUSM Riemann solver class (!1577)
 - Redesign of the compressible flow solver. Removal of RinglebFlow and IsentropicVortex subclasses (!1584)
 - Redesign of PreconCfs class (!1578)
+- Fix virtual functions in ContField class (!1616)
 
 **IncNavierStokesSolver**
 - Add an option to mask variables for the linear stability problem (!1280)
