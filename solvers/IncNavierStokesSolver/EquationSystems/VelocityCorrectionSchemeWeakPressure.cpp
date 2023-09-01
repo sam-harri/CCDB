@@ -111,6 +111,22 @@ void VCSWeakPressure::v_GenerateSummary(SolverUtils::SummaryList &s)
                 ", diff coeff = " +
                 boost::lexical_cast<string>(m_sVVDiffCoeff) + ")");
     }
+
+    if (m_useGJPStabilisation)
+    {
+        SolverUtils::AddSummaryItem(
+            s, "GJP Stab. Impl.    ",
+            m_session->GetSolverInfo("GJPStabilisation"));
+        SolverUtils::AddSummaryItem(s, "GJP Stab. JumpScale", m_GJPJumpScale);
+
+        if (boost::iequals(m_session->GetSolverInfo("GJPStabilisation"),
+                           "Explicit"))
+        {
+            SolverUtils::AddSummaryItem(
+                s, "GJP Normal Velocity",
+                m_session->GetSolverInfo("GJPNormalVelocity"));
+        }
+    }
 }
 
 /**

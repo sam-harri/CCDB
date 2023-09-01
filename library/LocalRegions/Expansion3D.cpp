@@ -704,6 +704,95 @@ DNekScalMatSharedPtr Expansion3D::CreateMatrix(const MatrixKey &mkey)
             }
         }
         break;
+        case StdRegions::eLinearAdvectionDiffusionReactionGJP:
+        {
+            // Copied mostly from ADR solve to have fine-grain control
+            // over updating only advection matrix, relevant for performance!
+            NekDouble lambda = mkey.GetConstFactor(StdRegions::eFactorLambda);
+
+            // Construct mass matrix (Check for varcoeffs)
+            MatrixKey masskey(StdRegions::eMass, mkey.GetShapeType(), *this);
+            if (mkey.HasVarCoeff(StdRegions::eVarCoeffMass))
+            {
+                masskey = MatrixKey(mkey, StdRegions::eMass);
+            }
+            DNekScalMat &MassMat = *GetLocMatrix(masskey);
+
+            // Construct laplacian matrix (Check for varcoeffs)
+            MatrixKey lapkey(StdRegions::eLaplacian, mkey.GetShapeType(), *this,
+                             mkey.GetConstFactors());
+            if ((mkey.HasVarCoeff(StdRegions::eVarCoeffLaplacian)) ||
+                (mkey.HasVarCoeff(StdRegions::eVarCoeffD00)) ||
+                (mkey.HasVarCoeff(StdRegions::eVarCoeffD01)) ||
+                (mkey.HasVarCoeff(StdRegions::eVarCoeffD10)) ||
+                (mkey.HasVarCoeff(StdRegions::eVarCoeffD02)) ||
+                (mkey.HasVarCoeff(StdRegions::eVarCoeffD20)) ||
+                (mkey.HasVarCoeff(StdRegions::eVarCoeffD11)) ||
+                (mkey.HasVarCoeff(StdRegions::eVarCoeffD12)) ||
+                (mkey.HasVarCoeff(StdRegions::eVarCoeffD21)) ||
+                (mkey.HasVarCoeff(StdRegions::eVarCoeffD22)))
+            {
+                lapkey = MatrixKey(mkey, StdRegions::eLaplacian);
+            }
+            DNekScalMat &LapMat = *GetLocMatrix(lapkey);
+
+            // Construct advection matrix
+            // (assume advection velocity defined and non-zero)
+            // Could check L2(AdvectionVelocity) or HasVarCoeff
+            MatrixKey advkey(mkey, StdRegions::eLinearAdvection);
+            DNekScalMat &AdvMat = *GetLocMatrix(advkey);
+
+            // Generate a local copy of traceMat
+            MatrixKey gjpkey(StdRegions::eNormDerivOnTrace, mkey.GetShapeType(),
+                             *this, mkey.GetConstFactors());
+            DNekScalMat &NDTraceMat = *GetLocMatrix(gjpkey);
+
+            NekDouble gjpfactor = mkey.GetConstFactor(StdRegions::eFactorGJP);
+            ASSERTL1(mkey.ConstFactorExists(StdRegions::eFactorGJP),
+                     "Need to specify eFactorGJP to construct "
+                     "a LinearAdvectionDiffusionReactionGJP matrix");
+
+            int rows = LapMat.GetRows();
+            int cols = LapMat.GetColumns();
+
+            DNekMatSharedPtr adr =
+                MemoryManager<DNekMat>::AllocateSharedPtr(rows, cols);
+
+            NekDouble one = 1.0;
+            (*adr) =
+                LapMat - lambda * MassMat + AdvMat + gjpfactor * NDTraceMat;
+
+            returnval = MemoryManager<DNekScalMat>::AllocateSharedPtr(one, adr);
+
+            // Clear memory
+            DropLocMatrix(advkey);
+            if (mkey.HasVarCoeff(StdRegions::eVarCoeffMass))
+            {
+                DropLocMatrix(masskey);
+            }
+            if ((mkey.HasVarCoeff(StdRegions::eVarCoeffLaplacian)) ||
+                (mkey.HasVarCoeff(StdRegions::eVarCoeffD00)) ||
+                (mkey.HasVarCoeff(StdRegions::eVarCoeffD01)) ||
+                (mkey.HasVarCoeff(StdRegions::eVarCoeffD10)) ||
+                (mkey.HasVarCoeff(StdRegions::eVarCoeffD02)) ||
+                (mkey.HasVarCoeff(StdRegions::eVarCoeffD20)) ||
+                (mkey.HasVarCoeff(StdRegions::eVarCoeffD11)) ||
+                (mkey.HasVarCoeff(StdRegions::eVarCoeffD12)) ||
+                (mkey.HasVarCoeff(StdRegions::eVarCoeffD21)) ||
+                (mkey.HasVarCoeff(StdRegions::eVarCoeffD22)))
+            {
+                DropLocMatrix(lapkey);
+            }
+        }
+        break;
+        case StdRegions::eNormDerivOnTrace:
+        {
+            NekDouble one        = 1.0;
+            DNekMatSharedPtr mat = Expansion3D::v_GenMatrix(mkey);
+
+            returnval = MemoryManager<DNekScalMat>::AllocateSharedPtr(one, mat);
+        }
+        break;
         case StdRegions::eIProductWRTBase:
         {
             if (m_metricinfo->GetGtype() == SpatialDomains::eDeformed)

@@ -885,7 +885,7 @@ GlobalLinSysKey ContField::v_HelmSolve(
 GlobalLinSysKey ContField::v_LinearAdvectionDiffusionReactionSolve(
     const Array<OneD, const NekDouble> &inarray,
     Array<OneD, NekDouble> &outarray, const StdRegions::ConstFactorMap &factors,
-    const StdRegions::VarCoeffMap &varcoeffs,
+    const StdRegions::VarCoeffMap &pvarcoeff,
     const MultiRegions::VarFactorsMap &varfactors,
     const Array<OneD, const NekDouble> &dirForcing, const bool PhysSpaceForcing)
 {
@@ -941,9 +941,49 @@ GlobalLinSysKey ContField::v_LinearAdvectionDiffusionReactionSolve(
         bndcnt += m_bndCondExpansions[i]->GetNcoeffs();
     }
 
+    StdRegions::MatrixType mtype =
+        StdRegions::eLinearAdvectionDiffusionReaction;
+
+    StdRegions::VarCoeffMap varcoeff(pvarcoeff);
+    if (factors.count(StdRegions::eFactorGJP))
+    {
+        // initialize if required
+        if (!m_GJPData)
+        {
+            m_GJPData = MemoryManager<GJPStabilisation>::AllocateSharedPtr(
+                GetSharedThisPtr());
+        }
+
+        if (m_GJPData->IsSemiImplicit())
+        {
+            mtype = StdRegions::eLinearAdvectionDiffusionReactionGJP;
+        }
+
+        // to set up forcing need initial guess in physical space
+        Array<OneD, NekDouble> phys(m_npoints), tmp;
+        BwdTrans(outarray, phys);
+        NekDouble scale = -1.0 * factors.find(StdRegions::eFactorGJP)->second;
+        /*
+        Array<OneD, NekDouble> tmp;
+        tmp = pvarcoeff.count(StdRegions::eVarCoeffGJPNormVel)
+                             ? pvarcoeff.find(StdRegions::eVarCoeffGJPNormVel)
+                                   ->second.GetValue()
+                             : NullNekDouble1DArray;
+        */
+
+        m_GJPData->Apply(phys, wsp,
+                         pvarcoeff.count(StdRegions::eVarCoeffGJPNormVel)
+                             ? pvarcoeff.find(StdRegions::eVarCoeffGJPNormVel)
+                                   ->second.GetValue()
+                             : NullNekDouble1DArray,
+                         scale);
+
+        varcoeff.erase(StdRegions::eVarCoeffGJPNormVel);
+    }
+
     // Solve the system
-    GlobalLinSysKey key(StdRegions::eLinearAdvectionDiffusionReaction,
-                        m_locToGloMap, factors, varcoeffs, varfactors);
+    GlobalLinSysKey key(mtype, m_locToGloMap, factors, pvarcoeff, varfactors);
+
     GlobalSolve(key, wsp, outarray, dirForcing);
 
     return key;
