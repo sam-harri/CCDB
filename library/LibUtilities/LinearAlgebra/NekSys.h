@@ -246,16 +246,16 @@ public:
 
     LIB_UTILITIES_EXPORT static NekSysSharedPtr CreateInstance(
         const LibUtilities::SessionReaderSharedPtr &pSession,
-        const LibUtilities::CommSharedPtr &vComm, const int nDimen,
+        const LibUtilities::CommSharedPtr &vRowComm, const int nDimen,
         const NekSysKey &pKey)
     {
         NekSysSharedPtr p = MemoryManager<NekSys>::AllocateSharedPtr(
-            pSession, vComm, nDimen, pKey);
+            pSession, vRowComm, nDimen, pKey);
         return p;
     }
     LIB_UTILITIES_EXPORT NekSys(
         const LibUtilities::SessionReaderSharedPtr &pSession,
-        const LibUtilities::CommSharedPtr &vComm, const int nDimen,
+        const LibUtilities::CommSharedPtr &vRowComm, const int nDimen,
         const NekSysKey &pKey);
     LIB_UTILITIES_EXPORT void InitObject()
     {
@@ -299,7 +299,7 @@ protected:
     /// Tolerance of iterative solver.
     NekDouble m_tolerance;
     /// Communicate.
-    LibUtilities::CommSharedPtr m_Comm;
+    LibUtilities::CommSharedPtr m_rowComm;
     /// Whether the iteration has been converged
     bool m_converged;
     /// Root if parallel

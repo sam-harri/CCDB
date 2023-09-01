@@ -54,9 +54,9 @@ string NekLinSysIterCG::className =
 
 NekLinSysIterCG::NekLinSysIterCG(
     const LibUtilities::SessionReaderSharedPtr &pSession,
-    const LibUtilities::CommSharedPtr &vComm, const int nDimen,
+    const LibUtilities::CommSharedPtr &vRowComm, const int nDimen,
     const NekSysKey &pKey)
-    : NekLinSysIter(pSession, vComm, nDimen, pKey)
+    : NekLinSysIter(pSession, vRowComm, nDimen, pKey)
 {
 }
 
@@ -133,7 +133,7 @@ void NekLinSysIterCG::DoConjugateGradient(
     // Evaluate initial residual error for exit check
     vExchange[2] = Vmath::Dot2(nNonDir, r_A, r_A, m_map + nDir);
 
-    m_Comm->AllReduce(vExchange[2], Nektar::LibUtilities::ReduceSum);
+    m_rowComm->AllReduce(vExchange[2], Nektar::LibUtilities::ReduceSum);
 
     eps = vExchange[2];
 
@@ -166,7 +166,7 @@ void NekLinSysIterCG::DoConjugateGradient(
 
     vExchange[1] = Vmath::Dot2(nNonDir, s_A + nDir, w_A + nDir, m_map + nDir);
 
-    m_Comm->AllReduce(vExchange, Nektar::LibUtilities::ReduceSum);
+    m_rowComm->AllReduce(vExchange, Nektar::LibUtilities::ReduceSum);
 
     rho               = vExchange[0];
     mu                = vExchange[1];
@@ -218,7 +218,7 @@ void NekLinSysIterCG::DoConjugateGradient(
         vExchange[2] = Vmath::Dot2(nNonDir, r_A, r_A, m_map + nDir);
 
         // Perform inner-product exchanges
-        m_Comm->AllReduce(vExchange, Nektar::LibUtilities::ReduceSum);
+        m_rowComm->AllReduce(vExchange, Nektar::LibUtilities::ReduceSum);
 
         rho_new = vExchange[0];
         mu      = vExchange[1];

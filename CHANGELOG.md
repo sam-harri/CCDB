@@ -49,6 +49,7 @@ v5.4.0
 - Remove useless ReadExpressions and SubstituteExpressions function in sessionReader (!1608)
 - Corrected workspace size in triangle BwdTrans (!1610)
 - Reactivate Reactivate Movement_fixed_3D_stacked_cylinders_curved_hdf5_par test except on ARM MacOS (!1536)
+- Rename communicator in LinearAlgebra (!1612)
 
 **CompressibleFlowSolver**
 - Fix AUSM3 Riemann solver and add tests to the CI (!1537)
