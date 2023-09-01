@@ -241,8 +241,8 @@ ContField::~ContField()
  * variable #inarray of the ExpList object \a Sin. The resulting global
  * coefficients \f$\hat{u}_g\f$ are stored in the array #outarray.
  */
-void ContField::FwdTrans(const Array<OneD, const NekDouble> &inarray,
-                         Array<OneD, NekDouble> &outarray)
+void ContField::v_FwdTrans(const Array<OneD, const NekDouble> &inarray,
+                           Array<OneD, NekDouble> &outarray)
 
 {
     // Inner product of forcing
@@ -276,12 +276,11 @@ void ContField::v_SmoothField(Array<OneD, NekDouble> &field)
  * @param   inarray     Input vector @f$\mathbf{x}@f$.
  * @param   outarray    Output vector @f$\mathbf{y}@f$.
  */
-void ContField::MultiplyByInvMassMatrix(
+void ContField::v_MultiplyByInvMassMatrix(
     const Array<OneD, const NekDouble> &inarray,
     Array<OneD, NekDouble> &outarray)
 
 {
-
     GlobalLinSysKey key(StdRegions::eMass, m_locToGloMap);
     GlobalSolve(key, inarray, outarray);
 }
@@ -556,15 +555,6 @@ GlobalLinSysSharedPtr ContField::GenGlobalLinSys(const GlobalLinSysKey &mkey)
     return ExpList::GenGlobalLinSys(mkey, m_locToGloMap);
 }
 
-/**
- *
- */
-void ContField::v_FwdTrans(const Array<OneD, const NekDouble> &inarray,
-                           Array<OneD, NekDouble> &outarray)
-{
-    FwdTrans(inarray, outarray);
-}
-
 void ContField::v_ImposeDirichletConditions(Array<OneD, NekDouble> &outarray)
 {
     int i, j;
@@ -758,16 +748,6 @@ void ContField::v_LocalToGlobal(bool useComm)
 
 {
     m_locToGloMap->LocalToGlobal(m_coeffs, m_coeffs, useComm);
-}
-
-/**
- *
- */
-void ContField::v_MultiplyByInvMassMatrix(
-    const Array<OneD, const NekDouble> &inarray,
-    Array<OneD, NekDouble> &outarray)
-{
-    MultiplyByInvMassMatrix(inarray, outarray);
 }
 
 /**
@@ -998,15 +978,6 @@ void ContField::v_LinearAdvectionReactionSolve(
                         factors, varcoeffs);
 
     GlobalSolve(key, wsp, outarray, dirForcing);
-}
-
-/**
- *
- */
-const Array<OneD, const SpatialDomains::BoundaryConditionShPtr>
-    &ContField::v_GetBndConditions()
-{
-    return GetBndConditions();
 }
 
 /**

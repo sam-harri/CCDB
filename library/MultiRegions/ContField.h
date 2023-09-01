@@ -102,18 +102,6 @@ public:
     /// Returns the map from local to global level.
     inline const AssemblyMapCGSharedPtr &GetLocalToGlobalMap() const;
 
-    /// Performs the global forward transformation of a function
-    /// \f$f(\boldsymbol{x})\f$, subject to the boundary conditions
-    /// specified.
-    MULTI_REGIONS_EXPORT void FwdTrans(
-        const Array<OneD, const NekDouble> &inarray,
-        Array<OneD, NekDouble> &outarray);
-
-    /// Multiply a solution by the inverse mass matrix.
-    MULTI_REGIONS_EXPORT void MultiplyByInvMassMatrix(
-        const Array<OneD, const NekDouble> &inarray,
-        Array<OneD, NekDouble> &outarray);
-
     /// Solves the two-dimensional Laplace equation, subject to the
     /// boundary conditions specified.
     MULTI_REGIONS_EXPORT void LaplaceSolve(
@@ -129,14 +117,6 @@ public:
         const NekDouble ax, const NekDouble ay, Array<OneD, NekDouble> &Real,
         Array<OneD, NekDouble> &Imag,
         Array<OneD, NekDouble> &Evecs = NullNekDouble1DArray);
-
-    /// Returns the boundary conditions expansion.
-    inline const Array<OneD, const MultiRegions::ExpListSharedPtr>
-        &GetBndCondExpansions();
-
-    /// Returns the boundary conditions.
-    inline const Array<OneD, const SpatialDomains::BoundaryConditionShPtr>
-        &GetBndConditions();
 
     inline int GetGlobalMatrixNnz(const GlobalMatrixKey &gkey);
 
@@ -223,11 +203,6 @@ protected:
 
     MULTI_REGIONS_EXPORT virtual void v_GlobalToLocal(void) override;
 
-    // /// Template method virtual forwarder for FwdTrans().
-    // MULTI_REGIONS_EXPORT virtual void v_BwdTrans(
-    //                     const Array<OneD, const NekDouble> &inarray,
-    //                     Array<OneD,       NekDouble> &outarray);
-
     /// Template method virtual forwarder for FwdTrans().
     MULTI_REGIONS_EXPORT virtual void v_FwdTrans(
         const Array<OneD, const NekDouble> &inarray,
@@ -273,6 +248,10 @@ protected:
         Array<OneD, NekDouble> &outarray, const NekDouble lambda,
         const Array<OneD, const NekDouble> &dirForcing =
             NullNekDouble1DArray) override;
+
+    /// Returns the boundary conditions expansion.
+    inline const Array<OneD, const MultiRegions::ExpListSharedPtr>
+        &v_GetBndCondExpansions() override;
 
     /// Template method virtual forwarder for GetBndConditions().
     MULTI_REGIONS_EXPORT virtual const Array<
@@ -359,13 +338,13 @@ inline const AssemblyMapCGSharedPtr &ContField::GetLocalToGlobalMap() const
 }
 
 inline const Array<OneD, const MultiRegions::ExpListSharedPtr>
-    &ContField::GetBndCondExpansions()
+    &ContField::v_GetBndCondExpansions()
 {
     return m_bndCondExpansions;
 }
 
 inline const Array<OneD, const SpatialDomains::BoundaryConditionShPtr>
-    &ContField::GetBndConditions()
+    &ContField::v_GetBndConditions()
 {
     return m_bndConditions;
 }
