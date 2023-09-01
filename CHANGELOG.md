@@ -50,6 +50,7 @@ v5.4.0
 - Corrected workspace size in triangle BwdTrans (!1610)
 - Reactivate Reactivate Movement_fixed_3D_stacked_cylinders_curved_hdf5_par test except on ARM MacOS (!1536)
 - Rename communicator in LinearAlgebra (!1612)
+- Add IProductWRTDerivBase operator for 3DH1D problems (!1483)
 
 **CompressibleFlowSolver**
 - Fix AUSM3 Riemann solver and add tests to the CI (!1537)
