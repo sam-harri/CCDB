@@ -105,12 +105,6 @@ protected:
     /// Tolerance to which steady state should be evaluated at.
     NekDouble m_steadyStateTol;
 
-    // Flag to control the update of preconditioning matrix.
-    bool m_flagUpdatePreconMat;
-    int m_TotNewtonIts = 0;
-    int m_TotLinIts    = 0;
-    int m_TotImpStages = 0;
-
     /// Number of time steps between outputting filters information.
     int m_filtersInfosteps;
     std::vector<std::pair<std::string, FilterSharedPtr>> m_filters;
@@ -118,11 +112,6 @@ protected:
     /// Flag to determine if simulation should start in homogeneous
     /// forward transformed state.
     bool m_homoInitialFwd;
-
-    /// Flag to update artificial viscosity.
-    bool m_CalcPhysicalAV = true;
-    bool m_flagImplicitItsStatistics;
-    bool m_flagImplicitSolver = false;
 
     // Steady-state residual file
     std::ofstream m_errFile;
@@ -141,6 +130,14 @@ protected:
 
     /// Solves an unsteady problem.
     SOLVER_UTILS_EXPORT virtual void v_DoSolve() override;
+
+    /// Print Status Information
+    SOLVER_UTILS_EXPORT virtual void v_PrintStatusInformation(
+        const int step, const NekDouble cpuTime);
+
+    /// Print Summary Statistics
+    SOLVER_UTILS_EXPORT virtual void v_PrintSummaryStatistics(
+        const NekDouble intTime);
 
     /// Sets up initial conditions.
     SOLVER_UTILS_EXPORT virtual void v_DoInitialise(

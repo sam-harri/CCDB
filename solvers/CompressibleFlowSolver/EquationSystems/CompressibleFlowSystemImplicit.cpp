@@ -59,6 +59,9 @@ void CFSImplicit::v_InitObject(bool DeclareFields)
     m_explicitDiffusion = false;
 
     // initialise implicit parameters
+    m_session->MatchSolverInfo("FLAGIMPLICITITSSTATISTICS", "True",
+                               m_flagImplicitItsStatistics, false);
+
     m_session->LoadParameter("JacobiFreeEps", m_jacobiFreeEps, 5.0E-8);
 
     int ntmp;
@@ -72,8 +75,6 @@ void CFSImplicit::v_InitObject(bool DeclareFields)
     m_ode.DefineImplicitSolve(&CFSImplicit::DoImplicitSolve, this);
 
     InitialiseNonlinSysSolver();
-
-    m_flagImplicitSolver = true;
 }
 
 void CFSImplicit::InitialiseNonlinSysSolver()
@@ -136,6 +137,50 @@ void CFSImplicit::InitialiseNonlinSysSolver()
  */
 CFSImplicit::~CFSImplicit()
 {
+}
+
+void CFSImplicit::v_DoSolve()
+{
+    m_TotNewtonIts = 0;
+    m_TotLinIts    = 0;
+    m_TotImpStages = 0;
+
+    UnsteadySystem::v_DoSolve();
+}
+
+void CFSImplicit::v_PrintStatusInformation(const int step,
+                                           const NekDouble cpuTime)
+{
+    UnsteadySystem::v_PrintStatusInformation(step, cpuTime);
+
+    if (m_infosteps && m_session->GetComm()->GetSpaceComm()->GetRank() == 0 &&
+        !((step + 1) % m_infosteps))
+    {
+        if (m_flagImplicitItsStatistics)
+        {
+            cout << "       &&"
+                 << " TotImpStages= " << m_TotImpStages
+                 << " TotNewtonIts= " << m_TotNewtonIts
+                 << " TotLinearIts = " << m_TotLinIts << endl;
+        }
+    }
+}
+
+void CFSImplicit::v_PrintSummaryStatistics(const NekDouble intTime)
+{
+    UnsteadySystem::v_PrintSummaryStatistics(intTime);
+
+    if (m_session->GetComm()->GetRank() == 0)
+    {
+        if (m_flagImplicitItsStatistics)
+        {
+            cout << "-------------------------------------------" << endl
+                 << "Total Implicit Stages: " << m_TotImpStages << endl
+                 << "Total Newton Its     : " << m_TotNewtonIts << endl
+                 << "Total Linear Its     : " << m_TotLinIts << endl
+                 << "-------------------------------------------" << endl;
+        }
+    }
 }
 
 void CFSImplicit::NonlinSysEvaluatorCoeff1D(
@@ -435,8 +480,7 @@ void CFSImplicit::PreconCoeff(const Array<OneD, NekDouble> &inarray,
 
     Gtimer.Start();
     if (m_preconCfs->UpdatePreconMatCheck(NullNekDouble1DArray,
-                                          m_TimeIntegLambda) &&
-        m_flagUpdatePreconMat)
+                                          m_TimeIntegLambda))
     {
         int nvariables = m_solutionPhys.size();
 
@@ -458,8 +502,6 @@ void CFSImplicit::PreconCoeff(const Array<OneD, NekDouble> &inarray,
         timer.Stop();
         timer.AccumulateRegion("PreconCfsOp::BuildPreconCfs", 1);
     }
-
-    m_flagUpdatePreconMat = false;
 
     timer.Start();
     m_preconCfs->DoPreconCfs(m_fields, inarray, outarray, flag);
