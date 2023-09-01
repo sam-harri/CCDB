@@ -142,6 +142,22 @@ void VCSImplicit::v_GenerateSummary(SolverUtils::SummaryList &s)
                 ", diff coeff = " +
                 boost::lexical_cast<string>(m_sVVDiffCoeffHomo1D) + "))");
     }
+
+    if (m_useGJPStabilisation)
+    {
+        SolverUtils::AddSummaryItem(
+            s, "GJP Stab. Impl.    ",
+            m_session->GetSolverInfo("GJPStabilisation"));
+        SolverUtils::AddSummaryItem(s, "GJP Stab. JumpScale", m_GJPJumpScale);
+
+        if (boost::iequals(m_session->GetSolverInfo("GJPStabilisation"),
+                           "Explicit"))
+        {
+            SolverUtils::AddSummaryItem(
+                s, "GJP Normal Velocity",
+                m_session->GetSolverInfo("GJPNormalVelocity"));
+        }
+    }
 }
 
 /**
@@ -371,14 +387,12 @@ void VCSImplicit::v_SolveViscous(
     const Array<OneD, const Array<OneD, NekDouble>> &inarray,
     Array<OneD, Array<OneD, NekDouble>> &outarray, const NekDouble aii_Dt)
 {
-    boost::ignore_unused(inarray); // Not required in implicit scheme
-
     StdRegions::ConstFactorMap factors;
     StdRegions::VarCoeffMap varcoeffs;
     MultiRegions::VarFactorsMap varfactors = MultiRegions::NullVarFactorsMap;
 
-    // TODO Check whether SVV works with VCSImplicit
     AppendSVVFactors(factors, varfactors);
+    ComputeGJPNormalVelocity(inarray, varcoeffs);
 
     // Set advection velocities
     StdRegions::VarCoeffType varcoefftypes[] = {StdRegions::eVarCoeffVelX,
@@ -392,6 +406,12 @@ void VCSImplicit::v_SolveViscous(
     // Solve Advection-Diffusion-Reaction system
     for (int i = 0; i < m_nConvectiveFields; ++i)
     {
+        // Add diffusion coefficient to GJP matrix operator (Implicit part)
+        if (m_useGJPStabilisation)
+        {
+            factors[StdRegions::eFactorGJP] = m_GJPJumpScale / m_diffCoeff[i];
+        }
+
         // \lambda = - /frac{\gamma}{\Delta t \nu}
         factors[StdRegions::eFactorLambda] = -1.0 / aii_Dt / m_diffCoeff[i];
 
@@ -399,12 +419,17 @@ void VCSImplicit::v_SolveViscous(
             Forcing[i], m_fields[i]->UpdateCoeffs(), factors, varcoeffs,
             varfactors);
 
-        // Nuke GlobalLinSys, avoids memory leak
-        if (i == m_nConvectiveFields - 1 // Remove after last velocity solve
-            && gkey.GetMatrixType() ==
-                   StdRegions::eLinearAdvectionDiffusionReaction) // catch Null
-                                                                  // return from
-                                                                  // 3DH1D solve
+        // Nuke GlobalLinSys, avoids memory leak under condition:
+        // Remove after last velocity solve (w-velocity in 3D,
+        // assumes same matrix for each velocity)
+        // Also, catches Null return from 3DH1D solve by checking matrix type
+        // is an ADR matrix (variant)
+        if (i == m_nConvectiveFields - 1 &&
+            (gkey.GetMatrixType() ==
+                 StdRegions::eLinearAdvectionDiffusionReaction ||
+             gkey.GetMatrixType() ==
+                 StdRegions::eLinearAdvectionDiffusionReactionGJP))
+
         {
             m_fields[i]->UnsetGlobalLinSys(gkey, true);
         }

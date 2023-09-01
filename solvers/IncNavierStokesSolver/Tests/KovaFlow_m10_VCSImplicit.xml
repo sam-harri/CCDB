@@ -16,22 +16,6 @@
             <I PROPERTY="TimeIntegrationMethod" VALUE="IMEXOrder2" />
         </SOLVERINFO>
 
-        <GLOBALSYSSOLNINFO>
-            <V VAR="u,v">
-                <I PROPERTY="GlobalSysSoln"	            VALUE="DirectFull" />
-                <I PROPERTY="Preconditioner"	        VALUE="Null"/>
-                <I PROPERTY="IterativeSolverTolerance"  VALUE="1e-14"/>
-                <I PROPERTY="LinSysIterSolver"          VALUE="GMRES"/>
-            </V>
-
-            <V VAR="p">
-                <I PROPERTY="GlobalSysSoln"	            VALUE="DirectFull" />
-                <I PROPERTY="Preconditioner"	        VALUE="Null"/>
-                <I PROPERTY="IterativeSolverTolerance"  VALUE="1e-14"/>
-                <I PROPERTY="LinSysIterSolver"          VALUE="ConjugateGradient"/>
-            </V>
-        </GLOBALSYSSOLNINFO>
-
         <PARAMETERS>
             <P> TimeStep      = 0.4         </P>
             <P> NumSteps      = 100         </P>

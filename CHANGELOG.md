@@ -58,6 +58,7 @@ v5.4.0
 - Register SolverType in SessionReader (!1541)
 - Prevent file overwrite with restart for the IsentropicVortex solver (!1543)
 - Fix GJP stabilisation for curved 3D elements (!1593)
+- Enable SVV and GJP stabilisation for unresolved scales in VCSImplicit (!1592)
 
 **Miscellaneous**
 - Fix compilation against TetGen 1.6 (!1547)
