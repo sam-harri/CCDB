@@ -31,6 +31,7 @@ v5.4.0
 - Tidy-up diffusion class and subclasses (!1581)
 - Tidy-up NekNonlinSys and fix some issues (!1563)
 - Add a priori convergence and null-input check to GMRES (!1590)
+- Add IProductWRTDerivBase operator for 3DH1D problems (!1483)
 
 **CompressibleFlowSolver**
 - Fix AUSM3 Riemann solver and add tests to the CI (!1537)
