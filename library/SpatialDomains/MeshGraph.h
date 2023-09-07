@@ -188,7 +188,8 @@ public:
     SPATIAL_DOMAINS_EXPORT static MeshGraphSharedPtr Read(
         const LibUtilities::SessionReaderSharedPtr pSession,
         LibUtilities::DomainRangeShPtr rng = LibUtilities::NullDomainRangeShPtr,
-        bool fillGraph                     = true);
+        bool fillGraph                     = true,
+        SpatialDomains::MeshGraphSharedPtr partitionedGraph = nullptr);
 
     SPATIAL_DOMAINS_EXPORT void WriteGeometry(
         std::string &outfilename, bool defaultExp = false,
@@ -406,6 +407,11 @@ public:
     {
         return m_hexGeoms;
     }
+    SPATIAL_DOMAINS_EXPORT std::unordered_map<int, GeometryLinkSharedPtr>
+        &GetAllFaceToElMap()
+    {
+        return m_faceToElMap;
+    }
 
     SPATIAL_DOMAINS_EXPORT int GetNumElements();
 
@@ -434,6 +440,8 @@ public:
     SPATIAL_DOMAINS_EXPORT LibUtilities::BasisKey GetFaceBasisKey(
         Geometry2DSharedPtr face, const int facedir,
         const std::string variable = "DefaultVar");
+
+    void SetPartition(SpatialDomains::MeshGraphSharedPtr graph);
 
     CompositeOrdering &GetCompositeOrdering()
     {
@@ -501,7 +509,7 @@ protected:
     int m_meshDimension;
     int m_spaceDimension;
     int m_partition;
-    bool m_meshPartitioned;
+    bool m_meshPartitioned = false;
     bool m_useExpansionType;
 
     // Refinement attributes (class members)
@@ -518,8 +526,6 @@ protected:
     LibUtilities::DomainRangeShPtr m_domainRange;
 
     ExpansionInfoMapShPtrMap m_expansionMapShPtrMap;
-
-    GeomInfoMap m_geomInfo;
 
     std::unordered_map<int, GeometryLinkSharedPtr> m_faceToElMap;
 
@@ -608,24 +614,6 @@ inline bool MeshGraph::SameExpansionInfo(const std::string var1,
 inline bool MeshGraph::ExpansionInfoDefined(const std::string var)
 {
     return m_expansionMapShPtrMap.count(var);
-}
-
-/**
- *
- */
-inline bool MeshGraph::CheckForGeomInfo(std::string parameter)
-{
-    return m_geomInfo.find(parameter) != m_geomInfo.end();
-}
-
-/**
- *
- */
-inline const std::string MeshGraph::GetGeomInfo(std::string parameter)
-{
-    ASSERTL1(m_geomInfo.find(parameter) != m_geomInfo.end(),
-             "Parameter " + parameter + " does not exist.");
-    return m_geomInfo[parameter];
 }
 
 } // namespace SpatialDomains

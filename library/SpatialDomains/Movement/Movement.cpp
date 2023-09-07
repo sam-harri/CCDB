@@ -111,14 +111,14 @@ Movement::Movement(const LibUtilities::SessionReaderSharedPtr &pSession,
         for (auto &zone : m_zones)
         {
             auto numEl = zone.second->GetElements().size();
-            comm->AllReduce(numEl, LibUtilities::ReduceSum);
+            comm->GetSpaceComm()->AllReduce(numEl, LibUtilities::ReduceSum);
 
             // Find shape type if not on this proc
             int shapeType =
                 !zone.second->GetElements().empty()
                     ? zone.second->GetElements().front()->GetShapeType()
                     : -1;
-            comm->AllReduce(shapeType, LibUtilities::ReduceMax);
+            comm->GetSpaceComm()->AllReduce(shapeType, LibUtilities::ReduceMax);
 
             if (comm->TreatAsRankZero())
             {
@@ -141,8 +141,8 @@ Movement::Movement(const LibUtilities::SessionReaderSharedPtr &pSession,
                 interface.second->GetLeftInterface()->GetEdge().size();
             auto numRight =
                 interface.second->GetRightInterface()->GetEdge().size();
-            comm->AllReduce(numLeft, LibUtilities::ReduceSum);
-            comm->AllReduce(numRight, LibUtilities::ReduceSum);
+            comm->GetSpaceComm()->AllReduce(numLeft, LibUtilities::ReduceSum);
+            comm->GetSpaceComm()->AllReduce(numRight, LibUtilities::ReduceSum);
 
             // Find shape type if not on this proc
             int shapeTypeLeft =
@@ -152,7 +152,8 @@ Movement::Movement(const LibUtilities::SessionReaderSharedPtr &pSession,
                           .begin()
                           ->second->GetShapeType()
                     : -1;
-            comm->AllReduce(shapeTypeLeft, LibUtilities::ReduceMax);
+            comm->GetSpaceComm()->AllReduce(shapeTypeLeft,
+                                            LibUtilities::ReduceMax);
             int shapeTypeRight =
                 !interface.second->GetRightInterface()->GetEdge().empty()
                     ? interface.second->GetRightInterface()
@@ -160,7 +161,8 @@ Movement::Movement(const LibUtilities::SessionReaderSharedPtr &pSession,
                           .begin()
                           ->second->GetShapeType()
                     : -1;
-            comm->AllReduce(shapeTypeRight, LibUtilities::ReduceMax);
+            comm->GetSpaceComm()->AllReduce(shapeTypeRight,
+                                            LibUtilities::ReduceMax);
 
             if (comm->TreatAsRankZero())
             {
@@ -176,7 +178,7 @@ Movement::Movement(const LibUtilities::SessionReaderSharedPtr &pSession,
             }
         }
 
-        comm->Block();
+        comm->GetSpaceComm()->Block();
         if (comm->TreatAsRankZero())
         {
             std::cout << std::endl;
