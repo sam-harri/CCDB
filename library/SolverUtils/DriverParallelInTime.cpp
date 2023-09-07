@@ -244,7 +244,10 @@ void DriverParallelInTime::SetParallelInTimeEquationSystem(
     std::string npz_string = std::to_string(npz);
     std::string nsz_string = std::to_string(nsz);
     std::string npt_string = std::to_string(npt);
-    std::string optfile    = m_session->GetSessionName() + ".opt";
+
+    // useoptfile
+    bool useoptfile         = m_session->DefinesCmdLineArgument("useoptfile");
+    std::string optfilename = useoptfile ? m_session->GetFilenames()[0] : "";
 
     char *argv[] = {const_cast<char *>("Solver"), // this is just a place holder
                     const_cast<char *>("--npx"),
@@ -258,13 +261,23 @@ void DriverParallelInTime::SetParallelInTimeEquationSystem(
                     const_cast<char *>("--npt"),
                     const_cast<char *>(npt_string.c_str()),
                     const_cast<char *>("--useoptfile"),
-                    const_cast<char *>(optfile.c_str()),
+                    const_cast<char *>(optfilename.c_str()),
                     nullptr};
 
-    int argc = m_session->DefinesCmdLineArgument("useoptfile") ? 11 : 13;
+    size_t argc = useoptfile ? 13 : 11;
+
+    // Get list of session file names.
+    std::vector<std::string> sessionFileNames;
+    for (auto &filename : m_session->GetFilenames())
+    {
+        // Remove optfile name, if necessary.
+        if (filename.substr(filename.find_last_of(".") + 1) != "opt")
+        {
+            sessionFileNames.push_back(filename);
+        }
+    }
 
     // Set session for coarse solver.
-    std::vector<std::string> sessionFileNames(m_session->GetFilenames());
     for (size_t timeLevel = 1; timeLevel < m_nequ; timeLevel++)
     {
         auto session = LibUtilities::SessionReader::CreateInstance(

@@ -144,9 +144,13 @@ vector<ForcingSharedPtr> Forcing::Load(
         {
             string vType = vForce->Attribute("TYPE");
 
+            TiXmlElement *vForceParam = vForce;
+            LibUtilities::SessionReader::GetXMLElementTimeLevel(
+                vForceParam, pSession->GetTimeLevel(), false);
             vForceList.push_back(GetForcingFactory().CreateInstance(
                 vType, pSession, pEquation, pFields, vNumForcingFields,
-                vForce));
+                vForceParam));
+
             vForce = vForce->NextSiblingElement("FORCE");
         }
     }

@@ -254,6 +254,8 @@ void Mapping::ReplaceField(
     if (m_session->DefinesElement("Nektar/Mapping"))
     {
         vMapping = m_session->GetElement("Nektar/Mapping");
+        LibUtilities::SessionReader::GetXMLElementTimeLevel(
+            vMapping, m_session->GetTimeLevel());
     }
     InitObject(pFields, vMapping);
 }
@@ -280,6 +282,8 @@ MappingSharedPtr Mapping::Load(
             vMapping    = pSession->GetElement("Nektar/Mapping");
             vType       = vMapping->Attribute("TYPE");
             m_isDefined = true;
+            LibUtilities::SessionReader::GetXMLElementTimeLevel(
+                vMapping, pSession->GetTimeLevel());
         }
         else
         {

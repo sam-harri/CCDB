@@ -66,11 +66,20 @@
     </EXPANSIONS>
     <CONDITIONS>
         <SOLVERINFO>
-            <I PROPERTY="EQTYPE"                VALUE="UnsteadyDiffusion"   />
-            <I PROPERTY="Projection"            VALUE="Continuous"          />
-            <I PROPERTY="TimeIntegrationMethod" VALUE="BackwardEuler"       />
-            <I PROPERTY="DiffusionAdvancement"  VALUE="Implicit"            />
-            <I PROPERTY="Driver"                VALUE="Parareal"            />
+            <TIMELEVEL VALUE="0">
+                <I PROPERTY="EQTYPE"                VALUE="UnsteadyDiffusion"   />
+                <I PROPERTY="Projection"            VALUE="Continuous"          />
+                <I PROPERTY="TimeIntegrationMethod" VALUE="BackwardEuler"       />
+                <I PROPERTY="DiffusionAdvancement"  VALUE="Implicit"            />
+                <I PROPERTY="Driver"                VALUE="Parareal"            />
+            </TIMELEVEL>
+            <TIMELEVEL VALUE="1">
+                <I PROPERTY="EQTYPE"                VALUE="UnsteadyDiffusion"   />
+                <I PROPERTY="Projection"            VALUE="Continuous"          />
+                <I PROPERTY="TimeIntegrationMethod" VALUE="BackwardEuler"       />
+                <I PROPERTY="DiffusionAdvancement"  VALUE="Implicit"            />
+                <I PROPERTY="Driver"                VALUE="Parareal"            />
+            </TIMELEVEL>
         </SOLVERINFO>
 
         <PARAMETERS>
@@ -96,29 +105,60 @@
         </PARAMETERS>
 
         <VARIABLES>
-            <V ID="0"> u </V>
+            <TIMELEVEL VALUE="0">
+                <V ID="0"> u </V>
+            </TIMELEVEL>
+            <TIMELEVEL VALUE="1">
+                <V ID="0"> u </V>
+            </TIMELEVEL>
         </VARIABLES>
 
         <BOUNDARYREGIONS>
-            <B ID="0"> C[2] </B>
-            <B ID="1"> C[3] </B>
+            <TIMELEVEL VALUE="0">
+                <B ID="0"> C[2] </B>
+                <B ID="1"> C[3] </B>
+            </TIMELEVEL>
+            <TIMELEVEL VALUE="1">
+                <B ID="0"> C[2] </B>
+                <B ID="1"> C[3] </B>
+            </TIMELEVEL>
         </BOUNDARYREGIONS>
 
         <BOUNDARYCONDITIONS>
-            <REGION REF="0">
-                <D VAR="u" VALUE="0" />
-            </REGION>
-            <REGION REF="1">
-                <N VAR="u" VALUE="0" />
-            </REGION>
+            <TIMELEVEL VALUE="0">
+                <REGION REF="0">
+                    <D VAR="u" VALUE="0" />
+                </REGION>
+                <REGION REF="1">
+                    <N VAR="u" VALUE="0" />
+                </REGION>
+            </TIMELEVEL>
+            <TIMELEVEL VALUE="1">
+                <REGION REF="0">
+                    <D VAR="u" VALUE="0" />
+                </REGION>
+                <REGION REF="1">
+                    <N VAR="u" VALUE="0" />
+                </REGION>
+            </TIMELEVEL>
         </BOUNDARYCONDITIONS>
 
         <FUNCTION NAME="InitialConditions">
-            <E VAR="u" VALUE="sin(wavefreq*x)*cos(wavefreq*y)" />
+            <TIMELEVEL VALUE="0">
+                <E VAR="u" VALUE="sin(wavefreq*x)*cos(wavefreq*y)" />
+            </TIMELEVEL>
+            <TIMELEVEL VALUE="1">
+                <E VAR="u" VALUE="sin(wavefreq*x)*cos(wavefreq*y)" />
+            </TIMELEVEL>
         </FUNCTION>
 
         <FUNCTION NAME="ExactSolution">
-            <E VAR="u" VALUE="exp(-2.0*wavefreq*wavefreq*t)*sin(wavefreq*x)*cos(wavefreq*y)" />
+            <TIMELEVEL VALUE="0">
+                <E VAR="u" VALUE="exp(-2.0*wavefreq*wavefreq*t)*sin(wavefreq*x)*cos(wavefreq*y)" />
+            </TIMELEVEL>
+            <TIMELEVEL VALUE="1">
+                <E VAR="u" VALUE="exp(-2.0*wavefreq*wavefreq*t)*sin(wavefreq*x)*cos(wavefreq*y)" />
+            </TIMELEVEL>
         </FUNCTION>
     </CONDITIONS>
 </NEKTAR>

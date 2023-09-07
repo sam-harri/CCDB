@@ -74,15 +74,17 @@ Movement::Movement(const LibUtilities::SessionReaderSharedPtr &pSession,
         bool zones = movement->FirstChild("ZONES") != nullptr;
         if (zones)
         {
-            ReadZones(pSession->GetElement("NEKTAR/MOVEMENT/ZONES"), meshGraph,
-                      pSession);
+            TiXmlElement *zonesTag =
+                pSession->GetElement("NEKTAR/MOVEMENT/ZONES");
+            ReadZones(zonesTag, meshGraph, pSession);
         }
 
         bool interfaces = movement->FirstChild("INTERFACES") != nullptr;
         if (interfaces)
         {
-            ReadInterfaces(pSession->GetElement("NEKTAR/MOVEMENT/INTERFACES"),
-                           meshGraph);
+            TiXmlElement *interfacesTag =
+                pSession->GetElement("NEKTAR/MOVEMENT/INTERFACES");
+            ReadInterfaces(interfacesTag, meshGraph);
         }
 
         ASSERTL0(zones == interfaces,

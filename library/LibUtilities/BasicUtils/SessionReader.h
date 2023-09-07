@@ -395,14 +395,15 @@ public:
     }
 
     /// Get time level (Parallel-in-Time)
-    LIB_UTILITIES_EXPORT int GetTimeLevel(void)
+    LIB_UTILITIES_EXPORT size_t GetTimeLevel(void) const
     {
         return m_timeLevel;
     }
 
     /// Get XML elment time level (Parallel-in-Time)
     LIB_UTILITIES_EXPORT static void GetXMLElementTimeLevel(
-        TiXmlElement *&element, const int timeLevel);
+        TiXmlElement *&element, const size_t timeLevel,
+        const bool disableCheck = true);
 
 private:
     boost::program_options::variables_map m_cmdLineOptions;
@@ -433,8 +434,8 @@ private:
     FilterMap m_filters;
     /// Time integration scheme information.
     TimeIntScheme m_timeIntScheme;
-    /// Time leven
-    int m_timeLevel = 0;
+    /// Time level.
+    size_t m_timeLevel = 0;
     /// Be verbose
     bool m_verbose;
     /// Running on a shared filesystem
