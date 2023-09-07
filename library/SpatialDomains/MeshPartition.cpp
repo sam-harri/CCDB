@@ -678,7 +678,7 @@ void MeshPartition::PartitionGraph(int nParts, bool overlapping)
         try
         {
             //////////////////////////////////////////////////////
-            // On a cartesian communicator do mesh partiotion just on the first
+            // On a cartesian communicator do mesh partition just on the first
             // column
             // so there is no doubt the partitions are all the same in all the
             // columns
@@ -734,7 +734,8 @@ void MeshPartition::PartitionGraph(int nParts, bool overlapping)
     else
     {
         // Figure out how many vertices we're going to get from each processor.
-        int nproc = m_comm->GetSize(), rank = m_comm->GetRank();
+        int nproc = m_comm->GetSpaceComm()->GetSize(),
+            rank  = m_comm->GetSpaceComm()->GetRank();
         std::vector<int> numToSend(nproc, 0), numToRecv(nproc);
         std::map<int, std::vector<int>> procMap;
 
@@ -746,7 +747,7 @@ void MeshPartition::PartitionGraph(int nParts, bool overlapping)
             procMap[toProc].push_back(m_graph[*vertit].id);
         }
 
-        m_comm->AlltoAll(numToSend, numToRecv);
+        m_comm->GetSpaceComm()->AlltoAll(numToSend, numToRecv);
 
         // Build offsets for all-to-all communication
         std::vector<int> sendOffsetMap(nproc), recvOffsetMap(nproc);
@@ -775,8 +776,8 @@ void MeshPartition::PartitionGraph(int nParts, bool overlapping)
         }
 
         // Send ID map to processors
-        m_comm->AlltoAllv(sendData, numToSend, sendOffsetMap, recvData,
-                          numToRecv, recvOffsetMap);
+        m_comm->GetSpaceComm()->AlltoAllv(sendData, numToSend, sendOffsetMap,
+                                          recvData, numToRecv, recvOffsetMap);
 
         // Finally, populate m_localPartition for this processor. Could contain
         // duplicates so erase those first.

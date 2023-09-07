@@ -341,7 +341,12 @@ void MeshGraphXml::v_PartitionMesh(
                 partitioner->GetElementIDs(parts[0], tmp);
                 elIDs[0].insert(tmp.begin(), tmp.end());
 
-                this->WriteXMLGeometry(session->GetSessionName(), elIDs, parts);
+                // if (comm->GetTimeComm()->GetRank() == 0) // FIXME
+                // (OpenMPI 3.1.3)
+                {
+                    this->WriteXMLGeometry(session->GetSessionName(), elIDs,
+                                           parts);
+                }
 
                 if (m_session->DefinesCmdLineArgument("part-info") && isRoot)
                 {
@@ -391,7 +396,6 @@ void MeshGraphXml::v_ReadGeometry(LibUtilities::DomainRangeShPtr rng,
     m_compositesLabels.clear();
     m_domain.clear();
     m_expansionMapShPtrMap.clear();
-    m_geomInfo.clear();
     m_faceToElMap.clear();
 
     m_domainRange = rng;

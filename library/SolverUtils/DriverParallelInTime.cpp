@@ -271,7 +271,8 @@ void DriverParallelInTime::SetParallelInTimeEquationSystem(
             argc, argv, sessionFileNames, m_session->GetComm(), timeLevel);
 
         // Set graph for coarse solver.
-        auto graph = SpatialDomains::MeshGraph::Read(session);
+        auto graph = SpatialDomains::MeshGraph::Read(
+            session, LibUtilities::NullDomainRangeShPtr, true, m_graph);
 
         // Set BndRegionOrdering (necessary for DG with periodic BC) FIXME
         graph->SetBndRegionOrdering(m_graph->GetBndRegionOrdering());

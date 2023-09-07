@@ -110,7 +110,8 @@ MeshGraph::~MeshGraph()
 
 MeshGraphSharedPtr MeshGraph::Read(
     const LibUtilities::SessionReaderSharedPtr session,
-    LibUtilities::DomainRangeShPtr rng, bool fillGraph)
+    LibUtilities::DomainRangeShPtr rng, bool fillGraph,
+    SpatialDomains::MeshGraphSharedPtr partitionedGraph)
 {
     LibUtilities::CommSharedPtr comm = session->GetComm();
     ASSERTL0(comm.get(), "Communication not initialised.");
@@ -152,12 +153,45 @@ MeshGraphSharedPtr MeshGraph::Read(
     // the PartitionMesh function so that we can support different options for
     // XML and HDF5.
     MeshGraphSharedPtr mesh = GetMeshGraphFactory().CreateInstance(geomType);
+
+    // For Parallel-in-Time
+    //    In contrast to XML, a pre-paritioned mesh directory (_xml) is not
+    //    produced when partitionning the mesh for the fine solver when using
+    //    HDF5. In order to guaranting the same partition on all time level,
+    //    the fine mesh partition has to be copied explicitly.
+    if (partitionedGraph && geomType == "HDF5")
+    {
+        mesh->SetPartition(partitionedGraph);
+    }
+
     mesh->PartitionMesh(session);
 
     // Finally, read the geometry information.
     mesh->ReadGeometry(rng, fillGraph);
 
     return mesh;
+}
+
+void MeshGraph::SetPartition(SpatialDomains::MeshGraphSharedPtr graph)
+{
+    m_meshPartitioned = true;
+
+    m_meshDimension  = graph->GetMeshDimension();
+    m_spaceDimension = graph->GetSpaceDimension();
+
+    m_vertSet     = graph->GetAllPointGeoms();
+    m_curvedFaces = graph->GetCurvedFaces();
+    m_curvedEdges = graph->GetCurvedEdges();
+
+    m_segGeoms   = graph->GetAllSegGeoms();
+    m_triGeoms   = graph->GetAllTriGeoms();
+    m_quadGeoms  = graph->GetAllQuadGeoms();
+    m_hexGeoms   = graph->GetAllHexGeoms();
+    m_prismGeoms = graph->GetAllPrismGeoms();
+    m_pyrGeoms   = graph->GetAllPyrGeoms();
+    m_tetGeoms   = graph->GetAllTetGeoms();
+
+    m_faceToElMap = graph->GetAllFaceToElMap();
 }
 
 void MeshGraph::FillGraph()
