@@ -45,6 +45,7 @@ v5.4.0
 - Fix an indexing error in MatrixFreeOps (!1602)
 - Update Session File for Parallel-in-Time (!1516)
 - Partially fix hdf5 partition for Parareal (!1611)
+- Update Collection for Parareal-in-Time (!1607)
 - New version of CreateCollection using basisKey (!1603)
 - Remove unused Domain.cpp and Domain.h file (!1609)
 - Remove useless ReadExpressions and SubstituteExpressions function in sessionReader (!1608)

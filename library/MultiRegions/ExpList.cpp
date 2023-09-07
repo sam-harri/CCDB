@@ -5193,7 +5193,6 @@ void ExpList::CreateCollections(Collections::ImplementationType ImpType)
     // session file or default given
     Collections::CollectionOptimisation colOpt(
         m_session, (*m_exp)[0]->GetShapeDimension(), ImpType);
-    // ImpType = colOpt.GetDefaultImplementationType();
 
     // turn on autotuning if explicitly specified in xml file
     // or command line option is set but only do optimisation

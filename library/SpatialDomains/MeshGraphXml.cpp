@@ -3126,14 +3126,25 @@ void MeshGraphXml::WriteXMLGeometry(std::string outname,
                 new TiXmlElement(*m_session->GetElement("Nektar/Conditions"));
             TiXmlElement *vBndRegions =
                 vConditions->FirstChildElement("BOUNDARYREGIONS");
+            // Use fine-level for mesh partition (Parallel-in-Time)
+            LibUtilities::SessionReader::GetXMLElementTimeLevel(vBndRegions, 0);
             TiXmlElement *vBndConditions =
                 vConditions->FirstChildElement("BOUNDARYCONDITIONS");
+            // Use fine-level for mesh partition (Parallel-in-Time)
+            LibUtilities::SessionReader::GetXMLElementTimeLevel(vBndConditions,
+                                                                0);
             TiXmlElement *vItem;
 
             if (vBndRegions)
             {
+                // Check for parallel-in-time
+                bool multiLevel =
+                    vConditions->FirstChildElement("BOUNDARYREGIONS")
+                        ->FirstChildElement("TIMELEVEL") != nullptr;
+
                 TiXmlElement *vNewBndRegions =
-                    new TiXmlElement("BOUNDARYREGIONS");
+                    multiLevel ? new TiXmlElement("TIMELEVEL")
+                               : new TiXmlElement("BOUNDARYREGIONS");
                 vItem = vBndRegions->FirstChildElement();
                 while (vItem)
                 {
@@ -3182,7 +3193,23 @@ void MeshGraphXml::WriteXMLGeometry(std::string outname,
                     // store original bnd region order
                     m_bndRegOrder[p] = vSeq;
                 }
-                vConditions->ReplaceChild(vBndRegions, *vNewBndRegions);
+                if (multiLevel)
+                {
+                    // Use fine-level for mesh partition (Parallel-in-Time)
+                    size_t timeLevel = 0;
+                    while (vBndRegions)
+                    {
+                        vNewBndRegions->SetAttribute("VALUE", timeLevel);
+                        vConditions->FirstChildElement("BOUNDARYREGIONS")
+                            ->ReplaceChild(vBndRegions, *vNewBndRegions);
+                        vBndRegions = vBndRegions->NextSiblingElement();
+                        timeLevel++;
+                    }
+                }
+                else
+                {
+                    vConditions->ReplaceChild(vBndRegions, *vNewBndRegions);
+                }
             }
 
             if (vBndConditions)

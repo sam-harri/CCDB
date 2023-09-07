@@ -239,6 +239,8 @@ void BoundaryConditions::ReadBoundaryRegions(TiXmlElement *conditions)
 
     TiXmlElement *boundaryRegions =
         conditions->FirstChildElement("BOUNDARYREGIONS");
+    LibUtilities::SessionReader::GetXMLElementTimeLevel(
+        boundaryRegions, m_session->GetTimeLevel());
     ASSERTL0(boundaryRegions, "Unable to find BOUNDARYREGIONS block.");
 
     // See if we have boundary regions defined.
@@ -328,6 +330,8 @@ void BoundaryConditions::ReadBoundaryConditions(TiXmlElement *conditions)
     // Read REGION tags
     TiXmlElement *boundaryConditionsElement =
         conditions->FirstChildElement("BOUNDARYCONDITIONS");
+    LibUtilities::SessionReader::GetXMLElementTimeLevel(
+        boundaryConditionsElement, m_session->GetTimeLevel());
     ASSERTL0(boundaryConditionsElement,
              "Boundary conditions must be specified.");
 

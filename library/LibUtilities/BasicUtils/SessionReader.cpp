@@ -281,6 +281,9 @@ void SessionReader::InitSession(const std::vector<std::string> &filenames)
         m_filenames = filenames;
     }
 
+    bool ParallelInTime =
+        m_comm->GetSize() != m_comm->GetSpaceComm()->GetSize();
+
     // check specified  opt file
     std::string optfile;
     int exists;
@@ -301,8 +304,35 @@ void SessionReader::InitSession(const std::vector<std::string> &filenames)
     else // check for writeoptfile
     {
         // check for opt file
-        optfile = m_sessionName + ".opt";
+        optfile = m_sessionName.substr(0, m_sessionName.find("_xml/")) + ".opt";
         exists  = (bool)boost::filesystem::exists(optfile.c_str());
+
+        // For Paralell-in-Time
+        if (exists && ParallelInTime)
+        {
+            TiXmlDocument doc;
+            doc.LoadFile(optfile);
+            TiXmlElement *xmlTag = doc.FirstChildElement("NEKTAR")
+                                       ->FirstChildElement("COLLECTIONS")
+                                       ->FirstChildElement("TIMELEVEL");
+            if (xmlTag)
+            {
+                // if there is a TIMELEVEL tag, then turn existing flag to false
+                // and check if the required time level is specified in the
+                // optfile.
+                exists = false;
+                while (xmlTag)
+                {
+                    if (m_timeLevel == stoi(xmlTag->Attribute("VALUE")))
+                    {
+                        exists = true;
+                        break;
+                    }
+                    xmlTag = xmlTag->NextSiblingElement();
+                }
+            }
+        }
+
         if (exists)
         {
             m_filenames.push_back(optfile);
@@ -1467,9 +1497,10 @@ bool SessionReader::DefinesCmdLineArgument(const std::string &pName) const
  *
  */
 void SessionReader::GetXMLElementTimeLevel(TiXmlElement *&Element,
-                                           const int timeLevel)
+                                           const size_t timeLevel,
+                                           const bool disableCheck)
 {
-    if (Element->FirstChildElement("TIMELEVEL"))
+    if (Element && Element->FirstChildElement("TIMELEVEL"))
     {
         Element = Element->FirstChildElement("TIMELEVEL");
         std::string timeLevelStr;
@@ -1492,10 +1523,13 @@ void SessionReader::GetXMLElementTimeLevel(TiXmlElement *&Element,
             }
             Element = Element->NextSiblingElement("TIMELEVEL");
         }
-        ASSERTL0(stoi(timeLevelStr) == timeLevel,
-                 "TIMELEVEL value " + std::to_string(timeLevel) +
-                     " not found in solver info "
-                     "XML element: \n\t'");
+        if (disableCheck)
+        {
+            ASSERTL0(stoi(timeLevelStr) == timeLevel,
+                     "TIMELEVEL value " + std::to_string(timeLevel) +
+                         " not found in solver info "
+                         "XML element: \n\t'");
+        }
     }
 }
 
@@ -1746,13 +1780,12 @@ void SessionReader::ReadParameters(TiXmlElement *conditions)
 
     TiXmlElement *parametersElement =
         conditions->FirstChildElement("PARAMETERS");
+    GetXMLElementTimeLevel(parametersElement, m_timeLevel);
 
     // See if we have parameters defined.  They are optional so we go on
     // if not.
     if (parametersElement)
     {
-        GetXMLElementTimeLevel(parametersElement, m_timeLevel);
-
         TiXmlElement *parameter = parametersElement->FirstChildElement("P");
 
         ParameterMap caseSensitiveParameters;
@@ -1833,11 +1866,10 @@ void SessionReader::ReadSolverInfo(TiXmlElement *conditions)
 
     TiXmlElement *solverInfoElement =
         conditions->FirstChildElement("SOLVERINFO");
+    GetXMLElementTimeLevel(solverInfoElement, m_timeLevel);
 
     if (solverInfoElement)
     {
-        GetXMLElementTimeLevel(solverInfoElement, m_timeLevel);
-
         TiXmlElement *solverInfo = solverInfoElement->FirstChildElement("I");
 
         while (solverInfo)
@@ -1907,14 +1939,11 @@ void SessionReader::ReadGlobalSysSolnInfo(TiXmlElement *conditions)
 
     TiXmlElement *GlobalSys =
         conditions->FirstChildElement("GLOBALSYSSOLNINFO");
+    GetXMLElementTimeLevel(GlobalSys, m_timeLevel);
 
     if (!GlobalSys)
     {
         return;
-    }
-    else
-    {
-        GetXMLElementTimeLevel(GlobalSys, m_timeLevel);
     }
 
     TiXmlElement *VarInfo = GlobalSys->FirstChildElement("V");
@@ -2036,14 +2065,11 @@ void SessionReader::ReadTimeIntScheme(TiXmlElement *conditions)
 
     TiXmlElement *timeInt =
         conditions->FirstChildElement("TIMEINTEGRATIONSCHEME");
+    GetXMLElementTimeLevel(timeInt, m_timeLevel);
 
     if (!timeInt)
     {
         return;
-    }
-    else
-    {
-        GetXMLElementTimeLevel(timeInt, m_timeLevel);
     }
 
     TiXmlElement *method  = timeInt->FirstChildElement("METHOD");
@@ -2146,6 +2172,7 @@ void SessionReader::ReadVariables(TiXmlElement *conditions)
     }
 
     TiXmlElement *variablesElement = conditions->FirstChildElement("VARIABLES");
+    GetXMLElementTimeLevel(variablesElement, m_timeLevel);
 
     // See if we have parameters defined. They are optional so we go on
     // if not.
@@ -2226,6 +2253,7 @@ void SessionReader::ReadFunctions(TiXmlElement *conditions)
 
     // Scan through conditions section looking for functions.
     TiXmlElement *function = conditions->FirstChildElement("FUNCTION");
+
     while (function)
     {
         stringstream tagcontent;
@@ -2246,7 +2274,9 @@ void SessionReader::ReadFunctions(TiXmlElement *conditions)
         boost::to_upper(functionStr);
 
         // Retrieve first entry (variable, or file)
-        TiXmlElement *variable = function->FirstChildElement();
+        TiXmlElement *element = function;
+        GetXMLElementTimeLevel(element, m_timeLevel, false);
+        TiXmlElement *variable = element->FirstChildElement();
 
         // Create new function structure with default type of none.
         FunctionVariableMap functionVarMap;
@@ -2451,6 +2481,7 @@ void SessionReader::ReadFilters(TiXmlElement *filters)
     m_filters.clear();
 
     TiXmlElement *filter = filters->FirstChildElement("FILTER");
+
     while (filter)
     {
         ASSERTL0(filter->Attribute("TYPE"),
@@ -2459,7 +2490,9 @@ void SessionReader::ReadFilters(TiXmlElement *filters)
 
         std::map<std::string, std::string> vParams;
 
-        TiXmlElement *param = filter->FirstChildElement("PARAM");
+        TiXmlElement *element = filter;
+        GetXMLElementTimeLevel(element, m_timeLevel, false);
+        TiXmlElement *param = element->FirstChildElement("PARAM");
         while (param)
         {
             ASSERTL0(param->Attribute("NAME"),
