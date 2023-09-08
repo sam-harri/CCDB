@@ -988,8 +988,8 @@ void HexExp::v_ComputeTraceNormal(const int face)
         int j, k;
 
         int nqe0  = ptsKeys[0].GetNumPoints();
-        int nqe1  = ptsKeys[0].GetNumPoints();
-        int nqe2  = ptsKeys[0].GetNumPoints();
+        int nqe1  = ptsKeys[1].GetNumPoints();
+        int nqe2  = ptsKeys[2].GetNumPoints();
         int nqe01 = nqe0 * nqe1;
         int nqe02 = nqe0 * nqe2;
         int nqe12 = nqe1 * nqe2;

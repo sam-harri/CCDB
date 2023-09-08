@@ -428,18 +428,11 @@ public:
         return Geometry2DSharedPtr();
     };
 
-    SPATIAL_DOMAINS_EXPORT LibUtilities::BasisKey GetEdgeBasisKey(
-        SegGeomSharedPtr edge, const std::string variable = "DefaultVar");
-
     SPATIAL_DOMAINS_EXPORT GeometryLinkSharedPtr
     GetElementsFromEdge(Geometry1DSharedPtr edge);
 
     SPATIAL_DOMAINS_EXPORT GeometryLinkSharedPtr
     GetElementsFromFace(Geometry2DSharedPtr face);
-
-    SPATIAL_DOMAINS_EXPORT LibUtilities::BasisKey GetFaceBasisKey(
-        Geometry2DSharedPtr face, const int facedir,
-        const std::string variable = "DefaultVar");
 
     void SetPartition(SpatialDomains::MeshGraphSharedPtr graph);
 

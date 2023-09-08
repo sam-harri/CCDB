@@ -860,89 +860,131 @@ const LibUtilities::BasisKey StdTriExp::v_GetTraceBasisKey(const int i,
     boost::ignore_unused(j);
     ASSERTL2(i >= 0 && i <= 2, "edge id is out of range");
 
-    if (i == 0)
+    // Get basiskey (0 or 1) according to edge id i
+    int dir = (i != 0);
+
+    switch (m_base[dir]->GetBasisType())
     {
-        return GetBasis(0)->GetBasisKey();
-    }
-    else
-    {
-        switch (m_base[1]->GetBasisType())
+        case LibUtilities::eGLL_Lagrange:
+        case LibUtilities::eModified_A:
         {
-            case LibUtilities::eModified_B:
+            switch (m_base[dir]->GetPointsType())
             {
-                switch (m_base[1]->GetPointsType())
+                case LibUtilities::eGaussLobattoLegendre:
                 {
-                    case LibUtilities::eGaussRadauMAlpha1Beta0:
-                    {
-                        LibUtilities::PointsKey pkey(
-                            m_base[1]
-                                    ->GetBasisKey()
-                                    .GetPointsKey()
-                                    .GetNumPoints() +
-                                1,
-                            LibUtilities::eGaussLobattoLegendre);
-                        return LibUtilities::BasisKey(LibUtilities::eModified_A,
-                                                      m_base[1]->GetNumModes(),
-                                                      pkey);
-                        break;
-                    }
-
-                    break;
-                        // Currently this does not increase the points by
-                        // 1 since when using this quadrature we are
-                        // presuming it is already been increased by one
-                        // when comopared to
-                        // GaussRadauMAlpha1Beta0. Currently used in the
-                        // GJP option
-                        //
-                        // Note have put down it back to numpoints +1 to
-                        // test for use on tri faces and GJP.
-
-                    case LibUtilities::eGaussRadauMLegendre:
-                    {
-                        LibUtilities::PointsKey pkey(
-                            m_base[1]
-                                    ->GetBasisKey()
-                                    .GetPointsKey()
-                                    .GetNumPoints() +
-                                1,
-                            LibUtilities::eGaussLobattoLegendre);
-                        return LibUtilities::BasisKey(LibUtilities::eModified_A,
-                                                      m_base[1]->GetNumModes(),
-                                                      pkey);
-                        break;
-                    }
-
-                    case LibUtilities::ePolyEvenlySpaced:
-                    {
-                        LibUtilities::PointsKey pkey(
-                            m_base[1]
-                                    ->GetBasisKey()
-                                    .GetPointsKey()
-                                    .GetNumPoints() +
-                                1,
-                            LibUtilities::ePolyEvenlySpaced);
-                        return LibUtilities::BasisKey(LibUtilities::eModified_A,
-                                                      m_base[1]->GetNumModes(),
-                                                      pkey);
-                        break;
-                    }
-
-                    break;
-                    default:
-                        NEKERROR(ErrorUtil::efatal,
-                                 "Unexpected points distribution " +
-                                     LibUtilities::kPointsTypeStr
-                                         [m_base[1]->GetPointsType()] +
-                                     " in StdTriExp::v_GetTraceBasisKey");
-                        break;
+                    return m_base[dir]->GetBasisKey();
                 }
                 break;
+                default:
+                {
+                    NEKERROR(ErrorUtil::efatal,
+                             "Unexpected points distribution " +
+                                 LibUtilities::kPointsTypeStr
+                                     [m_base[dir]->GetPointsType()] +
+                                 " in StdTriExp::v_GetTraceBasisKey");
+                }
             }
-            default:
-                NEKERROR(ErrorUtil::efatal,
-                         "Information not available to set edge key");
+        }
+        break;
+        case LibUtilities::eModified_B:
+        {
+            switch (m_base[dir]->GetPointsType())
+            {
+                case LibUtilities::eGaussRadauMAlpha1Beta0:
+                {
+                    LibUtilities::PointsKey pkey(
+                        m_base[dir]
+                                ->GetBasisKey()
+                                .GetPointsKey()
+                                .GetNumPoints() +
+                            1,
+                        LibUtilities::eGaussLobattoLegendre);
+                    return LibUtilities::BasisKey(LibUtilities::eModified_A,
+                                                  m_base[dir]->GetNumModes(),
+                                                  pkey);
+                }
                 break;
+                // Currently this does not increase the points by
+                // 1 since when using this quadrature we are
+                // presuming it is already been increased by one
+                // when comopared to
+                // GaussRadauMAlpha1Beta0. Currently used in the
+                // GJP option
+                //
+                // Note have put down it back to numpoints +1 to
+                // test for use on tri faces and GJP.
+                case LibUtilities::eGaussRadauMLegendre:
+                {
+                    LibUtilities::PointsKey pkey(
+                        m_base[dir]
+                                ->GetBasisKey()
+                                .GetPointsKey()
+                                .GetNumPoints() +
+                            1,
+                        LibUtilities::eGaussLobattoLegendre);
+                    return LibUtilities::BasisKey(LibUtilities::eModified_A,
+                                                  m_base[dir]->GetNumModes(),
+                                                  pkey);
+                }
+                break;
+                case LibUtilities::ePolyEvenlySpaced:
+                {
+                    LibUtilities::PointsKey pkey(
+                        m_base[dir]
+                                ->GetBasisKey()
+                                .GetPointsKey()
+                                .GetNumPoints() +
+                            1,
+                        LibUtilities::ePolyEvenlySpaced);
+                    return LibUtilities::BasisKey(LibUtilities::eModified_A,
+                                                  m_base[dir]->GetNumModes(),
+                                                  pkey);
+                }
+                break;
+                default:
+                {
+                    NEKERROR(ErrorUtil::efatal,
+                             "Unexpected points distribution " +
+                                 LibUtilities::kPointsTypeStr
+                                     [m_base[dir]->GetPointsType()] +
+                                 " in StdTriExp::v_GetTraceBasisKey");
+                }
+            }
+        }
+        break;
+        case LibUtilities::eOrtho_B:
+        {
+            switch (m_base[dir]->GetPointsType())
+            {
+                case LibUtilities::eGaussRadauMAlpha1Beta0:
+                {
+                    LibUtilities::PointsKey pkey(
+                        m_base[dir]
+                                ->GetBasisKey()
+                                .GetPointsKey()
+                                .GetNumPoints() +
+                            1,
+                        LibUtilities::eGaussLobattoLegendre);
+                    return LibUtilities::BasisKey(LibUtilities::eGLL_Lagrange,
+                                                  m_base[dir]->GetNumModes(),
+                                                  pkey);
+                }
+                break;
+                default:
+                {
+                    NEKERROR(ErrorUtil::efatal,
+                             "Unexpected points distribution " +
+                                 LibUtilities::kPointsTypeStr
+                                     [m_base[dir]->GetPointsType()] +
+                                 " in StdTriExp::v_GetTraceBasisKey");
+                }
+            }
+        }
+        break;
+        default:
+        {
+            NEKERROR(ErrorUtil::efatal,
+                     "Information not available to set edge key");
         }
     }
     return LibUtilities::NullBasisKey;
