@@ -56,7 +56,8 @@
         </ELEMENT>
         <CURVED />
         <COMPOSITE>
-            <C ID="1"> H[0-1] </C>
+            <C ID="0"> H[0] </C>
+            <C ID="1"> H[1] </C>
             <C ID="2"> F[0] </C>
             <C ID="3"> F[10] </C>
             <C ID="4"> F[1,6] </C>
@@ -64,9 +65,9 @@
             <C ID="6"> F[4,9] </C>
             <C ID="7"> F[2,7] </C>
         </COMPOSITE>
-        <DOMAIN> C[1] </DOMAIN>
+        <DOMAIN> C[0,1] </DOMAIN>
     </GEOMETRY>
     <EXPANSIONS>
-        <E COMPOSITE="C[1]" NUMMODES="2" TYPE="MODIFIED" FIELDS="u" />
+        <E COMPOSITE="C[0,1]" NUMMODES="2" TYPE="MODIFIED" FIELDS="u" />
     </EXPANSIONS>
 </NEKTAR>

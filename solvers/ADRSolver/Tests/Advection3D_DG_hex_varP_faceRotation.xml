@@ -2,10 +2,17 @@
 <NEKTAR>
     <EXPANSIONS>
         <E
-            COMPOSITE="C[0,1]"
-            BASISTYPE="Modified_A,Modified_A,Modified_A" NUMMODES="8,8,8"
+            COMPOSITE="C[0]"
+            BASISTYPE="Modified_A,Modified_A,Modified_A" NUMMODES="7,8,9"
             POINTSTYPE="GaussLobattoLegendre,GaussLobattoLegendre,GaussLobattoLegendre"
-            NUMPOINTS="8,8,8"
+            NUMPOINTS="9,9,10"
+            FIELDS="u"
+        />
+        <E
+            COMPOSITE="C[1]"
+            BASISTYPE="Modified_A,Modified_A,Modified_A" NUMMODES="8,7,8"
+            POINTSTYPE="GaussLobattoLegendre,GaussLobattoLegendre,GaussLobattoLegendre"
+            NUMPOINTS="9,8,9"
             FIELDS="u"
         />
     </EXPANSIONS>
