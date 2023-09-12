@@ -65,13 +65,6 @@ DriverSteadyState::DriverSteadyState(
 /**
  *
  */
-DriverSteadyState::~DriverSteadyState()
-{
-}
-
-/**
- *
- */
 void DriverSteadyState::v_InitObject(ostream &out)
 {
     DriverModifiedArnoldi::v_InitObject(out);

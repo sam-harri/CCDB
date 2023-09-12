@@ -61,13 +61,6 @@ DriverParareal::DriverParareal(
 /**
  *
  */
-DriverParareal::~DriverParareal()
-{
-}
-
-/**
- *
- */
 void DriverParareal::v_InitObject(std::ostream &out)
 {
     DriverParallelInTime::v_InitObject(out);

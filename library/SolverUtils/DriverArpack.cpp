@@ -79,13 +79,6 @@ DriverArpack::DriverArpack(const LibUtilities::SessionReaderSharedPtr pSession,
 /**
  *
  */
-DriverArpack::~DriverArpack()
-{
-}
-
-/**
- *
- */
 void DriverArpack::v_InitObject(ostream &out)
 {
     DriverArnoldi::v_InitObject(out);

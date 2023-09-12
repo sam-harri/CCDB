@@ -69,7 +69,7 @@ protected:
         const SpatialDomains::MeshGraphSharedPtr pGraph);
 
     /// Destructor
-    SOLVER_UTILS_EXPORT virtual ~DriverSteadyState();
+    SOLVER_UTILS_EXPORT virtual ~DriverSteadyState() = default;
 
     /// Initialises EquationSystem class members.
     SOLVER_UTILS_EXPORT virtual void v_InitObject(

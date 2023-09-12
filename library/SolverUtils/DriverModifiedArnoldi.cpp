@@ -66,13 +66,6 @@ DriverModifiedArnoldi::DriverModifiedArnoldi(
 /**
  *
  */
-DriverModifiedArnoldi::~DriverModifiedArnoldi()
-{
-}
-
-/**
- *
- */
 void DriverModifiedArnoldi::v_InitObject(ostream &out)
 {
     DriverArnoldi::v_InitObject(out);

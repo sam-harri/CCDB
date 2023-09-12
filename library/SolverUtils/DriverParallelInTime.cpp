@@ -56,13 +56,6 @@ DriverParallelInTime::DriverParallelInTime(
 /**
  *
  */
-DriverParallelInTime::~DriverParallelInTime()
-{
-}
-
-/**
- *
- */
 void DriverParallelInTime::v_InitObject(std::ostream &out)
 {
     try

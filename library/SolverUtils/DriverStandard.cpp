@@ -61,13 +61,6 @@ DriverStandard::DriverStandard(
 /**
  *
  */
-DriverStandard::~DriverStandard()
-{
-}
-
-/**
- *
- */
 void DriverStandard::v_InitObject(ostream &out)
 {
     Driver::v_InitObject(out);

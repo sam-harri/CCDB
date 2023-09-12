@@ -54,6 +54,7 @@ v5.4.0
 - Rename communicator in LinearAlgebra (!1612)
 - Add IProductWRTDerivBase operator for 3DH1D problems (!1483)
 - Full support of mixed-order elements in DG (!1606)
+- Use default keyword for destructor in Driver (!1624)
 
 **CompressibleFlowSolver**
 - Fix AUSM3 Riemann solver and add tests to the CI (!1537)
