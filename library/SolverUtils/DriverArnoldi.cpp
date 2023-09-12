@@ -90,7 +90,7 @@ void DriverArnoldi::v_InitObject(ostream &out)
             m_equ[0]->UpdateFields()[i]->SetWaveSpace(true);
         }
     }
-    m_negatedOp = m_equ[0]->v_NegatedOp();
+    m_negatedOp = m_equ[0]->NegatedOp();
 
     m_session->LoadParameter("kdim", m_kdim, 16);
     m_session->LoadParameter("nvec", m_nvec, 2);

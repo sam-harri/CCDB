@@ -79,9 +79,6 @@ public:
     /// Destructor
     SOLVER_UTILS_EXPORT virtual ~EquationSystem();
 
-    // Set up trace normals if required
-    SOLVER_UTILS_EXPORT void SetUpTraceNormals(void);
-
     /// Initialises the members of this object.
     SOLVER_UTILS_EXPORT inline void InitObject(bool DeclareField = true);
 
@@ -100,11 +97,6 @@ public:
 
     /// Perform output operations after solve.
     SOLVER_UTILS_EXPORT inline void Output();
-
-    /// Linf error computation
-    SOLVER_UTILS_EXPORT inline NekDouble LinfError(
-        unsigned int field,
-        const Array<OneD, NekDouble> &exactsoln = NullNekDouble1DArray);
 
     /// Get Session name
     SOLVER_UTILS_EXPORT std::string GetSessionName()
@@ -170,6 +162,11 @@ public:
     {
         return L2Error(field, NullNekDouble1DArray, Normalised);
     }
+
+    /// Linf error computation
+    SOLVER_UTILS_EXPORT NekDouble
+    LinfError(unsigned int field,
+              const Array<OneD, NekDouble> &exactsoln = NullNekDouble1DArray);
 
     /// Compute error (L2 and L_inf) over an larger set of quadrature
     /// points return [L2 Linf]
@@ -342,8 +339,8 @@ public:
     /// Evaluates the boundary conditions at the given time.
     SOLVER_UTILS_EXPORT void SetBoundaryConditions(NekDouble time);
 
-    /// Virtual function to identify if operator is negated in DoSolve
-    SOLVER_UTILS_EXPORT virtual bool v_NegatedOp();
+    /// Identify if operator is negated in DoSolve
+    SOLVER_UTILS_EXPORT bool NegatedOp();
 
     /// Check if solver use Parallel-in-Time
     SOLVER_UTILS_EXPORT bool ParallelInTime()
@@ -517,6 +514,9 @@ protected:
     SOLVER_UTILS_EXPORT virtual MultiRegions::ExpListSharedPtr v_GetPressure(
         void);
 
+    /// Virtual function to identify if operator is negated in DoSolve
+    SOLVER_UTILS_EXPORT virtual bool v_NegatedOp(void);
+
     SOLVER_UTILS_EXPORT virtual void v_ExtraFldOutput(
         std::vector<Array<OneD, NekDouble>> &fieldcoeffs,
         std::vector<std::string> &variables);
@@ -684,6 +684,12 @@ inline void EquationSystem::EvaluateExactSolution(
     int field, Array<OneD, NekDouble> &outfield, const NekDouble time)
 {
     v_EvaluateExactSolution(field, outfield, time);
+}
+
+/// Identify if operator is negated in DoSolve
+inline bool EquationSystem::NegatedOp(void)
+{
+    return v_NegatedOp();
 }
 
 inline Array<OneD, MultiRegions::ExpListSharedPtr>

@@ -28,7 +28,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 //
-// Description: Main wrapper class for Advection Diffusion Reaction Solver
+// Description:
 //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -85,6 +85,7 @@ std::string EquationSystem::projectionTypeLookupIds[7] = {
     LibUtilities::SessionReader::RegisterEnumValue(
         "Projection", "MixedCGDG", MultiRegions::eMixed_CG_Discontinuous),
 };
+
 /**
  * @class EquationSystem
  *
@@ -127,6 +128,17 @@ EquationSystem::EquationSystem(
         m_fieldMetaDataMap[sessionname]  = filenames[i];
         m_fieldMetaDataMap["ChkFileNum"] = boost::lexical_cast<std::string>(0);
     }
+}
+
+/**
+ * @brief Destructor for class EquationSystem.
+ */
+EquationSystem::~EquationSystem()
+{
+    LibUtilities::NekManager<LocalRegions::MatrixKey, DNekScalMat,
+                             LocalRegions::MatrixKey::opLess>::ClearManager();
+    LibUtilities::NekManager<LocalRegions::MatrixKey, DNekScalBlkMat,
+                             LocalRegions::MatrixKey::opLess>::ClearManager();
 }
 
 /**
@@ -720,16 +732,8 @@ void EquationSystem::v_InitObject(bool DeclareFields)
 }
 
 /**
- * @brief Destructor for class EquationSystem.
+ *
  */
-EquationSystem::~EquationSystem()
-{
-    LibUtilities::NekManager<LocalRegions::MatrixKey, DNekScalMat,
-                             LocalRegions::MatrixKey::opLess>::ClearManager();
-    LibUtilities::NekManager<LocalRegions::MatrixKey, DNekScalBlkMat,
-                             LocalRegions::MatrixKey::opLess>::ClearManager();
-}
-
 SessionFunctionSharedPtr EquationSystem::GetFunction(
     std::string name, const MultiRegions::ExpListSharedPtr &field, bool cache)
 {
@@ -1052,6 +1056,9 @@ void EquationSystem::v_SetInitialConditions(NekDouble initialtime,
     ++m_nchk;
 }
 
+/**
+ *
+ */
 void EquationSystem::v_EvaluateExactSolution(unsigned int field,
                                              Array<OneD, NekDouble> &outfield,
                                              const NekDouble time)
@@ -1466,7 +1473,7 @@ void EquationSystem::ImportFld(const std::string &infile,
 {
 
     ASSERTL0(fieldStr.size() <= coeffs.size(),
-             "length of fieldstr should be the same as pFields");
+             "length of fieldstr should be the same as coeffs");
 
     std::vector<LibUtilities::FieldDefinitionsSharedPtr> FieldDef;
     std::vector<std::vector<NekDouble>> FieldData;
@@ -1578,11 +1585,17 @@ void EquationSystem::SessionSummary(SummaryList &s)
     }
 }
 
+/**
+ *
+ */
 Array<OneD, bool> EquationSystem::v_GetSystemSingularChecks()
 {
     return Array<OneD, bool>(m_session->GetVariables().size(), false);
 }
 
+/**
+ *
+ */
 MultiRegions::ExpListSharedPtr EquationSystem::v_GetPressure()
 {
     ASSERTL0(false, "This function is not valid for the Base class");
@@ -1590,6 +1603,9 @@ MultiRegions::ExpListSharedPtr EquationSystem::v_GetPressure()
     return null;
 }
 
+/**
+ *
+ */
 void EquationSystem::v_ExtraFldOutput(
     std::vector<Array<OneD, NekDouble>> &fieldcoeffs,
     std::vector<std::string> &variables)

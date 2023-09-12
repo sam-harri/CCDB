@@ -598,7 +598,7 @@ NekDouble CompressibleFlowSystem::v_GetTimeStep(
 
     // Get the minimum time-step limit and return the time-step
     NekDouble TimeStep = Vmath::Vmin(nElements, tstep, 1);
-    m_comm->AllReduce(TimeStep, LibUtilities::ReduceMin);
+    m_comm->GetSpaceComm()->AllReduce(TimeStep, LibUtilities::ReduceMin);
 
     return TimeStep;
 }
@@ -661,7 +661,7 @@ void CompressibleFlowSystem::v_SetInitialConditions(NekDouble initialtime,
 
         if (Noise > 0.0)
         {
-            int seed = -m_comm->GetRank() * m_nConvectiveFields;
+            int seed = -m_comm->GetSpaceComm()->GetRank() * m_nConvectiveFields;
             for (int i = 0; i < m_nConvectiveFields; i++)
             {
                 Vmath::FillWhiteNoise(phystot, Noise, noise, 1, seed);
@@ -1038,7 +1038,7 @@ void CompressibleFlowSystem::v_SteadyStateResidual(int step,
         residual[i] = Vmath::Vsum(nPoints, tmp, 1);
     }
 
-    m_comm->AllReduce(residual, LibUtilities::ReduceSum);
+    m_comm->GetSpaceComm()->AllReduce(residual, LibUtilities::ReduceSum);
 
     NekDouble onPoints = 1.0 / NekDouble(nPoints);
     for (size_t i = 0; i < nFields; ++i)

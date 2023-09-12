@@ -97,7 +97,7 @@ void CFSImplicit::InitialiseNonlinSysSolver()
     key.m_LinSysMaxStorage          = 30;
 
     m_nonlinsol = LibUtilities::GetNekNonlinSysFactory().CreateInstance(
-        SolverType, m_session, m_comm, ntotal, key);
+        SolverType, m_session, m_comm->GetRowComm(), ntotal, key);
 
     LibUtilities::NekSysOperators nekSysOp;
     nekSysOp.DefineNekSysResEval(&CFSImplicit::NonlinSysEvaluatorCoeff1D, this);
@@ -428,7 +428,8 @@ void CFSImplicit::CalcRefValues(const Array<OneD, const NekDouble> &inarray)
     unsigned int npoints    = ntotal / nvariables;
 
     unsigned int nTotalGlobal = ntotal;
-    m_comm->AllReduce(nTotalGlobal, Nektar::LibUtilities::ReduceSum);
+    m_comm->GetSpaceComm()->AllReduce(nTotalGlobal,
+                                      Nektar::LibUtilities::ReduceSum);
     unsigned int nTotalDOF = nTotalGlobal / nvariables;
     NekDouble invTotalDOF  = 1.0 / nTotalDOF;
 
@@ -441,7 +442,8 @@ void CFSImplicit::CalcRefValues(const Array<OneD, const NekDouble> &inarray)
         m_magnitdEstimat[i] =
             Vmath::Dot(npoints, inarray + offset, inarray + offset);
     }
-    m_comm->AllReduce(m_magnitdEstimat, Nektar::LibUtilities::ReduceSum);
+    m_comm->GetSpaceComm()->AllReduce(m_magnitdEstimat,
+                                      Nektar::LibUtilities::ReduceSum);
 
     for (int i = 0; i < nvariables; ++i)
     {
@@ -1761,7 +1763,8 @@ void CFSImplicit::MatrixMultiplyMatrixFreeCoeff(
     NekDouble eps             = m_jacobiFreeEps;
     unsigned int nTotalGlobal = inarray.size();
     NekDouble magninarray     = Vmath::Dot(nTotalGlobal, inarray, inarray);
-    m_comm->AllReduce(magninarray, Nektar::LibUtilities::ReduceSum);
+    m_comm->GetSpaceComm()->AllReduce(magninarray,
+                                      Nektar::LibUtilities::ReduceSum);
     eps *= sqrt((sqrt(m_inArrayNorm) + 1.0) / magninarray);
 
     NekDouble oeps      = 1.0 / eps;
