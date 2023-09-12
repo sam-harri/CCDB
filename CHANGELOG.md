@@ -64,6 +64,7 @@ v5.4.0
 - Redesign of PreconCfs class (!1578)
 - Fix virtual functions in ContField class (!1616)
 - Tidy-up Compressible flow solver print status (!1615)
+- Update of for parallel-in-time (!1589)
 
 **IncNavierStokesSolver**
 - Add an option to mask variables for the linear stability problem (!1280)

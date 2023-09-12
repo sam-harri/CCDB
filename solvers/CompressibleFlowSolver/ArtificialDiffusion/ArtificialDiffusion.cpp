@@ -81,26 +81,28 @@ void ArtificialDiffusion::v_DoArtificialDiffusion(
     const Array<OneD, const Array<OneD, NekDouble>> &inarray,
     Array<OneD, Array<OneD, NekDouble>> &outarray)
 {
-    int i;
     int nvariables = inarray.size();
     int npoints    = m_fields[0]->GetNpoints();
 
     Array<OneD, Array<OneD, NekDouble>> outarrayDiff(nvariables);
 
-    for (i = 0; i < nvariables; ++i)
+    for (int i = 0; i < nvariables; ++i)
     {
         outarrayDiff[i] = Array<OneD, NekDouble>(npoints, 0.0);
     }
 
     m_diffusion->Diffuse(nvariables, m_fields, inarray, outarrayDiff);
 
-    for (i = 0; i < nvariables; ++i)
+    for (int i = 0; i < nvariables; ++i)
     {
         Vmath::Vadd(npoints, outarray[i], 1, outarrayDiff[i], 1, outarray[i],
                     1);
     }
 }
 
+/**
+ *
+ */
 void ArtificialDiffusion::DoArtificialDiffusionCoeff(
     const Array<OneD, const Array<OneD, NekDouble>> &inarray,
     Array<OneD, Array<OneD, NekDouble>> &outarray)
@@ -108,6 +110,9 @@ void ArtificialDiffusion::DoArtificialDiffusionCoeff(
     v_DoArtificialDiffusionCoeff(inarray, outarray);
 }
 
+/**
+ *
+ */
 void ArtificialDiffusion::v_DoArtificialDiffusionCoeff(
     const Array<OneD, const Array<OneD, NekDouble>> &inarray,
     Array<OneD, Array<OneD, NekDouble>> &outarray)
@@ -117,20 +122,23 @@ void ArtificialDiffusion::v_DoArtificialDiffusionCoeff(
 
     Array<OneD, Array<OneD, NekDouble>> outarrayDiff{nvariables};
 
-    for (int i = 0; i < nvariables; ++i)
+    for (size_t i = 0; i < nvariables; ++i)
     {
         outarrayDiff[i] = Array<OneD, NekDouble>{ncoeffs, 0.0};
     }
 
     m_diffusion->DiffuseCoeffs(nvariables, m_fields, inarray, outarrayDiff);
 
-    for (int i = 0; i < nvariables; ++i)
+    for (size_t i = 0; i < nvariables; ++i)
     {
         Vmath::Vadd(ncoeffs, outarray[i], 1, outarrayDiff[i], 1, outarray[i],
                     1);
     }
 }
 
+/**
+ *
+ */
 void ArtificialDiffusion::GetArtificialViscosity(
     const Array<OneD, Array<OneD, NekDouble>> &physfield,
     Array<OneD, NekDouble> &mu)
