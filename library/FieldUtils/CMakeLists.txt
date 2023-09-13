@@ -20,6 +20,7 @@ SET(FieldUtilsHeaders
     ProcessModules/ProcessAddCompositeID.h
     ProcessModules/ProcessFieldFromString.h
     ProcessModules/ProcessAddFld.h
+    ProcessModules/ProcessAverageFld.h
     ProcessModules/ProcessBoundaryExtract.h
     ProcessModules/ProcessCFL.h
     ProcessModules/ProcessCombineAvg.h
@@ -32,6 +33,7 @@ SET(FieldUtilsHeaders
     ProcessModules/ProcessGrad.h
     ProcessModules/ProcessHalfModeToFourier.h
     ProcessModules/ProcessHomogeneousPlane.h
+    ProcessModules/ProcessPowerSpectrum.h
     ProcessModules/ProcessHomogeneousStretch.h
     ProcessModules/ProcessInnerProduct.h
     ProcessModules/ProcessInterpField.h
@@ -85,6 +87,7 @@ SET(FieldUtilsSources
     ProcessModules/ProcessAddCompositeID.cpp
     ProcessModules/ProcessFieldFromString.cpp
     ProcessModules/ProcessAddFld.cpp
+    ProcessModules/ProcessAverageFld.cpp
     ProcessModules/ProcessBoundaryExtract.cpp
     ProcessModules/ProcessCFL.cpp
     ProcessModules/ProcessCombineAvg.cpp
@@ -97,6 +100,7 @@ SET(FieldUtilsSources
     ProcessModules/ProcessGrad.cpp
     ProcessModules/ProcessHalfModeToFourier.cpp
     ProcessModules/ProcessHomogeneousPlane.cpp
+    ProcessModules/ProcessPowerSpectrum.cpp
     ProcessModules/ProcessHomogeneousStretch.cpp
     ProcessModules/ProcessInnerProduct.cpp
     ProcessModules/ProcessInterpField.cpp

@@ -72,6 +72,8 @@ v5.4.0
 
 **FieldConvert**
 - Add option to use .csv files in pointdatatofld module (!1545)
+- Add a new module to output power spectral in a given area (!1271)
+- Add a new module to do field averaging (!1271)
 
 **IncNavierStokesSolver**
 - Register SolverType in SessionReader (!1541)

@@ -422,16 +422,18 @@ possibly also Reynolds stresses) into single file;
 \item \inltt{scalargrad}: Computes scalar gradient field;
 \item \inltt{scaleinputfld}: Rescale input field by a constant factor;
 \item \inltt{shear}: Computes time-averaged shear stress metrics: TAWSS, OSI, transWSS, TAAFI, TACFI, WSSG;
-\item \inltt{streamfunction}: Calculates stream function of a 2D incompressible flow.
-\item \inltt{surfdistance}: Computes height of a prismatic boundary layer mesh and projects onto the surface (for e.g. $y^+$ calculation).
-\item \inltt{vorticity}: Computes the vorticity field.
-\item \inltt{wss}: Computes wall shear stress field.
+\item \inltt{streamfunction}: Calculates stream function of a 2D incompressible flow;
+\item \inltt{surfdistance}: Computes height of a prismatic boundary layer mesh and projects onto the surface (for e.g. $y^+$ calculation);
+\item \inltt{vorticity}: Computes the vorticity field;
+\item \inltt{wss}: Computes wall shear stress field;
 \item \inltt{phifile}: Computes the $\Phi$ function representing a body defined
-  in an \inltt{.stl} file. Useful for the Smoothed Profile Method solver.
-\item \inltt{wallNormalData}: Interpolate values for a set of points in the wall-normal direction (for e.g. extract boundary layer profiles).
-\item inltt{bodyFittedVelocity}: Generate a body-fitted coordinate system and then 
+  in an \inltt{.stl} file. Useful for the Smoothed Profile Method solver;
+\item \inltt{wallNormalData}: Interpolate values for a set of points in the wall-normal direction (for e.g. extract boundary layer profiles);
+\item \inltt{bodyFittedVelocity}: Generate a body-fitted coordinate system and then
   project the velocity components from Cartesian coordinate system into the new 
-  coordinate system.
+  coordinate system;
+\item \inltt{averagefld}: Compute the averaging of several field files;
+\item \inltt{powerspectrum}: Compute power spectrum at given regions from a 3DH1D expansion.
 \end{enumerate}
 The module list above can be seen by running the command
 %
@@ -1547,6 +1549,20 @@ LinearElasticSolver mesh-linear.xml conditions.xml
 # displacement field, use FieldConvert to apply it:
 FieldConvert-g -m deform mesh-linear.xml mesh-linear.fld mesh-deformed.xml
 \end{lstlisting}
+
+\subsection{Field averaging module}
+To obtain the averaged field of several field files, the user can run:
+\begin{lstlisting}[style=BashInputStyle]
+FieldConvert -m averagefld:inputfld=chan3DH1D_%d.chk:range=0,1,4 chan3DH1D.xml phaseavg.fld
+\end{lstlisting}
+The option \inltt{inputfld} specifies the format of field file name. The option \inltt{range=start,skip,end} specifies the range of \%d in the input file name.
+
+\subsection{Computing the spanwise power spectrum module}
+To obtain the spanwise power spectrum of a 3DH1D field in a specific domain, the user can run:
+\begin{lstlisting}[style=BashInputStyle]
+FieldConvert -m powerspectrum:vars=u,v,w:box=0,0.5,0,0.5 chan3DH1D.xml chan3DH1D_0.chk chan3DH1D.plt
+\end{lstlisting}
+The option \inltt{vars=u,v,w} specifies the variables used to calculate the power spectrum. Both the number and variable name can be used. The option \inltt{box=xmin,xmax,ymin,ymax} specifies the domain where the power spectrum is computed.
 
 \section{FieldConvert in parallel}
 To run FieldConvert in parallel the user needs to compile
