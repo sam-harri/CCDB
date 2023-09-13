@@ -13,6 +13,7 @@ ADD_NEKTAR_TEST(Nektar++/extract_detectbnd_tube)
 ADD_NEKTAR_TEST(Nektar++/extrude)
 ADD_NEKTAR_TEST(Nektar++/jac_list_tet_face)
 ADD_NEKTAR_TEST(Nektar++/linearise_invalid_quad)
+ADD_NEKTAR_TEST(Nektar++/linearise_invalid_tet)
 
 # MeshGen test
 IF(NEKTAR_USE_MESHGEN)
