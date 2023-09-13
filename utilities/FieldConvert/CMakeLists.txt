@@ -60,6 +60,8 @@ ADD_NEKTAR_TEST(Hex_channel_C0helmsmoothing)
 ADD_NEKTAR_TEST(surfDist)
 ADD_NEKTAR_TEST(bndextract)
 ADD_NEKTAR_TEST(halfmodetofourier)
+ADD_NEKTAR_TEST(averagefld)
+ADD_NEKTAR_TEST(powerspectrum)
 
 IF (NEKTAR_USE_METIS OR NEKTAR_USE_SCOTCH)
     ADD_NEKTAR_TEST(chan3D_part_only)
