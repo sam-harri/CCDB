@@ -71,7 +71,7 @@ protected:
         const SpatialDomains::MeshGraphSharedPtr pGraph);
 
     /// Destructor
-    SOLVER_UTILS_EXPORT virtual ~DriverPFASST();
+    SOLVER_UTILS_EXPORT virtual ~DriverPFASST() = default;
 
     /// Virtual function for initialisation implementation.
     SOLVER_UTILS_EXPORT virtual void v_InitObject(

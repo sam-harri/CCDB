@@ -60,13 +60,6 @@ DriverPFASST::DriverPFASST(const LibUtilities::SessionReaderSharedPtr pSession,
 /**
  *
  */
-DriverPFASST::~DriverPFASST()
-{
-}
-
-/**
- *
- */
 void DriverPFASST::v_InitObject(std::ostream &out)
 {
     DriverParallelInTime::v_InitObject(out);

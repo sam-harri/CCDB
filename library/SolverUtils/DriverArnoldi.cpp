@@ -54,13 +54,6 @@ DriverArnoldi::DriverArnoldi(
 }
 
 /**
- * Destructor
- */
-DriverArnoldi::~DriverArnoldi()
-{
-}
-
-/**
  * Arnoldi driver initialisation
  */
 void DriverArnoldi::v_InitObject(ostream &out)
