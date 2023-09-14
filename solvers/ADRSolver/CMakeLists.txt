@@ -38,6 +38,15 @@ IF( NEKTAR_SOLVER_ADR )
         ADD_NEKTAR_TEST(PararealDriverImDiffusion_m12_partition_iter4)
     ENDIF()
 
+    # SDC time-integration
+    ADD_NEKTAR_TEST(UnsteadyAdvection2D_ExplicitSDCGaussLobattoLegendre)
+    ADD_NEKTAR_TEST(UnsteadyAdvection2D_ExplicitSDCGaussRadauLegendre)
+    ADD_NEKTAR_TEST(UnsteadyAdvection2D_ExplicitSDCGaussGaussLegendre)
+    ADD_NEKTAR_TEST(UnsteadyDiffusion2D_ImplicitSDCGaussRadauLegendre)
+    ADD_NEKTAR_TEST(UnsteadyDiffusion2D_ImplicitSDCGaussGaussLegendre)
+    ADD_NEKTAR_TEST(UnsteadyAdvectionDiffusion2D_IMEXSDCGaussRadauLegendre)
+    ADD_NEKTAR_TEST(UnsteadyAdvectionDiffusion2D_IMEXSDCGaussGaussLegendre)
+
     # IMEXdirk time-integration
     ADD_NEKTAR_TEST(UnsteadyAdvectionDiffusion2D_IMEXdirk_1_1_1)
     ADD_NEKTAR_TEST(UnsteadyAdvectionDiffusion2D_IMEXdirk_1_2_1)
