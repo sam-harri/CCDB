@@ -56,6 +56,7 @@ v5.4.0
 - Full support of mixed-order elements in DG (!1606)
 - Use default keyword for destructor in Driver (!1624)
 - Add additional test for SDC time-integration(!1621)
+- Fix to compiler flags for MSVC (!1604)
 
 **CompressibleFlowSolver**
 - Fix AUSM3 Riemann solver and add tests to the CI (!1537)
