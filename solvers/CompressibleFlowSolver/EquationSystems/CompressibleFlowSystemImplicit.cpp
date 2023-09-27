@@ -1404,9 +1404,30 @@ void CFSImplicit::CalcTraceNumericalFlux(
             visflux[i] = Array<OneD, NekDouble>(nTracePts, 0.0);
         }
 
-        m_diffusion->DiffuseTraceFlux(fields, inarray, qfield,
-                                      NullNekDoubleTensorOfArray3D, visflux,
-                                      vFwd, vBwd, nonZeroIndex);
+        string diffName;
+        m_session->LoadSolverInfo("DiffusionType", diffName, "InteriorPenalty");
+        if (diffName == "InteriorPenalty")
+        {
+            m_diffusion->DiffuseTraceFlux(fields, inarray, qfield,
+                                          NullNekDoubleTensorOfArray3D, visflux,
+                                          vFwd, vBwd, nonZeroIndex);
+        }
+        else
+        {
+            ASSERTL1(false, "LDGNS not yet validated for implicit compressible "
+                            "flow solver");
+            // For LDGNS, the array size should be nConvectiveFields - 1
+            Array<OneD, Array<OneD, NekDouble>> inBwd(nConvectiveFields - 1);
+            Array<OneD, Array<OneD, NekDouble>> inFwd(nConvectiveFields - 1);
+            for (int i = 0; i < nConvectiveFields - 1; ++i)
+            {
+                inBwd[i] = vBwd[i];
+                inFwd[i] = vFwd[i];
+            }
+            m_diffusion->DiffuseTraceFlux(fields, inarray, qfield,
+                                          NullNekDoubleTensorOfArray3D, visflux,
+                                          inFwd, inBwd, nonZeroIndex);
+        }
         for (int i = 0; i < nConvectiveFields; i++)
         {
             Vmath::Vsub(nTracePts, traceflux[i], 1, visflux[i], 1, traceflux[i],

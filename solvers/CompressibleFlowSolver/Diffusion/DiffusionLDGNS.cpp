@@ -278,7 +278,8 @@ void DiffusionLDGNS::v_DiffuseCoeffs(
 
     // Compute u from q_{\eta} and q_{\xi}
     // Obtain numerical fluxes
-    DiffuseTraceFlux(fields, inarray, derivativesO1, m_viscTensor, viscousFlux,
+    // Note: derivativesO1 is not used in DiffuseTraceFlux
+    DiffuseTraceFlux(fields, inarray, m_viscTensor, derivativesO1, viscousFlux,
                      pFwd, pBwd);
 
     Array<OneD, NekDouble> tmpOut{nCoeffs};
@@ -359,7 +360,6 @@ void DiffusionLDGNS::v_DiffuseVolumeFlux(
     TensorOfArray3D<NekDouble> &qfields, TensorOfArray3D<NekDouble> &VolumeFlux,
     Array<OneD, int> &nonZeroIndex)
 {
-
     boost::ignore_unused(fields, nonZeroIndex);
     m_fluxVectorNS(inarray, qfields, VolumeFlux);
 }
@@ -373,8 +373,8 @@ void DiffusionLDGNS::v_DiffuseTraceFlux(
     const Array<OneD, Array<OneD, NekDouble>> &pBwd,
     Array<OneD, int> &nonZeroIndex)
 {
-    boost::ignore_unused(inarray, qfields, nonZeroIndex);
-    NumericalFluxO2(fields, VolumeFlux, TraceFlux, pFwd, pBwd);
+    boost::ignore_unused(inarray, VolumeFlux, nonZeroIndex);
+    NumericalFluxO2(fields, qfields, TraceFlux, pFwd, pBwd);
 }
 
 /**
@@ -697,7 +697,6 @@ void DiffusionLDGNS::NumericalFluxO2(
     std::size_t nDim = fields[0]->GetCoordim(0);
     for (std::size_t i = 1; i < nVariables; ++i)
     {
-        qflux[i] = Array<OneD, NekDouble>{nTracePts, 0.0};
         for (std::size_t j = 0; j < nDim; ++j)
         {
             // Compute qFwd and qBwd value of qfield in position 'ji'
