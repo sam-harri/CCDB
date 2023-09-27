@@ -69,6 +69,7 @@ v5.4.0
 - Fix virtual functions in ContField class (!1616)
 - Tidy-up Compressible flow solver print status (!1615)
 - Update of for parallel-in-time (!1589)
+- Fix some memory bugs for implicit compressible flow solver with LDGNS (!1617)
 
 **IncNavierStokesSolver**
 - Add an option to mask variables for the linear stability problem (!1280)
