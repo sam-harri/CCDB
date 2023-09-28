@@ -82,6 +82,12 @@ public:
     {
         return m_id;
     }
+    /// Return whether this metric supports averaging results from multiple
+    /// runs.
+    bool SupportsAverage() const
+    {
+        return m_average;
+    }
 
 protected:
     /// Stores the ID of this metric.
@@ -90,6 +96,8 @@ protected:
     std::string m_type;
     /// Determines whether to generate this metric or not.
     bool m_generate;
+    /// Stores whether a metric supports averaging results from multiple runs.
+    bool m_average = false;
     /// Pointer to XML structure containing metric definition.
     TiXmlElement *m_metric;
 
