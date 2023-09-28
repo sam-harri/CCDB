@@ -121,6 +121,11 @@ unsigned int TestData::GetNumDependentFiles() const
     return m_files.size();
 }
 
+unsigned int TestData::GetNumRuns() const
+{
+    return m_runs;
+}
+
 Command TestData::ParseCommand(TiXmlElement *elmt) const
 {
     Command cmd;
@@ -175,6 +180,12 @@ void TestData::Parse(TiXmlDocument *pDoc)
     TiXmlElement *testElement, *tmp, *metrics, *files;
     testElement = handle.FirstChildElement("test").Element();
     ASSERTL0(testElement, "Cannot find 'test' root element.");
+
+    // Find the desired number of test runs
+    unsigned int runs = 1;
+    testElement->QueryUnsignedAttribute("runs", &runs);
+    ASSERTL0(runs > 0, "Number of runs must be greater than zero.");
+    m_runs = runs;
 
     // Find description tag.
     tmp = testElement->FirstChildElement("description");

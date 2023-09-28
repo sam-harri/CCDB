@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 //
-// File: TestData.h
+// File: MetricExecutionTime.h
 //
 // For more information, please see: http://www.nektar.info
 //
@@ -28,73 +28,66 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 //
-// Description: Encapsulation of test XML file.
+// Description: Implementation of the execution time metric. A test will fail
+// if the execution time of the test falls outside of an assigned tolerance.
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef NEKTAR_TESTER_TESTDATA
-#define NEKTAR_TESTER_TESTDATA
+#ifndef NEKTAR_TESTS_METRICEXECUTIONTIME_H
+#define NEKTAR_TESTS_METRICEXECUTIONTIME_H
 
-#include <boost/filesystem.hpp>
-#include <boost/program_options.hpp>
-
-#include <string>
+#include <Metric.h>
+#include <boost/regex.hpp>
 #include <vector>
-
-#include <tinyxml.h>
-
-namespace fs = boost::filesystem;
-namespace po = boost::program_options;
 
 namespace Nektar
 {
-struct DependentFile
+/**
+ * @brief Data structure for a Regex value to match.
+ */
+struct MetricExecutionTimeFieldValue
 {
-    std::string m_description;
-    std::string m_filename;
+    MetricExecutionTimeFieldValue()
+    {
+    }
+
+    MetricExecutionTimeFieldValue(std::string value) : m_value(value)
+    {
+    }
+
+    std::string m_value = "";
+    bool m_skip         = false;
+    double m_tolerance  = 5.0;
 };
 
-struct Command
-{
-    fs::path m_executable;
-    std::string m_parameters;
-    unsigned int m_processes;
-    bool m_pythonTest;
-};
-
-class TestData
+class MetricExecutionTime : public Metric
 {
 public:
-    TestData(const fs::path &pFilename, po::variables_map &pVm);
-    TestData(const TestData &pSrc);
+    virtual ~MetricExecutionTime()
+    {
+    }
 
-    const std::string &GetDescription() const;
-    const Command &GetCommand(unsigned int pId) const;
-    unsigned int GetNumCommands() const;
+    static MetricSharedPtr create(TiXmlElement *metric, bool generate)
+    {
+        return MetricSharedPtr(new MetricExecutionTime(metric, generate));
+    }
 
-    std::string GetMetricType(unsigned int pId) const;
-    unsigned int GetNumMetrics() const;
-    TiXmlElement *GetMetric(unsigned int pId);
-    unsigned int GetMetricId(unsigned int pId);
+    static std::string type;
 
-    DependentFile GetDependentFile(unsigned int pId) const;
-    unsigned int GetNumDependentFiles() const;
+protected:
+    /// Storage for the boost regex.
+    boost::regex m_regex;
+    /// Stores the multiple matches defined in each <MATCH> tag.
+    MetricExecutionTimeFieldValue m_match;
+    /// If true, regex matches may be in any order in output
+    bool m_unordered = false;
+    /// If true, use stderr for testing/generation instead of stdout.
+    bool m_useStderr = false;
 
-    unsigned int GetNumRuns() const;
+    MetricExecutionTime(TiXmlElement *metric, bool generate);
 
-    void SaveFile();
-
-private:
-    po::variables_map m_cmdoptions;
-    std::string m_description;
-    std::vector<Command> m_commands;
-    TiXmlDocument *m_doc;
-    std::vector<TiXmlElement *> m_metrics;
-    std::vector<DependentFile> m_files;
-    unsigned int m_runs;
-
-    void Parse(TiXmlDocument *pDoc);
-    Command ParseCommand(TiXmlElement *pElmt) const;
+    virtual bool v_Test(std::istream &pStdout, std::istream &pStderr);
+    virtual void v_Generate(std::istream &pStdout, std::istream &pStderr);
 };
 } // namespace Nektar
 
