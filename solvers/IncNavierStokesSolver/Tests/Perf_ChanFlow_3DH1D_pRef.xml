@@ -67,13 +67,13 @@
         </SOLVERINFO>
 
         <PARAMETERS>
-            <P> TimeStep      = 0.0005     </P>
-            <P> NumSteps      = 10000     </P>
-            <P> IO_CheckSteps = 10000      </P>
-            <P> IO_InfoSteps  = 10000      </P>
-            <P> Kinvis        = 1         </P>
-            <P> HomModesZ     = 8        </P>
-            <P> LZ            = 1.0       </P>
+            <P> TimeStep      = 0.0005  </P>
+            <P> NumSteps      = 3000    </P>
+            <P> IO_CheckSteps = 3000    </P>
+            <P> IO_InfoSteps  = 3000    </P>
+            <P> Kinvis        = 1       </P>
+            <P> HomModesZ     = 8       </P>
+            <P> LZ            = 1.0     </P>
         </PARAMETERS>
 
         <VARIABLES>

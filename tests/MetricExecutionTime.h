@@ -79,8 +79,6 @@ protected:
     boost::regex m_regex;
     /// Stores the multiple matches defined in each <MATCH> tag.
     MetricExecutionTimeFieldValue m_match;
-    /// If true, regex matches may be in any order in output
-    bool m_unordered = false;
     /// If true, use stderr for testing/generation instead of stdout.
     bool m_useStderr = false;
 

@@ -29,6 +29,12 @@ elif [[ $BUILD_TYPE == "full" ]]; then
     elif [[ $BUILD_SIMD == "avx512" ]]; then
         BUILD_OPTS="$BUILD_OPTS -DNEKTAR_ENABLE_SIMD_AVX512:BOOL=ON"
     fi
+elif [[ $BUILD_TYPE == "performance" ]]; then
+    BUILD_OPTS="-DCMAKE_BUILD_TYPE=Release \
+        -DNEKTAR_BUILD_TESTS=OFF \
+        -DNEKTAR_BUILD_UNIT_TESTS=OFF \
+        -DNEKTAR_BUILD_PERFORMANCE_TESTS=ON \
+        -DNEKTAR_ERROR_ON_WARNINGS=OFF"
 fi
 
 # Custom compiler
