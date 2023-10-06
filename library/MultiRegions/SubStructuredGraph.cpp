@@ -802,9 +802,15 @@ void MultiLevelBisectionReordering(
 
         // Pass the adjaceny graph into Scotch.
         SCOTCH_Graph *scGraph = SCOTCH_graphAlloc();
+        ASSERTL0(scGraph != nullptr,
+                 "Failed to allocate Scotch graph for substructuring.");
+
+        ASSERTL0(SCOTCH_graphInit(scGraph) == 0,
+                 "Failed to initialise Scotch graph for substructuring.");
+
         SCOTCH_CALL(SCOTCH_graphBuild,
-                    (scGraph, 0, nNonPartition, &xadj[0], &xadj[1], NULL, NULL,
-                     xadj[nNonPartition], &adjncy[0], NULL));
+                    (scGraph, 0, nNonPartition, &xadj[0], &xadj[1], nullptr,
+                     nullptr, xadj[nNonPartition], &adjncy[0], nullptr));
 
         // This horrible looking string defines the Scotch graph
         // reordering strategy, which essentially does a nested
