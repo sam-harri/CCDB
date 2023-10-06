@@ -223,12 +223,16 @@ int MeshPartitionScotch::PartGraph2(
 {
     // Scotch graph object to interface with libScotch
     SCOTCH_Graph *grafdat = SCOTCH_graphAlloc();
+    ASSERTL0(grafdat != nullptr,
+             "Failed to allocate Scotch graph for partitioning.");
+
     SCOTCH_Strat stradat;
     SCOTCH_Num baseval;
     SCOTCH_Num vertnbr;
     int o;
 
-    SCOTCH_graphInit(grafdat);
+    ASSERTL0(SCOTCH_graphInit(grafdat) == 0,
+             "Failed to initialise Scotch graph for partitioning.");
 
     baseval = *numflag;
     vertnbr = *n;
