@@ -167,6 +167,8 @@ protected:
     NekDouble m_currTime;
     /// Keep applying force during GMRES iteration
     bool m_implicitForcing{false};
+    /// Homogeneous expansion in z-direction
+    bool m_isH1D{false};
 
 private:
     ForcingIncNSSyntheticEddy(

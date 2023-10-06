@@ -60,7 +60,21 @@ void ForcingIncNSSyntheticEddy::v_InitObject(
     const Array<OneD, MultiRegions::ExpListSharedPtr> &pFields,
     const unsigned int &pNumForcingFields, const TiXmlElement *pForce)
 {
-    m_spacedim = pFields[0]->GetGraph()->GetSpaceDimension();
+    boost::ignore_unused(pNumForcingFields);
+    m_session->MatchSolverInfo("Homogeneous", "1D", m_isH1D, false);
+
+    // Check if it is not 2D.
+    if (pFields[0]->GetGraph()->GetMeshDimension() < 3)
+    {
+        if (!m_isH1D)
+        {
+            NEKERROR(Nektar::ErrorUtil::efatal, "Sythetic eddy method "
+                "is only available for three-dimensional simulations");
+        }
+    }
+
+    // Space dimension
+    m_spacedim = pFields[0]->GetGraph()->GetMeshDimension() + (m_isH1D ? 1 : 0);
 
     // Get gamma parameter
     m_session->LoadParameter("Gamma", m_gamma, 1.4);
@@ -226,7 +240,7 @@ void ForcingIncNSSyntheticEddy::v_Apply(
     {
         CalculateForcing(fields);
 
-        for (size_t i = 0; i < (nVars-1); ++i) // ------> change here
+        for (size_t i = 0; i < (nVars-1); ++i) // Only velocity: nVars - 1
         {
             Vmath::Vadd(nqTot, m_Forcing[i], 1, outarray[i], 1, 
                 outarray[i], 1);
