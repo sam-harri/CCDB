@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<test runs="5">
+<test runs="15">
     <description>Laminar Channel Flow 3D homogeneous 1D, p-Refinenement tag</description>
     <executable>IncNavierStokesSolver</executable>
     <parameters>Perf_ChanFlow_3DH1D_pRef.xml</parameters>
@@ -20,7 +20,7 @@
             <value variable="p" tolerance="1e-7">0.0671074</value>
         </metric>
         <metric type="ExecutionTime" id="3">
-            <value tolerance="0.5" hostname=" ">29.9922</value>
+            <value tolerance="8e-1" hostname="42.debian-bullseye-performance-build-and-test">15.7584</value>
         </metric>
     </metrics>
 </test>

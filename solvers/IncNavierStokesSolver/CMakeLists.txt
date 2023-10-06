@@ -41,7 +41,7 @@ IF( NEKTAR_SOLVER_INCNAVIERSTOKES )
     SUBDIRS(Utilities)
 
     # The following test is disabled pending better integration with the CI system
-    #ADD_NEKTAR_PERFORMANCE_TEST(Perf_ChanFlow_3DH1D_pRef)
+    ADD_NEKTAR_PERFORMANCE_TEST(Perf_ChanFlow_3DH1D_pRef)
 
     ADD_NEKTAR_TEST(Kovasznay_Flow_3modes)
     ADD_NEKTAR_TEST(ThermStab_dir)
