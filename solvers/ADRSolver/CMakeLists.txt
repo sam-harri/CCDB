@@ -24,6 +24,8 @@ IF( NEKTAR_SOLVER_ADR )
         ./EquationSystems/UnsteadyViscousBurgers.cpp
         ./EquationSystems/EigenValuesAdvection.cpp)
 
+    ADD_NEKTAR_PERFORMANCE_TEST(Perf_CubeAllElements)
+
     # Parallel-in-time solver
     IF (NEKTAR_USE_MPI)
         ADD_NEKTAR_TEST(PFASSTDriverUnsteadyAdvection1D)

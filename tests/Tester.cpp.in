@@ -32,6 +32,23 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
+/**
+ * @file Tester.cpp.in
+ * @brief This file contains the main function for the Tester program, which is
+ * a tool for testing Nektar++ executables.
+ *
+ * The main function reads command line options and parses the provided test
+ * (.tst) file. Using information provided in this file, the Tester program
+ * generates test metrics, and creates temporary subdirectories in which to run
+ * the executable. All test outputs are appended to a single @p master.out file,
+ * and errors are appended to @p master.err. These files are sent to all of the
+ * metrics for analysis. If the test fails, the output and error files are
+ * dumped to the terminal for debugging purposes.
+ * 
+ * @see Metric
+ * @see Metric#Test:
+ */
+
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -237,8 +254,7 @@ int main(int argc, char *argv[])
 
             // Temporary directory to create and in which to hold the run
             const fs::path tmpDir =
-                masterDir /
-                fs::path("run" + std::to_string(i));
+                masterDir / fs::path("run" + std::to_string(i));
             tmpWorkingDirs.push_back(tmpDir);
 
             if (verbose)

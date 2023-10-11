@@ -67,6 +67,7 @@ IF( NEKTAR_SOLVER_COMPRESSIBLE_FLOW )
 
     SUBDIRS(Utilities)
 
+    ADD_NEKTAR_PERFORMANCE_TEST(Perf_CylinderSubsonic_P3)
     ADD_NEKTAR_TEST(CylinderSubsonic_FRDG_SEM)
     ADD_NEKTAR_TEST(CylinderSubsonic_FRDG_GAUSS)
     ADD_NEKTAR_TEST(CylinderSubsonic_FRHU_SEM LENGTHY)

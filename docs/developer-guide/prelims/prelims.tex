@@ -764,12 +764,46 @@ code arrives at a particular answer, but rather in a \emph{black-box}
 fashion tests to see if code when operating on certain data yields the
 predicted response \cite{KFN-testing}.
 
+\subsection{Performance Tests}
+To avoid sudden regressions in performance, {\nek} has a series of performance tests which measure the execution times of some sample scenarios using various solvers. These are automatically run by the continuous integration system before merging, always using the same runner. Each scenario is run multiple times, and the average execution time is compared to a baseline figure and tolerance. If the test fails, the developer can investigate the cause of the regression and change the baseline figure if necessary.
+
+To register a new performance test, use \lstinline{ADD_NEKTAR_PERFORMANCE_TEST( TestName )} in the solver's \inlsh{CMakeLists.txt} file. As an example, the performance tests for the incompressible Navier-Stokes solver are listed in
+
+\inlsh{.../solvers/IncNavierStokesSolver/CMakeLists.txt}
+
+and one of the tests are defined by the following files:
+
+\inlsh{.../solvers/IncNavierStokesSolver/Tests/Perf\_ChanFlow\_3DH1D\_pRef.tst}
+
+\inlsh{.../solvers/IncNavierStokesSolver/Tests/Perf\_ChanFlow\_3DH1D\_pRef.xml}.\\
+
+The .tst file contains the test definition and metrics, and the XML file contains the test parameters. \inlsh{Perf\_ChanFlow\_3DH1D\_pRef.tst} contains the following information specific to performance tests:
+\begin{itemize}
+    \item \lstinline{<test runs="5">} \\
+    The \lstinline{runs} attribute indicates the number of times the test should be run. For this test the execution time would be averaged over five runs.\\
+
+    \item \lstinline{<metric type="ExecutionTime" id="3">} \\
+    The metric used for measuring execution time has type \lstinline{"ExecutionTime"}.\\
+
+    \item \lstinline{<value tolerance="1.0" hostname="42.debian-bullseye-performance-build-and-test">15.4133</value>} \\
+    This indicates that the baseline execution time is $15.4133 \pm 1.0$ seconds. The \lstinline{hostname} attribute refers to the name of the runner which is used to run the test. This is used to allow different runners to have different baselines.\\
+\end{itemize}
+
+By default, the ExecutionTime metric will search the test output for the Regex \lstinline{"^.*Total Computation Time\s*=\s*(\d+\.?\d*).*"}, which is used in most cases. If it is different, the \lstinline{<regex>} element may be used to specify a different expression, such as in this implementation of the metric:
+
+\begin{lstlisting}[firstnumber=16]
+    <metric type="ExecutionTime" id="1">
+        <regex>^.*Execute\s*(\d+\.?\d*).*</regex>
+        <value tolerance="0.5" hostname="42.debian-bullseye-performance-build-and-test">60.4946</value>
+    </metric>
+\end{lstlisting}
+
 \subsection{Continuous Integration}
-{\nek} uses the \emph{buildbot} continuous integration to perform testing of the code across multiple operating systems.  Builds are automatically instigated when merge requests are opened and subsequently when the associated branches receive additional commits.
+{\nek} uses the \emph{GitLab} continuous integration to perform testing of the code across multiple operating systems.  Builds are automatically instigated when merge requests are opened and subsequently when the associated branches receive additional commits.
 
 For more information, go to:
 
-\url{http://buildbot.nektar.info}
+\url{https://gitlab.nektar.info}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
