@@ -51,6 +51,13 @@ int main(int argc, char const *argv[])
     LIKWID_MARKER_REGISTER("GathrSimd");
 
     size_t nPts;
+    int count   = 0;
+    double time = 0.0;
+
+#ifndef NEKTAR_USE_LIKWID
+    boost::ignore_unused(count, time);
+#endif
+
     if (argc < 2)
     {
         nPts = 100;
