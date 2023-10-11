@@ -43,7 +43,7 @@
 namespace Nektar
 {
 /**
- * @brief Data structure for a Regex value to match.
+ * @brief Data structure for an execution time field value.
  */
 struct MetricExecutionTimeFieldValue
 {
@@ -55,11 +55,18 @@ struct MetricExecutionTimeFieldValue
     {
     }
 
+    /// The value to match. Defaults to empty string.
     std::string m_value = "";
-    bool m_skip         = false;
-    double m_tolerance  = 5.0;
+    /// Indicates whether the metric should be skipped. Defaults to false.
+    bool m_skip = false;
+    /// The tolerance to use for checking the execution time. Defaults to 5.0.
+    double m_tolerance = 5.0;
 };
 
+/**
+ * @brief Metric that finds the execution time in an output and tests it against
+ * an accepted value and tolerance.
+ */
 class MetricExecutionTime : public Metric
 {
 public:
@@ -75,9 +82,9 @@ public:
     static std::string type;
 
 protected:
-    /// Storage for the boost regex.
+    /// Regex used to match an execution time in a test output.
     boost::regex m_regex;
-    /// Stores the multiple matches defined in each <MATCH> tag.
+    /// Stores each execution time found in the test output.
     MetricExecutionTimeFieldValue m_match;
     /// If true, use stderr for testing/generation instead of stdout.
     bool m_useStderr = false;

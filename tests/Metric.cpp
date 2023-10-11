@@ -63,9 +63,7 @@ Metric::Metric(TiXmlElement *metric, bool generate)
     m_type = boost::to_upper_copy(string(metric->Attribute("type")));
 }
 
-/**
- * @brief Test a line of output from an executible.
- */
+/// Calls a metric's \p v_Test function (or \p v_Generate if \p m_generate).
 bool Metric::Test(std::istream &pStdout, std::istream &pStderr)
 {
     if (m_generate)

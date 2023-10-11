@@ -44,17 +44,47 @@ using namespace std;
 
 namespace Nektar
 {
-string MetricExecutionTime::type = GetMetricFactory().RegisterCreatorFunction(
-    "EXECUTIONTIME", MetricExecutionTime::create);
+std::string MetricExecutionTime::type =
+    GetMetricFactory().RegisterCreatorFunction("EXECUTIONTIME",
+                                               MetricExecutionTime::create);
 
 /**
- * @brief Constructor.
+ * @brief Construct a new MetricExecutionTime object.
+ *
+ * If the metric is not a derived class, then this constructor will parse the
+ * regular expression from the metric's element in the test file, or use a
+ * default value if this doesn't exist. It will also see if an expected
+ * execution time and tolerance have been provided for the current computer's
+ * hostname. If this is the case, these will be used by \p v_Test. If not, then
+ * a skip flag \p m_skip will be set to \p true and the test will automatically
+ * pass.
+ *
+ * @param metric
+ * @param generate
  */
 MetricExecutionTime::MetricExecutionTime(TiXmlElement *metric, bool generate)
     : Metric(metric, generate)
 {
-    // Set up the regular expression to match against.
-    m_regex = "^.*Total Computation Time\\s*=\\s*(\\d+\\.?\\d*)s";
+    // If we are a derived class, do nothing
+    if (m_type != "EXECUTIONTIME")
+    {
+        return;
+    }
+
+    // Parse Regex expression
+    TiXmlElement *regex = metric->FirstChildElement("regex");
+
+    if (regex)
+    {
+        ASSERTL0(regex->GetText(), "Failed to read regex element.");
+        m_regex = regex->GetText();
+    }
+    else
+    {
+        // Set the regex to a default value.
+        m_regex = "^.*Total Computation Time\\s*=\\s*(\\d+\\.?\\d*).*";
+    }
+
     // Inform the Tester this metric supports averaging data from multiple runs.
     m_average = true;
     m_match   = MetricExecutionTimeFieldValue("nil");
@@ -106,6 +136,20 @@ MetricExecutionTime::MetricExecutionTime(TiXmlElement *metric, bool generate)
 
 /**
  * @brief Test output against a regular expression and its expected value.
+ *
+ * This function will find the execution time for each test run in the output,
+ * using \b m_regex (provided in the test file). It will then average these
+ * times and compare them to the expected execution time for the current
+ * computer's hostname (this behaviour is defined in the constructor). If the
+ * average execution time falls outside of the tolerance then the test will
+ * fail.
+ *
+ * If no execution time value is provided for the current computer's hostname,
+ * \b m_skip will be set to \b true and the test will automatically pass.
+ *
+ * @param pStdout Reference to test output stream.
+ * @param pStderr Reference to test error stream.
+ * @return \b true if the test passes, \b false otherwise.
  */
 bool MetricExecutionTime::v_Test(istream &pStdout, istream &pStderr)
 {
@@ -125,7 +169,6 @@ bool MetricExecutionTime::v_Test(istream &pStdout, istream &pStderr)
     // Process output file line by line searching for regex matches
     while (getline(is, line))
     {
-
         // Test to see if we have a match on this line.
         if (boost::regex_match(line.c_str(), matches, m_regex))
         {
@@ -163,7 +206,9 @@ bool MetricExecutionTime::v_Test(istream &pStdout, istream &pStderr)
 
     if (!matched)
     {
-        cerr << "No execution times were found in the test output." << endl;
+        cerr << "No execution times were found in the test output. Consider "
+                "providing a custom regex for this test metric."
+             << endl;
         success = false;
     }
 
@@ -210,8 +255,14 @@ bool MetricExecutionTime::v_Test(istream &pStdout, istream &pStderr)
 }
 
 /**
- * @brief Generate accepted values for this metric using an output or error
- * file.
+ * @brief Generate an accepted execution time value using a test output or error
+ * stream.
+ *
+ * This function generate an execution time match by finding the first execution
+ * time in the output that matches \p m_regex (provided in the test file).
+ *
+ * @param pStdout Reference to test output stream.
+ * @param pStderr Reference to test error stream.
  */
 void MetricExecutionTime::v_Generate(istream &pStdout, istream &pStderr)
 {

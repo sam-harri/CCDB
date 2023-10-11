@@ -27,6 +27,8 @@ IF( NEKTAR_SOLVER_SHALLOW_WATER )
 
     ADD_SOLVER_EXECUTABLE(ShallowWaterSolver SOURCES ${ShallowWaterSolverSource})
 
+    ADD_NEKTAR_PERFORMANCE_TEST(Perf_TestMMFSWEPlane)
+
     #MMF Shallow Water
     ADD_NEKTAR_TEST(TestMMFSWEPlane)
     ADD_NEKTAR_TEST(TestMMFSWEZonalSphere)

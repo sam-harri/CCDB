@@ -230,6 +230,8 @@ debian-bullseye-performance-build-and-test:
   needs: ["debian-bullseye-performance-build-env"]
   tags:
     - perf
+  timeout: 1h
+  allow_failure: true
 
 debian-bullseye-full-build-and-test:
   <<: *build-and-test-template
