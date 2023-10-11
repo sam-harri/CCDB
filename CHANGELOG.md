@@ -98,6 +98,7 @@ v5.4.0
 - Added support for performance tests (!1614)
 - Integrated performance tests into the CI system and enabled a test (!1629)
 - Added additional performance tests and updated test documentation (!1631)
+- Fix VmathTimer compilation error (!1635)
 
 **NekMesh**
 - Changed CMake to set NEKTAR_USE_THREAD_SAFETY to ON when MeshGen is set to ON (!1546)
