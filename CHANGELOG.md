@@ -75,6 +75,9 @@ v5.4.0
 **IncNavierStokesSolver**
 - Add an option to mask variables for the linear stability problem (!1280)
 
+**ShallowWaterSolver**
+- Fix NonlinearPeregrine solver due to a change of API (!1637)
+
 **FieldConvert**
 - Add option to use .csv files in pointdatatofld module (!1545)
 - Add a new module to output power spectral in a given area (!1271)

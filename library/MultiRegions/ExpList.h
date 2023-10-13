@@ -2194,6 +2194,9 @@ inline void ExpList::AddTraceIntegral(const Array<OneD, const NekDouble> &Fx,
                                       const Array<OneD, const NekDouble> &Fy,
                                       Array<OneD, NekDouble> &outarray)
 {
+    WARNINGL1(false,
+              "Deprecated AddTraceIntegral interface, will be removed in "
+              "the next release");
     v_AddTraceIntegral(Fx, Fy, outarray);
 }
 inline void ExpList::AddTraceIntegral(const Array<OneD, const NekDouble> &Fn,

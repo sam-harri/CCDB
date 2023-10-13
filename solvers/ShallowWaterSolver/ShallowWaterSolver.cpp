@@ -34,6 +34,7 @@
 
 #include <LibUtilities/BasicUtils/SessionReader.h>
 #include <LibUtilities/BasicUtils/Timer.h>
+#include <SolverUtils/Driver.h>
 #include <SolverUtils/EquationSystem.h>
 
 using namespace std;
@@ -42,59 +43,49 @@ using namespace Nektar::SolverUtils;
 
 int main(int argc, char *argv[])
 {
-    // Create session reader and MeshGraph.
     LibUtilities::SessionReaderSharedPtr session;
-    session = LibUtilities::SessionReader::CreateInstance(argc, argv);
-
     SpatialDomains::MeshGraphSharedPtr graph;
-    graph = SpatialDomains::MeshGraph::Read(session);
+    string vDriverModule;
+    DriverSharedPtr drv;
 
-    Nektar::LibUtilities::Timer timer;
-    NekDouble CPUtime;
-    EquationSystemSharedPtr equ;
-
-    // Record start time.
-    timer.Start();
-
-    // Create instance of module to solve the equation specified in the session.
     try
     {
-        equ = GetEquationSystemFactory().CreateInstance(
-            session->GetSolverInfo("EQTYPE"), session, graph);
+        // Create session reader.
+        session = LibUtilities::SessionReader::CreateInstance(argc, argv);
+
+        // Create MeshGraph
+        graph = SpatialDomains::MeshGraph::Read(session);
+
+        // Create driver
+        session->LoadSolverInfo("Driver", vDriverModule, "Standard");
+        drv = GetDriverFactory().CreateInstance(vDriverModule, session, graph);
+
+        LibUtilities::Timer timer;
+        timer.Start();
+
+        // Execute driver
+        drv->Execute();
+
+        timer.Stop();
+        timer.AccumulateRegion("Execute");
+
+        // Print out timings if verbose
+        if (session->DefinesCmdLineArgument("verbose"))
+        {
+            LibUtilities::Timer::PrintElapsedRegions(session->GetComm());
+        }
+
+        // Finalise session
+        session->Finalise();
     }
-    catch (int e)
+    catch (const std::runtime_error &e)
     {
-        ASSERTL0(e == -1, "No such solver class defined.");
+        return 1;
     }
-
-    // Print a summary of solver and problem parameters and initialise the
-    // solver.
-    equ->PrintSummary(cout);
-    equ->DoInitialise();
-
-    // Solve the problem.
-    equ->DoSolve();
-
-    // Record end time.
-    timer.Stop();
-    CPUtime = (1.0 / 60.0 / 60.0) * timer.Elapsed().count();
-
-    // Write output to .fld file
-    equ->Output();
-
-    // Evaluate and output computation time and solution accuracy.
-    // The specific format of the error output is essential for the
-    // regression tests to work.
-    cout << "-------------------------------------------" << endl;
-    cout << "Total Computation Time = " << CPUtime << " hr." << endl;
-
-    for (int i = 0; i < equ->GetNvariables(); ++i)
+    catch (const std::string &eStr)
     {
-        cout << "L 2 error (variable " << equ->GetVariable(i)
-             << "): " << equ->L2Error(i, true) << endl;
-        cout << "L inf error (variable " << equ->GetVariable(i)
-             << "): " << equ->LinfError(i) << endl;
+        cout << "Error: " << eStr << endl;
     }
 
-    session->Finalise();
+    return 0;
 }
