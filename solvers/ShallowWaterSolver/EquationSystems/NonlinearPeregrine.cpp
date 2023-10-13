@@ -384,10 +384,8 @@ void NonlinearPeregrine::DoOdeRhs(
             NekDouble invgamma = 1.0 / gamma;
 
             int nTraceNumPoints = GetTraceTotPoints();
-            Array<OneD, Array<OneD, NekDouble>> upwindX(1);
-            Array<OneD, Array<OneD, NekDouble>> upwindY(1);
-            upwindX[0] = Array<OneD, NekDouble>(nTraceNumPoints);
-            upwindY[0] = Array<OneD, NekDouble>(nTraceNumPoints);
+            Array<OneD, NekDouble> upwindX(nTraceNumPoints);
+            Array<OneD, NekDouble> upwindY(nTraceNumPoints);
             //--------------------------------------------
 
             //--------------------------------------------
@@ -405,10 +403,11 @@ void NonlinearPeregrine::DoOdeRhs(
             Vmath::Neg(ncoeffs, coeffsfield[0], 1);
 
             // Evaluate  upwind numerical flux (physical space)
-            NumericalFluxForcing(physfield, upwindX[0], upwindY[0]);
-
-            m_fields[0]->AddTraceIntegral(upwindX[0], upwindY[0],
-                                          coeffsfield[0]);
+            NumericalFluxForcing(physfield, upwindX, upwindY);
+            Array<OneD, NekDouble> normflux(nTraceNumPoints);
+            Vmath::Vvtvvtp(nTraceNumPoints, upwindX, 1, m_traceNormals[0], 1,
+                           upwindY, 1, m_traceNormals[1], 1, normflux, 1);
+            m_fields[0]->AddTraceIntegral(normflux, coeffsfield[0]);
             m_fields[0]->MultiplyByElmtInvMass(coeffsfield[0], coeffsfield[0]);
             m_fields[0]->BwdTrans(coeffsfield[0], physfield[0]);
 
@@ -452,15 +451,16 @@ void NonlinearPeregrine::DoOdeRhs(
             Vmath::Neg(ncoeffs, coeffsfield[1], 1);
 
             // Evaluate  upwind numerical flux (physical space)
-            NumericalFluxConsVariables(physfield[0], upwindX[0], upwindY[0]);
+            NumericalFluxConsVariables(physfield[0], upwindX, upwindY);
 
             {
                 Array<OneD, NekDouble> uptemp(nTraceNumPoints, 0.0);
-
-                m_fields[0]->AddTraceIntegral(upwindX[0], uptemp,
-                                              coeffsfield[0]);
-                m_fields[0]->AddTraceIntegral(uptemp, upwindY[0],
-                                              coeffsfield[1]);
+                Vmath::Vvtvvtp(nTraceNumPoints, upwindX, 1, m_traceNormals[0],
+                               1, uptemp, 1, m_traceNormals[1], 1, normflux, 1);
+                m_fields[0]->AddTraceIntegral(normflux, coeffsfield[0]);
+                Vmath::Vvtvvtp(nTraceNumPoints, uptemp, 1, m_traceNormals[0], 1,
+                               upwindY, 1, m_traceNormals[1], 1, normflux, 1);
+                m_fields[0]->AddTraceIntegral(normflux, coeffsfield[1]);
             }
 
             Vmath::Vadd(ncoeffs, f1, 1, coeffsfield[0], 1, modarray[1], 1);
@@ -1202,6 +1202,7 @@ void NonlinearPeregrine::v_SetInitialConditions(NekDouble initialtime,
         case eSolitaryWave:
         {
             LaitoneSolitaryWave(0.1, m_const_depth, 0.0, 0.0);
+            m_nchk++;
             break;
         }
         default:
