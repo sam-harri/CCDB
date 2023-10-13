@@ -199,6 +199,13 @@ include:
   <<: *build-env-debian-template-default
   stage: build-env-full
 
+debian-bookworm-default-build-env:
+  <<: *build-env-debian-template-default
+
+debian-bookworm-full-build-env:
+  <<: *build-env-debian-template-full
+  needs: ["debian-bookworm-default-build-env"]
+
 debian-bullseye-default-build-env:
   <<: *build-env-debian-template-default
 
@@ -219,6 +226,30 @@ debian-buster-default-build-env:
 debian-buster-full-build-env:
   <<: *build-env-debian-template-full
   needs: ["debian-buster-default-build-env"]
+
+debian-bookworm-default-build-and-test:
+  <<: *build-and-test-template
+  needs: ["debian-bookworm-default-build-env"]
+
+debian-bookworm-full-build-and-test:
+  <<: *build-and-test-template
+  needs: ["debian-bookworm-full-build-env"]
+
+debian-bookworm-full-avx2-build-and-test:
+  <<: *build-and-test-template
+  needs: ["debian-bookworm-full-build-env"]
+  variables:
+    BUILD_SIMD: avx2
+  tags:
+    - avx2
+
+debian-bookworm-full-avx512-build-and-test:
+  <<: *build-and-test-template
+  needs: ["debian-bookworm-full-build-env"]
+  variables:
+    BUILD_SIMD: avx512
+  tags:
+    - avx512
 
 debian-bullseye-default-build-and-test:
   <<: *build-and-test-template
@@ -265,6 +296,22 @@ debian-buster-full-build-and-test:
 
 
 # COMPILER WARNINGS
+debian-bookworm-default-warnings:
+  <<: *compiler-warning-template
+  needs: ["debian-bookworm-default-build-and-test"]
+
+debian-bookworm-full-warnings:
+  <<: *compiler-warning-template
+  needs: ["debian-bookworm-full-build-and-test"]
+
+debian-bookworm-full-avx2-warnings:
+  <<: *compiler-warning-template
+  needs: ["debian-bookworm-full-avx2-build-and-test"]
+
+debian-bookworm-full-avx512-warnings:
+  <<: *compiler-warning-template
+  needs: ["debian-bookworm-full-avx512-build-and-test"]
+
 debian-bullseye-default-warnings:
   <<: *compiler-warning-template
   needs: ["debian-bullseye-default-build-and-test"]
@@ -276,6 +323,10 @@ debian-bullseye-full-warnings:
 debian-bullseye-full-avx2-warnings:
   <<: *compiler-warning-template
   needs: ["debian-bullseye-full-avx2-build-and-test"]
+
+debian-bullseye-full-avx512-warnings:
+  <<: *compiler-warning-template
+  needs: ["debian-bullseye-full-avx512-build-and-test"]
 
 debian-bullseye-performance-warnings:
   <<: *compiler-warning-template
@@ -305,7 +356,7 @@ debian-bullseye-xml-format:
 
 
 # DOCUMENTATION
-debian-bullseye-documentation-build-env:
+debian-bookworm-documentation-build-env:
   <<: *execution-conditions
   image: docker:19.03.6
   stage: build-env-full
@@ -316,12 +367,12 @@ debian-bullseye-documentation-build-env:
     - docker pull $IMAGE || true
     - docker build --pull -t $IMAGE .
     - docker push $IMAGE
-  needs: ["debian-bullseye-default-build-env"]
+  needs: ["debian-bookworm-default-build-env"]
 
 .build-documentation-template: &build-documentation-template
   <<: *build-and-test-template
   image: $CI_REGISTRY_IMAGE:env-documentation
-  needs: ["debian-bullseye-documentation-build-env"]
+  needs: ["debian-bookworm-documentation-build-env"]
 
 user-guide-build:
   <<: *build-documentation-template
