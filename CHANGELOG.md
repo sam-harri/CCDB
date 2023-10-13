@@ -104,6 +104,12 @@ v5.4.0
 - Changed CMake to set NEKTAR_USE_THREAD_SAFETY to ON when MeshGen is set to ON (!1546)
 - Fixed a bug where MeshElement/Tetrahedron did not assign edge IDs in the constructor (!1596)
 
+**Documentation**
+- Fix missing Tikz external package requires for bookworm (!1638)
+
+**CI**
+- Add testing and packaging for Debian bookworm (!1638)
+
 v5.3.0
 ------
 **Library**

@@ -76,7 +76,8 @@
     - pkg
   script:
     - DEBIAN_FRONTEND=noninteractive
-    - sed -i 's/main$/main contrib non-free/g' /etc/apt/sources.list
+    - if [ -f /etc/apt/sources.list ]; then sed -i 's/main$/main contrib non-free/g' /etc/apt/sources.list; fi
+    - if [ -f /etc/apt/sources.list.d/debian.sources ]; then sed -i 's/main$/main contrib non-free non-free-firmware/g' /etc/apt/sources.list.d/debian.sources; fi
     - apt -yq update
     - apt -yq install ssh
     - apt -yq install ./deb/nektar++-adr-solver_[1-9]*.deb ./deb/libnektar++_[1-9]*.deb
@@ -405,6 +406,39 @@ package-source-doc-deploy:
 #  needs: ["package-debian-unstable-build", "package-debian-unstable-deploy-dev"]
 #  dependencies:
 #    - package-debian-unstable-build
+
+##
+## Debian bookworm
+##
+package-debian-bookworm-env:
+  <<: *package-env-build
+
+package-debian-bookworm-build:
+  <<: *package-deb-build
+  needs: ["package-debian-bookworm-env"]
+  variables:
+    image_name: pkg/debian-bookworm
+
+package-debian-bookworm-test:
+  <<: *package-deb-test
+  needs: ["package-debian-bookworm-build"]
+  dependencies:
+    - package-debian-bookworm-build
+  variables:
+    image_name: debian:bookworm
+
+package-debian-bookworm-deploy-dev:
+  <<: *package-deb-deploy-dev
+  needs: ["package-debian-bookworm-build", "package-debian-bookworm-test"]
+  dependencies:
+    - package-debian-bookworm-build
+
+package-debian-bookworm-deploy:
+  <<: *package-deb-deploy
+  needs: ["package-debian-bookworm-build", "package-debian-bookworm-deploy-dev"]
+  dependencies:
+    - package-debian-bookworm-build
+
 
 ##
 ## Debian bullseye

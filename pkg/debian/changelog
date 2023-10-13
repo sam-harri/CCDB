@@ -1,3 +1,9 @@
+nektar++ (5.4.0-1) unstable; urgency=medium
+
+  * New upstream release.
+
+ -- Chris Cantwell <c.cantwell@imperial.ac.uk>  Thu, 12 Oct 2023 07:25:42 +0100
+
 nektar++ (5.3.0-1) unstable; urgency=medium
 
   * New upstream release.
