@@ -90,7 +90,8 @@ protected:
     /// Compute Constant C
     NekDouble ComputeConstantC(int row, int col);
     /// Compute Gaussian
-    NekDouble ComputeGaussian(NekDouble coord, NekDouble constC = 1.0);
+    NekDouble ComputeGaussian(NekDouble coord, NekDouble xiMaxVal,
+         NekDouble constC = 1.0);
     /// Check if point is inside the box of eddies
     bool InsideBoxOfEddies(NekDouble coord0, NekDouble coord1,
                            NekDouble coord2);

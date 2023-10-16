@@ -494,12 +494,14 @@ Array<OneD, Array<OneD, NekDouble>> ForcingIncNSSyntheticEddy::
                         stochasticSignal[n][j * nqTot + nqeCount + i] = 
                             epsilonSign[j][n] *
                             ComputeGaussian((coords0[i] - m_eddyPos[n][0]) / 
-                                m_lref[0], ComputeConstantC(0, j)) *
+                                m_lref[0], m_xiMax[j * m_spacedim + 0], 
+                                    ComputeConstantC(0, j)) *
                             ComputeGaussian((coords1[i] - m_eddyPos[n][1]) / 
-                                m_lref[1], ComputeConstantC(1, j)) *
+                                m_lref[1], m_xiMax[j * m_spacedim + 1], 
+                                    ComputeConstantC(1, j)) *
                             ComputeGaussian((coords2[i] - m_eddyPos[n][2]) / 
-                                m_lref[2], ComputeConstantC(2, j)); 
-                    }
+                                m_lref[2], m_xiMax[j * m_spacedim + 2], 
+                                    ComputeConstantC(2, j));                     }
                 }  
                 nqeCount += nqe;
             }
@@ -564,36 +566,44 @@ void ForcingIncNSSyntheticEddy::ComputeInitialRandomLocationOfEddies()
  * @return        Gaussian value for the coordinate
  */
 NekDouble ForcingIncNSSyntheticEddy::ComputeGaussian(NekDouble coord,
+                                                      NekDouble xiMaxVal,
                                                       NekDouble constC)
 {
-    return ((1 / (m_sigma * sqrt(2.0 * M_PI * constC))) *
-            exp(-0.5 * (coord / m_sigma) * (coord / m_sigma)));
+
+    NekDouble epsilon = 1e-6;
+    if (abs(coord) <= (xiMaxVal + epsilon))
+    {
+        return ((1.0 / (m_sigma * sqrt(2.0 * M_PI * constC))) *
+                exp(-0.5 * (coord / m_sigma) * (coord / m_sigma)));
+    }
+    else
+    {
+        return 0.0;
+    }
 }
 
 /**
  * @brief   Compute constant C for the gaussian funcion
  */
 NekDouble ForcingIncNSSyntheticEddy::ComputeConstantC(int row, int col)
-{
-    const int vecSize = 100;
-    std::vector<NekDouble> xiVec(vecSize);
-    NekDouble sizeLenScale = m_xiMax[row * m_spacedim + col];
-
-    // Step size
-    const NekDouble stepSize = (2 * sizeLenScale) / vecSize;
+{ 
+    NekDouble sizeLenScale = m_xiMax[col * m_spacedim + row];
 
     // Integration
     NekDouble sum  = 0.0;
-    NekDouble step = -sizeLenScale;
-    for (size_t i = 0; i < vecSize; ++i)
+    NekDouble step = 0.01;
+    NekDouble xi0 = - 1;
+    NekDouble xif = 1;
+    while (xi0 < xif)
     {
-        sum += (ComputeGaussian(step + stepSize) *
-                    ComputeGaussian(step + stepSize) +
-                ComputeGaussian(step) * ComputeGaussian(step));
-        step += stepSize;
+        sum += (ComputeGaussian(xi0 + step, sizeLenScale) *
+                ComputeGaussian(xi0 + step, sizeLenScale) +
+                ComputeGaussian(xi0, sizeLenScale) * 
+                ComputeGaussian(xi0, sizeLenScale));
+        xi0 += step;
     }
 
-    return (0.5 * 0.5 * stepSize * sum);
+    return (0.5 * 0.5 * step * sum);
 }
 
 /**
@@ -692,8 +702,8 @@ void ForcingIncNSSyntheticEddy::ComputeRefLenghts()
 {
     m_lref    = {m_spacedim, 0.0};
     m_lref[0] = m_l[0];
-    m_lref[1] = m_l[3];
-    m_lref[2] = m_l[6];
+    m_lref[1] = m_l[1];
+    m_lref[2] = m_l[2];
 
     // The l_{x}^{ref}, l_{y}^{ref} and l_{z}^{ref}
     // are the maximum among the velocity components
@@ -702,9 +712,9 @@ void ForcingIncNSSyntheticEddy::ComputeRefLenghts()
     {
         for (size_t j = 1; j < m_spacedim; ++j)
         {
-            if (m_l[m_spacedim * i + j] > m_lref[i])
+            if (m_l[m_spacedim * j + i] > m_lref[i])
             {
-                m_lref[i] = m_l[m_spacedim * i + j];
+                m_lref[i] = m_l[m_spacedim * j + i];
             }
         }
     }
@@ -719,14 +729,14 @@ void ForcingIncNSSyntheticEddy::ComputeXiMax()
     {
         for (size_t j = 0; j < m_spacedim; j++)
         {
-            value = (m_l[m_spacedim * i + j] / m_lref[i]);
+            value = (m_l[m_spacedim * j + i] / m_lref[i]);
             if (value > m_xiMaxMin)
             {
-                m_xiMax[m_spacedim * i + j] = value;
+                m_xiMax[m_spacedim * j + i] = value;
             }
             else
             {
-                m_xiMax[m_spacedim * i + j] = m_xiMaxMin;
+                m_xiMax[m_spacedim * j + i] = m_xiMaxMin;
             }
         }
     }
