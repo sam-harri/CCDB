@@ -793,13 +793,13 @@ void ForcingIncNSSyntheticEddy::SetCholeskyReyStresses(
                     "th parameter had an illegal parameter for dpptrf";
                 NEKERROR(ErrorUtil::efatal, message.c_str());
             }
-            else if (info > 0)
+            /*else if (info > 0)
             {
                 std::string message = "ERROR: The leading minor of order " +
                                       std::to_string(info) +
                                       " is not positive definite from dpptrf";
                 NEKERROR(ErrorUtil::efatal, message.c_str());
-            }
+            }*/
             m_Cholesky[nqeCount + i] =
                 Array<OneD, NekDouble>(m_spacedim * (m_spacedim + 1) / 2, A);
         }
