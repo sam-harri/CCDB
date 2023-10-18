@@ -103,6 +103,7 @@ v5.4.0
 - Added additional performance tests and updated test documentation (!1631)
 - Fix VmathTimer compilation error (!1635)
 - Fix SIMD compilation error (!1636)
+- Update ShallowWaterSolver performance test (!1643)
 
 **NekMesh**
 - Changed CMake to set NEKTAR_USE_THREAD_SAFETY to ON when MeshGen is set to ON (!1546)

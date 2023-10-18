@@ -8,9 +8,9 @@
     </files>
     <metrics>
         <metric type="L2" id="1">
-            <value variable="eta" tolerance="1e-8">0.00109671</value>
-            <value variable="u" tolerance="1e-8">0.00123931</value>
-            <value variable="v" tolerance="1e-8">0.0</value>
+            <value variable="eta" tolerance="1e-5">0.0303929</value>
+            <value variable="u" tolerance="1e-5">0.0343446</value>
+            <value variable="v" tolerance="1e-5">0.0</value>
         </metric>
         <metric type="Linf" id="2">
             <value variable="eta" tolerance="1e-5">0.032063</value>
@@ -18,7 +18,7 @@
             <value variable="v" tolerance="1e-5">0.0</value>
         </metric>
         <metric type="ExecutionTime" id="3">
-            <value tolerance="1e-4" hostname="42.debian-bullseye-performance-build-and-test">0.00210637</value>
+            <value tolerance="5e-1" hostname="42.debian-bullseye-performance-build-and-test">7.3</value>
         </metric>
     </metrics>
 </test>
