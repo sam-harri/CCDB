@@ -192,7 +192,7 @@ public:
         SpatialDomains::MeshGraphSharedPtr partitionedGraph = nullptr);
 
     SPATIAL_DOMAINS_EXPORT void WriteGeometry(
-        std::string &outfilename, bool defaultExp = false,
+        const std::string &outfilename, bool defaultExp = false,
         const LibUtilities::FieldMetaDataMap &metadata =
             LibUtilities::NullFieldMetaDataMap);
 
@@ -472,7 +472,7 @@ public:
 
 protected:
     SPATIAL_DOMAINS_EXPORT virtual void v_WriteGeometry(
-        std::string &outfilename, bool defaultExp = false,
+        const std::string &outfilename, bool defaultExp = false,
         const LibUtilities::FieldMetaDataMap &metadata =
             LibUtilities::NullFieldMetaDataMap) = 0;
     SPATIAL_DOMAINS_EXPORT virtual void v_ReadGeometry(
@@ -529,7 +529,7 @@ protected:
 
     struct GeomRTree;
     std::unique_ptr<GeomRTree> m_boundingBoxTree;
-    MovementSharedPtr m_movement = nullptr;
+    MovementSharedPtr m_movement;
 };
 typedef std::shared_ptr<MeshGraph> MeshGraphSharedPtr;
 typedef LibUtilities::NekFactory<std::string, MeshGraph> MeshGraphFactory;
@@ -540,7 +540,7 @@ SPATIAL_DOMAINS_EXPORT MeshGraphFactory &GetMeshGraphFactory();
  *
  */
 inline void MeshGraph::WriteGeometry(
-    std::string &outfilename, bool defaultExp,
+    const std::string &outfilename, bool defaultExp,
     const LibUtilities::FieldMetaDataMap &metadata)
 {
     v_WriteGeometry(outfilename, defaultExp, metadata);

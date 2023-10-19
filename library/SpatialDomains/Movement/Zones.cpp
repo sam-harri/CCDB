@@ -44,9 +44,10 @@ namespace Nektar
 namespace SpatialDomains
 {
 
-ZoneBase::ZoneBase(MovementType type, int indx, CompositeMap domain,
-                   int coordDim)
-    : m_type(type), m_id(indx), m_domain(domain), m_coordDim(coordDim)
+ZoneBase::ZoneBase(MovementType type, int indx, int domainID,
+                   CompositeMap domain, int coordDim)
+    : m_type(type), m_id(indx), m_domainID(domainID), m_domain(domain),
+      m_coordDim(coordDim)
 {
     // Fill elements from domain
     for (auto &comp : domain)
@@ -138,11 +139,12 @@ ZoneBase::ZoneBase(MovementType type, int indx, CompositeMap domain,
     }
 }
 
-ZoneRotate::ZoneRotate(int id, const CompositeMap &domain, const int coordDim,
-                       const NekPoint<NekDouble> &origin, const DNekVec &axis,
+ZoneRotate::ZoneRotate(int id, int domainID, const CompositeMap &domain,
+                       const int coordDim, const NekPoint<NekDouble> &origin,
+                       const DNekVec &axis,
                        const LibUtilities::EquationSharedPtr &angularVelEqn)
-    : ZoneBase(MovementType::eRotate, id, domain, coordDim), m_origin(origin),
-      m_axis(axis), m_angularVelEqn(angularVelEqn)
+    : ZoneBase(MovementType::eRotate, id, domainID, domain, coordDim),
+      m_origin(origin), m_axis(axis), m_angularVelEqn(angularVelEqn)
 {
     // Construct rotation matrix
     m_W(0, 1) = -m_axis[2];

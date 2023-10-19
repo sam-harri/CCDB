@@ -36,6 +36,9 @@
 #ifndef NEKTAR_SPATIALDOMAINS_MOVEMENT_H
 #define NEKTAR_SPATIALDOMAINS_MOVEMENT_H
 
+#include <LibUtilities/BasicUtils/FieldIO.h>
+
+#include <SpatialDomains/MeshGraph.h>
 #include <SpatialDomains/Movement/InterfaceInterpolation.h>
 #include <SpatialDomains/Movement/Zones.h>
 
@@ -51,13 +54,20 @@ typedef std::map<std::pair<int, std::string>, InterfacePairShPtr>
 class Movement
 {
 public:
-    /// Constructor
+    /// Default constructor
+    SPATIAL_DOMAINS_EXPORT Movement()
+    {
+    }
+    /// Constructor to read from XML file
     SPATIAL_DOMAINS_EXPORT Movement(
         const LibUtilities::SessionReaderSharedPtr &pSession,
         MeshGraph *meshGraph);
 
     /// Default destructor
     SPATIAL_DOMAINS_EXPORT ~Movement() = default;
+
+    /// Write the MOVEMENT section of the XML file
+    SPATIAL_DOMAINS_EXPORT void WriteMovement(TiXmlElement *root);
 
     inline const InterfaceCollection &GetInterfaces() const
     {
@@ -70,7 +80,15 @@ public:
     }
 
     // Unused - placeholder for ALE merge request
-    void PerformMovement(NekDouble timeStep);
+    SPATIAL_DOMAINS_EXPORT void PerformMovement(NekDouble timeStep);
+
+    // Methods for manipulating the MOVEMENT data programatically
+    /// Add a zone object to this Movement data.
+    SPATIAL_DOMAINS_EXPORT void AddZone(ZoneBaseShPtr zone);
+    /// Add pair of interfaces to this data
+    SPATIAL_DOMAINS_EXPORT void AddInterface(std::string name,
+                                             InterfaceShPtr left,
+                                             InterfaceShPtr right);
 
 protected:
     InterfaceCollection m_interfaces;

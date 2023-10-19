@@ -58,6 +58,8 @@ v5.4.0
 - Add additional test for SDC time-integration(!1621)
 - Fix to compiler flags for MSVC (!1604)
 - Correct bug in scotch initialisation for substructuring (!1634)
+- Add ability to build up Movement objects programmatically (!1600)
+- Write out movement data to XML files (!1600)
 
 **CompressibleFlowSolver**
 - Fix AUSM3 Riemann solver and add tests to the CI (!1537)
@@ -114,6 +116,10 @@ v5.4.0
 
 **CI**
 - Add testing and packaging for Debian bookworm (!1638)
+**NekPy**
+- Add bindings for Movement-related classes (!1600)
+- Add bindings for various helpful methods in the SpatialDomains
+  library (!1600)
 
 v5.3.0
 ------
