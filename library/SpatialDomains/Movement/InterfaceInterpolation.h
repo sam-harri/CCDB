@@ -37,6 +37,7 @@
 #define NEKTAR_SPATIALDOMAINS_INTERFACEINTERPOLATION_H
 
 #include <SpatialDomains/GeomFactors.h>
+#include <SpatialDomains/MeshGraph.h>
 
 namespace Nektar
 {
@@ -58,6 +59,7 @@ struct Interface
         // Fill element Ids
         for (auto &comp : edge)
         {
+            m_compositeIDs.push_back(comp.first);
             for (auto &geom : comp.second->m_geomVec)
             {
                 m_edge[geom->GetGlobalID()] = geom;
@@ -98,11 +100,20 @@ struct Interface
         return m_id;
     }
 
+    /// Returns IDs of composites making up the interface
+    inline const std::vector<unsigned int> &GetCompositeIDs() const
+    {
+        return m_compositeIDs;
+    }
+
 protected:
     /// Matching opposite interface of the interface pair
     std::shared_ptr<Interface> m_oppInterface;
     /// Interface ID
     int m_id;
+    /// String from XML representation, describing which composites make up this
+    /// interface
+    std::vector<unsigned int> m_compositeIDs;
     /// Map of global ID to geometry of the interface edge
     std::map<int, GeometrySharedPtr> m_edge;
 };

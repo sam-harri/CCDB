@@ -42,6 +42,7 @@
 #include <LibUtilities/BasicUtils/Timer.h>
 #include <SpatialDomains/MeshGraphHDF5.h>
 #include <SpatialDomains/MeshPartition.h>
+#include <SpatialDomains/Movement/Movement.h>
 
 #define TIME_RESULT(verb, msg, timer)                                          \
     if (verb)                                                                  \
@@ -1586,7 +1587,7 @@ void MeshGraphHDF5::WriteDomain(std::map<int, CompositeMap> &domain)
 }
 
 void MeshGraphHDF5::v_WriteGeometry(
-    std::string &outfilename, bool defaultExp,
+    const std::string &outfilename, bool defaultExp,
     const LibUtilities::FieldMetaDataMap &metadata)
 {
     boost::ignore_unused(metadata);
@@ -1657,6 +1658,9 @@ void MeshGraphHDF5::v_WriteGeometry(
         }
         root->LinkEndChild(expTag);
     }
+
+    if (m_movement)
+        m_movement->WriteMovement(root);
 
     doc->SaveFile(filenameXml);
 

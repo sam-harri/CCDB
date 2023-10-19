@@ -4,4 +4,7 @@ ADD_NEKPY_LIBRARY(SpatialDomains DEPENDS StdRegions SOURCES
     Curve.cpp
     MeshGraph.cpp
     GeomElements.cpp
+    Zones.cpp
+    Interfaces.cpp
+    Movement.cpp
     )

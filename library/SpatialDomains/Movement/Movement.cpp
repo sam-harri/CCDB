@@ -34,6 +34,10 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
+#include <algorithm>
+#include <memory>
+#include <string>
+
 #include <LibUtilities/BasicUtils/ParseUtils.h>
 #include <SpatialDomains/MeshGraph.h>
 #include <SpatialDomains/Movement/Movement.h>
@@ -57,6 +61,12 @@ std::string static inline ReadTag(std::string &tagStr)
     std::string indxStr = tagStr.substr(indxBeg, indxEnd - indxBeg + 1);
 
     return indxStr;
+}
+
+std::string static inline StripParentheses(const std::string &str)
+{
+    auto length = str.length();
+    return str.substr(1, length - 2);
 }
 
 Movement::Movement(const LibUtilities::SessionReaderSharedPtr &pSession,
@@ -210,7 +220,7 @@ void Movement::ReadZones(TiXmlElement *zonesTag, MeshGraph *meshGraph,
         ASSERTL0(err == TIXML_SUCCESS, "Unable to read zone domain.");
 
         auto &domains = meshGraph->GetDomain();
-        auto domFind  = stoi(ReadTag(interfaceDomainStr));
+        auto domFind  = std::stoi(ReadTag(interfaceDomainStr));
         std::map<int, CompositeSharedPtr> domain;
         if (domains.find(domFind) != domains.end())
         {
@@ -221,7 +231,7 @@ void Movement::ReadZones(TiXmlElement *zonesTag, MeshGraph *meshGraph,
         if (zoneType == "F" || zoneType == "FIXED")
         {
             zone = ZoneFixedShPtr(MemoryManager<ZoneFixed>::AllocateSharedPtr(
-                indx, domain, coordDim));
+                indx, domFind, domain, coordDim));
         }
         else if (zoneType == "R" || zoneType == "ROTATE" ||
                  zoneType == "ROTATING")
@@ -249,7 +259,7 @@ void Movement::ReadZones(TiXmlElement *zonesTag, MeshGraph *meshGraph,
                     pSession->GetInterpreter(), angularVelStr);
 
             zone = ZoneRotateShPtr(MemoryManager<ZoneRotate>::AllocateSharedPtr(
-                indx, domain, coordDim, origin, axis, angularVelEqn));
+                indx, domFind, domain, coordDim, origin, axis, angularVelEqn));
 
             m_moveFlag = true;
         }
@@ -264,7 +274,7 @@ void Movement::ReadZones(TiXmlElement *zonesTag, MeshGraph *meshGraph,
 
             zone = ZoneTranslateShPtr(
                 MemoryManager<ZoneTranslate>::AllocateSharedPtr(
-                    indx, domain, coordDim, velocity));
+                    indx, domFind, domain, coordDim, velocity));
 
             m_moveFlag = true;
         }
@@ -293,7 +303,7 @@ void Movement::ReadZones(TiXmlElement *zonesTag, MeshGraph *meshGraph,
 
             zone = ZonePrescribeShPtr(
                 MemoryManager<ZonePrescribe>::AllocateSharedPtr(
-                    indx, domain, coordDim, xDeformEqn, yDeformEqn,
+                    indx, domFind, domain, coordDim, xDeformEqn, yDeformEqn,
                     zDeformEqn));
 
             m_moveFlag = true;
@@ -349,9 +359,10 @@ void Movement::ReadInterfaces(TiXmlElement *interfacesTag, MeshGraph *meshGraph)
                 sideElement->QueryStringAttribute("BOUNDARY", &boundaryStr);
 
             CompositeMap boundaryEdge;
+            std::string indxStr;
             if (boundaryErr == TIXML_SUCCESS)
             {
-                std::string indxStr = ReadTag(boundaryStr);
+                indxStr = ReadTag(boundaryStr);
                 meshGraph->GetCompositeList(indxStr, boundaryEdge);
             }
 
@@ -393,6 +404,102 @@ void Movement::ReadInterfaces(TiXmlElement *interfacesTag, MeshGraph *meshGraph)
     }
 }
 
+/// Export this Movement information to a Nektar++ XML file.
+void Movement::WriteMovement(TiXmlElement *root)
+{
+    if (m_zones.size() == 0 && m_interfaces.size() == 0)
+        return;
+    TiXmlElement *movement = new TiXmlElement("MOVEMENT");
+    root->LinkEndChild(movement);
+
+    TiXmlElement *zones = new TiXmlElement("ZONES");
+    for (auto &i : m_zones)
+    {
+        const ZoneBaseShPtr z    = i.second;
+        const MovementType mtype = z->GetMovementType();
+        std::string label        = MovementTypeStr[static_cast<int>(mtype)];
+        TiXmlElement *e          = new TiXmlElement(label.substr(0, 1));
+        e->SetAttribute("ID", i.first);
+        std::stringstream s;
+        s << "D[" << z->GetDomainID() << "]";
+        e->SetAttribute("DOMAIN", s.str());
+
+        switch (mtype)
+        {
+            case MovementType::eRotate:
+            {
+                auto rotate = std::static_pointer_cast<ZoneRotate>(z);
+                e->SetAttribute(
+                    "ORIGIN", StripParentheses(rotate->GetOrigin().AsString()));
+                e->SetAttribute("AXIS",
+                                StripParentheses(rotate->GetAxis().AsString()));
+                e->SetAttribute("ANGVEL",
+                                rotate->GetAngularVelEqn()->GetExpression());
+            }
+            break;
+            case MovementType::eTranslate:
+            {
+                auto translate = std::static_pointer_cast<ZoneTranslate>(z);
+                const std::vector<NekDouble> vel = translate->GetVel();
+                std::stringstream vel_s;
+                vel_s << vel[0] << ", " << vel[1] << ", " << vel[2];
+                e->SetAttribute("VELOCITY", vel_s.str());
+            }
+            break;
+            case MovementType::ePrescribe:
+            {
+                auto prescribe = std::static_pointer_cast<ZonePrescribe>(z);
+                e->SetAttribute(
+                    "XDEFORM",
+                    prescribe->GetXDeformEquation()->GetExpression());
+                e->SetAttribute(
+                    "YDEFORM",
+                    prescribe->GetYDeformEquation()->GetExpression());
+                e->SetAttribute(
+                    "ZDEFORM",
+                    prescribe->GetZDeformEquation()->GetExpression());
+            }
+            break;
+            default:
+                break;
+        }
+        zones->LinkEndChild(e);
+    }
+    movement->LinkEndChild(zones);
+
+    TiXmlElement *interfaces = new TiXmlElement("INTERFACES");
+    for (auto &i : m_interfaces)
+    {
+        const std::string interfaceName = i.first.second;
+        TiXmlElement *e                 = new TiXmlElement("INTERFACE");
+        e->SetAttribute("NAME", interfaceName);
+        const InterfaceShPtr left  = i.second->GetLeftInterface();
+        const InterfaceShPtr right = i.second->GetRightInterface();
+        if (left)
+        {
+            TiXmlElement *left_e = new TiXmlElement("L");
+            left_e->SetAttribute("ID", left->GetId());
+            left_e->SetAttribute(
+                "BOUNDARY",
+                "C[" + ParseUtils::GenerateSeqString(left->GetCompositeIDs()) +
+                    "]");
+            e->LinkEndChild(left_e);
+        }
+        if (right)
+        {
+            TiXmlElement *right_e = new TiXmlElement("R");
+            right_e->SetAttribute("ID", right->GetId());
+            right_e->SetAttribute(
+                "BOUNDARY",
+                "C[" + ParseUtils::GenerateSeqString(right->GetCompositeIDs()) +
+                    "]");
+            e->LinkEndChild(right_e);
+        }
+        interfaces->LinkEndChild(e);
+    }
+    movement->LinkEndChild(interfaces);
+}
+
 // Acts as a placeholder for when ALE function and moving geometry capability
 // is added. Currently unused.
 void Movement::PerformMovement(NekDouble timeStep)
@@ -419,6 +526,24 @@ void Movement::PerformMovement(NekDouble timeStep)
             m_zones[rightId]->GetMoved() = true;
         }
     }
+}
+
+/// Store a zone object with this Movement data
+void Movement::AddZone(ZoneBaseShPtr zone)
+{
+    m_zones[zone->GetId()] = zone;
+    MovementType mtype     = zone->GetMovementType();
+    if (mtype != MovementType::eFixed && mtype != MovementType::eNone)
+        m_moveFlag = true;
+}
+
+/// Store an interface pair with this Movement data
+void Movement::AddInterface(std::string name, InterfaceShPtr left,
+                            InterfaceShPtr right)
+{
+    m_interfaces[std::make_pair(m_interfaces.size(), name)] =
+        InterfacePairShPtr(
+            MemoryManager<InterfacePair>::AllocateSharedPtr(left, right));
 }
 
 } // namespace SpatialDomains

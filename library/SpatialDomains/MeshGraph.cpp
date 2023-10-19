@@ -104,6 +104,7 @@ MeshGraph::MeshGraph()
 {
     m_boundingBoxTree =
         std::unique_ptr<MeshGraph::GeomRTree>(new MeshGraph::GeomRTree());
+    m_movement = std::make_shared<Movement>();
 }
 
 /**

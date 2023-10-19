@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-//  File: SpatialDomains.cpp
+//  File: Movement.cpp
 //
 //  For more information, please see: http://www.nektar.info/
 //
@@ -28,29 +28,48 @@
 //  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 //  DEALINGS IN THE SOFTWARE.
 //
-//  Description: Python wrapper for SpatialDomains classes.
+//  Description: Python wrapper for Movement.
 //
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <LibUtilities/Python/NekPyConfig.hpp>
+#include <SpatialDomains/Movement/Movement.h>
+#include <boost/python/suite/indexing/map_indexing_suite.hpp>
 
-void export_Geometry();
-void export_Curve();
-void export_MeshGraph();
-void export_GeomElements();
-void export_Zones();
-void export_Interfaces();
-void export_Movement();
+using namespace Nektar;
+using namespace Nektar::SpatialDomains;
 
-BOOST_PYTHON_MODULE(_SpatialDomains)
+// Convert InterfaceCollection to Python types, so it can be indexed
+// using tuples. Avoids having to export type for std::pair<int,
+// string>.
+py::dict GetInterfaces_wrapper(MovementSharedPtr movement)
 {
-    np::initialize();
+    py::dict d;
+    for (auto &iter : movement->GetInterfaces())
+    {
+        py::tuple key = py::make_tuple(iter.first.first, iter.first.second);
+        d[key]        = iter.second;
+    }
+    return d;
+}
 
-    export_Geometry();
-    export_Curve();
-    export_MeshGraph();
-    export_GeomElements();
-    export_Zones();
-    export_Interfaces();
-    export_Movement();
+MovementSharedPtr Movement_Init()
+{
+    return std::make_shared<Movement>();
+}
+
+void export_Movement()
+{
+
+    py::class_<std::map<int, ZoneBaseShPtr>>("ZoneMap").def(
+        py::map_indexing_suite<std::map<int, ZoneBaseShPtr>, true>());
+
+    py::class_<Movement, std::shared_ptr<Movement>>("Movement", py::no_init)
+        .def("__init__", py::make_constructor(&Movement_Init))
+        .def("GetInterfaces", &GetInterfaces_wrapper)
+        .def("GetZones", &Movement::GetZones,
+             py::return_value_policy<py::copy_const_reference>())
+        .def("PerformMovement", &Movement::PerformMovement)
+        .def("AddZone", &Movement::AddZone)
+        .def("AddInterface", &Movement::AddInterface);
 }

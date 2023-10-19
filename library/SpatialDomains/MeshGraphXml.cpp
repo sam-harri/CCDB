@@ -37,6 +37,7 @@
 
 #include <SpatialDomains/MeshGraphXml.h>
 #include <SpatialDomains/MeshPartition.h>
+#include <SpatialDomains/Movement/Movement.h>
 
 #include <LibUtilities/BasicUtils/FieldIOXml.h>
 #include <LibUtilities/BasicUtils/FileSystem.h>
@@ -2739,7 +2740,7 @@ void MeshGraphXml::WriteDefaultExpansion(TiXmlElement *root)
  * representing this MeshGraph instance inside a NEKTAR tag.
  */
 void MeshGraphXml::v_WriteGeometry(
-    std::string &outfilename, bool defaultExp,
+    const std::string &outfilename, bool defaultExp,
     const LibUtilities::FieldMetaDataMap &metadata)
 {
     // Create empty TinyXML document.
@@ -2800,6 +2801,9 @@ void MeshGraphXml::v_WriteGeometry(
     {
         WriteDefaultExpansion(root);
     }
+
+    if (m_movement)
+        m_movement->WriteMovement(root);
 
     // Save file.
     doc.SaveFile(outfilename);

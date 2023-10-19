@@ -37,6 +37,7 @@
 #define NEKTAR_SPATIALDOMAINS_ZONES_H
 
 #include <LibUtilities/BasicUtils/Equation.h>
+#include <SpatialDomains/MeshGraph.h>
 
 namespace Nektar
 {
@@ -45,13 +46,14 @@ namespace SpatialDomains
 {
 
 /// Enum of zone movement type
-enum class MovementType
+enum MovementType
 {
     eNone,
     eFixed,
     eRotate,
     eTranslate,
-    ePrescribe
+    ePrescribe,
+    SIZE_MovementType
 };
 
 /// Map of zone movement type to movement type string
@@ -62,7 +64,8 @@ const std::string MovementTypeStr[] = {"None", "Fixed", "Rotated", "Translated",
 struct ZoneBase
 {
     /// Constructor
-    ZoneBase(MovementType type, int indx, CompositeMap domain, int coordDim);
+    SPATIAL_DOMAINS_EXPORT ZoneBase(MovementType type, int indx, int domainID,
+                                    CompositeMap domain, int coordDim);
 
     /// Default destructor
     virtual ~ZoneBase() = default;
@@ -83,6 +86,12 @@ struct ZoneBase
     inline int &GetId()
     {
         return m_id;
+    }
+
+    /// Returns the ID of the domain making up this Zone
+    inline int &GetDomainID()
+    {
+        return m_domainID;
     }
 
     /// Performs the movement of the zone at @param time
@@ -111,6 +120,8 @@ protected:
     MovementType m_type = MovementType::eNone;
     /// Zone ID
     int m_id;
+    /// ID for the composite making up this zone.
+    int m_domainID;
     /// Zone domain
     CompositeMap m_domain;
     /// Vector of highest dimension zone elements
@@ -143,21 +154,42 @@ struct ZoneRotate final : public ZoneBase
      * Constructor for rotating zones
      *
      * @param id Zone ID
+     * @param domainID ID associated with the the domain making up
+     *        the zone
      * @param domain Domain that the zone consists of
      * @param coordDim Coordinate dimension
      * @param origin Origin that the zone rotates about
      * @param axis Axis that the zone rotates about
      * @param angularVelEqn Equation for the angular velocity of rotation
      */
-    ZoneRotate(int id, const CompositeMap &domain, const int coordDim,
-               const NekPoint<NekDouble> &origin, const DNekVec &axis,
-               const LibUtilities::EquationSharedPtr &angularVelEqn);
+    SPATIAL_DOMAINS_EXPORT ZoneRotate(
+        int id, int domainID, const CompositeMap &domain, const int coordDim,
+        const NekPoint<NekDouble> &origin, const DNekVec &axis,
+        const LibUtilities::EquationSharedPtr &angularVelEqn);
 
     /// Default destructor
     virtual ~ZoneRotate() = default;
 
     /// Return the angular velocity of the zone at @param time
-    NekDouble GetAngularVel(NekDouble &time) const;
+    SPATIAL_DOMAINS_EXPORT NekDouble GetAngularVel(NekDouble &time) const;
+
+    /// Returns the origin the zone rotates about
+    inline const NekPoint<NekDouble> &GetOrigin() const
+    {
+        return m_origin;
+    }
+
+    /// Returns the axis the zone rotates about
+    inline const DNekVec &GetAxis() const
+    {
+        return m_axis;
+    }
+
+    /// Returns the equation for the angular velocity of the rotation
+    inline LibUtilities::EquationSharedPtr GetAngularVelEqn() const
+    {
+        return m_angularVelEqn;
+    }
 
 protected:
     ///  Origin point rotation is performed around
@@ -172,7 +204,7 @@ protected:
     DNekMat m_W2 = DNekMat(3, 3, 0.0);
 
     /// Virtual function for movement of the zone at @param time
-    virtual bool v_Move(NekDouble time) final;
+    SPATIAL_DOMAINS_EXPORT virtual bool v_Move(NekDouble time) final;
 };
 
 /// Translating zone: addition of a constant vector to every point
@@ -182,13 +214,15 @@ struct ZoneTranslate final : public ZoneBase
      * Constructor for translating zone
      *
      * @param id Zone ID
+     * @param domainID ID associated with the the domain making up
+     *        the zone
      * @param domain Domain that the zone consists of
      * @param coordDim Coordinate dimension
      * @param velocity Vector of translation velocity in x,y,z direction
      */
-    ZoneTranslate(int id, const CompositeMap &domain, const int coordDim,
-                  const std::vector<NekDouble> &velocity)
-        : ZoneBase(MovementType::eTranslate, id, domain, coordDim),
+    ZoneTranslate(int id, int domainID, const CompositeMap &domain,
+                  const int coordDim, const std::vector<NekDouble> &velocity)
+        : ZoneBase(MovementType::eTranslate, id, domainID, domain, coordDim),
           m_velocity(velocity)
     {
     }
@@ -206,7 +240,7 @@ protected:
     std::vector<NekDouble> m_velocity;
 
     /// Virtual function for movement of the zone at @param time
-    virtual bool v_Move(NekDouble time) final;
+    SPATIAL_DOMAINS_EXPORT virtual bool v_Move(NekDouble time) final;
 };
 
 /// Prescribed zone: applies equation to every point
@@ -216,17 +250,19 @@ struct ZonePrescribe final : public ZoneBase
      * Constructor for prescribed zone
      *
      * @param id Zone ID
+     * @param domainID ID associated with the the domain making up
+     *        the zone
      * @param domain Domain that the zone consists of
      * @param coordDim Coordinate dimension
      * @param xDeform Equation for prescribed motion of x-coordinate
      * @param yDeform Equation for prescribed motion of y-coordinate
      * @param zDeform Equation for prescribed motion of z-coordinate
      */
-    ZonePrescribe(int id, const CompositeMap &domain, const int coordDim,
-                  LibUtilities::EquationSharedPtr xDeform,
+    ZonePrescribe(int id, int domainID, const CompositeMap &domain,
+                  const int coordDim, LibUtilities::EquationSharedPtr xDeform,
                   LibUtilities::EquationSharedPtr yDeform,
                   LibUtilities::EquationSharedPtr zDeform)
-        : ZoneBase(MovementType::ePrescribe, id, domain, coordDim),
+        : ZoneBase(MovementType::ePrescribe, id, domainID, domain, coordDim),
           m_xDeform(xDeform), m_yDeform(yDeform), m_zDeform(zDeform)
     {
     }
@@ -279,6 +315,24 @@ struct ZonePrescribe final : public ZoneBase
         return m_zDeform->Evaluate(x, y, z, t);
     }
 
+    /// Returns the equation for the prescribed motion in the x-coordinate
+    inline LibUtilities::EquationSharedPtr GetXDeformEquation() const
+    {
+        return m_xDeform;
+    }
+
+    /// Returns the equation for the prescribed motion in the y-coordinate
+    inline LibUtilities::EquationSharedPtr GetYDeformEquation() const
+    {
+        return m_yDeform;
+    }
+
+    /// Returns the equation for the prescribed motion in the z-coordinate
+    inline LibUtilities::EquationSharedPtr GetZDeformEquation() const
+    {
+        return m_zDeform;
+    }
+
 protected:
     /// Equation specifying prescribed motion in x-direction
     LibUtilities::EquationSharedPtr m_xDeform;
@@ -288,15 +342,16 @@ protected:
     LibUtilities::EquationSharedPtr m_zDeform;
 
     /// Virtual function for movement of the zone at @param time
-    virtual bool v_Move(NekDouble time) final;
+    SPATIAL_DOMAINS_EXPORT virtual bool v_Move(NekDouble time) final;
 };
 
 /// Fixed zone: does not move
 struct ZoneFixed final : public ZoneBase
 {
     /// Constructor
-    ZoneFixed(int id, const CompositeMap &domain, const int coordDim)
-        : ZoneBase(MovementType::eFixed, id, domain, coordDim)
+    ZoneFixed(int id, int domainID, const CompositeMap &domain,
+              const int coordDim)
+        : ZoneBase(MovementType::eFixed, id, domainID, domain, coordDim)
     {
     }
 
@@ -305,7 +360,7 @@ struct ZoneFixed final : public ZoneBase
 
 protected:
     /// Virtual function for movement of the zone at @param time
-    virtual bool v_Move(NekDouble time) final;
+    SPATIAL_DOMAINS_EXPORT virtual bool v_Move(NekDouble time) final;
 };
 
 typedef std::shared_ptr<ZoneRotate> ZoneRotateShPtr;

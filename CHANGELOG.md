@@ -54,6 +54,8 @@ v5.4.0
 - Rename communicator in LinearAlgebra (!1612)
 - Add IProductWRTDerivBase operator for 3DH1D problems (!1483)
 - Full support of mixed-order elements in DG (!1606)
+- Add ability to build up Movement objects programmatically (!1600)
+- Write out movement data to XML files (!1600)
 
 **CompressibleFlowSolver**
 - Fix AUSM3 Riemann solver and add tests to the CI (!1537)
@@ -94,6 +96,11 @@ v5.4.0
 **NekMesh**
 - Changed CMake to set NEKTAR_USE_THREAD_SAFETY to ON when MeshGen is set to ON (!1546)
 - Fixed a bug where MeshElement/Tetrahedron did not assign edge IDs in the constructor (!1596)
+
+**NekPy**
+- Add bindings for Movement-related classes (!1600)
+- Add bindings for various helpful methods in the SpatialDomains
+  library (!1600)
 
 v5.3.0
 ------
