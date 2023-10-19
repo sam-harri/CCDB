@@ -798,9 +798,6 @@ public:
     /// for boundary average and jump calculations
     MULTI_REGIONS_EXPORT void GetBwdWeight(Array<OneD, NekDouble> &weightAver,
                                            Array<OneD, NekDouble> &weightJump);
-    inline void AddTraceIntegral(const Array<OneD, const NekDouble> &Fx,
-                                 const Array<OneD, const NekDouble> &Fy,
-                                 Array<OneD, NekDouble> &outarray);
     inline void AddTraceIntegral(const Array<OneD, const NekDouble> &Fn,
                                  Array<OneD, NekDouble> &outarray);
     inline void AddFwdBwdTraceIntegral(const Array<OneD, const NekDouble> &Fwd,
@@ -1197,9 +1194,6 @@ protected:
     virtual std::vector<bool> &v_GetLeftAdjacentTraces(void);
     /// Populate \a normals with the normals of all expansions.
     virtual void v_GetNormals(Array<OneD, Array<OneD, NekDouble>> &normals);
-    virtual void v_AddTraceIntegral(const Array<OneD, const NekDouble> &Fx,
-                                    const Array<OneD, const NekDouble> &Fy,
-                                    Array<OneD, NekDouble> &outarray);
     virtual void v_AddTraceIntegral(const Array<OneD, const NekDouble> &Fn,
                                     Array<OneD, NekDouble> &outarray);
     virtual void v_AddFwdBwdTraceIntegral(
@@ -2189,15 +2183,6 @@ inline const Array<OneD, const int> &ExpList::GetTraceBndMap()
 inline void ExpList::GetNormals(Array<OneD, Array<OneD, NekDouble>> &normals)
 {
     v_GetNormals(normals);
-}
-inline void ExpList::AddTraceIntegral(const Array<OneD, const NekDouble> &Fx,
-                                      const Array<OneD, const NekDouble> &Fy,
-                                      Array<OneD, NekDouble> &outarray)
-{
-    WARNINGL1(false,
-              "Deprecated AddTraceIntegral interface, will be removed in "
-              "the next release");
-    v_AddTraceIntegral(Fx, Fy, outarray);
 }
 inline void ExpList::AddTraceIntegral(const Array<OneD, const NekDouble> &Fn,
                                       Array<OneD, NekDouble> &outarray)

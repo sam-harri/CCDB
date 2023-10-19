@@ -1,5 +1,10 @@
 Changelog
 =========
+v5.5.0
+------
+**Library**
+- Remove deprecated AddTraceIntegral interface from ExpList.h (!1646)
+
 v5.4.0
 ------
 **Library**
