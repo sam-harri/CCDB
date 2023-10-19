@@ -316,12 +316,6 @@ protected:
     }
 
     LIB_UTILITIES_EXPORT virtual const std::string &v_GetClassName() const = 0;
-
-    /// Check if solver use Parallel-in-Time
-    LIB_UTILITIES_EXPORT bool ParallelInTime()
-    {
-        return m_comm->GetSize() != m_comm->GetSpaceComm()->GetSize();
-    }
 };
 
 typedef std::shared_ptr<FieldIO> FieldIOSharedPtr;

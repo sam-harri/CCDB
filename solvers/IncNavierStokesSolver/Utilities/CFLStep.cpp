@@ -49,7 +49,7 @@ int main(int argc, char *argv[])
     if (argc != 2)
     {
         fprintf(stderr, "Usage: ./CflStep file.xml \n");
-        fprintf(stderr, "\t Method will read intiial conditions section of "
+        fprintf(stderr, "\t Method will read initial conditions section of "
                         ".xml file for input \n");
         exit(1);
     }

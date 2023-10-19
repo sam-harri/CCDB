@@ -549,9 +549,7 @@ OperatorImpMap CollectionOptimisation::SetWithTimings(
 void CollectionOptimisation::UpdateOptFile(std::string sessName,
                                            LibUtilities::CommSharedPtr &comm)
 {
-    bool parallelInTime = comm->GetSize() != comm->GetSpaceComm()->GetSize();
-
-    if (parallelInTime && comm->GetTimeComm()->GetRank() > 0)
+    if (comm->IsParallelInTime() && comm->GetTimeComm()->GetRank() > 0)
     {
         // No need to repeatly update the optfile for each time chunk.
         return;
@@ -573,7 +571,7 @@ void CollectionOptimisation::UpdateOptFile(std::string sessName,
             root = new TiXmlElement("NEKTAR");
             doc.LinkEndChild(root);
             root->LinkEndChild(xmlCol);
-            if (parallelInTime)
+            if (comm->IsParallelInTime())
             {
                 // Add timelevel tag
                 xmlCol = new TiXmlElement("TIMELEVEL");
