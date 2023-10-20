@@ -922,10 +922,11 @@ void ForcingIncNSSyntheticEddy::PrintReynoldsCholesky(std::map<int,
         while (l < ((m_spacedim * (m_spacedim + 1)) / 2))
         {
             vOut << m_R[l]->Evaluate(x, y, z)
-                 << setw(13) 
+                 << setw(26) 
                  << A[l]
-                 << setw(13) 
+                 << setw(26) 
                  << y
+                 << setw(26) 
                  << l << endl;
             l++;
         }
