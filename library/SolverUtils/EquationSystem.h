@@ -228,7 +228,7 @@ public:
     UpdateFieldMetaDataMap();
 
     /// Return final time
-    SOLVER_UTILS_EXPORT inline NekDouble GetFinalTime();
+    SOLVER_UTILS_EXPORT inline NekDouble GetTime();
 
     SOLVER_UTILS_EXPORT inline int GetNcoeffs();
 
@@ -341,12 +341,6 @@ public:
 
     /// Identify if operator is negated in DoSolve
     SOLVER_UTILS_EXPORT bool NegatedOp();
-
-    /// Check if solver use Parallel-in-Time
-    SOLVER_UTILS_EXPORT bool ParallelInTime()
-    {
-        return m_comm->GetSize() != m_comm->GetSpaceComm()->GetSize();
-    }
 
 protected:
     /// Communicator
@@ -698,8 +692,8 @@ inline Array<OneD, MultiRegions::ExpListSharedPtr>
     return m_fields;
 }
 
-/// Return final time
-inline NekDouble EquationSystem::GetFinalTime()
+/// Return time
+inline NekDouble EquationSystem::GetTime()
 {
     return m_time;
 }

@@ -4,6 +4,8 @@ v5.5.0
 ------
 **Library**
 - Add member function in MPI communicator to check if time-parallel is enable (!1647)
+- Add safety check for FinTime parameter for parallel-in-time (!1652)
+
 **FieldConvert**
 - Fix typo in user-guide and fix but for parallel-in-time FieldConvert (!1645)
 

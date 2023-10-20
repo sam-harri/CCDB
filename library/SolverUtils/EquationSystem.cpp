@@ -727,6 +727,14 @@ void EquationSystem::v_InitObject(bool DeclareFields)
              "should be set!");
     m_session->LoadParameter("TimeIncrementFactor", m_TimeIncrementFactor, 1.0);
 
+    // Check for parallel-in-time
+    if (m_comm->IsParallelInTime())
+    {
+        ASSERTL0(m_fintime == 0.0,
+                 "Only specify NumSteps and TimeSteps for Parallel-in-Time. "
+                 "FinTime should not be used! ");
+    }
+
     m_nchk    = 0;
     m_iterPIT = 0;
 }
