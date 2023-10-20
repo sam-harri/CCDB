@@ -278,8 +278,8 @@ int main(int argc, char *argv[])
             auto index = atoi(filename.substr(start, filename.size()).c_str());
 
             // Create output directory if does not exit.
-            if (f->m_comm->TreatAsRankZero() && !fs::is_directory(dir) &&
-                io == inout.end() - 1)
+            if (dir != "" && f->m_comm->TreatAsRankZero() &&
+                !fs::is_directory(dir) && io == inout.end() - 1)
             {
                 fs::create_directory(dir);
             }

@@ -673,7 +673,7 @@ outputted. To process this file you will need an xml file of the same region.
 This can be generated using the command:
 %
 \begin{lstlisting}[style=BashInputStyle]
-NekMesh -m extract:surf=5  test.xml test\_b0.xml
+NekMesh -m extract:surf=5  test.xml test_b0.xml
 \end{lstlisting}
 %
 The surface to be extracted in this command is the composite
@@ -681,7 +681,7 @@ number and so needs to correspond to the boundary region
 of interest. Finally to process the surface file one can use
 %
 \begin{lstlisting}[style=BashInputStyle]
-FieldConvert  test\_b0.xml test\_b0.fld test\_b0.dat
+FieldConvert  test_b0.xml test_b0.fld test_b0.dat
 \end{lstlisting}
 %
 This will obviously generate a Tecplot output if a .dat file
@@ -1612,14 +1612,15 @@ To run FieldConvert in parallel the user needs to compile
 command
 \begin{lstlisting}[style=BashInputStyle]
   mpirun -np <nprocs> FieldConvert --npt <nprocs> test.xml \
-                 in/test\_<n>.fld out/test\_<n>.vtu
+                 in/test_<n>.fld out/test_<n>.vtu
 \end{lstlisting}
 \begin{lstlisting}[style=BashInputStyle]
   mpirun -np <nprocs> FieldConvert --npt <nprocs> test.xml \
-                 in/test\_<n>.fld out/test\_<n>.dat
+                 in/test_<n>.fld out/test_<n>.dat
 \end{lstlisting}
 replacing \inltt{<nprocs>} with the number of processors and \inltt{<n>} 
-by the starting time index. FieldConvert will then process in parallel 
+by the starting time index while the subdirectories \inltt{in} and \inltt{out} 
+are optional. FieldConvert will then process in parallel 
 time solutions \inltt{test\_<n>}.dat to \inltt{test\_<n>+<nprocs>}.dat.
 %
 %
@@ -1668,7 +1669,7 @@ using the \inltt{--part-only} option you can now run the
 \inltt{FieldConvert} option using the \inltt{nparts}  command line
 option, that is
 \begin{lstlisting}[style=BashInputStyle]
-FieldConvert --nparts 10  file1\_xml:xml file1.fld file1.vtu
+FieldConvert --nparts 10  file1_xml:xml file1.fld file1.vtu
 \end{lstlisting}
 
 Note the form \inltt{file1\_xml:xml} option tells the code it is a
@@ -1706,7 +1707,7 @@ parallel using a smaller number of cores than the nparts.
 For the example of creating a vtu file above you can use 4 processor
 concurrently with the command line:
 \begin{lstlisting}[style=BashInputStyle]
-mpirun -n 4 FieldConvert --nparts 10   file1\_xml:xml file1.fld file1.vtu
+mpirun -n 4 FieldConvert --nparts 10   file1_xml:xml file1.fld file1.vtu
 \end{lstlisting}
 
 Obviously the executable will have to have been compiled with the MPI
