@@ -92,6 +92,9 @@ protected:
     /// Compute Gaussian
     NekDouble ComputeGaussian(NekDouble coord, NekDouble xiMaxVal,
          NekDouble constC = 1.0);
+    /// Compute Correlation function    
+    NekDouble ComputeCorrelationFunction(NekDouble r, 
+        NekDouble xiMaxVal, NekDouble constC = 1.0);
     /// Check if point is inside the box of eddies
     bool InsideBoxOfEddies(NekDouble coord0, NekDouble coord1,
                            NekDouble coord2);
@@ -127,6 +130,15 @@ protected:
     /// Calculate Forcing
     void CalculateForcing(
         const Array<OneD, MultiRegions::ExpListSharedPtr> &pFields);
+    /// Print Correlation Function: algorithm verification
+    void PrintCorrelationFunction();
+    /// Print Gaussian square: algorithm verification
+    void PrintGaussianSquare();
+    /// Print Reynods Stress and Cholesky decomposition 
+    void PrintReynoldsCholesky(std::map<int, 
+        LibUtilities::EquationSharedPtr> R, 
+        Array<OneD, NekDouble> A,
+        NekDouble x, NekDouble y, NekDouble z);
 
     // Members
     // Expressions (functions) of the prescribed Reynolds stresses
