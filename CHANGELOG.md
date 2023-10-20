@@ -1,5 +1,10 @@
 Changelog
 =========
+v5.5.0
+------
+**FieldConvert**
+- Fix typo in user-guide and fix but for parallel-in-time FieldConvert (!1645)
+
 v5.4.0
 ------
 **Library**
