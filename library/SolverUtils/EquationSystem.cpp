@@ -1037,11 +1037,11 @@ void EquationSystem::v_SetInitialConditions(NekDouble initialtime,
     }
 
     if (dumpInitialConditions && m_checksteps && m_nchk == 0 &&
-        !ParallelInTime())
+        !m_comm->IsParallelInTime())
     {
         Checkpoint_Output(m_nchk);
     }
-    else if (dumpInitialConditions && m_nchk == 0 && ParallelInTime())
+    else if (dumpInitialConditions && m_nchk == 0 && m_comm->IsParallelInTime())
     {
         std::string newdir = m_sessionName + ".pit";
         if (!fs::is_directory(newdir))
@@ -1124,7 +1124,7 @@ void EquationSystem::v_GenerateSummary(SummaryList &l)
  */
 void EquationSystem::v_Output(void)
 {
-    if (!ParallelInTime())
+    if (!m_comm->IsParallelInTime())
     {
         // Serial-in-time
         WriteFld(m_sessionName + ".fld");
@@ -1175,7 +1175,7 @@ void EquationSystem::FwdTransFields(void)
  */
 void EquationSystem::Checkpoint_Output(const int n)
 {
-    if (!ParallelInTime())
+    if (!m_comm->IsParallelInTime())
     {
         // Serial-in-time
         std::string outname =
@@ -1207,7 +1207,7 @@ void EquationSystem::Checkpoint_Output(
     std::vector<Array<OneD, NekDouble>> &fieldcoeffs,
     std::vector<std::string> &variables)
 {
-    if (!ParallelInTime())
+    if (!m_comm->IsParallelInTime())
     {
         // Serial-in-time
         std::string outname =

@@ -675,11 +675,11 @@ void CompressibleFlowSystem::v_SetInitialConditions(NekDouble initialtime,
     }
 
     if (dumpInitialConditions && m_nchk == 0 && m_checksteps &&
-        !ParallelInTime())
+        !m_comm->IsParallelInTime())
     {
         Checkpoint_Output(0);
     }
-    else if (dumpInitialConditions && m_nchk == 0 && ParallelInTime())
+    else if (dumpInitialConditions && m_nchk == 0 && m_comm->IsParallelInTime())
     {
         std::string newdir = m_sessionName + ".pit";
         if (!fs::is_directory(newdir))

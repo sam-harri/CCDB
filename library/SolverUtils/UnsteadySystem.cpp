@@ -291,7 +291,7 @@ void UnsteadySystem::v_DoSolve()
         }
 
         // Frozen preconditioner checks.
-        if (!ParallelInTime())
+        if (!m_comm->IsParallelInTime())
         {
             if (v_UpdateTimeStepCheck())
             {
@@ -548,7 +548,7 @@ void UnsteadySystem::v_PrintStatusInformation(const int step,
     if (m_infosteps && m_session->GetComm()->GetSpaceComm()->GetRank() == 0 &&
         !((step + 1) % m_infosteps))
     {
-        if (ParallelInTime())
+        if (m_comm->IsParallelInTime())
         {
             cout << "RANK " << m_session->GetComm()->GetTimeComm()->GetRank()
                  << " Steps: " << setw(8) << left << step + 1 << " "

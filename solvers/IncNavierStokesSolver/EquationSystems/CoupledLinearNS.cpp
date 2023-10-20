@@ -2458,7 +2458,7 @@ void CoupledLinearNS::v_Output(void)
     }
     variables[i] = "p";
 
-    if (!ParallelInTime())
+    if (!m_comm->IsParallelInTime())
     {
         WriteFld(m_sessionName + ".fld", m_fields[0], fieldcoeffs, variables);
     }

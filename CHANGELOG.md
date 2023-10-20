@@ -1,5 +1,10 @@
 Changelog
 =========
+v5.5.0
+------
+**Library**
+- Add member function in MPI communicator to check if time-parallel is enable (!1647)
+
 v5.4.0
 ------
 **Library**

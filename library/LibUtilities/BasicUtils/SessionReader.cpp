@@ -281,9 +281,6 @@ void SessionReader::InitSession(const std::vector<std::string> &filenames)
         m_filenames = filenames;
     }
 
-    bool ParallelInTime =
-        m_comm->GetSize() != m_comm->GetSpaceComm()->GetSize();
-
     // check specified  opt file
     std::string optfile;
     int exists;
@@ -308,7 +305,7 @@ void SessionReader::InitSession(const std::vector<std::string> &filenames)
         exists  = (bool)boost::filesystem::exists(optfile.c_str());
 
         // For Paralell-in-Time
-        if (exists && ParallelInTime)
+        if (exists && m_comm->IsParallelInTime())
         {
             TiXmlDocument doc;
             doc.LoadFile(optfile);
