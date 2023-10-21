@@ -34,6 +34,7 @@
 
 #include <CardiacEPSolver/Filters/FilterCellHistoryPoints.h>
 #include <LibUtilities/Memory/NekMemoryManager.hpp>
+#include <boost/format.hpp>
 #include <iomanip>
 
 using namespace std;
@@ -129,23 +130,92 @@ void FilterCellHistoryPoints::v_Update(
     // Exchange history data
     // This could be improved to reduce communication but works for now
     vComm->AllReduce(data, LibUtilities::ReduceSum);
+    v_WriteData(vComm->GetRank(), data, numFields, time);
+}
 
+void FilterCellHistoryPoints::v_WriteData(const int &rank,
+                                          const Array<OneD, NekDouble> &data,
+                                          const int &numFields,
+                                          const NekDouble &time)
+{
     // Only the root process writes out history data
-    if (vComm->GetRank() == 0)
+    if (rank > 0)
     {
+        return;
+    }
 
-        // Write data values point by point
-        for (size_t k = 0; k < m_historyPoints.size(); ++k)
+    Array<OneD, NekDouble> gloCoord(3, 0.0);
+    if (!m_outputOneFile || m_index == 1)
+    {
+        std::stringstream vOutputFilename;
+        if (m_outputOneFile)
         {
-            m_outputStream.width(8);
-            m_outputStream << setprecision(6) << time;
-            for (size_t j = 0; j < numFields; ++j)
-            {
-                m_outputStream.width(25);
-                m_outputStream << setprecision(16) << data[k * numFields + j];
-            }
+            vOutputFilename << m_outputFile << ".his";
+        }
+        else
+        {
+            vOutputFilename << m_outputFile << "_" << m_outputIndex << ".his";
+        }
+        ++m_outputIndex;
+        if (m_adaptive)
+        {
+            m_outputStream.open(vOutputFilename.str().c_str(), ofstream::app);
+        }
+        else
+        {
+            m_outputStream.open(vOutputFilename.str().c_str());
+        }
+        // m_outputStream << "# History data for variables (:";
+
+        // for (int i = 0; i < numFields; ++i)
+        //{
+        //     m_outputStream << m_session->GetVariable(i) <<",";
+        // }
+
+        if (m_isHomogeneous1D)
+        {
+            m_outputStream << ") at points:" << endl;
+        }
+        else
+        {
+            m_outputStream << ") at points:" << endl;
+        }
+
+        for (int i = 0; i < m_historyPoints.size(); ++i)
+        {
+            gloCoord = m_historyPoints[i];
+
+            m_outputStream << "# " << boost::format("%6.0f") % i;
+            m_outputStream << " " << boost::format("%15.9e") % gloCoord[0];
+            m_outputStream << " " << boost::format("%15.9e") % gloCoord[1];
+            m_outputStream << " " << boost::format("%15.9e") % gloCoord[2];
             m_outputStream << endl;
         }
+
+        if (m_isHomogeneous1D)
+        {
+            if (m_waveSpace)
+            {
+                m_outputStream << "# (in Wavespace)" << endl;
+            }
+        }
+    }
+
+    // Write data values point by point
+    for (int k = 0; k < m_historyPoints.size(); ++k)
+    {
+        m_outputStream << boost::format("%15.9e") % time;
+        for (int j = 0; j < numFields; ++j)
+        {
+            m_outputStream << " "
+                           << boost::format("%15.9e") % data[k * numFields + j];
+        }
+        m_outputStream << endl;
+    }
+
+    if (!m_outputOneFile)
+    {
+        m_outputStream.close();
     }
 }
 

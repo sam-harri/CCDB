@@ -591,10 +591,10 @@ void FilterHistoryPoints::v_Update(
     vComm->AllReduce(data, LibUtilities::ReduceSum);
 
     // TODO: Why not only call this routine if we are rank 0?
-    WriteData(vComm->GetRank(), data, numFields, time);
+    v_WriteData(vComm->GetRank(), data, numFields, time);
 }
 
-void FilterHistoryPoints::WriteData(const int &rank,
+void FilterHistoryPoints::v_WriteData(const int &rank,
                                     const Array<OneD, NekDouble> &data,
                                     const int &numFields, const NekDouble &time)
 {
