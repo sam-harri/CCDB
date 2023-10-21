@@ -76,6 +76,9 @@ protected:
     virtual void v_Update(
         const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
         const NekDouble &time) override;
+    virtual void v_WriteData(const int &rank,
+                             const Array<OneD, NekDouble> &data,
+                             const int &numFields, const NekDouble &time);
 
     CellModelSharedPtr m_cell;
 };

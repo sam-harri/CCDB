@@ -82,8 +82,10 @@ protected:
         const NekDouble &time) override;
     SOLVER_UTILS_EXPORT virtual bool v_IsTimeDependent() override;
     bool GetPoint(Array<OneD, NekDouble> gloCoord, int I);
-    void WriteData(const int &rank, const Array<OneD, NekDouble> &data,
-                   const int &numFields, const NekDouble &time);
+    SOLVER_UTILS_EXPORT void v_WriteData(const int &rank,
+                                         const Array<OneD, NekDouble> &data,
+                                         const int &numFields,
+                                         const NekDouble &time);
 
     Array<OneD, Array<OneD, const NekDouble>> m_historyPoints =
         Array<OneD, Array<OneD, const NekDouble>>(0);

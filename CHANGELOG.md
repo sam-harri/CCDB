@@ -4,6 +4,10 @@ v5.5.0
 ------
 **Library**
 - Add member function in MPI communicator to check if time-parallel is enable (!1647)
+
+**CardiacEPSolver**
+- Fix cell model history point filter output after base class change (!1342)
+
 **FieldConvert**
 - Fix typo in user-guide and fix but for parallel-in-time FieldConvert (!1645)
 
