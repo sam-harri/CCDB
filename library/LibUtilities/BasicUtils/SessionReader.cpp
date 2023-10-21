@@ -196,19 +196,19 @@ SessionReader::SessionReader(int argc, char *argv[])
 
     TestSharedFilesystem();
 
+    // Split up the communicator
+    PartitionComm();
+
     // If running in parallel change the default global sys solution
     // type.
-    if (m_comm->GetSize() > 1)
+    if (m_comm->GetSpaceComm()->GetSize() > 1)
     {
         GetSolverInfoDefaults()["GLOBALSYSSOLN"] = "IterativeStaticCond";
     }
 
     m_interpreter = MemoryManager<Interpreter>::AllocateSharedPtr();
-    m_interpreter->SetRandomSeed((m_comm->GetRank() + 1) *
+    m_interpreter->SetRandomSeed((m_comm->GetSpaceComm()->GetRank() + 1) *
                                  (unsigned int)time(NULL));
-
-    // Split up the communicator
-    PartitionComm();
 }
 
 /**
@@ -238,19 +238,19 @@ SessionReader::SessionReader(int argc, char *argv[],
 
     TestSharedFilesystem();
 
+    // Split up the communicator
+    PartitionComm();
+
     // If running in parallel change the default global sys solution
     // type.
-    if (m_comm->GetSize() > 1)
+    if (m_comm->GetSpaceComm()->GetSize() > 1)
     {
         GetSolverInfoDefaults()["GLOBALSYSSOLN"] = "IterativeStaticCond";
     }
 
     m_interpreter = MemoryManager<Interpreter>::AllocateSharedPtr();
-    m_interpreter->SetRandomSeed((m_comm->GetRank() + 1) *
+    m_interpreter->SetRandomSeed((m_comm->GetSpaceComm()->GetRank() + 1) *
                                  (unsigned int)time(NULL));
-
-    // Split up the communicator
-    PartitionComm();
 
     // Set time level (Parallel-in-Time)
     m_timeLevel = timelevel;
@@ -1495,7 +1495,7 @@ bool SessionReader::DefinesCmdLineArgument(const std::string &pName) const
  */
 void SessionReader::GetXMLElementTimeLevel(TiXmlElement *&Element,
                                            const size_t timeLevel,
-                                           const bool disableCheck)
+                                           const bool enableCheck)
 {
     if (Element && Element->FirstChildElement("TIMELEVEL"))
     {
@@ -1520,7 +1520,7 @@ void SessionReader::GetXMLElementTimeLevel(TiXmlElement *&Element,
             }
             Element = Element->NextSiblingElement("TIMELEVEL");
         }
-        if (disableCheck)
+        if (enableCheck)
         {
             ASSERTL0(stoi(timeLevelStr) == timeLevel,
                      "TIMELEVEL value " + std::to_string(timeLevel) +

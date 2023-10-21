@@ -3,7 +3,9 @@ Changelog
 v5.5.0
 ------
 **Library**
+- Update default global system solver parameters for paralell-in-time (!1649)
 - Add member function in MPI communicator to check if time-parallel is enable (!1647)
+
 **FieldConvert**
 - Fix typo in user-guide and fix but for parallel-in-time FieldConvert (!1645)
 

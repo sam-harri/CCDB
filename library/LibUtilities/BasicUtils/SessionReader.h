@@ -403,7 +403,7 @@ public:
     /// Get XML elment time level (Parallel-in-Time)
     LIB_UTILITIES_EXPORT static void GetXMLElementTimeLevel(
         TiXmlElement *&element, const size_t timeLevel,
-        const bool disableCheck = true);
+        const bool enableCheck = true);
 
 private:
     boost::program_options::variables_map m_cmdLineOptions;
