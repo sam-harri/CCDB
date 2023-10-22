@@ -551,7 +551,7 @@ void GlobalLinSysIterativeStaticCond::v_SolveLinearSystem(
 
         m_linsol->SetSysOperators(m_NekSysOp);
         v_UniqueMap();
-        m_linsol->setUniversalUniqueMap(m_map);
+        m_linsol->SetUniversalUniqueMap(m_map);
     }
 
     if (!m_precon)

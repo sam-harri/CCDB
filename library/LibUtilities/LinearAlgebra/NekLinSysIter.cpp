@@ -105,14 +105,14 @@ NekLinSysIter::NekLinSysIter(
 void NekLinSysIter::v_InitObject()
 {
     NekSys::v_InitObject();
-    setUniversalUniqueMap();
+    SetUniversalUniqueMap();
 }
 
 NekLinSysIter::~NekLinSysIter()
 {
 }
 
-void NekLinSysIter::setUniversalUniqueMap(Array<OneD, int> &map)
+void NekLinSysIter::SetUniversalUniqueMap(const Array<OneD, const int> &map)
 {
     int nmap = map.size();
     if (m_map.size() != nmap)
@@ -122,7 +122,7 @@ void NekLinSysIter::setUniversalUniqueMap(Array<OneD, int> &map)
     Vmath::Vcopy(nmap, map, 1, m_map, 1);
 }
 
-void NekLinSysIter::setUniversalUniqueMap()
+void NekLinSysIter::SetUniversalUniqueMap()
 {
     m_map = Array<OneD, int>(m_SysDimen, 1);
 }

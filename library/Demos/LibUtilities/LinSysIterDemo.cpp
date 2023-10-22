@@ -75,7 +75,7 @@ public:
         m_NekSysOp.DefineNekSysFixPointIte(&LinSysDemo::DoFixedPoint, this);
         m_linsol->SetSysOperators(m_NekSysOp);
         UniqueMap();
-        m_linsol->setUniversalUniqueMap(m_map);
+        m_linsol->SetUniversalUniqueMap(m_map);
     }
     ~LinSysDemo()
     {

@@ -8,6 +8,7 @@ v5.5.0
 
 **CardiacEPSolver**
 - Fix cell model history point filter output after base class change (!1342)
+- Add const qualifier to SetUniversalUniqueMap (!1644)
 
 **FieldConvert**
 - Fix typo in user-guide and fix but for parallel-in-time FieldConvert (!1645)
