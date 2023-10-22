@@ -75,7 +75,8 @@ public:
         const NekSysKey &pKey);
     LIB_UTILITIES_EXPORT virtual ~NekLinSysIter();
 
-    LIB_UTILITIES_EXPORT void setUniversalUniqueMap(Array<OneD, int> &map);
+    LIB_UTILITIES_EXPORT void SetUniversalUniqueMap(
+        const Array<OneD, const int> &map);
     LIB_UTILITIES_EXPORT void setRhsMagnitude(const NekDouble mag)
     {
         m_rhs_magnitude = mag;
@@ -123,7 +124,7 @@ protected:
 
     void Set_Rhs_Magnitude(const NekVector<NekDouble> &pIn);
     void Set_Rhs_Magnitude(const Array<OneD, NekDouble> &pIn);
-    void setUniversalUniqueMap();
+    void SetUniversalUniqueMap();
 
     virtual void v_InitObject() override;
 
