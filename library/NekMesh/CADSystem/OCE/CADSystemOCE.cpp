@@ -185,9 +185,7 @@ bool CADSystemOCE::LoadCAD()
     {
         // not a naca profile behave normally
         // could be a geo
-        string ext = boost::filesystem::extension(m_name);
-
-        if (boost::iequals(ext, ".geo"))
+        if (boost::filesystem::path(m_name).extension() == ".geo")
         {
             m_shape = BuildGeo(m_name);
         }

@@ -13,6 +13,9 @@ v5.5.0
 **FieldConvert**
 - Fix typo in user-guide and fix but for parallel-in-time FieldConvert (!1645)
 
+**NekMesh**
+- Replace deprecated boost::filesystem functions (!1654)
+
 v5.4.0
 ------
 **Library**
