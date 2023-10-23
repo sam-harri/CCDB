@@ -161,6 +161,7 @@ IF( NEKTAR_SOLVER_INCNAVIERSTOKES )
     ADD_NEKTAR_TEST(CylFlow2D_SPM)
     ADD_NEKTAR_TEST(CylFlow2DMov_SPM)
     ADD_NEKTAR_TEST(CylFlow3DH1D_SPM)
+    ADD_NEKTAR_TEST(manufactured_3DH1D)
 
     IF (NEKTAR_USE_SCOTCH)
         # This tests exhibits sensitivity to the choice of DirectStaticCond
