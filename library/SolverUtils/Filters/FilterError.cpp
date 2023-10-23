@@ -105,6 +105,11 @@ void FilterError::v_Initialise(
     const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
     const NekDouble &time)
 {
+
+    // Check for homogeneous expansion
+    m_homogeneous = pFields[0]->GetExpType() == MultiRegions::e3DH1D ||
+                    pFields[0]->GetExpType() == MultiRegions::e3DH2D;
+
     v_Update(pFields, time);
 }
 
@@ -112,8 +117,7 @@ void FilterError::v_Update(
     const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
     const NekDouble &time)
 {
-    boost::ignore_unused(pFields);
-
+    // Check whether output frequency matches
     if (m_index++ % m_outputFrequency > 0)
     {
         return;
@@ -131,10 +135,17 @@ void FilterError::v_Update(
 
     for (size_t i = 0; i < m_numVariables; ++i)
     {
-        Array<OneD, NekDouble> exactsoln(equationSys->GetTotPoints(), 0.0);
-
         // Evaluate "ExactSolution" function, or zero array
+        Array<OneD, NekDouble> exactsoln(pFields[i]->GetTotPoints(), 0.0);
         equationSys->EvaluateExactSolution(i, exactsoln, time);
+
+        // If homogeneous expansion is used, transform the solution to
+        // Fourier (Wave) space
+        if (m_homogeneous)
+        {
+            pFields[i]->HomogeneousFwdTrans(pFields[i]->GetTotPoints(),
+                                            exactsoln, exactsoln);
+        }
 
         NekDouble vL2Error   = equationSys->L2Error(i, exactsoln);
         NekDouble vLinfError = equationSys->LinfError(i, exactsoln);
