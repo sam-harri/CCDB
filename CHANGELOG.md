@@ -11,6 +11,7 @@ v5.5.0
 **CardiacEPSolver**
 - Fix cell model history point filter output after base class change (!1342)
 - Add const qualifier to SetUniversalUniqueMap (!1644)
+- Add safety check for FinTime parameter for parallel-in-time (!1652)
 
 **FieldConvert**
 - Fix typo in user-guide and fix but for parallel-in-time FieldConvert (!1645)

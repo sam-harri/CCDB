@@ -97,8 +97,6 @@
             <TIMELEVEL VALUE="1">
                 <P> TimeStep        = 0.01             </P>
                 <P> NumSteps        = 20               </P>
-                <P> IO_CheckSteps   = 0                </P>
-                <P> IO_InfoSteps    = 0                </P>
                 <P> wavefreq        = PI               </P>
                 <P> epsilon         = 1.0              </P>
             </TIMELEVEL>
