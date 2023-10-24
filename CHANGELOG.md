@@ -5,6 +5,7 @@ v5.5.0
 **Library**
 - Update default global system solver parameters for paralell-in-time (!1649)
 - Add member function in MPI communicator to check if time-parallel is enable (!1647)
+- Update AssemblyMap to reduce verbosity when using parallel-in-time (!1651)
 
 **CardiacEPSolver**
 - Fix cell model history point filter output after base class change (!1342)
