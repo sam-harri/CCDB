@@ -1415,8 +1415,10 @@ void AssemblyMap::PrintStats(std::ostream &out, std::string variable,
                              bool printHeader) const
 {
     LibUtilities::CommSharedPtr vRowComm = m_session->GetComm()->GetRowComm();
-    bool isRoot                          = vRowComm->GetRank() == 0;
-    int n                                = vRowComm->GetSize();
+    bool isRoot = m_session->GetComm()->IsParallelInTime()
+                      ? m_session->GetComm()->GetRank() == 0
+                      : vRowComm->GetRank() == 0;
+    int n       = vRowComm->GetSize();
     int i;
 
     // Determine number of global degrees of freedom.
@@ -1620,7 +1622,11 @@ void AssemblyMap::PrintStats(std::ostream &out, std::string variable,
     }
     else
     {
-        out << "  - Number of static cond. levels          : " << level << endl;
+        if (isRoot)
+        {
+            out << "  - Number of static cond. levels          : " << level
+                << endl;
+        }
     }
 
     if (isRoot)

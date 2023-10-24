@@ -7,6 +7,7 @@ v5.5.0
 - Add member function in MPI communicator to check if time-parallel is enable (!1647)
 - Fixed FilterError for homogeneous expansions (!1640)
 - Fix ForcingAbsorption for homogeneous expansions (!1650)
+- Update AssemblyMap to reduce verbosity when using parallel-in-time (!1651)
 
 **CardiacEPSolver**
 - Fix cell model history point filter output after base class change (!1342)
