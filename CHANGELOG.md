@@ -17,6 +17,9 @@ v5.5.0
 **FieldConvert**
 - Fix typo in user-guide and fix but for parallel-in-time FieldConvert (!1645)
 
+**CI**
+- Disable macOS Intel runner (!1655)
+
 v5.4.0
 ------
 **Library**
