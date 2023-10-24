@@ -64,6 +64,11 @@ void ForcingAbsorption::v_InitObject(
     m_NumVariable = pNumForcingFields;
     int npts      = pFields[0]->GetTotPoints();
 
+    // Check for homogeneous expansion
+    // for later transformation of evaluated Absorption (SessionFunction)
+    m_homogeneous = pFields[0]->GetExpType() == MultiRegions::e3DH1D ||
+                    pFields[0]->GetExpType() == MultiRegions::e3DH2D;
+
     CalcAbsorption(pFields, pForce);
 
     m_Forcing = Array<OneD, Array<OneD, NekDouble>>(m_NumVariable);
@@ -232,6 +237,17 @@ void ForcingAbsorption::CalcAbsorption(
             std::string s_FieldStr = m_session->GetVariable(i);
             GetFunction(pFields, m_session, funcName)
                 ->Evaluate(s_FieldStr, m_Absorption[i]);
+        }
+    }
+
+    // If homogeneous expansion is used, transform the forcing term to
+    // be in the Fourier space
+    if (m_homogeneous)
+    {
+        for (int i = 0; i < m_NumVariable; ++i)
+        {
+            pFields[i]->HomogeneousFwdTrans(pFields[i]->GetTotPoints(),
+                                            m_Absorption[i], m_Absorption[i]);
         }
     }
 }

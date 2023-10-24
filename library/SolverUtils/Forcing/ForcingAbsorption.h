@@ -112,6 +112,8 @@ protected:
         const NekDouble &time) override;
 
 private:
+    // Save whether the basis contains a homogeneous expansion
+    bool m_homogeneous;
     ForcingAbsorption(const LibUtilities::SessionReaderSharedPtr &pSession,
                       const std::weak_ptr<EquationSystem> &pEquation);
     virtual ~ForcingAbsorption(void){};

@@ -6,6 +6,7 @@ v5.5.0
 - Update default global system solver parameters for paralell-in-time (!1649)
 - Add member function in MPI communicator to check if time-parallel is enable (!1647)
 - Fixed FilterError for homogeneous expansions (!1640)
+- Fix ForcingAbsorption for homogeneous expansions (!1650)
 
 **CardiacEPSolver**
 - Fix cell model history point filter output after base class change (!1342)
