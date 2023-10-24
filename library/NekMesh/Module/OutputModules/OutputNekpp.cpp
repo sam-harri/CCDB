@@ -193,8 +193,6 @@ void OutputNekpp::Process()
         }
     }
 
-    string ext = boost::filesystem::extension(filename);
-
     if (m_config["stats"].beenSet)
     {
         m_mesh->PrintStats(m_log);
@@ -204,11 +202,12 @@ void OutputNekpp::Process()
     std::string type = "XmlCompressed";
 
     // Compress output and append .gz extension
-    if (boost::iequals(ext, ".xml") && m_config["uncompress"].beenSet)
+    if (boost::filesystem::path(filename).extension() == ".xml" &&
+        m_config["uncompress"].beenSet)
     {
         type = "Xml";
     }
-    else if (boost::iequals(ext, ".nekg"))
+    else if (boost::filesystem::path(filename).extension() == ".nekg")
     {
         type = "HDF5";
     }
