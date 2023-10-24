@@ -610,27 +610,6 @@ fedora-36-full-warnings:
     - bash -x ./.gitlab-ci/build-and-test.sh |
       tee log/${OS_VERSION}_${BUILD_TYPE}.log
 
-# Intel runners
-macos-default-intel-build-and-test:
-  <<: *build-and-test-macos-template
-  variables:
-    BUILD_TYPE: "default"
-  needs: []
-
-macos-full-intel-build-and-test:
-  <<: *build-and-test-macos-template
-  variables:
-    BUILD_TYPE: "full"
-  needs: []
-
-macos-default-intel-warnings:
-  <<: *compiler-warning-template
-  needs: ["macos-default-intel-build-and-test"]
-
-macos-full-intel-warnings:
-  <<: *compiler-warning-template
-  needs: ["macos-full-intel-build-and-test"]
-
 # ARM runners
 macos-default-arm-build-and-test:
   <<: *build-and-test-macos-template
