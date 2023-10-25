@@ -137,8 +137,7 @@ void FieldIOXml::v_Write(const std::string &outFile,
         {
             std::stringstream fieldsStringStream;
             bool first = true;
-            for (std::vector<int>::size_type i = 0;
-                 i < fielddefs[f]->m_fields.size(); i++)
+            for (size_t i = 0; i < fielddefs[f]->m_fields.size(); i++)
             {
                 if (!first)
                 {
@@ -179,8 +178,7 @@ void FieldIOXml::v_Write(const std::string &outFile,
         {
             std::stringstream basisStringStream;
             bool first = true;
-            for (std::vector<BasisType>::size_type i = 0;
-                 i < fielddefs[f]->m_basis.size(); i++)
+            for (size_t i = 0; i < fielddefs[f]->m_basis.size(); i++)
             {
                 if (!first)
                 {
@@ -293,8 +291,7 @@ void FieldIOXml::v_Write(const std::string &outFile,
                 numModesStringStream << "UNIORDER:";
                 // Just dump single definition
                 bool first = true;
-                for (std::vector<int>::size_type i = 0;
-                     i < fielddefs[f]->m_basis.size(); i++)
+                for (size_t i = 0; i < fielddefs[f]->m_basis.size(); i++)
                 {
                     if (!first)
                     {
@@ -308,8 +305,7 @@ void FieldIOXml::v_Write(const std::string &outFile,
             {
                 numModesStringStream << "MIXORDER:";
                 bool first = true;
-                for (std::vector<int>::size_type i = 0;
-                     i < fielddefs[f]->m_numModes.size(); i++)
+                for (size_t i = 0; i < fielddefs[f]->m_numModes.size(); i++)
                 {
                     if (!first)
                     {
@@ -342,6 +338,8 @@ void FieldIOXml::v_Write(const std::string &outFile,
         // bit machine.
         elemTag->SetAttribute("BITSIZE",
                               LibUtilities::CompressData::GetBitSizeStr());
+
+        // Write field data.
         std::string base64string;
         ASSERTL0(Z_OK == CompressData::ZlibEncodeToBase64Str(fielddata[f],
                                                              base64string),
@@ -353,7 +351,7 @@ void FieldIOXml::v_Write(const std::string &outFile,
 
     m_comm->GetSpaceComm()->Block();
 
-    // all data has been written
+    // All data has been written
     if (m_comm->TreatAsRankZero())
     {
         tm1 = m_comm->Wtime();
@@ -577,7 +575,7 @@ void FieldIOXml::v_Import(const std::string &infilename,
     }
     else
     {
-        // serial format case
+        // Serial format case.
         DataSourceSharedPtr doc = ImportFieldMetaData(infilename, fieldinfomap);
         ImportFieldDefs(doc, fielddefs, false);
         if (fielddata != NullVectorNekDoubleVector)
@@ -607,43 +605,6 @@ DataSourceSharedPtr FieldIOXml::v_ImportFieldMetaData(
     ASSERTL0(master, "Unable to find NEKTAR tag in file.");
     std::string strLoop = "NEKTAR";
 
-    // Retain original metadata structure for backwards compatibility
-    // TODO: Remove old metadata format
-    metadata = master->FirstChildElement("FIELDMETADATA");
-    if (metadata)
-    {
-        TiXmlElement *param = metadata->FirstChildElement("P");
-
-        while (param)
-        {
-            TiXmlAttribute *paramAttr = param->FirstAttribute();
-            std::string attrName(paramAttr->Name());
-            std::string paramString;
-
-            if (attrName == "PARAM")
-            {
-                paramString.insert(0, paramAttr->Value());
-            }
-            else
-            {
-                NEKERROR(ErrorUtil::efatal,
-                         "PARAM not provided as an attribute in "
-                         "FIELDMETADATA section");
-            }
-
-            // Now read body of param
-            std::string paramBodyStr;
-
-            TiXmlNode *paramBody = param->FirstChild();
-
-            paramBodyStr += paramBody->ToText()->Value();
-
-            fieldmetadatamap[paramString] = paramBodyStr;
-            param                         = param->NextSiblingElement("P");
-        }
-    }
-
-    // New metadata format
     metadata = master->FirstChildElement("Metadata");
     if (metadata)
     {
@@ -1105,7 +1066,7 @@ void FieldIOXml::ImportFieldData(
         ASSERTL0(element, "Unable to find ELEMENTS tag within nektar tag.");
         while (element)
         {
-            // Extract the body, which the "data".
+            // Extract the body, which is the "data".
             TiXmlNode *elementChild = element->FirstChild();
             ASSERTL0(elementChild,
                      "Unable to extract the data from the element tag.");

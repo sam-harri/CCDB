@@ -66,13 +66,9 @@ public:
                                     const bool backup = false);
 
 protected:
-    LIB_UTILITIES_EXPORT virtual void v_ImportFieldData(
+    LIB_UTILITIES_EXPORT virtual void v_ImportPtsFieldData(
         const std::string inFile, PtsFieldSharedPtr &ptsField,
         DomainRangeShPtr &Range) override;
-
-    // LIB_UTILITIES_EXPORT virtual void v_ImportFieldData(
-    //     const std::string inFile,
-    //     PtsFieldSharedPtr &ptsField);
 
     LIB_UTILITIES_EXPORT virtual std::string v_GetFileEnding() const override;
 };

@@ -107,9 +107,12 @@ void CsvIO::Write(const std::string &outFile,
     ptsFile.close();
 }
 
-void CsvIO::v_ImportFieldData(const std::string inFile,
-                              PtsFieldSharedPtr &ptsField,
-                              DomainRangeShPtr &Range)
+/**
+ *
+ */
+void CsvIO::v_ImportPtsFieldData(const std::string inFile,
+                                 PtsFieldSharedPtr &ptsField,
+                                 DomainRangeShPtr &Range)
 {
     std::stringstream errstr;
     errstr << "Unable to load file: " << inFile << std::endl;
@@ -271,6 +274,9 @@ void CsvIO::v_ImportFieldData(const std::string inFile,
     ptsField = MemoryManager<PtsField>::AllocateSharedPtr(dim, fieldNames, pts);
 }
 
+/**
+ *
+ */
 std::string CsvIO::v_GetFileEnding() const
 {
     return "csv";

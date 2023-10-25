@@ -77,12 +77,8 @@ public:
                                     const PtsFieldSharedPtr &ptsField,
                                     const bool backup = false);
 
-    LIB_UTILITIES_EXPORT void ImportFieldData(
-        const std::string inFile, PtsFieldSharedPtr &ptsField,
-        DomainRangeShPtr &Range = NullDomainRangeShPtr);
-
 protected:
-    LIB_UTILITIES_EXPORT virtual void v_ImportFieldData(
+    LIB_UTILITIES_EXPORT virtual void v_ImportPtsFieldData(
         const std::string inFile, PtsFieldSharedPtr &ptsField,
         DomainRangeShPtr &Range = NullDomainRangeShPtr);
 

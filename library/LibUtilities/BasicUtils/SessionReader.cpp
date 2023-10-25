@@ -149,7 +149,7 @@ SolverInfoMap &SessionReader::GetSolverInfoDefaults()
  * List of values for GlobalSysSoln parameters to be used to override
  * details given in SolverInfo
  *
- * This list is populated by ReadGlobalSysSoln if the
+ * This list is populated by ReadGlobalSysSolnInfo if the
  * GLOBALSYSSOLNINFO section is defined in the input file.
  * This List allows for details to define for the Global Sys
  * solver for each variable.
@@ -393,6 +393,9 @@ void SessionReader::InitSession(const std::vector<std::string> &filenames)
     }
 }
 
+/**
+ *
+ */
 void SessionReader::TestSharedFilesystem()
 {
     m_sharedFilesystem = false;
@@ -445,9 +448,9 @@ std::vector<std::string> SessionReader::ParseCommandLineArguments(int argc,
                 ("verbose,v",    "be verbose")
                 ("version,V",    "print version information")
                 ("help,h",       "print this help message")
-                ("solverinfo,I", po::value<vector<std::string> >(),
+                ("solverinfo,I", po::value<vector<std::string>>(),
                                  "override a SOLVERINFO property")
-                ("parameter,P",  po::value<vector<std::string> >(),
+                ("parameter,P",  po::value<vector<std::string>>(),
                                  "override a parameter")
                 ("npx",          po::value<int>(),
                                  "number of procs in X-dir")
@@ -463,13 +466,14 @@ std::vector<std::string> SessionReader::ParseCommandLineArguments(int argc,
                                  "only partition mesh into N partitions.")
                 ("part-only-overlapping",    po::value<int>(),
                                  "only partition mesh into N overlapping partitions.")
-                ("part-info",    "Output partition information")
-                ("forceoutput,f",  "Disables backups files and forces output to be "
+                ("part-info",    "output partition information")
+                ("forceoutput,f",  "disables backups files and forces output to be "
                                  "written without any checks")
                 ("writeoptfile", "write an optimisation file")
                 ("useoptfile",   po::value<std::string>(),
                                  "use an optimisation file");
     // clang-format on
+
 #ifdef NEKTAR_USE_CWIPI
     desc.add_options()("cwipi", po::value<std::string>(), "set CWIPI name");
 #endif
@@ -722,24 +726,6 @@ const std::vector<std::string> &SessionReader::GetFilenames() const
 const std::string &SessionReader::GetSessionName() const
 {
     return m_sessionName;
-}
-
-/**
- * Output is of the form [sessionName]_P[idx] where idx is the rank
- * of the process.
- */
-const std::string SessionReader::GetSessionNameRank() const
-{
-    std::string dirname = m_sessionName + "_xml";
-    fs::path pdirname(dirname);
-
-    std::string vFilename =
-        "P" + boost::lexical_cast<std::string>(m_comm->GetRowComm()->GetRank());
-    fs::path pFilename(vFilename);
-
-    fs::path fullpath = pdirname / pFilename;
-
-    return PortablePath(fullpath);
 }
 
 /**
@@ -1072,6 +1058,9 @@ const TimeIntScheme &SessionReader::GetTimeIntScheme() const
     return m_timeIntScheme;
 }
 
+/**
+ *
+ */
 std::string SessionReader::GetGeometryType() const
 {
     TiXmlElement *xmlGeom =
@@ -1104,96 +1093,6 @@ std::string SessionReader::GetGeometryType() const
 
     // no file pointer or compressed, just standard xml
     return "Xml";
-}
-
-/**
- *
- */
-bool SessionReader::DefinesGeometricInfo(const std::string &pName) const
-{
-    std::string vName = boost::to_upper_copy(pName);
-    return m_geometricInfo.find(vName) != m_geometricInfo.end();
-}
-
-/**
- *
- */
-void SessionReader::LoadGeometricInfo(const std::string &pName,
-                                      std::string &pVar,
-                                      const std::string &pDefault) const
-{
-    std::string vName = boost::to_upper_copy(pName);
-    auto iter         = m_geometricInfo.find(vName);
-    if (iter != m_geometricInfo.end())
-    {
-        pVar = iter->second;
-    }
-    else
-    {
-        pVar = pDefault;
-    }
-}
-
-/**
- *
- */
-void SessionReader::LoadGeometricInfo(const std::string &pName, bool &pVar,
-                                      const bool &pDefault) const
-{
-    std::string vName = boost::to_upper_copy(pName);
-    auto iter         = m_geometricInfo.find(vName);
-    if (iter != m_geometricInfo.end())
-    {
-        if (iter->second == "TRUE")
-        {
-            pVar = true;
-        }
-        else
-        {
-            pVar = false;
-        }
-    }
-    else
-    {
-        pVar = pDefault;
-    }
-}
-
-/**
- *
- */
-void SessionReader::LoadGeometricInfo(const std::string &pName, NekDouble &pVar,
-                                      const NekDouble &pDefault) const
-{
-    std::string vName = boost::to_upper_copy(pName);
-    auto iter         = m_geometricInfo.find(vName);
-    if (iter != m_geometricInfo.end())
-    {
-        pVar = std::atoi(iter->second.c_str());
-    }
-    else
-    {
-        pVar = pDefault;
-    }
-}
-
-/**
- *
- */
-void SessionReader::MatchGeometricInfo(const std::string &pName,
-                                       const std::string &pTrueVal, bool &pVar,
-                                       const bool &pDefault) const
-{
-    std::string vName = boost::to_upper_copy(pName);
-    auto iter         = m_geometricInfo.find(vName);
-    if (iter != m_geometricInfo.end())
-    {
-        pVar = boost::iequals(iter->second, pTrueVal);
-    }
-    else
-    {
-        pVar = pDefault;
-    }
 }
 
 /**
@@ -1618,7 +1517,6 @@ TiXmlDocument *SessionReader::MergeDoc(
 
                 // First check if the new item is in fact blank
                 // replace if it is a COLLECTIONS section however.
-
                 if (!p->FirstChild() && vMainEntry &&
                     !boost::iequals(p->Value(), "COLLECTIONS"))
                 {
@@ -1639,7 +1537,6 @@ TiXmlDocument *SessionReader::MergeDoc(
                 }
                 p = p->NextSiblingElement();
             }
-
             delete vTempDoc;
         }
     }
@@ -1654,9 +1551,10 @@ void SessionReader::ParseDocument()
     // Check we actually have a document loaded.
     ASSERTL0(m_xmlDoc, "No XML document loaded.");
 
-    // Look for all data in CONDITIONS block.
     TiXmlHandle docHandle(m_xmlDoc);
     TiXmlElement *e;
+
+    // Look for all data in CONDITIONS block.
     e = docHandle.FirstChildElement("NEKTAR")
             .FirstChildElement("CONDITIONS")
             .Element();
@@ -1669,10 +1567,12 @@ void SessionReader::ParseDocument()
     ReadVariables(e);
     ReadFunctions(e);
 
+    // Look for all data in FILTERS block.
     e = docHandle.FirstChildElement("NEKTAR")
             .FirstChildElement("FILTERS")
             .Element();
 
+    // Read the various sections of the FILTERS block
     ReadFilters(e);
 }
 
@@ -1704,10 +1604,7 @@ void SessionReader::CreateComm(int &argc, char *argv[])
 
 /**
  * Splits the processes into a cartesian grid and creates communicators
- * for each row and column of the grid. The grid is defined by the
- * PROC_X parameter which, if specified, gives the number of processes
- * spanned by the Fourier direction. PROC_X must exactly divide the
- * total number of processes or an error is thrown.
+ * for each row and column of the grid.
  */
 void SessionReader::PartitionComm()
 {
@@ -1842,7 +1739,6 @@ void SessionReader::ReadParameters(TiXmlElement *conditions)
                     m_parameters[lhs] = value;
                 }
             }
-
             parameter = parameter->NextSiblingElement();
         }
     }
@@ -1949,11 +1845,11 @@ void SessionReader::ReadGlobalSysSolnInfo(TiXmlElement *conditions)
     {
         std::stringstream tagcontent;
         tagcontent << *VarInfo;
+
         ASSERTL0(VarInfo->Attribute("VAR"),
                  "Missing VAR attribute in GobalSysSolnInfo XML "
                  "element: \n\t'" +
                      tagcontent.str() + "'");
-
         std::string VarList = VarInfo->Attribute("VAR");
         ASSERTL0(!VarList.empty(),
                  "VAR attribute must be non-empty in XML element:\n\t'" +
@@ -1981,10 +1877,8 @@ void SessionReader::ReadGlobalSysSolnInfo(TiXmlElement *conditions)
                          "GlobalSysSolnInfo for variable(s) '" +
                              VarList + "' in XML element: \n\t'" +
                              tagcontent.str() + "'");
-
                 std::string SysSolnProperty =
                     SysSolnInfo->Attribute("PROPERTY");
-
                 ASSERTL0(!SysSolnProperty.empty(),
                          "GlobalSysSolnIno properties must have a "
                          "non-empty name for variable(s) : '" +
@@ -2001,7 +1895,6 @@ void SessionReader::ReadGlobalSysSolnInfo(TiXmlElement *conditions)
                          "for variable(s) '" +
                              VarList + "' in XML element: \n\t" +
                              tagcontent.str() + "'");
-
                 std::string SysSolnValue = SysSolnInfo->Attribute("VALUE");
                 ASSERTL0(!SysSolnValue.empty(),
                          "GlobalSysSolnInfo properties must have a "
@@ -2023,7 +1916,6 @@ void SessionReader::ReadGlobalSysSolnInfo(TiXmlElement *conditions)
                         x->second[SysSolnPropertyUpper] = SysSolnValue;
                     }
                 }
-
                 SysSolnInfo = SysSolnInfo->NextSiblingElement("I");
             }
             VarInfo = VarInfo->NextSiblingElement("V");
@@ -2299,7 +2191,7 @@ void SessionReader::ReadFunctions(TiXmlElement *conditions)
             std::vector<std::string> variableList;
             ParseUtils::GenerateVector(variableStr, variableList);
 
-            // If no domain string put to 0
+            // If no domain is specified, put to 0
             std::string domainStr;
             if (!variable->Attribute("DOMAIN"))
             {
@@ -2310,18 +2202,18 @@ void SessionReader::ReadFunctions(TiXmlElement *conditions)
                 domainStr = variable->Attribute("DOMAIN");
             }
 
-            // If no domain string put to 0
+            // Parse list of domains
+            std::vector<std::string> varSplit;
+            std::vector<unsigned int> domainList;
+            ParseUtils::GenerateSeqVector(domainStr, domainList);
+
+            // if no evars is specified, put "x y z t"
             std::string evarsStr = "x y z t";
             if (variable->Attribute("EVARS"))
             {
                 evarsStr =
                     evarsStr + std::string(" ") + variable->Attribute("EVARS");
             }
-
-            // Parse list of variables
-            std::vector<std::string> varSplit;
-            std::vector<unsigned int> domainList;
-            ParseUtils::GenerateSeqVector(domainStr, domainList);
 
             // Expressions are denoted by E
             if (conditionType == "E")
@@ -2333,7 +2225,6 @@ void SessionReader::ReadFunctions(TiXmlElement *conditions)
                          "Attribute VALUE expected for function '" +
                              functionStr + "'.");
                 std::string fcnStr = variable->Attribute("VALUE");
-
                 ASSERTL0(!fcnStr.empty(),
                          (std::string("Expression for var: ") + variableStr +
                           std::string(" must be specified."))
@@ -2348,6 +2239,7 @@ void SessionReader::ReadFunctions(TiXmlElement *conditions)
             // Files are denoted by F
             else if (conditionType == "F")
             {
+                // Check if transient or not
                 if (variable->Attribute("TIMEDEPENDENT") &&
                     boost::lexical_cast<bool>(
                         variable->Attribute("TIMEDEPENDENT")))
@@ -2364,7 +2256,6 @@ void SessionReader::ReadFunctions(TiXmlElement *conditions)
                          "Attribute FILE expected for function '" +
                              functionStr + "'.");
                 std::string filenameStr = variable->Attribute("FILE");
-
                 ASSERTL0(!filenameStr.empty(),
                          "A filename must be specified for the FILE "
                          "attribute of function '" +
@@ -2372,7 +2263,6 @@ void SessionReader::ReadFunctions(TiXmlElement *conditions)
 
                 std::vector<std::string> fSplit;
                 boost::split(fSplit, filenameStr, boost::is_any_of(":"));
-
                 ASSERTL0(fSplit.size() == 1 || fSplit.size() == 2,
                          "Incorrect filename specification in function " +
                              functionStr +
@@ -2456,9 +2346,9 @@ void SessionReader::ReadFunctions(TiXmlElement *conditions)
                     }
                 }
             }
-
             variable = variable->NextSiblingElement();
         }
+
         // Add function definition to map
         m_functions[functionStr] = functionVarMap;
         function                 = function->NextSiblingElement("FUNCTION");
@@ -2512,6 +2402,9 @@ void SessionReader::ReadFilters(TiXmlElement *filters)
     }
 }
 
+/**
+ *
+ */
 void SessionReader::ParseEquals(const std::string &line, std::string &lhs,
                                 std::string &rhs)
 {
@@ -2601,6 +2494,9 @@ void SessionReader::CmdLineOverride()
     }
 }
 
+/**
+ *
+ */
 void SessionReader::VerifySolverInfo()
 {
     for (auto &x : m_solverInfo)
@@ -2620,6 +2516,9 @@ void SessionReader::VerifySolverInfo()
     }
 }
 
+/**
+ *
+ */
 InterpreterSharedPtr SessionReader::GetInterpreter()
 {
     return m_interpreter;
@@ -2634,16 +2533,14 @@ TiXmlElement *GetChildElementOrThrow(const std::string &filename,
                                      const TiXmlHandle &docHandle)
 {
     TiXmlElement *element = docHandle.FirstChildElement(elementName).Element();
-    if (element)
-    {
-        return element;
-    }
-    else
+
+    if (!element)
     {
         NEKERROR(ErrorUtil::efatal, "Unable to find '" + elementName +
                                         "' XML node in " + filename);
-        return nullptr; // Never reached; purely to keep gcc happy...
     }
+
+    return element;
 }
 
 } // namespace LibUtilities
