@@ -33,9 +33,9 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include <IncNavierStokesSolver/Forcing/ForcingIncNSSyntheticEddy.h>
+#include <ctime>
 #include <fstream>
 #include <iomanip>
-#include <ctime>
 
 using namespace std;
 
@@ -68,8 +68,9 @@ void ForcingIncNSSyntheticEddy::v_InitObject(
     {
         if (!m_isH1D)
         {
-            NEKERROR(Nektar::ErrorUtil::efatal, "Sythetic eddy method "
-                "is only available for three-dimensional simulations");
+            NEKERROR(Nektar::ErrorUtil::efatal,
+                     "Sythetic eddy method "
+                     "is only available for three-dimensional simulations");
         }
     }
 
@@ -240,10 +241,9 @@ void ForcingIncNSSyntheticEddy::v_Apply(
     {
         CalculateForcing(fields);
 
-        for (size_t i = 0; i < (nVars-1); ++i) // Only velocity: nVars - 1
+        for (size_t i = 0; i < (nVars - 1); ++i) // Only velocity: nVars - 1
         {
-            Vmath::Vadd(nqTot, m_Forcing[i], 1, outarray[i], 1, 
-                outarray[i], 1);
+            Vmath::Vadd(nqTot, m_Forcing[i], 1, outarray[i], 1, outarray[i], 1);
         }
         m_calcForcing = false;
     }
@@ -277,7 +277,7 @@ void ForcingIncNSSyntheticEddy::CalculateForcing(
     smoothFac = ComputeSmoothingFactor(fields, convTurbTime);
 
     // Check if eddies left the box
-    if(!m_eddiesIDForcing.empty())
+    if (!m_eddiesIDForcing.empty())
     {
         // Clean the m_Forcing member
         for (size_t j = 0; j < nVars; ++j)
@@ -285,10 +285,10 @@ void ForcingIncNSSyntheticEddy::CalculateForcing(
             for (int i = 0; i < nqTot; ++i)
             {
                 m_Forcing[j][i] = 0.0;
-            } 
+            }
         }
         // Select the eddies to apply the forcing. Superposition.
-        for (auto& n : m_eddiesIDForcing)
+        for (auto &n : m_eddiesIDForcing)
         {
             for (size_t i = 0; i < nqTot; ++i)
             {
@@ -297,18 +297,18 @@ void ForcingIncNSSyntheticEddy::CalculateForcing(
                     //  velocity term
                     for (size_t j = 0; j < m_spacedim; ++j)
                     {
-                        m_Forcing[j][i] += 
-                            (velFluc[n][j * nqTot + i] * 
-                            smoothFac[j][i]) / convTurbTime[j][i];
+                        m_Forcing[j][i] +=
+                            (velFluc[n][j * nqTot + i] * smoothFac[j][i]) /
+                            convTurbTime[j][i];
                     }
                 }
             }
         }
-        // delete eddies 
-        m_eddiesIDForcing.erase(m_eddiesIDForcing.begin(), 
-            m_eddiesIDForcing.end());
+        // delete eddies
+        m_eddiesIDForcing.erase(m_eddiesIDForcing.begin(),
+                                m_eddiesIDForcing.end());
     }
-    else 
+    else
     {
         NEKERROR(ErrorUtil::efatal, "Failed: Eddies ID vector is empty.");
     }
@@ -421,8 +421,8 @@ Array<OneD, Array<OneD, NekDouble>> ForcingIncNSSyntheticEddy::
     // Control loop for the m_Cholesky
     int l;
 
-    for (size_t n = 0; n < m_N; ++n)
-    {   
+    for (auto &n : m_eddiesIDForcing)
+    {
         velFluc[n] = Array<OneD, NekDouble>(nqTot * m_spacedim, 0.0);
 
         for (size_t k = 0; k < m_spacedim; ++k)
@@ -434,8 +434,9 @@ Array<OneD, Array<OneD, NekDouble>> ForcingIncNSSyntheticEddy::
                     if (m_mask[i])
                     {
                         l = k + j * (2 * m_spacedim - j - 1) * 0.5;
-                        velFluc[n][k * nqTot + i] += m_Cholesky[i][l] 
-                            * stochasticSignal[n][j * nqTot + i];
+                        velFluc[n][k * nqTot + i] +=
+                            m_Cholesky[i][l] *
+                            stochasticSignal[n][j * nqTot + i];
                     }
                 }
             }
@@ -447,7 +448,7 @@ Array<OneD, Array<OneD, NekDouble>> ForcingIncNSSyntheticEddy::
 
 /**
  * @brief Compute stochastic signal
-*/
+ */
 Array<OneD, Array<OneD, NekDouble>> ForcingIncNSSyntheticEddy::
     ComputeStochasticSignal(
         const Array<OneD, MultiRegions::ExpListSharedPtr> &pFields)
@@ -465,10 +466,10 @@ Array<OneD, Array<OneD, NekDouble>> ForcingIncNSSyntheticEddy::
 
     epsilonSign = GenerateRandomOneOrMinusOne();
 
-    // Calculate the stochastic signal for all eddies.
-    for (size_t n = 0; n < m_N; ++n)
+    // Calculate the stochastic signal for the eddies.
+    for (auto &n : m_eddiesIDForcing)
     {
-        stochasticSignal[n] = Array<OneD, NekDouble>(nqTot * m_spacedim, 0.0);  
+        stochasticSignal[n] = Array<OneD, NekDouble>(nqTot * m_spacedim, 0.0);
 
         // Evaluate the function at interpolation points for each component
         for (size_t j = 0; j < m_spacedim; ++j)
@@ -486,28 +487,32 @@ Array<OneD, Array<OneD, NekDouble>> ForcingIncNSSyntheticEddy::
 
                 pFields[0]->GetExp(e)->GetCoords(coords0, coords1, coords2);
 
-                // i: degrees of freedom, j: direction, n: eddies                
+                // i: degrees of freedom, j: direction, n: eddies
                 for (size_t i = 0; i < nqe; ++i)
                 {
                     if (m_mask[nqeCount + i])
-                    {   
-                        stochasticSignal[n][j * nqTot + nqeCount + i] = 
+                    {
+                        stochasticSignal[n][j * nqTot + nqeCount + i] =
                             epsilonSign[j][n] *
-                            ComputeGaussian((coords0[i] - m_eddyPos[n][0]) / 
-                                m_lref[0], m_xiMax[j * m_spacedim + 0], 
-                                    ComputeConstantC(0, j)) *
-                            ComputeGaussian((coords1[i] - m_eddyPos[n][1]) / 
-                                m_lref[1], m_xiMax[j * m_spacedim + 1], 
-                                    ComputeConstantC(1, j)) *
-                            ComputeGaussian((coords2[i] - m_eddyPos[n][2]) / 
-                                m_lref[2], m_xiMax[j * m_spacedim + 2], 
-                                    ComputeConstantC(2, j));                     }
-                }  
+                            ComputeGaussian((coords0[i] - m_eddyPos[n][0]) /
+                                                m_lref[0],
+                                            m_xiMax[j * m_spacedim + 0],
+                                            ComputeConstantC(0, j)) *
+                            ComputeGaussian((coords1[i] - m_eddyPos[n][1]) /
+                                                m_lref[1],
+                                            m_xiMax[j * m_spacedim + 1],
+                                            ComputeConstantC(1, j)) *
+                            ComputeGaussian((coords2[i] - m_eddyPos[n][2]) /
+                                                m_lref[2],
+                                            m_xiMax[j * m_spacedim + 2],
+                                            ComputeConstantC(2, j));
+                    }
+                }
                 nqeCount += nqe;
             }
         }
     }
-    
+
     return stochasticSignal;
 }
 
@@ -529,10 +534,12 @@ void ForcingIncNSSyntheticEddy::UpdateEddiesPositions()
         {
             // Generate a new one in the inlet plane
             m_eddyPos[n][0] = m_rc[0] - m_lref[0];
-            m_eddyPos[n][1] = (m_rc[1] - 0.5 * m_lyz[0]) + 
-                    (NekSingle(std::rand()) / NekSingle(RAND_MAX)) * m_lyz[0];
-            m_eddyPos[n][2] = (m_rc[2] - 0.5 * m_lyz[1]) + 
-                    (NekSingle(std::rand()) / NekSingle(RAND_MAX)) * m_lyz[1];
+            m_eddyPos[n][1] =
+                (m_rc[1] - 0.5 * m_lyz[0]) +
+                (NekSingle(std::rand()) / NekSingle(RAND_MAX)) * m_lyz[0];
+            m_eddyPos[n][2] =
+                (m_rc[2] - 0.5 * m_lyz[1]) +
+                (NekSingle(std::rand()) / NekSingle(RAND_MAX)) * m_lyz[1];
 
             m_eddiesIDForcing.push_back(n);
             m_calcForcing = true;
@@ -551,12 +558,15 @@ void ForcingIncNSSyntheticEddy::ComputeInitialRandomLocationOfEddies()
     {
         m_eddyPos[n] = Array<OneD, NekDouble>(m_spacedim);
         // Generate randomly eddies inside the box
-        m_eddyPos[n][0] = (m_rc[0] - m_lref[0]) + 
-                (NekSingle(std::rand()) / NekSingle(RAND_MAX)) * 2 * m_lref[0];
-        m_eddyPos[n][1] = (m_rc[1] - 0.5 * m_lyz[0]) + 
-                (NekSingle(std::rand()) / NekSingle(RAND_MAX)) * m_lyz[0];
-        m_eddyPos[n][2] = (m_rc[2] - 0.5 * m_lyz[1]) + 
-                (NekSingle(std::rand()) / NekSingle(RAND_MAX)) * m_lyz[1];
+        m_eddyPos[n][0] =
+            (m_rc[0] - m_lref[0]) +
+            (NekSingle(std::rand()) / NekSingle(RAND_MAX)) * 2 * m_lref[0];
+        m_eddyPos[n][1] =
+            (m_rc[1] - 0.5 * m_lyz[0]) +
+            (NekSingle(std::rand()) / NekSingle(RAND_MAX)) * m_lyz[0];
+        m_eddyPos[n][2] =
+            (m_rc[2] - 0.5 * m_lyz[1]) +
+            (NekSingle(std::rand()) / NekSingle(RAND_MAX)) * m_lyz[1];
     }
 }
 
@@ -566,8 +576,8 @@ void ForcingIncNSSyntheticEddy::ComputeInitialRandomLocationOfEddies()
  * @return        Gaussian value for the coordinate
  */
 NekDouble ForcingIncNSSyntheticEddy::ComputeGaussian(NekDouble coord,
-                                                      NekDouble xiMaxVal,
-                                                      NekDouble constC)
+                                                     NekDouble xiMaxVal,
+                                                     NekDouble constC)
 {
 
     NekDouble epsilon = 1e-6;
@@ -586,20 +596,20 @@ NekDouble ForcingIncNSSyntheticEddy::ComputeGaussian(NekDouble coord,
  * @brief   Compute constant C for the gaussian funcion
  */
 NekDouble ForcingIncNSSyntheticEddy::ComputeConstantC(int row, int col)
-{ 
+{
     NekDouble sizeLenScale = m_xiMax[col * m_spacedim + row];
 
     // Integration
     NekDouble sum  = 0.0;
     NekDouble step = 0.01;
-    NekDouble xi0 = - 1;
-    NekDouble xif = 1;
+    NekDouble xi0  = -1;
+    NekDouble xif  = 1;
     while (xi0 < xif)
     {
         sum += (ComputeGaussian(xi0 + step, sizeLenScale) *
-                ComputeGaussian(xi0 + step, sizeLenScale) +
-                ComputeGaussian(xi0, sizeLenScale) * 
-                ComputeGaussian(xi0, sizeLenScale));
+                    ComputeGaussian(xi0 + step, sizeLenScale) +
+                ComputeGaussian(xi0, sizeLenScale) *
+                    ComputeGaussian(xi0, sizeLenScale));
         xi0 += step;
     }
 
@@ -683,8 +693,8 @@ void ForcingIncNSSyntheticEddy::SetBoxOfEddiesMask(
  * @return flag     true or false
  */
 bool ForcingIncNSSyntheticEddy::InsideBoxOfEddies(NekDouble coord0,
-                                                   NekDouble coord1,
-                                                   NekDouble coord2)
+                                                  NekDouble coord1,
+                                                  NekDouble coord2)
 {
     if ((coord0 > (m_rc[0] - m_lref[0])) && (coord0 < (m_rc[0] + m_lref[0])) &&
         (coord1 > (m_rc[1] - 0.5 * m_lyz[0])) &&
@@ -812,7 +822,6 @@ void ForcingIncNSSyntheticEddy::SetNumberOfEddies()
     m_N = int((m_lyz[0] * m_lyz[1]) /
               (4 * m_lref[m_spacedim - 2] * m_lref[m_spacedim - 1]));
 }
-
 
 } // namespace SolverUtils
 } // namespace Nektar

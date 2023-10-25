@@ -91,7 +91,7 @@ protected:
     NekDouble ComputeConstantC(int row, int col);
     /// Compute Gaussian
     NekDouble ComputeGaussian(NekDouble coord, NekDouble xiMaxVal,
-         NekDouble constC = 1.0);
+                              NekDouble constC = 1.0);
     /// Check if point is inside the box of eddies
     bool InsideBoxOfEddies(NekDouble coord0, NekDouble coord1,
                            NekDouble coord2);
@@ -159,7 +159,7 @@ protected:
     /// Box of eddies mask
     Array<OneD, int> m_mask;
     /// Eddy position
-    Array<OneD, Array<OneD, NekDouble>> m_eddyPos; 
+    Array<OneD, Array<OneD, NekDouble>> m_eddyPos;
     /// Check when the forcing should be applied
     bool m_calcForcing{true};
     /// Eddies that add to the domain
@@ -182,5 +182,3 @@ private:
 } // namespace Nektar
 
 #endif
-
-
