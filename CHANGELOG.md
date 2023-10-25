@@ -19,6 +19,8 @@ v5.5.0
 
 **CI**
 - Disable macOS Intel runner (!1655)
+- Upgrade Win10 runners (!1656)
+
 **NekMesh**
 - Replace deprecated boost::filesystem functions (!1654)
 
