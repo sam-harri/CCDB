@@ -163,6 +163,9 @@ LIB_UTILITIES_EXPORT bool ParseUtils::GenerateVector(
     return success && it == str.end();
 }
 
+/**
+ *
+ */
 bool ParseUtils::GenerateVariableSet(const std::string &str,
                                      const std::vector<std::string> &variables,
                                      std::set<int> &out)
