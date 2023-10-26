@@ -470,12 +470,31 @@ int main(int argc, char *argv[])
         mod->SetDefaults();
     }
 
-    // Include equispacedoutput module if needed.
     Array<OneD, int> modulesCount(SIZE_ModulePriority, 0);
     for (int i = 0; i < modules.size(); ++i)
     {
         ++modulesCount[modules[i]->GetModulePriority()];
     }
+
+    // Loading module prerequisites
+    for (int i = 0; i < modules.size(); ++i)
+    {
+        // Looping through listed prereqs and loading them
+        for (int j = 0; j < modules[i]->GetModulePrerequisites().size(); ++j)
+        {
+            mod = GetModuleFactory().CreateInstance(
+                modules[i]->GetModulePrerequisites()[j], f);
+            // Logic that prevents double loading
+            if (modulesCount[mod->GetModulePriority()] == 0)
+            {
+                ++modulesCount[mod->GetModulePriority()];
+                modules.push_back(mod);
+                mod->SetDefaults();
+            }
+        }
+    }
+
+    // Include equispacedoutput module if needed
     if (modulesCount[eModifyPts] != 0 && modulesCount[eCreatePts] == 0 &&
         modulesCount[eConvertExpToPts] == 0)
     {
