@@ -56,6 +56,15 @@ ForcingIncNSSyntheticEddy::ForcingIncNSSyntheticEddy(
 {
 }
 
+/**
+ * @brief Read input from xml file and initialise the class members.
+ *        The main parameters are the characteristic lengths, Reynolds
+ *        stresses and the synthetic eddy region (box of eddies).
+ * 
+ * @param pFields           Pointer to fields.
+ * @param pNumForcingField  Number of forcing fields.
+ * @param pForce            Xml element describing the mapping.
+ */
 void ForcingIncNSSyntheticEddy::v_InitObject(
     const Array<OneD, MultiRegions::ExpListSharedPtr> &pFields,
     const unsigned int &pNumForcingFields, const TiXmlElement *pForce)
@@ -225,6 +234,16 @@ void ForcingIncNSSyntheticEddy::v_InitObject(
     }
 }
 
+/**
+ * @brief Apply forcing term if an eddy left the box of eddies and
+ *        update the eddies positions. 
+ * 
+ * @param fields    Pointer to fields.
+ * @param inarray   Given fields. The fields are in in physical space.    
+ * @param outarray  Calculated solution after forcing term being applied
+ *                  in physical space.
+ * @param time      time.
+ */
 void ForcingIncNSSyntheticEddy::v_Apply(
     const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
     const Array<OneD, Array<OneD, NekDouble>> &inarray,
@@ -252,6 +271,11 @@ void ForcingIncNSSyntheticEddy::v_Apply(
     UpdateEddiesPositions();
 }
 
+/**
+ * @brief Calculate forcing term.
+ *  
+ * @param fields  Pointer to fields.
+ */
 void ForcingIncNSSyntheticEddy::CalculateForcing(
     const Array<OneD, MultiRegions::ExpListSharedPtr> &fields)
 {
@@ -315,7 +339,9 @@ void ForcingIncNSSyntheticEddy::CalculateForcing(
 }
 
 /**
- * @brief   Compute characteristic convective turbulent time.
+ * @brief Compute characteristic convective turbulent time.
+ * 
+ * @param pFields  Pointer to fields.
  */
 Array<OneD, Array<OneD, NekDouble>> ForcingIncNSSyntheticEddy::
     ComputeCharConvTurbTime(
@@ -344,8 +370,11 @@ Array<OneD, Array<OneD, NekDouble>> ForcingIncNSSyntheticEddy::
 }
 
 /**
- * @brief   Compute smoothing factor to avoid strong variations
- *          of the source term across the domain.
+ * @brief Compute smoothing factor to avoid strong variations
+ *        of the source term across the domain.
+ * 
+ * @param pFields       Pointer to fields.
+ * @param convTurbTime  Convective turbulent time.
  */
 Array<OneD, Array<OneD, NekDouble>> ForcingIncNSSyntheticEddy::
     ComputeSmoothingFactor(
@@ -405,9 +434,10 @@ Array<OneD, Array<OneD, NekDouble>> ForcingIncNSSyntheticEddy::
 
 /**
  * @brief Calculate velocity fluctuation for the source term
- *
- * @param stochasticSignal  Stochastic signal
- * @return velFluc         Velocity fluctuation
+ * 
+ * @param pFields           Pointer to fields.
+ * @param stochasticSignal  Stochastic signal.
+ * @return                  Velocity fluctuation.
  */
 Array<OneD, Array<OneD, NekDouble>> ForcingIncNSSyntheticEddy::
     ComputeVelocityFluctuation(
@@ -447,7 +477,10 @@ Array<OneD, Array<OneD, NekDouble>> ForcingIncNSSyntheticEddy::
 }
 
 /**
- * @brief Compute stochastic signal
+ * @brief Compute stochastic signal.
+ * 
+ * @param pFields  Pointer to fields.
+ * @return         Stochastic signal.
  */
 Array<OneD, Array<OneD, NekDouble>> ForcingIncNSSyntheticEddy::
     ComputeStochasticSignal(
@@ -548,7 +581,7 @@ void ForcingIncNSSyntheticEddy::UpdateEddiesPositions()
 }
 
 /**
- * @brief   Calculate distribution of eddies in the box.
+ * @brief Calculate distribution of eddies in the box.
  */
 void ForcingIncNSSyntheticEddy::ComputeInitialRandomLocationOfEddies()
 {
@@ -571,9 +604,10 @@ void ForcingIncNSSyntheticEddy::ComputeInitialRandomLocationOfEddies()
 }
 
 /**
- * @brief         Compute standard Gaussian with zero mean
- * @param coord   Coordianate
- * @return        Gaussian value for the coordinate
+ * @brief Compute standard Gaussian with zero mean.
+ * 
+ * @param coord  Coordianate.
+ * @return       Gaussian value for the coordinate.
  */
 NekDouble ForcingIncNSSyntheticEddy::ComputeGaussian(NekDouble coord,
                                                      NekDouble xiMaxVal,
@@ -593,7 +627,11 @@ NekDouble ForcingIncNSSyntheticEddy::ComputeGaussian(NekDouble coord,
 }
 
 /**
- * @brief   Compute constant C for the gaussian funcion
+ * @brief Compute constant C for the gaussian funcion.
+ * 
+ * @param row  index for the rows of the matrix.
+ * @param col  index for the columns of the matrix.
+ * @return     Value of C.
  */
 NekDouble ForcingIncNSSyntheticEddy::ComputeConstantC(int row, int col)
 {
@@ -617,9 +655,9 @@ NekDouble ForcingIncNSSyntheticEddy::ComputeConstantC(int row, int col)
 }
 
 /**
- * @brief       Generate random 1 or -1 values to be use to compute
- *              the stochastic signal.
- * @return      ramdom 1 or -1 values
+ * @brief Generate random 1 or -1 values to be use to compute
+ *        the stochastic signal.
+ * @return ramdom 1 or -1 values.
  */
 Array<OneD, Array<OneD, int>> ForcingIncNSSyntheticEddy::
     GenerateRandomOneOrMinusOne()
@@ -644,9 +682,11 @@ Array<OneD, Array<OneD, int>> ForcingIncNSSyntheticEddy::
 }
 
 /**
- * @brief   Set box of eddies mask to be use to seprate the
- *          degrees of freedom (coordinates) inside and outside
- *          the box of eddies.
+ * @brief Set box of eddies mask to be use to seprate the
+ *        degrees of freedom (coordinates) inside and outside
+ *        the box of eddies.
+ * 
+ * @param pFields  Pointer to fields.
  */
 void ForcingIncNSSyntheticEddy::SetBoxOfEddiesMask(
     const Array<OneD, MultiRegions::ExpListSharedPtr> &pFields)
@@ -687,10 +727,10 @@ void ForcingIncNSSyntheticEddy::SetBoxOfEddiesMask(
 /**
  * @brief Check it point is inside the box of eddies.
  *
- * @param coord0    coordinate in the x-direction
- * @param coord1    coordinate in the y-direction
- * @param coord2    coordinate in the z-direction
- * @return flag     true or false
+ * @param coord0  coordinate in the x-direction.
+ * @param coord1  coordinate in the y-direction.
+ * @param coord2  coordinate in the z-direction.
+ * @return        true or false
  */
 bool ForcingIncNSSyntheticEddy::InsideBoxOfEddies(NekDouble coord0,
                                                   NekDouble coord1,
@@ -708,6 +748,9 @@ bool ForcingIncNSSyntheticEddy::InsideBoxOfEddies(NekDouble coord0,
     return false;
 }
 
+/**
+ * @brief Calculates the reference lenghts ... 
+ */
 void ForcingIncNSSyntheticEddy::ComputeRefLenghts()
 {
     m_lref    = {m_spacedim, 0.0};
@@ -730,6 +773,9 @@ void ForcingIncNSSyntheticEddy::ComputeRefLenghts()
     }
 }
 
+/**
+ * @brief Calculates the \f$\xi_{max}\f$. 
+ */
 void ForcingIncNSSyntheticEddy::ComputeXiMax()
 {
     NekDouble value;
@@ -755,6 +801,8 @@ void ForcingIncNSSyntheticEddy::ComputeXiMax()
 /**
  * @brief Calculates the Cholesky decomposition of the Reynolds Stresses
  *        in each degree of freedom of the mesh.
+ * 
+ * @param pFields  Pointer to fields. 
  */
 void ForcingIncNSSyntheticEddy::SetCholeskyReyStresses(
     const Array<OneD, MultiRegions::ExpListSharedPtr> &pFields)
@@ -817,6 +865,10 @@ void ForcingIncNSSyntheticEddy::SetCholeskyReyStresses(
     }
 }
 
+/**
+ * @brief Calculate the number of eddies that are going to be
+ *        injected in the synthetic eddy region (box). 
+ */
 void ForcingIncNSSyntheticEddy::SetNumberOfEddies()
 {
     m_N = int((m_lyz[0] * m_lyz[1]) /
