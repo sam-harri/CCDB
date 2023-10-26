@@ -15,6 +15,9 @@ v5.5.0
 - Add const qualifier to SetUniversalUniqueMap (!1644)
 - Add safety check for FinTime parameter for parallel-in-time (!1652)
 
+**IncNavierStokesSolver**
+- Save BndElmtExpansion and avoid re-building (!1648)
+
 **FieldConvert**
 - Fix typo in user-guide and fix but for parallel-in-time FieldConvert (!1645)
 
