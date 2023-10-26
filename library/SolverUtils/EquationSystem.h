@@ -268,6 +268,9 @@ public:
     SOLVER_UTILS_EXPORT inline void CopyToPhysField(
         const int i, const Array<OneD, const NekDouble> &input);
 
+    SOLVER_UTILS_EXPORT inline Array<OneD, NekDouble> &UpdatePhysField(
+        const int i);
+
     SOLVER_UTILS_EXPORT inline void SetSteps(const int steps);
 
     SOLVER_UTILS_EXPORT void ZeroPhysFields();
@@ -796,6 +799,11 @@ inline void EquationSystem::CopyToPhysField(
     const int i, const Array<OneD, const NekDouble> &input)
 {
     Vmath::Vcopy(input.size(), input, 1, m_fields[i]->UpdatePhys(), 1);
+}
+
+inline Array<OneD, NekDouble> &EquationSystem::UpdatePhysField(const int i)
+{
+    return m_fields[i]->UpdatePhys();
 }
 
 } // namespace SolverUtils

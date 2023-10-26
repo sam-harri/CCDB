@@ -44,6 +44,8 @@ namespace Nektar
 namespace SolverUtils
 {
 
+typedef Array<OneD, Array<OneD, Array<OneD, NekDouble>>> SDCarray;
+
 /// Base class for the development of solvers.
 class DriverPFASST : public DriverParallelInTime
 {
@@ -81,120 +83,105 @@ protected:
     SOLVER_UTILS_EXPORT virtual void v_Execute(
         std::ostream &out = std::cout) override;
 
-    virtual NekDouble v_EstimateCommunicationTime(void) override;
-
-    virtual NekDouble v_EstimateRestrictionTime(void) override;
-
-    virtual NekDouble v_EstimateInterpolationTime(void) override;
-
-    virtual NekDouble v_EstimateCoarseSolverTime(void) override;
-
-    virtual NekDouble v_EstimateFineSolverTime(void) override;
-
-    virtual NekDouble v_EstimatePredictorTime(void) override;
-
-    virtual NekDouble v_EstimateOverheadTime(void) override;
-
-    virtual NekDouble v_ComputeSpeedUp(
-        const size_t iter, NekDouble fineSolveTime, NekDouble coarseSolveTime,
-        NekDouble restTime, NekDouble interTime, NekDouble commTime,
-        NekDouble predictorOverheadTime, NekDouble overheadTime) override;
-
     static std::string driverLookupId;
 
 private:
     void AssertParameters(void);
 
-    void InitialiseSDCScheme(bool pfasst);
+    void InitialiseSDCScheme(void);
 
     void SetTimeInterpolator(void);
 
     bool IsNotInitialCondition(const size_t n);
 
-    void SetTime(const NekDouble &time);
+    void PropagateQuadratureSolutionAndResidual(const size_t timeLevel,
+                                                const size_t index);
 
-    void CopyQuadratureSolutionAndResidual(
-        std::shared_ptr<LibUtilities::TimeIntegrationSchemeSDC> SDCsolver,
-        const int index);
+    void UpdateFirstQuadrature(const size_t timeLevel);
 
-    void UpdateCoarseFirstQuadrature(void);
+    void RunSweep(const NekDouble time, const size_t timeLevel,
+                  const bool update = false);
 
-    void UpdateFineFirstQuadrature(void);
+    void ResidualEval(const NekDouble time, const size_t timeLevel,
+                      const size_t n);
 
-    void ComputeCoarseInitialGuess(void);
+    void ResidualEval(const NekDouble time, const size_t timeLevel);
 
-    void ComputeFineInitialGuess(void);
+    void IntegratedResidualEval(const size_t timeLevel);
 
-    void RunCoarseSweep(void);
+    void Interpolate(const size_t coarseLevel, const SDCarray &in,
+                     const size_t fineLevel, SDCarray &out, bool forced);
 
-    void RunFineSweep(void);
+    void InterpolateSolution(const size_t timeLevel);
 
-    void CoarseResidualEval(const size_t n);
+    void InterpolateResidual(const size_t timeLevel);
 
-    void CoarseResidualEval(void);
+    void Restrict(const size_t fineLevel, const SDCarray &in,
+                  const size_t coarseLevel, SDCarray &out);
 
-    void FineResidualEval(const size_t n);
+    void RestrictSolution(const size_t timeLevel);
 
-    void FineResidualEval(void);
+    void RestrictResidual(const size_t timeLevel);
 
-    void CoarseIntegratedResidualEval(void);
+    void ComputeFASCorrection(const size_t timeLevel);
 
-    void FineIntegratedResidualEval(void);
+    void Correct(const size_t coarseLevel,
+                 const Array<OneD, Array<OneD, NekDouble>> &in,
+                 const size_t fineLevel,
+                 Array<OneD, Array<OneD, NekDouble>> &out, bool forced);
 
-    void Interpolate(
-        const Array<OneD, Array<OneD, Array<OneD, NekDouble>>> &coarse,
-        Array<OneD, Array<OneD, Array<OneD, NekDouble>>> &fine, bool forced);
+    void CorrectInitialSolution(const size_t timeLevel);
 
-    void InterpolateCoarseSolution(void);
+    void CorrectInitialResidual(const size_t timeLevel);
 
-    void InterpolateCoarseResidual(void);
-
-    void Restrict(const Array<OneD, Array<OneD, Array<OneD, NekDouble>>> &fine,
-                  Array<OneD, Array<OneD, Array<OneD, NekDouble>>> &coarse);
-
-    void RestrictFineSolution(void);
-
-    void RestrictFineResidual(void);
-
-    void SaveCoarseSolution(void);
-
-    void SaveCoarseResidual(void);
-
-    void ComputeFASCorrection(void);
-
-    void Correct(const Array<OneD, Array<OneD, NekDouble>> &coarse,
-                 Array<OneD, Array<OneD, NekDouble>> &fine, bool forced);
-
-    void CorrectInitialFineSolution(void);
-
-    void CorrectInitialFineResidual(void);
-
-    void Correct(const Array<OneD, Array<OneD, Array<OneD, NekDouble>>> &rest,
-                 const Array<OneD, Array<OneD, Array<OneD, NekDouble>>> &coarse,
-                 Array<OneD, Array<OneD, Array<OneD, NekDouble>>> &fine,
+    void Correct(const size_t coarseLevel, const SDCarray &rest,
+                 const SDCarray &in, const size_t fineLevel, SDCarray &out,
                  bool forced);
 
-    void CorrectFineSolution(void);
+    void CorrectSolution(const size_t timeLevel);
 
-    void CorrectFineResidual(void);
+    void CorrectResidual(const size_t timeLevel);
 
     void ApplyWindowing(void);
 
-    void EvaluateSDCResidualNorm(void);
+    void EvaluateSDCResidualNorm(const size_t timeLevel);
 
-    void WriteOutput(size_t chkPts);
+    void WriteOutput(const size_t step, const NekDouble time);
+
+    void SpeedUpAnalysis();
+
+    void PrintSpeedUp(NekDouble fineSolveTime, NekDouble coarseSolveTime,
+                      NekDouble fasTime, NekDouble commTime,
+                      NekDouble predictorTime, NekDouble overheadTime);
+
+    NekDouble ComputeSpeedUp(const size_t iter, NekDouble fineSolveTime,
+                             NekDouble coarseSolveTime, NekDouble fastTime,
+                             NekDouble commTime, NekDouble predictorTime,
+                             NekDouble overheadTime);
+
+    NekDouble EstimateCommunicationTime(void);
+
+    NekDouble EstimateFASCorrectionTime(void);
+
+    NekDouble EstimateSolverTime(const size_t timeLevel);
+
+    NekDouble EstimatePredictorTime(void);
+
+    NekDouble EstimateOverheadTime(void);
 
     // Storage of PFASST
-    Array<OneD, NekDouble> m_ImatFtoC;
-    Array<OneD, NekDouble> m_ImatCtoF;
-    Array<OneD, Array<OneD, Array<OneD, NekDouble>>> m_solutionRest;
-    Array<OneD, Array<OneD, Array<OneD, NekDouble>>> m_residualRest;
-    Array<OneD, Array<OneD, Array<OneD, NekDouble>>> m_tmpfine_arr;
-    Array<OneD, Array<OneD, Array<OneD, NekDouble>>> m_tmpcoarse_arr;
-    std::shared_ptr<LibUtilities::TimeIntegrationSchemeSDC> m_fineSDCSolver;
-    std::shared_ptr<LibUtilities::TimeIntegrationSchemeSDC> m_coarseSDCSolver;
+    Array<OneD, size_t> m_QuadPts;
+    Array<OneD, Array<OneD, NekDouble>> m_ImatFtoC;
+    Array<OneD, Array<OneD, NekDouble>> m_ImatCtoF;
+    Array<OneD, SDCarray> m_solutionRest;
+    Array<OneD, SDCarray> m_residualRest;
+    Array<OneD, SDCarray> m_integralRest;
+    Array<OneD, SDCarray> m_correction;
+    Array<OneD, SDCarray> m_storage;
+    Array<OneD, std::shared_ptr<LibUtilities::TimeIntegrationSchemeSDC>>
+        m_SDCSolver;
 
-    bool m_updateFineResidual = false;
+    bool m_updateResidual = false;
 };
 
 } // namespace SolverUtils

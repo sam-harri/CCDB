@@ -29,6 +29,8 @@ IF( NEKTAR_SOLVER_ADR )
     # Parallel-in-time solver
     IF (NEKTAR_USE_MPI)
         ADD_NEKTAR_TEST(PFASSTDriverUnsteadyAdvection1D)
+        ADD_NEKTAR_TEST(PFASSTDriverUnsteadyAdvection2D)
+        ADD_NEKTAR_TEST(PararealDriverUnsteadyAdvection2D)
         ADD_NEKTAR_TEST(PararealDriverImDiffusion_m6_iter0)
         ADD_NEKTAR_TEST(PararealDriverImDiffusion_m6_iter2)
         ADD_NEKTAR_TEST(PararealDriverImDiffusion_m6_iter4)

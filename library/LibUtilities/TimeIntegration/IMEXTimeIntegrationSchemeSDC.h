@@ -149,39 +149,9 @@ void IMEXTimeIntegrationSchemeSDC::v_InitializeScheme(
 void IMEXTimeIntegrationSchemeSDC::v_ResidualEval(const NekDouble &delta_t,
                                                   const size_t n)
 {
-    // Compute implicit residual
-    if (n == 0)
-    {
-        // Not implemented, require implicit evaluation for m_Fimp[0].
-        // Quadrature type that include the left end point (e.g.
-        // GaussLobattoLegendre) should not be used.
+    boost::ignore_unused(delta_t, n);
 
-        // Apply time-dependent boundary condition
-        m_op.DoProjection(m_Y[0], m_Y[0], m_time);
-    }
-    else
-    {
-        NekDouble dtn = delta_t * (m_tau[n] - m_tau[n - 1]);
-
-        // Update implicit solution
-        m_op.DoImplicitSolve(m_Y[n - 1], m_tmp, m_time + delta_t * m_tau[n],
-                             m_theta * dtn);
-
-        // Compute implicit residual from updated solution
-        for (size_t i = 0; i < m_nvars; ++i)
-        {
-            Vmath::Vsub(m_npoints, m_tmp[i], 1, m_Y[n - 1][i], 1, m_Fimp[n][i],
-                        1);
-            Vmath::Smul(m_npoints, 1.0 / (m_theta * dtn), m_Fimp[n][i], 1,
-                        m_Fimp[n][i], 1);
-        }
-    }
-
-    // Compute explicit residual
-    m_op.DoOdeRhs(m_Y[n], m_Fexp[n], m_time + delta_t * m_tau[n]);
-
-    // Compute total residual
-    ComputeTotalResidual(n);
+    ASSERTL0(false, "v_ResidualEval not implemented for IMEX SDC");
 }
 
 void IMEXTimeIntegrationSchemeSDC::v_ResidualEval(const NekDouble &delta_t)
@@ -202,10 +172,6 @@ void IMEXTimeIntegrationSchemeSDC::v_ComputeInitialGuess(
     {
         if (n == 0)
         {
-            // Not implemented, require implicit evaluation for m_Fimp[0].
-            // Quadrature type that include the left end point (e.g.
-            // GaussLobattoLegendre) should not be used.
-
             // Apply time-dependent boundary condition
             m_op.DoProjection(m_Y[0], m_Y[0], m_time);
         }
