@@ -141,6 +141,8 @@ public:
 
     void AddPressureToOutflowBCs(NekDouble kinvis);
 
+    void GenerateBndElmtExpansion(void);
+
 protected:
     virtual void v_EvaluatePressureBCs(
         const Array<OneD, const Array<OneD, NekDouble>> &inarray,
@@ -222,6 +224,9 @@ protected:
 
     /// pressure boundary conditions expansion container
     Array<OneD, MultiRegions::ExpListSharedPtr> m_PBndExp;
+
+    /// Boundary expansions on each domain boundary
+    Array<OneD, MultiRegions::ExpListSharedPtr> m_bndElmtExps;
 
     /// number of times the high-order pressure BCs have been called
     int m_pressureCalls;

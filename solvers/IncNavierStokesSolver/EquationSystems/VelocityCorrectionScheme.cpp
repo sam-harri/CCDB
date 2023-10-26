@@ -166,6 +166,7 @@ void VelocityCorrectionScheme::SetUpExtrapolation()
 
         m_extrapolation->SetForcing(m_forcing);
         m_extrapolation->SubSteppingTimeIntegration(m_intScheme);
+        m_extrapolation->GenerateBndElmtExpansion();
         m_extrapolation->GenerateHOPBCMap(m_session);
     }
 }
