@@ -3,6 +3,7 @@ Changelog
 v5.5.0
 ------
 **Library**
+- Redesign of Parareal and PFASST driver (!1613)
 - Update default global system solver parameters for paralell-in-time (!1649)
 - Add member function in MPI communicator to check if time-parallel is enable (!1647)
 - Fixed FilterError for homogeneous expansions (!1640)

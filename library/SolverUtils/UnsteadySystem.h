@@ -57,14 +57,21 @@ public:
         return v_GetTimeStep(inarray);
     }
 
+    SOLVER_UTILS_EXPORT NekDouble GetTimeStep()
+    {
+        return EquationSystem::GetTimeStep();
+    }
+
+    SOLVER_UTILS_EXPORT void SetTimeStep(const NekDouble timestep)
+    {
+        EquationSystem::SetTimeStep(timestep);
+    }
+
     SOLVER_UTILS_EXPORT void SteadyStateResidual(int step,
                                                  Array<OneD, NekDouble> &L2)
     {
         v_SteadyStateResidual(step, L2);
     }
-
-    static std::string cmdSetStartTime;
-    static std::string cmdSetStartChkNum;
 
     SOLVER_UTILS_EXPORT LibUtilities::TimeIntegrationSchemeSharedPtr &
     GetTimeIntegrationScheme();
@@ -72,9 +79,13 @@ public:
     SOLVER_UTILS_EXPORT LibUtilities::TimeIntegrationSchemeOperators &
     GetTimeIntegrationSchemeOperators();
 
+    static std::string cmdSetStartTime;
+    static std::string cmdSetStartChkNum;
+
 protected:
     /// Wrapper to the time integration scheme.
     LibUtilities::TimeIntegrationSchemeSharedPtr m_intScheme;
+
     /// The time integration scheme operators to use.
     LibUtilities::TimeIntegrationSchemeOperators m_ode;
 

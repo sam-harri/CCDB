@@ -79,50 +79,59 @@ protected:
     SOLVER_UTILS_EXPORT virtual void v_Execute(
         std::ostream &out = std::cout) override;
 
-    virtual NekDouble v_EstimateCommunicationTime(void) override;
-
-    virtual NekDouble v_EstimateRestrictionTime(void) override;
-
-    virtual NekDouble v_EstimateInterpolationTime(void) override;
-
-    virtual NekDouble v_EstimateCoarseSolverTime(void) override;
-
-    virtual NekDouble v_EstimateFineSolverTime(void) override;
-
-    virtual NekDouble v_EstimatePredictorTime(void) override;
-
-    virtual NekDouble v_EstimateOverheadTime(void) override;
-
-    virtual NekDouble v_ComputeSpeedUp(
-        const size_t iter, NekDouble fineSolveTime, NekDouble coarseSolveTime,
-        NekDouble restTime, NekDouble interTime, NekDouble commTime,
-        NekDouble predictorOverheadTime, NekDouble overheadTime) override;
-
     static std::string driverLookupId;
 
 private:
+    void AllocateMemory(void);
+
     void AssertParameters(void);
 
-    void RunCoarseSolve(const NekDouble time, const size_t nstep,
-                        const Array<OneD, const Array<OneD, NekDouble>> &input,
-                        Array<OneD, Array<OneD, NekDouble>> &output);
+    void UpdateInitialConditionFromSolver(const size_t timeLevel);
 
-    void RunFineSolve(const NekDouble time, const size_t nstep,
-                      const size_t iter, const size_t wd,
-                      const Array<OneD, const Array<OneD, NekDouble>> &input,
-                      Array<OneD, Array<OneD, NekDouble>> &output);
+    void UpdateSolverInitialCondition(const size_t timeLevel);
 
-    void PararealCorrection(
-        const Array<OneD, const Array<OneD, NekDouble>> &coarse_new,
-        const Array<OneD, const Array<OneD, NekDouble>> &coarse_old,
-        Array<OneD, Array<OneD, NekDouble>> &fine);
+    void UpdateSolution(const size_t timeLevel, const NekDouble time,
+                        const size_t nstep, const size_t wd = 0,
+                        const size_t iter = 0);
 
-    void PrintSolutionFile(void);
+    void CorrectionWithOldCoarseSolution(void);
 
-    void ApplyWindowing(const Array<OneD, const Array<OneD, NekDouble>> &in,
-                        Array<OneD, Array<OneD, NekDouble>> &out);
+    void CorrectionWithNewCoarseSolution(void);
 
-    void CopyConvergedCheckPoints(const size_t w, const size_t k, size_t kmax);
+    void InterpolateCoarseSolution(void);
+
+    void ApplyWindowing(const size_t w);
+
+    void CopyConvergedCheckPoints(const size_t w, const size_t k);
+
+    void WriteTimeChunkOuput(void);
+
+    void SpeedUpAnalysis();
+
+    void PrintSpeedUp(NekDouble fineSolveTime, NekDouble coarseSolveTime,
+                      NekDouble restTime, NekDouble interTime,
+                      NekDouble commTime, NekDouble predictorTime);
+
+    NekDouble ComputeSpeedUp(const size_t iter, NekDouble fineSolveTime,
+                             NekDouble coarseSolveTime, NekDouble restTime,
+                             NekDouble interTime, NekDouble commTime,
+                             NekDouble predictorTime);
+
+    NekDouble EstimateCommunicationTime(void);
+
+    NekDouble EstimateRestrictionTime(void);
+
+    NekDouble EstimateInterpolationTime(void);
+
+    NekDouble EstimateSolverTime(const size_t timeLevel, const size_t nstep);
+
+    NekDouble EstimatePredictorTime(void);
+
+    static constexpr size_t m_fineLevel   = 0;
+    static constexpr size_t m_coarseLevel = 1;
+    Array<OneD, Array<OneD, NekDouble>> m_initialCondition;
+    Array<OneD, Array<OneD, NekDouble>> m_fineSolution;
+    Array<OneD, Array<OneD, NekDouble>> m_coarseSolution;
 };
 
 } // namespace SolverUtils

@@ -264,12 +264,12 @@ public:
         return m_F;
     }
 
-    LUE const TripleArray &GetIntegratedResidualQFintVector() const
+    LUE const TripleArray &GetIntegratedResidualVector() const
     {
         return m_QFint;
     }
 
-    LUE TripleArray &UpdateIntegratedResidualQFintVector()
+    LUE TripleArray &UpdateIntegratedResidualVector()
     {
         return m_QFint;
     }
