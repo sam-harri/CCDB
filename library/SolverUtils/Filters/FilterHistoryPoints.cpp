@@ -595,8 +595,9 @@ void FilterHistoryPoints::v_Update(
 }
 
 void FilterHistoryPoints::v_WriteData(const int &rank,
-                                    const Array<OneD, NekDouble> &data,
-                                    const int &numFields, const NekDouble &time)
+                                      const Array<OneD, NekDouble> &data,
+                                      const int &numFields,
+                                      const NekDouble &time)
 {
     // Only the root process writes out history data
     if (rank == 0)
