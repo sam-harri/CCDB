@@ -238,27 +238,27 @@ void ForcingIncNSSyntheticEddy::v_InitObject(
  * @brief Apply forcing term if an eddy left the box of eddies and
  *        update the eddies positions. 
  * 
- * @param fields    Pointer to fields.
+ * @param pFields   Pointer to fields.
  * @param inarray   Given fields. The fields are in in physical space.    
  * @param outarray  Calculated solution after forcing term being applied
  *                  in physical space.
  * @param time      time.
  */
 void ForcingIncNSSyntheticEddy::v_Apply(
-    const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
+    const Array<OneD, MultiRegions::ExpListSharedPtr> &pFields,
     const Array<OneD, Array<OneD, NekDouble>> &inarray,
     Array<OneD, Array<OneD, NekDouble>> &outarray, const NekDouble &time)
 {
     // Number of Variables
-    int nVars = fields.size();
+    int nVars = pFields.size();
     // Total number of coefficients
-    unsigned int nqTot = fields[0]->GetTotPoints();
+    unsigned int nqTot = pFields[0]->GetTotPoints();
 
     // Only apply in the first time step and when an eddy leaves
     // the box
     if (m_calcForcing)
     {
-        CalculateForcing(fields);
+        CalculateForcing(pFields);
 
         for (size_t i = 0; i < (nVars - 1); ++i) // Only velocity: nVars - 1
         {
@@ -274,31 +274,31 @@ void ForcingIncNSSyntheticEddy::v_Apply(
 /**
  * @brief Calculate forcing term.
  *  
- * @param fields  Pointer to fields.
+ * @param pFfields  Pointer to fields.
  */
 void ForcingIncNSSyntheticEddy::CalculateForcing(
-    const Array<OneD, MultiRegions::ExpListSharedPtr> &fields)
+    const Array<OneD, MultiRegions::ExpListSharedPtr> &pFields)
 {
     // Total number of quadrature points
-    int nqTot = fields[0]->GetTotPoints();
+    int nqTot = pFields[0]->GetTotPoints();
     // Number of Variables
-    int nVars = fields.size();
+    int nVars = pFields.size();
 
     // Compute Stochastic Signal
     Array<OneD, Array<OneD, NekDouble>> stochasticSignal;
-    stochasticSignal = ComputeStochasticSignal(fields);
+    stochasticSignal = ComputeStochasticSignal(pFields);
 
     // Compute velocity flsuctuation
     Array<OneD, Array<OneD, NekDouble>> velFluc;
-    velFluc = ComputeVelocityFluctuation(fields, stochasticSignal);
+    velFluc = ComputeVelocityFluctuation(pFields, stochasticSignal);
 
     // Compute characteristic convective turbulent time
     Array<OneD, Array<OneD, NekDouble>> convTurbTime;
-    convTurbTime = ComputeCharConvTurbTime(fields);
+    convTurbTime = ComputeCharConvTurbTime(pFields);
 
     // Compute smoothing factor
     Array<OneD, Array<OneD, NekDouble>> smoothFac;
-    smoothFac = ComputeSmoothingFactor(fields, convTurbTime);
+    smoothFac = ComputeSmoothingFactor(pFields, convTurbTime);
 
     // Check if eddies left the box
     if (!m_eddiesIDForcing.empty())

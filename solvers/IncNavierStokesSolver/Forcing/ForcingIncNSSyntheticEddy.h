@@ -71,7 +71,7 @@ protected:
         const TiXmlElement *pForce) override;
 
     SOLVER_UTILS_EXPORT void v_Apply(
-        const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
+        const Array<OneD, MultiRegions::ExpListSharedPtr> &pFields,
         const Array<OneD, Array<OneD, NekDouble>> &inarray,
         Array<OneD, Array<OneD, NekDouble>> &outarray,
         const NekDouble &time) override;
