@@ -40,6 +40,54 @@ This force type specifies the name of a body forcing function expressed in the \
 </FORCE>
 \end{lstlisting}
 
+\subsection{IncNSSyntheticTurbulence}
+This force type allows the user to apply synthetic turbulence genetation in the flow field. The Synthetic Eddy Method is implemeted. The approach developed here is based on a source term formulation. This formulation allows the user to apply synthetic turbulence generation in any specific area of the domain, not only in the boundary condition as most of methodologies do. So that, after defining a synthetic eddy region (box of eddies), the user can randomly release eddies inside this box which are going to be convected downstream and will produce turbulence depending on the flow conditions. Each eddy  that leaves the synthetic eddy region is reintroduced in the inlet plane of the box, so this  mechanisms reenergise the system, roughly speaking. 
+
+Below it is shown how to define the Synthetic Eddy Method for a fully three-dimensional Navier-Stokes simulation. Note that this definition is under the \inltt{FORCING} tag. Firstly, in the \inltt{TYPE} entry, we define the force type as \texttt{IncNSSyntheticTurbulence}. In the \inltt{BoxOfEddies} tag, under the \inltt{FORCE} tag, the center plane of the synthetic eddy region defined. The coordinates of its center is given by \texttt{x0, y0, z0} and 
+
+\begin{lstlisting}[style=XMLStyle] 
+<FORCE TYPE="IncNSSyntheticTurbulence">
+    <BoxOfEddies> x0 y0 z0 lyref lzref </BoxOfEddies>
+    <Sigma> sigma </Sigma>
+    <BulkVelocity> Ub </BulkVelocity>
+    <ReynoldsStresses> [ReynoldsStresses FUNCTION NAME] </ReynoldsStresses>
+    <CharLengthScales> [LenScales FUNCTION NAME] </CharLengthScales>
+</FORCE>
+\end{lstlisting}
+
+It is worthy mentioning that it is possible to define space-dependent fuctions for each Reynolds stress. In other words, the user can, for instance, provide the analytical solution of the Reynolds stresses close to the wall (boundary). This information is essential to calculate the velocity fluctuations. 
+
+\begin{lstlisting}[style=XMLStyle] 
+<FUNCTION NAME="ReynoldsStresses">
+    <E VAR="r00" VALUE="1e-6" />
+    <E VAR="r10" VALUE="10*y" />
+    <E VAR="r20" VALUE="0.0"  />
+    <E VAR="r11" VALUE="1e-6" />
+    <E VAR="r21" VALUE="0.0"  />
+    <E VAR="r22" VALUE="1e-6" />
+</FUNCTION>
+\end{lstlisting}
+
+The characteristic  ...
+
+These function are added under the \inltt{CONDITION} tag.
+
+\begin{lstlisting}[style=XMLStyle] 
+<FUNCTION NAME="LenScales">
+    <E VAR="l00" VALUE="1.0"   />
+    <E VAR="l10" VALUE="0.085" />
+    <E VAR="l20" VALUE="0.125" />
+    <E VAR="l01" VALUE="0.4"   />
+    <E VAR="l11" VALUE="0.085" />
+    <E VAR="l21" VALUE="0.125" />
+    <E VAR="l02" VALUE="0.4"   />
+    <E VAR="l12" VALUE="0.170" />
+    <E VAR="l22" VALUE="0.25"  />
+</FUNCTION>
+\end{lstlisting}
+
+Note that the Synthetic Eddy Method is only supported for a fully three-dimensional Incompressible Navier-Stokes simulation.
+
 \subsection{MovingReferenceFrame}
 This force type allows the solution of incompressilbe Navier-Stokes in moving frame of reference. The moving frame is attached the to body and can have translational, rotational or both motions. Although the Navier-Stokes equations are solved in a moving reference frame, our formulation is based on the absolute velocity and pressure (in inertial frame). However, note that these absolute velocities and any other vector quantities are expressed using the coordinate basis of the moving frame. Further, note that if you are using the FilterAeroForces, the force vector $\left(F_x, F_y, F_z\right)$ is automatically converted and output in the inertial frame (ground reference frame).
 
