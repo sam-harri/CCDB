@@ -959,6 +959,13 @@ void StdExpansion::LinearAdvectionDiffusionReactionMatrixOp_MatFree(
     // Add reaction term if lambda != 0.0
     if (lambda)
     {
+        // Add mass varcoeff
+        if (mkey.HasVarCoeff(eVarCoeffMass))
+        {
+            Vmath::Vmul(totpts, mkey.GetVarCoeff(eVarCoeffMass), 1, tmp, 1, tmp,
+                        1);
+        }
+
         Vmath::Svtvp(totpts, -lambda, tmp, 1, tmp_adv, 1, tmp_adv, 1);
     }
 

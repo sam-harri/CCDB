@@ -63,8 +63,17 @@ public:
     virtual ~VCSImplicit();
 
 protected:
-    // Array for Advection Velocities
-    Array<OneD, Array<OneD, NekDouble>> m_AdvVel;
+    /// 2D Array for Advection Velocities [dir][dof]
+    Array<OneD, Array<OneD, NekDouble>> m_advection, m_AdvVel;
+    /// 3D Array for extrapolated Advection Velocities [dir][time-levle][dof]
+    Array<OneD, Array<OneD, Array<OneD, NekDouble>>> m_extVel;
+    /// bool to identify implicit scheme ie advection velocity
+    bool m_advectionVelocity;
+    /// bool to identify advection operator
+    bool m_implicitSkewSymAdvection;
+    /// integer for advection velocity
+    int m_intOrder;
+    std::string m_convectiveType;
 
     // Virtual functions
     virtual void v_GenerateSummary(SolverUtils::SummaryList &s) override;
@@ -101,6 +110,9 @@ protected:
         const NekDouble time) override;
 
     static std::string solverTypeLookupId;
+
+    void AddImplicitSkewSymAdvection(StdRegions::VarCoeffMap varcoeffs,
+                                     NekDouble aii_Dt);
 
 private:
 };

@@ -2,7 +2,7 @@
 <test>
     <description>Kovasznay flow test case with mixed Quad-Tri elements, NUMMODES=10 and dt=0.4</description>
     <executable>IncNavierStokesSolver</executable>
-    <parameters>KovaFlow_m10_QuadTri_VCSImplicit.xml</parameters>
+    <parameters>KovaFlow_m10_QuadTri_VCSImplicit.xml -I AdvectionVelocity=Dong</parameters>
     <files>
         <file description="Session File">KovaFlow_m10_QuadTri_VCSImplicit.xml</file>
     </files>

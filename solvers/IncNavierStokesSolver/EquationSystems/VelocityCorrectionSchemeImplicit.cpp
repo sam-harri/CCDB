@@ -167,12 +167,50 @@ void VCSImplicit::v_DoInitialise(bool dumpInitialConditions)
 {
     VelocityCorrectionScheme::v_DoInitialise(dumpInitialConditions);
 
+    // Get integration order for extrapolation
+    m_intOrder = m_intScheme->GetOrder();
+
     // Initialise Advection velocity
     m_AdvVel = Array<OneD, Array<OneD, NekDouble>>(m_velocity.size());
     for (int i = 0; i < m_velocity.size(); i++)
     {
         m_AdvVel[i] = Array<OneD, NekDouble>(m_fields[i]->GetTotPoints(), 0.0);
     }
+
+    // Initialise storage for explicit advection terms
+    m_advection = Array<OneD, Array<OneD, NekDouble>>(m_nConvectiveFields);
+    for (int i = 0; i < m_nConvectiveFields; i++)
+    {
+        m_advection[i] =
+            Array<OneD, NekDouble>(m_fields[i]->GetTotPoints(), 0.0);
+    }
+
+    // Check advection velocity: Simo or Dong scheme
+    // Default to Simo scheme
+    m_session->MatchSolverInfo("AdvectionVelocity", "Simo", m_advectionVelocity,
+                               true);
+
+    // Extrapolated velocity (for 2nd order Simo scheme)
+    // Only initiliase for Simo scheme
+    if (m_advectionVelocity)
+    {
+        m_extVel =
+            Array<OneD, Array<OneD, Array<OneD, NekDouble>>>(m_velocity.size());
+        for (int i = 0; i < m_velocity.size(); i++)
+        {
+            m_extVel[i] = Array<OneD, Array<OneD, NekDouble>>(m_intOrder);
+            for (int j = 0; j < m_intOrder; j++)
+            {
+                m_extVel[i][j] =
+                    Array<OneD, NekDouble>(m_fields[i]->GetTotPoints(), 0.0);
+            }
+        }
+    }
+
+    // Check skew-symmetric advection operator
+    // Default to Convective operator = false
+    m_session->MatchSolverInfo("AdvectionOperator", "SkewSymmetric",
+                               m_implicitSkewSymAdvection, false);
 }
 
 /**
@@ -193,41 +231,24 @@ void VCSImplicit::v_SetUpPressureForcing(
     Array<OneD, Array<OneD, NekDouble>> &Forcing, const NekDouble aii_Dt)
 {
     int ncoeffs = m_pressure->GetNcoeffs();
-
-    // Evaluate Advection -N(u)^n
     int phystot = m_fields[0]->GetTotPoints();
     int nvel    = m_velocity.size();
-    Array<OneD, Array<OneD, NekDouble>> velocity(nvel), advection(nvel);
-    for (int i = 0; i < nvel; i++)
-    {
-        velocity[i]  = Array<OneD, NekDouble>(phystot, 0.0);
-        advection[i] = Array<OneD, NekDouble>(phystot, 0.0);
-    }
-
-    // Get velocity fields u^n
-    for (int i = 0; i < nvel; i++)
-    {
-        velocity[i] = m_fields[i]->GetPhys();
-    }
-
-    // Get -N(u^n)
-    EvaluateAdvectionTerms(velocity, advection, m_time);
 
     // Add 1/dt \sum_q \alpha_q u^{n-q} - N(u^n)
     for (int i = 0; i < nvel; i++)
     {
-        Vmath::Svtvp(phystot, 1.0 / aii_Dt, fields[i], 1, advection[i], 1,
-                     advection[i], 1);
+        Vmath::Svtvp(phystot, 1.0 / aii_Dt, fields[i], 1, m_advection[i], 1,
+                     Forcing[i], 1);
     }
 
     // Add forcing terms
     for (auto &x : m_forcing)
     {
-        x->Apply(m_fields, advection, advection, m_time);
+        x->Apply(m_fields, Forcing, Forcing, m_time + m_timestep);
     }
 
     // Do Innerproduct with derivative base
-    m_pressure->IProductWRTDerivBase(advection, Forcing[0]);
+    m_pressure->IProductWRTDerivBase(Forcing, Forcing[0]);
 
     // Negate to reverse negation in HelmSolve
     Vmath::Neg(ncoeffs, Forcing[0], 1);
@@ -259,7 +280,7 @@ void VCSImplicit::v_SetUpViscousForcing(
     int phystot = m_fields[0]->GetTotPoints();
     int nvel    = m_velocity.size();
 
-    // Update pressure to n+1
+    // Update (PhysSpace) pressure to n+1
     m_pressure->BwdTrans(m_pressure->GetCoeffs(), m_pressure->UpdatePhys());
 
     // Compute gradient \nabla p^{n+1}
@@ -274,65 +295,70 @@ void VCSImplicit::v_SetUpViscousForcing(
                               Forcing[m_velocity[1]], Forcing[m_velocity[2]]);
     }
 
+    // Negate pressure gradient: -1 * \nabla p
+    for (int i = 0; i < nvel; ++i)
+    {
+        Vmath::Neg(phystot, Forcing[i], 1);
+    }
+
     // Zero convective fields
     for (int i = nvel; i < m_nConvectiveFields; ++i)
     {
         Vmath::Zero(phystot, Forcing[i], 1);
     }
 
-    // Get velocity fields and evaluate advection
-    Array<OneD, Array<OneD, NekDouble>> velocity(nvel), advection(nvel);
-    for (int i = 0; i < nvel; i++)
-    {
-        velocity[i]  = Array<OneD, NekDouble>(phystot, 0.0);
-        advection[i] = Array<OneD, NekDouble>(phystot, 0.0);
-    }
-
-    // Velocity [u^n, v^n, ..]
-    for (int i = 0; i < nvel; i++)
-    {
-        velocity[i] = m_fields[i]->GetPhys();
-    }
-
-    // Advection [-N(u)^n, ..]
-    EvaluateAdvectionTerms(velocity, advection, m_time);
-
-    // Curl of vorticity \nabla \times \nabla \times [u^n, v^n, ..]
-    m_fields[0]->CurlCurl(velocity, velocity);
-
-    // Negate pressure gradient
-    for (int i = 0; i < nvel; ++i)
-    {
-        Vmath::Neg(phystot, Forcing[i], 1); // -1 * \nabla p
-    }
-
-    // Add forcing terms
+    // Add forcing terms: += f^{n+1}
     for (auto &x : m_forcing)
     {
-        x->Apply(m_fields, Forcing, Forcing, m_time); // += f^{n+1}
+        x->Apply(m_fields, Forcing, Forcing, m_time + m_timestep);
     }
 
-    // Build Forcing term and Advection Velocity
+    // Build Advection Velocity
     for (int i = 0; i < nvel; ++i)
     {
-        /// Advection Velocity
-        Vmath::Svtvp(phystot, aii_Dt, Forcing[i], 1, inarray[i], 1, m_AdvVel[i],
-                     1); // \frac{\Delta t}{\gamma}(-\nabla p + f) + inarray
-        Vmath::Svtvp(phystot, aii_Dt, advection[i], 1, m_AdvVel[i], 1,
-                     m_AdvVel[i],
-                     1); // += \frac{\Delta t}{\gamma} -N(u)
-        Vmath::Svtvp(phystot, -aii_Dt * m_diffCoeff[i], velocity[i], 1,
-                     m_AdvVel[i], 1, m_AdvVel[i],
-                     1); // += -\frac{\Delta t}{\gamma} CurlCurl(u)
-        Vmath::Smul(phystot, 1.0 / m_diffCoeff[i], m_AdvVel[i], 1, m_AdvVel[i],
-                    1); // *= 1/\nu
+        // Advection Velocity = u^*n+1; Simo and Armero, 1994
+        if (m_advectionVelocity)
+        {
+            Vmath::Smul(phystot, 1.0 / m_diffCoeff[i],
+                        m_extVel[i][m_intOrder - 1], 1, m_AdvVel[i], 1);
+        }
+        // Advection Velocity = u^*n+1 - (...); Dong and Shen, 2010
+        else
+        {
+            // Get velocity fields [u^n, v^n, ..] for curl of vorticity
+            Array<OneD, Array<OneD, NekDouble>> velocity(nvel);
+            for (int i = 0; i < nvel; i++)
+            {
+                velocity[i] = Array<OneD, NekDouble>(m_fields[i]->GetPhys());
+            }
+            // Curl of vorticity \nabla \times \nabla \times [u^n, v^n, ..]
+            m_fields[0]->CurlCurl(velocity, velocity);
 
-        /// Forcing
+            // \frac{\Delta t}{\gamma}(-\nabla p + f) + inarray
+            Vmath::Svtvp(phystot, aii_Dt, Forcing[i], 1, inarray[i], 1,
+                         m_AdvVel[i], 1);
+            // += \frac{\Delta t}{\gamma} -N(u)
+            Vmath::Svtvp(phystot, aii_Dt, m_advection[i], 1, m_AdvVel[i], 1,
+                         m_AdvVel[i], 1);
+            // += -\frac{\Delta t}{\gamma} CurlCurl(u)
+            Vmath::Svtvp(phystot, -aii_Dt * m_diffCoeff[i], velocity[i], 1,
+                         m_AdvVel[i], 1, m_AdvVel[i], 1);
+            // *= 1/\nu
+            Vmath::Smul(phystot, 1.0 / m_diffCoeff[i], m_AdvVel[i], 1,
+                        m_AdvVel[i], 1);
+        }
+    }
+
+    // Build Forcing term
+    for (int i = 0; i < nvel; ++i)
+    {
+        // \frac{\gamma}{\Delta t} * inarray - \nabla p + f
         Vmath::Svtvp(phystot, 1.0 / aii_Dt, inarray[i], 1, Forcing[i], 1,
-                     Forcing[i],
-                     1); // \frac{\gamma}{\Delta t} * inarray - \nabla p + f
+                     Forcing[i], 1);
+
+        // *= -1/kinvis
         Vmath::Smul(phystot, -1.0 / m_diffCoeff[i], Forcing[i], 1, Forcing[i],
-                    1); // *= -1/kinvis
+                    1);
     }
 }
 
@@ -359,7 +385,6 @@ void VCSImplicit::v_SolvePressure(const Array<OneD, NekDouble> &Forcing)
                           false);
 
     // Add presure to outflow bc if using convective like BCs
-    // TODO Check HO outflow BCs with Implicit scheme
     m_extrapolation->AddPressureToOutflowBCs(m_kinvis);
 }
 
@@ -394,6 +419,9 @@ void VCSImplicit::v_SolveViscous(
     AppendSVVFactors(factors, varfactors);
     ComputeGJPNormalVelocity(inarray, varcoeffs);
 
+    // Compute mass varcoeff for implicit Skew-symmetric operator
+    AddImplicitSkewSymAdvection(varcoeffs, aii_Dt);
+
     // Set advection velocities
     StdRegions::VarCoeffType varcoefftypes[] = {StdRegions::eVarCoeffVelX,
                                                 StdRegions::eVarCoeffVelY,
@@ -419,17 +447,17 @@ void VCSImplicit::v_SolveViscous(
             Forcing[i], m_fields[i]->UpdateCoeffs(), factors, varcoeffs,
             varfactors);
 
-        // Nuke GlobalLinSys, avoids memory leak under condition:
-        // Remove after last velocity solve (w-velocity in 3D,
+        // Nuke GlobalLinSys to avoid memory leak
+        // The condition nukes, if:
+        // - Remove after last velocity solve (w-velocity in 3D,
         // assumes same matrix for each velocity)
-        // Also, catches Null return from 3DH1D solve by checking matrix type
-        // is an ADR matrix (variant)
+        // - Catches Null return from 3DH1D solve by checking matrix type
+        // is a LinearADR matrix (variant)
         if (i == m_nConvectiveFields - 1 &&
             (gkey.GetMatrixType() ==
                  StdRegions::eLinearAdvectionDiffusionReaction ||
              gkey.GetMatrixType() ==
                  StdRegions::eLinearAdvectionDiffusionReactionGJP))
-
         {
             m_fields[i]->UnsetGlobalLinSys(gkey, true);
         }
@@ -455,8 +483,6 @@ void VCSImplicit::v_EvaluateAdvection_SetPressureBCs(
     const Array<OneD, const Array<OneD, NekDouble>> &inarray,
     Array<OneD, Array<OneD, NekDouble>> &outarray, const NekDouble time)
 {
-    boost::ignore_unused(time); // Not required without advection terms
-
     // Zero RHS derivatives, avoids undefined values
     for (int i = 0; i < m_velocity.size(); ++i)
     {
@@ -469,6 +495,53 @@ void VCSImplicit::v_EvaluateAdvection_SetPressureBCs(
     m_extrapolation->EvaluatePressureBCs(inarray, outarray, m_kinvis);
     timer.Stop();
     timer.AccumulateRegion("Pressure BCs");
+
+    // If Simo-advection: Extrapolate velocity
+    if (m_advectionVelocity)
+    {
+        for (int i = 0; i < m_velocity.size(); ++i)
+        {
+            Vmath::Vcopy(inarray[i].size(), inarray[i], 1,
+                         m_extVel[i][m_intOrder - 1], 1);
+            m_extrapolation->ExtrapolateArray(m_extVel[i]);
+        }
+    }
+
+    // Compute explicit advection terms
+    EvaluateAdvectionTerms(inarray, m_advection, time);
+}
+
+void VCSImplicit::AddImplicitSkewSymAdvection(StdRegions::VarCoeffMap varcoeffs,
+                                              NekDouble aii_Dt)
+{
+    if (!m_implicitSkewSymAdvection)
+    {
+        return;
+    }
+
+    // Setup temporary storages
+    int nvel    = m_velocity.size();
+    int phystot = m_fields[0]->GetTotPoints();
+    Array<OneD, NekDouble> divAdvVel(phystot, 0.0);
+    Array<OneD, NekDouble> tmpstore(phystot);
+    Array<OneD, NekDouble> ones(phystot, 1.0);
+
+    // Compute divergence of advection velocity: 1/\nu \tilde{u}
+    m_fields[0]->PhysDeriv(eX, m_AdvVel[0], divAdvVel);
+    for (int i = 1; i < nvel; ++i)
+    {
+        m_fields[i]->PhysDeriv(DirCartesianMap[i], m_AdvVel[i], tmpstore);
+        Vmath::Vadd(phystot, divAdvVel, 1, tmpstore, 1, divAdvVel, 1);
+    }
+    // Smul: 1/(2*lambda) * divAdvVel
+    NekDouble lambda = 1.0 / aii_Dt / m_diffCoeff[0];
+    Vmath::Smul(phystot, 1.0 / 2.0 / lambda, divAdvVel, 1, divAdvVel, 1);
+
+    // Vadd: 1 + 1/(2*lambda) * divAdvVel
+    Vmath::Vadd(phystot, ones, 1, divAdvVel, 1, divAdvVel, 1);
+
+    // Assign VarcoeffMass
+    varcoeffs[StdRegions::eVarCoeffMass] = divAdvVel;
 }
 
 } // namespace Nektar

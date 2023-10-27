@@ -980,6 +980,11 @@ void Extrapolate::ExtrapolateArray(Array<OneD, Array<OneD, NekDouble>> &array)
     int nlevels = array.size();
     int nPts    = array[0].size();
 
+    // Check integer for time levels
+    // Note that ExtrapolateArray assumes m_pressureCalls is >= 1
+    // meaning v_EvaluatePressureBCs has been called previously
+    ASSERTL0(nint > 0, "nint must be > 0 when calling ExtrapolateArray.");
+
     // Update array
     RollOver(array);
 
