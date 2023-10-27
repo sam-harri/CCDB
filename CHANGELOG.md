@@ -29,6 +29,7 @@ v5.5.0
 
 **NekMesh**
 - Replace deprecated boost::filesystem functions (!1654)
+- Remove deprecated AddTraceIntegral interface from ExpList.h (!1646)
 
 v5.4.0
 ------

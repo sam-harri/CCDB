@@ -4750,15 +4750,6 @@ void ExpList::GetElmtNormalLength(Array<OneD, NekDouble> &lengthsFwd,
     }
 }
 
-void ExpList::v_AddTraceIntegral(const Array<OneD, const NekDouble> &Fx,
-                                 const Array<OneD, const NekDouble> &Fy,
-                                 Array<OneD, NekDouble> &outarray)
-{
-    boost::ignore_unused(Fx, Fy, outarray);
-    NEKERROR(ErrorUtil::efatal,
-             "This method is not defined or valid for this class type");
-}
-
 void ExpList::v_AddTraceIntegral(const Array<OneD, const NekDouble> &Fn,
                                  Array<OneD, NekDouble> &outarray)
 {
