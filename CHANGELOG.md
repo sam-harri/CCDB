@@ -1,8 +1,10 @@
 Changelog
 =========
+
 v5.5.0
 ------
 **Library**
+- Fix Nektar++Config.cmake to use MPI_CXX (!1224)
 - Redesign of Parareal and PFASST driver (!1613)
 - Update default global system solver parameters for paralell-in-time (!1649)
 - Add member function in MPI communicator to check if time-parallel is enable (!1647)
