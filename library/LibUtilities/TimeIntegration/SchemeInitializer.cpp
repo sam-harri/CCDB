@@ -45,6 +45,7 @@
 #include <LibUtilities/TimeIntegration/IMEXTimeIntegrationSchemes.h>
 #include <LibUtilities/TimeIntegration/IMEXdirkTimeIntegrationSchemes.h>
 #include <LibUtilities/TimeIntegration/MCNABTimeIntegrationScheme.h>
+#include <LibUtilities/TimeIntegration/NoSchemeTimeIntegrationScheme.h>
 #include <LibUtilities/TimeIntegration/RungeKuttaTimeIntegrationSchemes.h>
 
 #include <LibUtilities/TimeIntegration/TimeIntegrationSchemeFIT.h>
@@ -195,6 +196,10 @@ FACTORYREGISTER(RungeKutta4);
 SESSIONREGISTER(RungeKutta4);
 FACTORYREGISTER(RungeKutta5);
 SESSIONREGISTER(RungeKutta5);
+
+// Do nothing
+FACTORYREGISTER(NoScheme);
+SESSIONREGISTER(NoScheme);
 
 // TimeIntegrationSchemesSDC.h
 std::string ExplicitTimeIntegrationSchemeSDC::className =

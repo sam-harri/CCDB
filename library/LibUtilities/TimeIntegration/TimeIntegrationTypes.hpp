@@ -68,6 +68,11 @@ typedef std::shared_ptr<TimeIntegrationScheme> TimeIntegrationSchemeSharedPtr;
 
 typedef std::vector<TimeIntegrationSchemeSharedPtr> TimeIntegrationSchemeVector;
 
+class NoSchemeTimeIntegrationScheme;
+
+typedef std::shared_ptr<NoSchemeTimeIntegrationScheme>
+    NoTimeIntegrationSchemeSharedPtr;
+
 //
 class FractionalInTimeIntegrationScheme;
 
