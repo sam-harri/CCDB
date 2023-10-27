@@ -176,7 +176,7 @@ This scheme is activated in the SolverInfo section with the
 
 \subsubsection{Implicit Velocity Correction Scheme}
 
-The implicit solver is based on the work of \cite{Dong2010}. Following the 
+The implicit solver is based on the work of \cite{Dong2010,Simo1994}. Following the 
 previous subsections, the implicit solver handles the
 advection terms implicitly. Effectively, it uses the same formulation
 as the Semi-Implicit scheme presented above, but brings the advection
@@ -192,16 +192,25 @@ and large-scale simulations.
 The advection operator is linearised
 using the approximation $[\mathbf{u} \cdot \nabla \mathbf{u}]^{n+1} \approx 
 [\tilde{\mathbf{u}} \cdot \nabla \mathbf{u}]^{n+1}$ where $\tilde{\mathbf{u}}$
-is an approximate advection velocity defined as
-\begin{equation}
-    \tilde{\mathbf{u}}^{n+1} =
+is an approximate advection velocity. The Advection velocity $\tilde{\mathbf{u}}$ can 
+take either the form described in \cite{Simo1994} or \cite{Dong2010} which are defined as,
+\begin{align}
+    \texttt{Simo}\qquad\tilde{\mathbf{u}}^{n+1} &=
+    \sum_q \frac{\alpha_q}{\gamma} \mathbf{u}^{n-q},\\
+    \texttt{Dong}\qquad\tilde{\mathbf{u}}^{n+1} &=
     \sum_q \frac{\alpha_q}{\gamma} \mathbf{u}^{n-q} 
     - \frac{\Delta t}{\gamma} \left(
     \nabla p^{n+1}
-    - [\mathbf{u} \cdot \nabla \mathbf{u}]^{n} 
-    - \nu \nabla \times \mathbf{\omega}^{n}
-    + \mathbf{f}^{n+1} \right).
-\end{equation}
+    + [\mathbf{u} \cdot \nabla \mathbf{u}]^{n} 
+    + \nu \nabla \times \mathbf{\omega}^{n}
+    - \mathbf{f}^{n+1} \right).
+\end{align}
+The scheme defaults to \texttt{Simo}, however, can be chosen via the \inltt{SolverInfo} with either
+
+\begin{lstlisting}[style=XMLStyle]
+<I PROPERTY="AdvectionVelocity"  VALUE="Simo"/>
+<I PROPERTY="AdvectionVelocity"  VALUE="Dong"/>
+\end{lstlisting}
 
 The final operator for the velocity solve in weak form and with Neumann boundary condition is
 \begin{align}

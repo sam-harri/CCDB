@@ -25,7 +25,7 @@
 
         <PARAMETERS>
             <P> TimeStep      = 0.4       </P>
-            <P> NumSteps      = 200         </P>
+            <P> NumSteps      = 300         </P>
             <P> IO_InfoSteps  = NumSteps    </P>
             <P> Kinvis        = 0.025        </P>
             <P> kovaLam       = 0.963740544195769 </P>

@@ -256,7 +256,7 @@ void DriverParallelInTime::GetParametersFromSession(void)
     m_infoSteps  = m_session->DefinesParameter("IO_InfoSteps")
                        ? m_session->GetParameter("IO_InfoSteps")
                        : 0;
-    m_checkSteps  = m_session->DefinesParameter("IO_CheckSteps")
+    m_checkSteps = m_session->DefinesParameter("IO_CheckSteps")
                        ? m_session->GetParameter("IO_CheckSteps")
                        : 0;
 

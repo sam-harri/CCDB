@@ -640,17 +640,24 @@ DNekScalMatSharedPtr Expansion3D::CreateMatrix(const MatrixKey &mkey)
         {
             NekDouble lambda = mkey.GetConstFactor(StdRegions::eFactorLambda);
 
-            // Construct mass matrix (Check for varcoeffs)
-            MatrixKey masskey(StdRegions::eMass, mkey.GetShapeType(), *this);
+            // Construct mass matrix
+            // Check for mass-specific varcoeffs to avoid unncessary
+            // re-computation of the elemental matrix every time step
+            StdRegions::VarCoeffMap massVarcoeffs = StdRegions::NullVarCoeffMap;
             if (mkey.HasVarCoeff(StdRegions::eVarCoeffMass))
             {
-                masskey = MatrixKey(mkey, StdRegions::eMass);
+                massVarcoeffs[StdRegions::eVarCoeffMass] =
+                    mkey.GetVarCoeff(StdRegions::eVarCoeffMass);
             }
+            MatrixKey masskey(StdRegions::eMass, mkey.GetShapeType(), *this,
+                              mkey.GetConstFactors(), massVarcoeffs);
             DNekScalMat &MassMat = *GetLocMatrix(masskey);
 
             // Construct laplacian matrix (Check for varcoeffs)
-            MatrixKey lapkey(StdRegions::eLaplacian, mkey.GetShapeType(),
-                             *this);
+            // Take all varcoeffs if one or more are detected
+            // TODO We might want to have a map
+            // from MatrixType to Vector of Varcoeffs and vice-versa
+            StdRegions::VarCoeffMap lapVarcoeffs = StdRegions::NullVarCoeffMap;
             if ((mkey.HasVarCoeff(StdRegions::eVarCoeffLaplacian)) ||
                 (mkey.HasVarCoeff(StdRegions::eVarCoeffD00)) ||
                 (mkey.HasVarCoeff(StdRegions::eVarCoeffD01)) ||
@@ -662,13 +669,15 @@ DNekScalMatSharedPtr Expansion3D::CreateMatrix(const MatrixKey &mkey)
                 (mkey.HasVarCoeff(StdRegions::eVarCoeffD21)) ||
                 (mkey.HasVarCoeff(StdRegions::eVarCoeffD22)))
             {
-                lapkey = MatrixKey(mkey, StdRegions::eLaplacian);
+                lapVarcoeffs = mkey.GetVarCoeffs();
             }
+            MatrixKey lapkey(StdRegions::eLaplacian, mkey.GetShapeType(), *this,
+                             mkey.GetConstFactors(), lapVarcoeffs);
             DNekScalMat &LapMat = *GetLocMatrix(lapkey);
 
             // Construct advection matrix
-            // (assume advection velocity defined and non-zero)
-            // Could check L2(AdvectionVelocity) or HasVarCoeff
+            // Check for varcoeffs not required;
+            // assume advection velocity is always time-dependent
             MatrixKey advkey(mkey, StdRegions::eLinearAdvection);
             DNekScalMat &AdvMat = *GetLocMatrix(advkey);
 
