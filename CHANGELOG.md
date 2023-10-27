@@ -34,6 +34,9 @@ v5.5.0
 - Replace deprecated boost::filesystem functions (!1654)
 - Remove deprecated AddTraceIntegral interface from ExpList.h (!1646)
 
+**Miscellaneous**
+- Add a particle tracker utilitiy using equation system infrastructure (!1310)
+
 v5.4.0
 ------
 **Library**
