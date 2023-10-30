@@ -288,7 +288,7 @@ int main(int argc, char *argv[])
 
                 if (fs::is_directory(source))
                 {
-                    fs::copy_directory(source, dest);
+                    fs::create_directory(dest);
                     // If source is a directory, then only directory name is
                     // created, so call copy again to copy files.
                     for (const auto &dirEnt :
@@ -318,7 +318,7 @@ int main(int argc, char *argv[])
 
                 if (fs::is_directory(source))
                 {
-                    fs::copy_directory(source, dest);
+                    fs::create_directory(dest);
                     // If source is a directory, then only directory name is
                     // created, so call copy again to copy files.
                     for (const auto &dirEnt :
