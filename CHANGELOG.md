@@ -36,6 +36,7 @@ v5.5.0
 
 **Miscellaneous**
 - Add a particle tracker utilitiy using equation system infrastructure (!1310)
+- Remove deprecated fs::copy_directory function call (!1662)
 
 v5.4.0
 ------
