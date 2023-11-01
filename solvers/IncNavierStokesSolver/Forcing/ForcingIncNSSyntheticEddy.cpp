@@ -358,9 +358,11 @@ Array<OneD, Array<OneD, NekDouble>> ForcingIncNSSyntheticEddy::
         for (size_t i = 0; i < nqTot; ++i)
         {
             NekDouble convTurbLength = m_xiMaxMin * m_lref[0];
-            if ((m_l[k] > m_xiMaxMin * m_lref[0]) && (m_mask[i]))
+            // 3*k because of the structure of the m_l parameter
+            // to obtain lxk.
+            if ((m_l[3*k] > m_xiMaxMin * m_lref[0]) && (m_mask[i]))
             {
-                convTurbLength = m_l[k];
+                convTurbLength = m_l[3*k]; 
             }
             convTurbTime[k][i] = convTurbLength / m_Ub;
         }
@@ -413,17 +415,20 @@ Array<OneD, Array<OneD, NekDouble>> ForcingIncNSSyntheticEddy::
         {
             if (m_mask[count + i])
             {
-                // Calculate here all three directions at once.
-                mod = (coords0[i] - m_rc[0]) * (coords0[i] - m_rc[0]) +
-                      (coords1[i] - m_rc[1]) * (coords1[i] - m_rc[1]) +
-                      (coords2[i] - m_rc[2]) * (coords2[i] - m_rc[2]);
+                mod = (coords0[i] - m_rc[0]) * (coords0[i] - m_rc[0]);
 
                 smoothFac[0][count + i] =
-                    -0.5 * M_PI * mod * convTurbTime[0][count + i] * m_Ub;
+                    exp(-0.5 * M_PI * mod * 
+                    convTurbTime[0][count + i] * convTurbTime[0][count + i] * 
+                    m_Ub * m_Ub);
                 smoothFac[1][count + i] =
-                    -0.5 * M_PI * mod * convTurbTime[1][count + i] * m_Ub;
+                    exp(-0.5 * M_PI * mod * 
+                    convTurbTime[1][count + i] * convTurbTime[1][count + i] * 
+                    m_Ub * m_Ub);
                 smoothFac[2][count + i] =
-                    -0.5 * M_PI * mod * convTurbTime[2][count + i] * m_Ub;
+                    exp(-0.5 * M_PI * mod * 
+                    convTurbTime[2][count + i] * convTurbTime[2][count + i] * 
+                    m_Ub * m_Ub);
             }
         }
         count += nqe;
@@ -555,6 +560,12 @@ Array<OneD, Array<OneD, NekDouble>> ForcingIncNSSyntheticEddy::
 void ForcingIncNSSyntheticEddy::UpdateEddiesPositions()
 {
     NekDouble dt = m_session->GetParameter("TimeStep");
+    // Tolerance when the forcing is applied in the interface 
+    // of the inlet region. Also, the eddies should be created enterily
+    // inside the box when they are regenerated.
+    // Should include the radius of the eddy, which is 0.41 of the
+    // boundary layer thickness. 
+    NekDouble tol = m_lref[0] * 0.15; 
 
     for (size_t n = 0; n < m_N; ++n)
     {
@@ -566,7 +577,7 @@ void ForcingIncNSSyntheticEddy::UpdateEddiesPositions()
         else
         {
             // Generate a new one in the inlet plane
-            m_eddyPos[n][0] = m_rc[0] - m_lref[0];
+            m_eddyPos[n][0] = m_rc[0] - m_lref[0] + tol;
             m_eddyPos[n][1] =
                 (m_rc[1] - 0.5 * m_lyz[0]) +
                 (NekSingle(std::rand()) / NekSingle(RAND_MAX)) * m_lyz[0];
@@ -613,7 +624,6 @@ NekDouble ForcingIncNSSyntheticEddy::ComputeGaussian(NekDouble coord,
                                                      NekDouble xiMaxVal,
                                                      NekDouble constC)
 {
-
     NekDouble epsilon = 1e-6;
     if (abs(coord) <= (xiMaxVal + epsilon))
     {
