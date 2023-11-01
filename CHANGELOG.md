@@ -11,6 +11,7 @@ v5.5.0
 - Fixed FilterError for homogeneous expansions (!1640)
 - Fix ForcingAbsorption for homogeneous expansions (!1650)
 - Update AssemblyMap to reduce verbosity when using parallel-in-time (!1651)
+- Tidy-up of Collection library (!1622)
 - Tidy-up of I/O in BasicUtils (!1623)
 
 **CardiacEPSolver**

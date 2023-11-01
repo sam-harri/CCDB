@@ -109,6 +109,22 @@ const char *const ImplementationTypeMap1[] = {
 
 typedef bool ExpansionIsNodal;
 
+class Operator;
+
+/// Key for describing an Operator
+typedef std::tuple<LibUtilities::ShapeType, OperatorType, ImplementationType,
+                   ExpansionIsNodal>
+    OperatorKey;
+
+/// Operator factory definition
+typedef Nektar::LibUtilities::NekFactory<
+    OperatorKey, Operator, std::vector<StdRegions::StdExpansionSharedPtr>,
+    CoalescedGeomDataSharedPtr, StdRegions::FactorMap>
+    OperatorFactory;
+
+/// Returns the singleton Operator factory object
+OperatorFactory &GetOperatorFactory();
+
 typedef std::map<OperatorType, ImplementationType> OperatorImpMap;
 
 /// simple Operator Implementation Map generator
@@ -123,8 +139,9 @@ public:
              std::shared_ptr<CoalescedGeomData> GeomData,
              StdRegions::FactorMap factors);
 
-    /// Perform operation
+    virtual ~Operator() = default;
 
+    /// Perform operation
     COLLECTIONS_EXPORT virtual void operator()(
         const Array<OneD, const NekDouble> &input,
         Array<OneD, NekDouble> &output0, Array<OneD, NekDouble> &output1,
@@ -136,8 +153,6 @@ public:
         Array<OneD, NekDouble> &output,
         Array<OneD, NekDouble> &wsp = NullNekDouble1DArray) = 0;
 
-    COLLECTIONS_EXPORT virtual ~Operator();
-
     /// Check the validity of the supplied factor map
     COLLECTIONS_EXPORT virtual void CheckFactors(StdRegions::FactorMap factors,
                                                  int coll_phys_offset) = 0;
@@ -148,7 +163,7 @@ public:
         return m_wspSize;
     }
 
-    /// Get expansion pointer
+    /// Get number of elements
     unsigned int GetNumElmt()
     {
         return m_numElmt;
@@ -171,25 +186,11 @@ protected:
 /// Shared pointer to an Operator object
 typedef std::shared_ptr<Operator> OperatorSharedPtr;
 
-/// Key for describing an Operator
-typedef std::tuple<LibUtilities::ShapeType, OperatorType, ImplementationType,
-                   ExpansionIsNodal>
-    OperatorKey;
-
 /// Less-than comparison operator for OperatorKey objects
 bool operator<(OperatorKey const &p1, OperatorKey const &p2);
 
 /// Stream output operator for OperatorKey objects
 std::ostream &operator<<(std::ostream &os, OperatorKey const &p);
-
-/// Operator factory definition
-typedef Nektar::LibUtilities::NekFactory<
-    OperatorKey, Operator, std::vector<StdRegions::StdExpansionSharedPtr>,
-    CoalescedGeomDataSharedPtr, StdRegions::FactorMap>
-    OperatorFactory;
-
-/// Returns the singleton Operator factory object
-OperatorFactory &GetOperatorFactory();
 
 } // namespace Collections
 } // namespace Nektar

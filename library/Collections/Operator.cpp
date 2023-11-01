@@ -40,6 +40,31 @@ namespace Nektar
 namespace Collections
 {
 
+/**
+ *
+ */
+OperatorFactory &GetOperatorFactory()
+{
+    static OperatorFactory instance;
+    return instance;
+}
+
+// simple operator Map evaluation
+OperatorImpMap SetFixedImpType(ImplementationType defaultType)
+{
+    OperatorImpMap opMap;
+
+    for (int i = 0; i < SIZE_OperatorType; ++i)
+    {
+        opMap[(OperatorType)i] = defaultType;
+    }
+
+    return opMap;
+}
+
+/**
+ *
+ */
 Operator::Operator(std::vector<StdRegions::StdExpansionSharedPtr> pCollExp,
                    std::shared_ptr<CoalescedGeomData> GeomData,
                    StdRegions::FactorMap factors)
@@ -102,35 +127,6 @@ std::ostream &operator<<(std::ostream &os, OperatorKey const &p)
        << ImplementationTypeMap[std::get<2>(p)] << ", "
        << (std::get<3>(p) ? "Nodal" : "Modal");
     return os;
-}
-
-/**
- *
- */
-Operator::~Operator()
-{
-}
-
-/**
- *
- */
-OperatorFactory &GetOperatorFactory()
-{
-    static OperatorFactory instance;
-    return instance;
-}
-
-// simple operator Map evaluation
-OperatorImpMap SetFixedImpType(ImplementationType defaultType)
-{
-    OperatorImpMap opMap;
-
-    for (int i = 0; i < SIZE_OperatorType; ++i)
-    {
-        opMap[(OperatorType)i] = defaultType;
-    }
-
-    return opMap;
 }
 
 } // namespace Collections

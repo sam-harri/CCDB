@@ -28,7 +28,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 //
-// Description: base class definiitin for matrrix free type
+// Description: base class definition for matrrix free type
 //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -47,9 +47,7 @@ class MatrixFreeBase
 {
 public:
     // Default constructor
-    MatrixFreeBase()
-    {
-    }
+    MatrixFreeBase() = default;
 
     MatrixFreeBase(const unsigned int nIn, const unsigned int nOut,
                    const unsigned int nCollSize)
