@@ -64,9 +64,7 @@ class IProductWRTDerivBase_StdMat final : public Operator
 public:
     OPERATOR_CREATE(IProductWRTDerivBase_StdMat)
 
-    ~IProductWRTDerivBase_StdMat() final
-    {
-    }
+    ~IProductWRTDerivBase_StdMat() final = default;
 
     void operator()(const Array<OneD, const NekDouble> &entry0,
                     Array<OneD, NekDouble> &entry1,
@@ -192,9 +190,8 @@ private:
         CoalescedGeomDataSharedPtr pGeomData, StdRegions::FactorMap factors)
         : Operator(pCollExp, pGeomData, factors)
     {
-        LibUtilities::PointsKeyVector PtsKey = m_stdExp->GetPointsKeys();
-        m_dim                                = PtsKey.size();
-        m_coordim                            = pCollExp[0]->GetCoordim();
+        m_dim     = pCollExp[0]->GetShapeDimension();
+        m_coordim = pCollExp[0]->GetCoordim();
 
         m_nqe      = m_stdExp->GetTotPoints();
         int nmodes = m_stdExp->GetNcoeffs();
@@ -273,9 +270,7 @@ class IProductWRTDerivBase_MatrixFree final : public Operator,
 public:
     OPERATOR_CREATE(IProductWRTDerivBase_MatrixFree)
 
-    ~IProductWRTDerivBase_MatrixFree() final
-    {
-    }
+    ~IProductWRTDerivBase_MatrixFree() final = default;
 
     void operator()(const Array<OneD, const NekDouble> &entry0,
                     Array<OneD, NekDouble> &entry1,
@@ -445,9 +440,7 @@ class IProductWRTDerivBase_IterPerExp final : public Operator
 public:
     OPERATOR_CREATE(IProductWRTDerivBase_IterPerExp)
 
-    ~IProductWRTDerivBase_IterPerExp() final
-    {
-    }
+    ~IProductWRTDerivBase_IterPerExp() final = default;
 
     void operator()(const Array<OneD, const NekDouble> &entry0,
                     Array<OneD, NekDouble> &entry1,
@@ -575,9 +568,8 @@ private:
         CoalescedGeomDataSharedPtr pGeomData, StdRegions::FactorMap factors)
         : Operator(pCollExp, pGeomData, factors)
     {
-        LibUtilities::PointsKeyVector PtsKey = m_stdExp->GetPointsKeys();
-        m_dim                                = PtsKey.size();
-        m_coordim                            = pCollExp[0]->GetCoordim();
+        m_dim     = pCollExp[0]->GetShapeDimension();
+        m_coordim = pCollExp[0]->GetCoordim();
 
         m_nqe = m_stdExp->GetTotPoints();
 
@@ -639,9 +631,7 @@ class IProductWRTDerivBase_NoCollection final : public Operator
 public:
     OPERATOR_CREATE(IProductWRTDerivBase_NoCollection)
 
-    ~IProductWRTDerivBase_NoCollection() final
-    {
-    }
+    ~IProductWRTDerivBase_NoCollection() final = default;
 
     void operator()(const Array<OneD, const NekDouble> &entry0,
                     Array<OneD, NekDouble> &entry1,
@@ -766,9 +756,7 @@ class IProductWRTDerivBase_SumFac_Seg final : public Operator
 public:
     OPERATOR_CREATE(IProductWRTDerivBase_SumFac_Seg)
 
-    ~IProductWRTDerivBase_SumFac_Seg() final
-    {
-    }
+    ~IProductWRTDerivBase_SumFac_Seg() final = default;
 
     void operator()(const Array<OneD, const NekDouble> &entry0,
                     Array<OneD, NekDouble> &entry1,
@@ -877,9 +865,7 @@ class IProductWRTDerivBase_SumFac_Quad final : public Operator
 public:
     OPERATOR_CREATE(IProductWRTDerivBase_SumFac_Quad)
 
-    ~IProductWRTDerivBase_SumFac_Quad() final
-    {
-    }
+    ~IProductWRTDerivBase_SumFac_Quad() final = default;
 
     void operator()(const Array<OneD, const NekDouble> &entry0,
                     Array<OneD, NekDouble> &entry1,
@@ -997,9 +983,7 @@ private:
           m_derbase0(m_stdExp->GetBasis(0)->GetDbdata()),
           m_derbase1(m_stdExp->GetBasis(1)->GetDbdata())
     {
-        LibUtilities::PointsKeyVector PtsKey = m_stdExp->GetPointsKeys();
-        m_coordim                            = pCollExp[0]->GetCoordim();
-
+        m_coordim  = pCollExp[0]->GetCoordim();
         m_derivFac = pGeomData->GetDerivFactors(pCollExp);
         m_jacWStdW = pGeomData->GetJacWithStdWeights(pCollExp);
         m_wspSize =
@@ -1022,9 +1006,7 @@ class IProductWRTDerivBase_SumFac_Tri final : public Operator
 public:
     OPERATOR_CREATE(IProductWRTDerivBase_SumFac_Tri)
 
-    ~IProductWRTDerivBase_SumFac_Tri() final
-    {
-    }
+    ~IProductWRTDerivBase_SumFac_Tri() final = default;
 
     /**
      * This method calculates:
@@ -1189,9 +1171,7 @@ private:
           m_derbase0(m_stdExp->GetBasis(0)->GetDbdata()),
           m_derbase1(m_stdExp->GetBasis(1)->GetDbdata())
     {
-        LibUtilities::PointsKeyVector PtsKey = m_stdExp->GetPointsKeys();
-        m_coordim                            = pCollExp[0]->GetCoordim();
-
+        m_coordim  = pCollExp[0]->GetCoordim();
         m_derivFac = pGeomData->GetDerivFactors(pCollExp);
         m_jacWStdW = pGeomData->GetJacWithStdWeights(pCollExp);
         m_wspSize =
@@ -1246,9 +1226,7 @@ class IProductWRTDerivBase_SumFac_Hex final : public Operator
 public:
     OPERATOR_CREATE(IProductWRTDerivBase_SumFac_Hex)
 
-    ~IProductWRTDerivBase_SumFac_Hex() final
-    {
-    }
+    ~IProductWRTDerivBase_SumFac_Hex() final = default;
 
     void operator()(const Array<OneD, const NekDouble> &entry0,
                     Array<OneD, NekDouble> &entry1,
@@ -1680,9 +1658,7 @@ class IProductWRTDerivBase_SumFac_Prism final : public Operator
 public:
     OPERATOR_CREATE(IProductWRTDerivBase_SumFac_Prism)
 
-    ~IProductWRTDerivBase_SumFac_Prism() final
-    {
-    }
+    ~IProductWRTDerivBase_SumFac_Prism() final = default;
 
     /**
      * This method calculates:
@@ -1927,9 +1903,7 @@ class IProductWRTDerivBase_SumFac_Pyr final : public Operator
 public:
     OPERATOR_CREATE(IProductWRTDerivBase_SumFac_Pyr)
 
-    ~IProductWRTDerivBase_SumFac_Pyr() final
-    {
-    }
+    ~IProductWRTDerivBase_SumFac_Pyr() final = default;
 
     /**
      * This method calculates:

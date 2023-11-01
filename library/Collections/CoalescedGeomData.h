@@ -59,9 +59,9 @@ enum GeomData
 class CoalescedGeomData
 {
 public:
-    CoalescedGeomData(void);
+    CoalescedGeomData(void) = default;
 
-    virtual ~CoalescedGeomData(void);
+    virtual ~CoalescedGeomData(void) = default;
 
     const Array<OneD, const NekDouble> &GetJac(
         std::vector<StdRegions::StdExpansionSharedPtr> &pColLExp);
@@ -85,8 +85,6 @@ private:
     std::map<GeomData, Array<TwoD, NekDouble>> m_twoDGeomData;
     std::map<GeomData, std::shared_ptr<VecVec_t>> m_oneDGeomDataInterLeave;
     std::map<GeomData, std::shared_ptr<VecVec_t>> m_twoDGeomDataInterLeave;
-    bool m_deformed;
-    bool m_isDeformedSet{false};
 };
 
 typedef std::shared_ptr<CoalescedGeomData> CoalescedGeomDataSharedPtr;

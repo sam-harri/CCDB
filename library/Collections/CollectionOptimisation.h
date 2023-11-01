@@ -56,9 +56,7 @@ public:
     }
 
     /// Destructor
-    ~OpImpTimingKey(void)
-    {
-    }
+    ~OpImpTimingKey(void) = default;
 
     LibUtilities::ShapeType GetShapeType(void) const
     {
@@ -128,7 +126,7 @@ public:
         LibUtilities::SessionReaderSharedPtr pSession, const int shapedim,
         ImplementationType defaultType = eStdMat);
 
-    ~CollectionOptimisation(){};
+    ~CollectionOptimisation() = default;
 
     ImplementationType GetDefaultImplementationType()
     {

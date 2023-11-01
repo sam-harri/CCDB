@@ -110,7 +110,6 @@ NEK_FORCE_INLINE static void BwdTransTriKernel(
 
             if (correct)
             {
-                // p_sum += coef * basis0 * basis1
                 p_sum.fma(in[1] * basis0[nq0 + eta0], basis1[nq1 + eta1]);
             }
 
@@ -299,11 +298,6 @@ NEK_FORCE_INLINE static void BwdTransTetKernel(
                 {
                     // top vertex
                     //
-                    // sum += inarray[1] * base2[nquad2 + k] * (
-                    //     base0[i] * base1[nquad1+j] +
-                    //     base0[nquad0+i] * base1[j] +
-                    //     base0[nquad0+i] * base1[nquad1+j]);
-
                     vec_t tmp1 = basis0[i] * basis1[nq1 + j];   // Load 2x
                     tmp1.fma(basis0[nq0 + i], basis1[j]);       // Load 2x
                     tmp1.fma(basis0[nq0 + i], basis1[nq1 + j]); // Load 2x
@@ -314,8 +308,6 @@ NEK_FORCE_INLINE static void BwdTransTetKernel(
 
                     // bottom vertex
                     //
-                    // sum += inarray[order2] * base2[k] * (
-                    //     base0[nquad0+i] * base1[nquad1+j]);
                     tmp1     = basis0[nq0 + i] * basis1[nq1 + j]; // Load 2x
                     tmp1     = tmp1 * basis2[k];                  // Load 1x
                     inarray1 = in[nm2];                           // Load 1x
@@ -324,8 +316,6 @@ NEK_FORCE_INLINE static void BwdTransTetKernel(
                     // singular edge
                     for (int r = 1; r < nm2 - 1; ++r)
                     {
-                        // sum += inarray[order2+r] * base2[(r+1)*nquad2+k] *
-                        //     base1[nquad1+j] * base0[nquad0+i];
                         tmp1     = basis1[nq1 + j] * basis0[nq0 + i]; // Load 2x
                         tmp1     = tmp1 * basis2[(r + 1) * nq2 + k];  // Load 1x
                         inarray1 = in[nm2 + r];                       // Load 1x
@@ -486,10 +476,6 @@ NEK_FORCE_INLINE static void BwdTransPyrKernel(
                 {
                     // top vertex
                     //
-                    // sum += inarray[1] * base2[nquad2 + k] * (
-                    //     base0[i] * base1[nquad1+j] +
-                    //     base0[nquad0+i] * base1[j] +
-                    //     base0[nquad0+i] * base1[nquad1+j]);
                     vec_t tmp1 = basis0[i] * basis1[nq1 + j];   // Load 2x
                     tmp1.fma(basis0[nq0 + i], basis1[j]);       // Load 2x
                     tmp1.fma(basis0[nq0 + i], basis1[nq1 + j]); // Load 2x
