@@ -255,7 +255,7 @@ void ForcingIncNSSyntheticEddy::v_Apply(
     unsigned int nqTot = pFields[0]->GetTotPoints();
 
     // Only apply in the first time step and when an eddy leaves
-    // the box
+    // the synthetic eddy region (box).
     if (m_calcForcing)
     {
         CalculateForcing(pFields);
@@ -267,7 +267,7 @@ void ForcingIncNSSyntheticEddy::v_Apply(
         m_calcForcing = false;
     }
 
-    // Check for update
+    // Update eddies position inside the box.
     UpdateEddiesPositions();
 }
 
@@ -300,7 +300,9 @@ void ForcingIncNSSyntheticEddy::CalculateForcing(
     Array<OneD, Array<OneD, NekDouble>> smoothFac;
     smoothFac = ComputeSmoothingFactor(pFields, convTurbTime);
 
-    // Check if eddies left the box
+    // Check if eddies left the box. Note that the member m_eddiesIDForcing
+    // is populate with the eddies that left the box. If any left it is going
+    // to be empty
     if (!m_eddiesIDForcing.empty())
     {
         // Clean the m_Forcing member
@@ -501,10 +503,11 @@ Array<OneD, Array<OneD, NekDouble>> ForcingIncNSSyntheticEddy::
     Array<OneD, Array<OneD, NekDouble>> stochasticSignal(m_N);
     // Random numbers: -1 and 1
     Array<OneD, Array<OneD, int>> epsilonSign;
-
+    
+    // Generate only for the new eddies after the first time step
     epsilonSign = GenerateRandomOneOrMinusOne();
 
-    // Calculate the stochastic signal for the eddies.
+    // Calculate the stochastic signal for the eddies
     for (auto &n : m_eddiesIDForcing)
     {
         stochasticSignal[n] = Array<OneD, NekDouble>(nqTot * m_spacedim, 0.0);
@@ -679,7 +682,7 @@ Array<OneD, Array<OneD, int>> ForcingIncNSSyntheticEddy::
     for (size_t j = 0; j < m_spacedim; ++j)
     {
         epsilonSign[j] = Array<OneD, int>(m_N, 0.0);
-        for (size_t n = 0; n < m_N; ++n)
+        for (auto &n : m_eddiesIDForcing)
         {
             // Convert to -1 or to 1
             epsilonSign[j][n] =
