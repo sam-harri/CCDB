@@ -102,14 +102,6 @@ protected:
     Array<OneD, Array<OneD, NekDouble>> ComputeVelocityFluctuation(
         const Array<OneD, MultiRegions::ExpListSharedPtr> &pFields,
         Array<OneD, Array<OneD, NekDouble>> stochasticSignal);
-    /// Compute Velocity Fluctuation
-    Array<OneD, Array<OneD, NekDouble>> ComputeDensityFluctuation(
-        const Array<OneD, MultiRegions::ExpListSharedPtr> &pFields,
-        Array<OneD, Array<OneD, NekDouble>> &velFLuc,
-        std::pair<NekDouble, NekDouble> rhoMachMean);
-    /// Compute rho and mach mean
-    std::pair<NekDouble, NekDouble> ComputeRhoMachMean(
-        const Array<OneD, MultiRegions::ExpListSharedPtr> &pFields);
     /// Compute Characteristic Convective Turbulent Time
     Array<OneD, Array<OneD, NekDouble>> ComputeCharConvTurbTime(
         const Array<OneD, MultiRegions::ExpListSharedPtr> &pFields);
