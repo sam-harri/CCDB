@@ -455,7 +455,7 @@ Array<OneD, Array<OneD, NekDouble>> ForcingIncNSSyntheticEddy::
     int nqTot = pFields[0]->GetTotPoints();
     // Velocity fluctuation vector
     Array<OneD, Array<OneD, NekDouble>> velFluc(m_N);
-    // Control loop for the m_Cholesky
+    // Control loop for the m_Cholesky (Cholesky decomposition matrix)
     int l;
 
     for (auto &n : m_eddiesIDForcing)
@@ -568,7 +568,7 @@ void ForcingIncNSSyntheticEddy::UpdateEddiesPositions()
     // inside the box when they are regenerated.
     // Should include the radius of the eddy, which is 0.41 of the
     // boundary layer thickness. 
-    NekDouble tol = m_lref[0] * 0.15; 
+    NekDouble tol = m_lref[0] * 0.2; 
 
     for (size_t n = 0; n < m_N; ++n)
     {
