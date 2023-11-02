@@ -58,14 +58,14 @@ Below it is shown how to define the Synthetic Eddy Method for a fully three-dime
 In order to define the Reynolds stresses (\inltt{ReynoldsStresses} tag) and the characteristic length scales  (\inltt{CharLengthScales} tag) of the eddies, the name of the functions which define them must be given. These functions must be placed under the   \inltt{CONDITIONS} tag. Both functions are provided below. It is worthy mentioning that it is possible to define space-dependent functions for each Reynolds stress. In other words, the user can, for instance, provide the analytical solution of the Reynolds stresses close to the wall (boundary). This information is essential to calculate the velocity fluctuations. 
 
 \begin{lstlisting}[style=XMLStyle] 
-    <FUNCTION NAME="ReynoldsStresses">
+<FUNCTION NAME="ReynoldsStresses">
     <E VAR="r00" VALUE="1e-6" />
     <E VAR="r10" VALUE="10*y" />
     <E VAR="r20" VALUE="0.0"  />
     <E VAR="r11" VALUE="1e-6" />
     <E VAR="r21" VALUE="0.0"  />
     <E VAR="r22" VALUE="1e-6" />
-    </FUNCTION>
+ </FUNCTION>
 \end{lstlisting}
 
 Also, in the Synthetic Eddy Method implemented here, an isotropic or anisotropic turbulence can be described depending on the values provided in the characteristic length scale function.  For an isotropic turbulence, all the values must be the same.
