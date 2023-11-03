@@ -26,6 +26,7 @@ v5.5.0
 **FieldConvert**
 - Fix typo in user-guide and fix but for parallel-in-time FieldConvert (!1645)
 - Fixed FieldConvert -m addfld (!1500)
+- Fix tecplot output for line and plane points (!1497)
 
 **CI**
 - Disable macOS Intel runner (!1655)
