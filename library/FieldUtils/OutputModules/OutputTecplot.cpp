@@ -176,14 +176,17 @@ void OutputTecplot::v_OutputFromPts(po::variables_map &vm)
             m_zoneType = eOrdered;
             break;
         case LibUtilities::ePtsLine:
-            m_numPoints.resize(1);
+            m_numPoints.resize(3);
             m_numPoints[0] = fPts->GetPointsPerEdge(0);
+            m_numPoints[1] = 1;
+            m_numPoints[2] = 1;
             m_zoneType     = eOrdered;
             break;
         case LibUtilities::ePtsPlane:
-            m_numPoints.resize(2);
+            m_numPoints.resize(3);
             m_numPoints[0] = fPts->GetPointsPerEdge(0);
             m_numPoints[1] = fPts->GetPointsPerEdge(1);
+            m_numPoints[2] = 1;
             m_zoneType     = eOrdered;
             break;
         case LibUtilities::ePtsBox:
