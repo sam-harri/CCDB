@@ -129,6 +129,7 @@ public:
     /// Destructor
     virtual ~FileSolution();
 
+protected:
     virtual void v_GetVelocity(
         const Array<OneD, const Array<OneD, NekDouble>> &physfield,
         Array<OneD, Array<OneD, NekDouble>> &velocity) override;
@@ -137,17 +138,17 @@ public:
         const Array<OneD, const Array<OneD, NekDouble>> &physfield,
         Array<OneD, NekDouble> &pressure) override;
 
+    using SolverUtils::EquationSystem::v_GetPressure;
+
     virtual void v_GetDensity(
         const Array<OneD, const Array<OneD, NekDouble>> &physfield,
         Array<OneD, NekDouble> &density) override;
 
     virtual bool v_HasConstantDensity() override;
 
-protected:
     /// Session reader
-    SOLVER_UTILS_EXPORT FileSolution(
-        const LibUtilities::SessionReaderSharedPtr &pSession,
-        const SpatialDomains::MeshGraphSharedPtr &pGraph);
+    FileSolution(const LibUtilities::SessionReaderSharedPtr &pSession,
+                 const SpatialDomains::MeshGraphSharedPtr &pGraph);
 
     /// Compute the RHS
     void DoOdeRhs(const Array<OneD, const Array<OneD, NekDouble>> &inarray,
@@ -165,24 +166,21 @@ protected:
         NekDouble lambda);
 
     /// Initialise the object
-    SOLVER_UTILS_EXPORT virtual void v_InitObject(
-        bool DeclareField = true) override;
+    virtual void v_InitObject(bool DeclareField = true) override;
 
-    SOLVER_UTILS_EXPORT virtual bool v_PostIntegrate(int step) override;
+    virtual bool v_PostIntegrate(int step) override;
 
-    SOLVER_UTILS_EXPORT virtual bool v_RequireFwdTrans() override;
+    virtual bool v_RequireFwdTrans() override;
 
-    SOLVER_UTILS_EXPORT virtual void v_DoInitialise(
-        bool dumpInitialConditions) override;
+    virtual void v_DoInitialise(bool dumpInitialConditions) override;
 
     void UpdateField(NekDouble time);
 
+private:
     FileFieldInterpolatorSharedPtr m_solutionFile;
     std::set<std::string> m_variableFile;
     Array<OneD, Array<OneD, NekDouble>> m_coord;
     std::map<std::string, LibUtilities::EquationSharedPtr> m_solutionFunction;
-
-private:
 };
 } // namespace SolverUtils
 } // namespace Nektar
