@@ -24,9 +24,13 @@ IF( NEKTAR_SOLVER_ADR )
         ./EquationSystems/UnsteadyViscousBurgers.cpp
         ./EquationSystems/EigenValuesAdvection.cpp)
 
+    ADD_NEKTAR_PERFORMANCE_TEST(Perf_CubeAllElements)
+
     # Parallel-in-time solver
     IF (NEKTAR_USE_MPI)
         ADD_NEKTAR_TEST(PFASSTDriverUnsteadyAdvection1D)
+        ADD_NEKTAR_TEST(PFASSTDriverUnsteadyAdvection2D)
+        ADD_NEKTAR_TEST(PararealDriverUnsteadyAdvection2D)
         ADD_NEKTAR_TEST(PararealDriverImDiffusion_m6_iter0)
         ADD_NEKTAR_TEST(PararealDriverImDiffusion_m6_iter2)
         ADD_NEKTAR_TEST(PararealDriverImDiffusion_m6_iter4)
@@ -37,6 +41,15 @@ IF( NEKTAR_SOLVER_ADR )
         ADD_NEKTAR_TEST(PararealDriverImDiffusion_m12_partition_iter2)
         ADD_NEKTAR_TEST(PararealDriverImDiffusion_m12_partition_iter4)
     ENDIF()
+
+    # SDC time-integration
+    ADD_NEKTAR_TEST(UnsteadyAdvection2D_ExplicitSDCGaussLobattoLegendre)
+    ADD_NEKTAR_TEST(UnsteadyAdvection2D_ExplicitSDCGaussRadauLegendre)
+    ADD_NEKTAR_TEST(UnsteadyAdvection2D_ExplicitSDCGaussGaussLegendre)
+    ADD_NEKTAR_TEST(UnsteadyDiffusion2D_ImplicitSDCGaussRadauLegendre)
+    ADD_NEKTAR_TEST(UnsteadyDiffusion2D_ImplicitSDCGaussGaussLegendre)
+    ADD_NEKTAR_TEST(UnsteadyAdvectionDiffusion2D_IMEXSDCGaussRadauLegendre)
+    ADD_NEKTAR_TEST(UnsteadyAdvectionDiffusion2D_IMEXSDCGaussGaussLegendre)
 
     # IMEXdirk time-integration
     ADD_NEKTAR_TEST(UnsteadyAdvectionDiffusion2D_IMEXdirk_1_1_1)
@@ -139,6 +152,8 @@ IF( NEKTAR_SOLVER_ADR )
     # face rotation test
     ADD_NEKTAR_TEST(Advection3D_DG_hex_faceRotation1122)
     ADD_NEKTAR_TEST(Advection3D_DG_hex_faceRotation1221)
+    ADD_NEKTAR_TEST(Advection3D_DG_hex_varP_faceRotation1122)
+    ADD_NEKTAR_TEST(Advection3D_DG_hex_varP_faceRotation1221)
     ADD_NEKTAR_TEST(Advection3D_DG_prism)
 
     # 1D inviscid Burger (DG/FR)
@@ -301,8 +316,10 @@ IF( NEKTAR_SOLVER_ADR )
         IF (NEKTAR_USE_HDF5)
             ADD_NEKTAR_TEST(Advection3D_m10_DG_prism_VarP_hdf)
             ADD_NEKTAR_TEST(Movement_fixed_3D_stacked_cylinders_curved_hdf5)
-            if (NOT APPLE OR NOT CMAKE_SYSTEM_PROCESSOR MATCHES "arm64")
-                ADD_NEKTAR_TEST(Movement_fixed_3D_stacked_cylinders_curved_hdf5_par)
+            ADD_NEKTAR_TEST(PararealDriver_Movement_fixed_3D_stacked_cylinders_curved_hdf5)
+            IF (NOT APPLE OR NOT CMAKE_SYSTEM_PROCESSOR MATCHES "arm64")
+                #ADD_NEKTAR_TEST(Movement_fixed_3D_stacked_cylinders_curved_hdf5_par)
+                ADD_NEKTAR_TEST(PararealDriver_Movement_fixed_3D_stacked_cylinders_curved_hdf5_par)
             ENDIF()
         ENDIF()
         ADD_NEKTAR_TEST(RotPerBcs3D_Annulus LENGTHY)

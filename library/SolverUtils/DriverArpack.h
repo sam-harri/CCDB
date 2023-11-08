@@ -75,7 +75,7 @@ protected:
                  const SpatialDomains::MeshGraphSharedPtr pGraph);
 
     /// Destructor
-    virtual ~DriverArpack();
+    virtual ~DriverArpack() = default;
 
     /// Virtual function for initialisation implementation.
     virtual void v_InitObject(std::ostream &out = std::cout) override;

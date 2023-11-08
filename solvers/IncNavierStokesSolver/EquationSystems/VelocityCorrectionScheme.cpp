@@ -166,6 +166,7 @@ void VelocityCorrectionScheme::SetUpExtrapolation()
 
         m_extrapolation->SetForcing(m_forcing);
         m_extrapolation->SubSteppingTimeIntegration(m_intScheme);
+        m_extrapolation->GenerateBndElmtExpansion();
         m_extrapolation->GenerateHOPBCMap(m_session);
     }
 }
@@ -886,40 +887,12 @@ void VelocityCorrectionScheme::v_SolveViscous(
     MultiRegions::VarFactorsMap varFactorsMap = MultiRegions::NullVarFactorsMap;
 
     AppendSVVFactors(factors, varFactorsMap);
-
-    // Calculate Normal velocity at Trace for GJP explicit stabiliation
-    if (m_useGJPNormalVel)
-    {
-        MultiRegions::ContFieldSharedPtr cfield =
-            std::dynamic_pointer_cast<MultiRegions::ContField>(m_fields[0]);
-
-        MultiRegions::GJPStabilisationSharedPtr GJPData =
-            cfield->GetGJPForcing();
-
-        int nTracePts = GJPData->GetNumTracePts();
-        Array<OneD, NekDouble> unorm(nTracePts, 1.0);
-        Array<OneD, NekDouble> Fwd(nTracePts), Bwd(nTracePts);
-        Array<OneD, Array<OneD, NekDouble>> traceNormals =
-            GJPData->GetTraceNormals();
-
-        m_fields[0]->GetFwdBwdTracePhys(inarray[0], Fwd, Bwd, true, true);
-        Vmath::Vmul(nTracePts, Fwd, 1, traceNormals[0], 1, unorm, 1);
-
-        // Evaluate u.n on trace
-        for (int f = 1; f < m_fields[0]->GetCoordim(0); ++f)
-        {
-            m_fields[0]->GetFwdBwdTracePhys(inarray[f], Fwd, Bwd, true, true);
-            Vmath::Vvtvp(nTracePts, Fwd, 1, traceNormals[f], 1, unorm, 1, unorm,
-                         1);
-        }
-        Vmath::Vabs(nTracePts, unorm, 1, unorm, 1);
-        varCoeffMap[StdRegions::eVarCoeffGJPNormVel] = unorm;
-    }
+    ComputeGJPNormalVelocity(inarray, varCoeffMap);
 
     // Solve Helmholtz system and put in Physical space
     for (int i = 0; i < m_nConvectiveFields; ++i)
     {
-        // test by adding GJP implicit
+        // Add diffusion coefficient to GJP matrix operator (Implicit part)
         if (m_useGJPStabilisation)
         {
             factors[StdRegions::eFactorGJP] = m_GJPJumpScale / m_diffCoeff[i];
@@ -1181,6 +1154,45 @@ void VelocityCorrectionScheme::AppendSVVFactors(
                     m_svvVarDiffCoeff;
             }
         }
+    }
+}
+
+/*
+ * Calculate Normal velocity on Trace (boundary of elements)
+ * for GJP stabilisation.
+ * We only use this for explicit stabilisation. The Semi-Implicit
+ * operator uses a constant u_{norm} = 1.0
+ */
+void VelocityCorrectionScheme::ComputeGJPNormalVelocity(
+    const Array<OneD, const Array<OneD, NekDouble>> &inarray,
+    StdRegions::VarCoeffMap &varcoeffs)
+{
+    if (m_useGJPNormalVel)
+    {
+        MultiRegions::ContFieldSharedPtr cfield =
+            std::dynamic_pointer_cast<MultiRegions::ContField>(m_fields[0]);
+
+        MultiRegions::GJPStabilisationSharedPtr GJPData =
+            cfield->GetGJPForcing();
+
+        int nTracePts = GJPData->GetNumTracePts();
+        Array<OneD, NekDouble> unorm(nTracePts, 1.0);
+        Array<OneD, NekDouble> Fwd(nTracePts), Bwd(nTracePts);
+        Array<OneD, Array<OneD, NekDouble>> traceNormals =
+            GJPData->GetTraceNormals();
+
+        m_fields[0]->GetFwdBwdTracePhys(inarray[0], Fwd, Bwd, true, true);
+        Vmath::Vmul(nTracePts, Fwd, 1, traceNormals[0], 1, unorm, 1);
+
+        // Evaluate u.n on trace
+        for (int f = 1; f < m_fields[0]->GetCoordim(0); ++f)
+        {
+            m_fields[0]->GetFwdBwdTracePhys(inarray[f], Fwd, Bwd, true, true);
+            Vmath::Vvtvp(nTracePts, Fwd, 1, traceNormals[f], 1, unorm, 1, unorm,
+                         1);
+        }
+        Vmath::Vabs(nTracePts, unorm, 1, unorm, 1);
+        varcoeffs[StdRegions::eVarCoeffGJPNormVel] = unorm;
     }
 }
 } // namespace Nektar

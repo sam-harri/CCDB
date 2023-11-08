@@ -56,7 +56,7 @@ InterfaceMapDG::InterfaceMapDG(
     const ExpListSharedPtr &trace)
     : m_graph(meshGraph), m_movement(meshGraph->GetMovement()), m_trace(trace)
 {
-    auto comm                = m_trace->GetComm();
+    auto comm                = m_trace->GetComm()->GetSpaceComm();
     auto interfaceCollection = m_movement->GetInterfaces();
 
     // myIndxLR contains the info about what interface edges are present on
@@ -197,7 +197,7 @@ InterfaceMapDG::InterfaceMapDG(
 
 void InterfaceMapDG::ExchangeCoords()
 {
-    auto comm  = m_trace->GetComm();
+    auto comm  = m_trace->GetComm()->GetSpaceComm();
     auto zones = m_movement->GetZones();
 
     for (auto &interfaceTrace : m_localInterfaces)
@@ -432,7 +432,7 @@ void InterfaceExchange::SendMissing(
 void InterfaceMapDG::ExchangeTrace(Array<OneD, NekDouble> &Fwd,
                                    Array<OneD, NekDouble> &Bwd)
 {
-    auto comm = m_trace->GetComm();
+    auto comm = m_trace->GetComm()->GetSpaceComm();
 
     // If no parallel exchange needed we only fill the local traces
     if (m_exchange.empty())

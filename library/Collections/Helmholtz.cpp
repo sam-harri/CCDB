@@ -34,12 +34,11 @@
 
 #include <boost/core/ignore_unused.hpp>
 
-#include <MatrixFreeOps/Operator.hpp>
-
 #include <Collections/Collection.h>
 #include <Collections/IProduct.h>
 #include <Collections/MatrixFreeBase.h>
 #include <Collections/Operator.h>
+#include <MatrixFreeOps/Operator.hpp>
 
 using namespace std;
 
@@ -64,9 +63,7 @@ class Helmholtz_NoCollection final : public Operator
 public:
     OPERATOR_CREATE(Helmholtz_NoCollection)
 
-    ~Helmholtz_NoCollection() final
-    {
-    }
+    ~Helmholtz_NoCollection() final = default;
 
     void operator()(const Array<OneD, const NekDouble> &entry0,
                     Array<OneD, NekDouble> &entry1,
@@ -165,9 +162,7 @@ class Helmholtz_IterPerExp final : public Operator
 public:
     OPERATOR_CREATE(Helmholtz_IterPerExp)
 
-    ~Helmholtz_IterPerExp() final
-    {
-    }
+    ~Helmholtz_IterPerExp() final = default;
 
     void operator()(const Array<OneD, const NekDouble> &input,
                     Array<OneD, NekDouble> &output,
@@ -301,7 +296,6 @@ public:
                 // calculate Iproduct WRT Std Deriv
                 for (int j = 0; j < m_dim; ++j)
                 {
-
                     // multiply by Jacobian
                     Vmath::Vmul(nPhys, m_jac + i * nPhys, 1, dtmp[j], 1,
                                 dtmp[j], 1);
@@ -496,10 +490,9 @@ private:
                          StdRegions::FactorMap factors)
         : Operator(pCollExp, pGeomData, factors)
     {
-        LibUtilities::PointsKeyVector PtsKey = m_stdExp->GetPointsKeys();
-        m_dim                                = PtsKey.size();
-        m_coordim                            = pCollExp[0]->GetCoordim();
-        int nqtot                            = m_stdExp->GetTotPoints();
+        m_dim     = pCollExp[0]->GetShapeDimension();
+        m_coordim = pCollExp[0]->GetCoordim();
+        int nqtot = m_stdExp->GetTotPoints();
 
         m_derivFac = pGeomData->GetDerivFactors(pCollExp);
         m_jac      = pGeomData->GetJac(pCollExp);
@@ -553,9 +546,7 @@ class Helmholtz_MatrixFree final : public Operator, MatrixFreeOneInOneOut
 public:
     OPERATOR_CREATE(Helmholtz_MatrixFree)
 
-    ~Helmholtz_MatrixFree() final
-    {
-    }
+    ~Helmholtz_MatrixFree() final = default;
 
     void operator()(const Array<OneD, const NekDouble> &input,
                     Array<OneD, NekDouble> &output0,

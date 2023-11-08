@@ -243,15 +243,16 @@ void LocTraceToTraceMap::Setup(
                     {
                         toPointsKey0 = elmttrace->GetBasis(0)->GetPointsKey();
                         toPointsKey1 = elmttrace->GetBasis(1)->GetPointsKey();
+                        P[0]         = elmttrace->GetBasisNumModes(0);
+                        P[1]         = elmttrace->GetBasisNumModes(1);
                     }
                     else // transpose points key evaluation
                     {
                         toPointsKey0 = elmttrace->GetBasis(1)->GetPointsKey();
                         toPointsKey1 = elmttrace->GetBasis(0)->GetPointsKey();
+                        P[0]         = elmttrace->GetBasisNumModes(1);
+                        P[1]         = elmttrace->GetBasisNumModes(0);
                     }
-
-                    P[0] = elmttrace->GetBasisNumModes(0);
-                    P[1] = elmttrace->GetBasisNumModes(1);
                 }
                 break;
             }
@@ -270,7 +271,9 @@ void LocTraceToTraceMap::Setup(
             // to elements
             Array<OneD, unsigned int> map;
             Array<OneD, int> sign;
-
+            // Test shows we should swap P0 and P1 before calling
+            // GetTraceToElementMap if orientation is transposed.
+            // This is contrary to ReOrientTracePhysMap
             elmt->GetTraceToElementMap(e, map, sign, orient, P[0], P[1]);
 
             int order_t  = elmttrace->GetNcoeffs();
@@ -375,9 +378,20 @@ void LocTraceToTraceMap::Setup(
 
             StdRegions::Orientation orient = elmt->GetTraceOrient(e);
 
-            elmt->ReOrientTracePhysMap(orient, locTraceToTraceMap,
-                                       toPointsKey0.GetNumPoints(),
-                                       toPointsKey1.GetNumPoints());
+            // toPoints have already been swapped. But here we need original
+            // elmttrace points (w.r.t local axes). So swap back if orient >= 9
+            if (orient >= 9)
+            {
+                elmt->ReOrientTracePhysMap(orient, locTraceToTraceMap,
+                                           toPointsKey1.GetNumPoints(),
+                                           toPointsKey0.GetNumPoints());
+            }
+            else
+            {
+                elmt->ReOrientTracePhysMap(orient, locTraceToTraceMap,
+                                           toPointsKey0.GetNumPoints(),
+                                           toPointsKey1.GetNumPoints());
+            }
 
             int offset = trace->GetPhys_Offset(elmtToTrace[n][e]->GetElmtId());
 
@@ -456,7 +470,9 @@ void LocTraceToTraceMap::Setup(
                             m_interpTraceI0[set][cnt1] =
                                 LibUtilities::PointsManager()[fromPointsKey0]
                                     ->GetI(toPointsKey0);
-
+                            m_interpFromTraceI0[set][cnt1] =
+                                LibUtilities::PointsManager()[toPointsKey0]
+                                    ->GetI(fromPointsKey0);
                             // Check to see if we can
                             // just interpolate endpoint
                             if ((fromPointsKey0.GetPointsType() ==
@@ -484,17 +500,6 @@ void LocTraceToTraceMap::Setup(
                                                  &m_interpEndPtI0[set][cnt1][0],
                                                  1);
                                 }
-                            }
-                            else
-                            {
-                                m_interpTrace[set][cnt1] = eInterpDir0;
-                                m_interpTraceI0[set][cnt1] =
-                                    LibUtilities::PointsManager()
-                                        [fromPointsKey0]
-                                            ->GetI(toPointsKey0);
-                                m_interpFromTraceI0[set][cnt1] =
-                                    LibUtilities::PointsManager()[toPointsKey0]
-                                        ->GetI(fromPointsKey0);
                             }
                         }
                     }
@@ -1263,7 +1268,7 @@ void LocTraceToTraceMap::InterpLocFacesToTrace(
                 case eInterpDir0:
                 {
                     DNekMatSharedPtr I0 = m_interpTraceI0[dir][i];
-                    Blas::Dgemm('N', 'N', tnp0, tnp1, fnp0, 1.0,
+                    Blas::Dgemm('N', 'N', tnp0, tnp1 * nfaces, fnp0, 1.0,
                                 I0->GetPtr().get(), tnp0, locfaces.get() + cnt,
                                 fnp0, 0.0, tmp.get() + cnt1, tnp0);
                 }

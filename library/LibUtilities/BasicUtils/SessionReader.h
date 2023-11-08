@@ -180,8 +180,6 @@ public:
     LIB_UTILITIES_EXPORT const std::vector<std::string> &GetFilenames() const;
     /// Returns the session name of the loaded XML document.
     LIB_UTILITIES_EXPORT const std::string &GetSessionName() const;
-    /// Returns the session name with process rank
-    LIB_UTILITIES_EXPORT const std::string GetSessionNameRank() const;
     /// Returns the communication object.
     LIB_UTILITIES_EXPORT CommSharedPtr GetComm();
     /// Returns if file system shared
@@ -266,7 +264,6 @@ public:
     LIB_UTILITIES_EXPORT bool GetBackups() const;
 
     /* ----GlobalSysSolnInfo ----- */
-
     LIB_UTILITIES_EXPORT bool DefinesGlobalSysSolnInfo(
         const std::string &variable, const std::string &property) const;
 
@@ -279,26 +276,6 @@ public:
 
     /* ------ GEOMETRIC INFO ------ */
     LIB_UTILITIES_EXPORT std::string GetGeometryType() const;
-    /// Checks if a geometric info property is defined.
-    LIB_UTILITIES_EXPORT bool DefinesGeometricInfo(
-        const std::string &name) const;
-    /// Checks for and load a geometric info string property.
-    LIB_UTILITIES_EXPORT void LoadGeometricInfo(
-        const std::string &name, std::string &var,
-        const std::string &def = "") const;
-    /// Checks for and loads a geometric info boolean property.
-    LIB_UTILITIES_EXPORT void LoadGeometricInfo(const std::string &name,
-                                                bool &var,
-                                                const bool &def = false) const;
-    /// Checks for and loads a geometric info double-precision property.
-    LIB_UTILITIES_EXPORT void LoadGeometricInfo(
-        const std::string &name, NekDouble &var,
-        const NekDouble &def = 0.0) const;
-    /// Check if the value of a geometric info string property matches.
-    LIB_UTILITIES_EXPORT void MatchGeometricInfo(const std::string &name,
-                                                 const std::string &trueval,
-                                                 bool &var,
-                                                 const bool &def = false) const;
 
     /* ------ VARIABLES ------ */
     /// Returns the name of the variable specified by the given index.
@@ -395,14 +372,15 @@ public:
     }
 
     /// Get time level (Parallel-in-Time)
-    LIB_UTILITIES_EXPORT int GetTimeLevel(void)
+    LIB_UTILITIES_EXPORT size_t GetTimeLevel(void) const
     {
         return m_timeLevel;
     }
 
     /// Get XML elment time level (Parallel-in-Time)
     LIB_UTILITIES_EXPORT static void GetXMLElementTimeLevel(
-        TiXmlElement *&element, const int timeLevel);
+        TiXmlElement *&element, const size_t timeLevel,
+        const bool enableCheck = true);
 
 private:
     boost::program_options::variables_map m_cmdLineOptions;
@@ -433,8 +411,8 @@ private:
     FilterMap m_filters;
     /// Time integration scheme information.
     TimeIntScheme m_timeIntScheme;
-    /// Time leven
-    int m_timeLevel = 0;
+    /// Time level.
+    size_t m_timeLevel = 0;
     /// Be verbose
     bool m_verbose;
     /// Running on a shared filesystem
@@ -443,6 +421,7 @@ private:
     bool m_backups = true;
     /// Update optimisation file
     bool m_updateOptFile;
+
     /// String to enumeration map for Solver Info parameters.
     LIB_UTILITIES_EXPORT static EnumMapList &GetSolverInfoEnums();
     /// Default solver info options.
@@ -471,10 +450,10 @@ private:
         const std::vector<std::string> &pFilenames) const;
     /// Loads and parses the specified file.
     LIB_UTILITIES_EXPORT void ParseDocument();
+
     /// Loads the given XML document and instantiates an appropriate
     /// communication object.
     LIB_UTILITIES_EXPORT void CreateComm(int &argc, char *argv[]);
-
     /// Partitions the comm object based on session parameters.
     LIB_UTILITIES_EXPORT void PartitionComm();
 

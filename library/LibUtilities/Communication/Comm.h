@@ -101,6 +101,7 @@ public:
 
     LIB_UTILITIES_EXPORT inline bool TreatAsRankZero();
     LIB_UTILITIES_EXPORT inline bool IsSerial();
+    LIB_UTILITIES_EXPORT inline bool IsParallelInTime();
     LIB_UTILITIES_EXPORT inline std::tuple<int, int, int> GetVersion();
 
     /// Block execution until all processes reach this point
@@ -297,6 +298,14 @@ inline bool Comm::TreatAsRankZero()
 inline bool Comm::IsSerial()
 {
     return v_IsSerial();
+}
+
+/**
+ *
+ */
+inline bool Comm::IsParallelInTime()
+{
+    return m_commTime.get();
 }
 
 /**

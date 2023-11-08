@@ -75,6 +75,7 @@ void VCSMapping::v_InitObject(bool DeclareField)
         vExtrapolation, m_session, m_fields, m_pressure, m_velocity,
         m_advObject);
     m_extrapolation->SubSteppingTimeIntegration(m_intScheme);
+    m_extrapolation->GenerateBndElmtExpansion();
     m_extrapolation->GenerateHOPBCMap(m_session);
 
     // Storage to extrapolate pressure forcing

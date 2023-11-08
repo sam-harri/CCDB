@@ -55,9 +55,9 @@ string NekLinSysIterGMRESLoc::className =
 
 NekLinSysIterGMRESLoc::NekLinSysIterGMRESLoc(
     const LibUtilities::SessionReaderSharedPtr &pSession,
-    const LibUtilities::CommSharedPtr &vComm, const int nDimen,
+    const LibUtilities::CommSharedPtr &vRowComm, const int nDimen,
     const NekSysKey &pKey)
-    : NekLinSysIter(pSession, vComm, nDimen, pKey)
+    : NekLinSysIter(pSession, vRowComm, nDimen, pKey)
 {
     std::vector<std::string> variables(1);
     variables[0]    = pSession->GetVariable(0);
@@ -196,7 +196,7 @@ int NekLinSysIterGMRESLoc::DoGMRES(const int nLocal,
         m_operator.DoAssembleLoc(r0, wk, true);
         NekDouble vExchange = Vmath::Dot(nLocal, wk, r0);
 
-        m_Comm->AllReduce(vExchange, LibUtilities::ReduceSum);
+        m_rowComm->AllReduce(vExchange, LibUtilities::ReduceSum);
         NekDouble eps1 = vExchange;
 
         if (m_root)
@@ -295,7 +295,7 @@ NekDouble NekLinSysIterGMRESLoc::DoGmresRestart(
     Array<OneD, NekDouble> wk(nLocal);
     m_operator.DoAssembleLoc(r0, wk, true);
     vExchange = Vmath::Dot(nLocal, wk, r0);
-    m_Comm->AllReduce(vExchange, LibUtilities::ReduceSum);
+    m_rowComm->AllReduce(vExchange, LibUtilities::ReduceSum);
     eps = vExchange;
 
     if (!restarted)
@@ -309,7 +309,7 @@ NekDouble NekLinSysIterGMRESLoc::DoGmresRestart(
 
                 m_operator.DoAssembleLoc(pInput, wk, true);
                 vExchange = Vmath::Dot(nLocal, wk, pInput);
-                m_Comm->AllReduce(vExchange, LibUtilities::ReduceSum);
+                m_rowComm->AllReduce(vExchange, LibUtilities::ReduceSum);
                 m_prec_factor = vExchange / eps;
             }
             else
@@ -471,7 +471,7 @@ void NekLinSysIterGMRESLoc::DoArnoldi(
         // scatter back vector and then zero Dirichlet conditions.
         m_operator.DoAssembleLoc(V_local[numbertem], wk, true);
         vExchange = Vmath::Dot(nLocal, wk, w);
-        m_Comm->AllReduce(vExchange, LibUtilities::ReduceSum);
+        m_rowComm->AllReduce(vExchange, LibUtilities::ReduceSum);
 
         h[i] = vExchange;
 
@@ -484,7 +484,7 @@ void NekLinSysIterGMRESLoc::DoArnoldi(
     // calculate the L2 norm and normalize
     m_operator.DoAssembleLoc(w, wk, true);
     vExchange = Vmath::Dot(nLocal, wk, w);
-    m_Comm->AllReduce(vExchange, LibUtilities::ReduceSum);
+    m_rowComm->AllReduce(vExchange, LibUtilities::ReduceSum);
 
     h[endtem] = sqrt(vExchange);
 

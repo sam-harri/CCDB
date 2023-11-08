@@ -104,6 +104,7 @@ MeshGraph::MeshGraph()
 {
     m_boundingBoxTree =
         std::unique_ptr<MeshGraph::GeomRTree>(new MeshGraph::GeomRTree());
+    m_movement = std::make_shared<Movement>();
 }
 
 /**
@@ -115,7 +116,8 @@ MeshGraph::~MeshGraph()
 
 MeshGraphSharedPtr MeshGraph::Read(
     const LibUtilities::SessionReaderSharedPtr session,
-    LibUtilities::DomainRangeShPtr rng, bool fillGraph)
+    LibUtilities::DomainRangeShPtr rng, bool fillGraph,
+    SpatialDomains::MeshGraphSharedPtr partitionedGraph)
 {
     LibUtilities::CommSharedPtr comm = session->GetComm();
     ASSERTL0(comm.get(), "Communication not initialised.");
@@ -157,12 +159,45 @@ MeshGraphSharedPtr MeshGraph::Read(
     // the PartitionMesh function so that we can support different options for
     // XML and HDF5.
     MeshGraphSharedPtr mesh = GetMeshGraphFactory().CreateInstance(geomType);
+
+    // For Parallel-in-Time
+    //    In contrast to XML, a pre-paritioned mesh directory (_xml) is not
+    //    produced when partitionning the mesh for the fine solver when using
+    //    HDF5. In order to guaranting the same partition on all time level,
+    //    the fine mesh partition has to be copied explicitly.
+    if (partitionedGraph && geomType == "HDF5")
+    {
+        mesh->SetPartition(partitionedGraph);
+    }
+
     mesh->PartitionMesh(session);
 
     // Finally, read the geometry information.
     mesh->ReadGeometry(rng, fillGraph);
 
     return mesh;
+}
+
+void MeshGraph::SetPartition(SpatialDomains::MeshGraphSharedPtr graph)
+{
+    m_meshPartitioned = true;
+
+    m_meshDimension  = graph->GetMeshDimension();
+    m_spaceDimension = graph->GetSpaceDimension();
+
+    m_vertSet     = graph->GetAllPointGeoms();
+    m_curvedFaces = graph->GetCurvedFaces();
+    m_curvedEdges = graph->GetCurvedEdges();
+
+    m_segGeoms   = graph->GetAllSegGeoms();
+    m_triGeoms   = graph->GetAllTriGeoms();
+    m_quadGeoms  = graph->GetAllQuadGeoms();
+    m_hexGeoms   = graph->GetAllHexGeoms();
+    m_prismGeoms = graph->GetAllPrismGeoms();
+    m_pyrGeoms   = graph->GetAllPyrGeoms();
+    m_tetGeoms   = graph->GetAllTetGeoms();
+
+    m_faceToElMap = graph->GetAllFaceToElMap();
 }
 
 void MeshGraph::FillGraph()
@@ -2934,7 +2969,6 @@ void MeshGraph::ReadExpansionInfo()
 {
     // Find the Expansions tag
     TiXmlElement *expansionTypes = m_session->GetElement("NEKTAR/EXPANSIONS");
-
     LibUtilities::SessionReader::GetXMLElementTimeLevel(
         expansionTypes, m_session->GetTimeLevel());
 
@@ -3922,240 +3956,6 @@ GeometryLinkSharedPtr MeshGraph::GetElementsFromEdge(Geometry1DSharedPtr edge)
     }
 
     return ret;
-}
-
-LibUtilities::BasisKey MeshGraph::GetEdgeBasisKey(SegGeomSharedPtr edge,
-                                                  const std::string variable)
-{
-    GeometryLinkSharedPtr elmts = GetElementsFromEdge(edge);
-    // Perhaps, a check should be done here to ensure that
-    // in case elements->size!=1, all elements to which
-    // the edge belongs have the same type and order of
-    // expansion such that no confusion can arise.
-    GeometrySharedPtr geom       = elmts->at(0).first;
-    ExpansionInfoShPtr expansion = GetExpansionInfo(geom, variable);
-    int edge_id                  = elmts->at(0).second;
-    if (geom->GetShapeType() == LibUtilities::eTriangle)
-    {
-        edge_id = (edge_id) ? 1 : 0;
-    }
-    else
-    {
-        edge_id = edge_id % 2;
-    }
-    int nummodes  = expansion->m_basisKeyVector[edge_id].GetNumModes();
-    int numpoints = expansion->m_basisKeyVector[edge_id].GetNumPoints();
-    if (geom->GetShapeType() == LibUtilities::eTriangle)
-    {
-        // Use edge 0 to define basis of order relevant to edge
-        switch (expansion->m_basisKeyVector[edge_id].GetBasisType())
-        {
-            case LibUtilities::eGLL_Lagrange:
-            {
-                switch (expansion->m_basisKeyVector[edge_id].GetPointsType())
-                {
-                    case LibUtilities::eGaussLobattoLegendre:
-                    {
-                        const LibUtilities::PointsKey pkey(
-                            numpoints, LibUtilities::eGaussLobattoLegendre);
-                        return LibUtilities::BasisKey(
-                            expansion->m_basisKeyVector[0].GetBasisType(),
-                            nummodes, pkey);
-                    }
-                    break;
-                    default:
-                        ASSERTL0(false, "Unexpected points distribution");
-                        // It doesn't matter what we return
-                        // here since the ASSERT will stop
-                        // execution.  Just return something
-                        // to prevent warnings messages.
-                        const LibUtilities::PointsKey pkey(
-                            numpoints, LibUtilities::eGaussLobattoLegendre);
-                        return LibUtilities::BasisKey(
-                            expansion->m_basisKeyVector[0].GetBasisType(),
-                            nummodes, pkey);
-                        break;
-                }
-            }
-            break;
-            case LibUtilities::eOrtho_B: // Assume this is called from nodal
-                                         // triangular basis
-            {
-                switch (expansion->m_basisKeyVector[edge_id].GetPointsType())
-                {
-                    case LibUtilities::eGaussRadauMAlpha1Beta0:
-                    {
-                        const LibUtilities::PointsKey pkey(
-                            numpoints + 1, LibUtilities::eGaussLobattoLegendre);
-                        return LibUtilities::BasisKey(
-                            LibUtilities::eGLL_Lagrange, nummodes, pkey);
-                    }
-                    break;
-                    default:
-                        ASSERTL0(false, "Unexpected points distribution");
-                        // It doesn't matter what we return
-                        // here since the ASSERT will stop
-                        // execution.  Just return something
-                        // to prevent warnings messages.
-                        const LibUtilities::PointsKey pkey(
-                            numpoints + 1, LibUtilities::eGaussLobattoLegendre);
-                        return LibUtilities::BasisKey(
-                            expansion->m_basisKeyVector[0].GetBasisType(),
-                            nummodes, pkey);
-                        break;
-                }
-            }
-            break;
-            case LibUtilities::eModified_B:
-            {
-                switch (expansion->m_basisKeyVector[edge_id].GetPointsType())
-                {
-                    case LibUtilities::eGaussRadauMLegendre:
-                    case LibUtilities::eGaussRadauMAlpha1Beta0:
-                    {
-                        const LibUtilities::PointsKey pkey(
-                            numpoints + 1, LibUtilities::eGaussLobattoLegendre);
-                        return LibUtilities::BasisKey(
-                            expansion->m_basisKeyVector[0].GetBasisType(),
-                            nummodes, pkey);
-                    }
-                    break;
-                    case LibUtilities::eGaussLobattoLegendre:
-                    {
-                        const LibUtilities::PointsKey pkey(
-                            numpoints, LibUtilities::eGaussLobattoLegendre);
-                        return LibUtilities::BasisKey(
-                            expansion->m_basisKeyVector[0].GetBasisType(),
-                            nummodes, pkey);
-                    }
-                    break;
-                    default:
-                        ASSERTL0(false, "Unexpected points distribution");
-                        // It doesn't matter what we return
-                        // here since the ASSERT will stop
-                        // execution.  Just return something
-                        // to prevent warnings messages.
-                        const LibUtilities::PointsKey pkey(
-                            numpoints + 1, LibUtilities::eGaussLobattoLegendre);
-                        return LibUtilities::BasisKey(
-                            expansion->m_basisKeyVector[0].GetBasisType(),
-                            nummodes, pkey);
-                        break;
-                }
-            }
-            break;
-            case LibUtilities::eModified_A:
-            {
-                switch (expansion->m_basisKeyVector[edge_id].GetPointsType())
-                {
-                    case LibUtilities::eGaussLobattoLegendre:
-                    {
-                        const LibUtilities::PointsKey pkey(
-                            numpoints, LibUtilities::eGaussLobattoLegendre);
-                        return LibUtilities::BasisKey(
-                            expansion->m_basisKeyVector[0].GetBasisType(),
-                            nummodes, pkey);
-                    }
-                    break;
-                    default:
-                        ASSERTL0(false, "Unexpected points distribution");
-                        // It doesn't matter what we return here
-                        // since the ASSERT will stop execution.
-                        // Just return something to prevent
-                        // warnings messages.
-                        const LibUtilities::PointsKey pkey(
-                            numpoints, LibUtilities::eGaussLobattoLegendre);
-                        return LibUtilities::BasisKey(
-                            expansion->m_basisKeyVector[0].GetBasisType(),
-                            nummodes, pkey);
-                        break;
-                }
-            }
-            break;
-            default:
-                ASSERTL0(false, "Unexpected basis distribution");
-                // It doesn't matter what we return here since the
-                // ASSERT will stop execution.  Just return
-                // something to prevent warnings messages.
-                const LibUtilities::PointsKey pkey(
-                    numpoints + 1, LibUtilities::eGaussLobattoLegendre);
-                return LibUtilities::BasisKey(
-                    expansion->m_basisKeyVector[0].GetBasisType(), nummodes,
-                    pkey);
-        }
-    }
-    else
-    {
-        // Quadrilateral
-        const LibUtilities::PointsKey pkey(
-            numpoints, expansion->m_basisKeyVector[edge_id].GetPointsType());
-        return LibUtilities::BasisKey(
-            expansion->m_basisKeyVector[edge_id].GetBasisType(), nummodes,
-            pkey);
-    }
-
-    ASSERTL0(false, "Unable to determine edge points type.");
-    return LibUtilities::NullBasisKey;
-}
-
-/// 3D functions
-
-LibUtilities::BasisKey MeshGraph::GetFaceBasisKey(Geometry2DSharedPtr face,
-                                                  const int facedir,
-                                                  const std::string variable)
-{
-    // Retrieve the list of elements and the associated face index
-    // to which the face geometry belongs.
-    GeometryLinkSharedPtr elements = GetElementsFromFace(face);
-    ASSERTL0(elements->size() > 0,
-             "No elements for the given face."
-             " Check all elements belong to the domain composite.");
-    // Perhaps, a check should be done here to ensure that in case
-    // elements->size!=1, all elements to which the edge belongs have
-    // the same type and order of expansion such that no confusion can
-    // arise.
-    // Get the Expansion structure detailing the basis keys used for
-    // this element.
-    GeometrySharedPtr geom       = elements->at(0).first;
-    ExpansionInfoShPtr expansion = GetExpansionInfo(geom, variable);
-    ASSERTL0(expansion, "Could not find expansion connected to face " +
-                            boost::lexical_cast<string>(face->GetGlobalID()));
-    // Retrieve the geometry object of the element as a Geometry3D.
-    Geometry3DSharedPtr geom3d =
-        std::dynamic_pointer_cast<SpatialDomains::Geometry3D>(
-            expansion->m_geomShPtr);
-    // Use the geometry of the element to calculate the coordinate
-    // direction of the element which corresponds to the requested
-    // coordinate direction of the given face.
-    int dir = geom3d->GetDir(elements->at(0).second, facedir);
-
-    if (face->GetNumVerts() == 3)
-    {
-        return StdRegions::EvaluateTriFaceBasisKey(
-            facedir, expansion->m_basisKeyVector[dir].GetBasisType(),
-            expansion->m_basisKeyVector[dir].GetNumPoints(),
-            expansion->m_basisKeyVector[dir].GetNumModes());
-    }
-    else
-    {
-
-        // Check face orientationa to see if it should be transposed
-        StdRegions::Orientation orient =
-            geom3d->GetForient(elements->at(0).second);
-        // revese direction if face rotated so dir1 aligned to dir2
-        if (orient >= StdRegions::eDir1FwdDir2_Dir2FwdDir1)
-        {
-            dir = (dir == 0) ? 1 : 0;
-        }
-
-        return StdRegions::EvaluateQuadFaceBasisKey(
-            facedir, expansion->m_basisKeyVector[dir].GetBasisType(),
-            expansion->m_basisKeyVector[dir].GetNumPoints(),
-            expansion->m_basisKeyVector[dir].GetNumModes());
-    }
-
-    // Keep things happy by returning a value.
-    return LibUtilities::NullBasisKey;
 }
 
 GeometryLinkSharedPtr MeshGraph::GetElementsFromFace(Geometry2DSharedPtr face)

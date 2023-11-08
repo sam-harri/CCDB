@@ -1,5 +1,45 @@
 Changelog
 =========
+
+v5.5.0
+------
+**Library**
+- Fix Nektar++Config.cmake to use MPI_CXX (!1224)
+- Redesign of Parareal and PFASST driver (!1613)
+- Update default global system solver parameters for paralell-in-time (!1649)
+- Add member function in MPI communicator to check if time-parallel is enable (!1647)
+- Fixed FilterError for homogeneous expansions (!1640)
+- Fix ForcingAbsorption for homogeneous expansions (!1650)
+- Update AssemblyMap to reduce verbosity when using parallel-in-time (!1651)
+- Tidy-up of Collection library (!1622)
+- Tidy-up of I/O in BasicUtils (!1623)
+
+**CardiacEPSolver**
+- Fix cell model history point filter output after base class change (!1342)
+- Add const qualifier to SetUniversalUniqueMap (!1644)
+- Add safety check for FinTime parameter for parallel-in-time (!1652)
+
+**IncNavierStokesSolver**
+- Save BndElmtExpansion and avoid re-building (!1648)
+- Add Simo-advection and a switch for Simo-/Dong-advection to VCSImplicit (!1630)
+
+**FieldConvert**
+- Fix typo in user-guide and fix but for parallel-in-time FieldConvert (!1645)
+- Fixed FieldConvert -m addfld (!1500)
+- Fix tecplot output for line and plane points (!1497)
+
+**CI**
+- Disable macOS Intel runner (!1655)
+- Upgrade Win10 runners (!1656)
+
+**NekMesh**
+- Replace deprecated boost::filesystem functions (!1654)
+- Remove deprecated AddTraceIntegral interface from ExpList.h (!1646)
+
+**Miscellaneous**
+- Add a particle tracker utilitiy using equation system infrastructure (!1310)
+- Remove deprecated fs::copy_directory function call (!1662)
+
 v5.4.0
 ------
 **Library**
@@ -44,11 +84,22 @@ v5.4.0
 - Accelerate interpolation for regular and straight-edge elements (!1283)
 - Fix an indexing error in MatrixFreeOps (!1602)
 - Update Session File for Parallel-in-Time (!1516)
+- Partially fix hdf5 partition for Parareal (!1611)
+- Update Collection for Parareal-in-Time (!1607)
 - New version of CreateCollection using basisKey (!1603)
 - Remove unused Domain.cpp and Domain.h file (!1609)
 - Remove useless ReadExpressions and SubstituteExpressions function in sessionReader (!1608)
 - Corrected workspace size in triangle BwdTrans (!1610)
 - Reactivate Reactivate Movement_fixed_3D_stacked_cylinders_curved_hdf5_par test except on ARM MacOS (!1536)
+- Rename communicator in LinearAlgebra (!1612)
+- Add IProductWRTDerivBase operator for 3DH1D problems (!1483)
+- Full support of mixed-order elements in DG (!1606)
+- Use default keyword for destructor in Driver (!1624)
+- Add additional test for SDC time-integration(!1621)
+- Fix to compiler flags for MSVC (!1604)
+- Correct bug in scotch initialisation for substructuring (!1634)
+- Add ability to build up Movement objects programmatically (!1600)
+- Write out movement data to XML files (!1600)
 
 **CompressibleFlowSolver**
 - Fix AUSM3 Riemann solver and add tests to the CI (!1537)
@@ -58,17 +109,28 @@ v5.4.0
 - Redesign of AUSM Riemann solver class (!1577)
 - Redesign of the compressible flow solver. Removal of RinglebFlow and IsentropicVortex subclasses (!1584)
 - Redesign of PreconCfs class (!1578)
+- Fix virtual functions in ContField class (!1616)
+- Tidy-up Compressible flow solver print status (!1615)
+- Update of for parallel-in-time (!1589)
+- Fix some memory bugs for implicit compressible flow solver with LDGNS (!1617)
 
 **IncNavierStokesSolver**
 - Add an option to mask variables for the linear stability problem (!1280)
 
+**ShallowWaterSolver**
+- Fix NonlinearPeregrine solver due to a change of API (!1637)
+
 **FieldConvert**
 - Add option to use .csv files in pointdatatofld module (!1545)
+- Add a new module to output power spectral in a given area (!1271)
+- Add a new module to do field averaging (!1271)
 
 **IncNavierStokesSolver**
 - Register SolverType in SessionReader (!1541)
 - Prevent file overwrite with restart for the IsentropicVortex solver (!1543)
 - Fix GJP stabilisation for curved 3D elements (!1593)
+- Enable SVV and GJP stabilisation for unresolved scales in VCSImplicit (!1592)
+- Fix tolerance in KovaFlow_m10_VCSImplicit_SVV (!1619)
 
 **Miscellaneous**
 - Fix compilation against TetGen 1.6 (!1547)
@@ -78,9 +140,26 @@ v5.4.0
 - Add a check to avoid unnecessary copy in DoOdoProjecton function (!1582)
 - Update user guide and developer guide (!1598)
 - Some various tidy-up (!1585)
+- Added support for performance tests (!1614)
+- Integrated performance tests into the CI system and enabled a test (!1629)
+- Added additional performance tests and updated test documentation (!1631)
+- Fix VmathTimer compilation error (!1635)
+- Fix SIMD compilation error (!1636)
+- Update ShallowWaterSolver performance test (!1643)
 
 **NekMesh**
 - Changed CMake to set NEKTAR_USE_THREAD_SAFETY to ON when MeshGen is set to ON (!1546)
+- Fixed a bug where MeshElement/Tetrahedron did not assign edge IDs in the constructor (!1596)
+
+**Documentation**
+- Fix missing Tikz external package requires for bookworm (!1638)
+
+**CI**
+- Add testing and packaging for Debian bookworm (!1638)
+**NekPy**
+- Add bindings for Movement-related classes (!1600)
+- Add bindings for various helpful methods in the SpatialDomains
+  library (!1600)
 
 v5.3.0
 ------

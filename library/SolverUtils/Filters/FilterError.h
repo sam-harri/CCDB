@@ -82,6 +82,7 @@ private:
     size_t m_index = 0;
     size_t m_outputFrequency;
     size_t m_numVariables;
+    bool m_homogeneous;
     std::ofstream m_outFile;
     LibUtilities::CommSharedPtr m_comm;
 };

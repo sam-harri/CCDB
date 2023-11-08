@@ -476,7 +476,7 @@ std::string FieldIO::SetUpOutput(const std::string outname, bool perRank,
     }
     else
     {
-        // Guess at filename that might belong to this process.
+        // Guess the filename that might belong to this process.
         boost::format pad("P%1$07d.%2$s");
         pad % m_comm->GetSpaceComm()->GetRank() % GetFileEnding();
 
@@ -533,7 +533,7 @@ std::string FieldIO::SetUpOutput(const std::string outname, bool perRank,
 
     if (root)
     {
-        std::cout << "Writing: " << specPath << std::endl;
+        std::cout << "Writing: " << specPath;
     }
 
     // serial processing just add ending.

@@ -53,12 +53,12 @@ public:
 
     LIB_UTILITIES_EXPORT static NekNonlinSysSharedPtr create(
         const LibUtilities::SessionReaderSharedPtr &pSession,
-        const LibUtilities::CommSharedPtr &vComm, const int nDimen,
+        const LibUtilities::CommSharedPtr &vRowComm, const int nDimen,
         const NekSysKey &pKey)
     {
         NekNonlinSysSharedPtr p =
             MemoryManager<NekNonlinSysNewton>::AllocateSharedPtr(
-                pSession, vComm, nDimen, pKey);
+                pSession, vRowComm, nDimen, pKey);
         p->InitObject();
         return p;
     }
@@ -66,7 +66,7 @@ public:
     static std::string className;
     LIB_UTILITIES_EXPORT NekNonlinSysNewton(
         const LibUtilities::SessionReaderSharedPtr &pSession,
-        const LibUtilities::CommSharedPtr &vComm, const int nscale,
+        const LibUtilities::CommSharedPtr &vRowComm, const int nscale,
         const NekSysKey &pKey);
     LIB_UTILITIES_EXPORT ~NekNonlinSysNewton();
 

@@ -56,9 +56,7 @@ public:
     }
 
     /// Destructor
-    ~OpImpTimingKey(void)
-    {
-    }
+    ~OpImpTimingKey(void) = default;
 
     LibUtilities::ShapeType GetShapeType(void) const
     {
@@ -128,14 +126,14 @@ public:
         LibUtilities::SessionReaderSharedPtr pSession, const int shapedim,
         ImplementationType defaultType = eStdMat);
 
-    ~CollectionOptimisation(){};
+    ~CollectionOptimisation() = default;
 
     ImplementationType GetDefaultImplementationType()
     {
         return m_defaultType;
     }
 
-    unsigned int GetMaxCollectionSize()
+    size_t GetMaxCollectionSize()
     {
         return m_maxCollSize;
     }
@@ -162,12 +160,14 @@ private:
     typedef std::pair<LibUtilities::ShapeType, int> ElmtOrder;
     typedef std::map<OperatorType, std::map<ElmtOrder, ImplementationType>>
         GlobalOpMap;
-    static std::map<OpImpTimingKey, OperatorImpMap> m_opImpMap;
+    static std::map<size_t, std::map<OpImpTimingKey, OperatorImpMap>>
+        m_opImpMap;
     GlobalOpMap m_global;
     bool m_autotune;
     ImplementationType m_defaultType;
-    unsigned int m_maxCollSize;
-    unsigned int m_shapeDim;
+    size_t m_maxCollSize;
+    size_t m_shapeDim;
+    size_t m_timeLevel;
 
     void ReadCollOps(TiXmlElement *xmlCol, GlobalOpMap &global, bool verbose);
 };

@@ -37,6 +37,7 @@
 
 #include <SpatialDomains/MeshGraphXml.h>
 #include <SpatialDomains/MeshPartition.h>
+#include <SpatialDomains/Movement/Movement.h>
 
 #include <LibUtilities/BasicUtils/FieldIOXml.h>
 #include <LibUtilities/BasicUtils/FileSystem.h>
@@ -341,7 +342,12 @@ void MeshGraphXml::v_PartitionMesh(
                 partitioner->GetElementIDs(parts[0], tmp);
                 elIDs[0].insert(tmp.begin(), tmp.end());
 
-                this->WriteXMLGeometry(session->GetSessionName(), elIDs, parts);
+                // if (comm->GetTimeComm()->GetRank() == 0) // FIXME
+                // (OpenMPI 3.1.3)
+                {
+                    this->WriteXMLGeometry(session->GetSessionName(), elIDs,
+                                           parts);
+                }
 
                 if (m_session->DefinesCmdLineArgument("part-info") && isRoot)
                 {
@@ -391,7 +397,6 @@ void MeshGraphXml::v_ReadGeometry(LibUtilities::DomainRangeShPtr rng,
     m_compositesLabels.clear();
     m_domain.clear();
     m_expansionMapShPtrMap.clear();
-    m_geomInfo.clear();
     m_faceToElMap.clear();
 
     m_domainRange = rng;
@@ -2735,7 +2740,7 @@ void MeshGraphXml::WriteDefaultExpansion(TiXmlElement *root)
  * representing this MeshGraph instance inside a NEKTAR tag.
  */
 void MeshGraphXml::v_WriteGeometry(
-    std::string &outfilename, bool defaultExp,
+    const std::string &outfilename, bool defaultExp,
     const LibUtilities::FieldMetaDataMap &metadata)
 {
     // Create empty TinyXML document.
@@ -2796,6 +2801,9 @@ void MeshGraphXml::v_WriteGeometry(
     {
         WriteDefaultExpansion(root);
     }
+
+    if (m_movement)
+        m_movement->WriteMovement(root);
 
     // Save file.
     doc.SaveFile(outfilename);
@@ -3122,14 +3130,25 @@ void MeshGraphXml::WriteXMLGeometry(std::string outname,
                 new TiXmlElement(*m_session->GetElement("Nektar/Conditions"));
             TiXmlElement *vBndRegions =
                 vConditions->FirstChildElement("BOUNDARYREGIONS");
+            // Use fine-level for mesh partition (Parallel-in-Time)
+            LibUtilities::SessionReader::GetXMLElementTimeLevel(vBndRegions, 0);
             TiXmlElement *vBndConditions =
                 vConditions->FirstChildElement("BOUNDARYCONDITIONS");
+            // Use fine-level for mesh partition (Parallel-in-Time)
+            LibUtilities::SessionReader::GetXMLElementTimeLevel(vBndConditions,
+                                                                0);
             TiXmlElement *vItem;
 
             if (vBndRegions)
             {
+                // Check for parallel-in-time
+                bool multiLevel =
+                    vConditions->FirstChildElement("BOUNDARYREGIONS")
+                        ->FirstChildElement("TIMELEVEL") != nullptr;
+
                 TiXmlElement *vNewBndRegions =
-                    new TiXmlElement("BOUNDARYREGIONS");
+                    multiLevel ? new TiXmlElement("TIMELEVEL")
+                               : new TiXmlElement("BOUNDARYREGIONS");
                 vItem = vBndRegions->FirstChildElement();
                 while (vItem)
                 {
@@ -3178,7 +3197,23 @@ void MeshGraphXml::WriteXMLGeometry(std::string outname,
                     // store original bnd region order
                     m_bndRegOrder[p] = vSeq;
                 }
-                vConditions->ReplaceChild(vBndRegions, *vNewBndRegions);
+                if (multiLevel)
+                {
+                    // Use fine-level for mesh partition (Parallel-in-Time)
+                    size_t timeLevel = 0;
+                    while (vBndRegions)
+                    {
+                        vNewBndRegions->SetAttribute("VALUE", timeLevel);
+                        vConditions->FirstChildElement("BOUNDARYREGIONS")
+                            ->ReplaceChild(vBndRegions, *vNewBndRegions);
+                        vBndRegions = vBndRegions->NextSiblingElement();
+                        timeLevel++;
+                    }
+                }
+                else
+                {
+                    vConditions->ReplaceChild(vBndRegions, *vNewBndRegions);
+                }
             }
 
             if (vBndConditions)

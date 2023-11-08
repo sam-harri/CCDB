@@ -7,9 +7,7 @@ IF (NOT NEKTAR_BUILD_SOLVERS)
 ENDIF()
 
 IF( NEKTAR_SOLVER_CARDIAC_EP )
-    ADD_SOLVER_EXECUTABLE(CardiacEPSolver
-        SOURCES CardiacEPSolver.cpp
-        LIBRARY_SOURCES
+    SET(CARDIACEPSOLVER_SOURCES
         EquationSystems/Monodomain.cpp
         EquationSystems/Bidomain.cpp
         EquationSystems/BidomainRoth.cpp
@@ -26,6 +24,7 @@ IF( NEKTAR_SOLVER_CARDIAC_EP )
         Filters/FilterElectrogram.cpp
         Filters/FilterBenchmark.cpp
         Filters/FilterCellHistoryPoints.cpp
+        Filters/FilterOffsetPhase.cpp
         Stimuli/Stimulus.cpp
         Stimuli/StimulusCircle.cpp
         Stimuli/StimulusRect.cpp
@@ -36,5 +35,15 @@ IF( NEKTAR_SOLVER_CARDIAC_EP )
         Stimuli/ProtocolS1S2.cpp
         )
 
+    IF( NEKTAR_USE_FFTW )
+        SET(CARDIACEPSOLVER_SOURCES ${CARDIACEPSOLVER_SOURCES}
+            Filters/FilterHilbertFFTPhase.cpp
+        )
+    ENDIF( NEKTAR_USE_FFTW )
+
+    ADD_SOLVER_EXECUTABLE(CardiacEPSolver
+        SOURCES CardiacEPSolver.cpp
+        LIBRARY_SOURCES
+        ${CARDIACEPSOLVER_SOURCES})
     ADD_SUBDIRECTORY(Utilities)
 ENDIF( NEKTAR_SOLVER_CARDIAC_EP )

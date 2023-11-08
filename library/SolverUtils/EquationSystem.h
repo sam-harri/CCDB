@@ -79,9 +79,6 @@ public:
     /// Destructor
     SOLVER_UTILS_EXPORT virtual ~EquationSystem();
 
-    // Set up trace normals if required
-    SOLVER_UTILS_EXPORT void SetUpTraceNormals(void);
-
     /// Initialises the members of this object.
     SOLVER_UTILS_EXPORT inline void InitObject(bool DeclareField = true);
 
@@ -100,11 +97,6 @@ public:
 
     /// Perform output operations after solve.
     SOLVER_UTILS_EXPORT inline void Output();
-
-    /// Linf error computation
-    SOLVER_UTILS_EXPORT inline NekDouble LinfError(
-        unsigned int field,
-        const Array<OneD, NekDouble> &exactsoln = NullNekDouble1DArray);
 
     /// Get Session name
     SOLVER_UTILS_EXPORT std::string GetSessionName()
@@ -171,6 +163,11 @@ public:
         return L2Error(field, NullNekDouble1DArray, Normalised);
     }
 
+    /// Linf error computation
+    SOLVER_UTILS_EXPORT NekDouble
+    LinfError(unsigned int field,
+              const Array<OneD, NekDouble> &exactsoln = NullNekDouble1DArray);
+
     /// Compute error (L2 and L_inf) over an larger set of quadrature
     /// points return [L2 Linf]
     SOLVER_UTILS_EXPORT Array<OneD, NekDouble> ErrorExtraPoints(
@@ -231,7 +228,7 @@ public:
     UpdateFieldMetaDataMap();
 
     /// Return final time
-    SOLVER_UTILS_EXPORT inline NekDouble GetFinalTime();
+    SOLVER_UTILS_EXPORT inline NekDouble GetTime();
 
     SOLVER_UTILS_EXPORT inline int GetNcoeffs();
 
@@ -270,6 +267,9 @@ public:
 
     SOLVER_UTILS_EXPORT inline void CopyToPhysField(
         const int i, const Array<OneD, const NekDouble> &input);
+
+    SOLVER_UTILS_EXPORT inline Array<OneD, NekDouble> &UpdatePhysField(
+        const int i);
 
     SOLVER_UTILS_EXPORT inline void SetSteps(const int steps);
 
@@ -342,14 +342,8 @@ public:
     /// Evaluates the boundary conditions at the given time.
     SOLVER_UTILS_EXPORT void SetBoundaryConditions(NekDouble time);
 
-    /// Virtual function to identify if operator is negated in DoSolve
-    SOLVER_UTILS_EXPORT virtual bool v_NegatedOp();
-
-    /// Check if solver use Parallel-in-Time
-    SOLVER_UTILS_EXPORT bool ParallelInTime()
-    {
-        return m_comm->GetSize() != m_comm->GetSpaceComm()->GetSize();
-    }
+    /// Identify if operator is negated in DoSolve
+    SOLVER_UTILS_EXPORT bool NegatedOp();
 
 protected:
     /// Communicator
@@ -516,6 +510,9 @@ protected:
     // Get pressure field if available
     SOLVER_UTILS_EXPORT virtual MultiRegions::ExpListSharedPtr v_GetPressure(
         void);
+
+    /// Virtual function to identify if operator is negated in DoSolve
+    SOLVER_UTILS_EXPORT virtual bool v_NegatedOp(void);
 
     SOLVER_UTILS_EXPORT virtual void v_ExtraFldOutput(
         std::vector<Array<OneD, NekDouble>> &fieldcoeffs,
@@ -686,14 +683,20 @@ inline void EquationSystem::EvaluateExactSolution(
     v_EvaluateExactSolution(field, outfield, time);
 }
 
+/// Identify if operator is negated in DoSolve
+inline bool EquationSystem::NegatedOp(void)
+{
+    return v_NegatedOp();
+}
+
 inline Array<OneD, MultiRegions::ExpListSharedPtr>
     &EquationSystem::UpdateFields(void)
 {
     return m_fields;
 }
 
-/// Return final time
-inline NekDouble EquationSystem::GetFinalTime()
+/// Return time
+inline NekDouble EquationSystem::GetTime()
 {
     return m_time;
 }
@@ -796,6 +799,11 @@ inline void EquationSystem::CopyToPhysField(
     const int i, const Array<OneD, const NekDouble> &input)
 {
     Vmath::Vcopy(input.size(), input, 1, m_fields[i]->UpdatePhys(), 1);
+}
+
+inline Array<OneD, NekDouble> &EquationSystem::UpdatePhysField(const int i)
+{
+    return m_fields[i]->UpdatePhys();
 }
 
 } // namespace SolverUtils

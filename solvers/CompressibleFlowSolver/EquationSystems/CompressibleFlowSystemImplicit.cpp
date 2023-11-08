@@ -59,6 +59,9 @@ void CFSImplicit::v_InitObject(bool DeclareFields)
     m_explicitDiffusion = false;
 
     // initialise implicit parameters
+    m_session->MatchSolverInfo("FLAGIMPLICITITSSTATISTICS", "True",
+                               m_flagImplicitItsStatistics, false);
+
     m_session->LoadParameter("JacobiFreeEps", m_jacobiFreeEps, 5.0E-8);
 
     int ntmp;
@@ -72,8 +75,6 @@ void CFSImplicit::v_InitObject(bool DeclareFields)
     m_ode.DefineImplicitSolve(&CFSImplicit::DoImplicitSolve, this);
 
     InitialiseNonlinSysSolver();
-
-    m_flagImplicitSolver = true;
 }
 
 void CFSImplicit::InitialiseNonlinSysSolver()
@@ -96,7 +97,7 @@ void CFSImplicit::InitialiseNonlinSysSolver()
     key.m_LinSysMaxStorage          = 30;
 
     m_nonlinsol = LibUtilities::GetNekNonlinSysFactory().CreateInstance(
-        SolverType, m_session, m_comm, ntotal, key);
+        SolverType, m_session, m_comm->GetRowComm(), ntotal, key);
 
     LibUtilities::NekSysOperators nekSysOp;
     nekSysOp.DefineNekSysResEval(&CFSImplicit::NonlinSysEvaluatorCoeff1D, this);
@@ -136,6 +137,50 @@ void CFSImplicit::InitialiseNonlinSysSolver()
  */
 CFSImplicit::~CFSImplicit()
 {
+}
+
+void CFSImplicit::v_DoSolve()
+{
+    m_TotNewtonIts = 0;
+    m_TotLinIts    = 0;
+    m_TotImpStages = 0;
+
+    UnsteadySystem::v_DoSolve();
+}
+
+void CFSImplicit::v_PrintStatusInformation(const int step,
+                                           const NekDouble cpuTime)
+{
+    UnsteadySystem::v_PrintStatusInformation(step, cpuTime);
+
+    if (m_infosteps && m_session->GetComm()->GetSpaceComm()->GetRank() == 0 &&
+        !((step + 1) % m_infosteps))
+    {
+        if (m_flagImplicitItsStatistics)
+        {
+            cout << "       &&"
+                 << " TotImpStages= " << m_TotImpStages
+                 << " TotNewtonIts= " << m_TotNewtonIts
+                 << " TotLinearIts = " << m_TotLinIts << endl;
+        }
+    }
+}
+
+void CFSImplicit::v_PrintSummaryStatistics(const NekDouble intTime)
+{
+    UnsteadySystem::v_PrintSummaryStatistics(intTime);
+
+    if (m_session->GetComm()->GetRank() == 0)
+    {
+        if (m_flagImplicitItsStatistics)
+        {
+            cout << "-------------------------------------------" << endl
+                 << "Total Implicit Stages: " << m_TotImpStages << endl
+                 << "Total Newton Its     : " << m_TotNewtonIts << endl
+                 << "Total Linear Its     : " << m_TotLinIts << endl
+                 << "-------------------------------------------" << endl;
+        }
+    }
 }
 
 void CFSImplicit::NonlinSysEvaluatorCoeff1D(
@@ -383,7 +428,8 @@ void CFSImplicit::CalcRefValues(const Array<OneD, const NekDouble> &inarray)
     unsigned int npoints    = ntotal / nvariables;
 
     unsigned int nTotalGlobal = ntotal;
-    m_comm->AllReduce(nTotalGlobal, Nektar::LibUtilities::ReduceSum);
+    m_comm->GetSpaceComm()->AllReduce(nTotalGlobal,
+                                      Nektar::LibUtilities::ReduceSum);
     unsigned int nTotalDOF = nTotalGlobal / nvariables;
     NekDouble invTotalDOF  = 1.0 / nTotalDOF;
 
@@ -396,7 +442,8 @@ void CFSImplicit::CalcRefValues(const Array<OneD, const NekDouble> &inarray)
         m_magnitdEstimat[i] =
             Vmath::Dot(npoints, inarray + offset, inarray + offset);
     }
-    m_comm->AllReduce(m_magnitdEstimat, Nektar::LibUtilities::ReduceSum);
+    m_comm->GetSpaceComm()->AllReduce(m_magnitdEstimat,
+                                      Nektar::LibUtilities::ReduceSum);
 
     for (int i = 0; i < nvariables; ++i)
     {
@@ -435,8 +482,7 @@ void CFSImplicit::PreconCoeff(const Array<OneD, NekDouble> &inarray,
 
     Gtimer.Start();
     if (m_preconCfs->UpdatePreconMatCheck(NullNekDouble1DArray,
-                                          m_TimeIntegLambda) &&
-        m_flagUpdatePreconMat)
+                                          m_TimeIntegLambda))
     {
         int nvariables = m_solutionPhys.size();
 
@@ -458,8 +504,6 @@ void CFSImplicit::PreconCoeff(const Array<OneD, NekDouble> &inarray,
         timer.Stop();
         timer.AccumulateRegion("PreconCfsOp::BuildPreconCfs", 1);
     }
-
-    m_flagUpdatePreconMat = false;
 
     timer.Start();
     m_preconCfs->DoPreconCfs(m_fields, inarray, outarray, flag);
@@ -1360,9 +1404,30 @@ void CFSImplicit::CalcTraceNumericalFlux(
             visflux[i] = Array<OneD, NekDouble>(nTracePts, 0.0);
         }
 
-        m_diffusion->DiffuseTraceFlux(fields, inarray, qfield,
-                                      NullNekDoubleTensorOfArray3D, visflux,
-                                      vFwd, vBwd, nonZeroIndex);
+        string diffName;
+        m_session->LoadSolverInfo("DiffusionType", diffName, "InteriorPenalty");
+        if (diffName == "InteriorPenalty")
+        {
+            m_diffusion->DiffuseTraceFlux(fields, inarray, qfield,
+                                          NullNekDoubleTensorOfArray3D, visflux,
+                                          vFwd, vBwd, nonZeroIndex);
+        }
+        else
+        {
+            ASSERTL1(false, "LDGNS not yet validated for implicit compressible "
+                            "flow solver");
+            // For LDGNS, the array size should be nConvectiveFields - 1
+            Array<OneD, Array<OneD, NekDouble>> inBwd(nConvectiveFields - 1);
+            Array<OneD, Array<OneD, NekDouble>> inFwd(nConvectiveFields - 1);
+            for (int i = 0; i < nConvectiveFields - 1; ++i)
+            {
+                inBwd[i] = vBwd[i];
+                inFwd[i] = vFwd[i];
+            }
+            m_diffusion->DiffuseTraceFlux(fields, inarray, qfield,
+                                          NullNekDoubleTensorOfArray3D, visflux,
+                                          inFwd, inBwd, nonZeroIndex);
+        }
         for (int i = 0; i < nConvectiveFields; i++)
         {
             Vmath::Vsub(nTracePts, traceflux[i], 1, visflux[i], 1, traceflux[i],
@@ -1719,7 +1784,8 @@ void CFSImplicit::MatrixMultiplyMatrixFreeCoeff(
     NekDouble eps             = m_jacobiFreeEps;
     unsigned int nTotalGlobal = inarray.size();
     NekDouble magninarray     = Vmath::Dot(nTotalGlobal, inarray, inarray);
-    m_comm->AllReduce(magninarray, Nektar::LibUtilities::ReduceSum);
+    m_comm->GetSpaceComm()->AllReduce(magninarray,
+                                      Nektar::LibUtilities::ReduceSum);
     eps *= sqrt((sqrt(m_inArrayNorm) + 1.0) / magninarray);
 
     NekDouble oeps      = 1.0 / eps;

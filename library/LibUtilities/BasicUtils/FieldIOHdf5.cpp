@@ -204,10 +204,11 @@ void FieldIOHdf5::v_Write(const std::string &outFile,
     m_comm->GetSpaceComm()->AllReduce(nMaxFields, LibUtilities::ReduceMax);
 
     int root_rank = -1;
+    int nprocs    = m_comm->GetSpaceComm()->GetSize();
     bool amRoot   = false;
     LibUtilities::CommSharedPtr max_fields_comm;
 
-    if (m_comm->GetSpaceComm()->GetSize() > 1)
+    if (nprocs > 1)
     {
         max_fields_comm = m_comm->GetSpaceComm()->CommCreateIf(
             (nFields == nMaxFields) ? 1 : 0);
@@ -230,12 +231,11 @@ void FieldIOHdf5::v_Write(const std::string &outFile,
     }
 
     m_comm->GetSpaceComm()->AllReduce(root_rank, LibUtilities::ReduceMax);
-    ASSERTL1(root_rank >= 0 && root_rank < m_comm->GetSpaceComm()->GetSize(),
+    ASSERTL1(root_rank >= 0 && root_rank < nprocs,
              prfx.str() + "invalid root rank.");
 
     std::vector<uint64_t> decomps(nMaxFields * MAX_DCMPS, 0);
-    std::vector<uint64_t> all_hashes(
-        nMaxFields * m_comm->GetSpaceComm()->GetSize(), 0);
+    std::vector<uint64_t> all_hashes(nMaxFields * nprocs, 0);
     std::vector<uint64_t> cnts(MAX_CNTS, 0);
     std::vector<std::string> fieldNames(nFields);
     std::vector<std::string> shapeStrings(nFields);
@@ -282,14 +282,14 @@ void FieldIOHdf5::v_Write(const std::string &outFile,
 
         // Hash the field specification
         std::stringstream hashStream;
-        std::size_t nSubFields = fielddefs[f]->m_fields.size();
-        for (int sf = 0; sf < nSubFields; ++sf)
+        size_t nSubFields = fielddefs[f]->m_fields.size();
+        for (size_t sf = 0; sf < nSubFields; ++sf)
         {
             hashStream << fielddefs[f]->m_fields[sf];
         }
 
         nSubFields = fielddefs[f]->m_basis.size();
-        for (int sf = 0; sf < nSubFields; ++sf)
+        for (size_t sf = 0; sf < nSubFields; ++sf)
         {
             hashStream << fielddefs[f]->m_basis[sf];
         }
@@ -326,7 +326,7 @@ void FieldIOHdf5::v_Write(const std::string &outFile,
         {
             nSubFields = fielddefs[f]->m_homogeneousLengths.size();
             homoLengths[f].resize(nSubFields);
-            for (int sf = 0; sf < nSubFields; ++sf)
+            for (size_t sf = 0; sf < nSubFields; ++sf)
             {
                 NekDouble len = fielddefs[f]->m_homogeneousLengths[sf];
                 hashStream << len;
@@ -339,7 +339,7 @@ void FieldIOHdf5::v_Write(const std::string &outFile,
                 homoYIDs[f].resize(nSubFields);
                 decomps[f * MAX_DCMPS + HOMY_DCMP_IDX] = nSubFields;
                 cnts[HOMY_CNT_IDX] += nSubFields;
-                for (int sf = 0; sf < nSubFields; ++sf)
+                for (size_t sf = 0; sf < nSubFields; ++sf)
                 {
                     homoYIDs[f][sf] = fielddefs[f]->m_homogeneousYIDs[sf];
                 }
@@ -351,7 +351,7 @@ void FieldIOHdf5::v_Write(const std::string &outFile,
                 homoZIDs[f].resize(nSubFields);
                 decomps[f * MAX_DCMPS + HOMZ_DCMP_IDX] = nSubFields;
                 cnts[HOMZ_CNT_IDX] += nSubFields;
-                for (int sf = 0; sf < nSubFields; ++sf)
+                for (size_t sf = 0; sf < nSubFields; ++sf)
                 {
                     homoZIDs[f][sf] = fielddefs[f]->m_homogeneousZIDs[sf];
                 }
@@ -363,7 +363,7 @@ void FieldIOHdf5::v_Write(const std::string &outFile,
                 homoSIDs[f].resize(nSubFields);
                 decomps[f * MAX_DCMPS + HOMS_DCMP_IDX] = nSubFields;
                 cnts[HOMS_CNT_IDX] += nSubFields;
-                for (int sf = 0; sf < nSubFields; ++sf)
+                for (size_t sf = 0; sf < nSubFields; ++sf)
                 {
                     homoSIDs[f][sf] = fielddefs[f]->m_homogeneousSIDs[sf];
                 }
@@ -374,15 +374,14 @@ void FieldIOHdf5::v_Write(const std::string &outFile,
         {
             std::vector<unsigned int> elemModes(fielddefs[f]->m_basis.size());
 
-            for (std::vector<int>::size_type i = 0;
-                 i < fielddefs[f]->m_basis.size(); ++i)
+            for (size_t i = 0; i < fielddefs[f]->m_basis.size(); ++i)
             {
                 elemModes[i] = fielddefs[f]->m_numModes[i];
             }
 
             if (varOrder)
             {
-                for (std::vector<int>::size_type i = 0; i < nFieldElems; ++i)
+                for (size_t i = 0; i < nFieldElems; ++i)
                 {
                     std::copy(elemModes.begin(), elemModes.end(),
                               std::back_inserter(numModesPerDirVar[f]));
@@ -395,8 +394,7 @@ void FieldIOHdf5::v_Write(const std::string &outFile,
             {
                 std::stringstream numModesStringStream;
                 numModesStringStream << "UNIORDER:";
-                for (std::vector<int>::size_type i = 0; i < elemModes.size();
-                     i++)
+                for (size_t i = 0; i < elemModes.size(); i++)
                 {
                     if (i > 0)
                     {
@@ -432,8 +430,7 @@ void FieldIOHdf5::v_Write(const std::string &outFile,
     // Gather information from all MPI processes
     std::vector<uint64_t> all_cnts =
         m_comm->GetSpaceComm()->Gather(root_rank, cnts);
-    std::vector<uint64_t> all_idxs(m_comm->GetSpaceComm()->GetSize() * MAX_IDXS,
-                                   0);
+    std::vector<uint64_t> all_idxs(nprocs * MAX_IDXS, 0);
     std::vector<uint64_t> all_decomps =
         m_comm->GetSpaceComm()->Gather(root_rank, decomps);
     std::vector<uint64_t> all_dsetsize(MAX_CNTS, 0);
@@ -453,10 +450,9 @@ void FieldIOHdf5::v_Write(const std::string &outFile,
 
         // Calculate the indexes to be used by each MPI process when reading the
         // IDS and DATA datasets
-        std::size_t nTotElems = 0, nTotVals = 0, nTotOrder = 0;
-        std::size_t nTotHomY = 0, nTotHomZ = 0, nTotHomS = 0;
-        int nRanks = m_comm->GetSpaceComm()->GetSize();
-        for (int r = 0; r < nRanks; ++r)
+        size_t nTotElems = 0, nTotVals = 0, nTotOrder = 0;
+        size_t nTotHomY = 0, nTotHomZ = 0, nTotHomS = 0;
+        for (int r = 0; r < nprocs; ++r)
         {
             all_idxs[r * MAX_IDXS + IDS_IDX_IDX]   = nTotElems;
             all_idxs[r * MAX_IDXS + DATA_IDX_IDX]  = nTotVals;
@@ -574,7 +570,7 @@ void FieldIOHdf5::v_Write(const std::string &outFile,
     // Gather all field hashes to every processor.
     m_comm->GetSpaceComm()->AllReduce(all_hashes, LibUtilities::ReduceMax);
 
-    for (int n = 0; n < m_comm->GetSpaceComm()->GetSize(); ++n)
+    for (int n = 0; n < nprocs; ++n)
     {
         for (int i = 0; i < nMaxFields; ++i)
         {
@@ -702,7 +698,7 @@ void FieldIOHdf5::v_Write(const std::string &outFile,
     // Set properties for parallel file access (if we're in parallel)
     H5::PListSharedPtr parallelProps = H5::PList::Default();
     H5::PListSharedPtr writePL       = H5::PList::Default();
-    if (m_comm->GetSpaceComm()->GetSize() > 1)
+    if (nprocs > 1)
     {
         // Use MPI/O to access the file
         parallelProps = H5::PList::FileAccess();
@@ -897,14 +893,14 @@ void FieldIOHdf5::v_Import(const std::string &infilename,
                            const Array<OneD, int> &ElementIDs)
 {
     std::stringstream prfx;
-    int nRanks = m_comm->GetSpaceComm()->GetSize();
+    int nprocs = m_comm->GetSpaceComm()->GetSize();
 
     // Set properties for parallel file access (if we're in parallel)
     H5::PListSharedPtr parallelProps = H5::PList::Default();
     H5::PListSharedPtr readPL        = H5::PList::Default();
     H5::PListSharedPtr readPLInd     = H5::PList::Default();
 
-    if (nRanks > 1)
+    if (nprocs > 1)
     {
         // Use MPI/O to access the file
         parallelProps = H5::PList::FileAccess();
@@ -1203,8 +1199,7 @@ void FieldIOHdf5::ImportFieldDef(H5::PListSharedPtr readPL,
                 ParseUtils::GenerateVector(pointsString, pointsStrings);
             ASSERTL0(valid, prfx.str() +
                                 "unable to correctly parse the points types.");
-            for (std::vector<std::string>::size_type i = 0;
-                 i < pointsStrings.size(); i++)
+            for (size_t i = 0; i < pointsStrings.size(); i++)
             {
                 valid = false;
                 for (unsigned int j = 0; j < SIZE_PointsType; j++)
@@ -1347,9 +1342,7 @@ void FieldIOHdf5::ImportHDF5FieldMetaData(DataSourceSharedPtr dataSource,
 {
     H5DataSourceSharedPtr hdf =
         std::static_pointer_cast<H5DataSource>(dataSource);
-
-    H5::GroupSharedPtr master = hdf->Get()->OpenGroup("NEKTAR");
-    // New metadata format only in HDF
+    H5::GroupSharedPtr master   = hdf->Get()->OpenGroup("NEKTAR");
     H5::GroupSharedPtr metadata = master->OpenGroup("Metadata");
 
     if (metadata)

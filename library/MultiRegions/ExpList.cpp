@@ -134,31 +134,6 @@ ExpList::ExpList(const ExpList &in, const bool DeclareCoeffPhysArrays)
     SetupCoeffPhys(DeclareCoeffPhysArrays, false);
 }
 
-ExpList::ExpList(const ExpListSharedPtr &in, const bool DeclareCoeffArrays,
-                 const bool DeclarePhysArrays)
-    : m_expType(in->m_expType),
-
-      m_comm(in->m_comm), m_session(in->m_session), m_graph(in->m_graph),
-      m_ncoeffs(in->m_ncoeffs), m_npoints(in->m_npoints),
-      m_physState(in->m_physState), m_exp(in->m_exp),
-      m_collections(in->m_collections),
-      m_collectionsDoInit(in->m_collectionsDoInit),
-      m_coll_coeff_offset(in->m_coll_coeff_offset),
-      m_coll_phys_offset(in->m_coll_phys_offset),
-      m_coeff_offset(in->m_coeff_offset), m_phys_offset(in->m_phys_offset),
-      m_coeffsToElmt(in->m_coeffsToElmt), m_blockMat(in->m_blockMat),
-      m_WaveSpace(in->m_WaveSpace), m_elmtToExpId(in->m_elmtToExpId)
-{
-    if (DeclareCoeffArrays)
-    {
-        m_coeffs = Array<OneD, NekDouble>(m_ncoeffs, 0.0);
-    }
-    if (DeclarePhysArrays)
-    {
-        m_phys = Array<OneD, NekDouble>(m_npoints, 0.0);
-    }
-}
-
 /**
  * Copies the eIds elements from an existing expansion list.
  * @param   in              Source expansion list.
@@ -461,13 +436,13 @@ ExpList::ExpList(
 
                 auto it = edgeOrders.find(id);
 
-                if (it == edgeOrders.end())
+                if (it == edgeOrders.end()) // not exist, insert new one
                 {
                     edgeOrders.insert(std::make_pair(
                         id, std::make_pair(segGeom,
                                            locexp[i]->GetTraceBasisKey(j))));
                 }
-                else // variable modes/points
+                else // already exist, check if we need to update it
                 {
                     LibUtilities::BasisKey edge =
                         locexp[i]->GetTraceBasisKey(j);
@@ -478,11 +453,17 @@ ExpList::ExpList(
                     int nm1 = edge.GetNumModes();
                     int nm2 = existing.GetNumModes();
 
+                    // if the existing edge has less points/modes than the
+                    // present edge, then we update the existing edge with
+                    // present one (trace should always have highest order)
+
+                    // The pointsType is always GLL for edges
+                    // So we can directly compare them.
                     if (np2 >= np1 && nm2 >= nm1)
                     {
                         continue;
                     }
-                    else if (np2 < np1 && nm2 < nm1)
+                    else if (np2 <= np1 && nm2 <= nm1)
                     {
                         it->second.second = edge;
                     }
@@ -503,26 +484,36 @@ ExpList::ExpList(
             {
                 FaceGeom = exp3D->GetGeom3D()->GetFace(j);
                 id       = FaceGeom->GetGlobalID();
-
+                // Ignore Dirichlet edges
                 if (tracesDone.count(id) != 0)
                 {
                     continue;
                 }
                 auto it = faceOrders.find(id);
 
-                if (it == faceOrders.end())
+                if (it == faceOrders.end()) // not exist, insert new one
                 {
+                    // GetTraceBasisKey does not take into account
+                    // the orientaion. It is w.r.t local face axes.
                     LibUtilities::BasisKey face_dir0 =
                         locexp[i]->GetTraceBasisKey(j, 0);
                     LibUtilities::BasisKey face_dir1 =
                         locexp[i]->GetTraceBasisKey(j, 1);
+
+                    // If the axes 1, 2 of the local face correspond to
+                    // the axes 2, 1 of global face, respectively,
+                    // then swap face0 and face1
+                    if (locexp[i]->GetTraceOrient(j) >= 9)
+                    {
+                        std::swap(face_dir0, face_dir1);
+                    }
 
                     faceOrders.insert(std::make_pair(
                         id,
                         std::make_pair(FaceGeom,
                                        std::make_pair(face_dir0, face_dir1))));
                 }
-                else // variable modes/points
+                else // already exist, check if we need to update it
                 {
                     LibUtilities::BasisKey face0 =
                         locexp[i]->GetTraceBasisKey(j, 0);
@@ -531,6 +522,8 @@ ExpList::ExpList(
                     LibUtilities::BasisKey existing0 = it->second.second.first;
                     LibUtilities::BasisKey existing1 = it->second.second.second;
 
+                    // np -- number of points; nm -- number of modes;
+                    // np_I_J --- I=1 current; I=2 existing; J=1 dir0; J=2 dir1;
                     int np11 = face0.GetNumPoints();
                     int np12 = face1.GetNumPoints();
                     int np21 = existing0.GetNumPoints();
@@ -540,18 +533,98 @@ ExpList::ExpList(
                     int nm21 = existing0.GetNumModes();
                     int nm22 = existing1.GetNumModes();
 
-                    if ((np22 >= np12 || np21 >= np11) &&
-                        (nm22 >= nm12 || nm21 >= nm11))
+                    // If the axes 1, 2 of the current face correspond to
+                    // the axes 2, 1 of existing face, respectively,
+                    // then swap face0 and face1
+                    // eDir1FwdDir2_Dir2FwdDir1 = 9
+                    // eDir1FwdDir2_Dir2BwdDir1 = 10
+                    // eDir1BwdDir2_Dir2FwdDir1 = 11
+                    // eDir1BwdDir2_Dir2BwdDir1 = 12
+                    if (locexp[i]->GetTraceOrient(j) >= 9)
                     {
-                        continue;
+                        std::swap(np11, np12);
+                        std::swap(nm11, nm12);
+                        std::swap(face0, face1);
                     }
-                    else if ((np22 < np12 || np21 < np11) &&
-                             (nm22 < nm12 || nm21 < nm11))
+
+                    // The baiskey return by GetTraceBasisKey should always
+                    // have GLL for eModified_A and GR for eModified_B.
+                    // But we still use GetPointsType to check this.
+                    if (existing1.GetPointsType() ==
+                        LibUtilities::eGaussRadauMAlpha1Beta0)
                     {
-                        it->second.second.first  = face0;
-                        it->second.second.second = face1;
+                        if (face1.GetPointsType() ==
+                            LibUtilities::eGaussLobattoLegendre)
+                        {
+                            np12--; // make np12 comparable to np22
+                        }
                     }
                     else
+                    {
+                        if (face1.GetPointsType() ==
+                            LibUtilities::eGaussRadauMAlpha1Beta0)
+                        {
+                            np12++; // make np12 comparable to np22
+                        }
+                    }
+
+                    if (existing0.GetPointsType() ==
+                        LibUtilities::eGaussRadauMAlpha1Beta0)
+                    {
+                        if (face0.GetPointsType() ==
+                            LibUtilities::eGaussLobattoLegendre)
+                        {
+                            np11--; // make np11 comparable to np21
+                        }
+                    }
+                    else
+                    {
+                        if (face0.GetPointsType() ==
+                            LibUtilities::eGaussRadauMAlpha1Beta0)
+                        {
+                            np11++; // make np11 comparable to np21
+                        }
+                    }
+
+                    // if the existing face_i has less points/modes than the
+                    // present face_i, then we update the existing face_i with
+                    // present one (trace should always have highest order)
+                    if (np22 >= np12 && nm22 >= nm12)
+                    {
+                        // keep existing face_i and do nothing
+                    }
+                    else if (np22 <= np12 && nm22 <= nm12)
+                    {
+                        // Instead of using face0 directly, We create new
+                        // basiskey with original Type but higher order.
+                        LibUtilities::BasisKey newbkey(
+                            existing1.GetBasisType(), nm12,
+                            LibUtilities::PointsKey(np12,
+                                                    existing1.GetPointsType()));
+                        it->second.second.second = newbkey;
+                    }
+                    else // np22 > np12 but nm22 < nm12
+                    {
+                        NEKERROR(ErrorUtil::efatal,
+                                 "inappropriate number of points/modes (max"
+                                 "num of points is not set with max order)");
+                    }
+
+                    if (np21 >= np11 && nm21 >= nm11)
+                    {
+                        // keep existing face_i and do nothing
+                    }
+                    else if (np21 <= np11 && nm21 <= nm11)
+                    {
+                        // Instead of using face0 directly, We create new
+                        // basiskey with original Type but higher order.
+                        LibUtilities::PointsKey newpkey(
+                            np11, existing0.GetPointsType());
+                        LibUtilities::BasisKey newbkey(existing0.GetBasisType(),
+                                                       nm11, newpkey);
+                        it->second.second.first = newbkey;
+                    }
+                    else // np21 > np11 but nm21 < nm11
                     {
                         NEKERROR(ErrorUtil::efatal,
                                  "inappropriate number of points/modes (max"
@@ -575,8 +648,8 @@ ExpList::ExpList(
             tCnt += locexp[i]->GetNtraces();
         }
 
-        // Set up the offset and the array that will contain the list of
-        // edge IDs, then reduce this across processors.
+        // Record the number traces on each partition,
+        // then reduce this across processors.
         Array<OneD, int> tracesCnt(nproc, 0);
         tracesCnt[tracepr] = tCnt;
         m_comm->GetRowComm()->AllReduce(tracesCnt, LibUtilities::ReduceSum);
@@ -590,12 +663,24 @@ ExpList::ExpList(
             tTotOffsets[i] = tTotOffsets[i - 1] + tracesCnt[i - 1];
         }
 
-        // Local list of the edges per element
+        // Set up arrays that are large enough to hold all traces
+        // in the domain, not just those in local partition.
         Array<OneD, int> TracesTotID(totTraceCnt, 0);
         Array<OneD, int> TracesTotNm0(totTraceCnt, 0);
         Array<OneD, int> TracesTotNm1(totTraceCnt, 0);
         Array<OneD, int> TracesTotPnts0(totTraceCnt, 0);
         Array<OneD, int> TracesTotPnts1(totTraceCnt, 0);
+        Array<OneD, int> TracesPointsType0(totTraceCnt, 0);
+        Array<OneD, int> TracesPointsType1(totTraceCnt, 0);
+        // convert enum PointsType to integer, so that MPI can handle it
+
+        // TODO: Change this design to save memory and improve performance.
+        //
+        // In the current design, After AllReduce, each processor will
+        // store a full copy these large arrays, which might be too
+        // expensive when nproc and mesh are large. So basically, this
+        // design is just a naive implementation and we need to redesign it
+        // in the future.
 
         int cntr = tTotOffsets[tracepr];
 
@@ -613,6 +698,10 @@ ExpList::ExpList(
                     TracesTotID[cntr]    = exp2D->GetGeom2D()->GetEid(j);
                     TracesTotNm0[cntr]   = bkeyEdge.GetNumModes();
                     TracesTotPnts0[cntr] = bkeyEdge.GetNumPoints();
+                    TracesPointsType0[cntr] =
+                        static_cast<int>(bkeyEdge.GetPointsType());
+                    // Althought for edges, we only have GLL points, we still
+                    // keep this design for backup.
                 }
             }
             else if ((exp3D = locexp[i]->as<LocalRegions::Expansion3D>()))
@@ -626,11 +715,23 @@ ExpList::ExpList(
                     LibUtilities::BasisKey face_dir1 =
                         locexp[i]->GetTraceBasisKey(j, 1);
 
+                    // If the axes 1, 2 of the local face correspond to
+                    // the axes 2, 1 of global face, respectively,
+                    // then swap face0 and face1
+                    if (locexp[i]->GetTraceOrient(j) >= 9)
+                    {
+                        std::swap(face_dir0, face_dir1);
+                    }
+
                     TracesTotID[cntr]    = exp3D->GetGeom3D()->GetFid(j);
                     TracesTotNm0[cntr]   = face_dir0.GetNumModes();
                     TracesTotNm1[cntr]   = face_dir1.GetNumModes();
                     TracesTotPnts0[cntr] = face_dir0.GetNumPoints();
                     TracesTotPnts1[cntr] = face_dir1.GetNumPoints();
+                    TracesPointsType0[cntr] =
+                        static_cast<int>(face_dir0.GetPointsType());
+                    TracesPointsType1[cntr] =
+                        static_cast<int>(face_dir1.GetPointsType());
                 }
             }
         }
@@ -639,11 +740,21 @@ ExpList::ExpList(
         m_comm->GetRowComm()->AllReduce(TracesTotNm0, LibUtilities::ReduceSum);
         m_comm->GetRowComm()->AllReduce(TracesTotPnts0,
                                         LibUtilities::ReduceSum);
-        if (m_expType == e2D)
+        m_comm->GetRowComm()->AllReduce(TracesPointsType0,
+                                        LibUtilities::ReduceSum);
+        if (m_expType == e2D) // 2D face
         {
-            m_comm->AllReduce(TracesTotNm1, LibUtilities::ReduceSum);
-            m_comm->AllReduce(TracesTotPnts1, LibUtilities::ReduceSum);
+            m_comm->GetRowComm()->AllReduce(TracesTotNm1,
+                                            LibUtilities::ReduceSum);
+            m_comm->GetRowComm()->AllReduce(TracesTotPnts1,
+                                            LibUtilities::ReduceSum);
+            m_comm->GetRowComm()->AllReduce(TracesPointsType1,
+                                            LibUtilities::ReduceSum);
         }
+        // TracesTotXXX has collected traces info of entire domain
+        // Now compare them with current traces info - edgeOrders
+        // and update traces basiskey. This step is to ensure the
+        // m_trace has highest order even on parition interfaces.
 
         if (edgeOrders.size())
         {
@@ -657,23 +768,26 @@ ExpList::ExpList(
                 }
 
                 LibUtilities::BasisKey existing = it->second.second;
-                LibUtilities::BasisKey edge(
-                    existing.GetBasisType(), TracesTotNm0[i],
-                    LibUtilities::PointsKey(TracesTotPnts0[i],
-                                            existing.GetPointsType()));
 
-                int np1 = edge.GetNumPoints();
+                int np1 = TracesTotPnts0[i];
                 int np2 = existing.GetNumPoints();
-                int nm1 = edge.GetNumModes();
+                int nm1 = TracesTotNm0[i];
                 int nm2 = existing.GetNumModes();
 
+                // The pointsType is always GLL for edges
+                // So we can directly compare them.
                 if (np2 >= np1 && nm2 >= nm1)
                 {
                     continue;
                 }
-                else if (np2 < np1 && nm2 < nm1)
+                else if (np2 <= np1 && nm2 <= nm1)
                 {
-                    it->second.second = edge;
+                    // We have to rebuild the basis key locally because
+                    // MPI::AllReduce does not support BasisKey directly.
+                    LibUtilities::BasisKey newbkey(
+                        existing.GetBasisType(), nm1,
+                        LibUtilities::PointsKey(np1, existing.GetPointsType()));
+                    it->second.second = newbkey;
                 }
                 else
                 {
@@ -696,39 +810,99 @@ ExpList::ExpList(
 
                 LibUtilities::BasisKey existing0 = it->second.second.first;
                 LibUtilities::BasisKey existing1 = it->second.second.second;
-                LibUtilities::BasisKey face0(
-                    existing0.GetBasisType(), TracesTotNm0[i],
-                    LibUtilities::PointsKey(TracesTotPnts0[i],
-                                            existing0.GetPointsType()));
-                LibUtilities::BasisKey face1(
-                    existing1.GetBasisType(), TracesTotNm1[i],
-                    LibUtilities::PointsKey(TracesTotPnts1[i],
-                                            existing1.GetPointsType()));
 
-                int np11 = face0.GetNumPoints();
-                int np12 = face1.GetNumPoints();
+                // np -- number of points; nm -- number of modes;
+                // np_I_J --- I=1 current; I=2 existing; J=1 dir0; J=2 dir1;
+                int np11 = TracesTotPnts0[i];
+                int np12 = TracesTotPnts1[i];
                 int np21 = existing0.GetNumPoints();
                 int np22 = existing1.GetNumPoints();
-                int nm11 = face0.GetNumModes();
-                int nm12 = face1.GetNumModes();
+                int nm11 = TracesTotNm0[i];
+                int nm12 = TracesTotNm1[i];
                 int nm21 = existing0.GetNumModes();
                 int nm22 = existing1.GetNumModes();
 
-                if ((np22 >= np12 || np21 >= np11) &&
-                    (nm22 >= nm12 || nm21 >= nm11))
+                // The orientation is already aligned
+                // Here we only need to compare pointsType
+                // and adjust np
+                if (existing1.GetPointsType() ==
+                    LibUtilities::eGaussRadauMAlpha1Beta0)
                 {
-                    continue;
-                }
-                else if ((np22 < np12 || np21 < np11) &&
-                         (nm22 < nm12 || nm21 < nm11))
-                {
-                    it->second.second.first  = face0;
-                    it->second.second.second = face1;
+                    if (static_cast<LibUtilities::PointsType>(
+                            TracesPointsType1[i]) ==
+                        LibUtilities::eGaussLobattoLegendre)
+                    {
+                        np12--; // make np12 comparable to np22
+                    }
                 }
                 else
                 {
+                    if (static_cast<LibUtilities::PointsType>(
+                            TracesPointsType1[i]) ==
+                        LibUtilities::eGaussRadauMAlpha1Beta0)
+                    {
+                        np12++; // make np12 comparable to np22
+                    }
+                }
+
+                if (existing0.GetPointsType() ==
+                    LibUtilities::eGaussRadauMAlpha1Beta0)
+                {
+                    if (static_cast<LibUtilities::PointsType>(
+                            TracesPointsType0[i]) ==
+                        LibUtilities::eGaussLobattoLegendre)
+                    {
+                        np11--; // make np11 comparable to np21
+                    }
+                }
+                else
+                {
+                    if (static_cast<LibUtilities::PointsType>(
+                            TracesPointsType0[i]) ==
+                        LibUtilities::eGaussRadauMAlpha1Beta0)
+                    {
+                        np11++; // make np11 comparable to np21
+                    }
+                }
+
+                // if the existing face_i has less points/modes than the
+                // present face_i, then we update the existing face_i with
+                // present one (trace should always have highest order)
+                if (np22 >= np12 && nm22 >= nm12)
+                {
+                    // keep existing face_i and do nothing
+                }
+                else if (np22 <= np12 && nm22 <= nm12)
+                {
+                    LibUtilities::BasisKey newbkey(
+                        existing1.GetBasisType(), nm12,
+                        LibUtilities::PointsKey(np12,
+                                                existing1.GetPointsType()));
+                    it->second.second.second = newbkey;
+                }
+                else // np22 > np12 but nm22 < nm12
+                {
                     NEKERROR(ErrorUtil::efatal,
                              "inappropriate number of points/modes (max "
+                             "num of points is not set with max order)");
+                }
+
+                if (np21 >= np11 && nm21 >= nm11)
+                {
+                    // keep existing face_i and do nothing
+                }
+                else if (np21 <= np11 && nm21 <= nm11)
+                {
+                    LibUtilities::BasisKey newbkey(
+                        existing0.GetBasisType(), nm11,
+                        LibUtilities::PointsKey(np11,
+                                                existing0.GetPointsType()));
+                    it->second.second.first = newbkey;
+                }
+                else // np21 > np11 but nm21 < nm11
+                {
+                    NEKERROR(ErrorUtil::efatal,
+                             "inappropriate number of points/modes (max"
                              "num of points is not set with max order)");
                 }
             }
@@ -988,7 +1162,7 @@ ExpList::ExpList(const LibUtilities::SessionReaderSharedPtr &pSession,
 
     int meshdim = graph->GetMeshDimension();
 
-    // Retrieve the list of expansions (needed of meshdim == 1
+    // Retrieve the list of expansions (element exp)
     const SpatialDomains::ExpansionInfoMap &expansions =
         graph->GetExpansionInfo(variable);
 
@@ -1018,14 +1192,48 @@ ExpList::ExpList(const LibUtilities::SessionReaderSharedPtr &pSession,
 
                 if (meshdim == 1)
                 {
+                    // map<int, ExpansionInfoShPtr>
                     auto expIt = expansions.find(SegGeom->GetGlobalID());
                     ASSERTL0(expIt != expansions.end(),
                              "Failed to find basis key");
                     bkey = expIt->second->m_basisKeyVector[0];
                 }
-                else
+                else // get bkey from Tri or Quad
                 {
-                    bkey = graph->GetEdgeBasisKey(SegGeom, variable);
+                    // First, create the element stdExp that the edge belongs to
+                    SpatialDomains::GeometryLinkSharedPtr elmts =
+                        graph->GetElementsFromEdge(SegGeom);
+                    // elmts -> std::vector<std::pair<GeometrySharedPtr, int> >
+                    // Currently we assume the elements adjacent to the edge
+                    // have the same type. So we directly fetch the first
+                    // element.
+                    SpatialDomains::GeometrySharedPtr geom = elmts->at(0).first;
+                    int edge_id = elmts->at(0).second;
+                    SpatialDomains::ExpansionInfoShPtr expInfo =
+                        graph->GetExpansionInfo(geom, variable);
+                    LibUtilities::BasisKey Ba = expInfo->m_basisKeyVector[0];
+                    LibUtilities::BasisKey Bb = expInfo->m_basisKeyVector[1];
+                    StdRegions::StdExpansionSharedPtr elmtStdExp;
+
+                    if (geom->GetShapeType() == LibUtilities::eTriangle)
+                    {
+                        elmtStdExp = MemoryManager<
+                            StdRegions::StdTriExp>::AllocateSharedPtr(Ba, Bb);
+                    }
+                    else if (geom->GetShapeType() ==
+                             LibUtilities::eQuadrilateral)
+                    {
+                        elmtStdExp = MemoryManager<
+                            StdRegions::StdQuadExp>::AllocateSharedPtr(Ba, Bb);
+                    }
+                    else
+                    {
+                        NEKERROR(ErrorUtil::efatal,
+                                 "Fail to cast geom to a known 2D shape.");
+                    }
+                    // Then, get the trace basis key from the element stdExp,
+                    // which may be different from Ba and Bb.
+                    bkey = elmtStdExp->GetTraceBasisKey(edge_id);
                 }
 
                 if (SetToOneSpaceDimension)
@@ -1051,10 +1259,54 @@ ExpList::ExpList(const LibUtilities::SessionReaderSharedPtr &pSession,
             {
                 m_expType = e2D;
 
+                // First, create the element stdExp that the face belongs to
+                SpatialDomains::GeometryLinkSharedPtr elmts =
+                    graph->GetElementsFromFace(TriGeom);
+                // elmts -> std::vector<std::pair<GeometrySharedPtr, int> >
+                // Currently we assume the elements adjacent to the face have
+                // the same type. So we directly fetch the first element.
+                SpatialDomains::GeometrySharedPtr geom = elmts->at(0).first;
+                int face_id                            = elmts->at(0).second;
+                SpatialDomains::ExpansionInfoShPtr expInfo =
+                    graph->GetExpansionInfo(geom, variable);
+                LibUtilities::BasisKey Ba = expInfo->m_basisKeyVector[0];
+                LibUtilities::BasisKey Bb = expInfo->m_basisKeyVector[1];
+                LibUtilities::BasisKey Bc = expInfo->m_basisKeyVector[2];
+                StdRegions::StdExpansionSharedPtr elmtStdExp;
+
+                if (geom->GetShapeType() == LibUtilities::ePrism)
+                {
+                    elmtStdExp = MemoryManager<
+                        StdRegions::StdPrismExp>::AllocateSharedPtr(Ba, Bb, Bc);
+                }
+                else if (geom->GetShapeType() == LibUtilities::eTetrahedron)
+                {
+                    elmtStdExp =
+                        MemoryManager<StdRegions::StdTetExp>::AllocateSharedPtr(
+                            Ba, Bb, Bc);
+                }
+                else if (geom->GetShapeType() == LibUtilities::ePyramid)
+                {
+                    elmtStdExp =
+                        MemoryManager<StdRegions::StdPyrExp>::AllocateSharedPtr(
+                            Ba, Bb, Bc);
+                }
+                else // hex cannot have tri surface
+                {
+                    NEKERROR(ErrorUtil::efatal,
+                             "Fail to cast geom to a known 3D shape.");
+                }
+                // Then, get the trace basis key from the element stdExp,
+                // which may be different from Ba, Bb and Bc.
                 LibUtilities::BasisKey TriBa =
-                    graph->GetFaceBasisKey(TriGeom, 0, variable);
+                    elmtStdExp->GetTraceBasisKey(face_id, 0);
                 LibUtilities::BasisKey TriBb =
-                    graph->GetFaceBasisKey(TriGeom, 1, variable);
+                    elmtStdExp->GetTraceBasisKey(face_id, 1);
+                // swap TriBa and TriBb orientation is transposed
+                if (geom->GetForient(face_id) >= 9)
+                {
+                    std::swap(TriBa, TriBb);
+                }
 
                 if (graph->GetExpansionInfo()
                         .begin()
@@ -1083,10 +1335,54 @@ ExpList::ExpList(const LibUtilities::SessionReaderSharedPtr &pSession,
             {
                 m_expType = e2D;
 
+                // First, create the element stdExp that the face belongs to
+                SpatialDomains::GeometryLinkSharedPtr elmts =
+                    graph->GetElementsFromFace(QuadGeom);
+                // elmts -> std::vector<std::pair<GeometrySharedPtr, int> >
+                // Currently we assume the elements adjacent to the face have
+                // the same type. So we directly fetch the first element.
+                SpatialDomains::GeometrySharedPtr geom = elmts->at(0).first;
+                int face_id                            = elmts->at(0).second;
+                SpatialDomains::ExpansionInfoShPtr expInfo =
+                    graph->GetExpansionInfo(geom, variable);
+                LibUtilities::BasisKey Ba = expInfo->m_basisKeyVector[0];
+                LibUtilities::BasisKey Bb = expInfo->m_basisKeyVector[1];
+                LibUtilities::BasisKey Bc = expInfo->m_basisKeyVector[2];
+                StdRegions::StdExpansionSharedPtr elmtStdExp;
+
+                if (geom->GetShapeType() == LibUtilities::ePrism)
+                {
+                    elmtStdExp = MemoryManager<
+                        StdRegions::StdPrismExp>::AllocateSharedPtr(Ba, Bb, Bc);
+                }
+                else if (geom->GetShapeType() == LibUtilities::eHexahedron)
+                {
+                    elmtStdExp =
+                        MemoryManager<StdRegions::StdHexExp>::AllocateSharedPtr(
+                            Ba, Bb, Bc);
+                }
+                else if (geom->GetShapeType() == LibUtilities::ePyramid)
+                {
+                    elmtStdExp =
+                        MemoryManager<StdRegions::StdPyrExp>::AllocateSharedPtr(
+                            Ba, Bb, Bc);
+                }
+                else // Tet cannot have quad surface
+                {
+                    NEKERROR(ErrorUtil::efatal,
+                             "Fail to cast geom to a known 3D shape.");
+                }
+                // Then, get the trace basis key from the element stdExp,
+                // which may be different from Ba, Bb and Bc.
                 LibUtilities::BasisKey QuadBa =
-                    graph->GetFaceBasisKey(QuadGeom, 0, variable);
+                    elmtStdExp->GetTraceBasisKey(face_id, 0);
                 LibUtilities::BasisKey QuadBb =
-                    graph->GetFaceBasisKey(QuadGeom, 1, variable);
+                    elmtStdExp->GetTraceBasisKey(face_id, 1);
+                // swap Ba and Bb if the orientation is transposed
+                if (geom->GetForient(face_id) >= 9)
+                {
+                    std::swap(QuadBa, QuadBb);
+                }
 
                 exp = MemoryManager<LocalRegions::QuadExp>::AllocateSharedPtr(
                     QuadBa, QuadBb, QuadGeom);
@@ -1413,9 +1709,9 @@ void ExpList::DivideByQuadratureMetric(
  * @param   outarray        An array of size \f$N_{\mathrm{eof}}\f$
  *                          used to store the result.
  */
-void ExpList::IProductWRTDerivBase(const int dir,
-                                   const Array<OneD, const NekDouble> &inarray,
-                                   Array<OneD, NekDouble> &outarray)
+void ExpList::v_IProductWRTDerivBase(
+    const int dir, const Array<OneD, const NekDouble> &inarray,
+    Array<OneD, NekDouble> &outarray)
 {
     int i;
 
@@ -1475,7 +1771,7 @@ void ExpList::IProductWRTDirectionalDerivBase(
  * @param   outarray        An array of size \f$N_{\mathrm{eof}}\f$
  *                          used to store the result.
  */
-void ExpList::IProductWRTDerivBase(
+void ExpList::v_IProductWRTDerivBase(
     const Array<OneD, const Array<OneD, NekDouble>> &inarray,
     Array<OneD, NekDouble> &outarray)
 {
@@ -4454,15 +4750,6 @@ void ExpList::GetElmtNormalLength(Array<OneD, NekDouble> &lengthsFwd,
     }
 }
 
-void ExpList::v_AddTraceIntegral(const Array<OneD, const NekDouble> &Fx,
-                                 const Array<OneD, const NekDouble> &Fy,
-                                 Array<OneD, NekDouble> &outarray)
-{
-    boost::ignore_unused(Fx, Fy, outarray);
-    NEKERROR(ErrorUtil::efatal,
-             "This method is not defined or valid for this class type");
-}
-
 void ExpList::v_AddTraceIntegral(const Array<OneD, const NekDouble> &Fn,
                                  Array<OneD, NekDouble> &outarray)
 {
@@ -5193,7 +5480,6 @@ void ExpList::CreateCollections(Collections::ImplementationType ImpType)
     // session file or default given
     Collections::CollectionOptimisation colOpt(
         m_session, (*m_exp)[0]->GetShapeDimension(), ImpType);
-    // ImpType = colOpt.GetDefaultImplementationType();
 
     // turn on autotuning if explicitly specified in xml file
     // or command line option is set but only do optimisation

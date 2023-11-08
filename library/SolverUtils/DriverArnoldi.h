@@ -85,7 +85,7 @@ protected:
                   const SpatialDomains::MeshGraphSharedPtr pGraph);
 
     /// Destructor
-    virtual ~DriverArnoldi();
+    virtual ~DriverArnoldi() = default;
 
     /// Virtual function for initialisation implementation.
     virtual void v_InitObject(std::ostream &out = std::cout) override;

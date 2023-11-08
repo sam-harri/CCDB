@@ -29,6 +29,18 @@ elif [[ $BUILD_TYPE == "full" ]]; then
     elif [[ $BUILD_SIMD == "avx512" ]]; then
         BUILD_OPTS="$BUILD_OPTS -DNEKTAR_ENABLE_SIMD_AVX512:BOOL=ON"
     fi
+elif [[ $BUILD_TYPE == "performance" ]]; then
+    BUILD_OPTS="-DCMAKE_BUILD_TYPE=Release \
+        -DNEKTAR_BUILD_TESTS=OFF \
+        -DNEKTAR_BUILD_UNIT_TESTS=OFF \
+        -DNEKTAR_BUILD_PERFORMANCE_TESTS=ON \
+        -DNEKTAR_ERROR_ON_WARNINGS=OFF"
+fi
+
+if [[ $BUILD_TYPE != "performance" ]]; then
+    TEST_JOBS="$NUM_CPUS"
+else 
+    TEST_JOBS="1"
 fi
 
 # Custom compiler
@@ -45,7 +57,7 @@ fi
 rm -rf build && mkdir -p build && (cd build && cmake -G 'Unix Makefiles' $BUILD_OPTS ..) && \
     make -C build -j $NUM_CPUS all 2>&1 && \
     make -C build -j $NUM_CPUS install && \
-    (cd build && ctest -j $NUM_CPUS --output-on-failure)
+    (cd build && ctest -j $TEST_JOBS --output-on-failure)
 
 exit_code=$?
 if [[ $exit_code -ne 0 ]]

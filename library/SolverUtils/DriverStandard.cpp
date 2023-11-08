@@ -61,13 +61,6 @@ DriverStandard::DriverStandard(
 /**
  *
  */
-DriverStandard::~DriverStandard()
-{
-}
-
-/**
- *
- */
 void DriverStandard::v_InitObject(ostream &out)
 {
     Driver::v_InitObject(out);
@@ -111,7 +104,7 @@ void DriverStandard::v_Execute(ostream &out)
         Array<OneD, NekDouble> exactsoln(m_equ[0]->GetTotPoints(), 0.0);
 
         // Evaluate "ExactSolution" function, or zero array
-        m_equ[0]->EvaluateExactSolution(i, exactsoln, m_equ[0]->GetFinalTime());
+        m_equ[0]->EvaluateExactSolution(i, exactsoln, m_equ[0]->GetTime());
 
         NekDouble vL2Error   = m_equ[0]->L2Error(i, exactsoln);
         NekDouble vLinfError = m_equ[0]->LinfError(i, exactsoln);

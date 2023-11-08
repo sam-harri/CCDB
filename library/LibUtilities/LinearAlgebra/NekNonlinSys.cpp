@@ -53,9 +53,9 @@ NekNonlinSysFactory &GetNekNonlinSysFactory()
 }
 
 NekNonlinSys::NekNonlinSys(const LibUtilities::SessionReaderSharedPtr &pSession,
-                           const LibUtilities::CommSharedPtr &vComm,
+                           const LibUtilities::CommSharedPtr &vRowComm,
                            const int nDimen, const NekSysKey &pKey)
-    : NekSys(pSession, vComm, nDimen, pKey)
+    : NekSys(pSession, vRowComm, nDimen, pKey)
 {
     std::vector<std::string> variables(1);
     variables[0]    = pSession->GetVariable(0);
@@ -137,7 +137,7 @@ NekNonlinSys::NekNonlinSys(const LibUtilities::SessionReaderSharedPtr &pSession,
                  "' is not defined.\n");
 
     m_linsol = LibUtilities::GetNekLinSysIterFactory().CreateInstance(
-        m_LinSysIterSolverType, pSession, m_Comm, m_SysDimen, pKey);
+        m_LinSysIterSolverType, pSession, m_rowComm, m_SysDimen, pKey);
     m_linsol->SetFlagWarnings(false);
 }
 

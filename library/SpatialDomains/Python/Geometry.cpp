@@ -59,6 +59,7 @@ void export_Geometry()
 
         .def("GetCoordim", &Geometry::GetCoordim)
         .def("GetGlobalID", &Geometry::GetGlobalID)
+        .def("SetGlobalID", &Geometry::SetGlobalID)
 
         .def("Setup", &Geometry::Setup)
         .def("FillGeom", &Geometry::FillGeom)

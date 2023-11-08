@@ -241,8 +241,8 @@ ContField::~ContField()
  * variable #inarray of the ExpList object \a Sin. The resulting global
  * coefficients \f$\hat{u}_g\f$ are stored in the array #outarray.
  */
-void ContField::FwdTrans(const Array<OneD, const NekDouble> &inarray,
-                         Array<OneD, NekDouble> &outarray)
+void ContField::v_FwdTrans(const Array<OneD, const NekDouble> &inarray,
+                           Array<OneD, NekDouble> &outarray)
 
 {
     // Inner product of forcing
@@ -276,12 +276,11 @@ void ContField::v_SmoothField(Array<OneD, NekDouble> &field)
  * @param   inarray     Input vector @f$\mathbf{x}@f$.
  * @param   outarray    Output vector @f$\mathbf{y}@f$.
  */
-void ContField::MultiplyByInvMassMatrix(
+void ContField::v_MultiplyByInvMassMatrix(
     const Array<OneD, const NekDouble> &inarray,
     Array<OneD, NekDouble> &outarray)
 
 {
-
     GlobalLinSysKey key(StdRegions::eMass, m_locToGloMap);
     GlobalSolve(key, inarray, outarray);
 }
@@ -556,15 +555,6 @@ GlobalLinSysSharedPtr ContField::GenGlobalLinSys(const GlobalLinSysKey &mkey)
     return ExpList::GenGlobalLinSys(mkey, m_locToGloMap);
 }
 
-/**
- *
- */
-void ContField::v_FwdTrans(const Array<OneD, const NekDouble> &inarray,
-                           Array<OneD, NekDouble> &outarray)
-{
-    FwdTrans(inarray, outarray);
-}
-
 void ContField::v_ImposeDirichletConditions(Array<OneD, NekDouble> &outarray)
 {
     int i, j;
@@ -761,16 +751,6 @@ void ContField::v_LocalToGlobal(bool useComm)
 }
 
 /**
- *
- */
-void ContField::v_MultiplyByInvMassMatrix(
-    const Array<OneD, const NekDouble> &inarray,
-    Array<OneD, NekDouble> &outarray)
-{
-    MultiplyByInvMassMatrix(inarray, outarray);
-}
-
-/**
  * Consider the two dimensional Helmholtz equation,
  * \f[\nabla^2u(\boldsymbol{x})-\lambda u(\boldsymbol{x})
  * = f(\boldsymbol{x}),\f] supplemented with appropriate boundary
@@ -905,7 +885,7 @@ GlobalLinSysKey ContField::v_HelmSolve(
 GlobalLinSysKey ContField::v_LinearAdvectionDiffusionReactionSolve(
     const Array<OneD, const NekDouble> &inarray,
     Array<OneD, NekDouble> &outarray, const StdRegions::ConstFactorMap &factors,
-    const StdRegions::VarCoeffMap &varcoeffs,
+    const StdRegions::VarCoeffMap &pvarcoeff,
     const MultiRegions::VarFactorsMap &varfactors,
     const Array<OneD, const NekDouble> &dirForcing, const bool PhysSpaceForcing)
 {
@@ -961,9 +941,49 @@ GlobalLinSysKey ContField::v_LinearAdvectionDiffusionReactionSolve(
         bndcnt += m_bndCondExpansions[i]->GetNcoeffs();
     }
 
+    StdRegions::MatrixType mtype =
+        StdRegions::eLinearAdvectionDiffusionReaction;
+
+    StdRegions::VarCoeffMap varcoeff(pvarcoeff);
+    if (factors.count(StdRegions::eFactorGJP))
+    {
+        // initialize if required
+        if (!m_GJPData)
+        {
+            m_GJPData = MemoryManager<GJPStabilisation>::AllocateSharedPtr(
+                GetSharedThisPtr());
+        }
+
+        if (m_GJPData->IsSemiImplicit())
+        {
+            mtype = StdRegions::eLinearAdvectionDiffusionReactionGJP;
+        }
+
+        // to set up forcing need initial guess in physical space
+        Array<OneD, NekDouble> phys(m_npoints), tmp;
+        BwdTrans(outarray, phys);
+        NekDouble scale = -1.0 * factors.find(StdRegions::eFactorGJP)->second;
+        /*
+        Array<OneD, NekDouble> tmp;
+        tmp = pvarcoeff.count(StdRegions::eVarCoeffGJPNormVel)
+                             ? pvarcoeff.find(StdRegions::eVarCoeffGJPNormVel)
+                                   ->second.GetValue()
+                             : NullNekDouble1DArray;
+        */
+
+        m_GJPData->Apply(phys, wsp,
+                         pvarcoeff.count(StdRegions::eVarCoeffGJPNormVel)
+                             ? pvarcoeff.find(StdRegions::eVarCoeffGJPNormVel)
+                                   ->second.GetValue()
+                             : NullNekDouble1DArray,
+                         scale);
+
+        varcoeff.erase(StdRegions::eVarCoeffGJPNormVel);
+    }
+
     // Solve the system
-    GlobalLinSysKey key(StdRegions::eLinearAdvectionDiffusionReaction,
-                        m_locToGloMap, factors, varcoeffs, varfactors);
+    GlobalLinSysKey key(mtype, m_locToGloMap, factors, pvarcoeff, varfactors);
+
     GlobalSolve(key, wsp, outarray, dirForcing);
 
     return key;
@@ -998,15 +1018,6 @@ void ContField::v_LinearAdvectionReactionSolve(
                         factors, varcoeffs);
 
     GlobalSolve(key, wsp, outarray, dirForcing);
-}
-
-/**
- *
- */
-const Array<OneD, const SpatialDomains::BoundaryConditionShPtr>
-    &ContField::v_GetBndConditions()
-{
-    return GetBndConditions();
 }
 
 /**

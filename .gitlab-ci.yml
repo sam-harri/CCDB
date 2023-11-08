@@ -90,6 +90,7 @@ include:
     - mkdir -p log
     - if [ ! -d $CCACHE_DIR ]; then mkdir -p $CCACHE_DIR && chown 1000:1000 $CCACHE_DIR; fi
     - docker run --name $CONTAINER_NAME -v ccache:/cache
+      -h "${CI_RUNNER_ID}.${CI_JOB_NAME}"
       -e "BUILD_TYPE=$BUILD_TYPE"
       -e "BUILD_SIMD=$BUILD_SIMD"
       -e "BUILD_CC=$BUILD_CC"
@@ -191,9 +192,19 @@ include:
   <<: *build-env-template
   stage: build-env-default
 
+.build-env-debian-template-performance: &build-env-debian-template-performance
+  <<: *build-env-debian-template-default
+
 .build-env-debian-template-full: &build-env-debian-template-full
   <<: *build-env-debian-template-default
   stage: build-env-full
+
+debian-bookworm-default-build-env:
+  <<: *build-env-debian-template-default
+
+debian-bookworm-full-build-env:
+  <<: *build-env-debian-template-full
+  needs: ["debian-bookworm-default-build-env"]
 
 debian-bullseye-default-build-env:
   <<: *build-env-debian-template-default
@@ -204,6 +215,11 @@ debian-bullseye-full-build-env:
     REMOVE_UCX: 1
   needs: ["debian-bullseye-default-build-env"]
 
+debian-bullseye-performance-build-env:
+  <<: *build-env-debian-template-performance
+  tags:
+    - perf
+
 debian-buster-default-build-env:
   <<: *build-env-debian-template-default
 
@@ -211,9 +227,42 @@ debian-buster-full-build-env:
   <<: *build-env-debian-template-full
   needs: ["debian-buster-default-build-env"]
 
+debian-bookworm-default-build-and-test:
+  <<: *build-and-test-template
+  needs: ["debian-bookworm-default-build-env"]
+
+debian-bookworm-full-build-and-test:
+  <<: *build-and-test-template
+  needs: ["debian-bookworm-full-build-env"]
+
+debian-bookworm-full-avx2-build-and-test:
+  <<: *build-and-test-template
+  needs: ["debian-bookworm-full-build-env"]
+  variables:
+    BUILD_SIMD: avx2
+  tags:
+    - avx2
+
+debian-bookworm-full-avx512-build-and-test:
+  <<: *build-and-test-template
+  needs: ["debian-bookworm-full-build-env"]
+  variables:
+    BUILD_SIMD: avx512
+  tags:
+    - avx512
+
 debian-bullseye-default-build-and-test:
   <<: *build-and-test-template
   needs: ["debian-bullseye-default-build-env"]
+
+debian-bullseye-performance-build-and-test:
+  <<: *build-and-test-template
+  stage: build-and-test
+  needs: ["debian-bullseye-performance-build-env"]
+  tags:
+    - perf
+  timeout: 1h
+  allow_failure: true
 
 debian-bullseye-full-build-and-test:
   <<: *build-and-test-template
@@ -247,6 +296,22 @@ debian-buster-full-build-and-test:
 
 
 # COMPILER WARNINGS
+debian-bookworm-default-warnings:
+  <<: *compiler-warning-template
+  needs: ["debian-bookworm-default-build-and-test"]
+
+debian-bookworm-full-warnings:
+  <<: *compiler-warning-template
+  needs: ["debian-bookworm-full-build-and-test"]
+
+debian-bookworm-full-avx2-warnings:
+  <<: *compiler-warning-template
+  needs: ["debian-bookworm-full-avx2-build-and-test"]
+
+debian-bookworm-full-avx512-warnings:
+  <<: *compiler-warning-template
+  needs: ["debian-bookworm-full-avx512-build-and-test"]
+
 debian-bullseye-default-warnings:
   <<: *compiler-warning-template
   needs: ["debian-bullseye-default-build-and-test"]
@@ -258,6 +323,14 @@ debian-bullseye-full-warnings:
 debian-bullseye-full-avx2-warnings:
   <<: *compiler-warning-template
   needs: ["debian-bullseye-full-avx2-build-and-test"]
+
+debian-bullseye-full-avx512-warnings:
+  <<: *compiler-warning-template
+  needs: ["debian-bullseye-full-avx512-build-and-test"]
+
+debian-bullseye-performance-warnings:
+  <<: *compiler-warning-template
+  needs: ["debian-bullseye-performance-build-and-test"]
 
 debian-buster-default-warnings:
   <<: *compiler-warning-template
@@ -283,7 +356,7 @@ debian-bullseye-xml-format:
 
 
 # DOCUMENTATION
-debian-bullseye-documentation-build-env:
+debian-bookworm-documentation-build-env:
   <<: *execution-conditions
   image: docker:19.03.6
   stage: build-env-full
@@ -294,12 +367,12 @@ debian-bullseye-documentation-build-env:
     - docker pull $IMAGE || true
     - docker build --pull -t $IMAGE .
     - docker push $IMAGE
-  needs: ["debian-bullseye-default-build-env"]
+  needs: ["debian-bookworm-default-build-env"]
 
 .build-documentation-template: &build-documentation-template
   <<: *build-and-test-template
   image: $CI_REGISTRY_IMAGE:env-documentation
-  needs: ["debian-bullseye-documentation-build-env"]
+  needs: ["debian-bookworm-documentation-build-env"]
 
 user-guide-build:
   <<: *build-documentation-template
@@ -537,27 +610,6 @@ fedora-36-full-warnings:
     - bash -x ./.gitlab-ci/build-and-test.sh |
       tee log/${OS_VERSION}_${BUILD_TYPE}.log
 
-# Intel runners
-macos-default-intel-build-and-test:
-  <<: *build-and-test-macos-template
-  variables:
-    BUILD_TYPE: "default"
-  needs: []
-
-macos-full-intel-build-and-test:
-  <<: *build-and-test-macos-template
-  variables:
-    BUILD_TYPE: "full"
-  needs: []
-
-macos-default-intel-warnings:
-  <<: *compiler-warning-template
-  needs: ["macos-default-intel-build-and-test"]
-
-macos-full-intel-warnings:
-  <<: *compiler-warning-template
-  needs: ["macos-full-intel-build-and-test"]
-
 # ARM runners
 macos-default-arm-build-and-test:
   <<: *build-and-test-macos-template
@@ -597,9 +649,9 @@ win10-default-build-and-test:
     - echo $Env:path
     - mkdir build
     - cd build
-    - cmake.exe -G "Visual Studio 14 2015 Win64" --config Debug ..
-    - cmake.exe --build . --target ALL_BUILD --config Debug
-    - cmake.exe --build . --target INSTALL --config Debug
+    - cmake.exe -DCMAKE_BUILD_TYPE=Debug ..
+    - cmake.exe --build . --target ALL_BUILD
+    - cmake.exe --build . --target INSTALL
     - ctest --output-on-failure -C Debug -j8
   after_script:
     # This script identifies any orphan Tester-g processes still running
@@ -642,9 +694,9 @@ win10-mpi-default-build-and-test:
     - echo $Env:path
     - mkdir build
     - cd build
-    - cmake.exe -G "Visual Studio 14 2015 Win64" -DNEKTAR_USE_MPI=ON --config Debug ..
-    - cmake.exe --build . --target ALL_BUILD --config Debug
-    - cmake.exe --build . --target INSTALL --config Debug
+    - cmake.exe -DCMAKE_BUILD_TYPE=Debug -DNEKTAR_USE_MPI=ON ..
+    - cmake.exe --build . --target ALL_BUILD
+    - cmake.exe --build . --target INSTALL
     - ctest --output-on-failure -C Debug -j8
   after_script:
     # This script identifies any orphan Tester-g processes still running

@@ -97,10 +97,6 @@ void UnsteadySystem::v_InitObject(bool DeclareField)
                                m_explicitAdvection, true);
     m_session->MatchSolverInfo("REACTIONADVANCEMENT", "Explicit",
                                m_explicitReaction, true);
-
-    m_session->MatchSolverInfo("FLAGIMPLICITITSSTATISTICS", "True",
-                               m_flagImplicitItsStatistics, false);
-
     m_session->LoadParameter("CheckAbortSteps", m_abortSteps, 1);
 
     // Steady state tolerance.
@@ -277,10 +273,6 @@ void UnsteadySystem::v_DoSolve()
 
     m_lastCheckTime = 0.0;
 
-    m_TotNewtonIts = 0;
-    m_TotLinIts    = 0;
-    m_TotImpStages = 0;
-
     Array<OneD, int> abortFlags(2, 0);
     string abortFile = "abort";
     if (m_session->DefinesSolverInfo("CheckAbortFile"))
@@ -298,13 +290,8 @@ void UnsteadySystem::v_DoSolve()
                 min(m_CFLEnd, m_CFLGrowth * tmp_cflSafetyFactor);
         }
 
-        m_flagUpdatePreconMat = true;
-
-        // Flag to update AV.
-        m_CalcPhysicalAV = true;
-
         // Frozen preconditioner checks.
-        if (!ParallelInTime())
+        if (!m_comm->IsParallelInTime())
         {
             if (v_UpdateTimeStepCheck())
             {
@@ -360,41 +347,13 @@ void UnsteadySystem::v_DoSolve()
         cpuTime += elapsed;
 
         // Write out status information.
+        v_PrintStatusInformation(step, cpuTime);
         if (m_infosteps &&
             m_session->GetComm()->GetSpaceComm()->GetRank() == 0 &&
             !((step + 1) % m_infosteps))
         {
-            if (ParallelInTime())
-            {
-                cout << "RANK "
-                     << m_session->GetComm()->GetTimeComm()->GetRank()
-                     << " Steps: " << setw(8) << left << step + 1 << " "
-                     << "Time: " << setw(12) << left << m_time;
-            }
-            else
-            {
-                cout << "Steps: " << setw(8) << left << step + 1 << " "
-                     << "Time: " << setw(12) << left << m_time;
-            }
-
-            if (m_cflSafetyFactor)
-            {
-                cout << " Time-step: " << setw(12) << left << m_timestep;
-            }
-
-            stringstream ss;
-            ss << cpuTime << "s";
-            cout << " CPU Time: " << setw(8) << left << ss.str() << endl;
             cpuPrevious = cpuTime;
             cpuTime     = 0.0;
-
-            if (m_flagImplicitItsStatistics && m_flagImplicitSolver)
-            {
-                cout << "       &&"
-                     << " TotImpStages= " << m_TotImpStages
-                     << " TotNewtonIts= " << m_TotNewtonIts
-                     << " TotLinearIts = " << m_TotLinIts << endl;
-            }
         }
 
         // Transform data into coefficient space.
@@ -547,29 +506,7 @@ void UnsteadySystem::v_DoSolve()
     }
 
     // Print out summary statistics.
-    if (m_session->GetComm()->GetRank() == 0)
-    {
-        if (m_cflSafetyFactor > 0.0)
-        {
-            cout << "CFL safety factor : " << m_cflSafetyFactor << endl
-                 << "CFL time-step     : " << m_timestep << endl;
-        }
-
-        if (m_session->GetSolverInfo("Driver") != "SteadyState" &&
-            m_session->GetSolverInfo("Driver") != "Parareal")
-        {
-            cout << "Time-integration  : " << intTime << "s" << endl;
-        }
-
-        if (m_flagImplicitItsStatistics && m_flagImplicitSolver)
-        {
-            cout << "-------------------------------------------" << endl
-                 << "Total Implicit Stages: " << m_TotImpStages << endl
-                 << "Total Newton Its     : " << m_TotNewtonIts << endl
-                 << "Total Linear Its     : " << m_TotLinIts << endl
-                 << "-------------------------------------------" << endl;
-        }
-    }
+    v_PrintSummaryStatistics(intTime);
 
     // If homogeneous, transform back into physical space if necessary.
     if (m_HomogeneousType != eNotHomogeneous)
@@ -602,6 +539,53 @@ void UnsteadySystem::v_DoSolve()
     if (m_spacedim == 1)
     {
         AppendOutput1D();
+    }
+}
+
+void UnsteadySystem::v_PrintStatusInformation(const int step,
+                                              const NekDouble cpuTime)
+{
+    if (m_infosteps && m_session->GetComm()->GetSpaceComm()->GetRank() == 0 &&
+        !((step + 1) % m_infosteps))
+    {
+        if (m_comm->IsParallelInTime())
+        {
+            cout << "RANK " << m_session->GetComm()->GetTimeComm()->GetRank()
+                 << " Steps: " << setw(8) << left << step + 1 << " "
+                 << "Time: " << setw(12) << left << m_time;
+        }
+        else
+        {
+            cout << "Steps: " << setw(8) << left << step + 1 << " "
+                 << "Time: " << setw(12) << left << m_time;
+        }
+
+        if (m_cflSafetyFactor)
+        {
+            cout << " Time-step: " << setw(12) << left << m_timestep;
+        }
+
+        stringstream ss;
+        ss << cpuTime << "s";
+        cout << " CPU Time: " << setw(8) << left << ss.str() << endl;
+    }
+}
+
+void UnsteadySystem::v_PrintSummaryStatistics(const NekDouble intTime)
+{
+    if (m_session->GetComm()->GetRank() == 0)
+    {
+        if (m_cflSafetyFactor > 0.0)
+        {
+            cout << "CFL safety factor : " << m_cflSafetyFactor << endl
+                 << "CFL time-step     : " << m_timestep << endl;
+        }
+
+        if (m_session->GetSolverInfo("Driver") != "SteadyState" &&
+            m_session->GetSolverInfo("Driver") != "Parareal")
+        {
+            cout << "Time-integration  : " << intTime << "s" << endl;
+        }
     }
 }
 

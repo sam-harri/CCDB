@@ -42,6 +42,7 @@
 #include <LibUtilities/BasicUtils/Timer.h>
 #include <SpatialDomains/MeshGraphHDF5.h>
 #include <SpatialDomains/MeshPartition.h>
+#include <SpatialDomains/Movement/Movement.h>
 
 #define TIME_RESULT(verb, msg, timer)                                          \
     if (verb)                                                                  \
@@ -165,25 +166,26 @@ std::string MeshGraphHDF5::cmdSwitch =
 void MeshGraphHDF5::v_PartitionMesh(
     LibUtilities::SessionReaderSharedPtr session)
 {
+    m_session = session;
+
     LibUtilities::Timer all;
     all.Start();
     int err;
-    LibUtilities::CommSharedPtr comm = session->GetComm();
-    int rank = comm->GetRank(), nproc = comm->GetSize();
+    LibUtilities::CommSharedPtr comm     = m_session->GetComm();
+    LibUtilities::CommSharedPtr commMesh = comm->GetRowComm();
+    const bool isRoot                    = comm->TreatAsRankZero();
 
     // By default, only the root process will have read the session file, which
     // is done to avoid every process needing to read the XML file. For HDF5, we
     // don't care about this, so just have every process parse the session file.
-    if (rank > 0)
+    if (!isRoot)
     {
-        session->InitSession();
+        m_session->InitSession();
     }
 
     // We use the XML geometry to find information about the HDF5 file.
-    m_session            = session;
     m_xmlGeom            = m_session->GetElement("NEKTAR/GEOMETRY");
     TiXmlAttribute *attr = m_xmlGeom->FirstAttribute();
-    m_meshPartitioned    = true;
     m_meshDimension      = 3;
     m_spaceDimension     = 3;
 
@@ -208,7 +210,6 @@ void MeshGraphHDF5::v_PartitionMesh(
         else if (attrName == "HDF5FILE")
         {
             m_hdf5Name = attr->Value();
-            ASSERTL1(err == TIXML_SUCCESS, "Unable to read hdf5 name.");
         }
         else if (attrName == "PARTITIONED")
         {
@@ -233,11 +234,11 @@ void MeshGraphHDF5::v_PartitionMesh(
     LibUtilities::H5::PListSharedPtr parallelProps = H5::PList::Default();
     m_readPL                                       = H5::PList::Default();
 
-    if (nproc > 1)
+    if (commMesh->GetSize() > 1)
     {
         // Use MPI/O to access the file
         parallelProps = H5::PList::FileAccess();
-        parallelProps->SetMpio(comm);
+        parallelProps->SetMpio(commMesh);
         // Use collective IO
         m_readPL = H5::PList::DatasetXfer();
         m_readPL->SetDxMpioCollective();
@@ -275,6 +276,15 @@ void MeshGraphHDF5::v_PartitionMesh(
     m_maps = root2->OpenGroup("MAPS");
     ASSERTL0(m_mesh, "Cannot find NEKTAR/GEOMETRY/MAPS group in HDF5 file.");
 
+    if (m_meshPartitioned)
+    {
+        return;
+    }
+    else
+    {
+        m_meshPartitioned = true;
+    }
+
     // Depending on dimension, read element IDs.
     std::map<int,
              std::vector<std::tuple<std::string, int, LibUtilities::ShapeType>>>
@@ -288,7 +298,8 @@ void MeshGraphHDF5::v_PartitionMesh(
                    make_tuple("PRISM", 5, LibUtilities::ePrism),
                    make_tuple("HEX", 6, LibUtilities::eHexahedron)};
 
-    bool verbRoot = rank == 0 && m_session->DefinesCmdLineArgument("verbose");
+    const bool verbRoot =
+        isRoot && m_session->DefinesCmdLineArgument("verbose");
 
     if (verbRoot)
     {
@@ -300,10 +311,15 @@ void MeshGraphHDF5::v_PartitionMesh(
     // to be the normal communicator: this way if the multi-level partitioning
     // is disabled we proceed as 'normal'.
     LibUtilities::CommSharedPtr innerComm, interComm = comm;
-    int innerRank = 0, innerSize = 1, interRank = rank, interSize = nproc;
+    int innerRank = 0, innerSize = 1,
+        interRank = interComm->GetRowComm()->GetRank(),
+        interSize = interComm->GetRowComm()->GetSize();
 
     if (session->DefinesCmdLineArgument("use-hdf5-node-comm"))
     {
+        ASSERTL0(comm->GetSize() == commMesh->GetSize(),
+                 "--use-hdf5-node-comm not available with Parallel-in-Time")
+
         auto splitComm = comm->SplitCommNode();
         innerComm      = splitComm.first;
         interComm      = splitComm.second;
@@ -338,8 +354,8 @@ void MeshGraphHDF5::v_PartitionMesh(
         LibUtilities::Timer t2;
         t2.Start();
 
-        bool verbRoot2 =
-            session->DefinesCmdLineArgument("verbose") && interRank == 0;
+        const bool verbRoot2 =
+            isRoot && session->DefinesCmdLineArgument("verbose");
 
         // Read IDs for partitioning purposes
         std::vector<int> ids;
@@ -414,7 +430,7 @@ void MeshGraphHDF5::v_PartitionMesh(
             }
         }
 
-        interComm->Block();
+        interComm->GetRowComm()->Block();
 
         t2.Stop();
         TIME_RESULT(verbRoot2, "  - initial read", t2);
@@ -422,7 +438,7 @@ void MeshGraphHDF5::v_PartitionMesh(
 
         // Check to see we have at least as many processors as elements.
         size_t numElmt = elmts.size();
-        ASSERTL0(nproc <= numElmt,
+        ASSERTL0(commMesh->GetSize() <= numElmt,
                  "This mesh has more processors than elements!");
 
         auto elRange = SplitWork(numElmt, interRank, interSize);
@@ -480,7 +496,8 @@ void MeshGraphHDF5::v_PartitionMesh(
         // Create partitioner. Default partitioner to use is PtScotch. Use
         // ParMetis as default if it is installed. Override default with
         // command-line flags if they are set.
-        string partitionerName = nproc > 1 ? "PtScotch" : "Scotch";
+        string partitionerName =
+            commMesh->GetSize() > 1 ? "PtScotch" : "Scotch";
         if (GetMeshPartitionFactory().ModuleExists("ParMetis"))
         {
             partitionerName = "ParMetis";
@@ -643,7 +660,7 @@ void MeshGraphHDF5::v_PartitionMesh(
     if (m_meshDimension >= 1)
     {
         t.Start();
-        // Read 2D data
+        // Read 1D data
         ReadGeometryData(m_segGeoms, "SEG", toRead, segIDs, segData);
 
         toRead.clear();
@@ -719,6 +736,8 @@ void MeshGraphHDF5::v_PartitionMesh(
             new TiXmlElement(*m_session->GetElement("Nektar/Conditions"));
         TiXmlElement *vBndRegions =
             vConditions->FirstChildElement("BOUNDARYREGIONS");
+        // Use fine-level for mesh partition (Parallel-in-Time)
+        LibUtilities::SessionReader::GetXMLElementTimeLevel(vBndRegions, 0);
         TiXmlElement *vItem;
 
         if (vBndRegions)
@@ -987,7 +1006,8 @@ void MeshGraphHDF5::ReadCurveMap(CurveMap &curveMap, std::string dsName,
 
     // Check to see whether any processor will read anything
     auto toRead = newIds.size();
-    m_session->GetComm()->AllReduce(toRead, LibUtilities::ReduceSum);
+    m_session->GetComm()->GetRowComm()->AllReduce(toRead,
+                                                  LibUtilities::ReduceSum);
 
     if (toRead == 0)
     {
@@ -1567,7 +1587,7 @@ void MeshGraphHDF5::WriteDomain(std::map<int, CompositeMap> &domain)
 }
 
 void MeshGraphHDF5::v_WriteGeometry(
-    std::string &outfilename, bool defaultExp,
+    const std::string &outfilename, bool defaultExp,
     const LibUtilities::FieldMetaDataMap &metadata)
 {
     boost::ignore_unused(metadata);
@@ -1638,6 +1658,9 @@ void MeshGraphHDF5::v_WriteGeometry(
         }
         root->LinkEndChild(expTag);
     }
+
+    if (m_movement)
+        m_movement->WriteMovement(root);
 
     doc->SaveFile(filenameXml);
 

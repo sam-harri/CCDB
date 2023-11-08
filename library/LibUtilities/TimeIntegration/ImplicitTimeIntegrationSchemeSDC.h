@@ -124,28 +124,9 @@ void ImplicitTimeIntegrationSchemeSDC::v_InitializeScheme(
 void ImplicitTimeIntegrationSchemeSDC::v_ResidualEval(const NekDouble &delta_t,
                                                       const size_t n)
 {
-    if (n == 0)
-    {
-        // Not implemented, require implicit evaluation for m_F[0].
-        // Quadrature type that include the left end point (e.g.
-        // GaussLobattoLegendre) should not be used.
-    }
-    else
-    {
-        NekDouble dtn = delta_t * (m_tau[n] - m_tau[n - 1]);
+    boost::ignore_unused(delta_t, n);
 
-        // Update solution
-        m_op.DoImplicitSolve(m_Y[n - 1], m_tmp, m_time + delta_t * m_tau[n],
-                             m_theta * dtn);
-
-        // Compute residual from updated solution
-        for (size_t i = 0; i < m_nvars; ++i)
-        {
-            Vmath::Vsub(m_npoints, m_tmp[i], 1, m_Y[n - 1][i], 1, m_F[n][i], 1);
-            Vmath::Smul(m_npoints, 1.0 / (m_theta * dtn), m_F[n][i], 1,
-                        m_F[n][i], 1);
-        }
-    }
+    ASSERTL0(false, "v_ResidualEval not implemented for implicit SDC");
 }
 
 void ImplicitTimeIntegrationSchemeSDC::v_ResidualEval(const NekDouble &delta_t)
@@ -164,13 +145,7 @@ void ImplicitTimeIntegrationSchemeSDC::v_ComputeInitialGuess(
 {
     for (size_t n = 0; n < m_nQuadPts; ++n)
     {
-        if (n == 0)
-        {
-            // Not implemented, require implicit evaluation for m_F[0].
-            // Quadrature type that include the left end point (e.g.
-            // GaussLobattoLegendre) should not be used.
-        }
-        else
+        if (n != 0)
         {
             NekDouble dtn = delta_t * (m_tau[n] - m_tau[n - 1]);
 

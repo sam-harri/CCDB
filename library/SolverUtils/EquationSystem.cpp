@@ -28,7 +28,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 //
-// Description: Main wrapper class for Advection Diffusion Reaction Solver
+// Description:
 //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -85,6 +85,7 @@ std::string EquationSystem::projectionTypeLookupIds[7] = {
     LibUtilities::SessionReader::RegisterEnumValue(
         "Projection", "MixedCGDG", MultiRegions::eMixed_CG_Discontinuous),
 };
+
 /**
  * @class EquationSystem
  *
@@ -127,6 +128,17 @@ EquationSystem::EquationSystem(
         m_fieldMetaDataMap[sessionname]  = filenames[i];
         m_fieldMetaDataMap["ChkFileNum"] = boost::lexical_cast<std::string>(0);
     }
+}
+
+/**
+ * @brief Destructor for class EquationSystem.
+ */
+EquationSystem::~EquationSystem()
+{
+    LibUtilities::NekManager<LocalRegions::MatrixKey, DNekScalMat,
+                             LocalRegions::MatrixKey::opLess>::ClearManager();
+    LibUtilities::NekManager<LocalRegions::MatrixKey, DNekScalBlkMat,
+                             LocalRegions::MatrixKey::opLess>::ClearManager();
 }
 
 /**
@@ -715,21 +727,21 @@ void EquationSystem::v_InitObject(bool DeclareFields)
              "should be set!");
     m_session->LoadParameter("TimeIncrementFactor", m_TimeIncrementFactor, 1.0);
 
+    // Check for parallel-in-time
+    if (m_comm->IsParallelInTime())
+    {
+        ASSERTL0(m_fintime == 0.0,
+                 "Only specify NumSteps and TimeSteps for Parallel-in-Time. "
+                 "FinTime should not be used! ");
+    }
+
     m_nchk    = 0;
     m_iterPIT = 0;
 }
 
 /**
- * @brief Destructor for class EquationSystem.
+ *
  */
-EquationSystem::~EquationSystem()
-{
-    LibUtilities::NekManager<LocalRegions::MatrixKey, DNekScalMat,
-                             LocalRegions::MatrixKey::opLess>::ClearManager();
-    LibUtilities::NekManager<LocalRegions::MatrixKey, DNekScalBlkMat,
-                             LocalRegions::MatrixKey::opLess>::ClearManager();
-}
-
 SessionFunctionSharedPtr EquationSystem::GetFunction(
     std::string name, const MultiRegions::ExpListSharedPtr &field, bool cache)
 {
@@ -1033,11 +1045,11 @@ void EquationSystem::v_SetInitialConditions(NekDouble initialtime,
     }
 
     if (dumpInitialConditions && m_checksteps && m_nchk == 0 &&
-        !ParallelInTime())
+        !m_comm->IsParallelInTime())
     {
         Checkpoint_Output(m_nchk);
     }
-    else if (dumpInitialConditions && m_nchk == 0 && ParallelInTime())
+    else if (dumpInitialConditions && m_nchk == 0 && m_comm->IsParallelInTime())
     {
         std::string newdir = m_sessionName + ".pit";
         if (!fs::is_directory(newdir))
@@ -1052,6 +1064,9 @@ void EquationSystem::v_SetInitialConditions(NekDouble initialtime,
     ++m_nchk;
 }
 
+/**
+ *
+ */
 void EquationSystem::v_EvaluateExactSolution(unsigned int field,
                                              Array<OneD, NekDouble> &outfield,
                                              const NekDouble time)
@@ -1117,7 +1132,7 @@ void EquationSystem::v_GenerateSummary(SummaryList &l)
  */
 void EquationSystem::v_Output(void)
 {
-    if (!ParallelInTime())
+    if (!m_comm->IsParallelInTime())
     {
         // Serial-in-time
         WriteFld(m_sessionName + ".fld");
@@ -1168,7 +1183,7 @@ void EquationSystem::FwdTransFields(void)
  */
 void EquationSystem::Checkpoint_Output(const int n)
 {
-    if (!ParallelInTime())
+    if (!m_comm->IsParallelInTime())
     {
         // Serial-in-time
         std::string outname =
@@ -1200,7 +1215,7 @@ void EquationSystem::Checkpoint_Output(
     std::vector<Array<OneD, NekDouble>> &fieldcoeffs,
     std::vector<std::string> &variables)
 {
-    if (!ParallelInTime())
+    if (!m_comm->IsParallelInTime())
     {
         // Serial-in-time
         std::string outname =
@@ -1466,7 +1481,7 @@ void EquationSystem::ImportFld(const std::string &infile,
 {
 
     ASSERTL0(fieldStr.size() <= coeffs.size(),
-             "length of fieldstr should be the same as pFields");
+             "length of fieldstr should be the same as coeffs");
 
     std::vector<LibUtilities::FieldDefinitionsSharedPtr> FieldDef;
     std::vector<std::vector<NekDouble>> FieldData;
@@ -1578,11 +1593,17 @@ void EquationSystem::SessionSummary(SummaryList &s)
     }
 }
 
+/**
+ *
+ */
 Array<OneD, bool> EquationSystem::v_GetSystemSingularChecks()
 {
     return Array<OneD, bool>(m_session->GetVariables().size(), false);
 }
 
+/**
+ *
+ */
 MultiRegions::ExpListSharedPtr EquationSystem::v_GetPressure()
 {
     ASSERTL0(false, "This function is not valid for the Base class");
@@ -1590,6 +1611,9 @@ MultiRegions::ExpListSharedPtr EquationSystem::v_GetPressure()
     return null;
 }
 
+/**
+ *
+ */
 void EquationSystem::v_ExtraFldOutput(
     std::vector<Array<OneD, NekDouble>> &fieldcoeffs,
     std::vector<std::string> &variables)

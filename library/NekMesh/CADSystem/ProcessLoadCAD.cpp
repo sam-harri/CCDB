@@ -72,9 +72,7 @@ void ProcessLoadCAD::Process()
 
     m_log(VERBOSE) << "Loading CAD for: '" << name << "'" << endl;
 
-    string ext = boost::filesystem::extension(name);
-
-    if (boost::iequals(ext, ".fbm"))
+    if (boost::filesystem::path(name).extension() == ".fbm")
     {
         m_mesh->m_cad = GetEngineFactory().CreateInstance("cfi", name);
 

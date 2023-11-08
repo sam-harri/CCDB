@@ -60,16 +60,14 @@ DriverPFASST::DriverPFASST(const LibUtilities::SessionReaderSharedPtr pSession,
 /**
  *
  */
-DriverPFASST::~DriverPFASST()
-{
-}
-
-/**
- *
- */
 void DriverPFASST::v_InitObject(std::ostream &out)
 {
     DriverParallelInTime::v_InitObject(out);
+    DriverParallelInTime::GetParametersFromSession();
+    DriverParallelInTime::PrintSolverInfo(out);
+    DriverParallelInTime::InitialiseEqSystem(true);
+    InitialiseSDCScheme();
+    SetTimeInterpolator();
 }
 
 /**
@@ -77,65 +75,45 @@ void DriverPFASST::v_InitObject(std::ostream &out)
  */
 void DriverPFASST::v_Execute(std::ostream &out)
 {
-    // Set timer.
-    Nektar::LibUtilities::Timer timer;
-    NekDouble CPUtime = 0.0;
+    boost::ignore_unused(out);
 
-    // Set time communication parameters.
-    LibUtilities::CommSharedPtr tComm = m_session->GetComm()->GetTimeComm();
-    m_numChunks                       = tComm->GetSize();
-    m_chunkRank                       = tComm->GetRank();
-
-    // Set parameters from session file.
-    GetParametersFromSession();
-    AssertParameters();
-
-    // Print solver summay.
-    PrintFineSolverInfo(out);
-    PrintCoarseSolverInfo(out);
-
-    // Initialization.
-    InitialiseEqSystem(true);
-    AllocateMemory();
-    InitialiseSDCScheme(true);
-    InitialiseInterpolationField();
-    SetTimeInterpolator();
+    size_t step     = m_chunkRank;
+    m_totalTime     = m_timestep[0] * m_nsteps[0];
+    m_numWindowsPIT = m_nsteps[0] / m_numChunks;
+    m_chunkTime     = m_timestep[0];
 
     // Start iteration windows.
-    tComm->Block();
-    size_t chkPts   = m_chunkRank;
-    m_totalTime     = m_fineTimeStep * m_fineSteps;
-    m_numWindowsPIT = m_fineSteps / m_numChunks;
-    m_chunkTime     = m_fineTimeStep;
+    m_comm->GetTimeComm()->Block();
+    m_CPUtime = 0.0;
     for (size_t w = 0; w < m_numWindowsPIT; w++)
     {
-        timer.Start();
-        PrintHeaderTitle1((boost::format("WINDOWS #%1%") % (w + 1)).str());
+        m_timer.Start();
+        PrintHeader((boost::format("WINDOWS #%1%") % (w + 1)).str(), '*');
 
         // Compute initial guess for coarse solver.
         m_time = (w * m_numChunks) * m_chunkTime;
-        SetTime(m_time);
-        CoarseResidualEval(0);
-        CopyQuadratureSolutionAndResidual(m_coarseSDCSolver, 0);
+        ResidualEval(m_time, m_nTimeLevel - 1, 0);
+        PropagateQuadratureSolutionAndResidual(m_nTimeLevel - 1, 0);
         for (size_t k = 0; k < m_chunkRank; k++)
         {
-            RunCoarseSweep();
-            UpdateCoarseFirstQuadrature();
-            CopyQuadratureSolutionAndResidual(m_coarseSDCSolver, 0);
+            RunSweep(m_time, m_nTimeLevel - 1);
+            UpdateFirstQuadrature(m_nTimeLevel - 1);
+            PropagateQuadratureSolutionAndResidual(m_nTimeLevel - 1, 0);
             m_time += m_chunkTime;
-            SetTime(m_time);
         }
-        RunCoarseSweep();
+        RunSweep(m_time, m_nTimeLevel - 1);
 
         // Interpolate coarse solution and residual to fine.
-        InterpolateCoarseSolution();
-        InterpolateCoarseResidual();
+        for (size_t timeLevel = m_nTimeLevel - 1; timeLevel > 0; timeLevel--)
+        {
+            InterpolateSolution(timeLevel);
+            InterpolateResidual(timeLevel);
+        }
 
-        // Start PFASST iteration.
+        // Start CorrectInitialPFASST iteration.
         size_t k            = 0;
         int convergenceCurr = 0;
-        int convergencePrev = (m_chunkRank == 0);
-        int convergence     = convergencePrev;
+        std::vector<int> convergencePrev(m_nTimeLevel, m_chunkRank == 0);
         while (k < m_iterMaxPIT && !convergenceCurr)
         {
             // The PFASST implementation follow "Bolten, M., Moser, D., & Speck,
@@ -149,43 +127,62 @@ void DriverPFASST::v_Execute(std::ostream &out)
                 std::cout << "Iteration " << k + 1 << std::endl << std::flush;
             }
 
-            // Performe fine sweep (parallel-in-time).
-            FineResidualEval(0);
-            RunFineSweep();
+            // Fine-to-coarse
+            for (size_t timeLevel = 0; timeLevel < m_nTimeLevel - 1;
+                 timeLevel++)
+            {
+                // Performe sweep (parallel-in-time).
+                RunSweep(m_time, timeLevel, true);
 
-            // Compute FAS correction.
-            RestrictFineSolution();
-            SaveCoarseSolution();
-            RestrictFineResidual();
-            SaveCoarseResidual();
-            ComputeFASCorrection();
-            EvaluateSDCResidualNorm();
+                // Compute FAS correction (parallel-in-time).
+                RestrictSolution(timeLevel);
+                RestrictResidual(timeLevel);
+                IntegratedResidualEval(timeLevel);
+                IntegratedResidualEval(timeLevel + 1);
+                ComputeFASCorrection(timeLevel + 1);
+
+                // Check convergence.
+                if (timeLevel == 0)
+                {
+                    // Evaluate SDC residual norm.
+                    EvaluateSDCResidualNorm(timeLevel);
+
+                    // Display L2norm.
+                    PrintErrorNorm(timeLevel, true);
+                }
+            }
 
             // Perform coarse sweep (serial-in-time).
-            RecvInitialConditionFromPreviousProc(
-                m_coarseSDCSolver->UpdateFirstQuadratureSolutionVector(),
-                convergence);
-            CoarseResidualEval(0);
-            RunCoarseSweep();
-            convergenceCurr = (vL2ErrorMax() < m_tolerPIT && convergence);
-            SendSolutionToNextProc(
-                m_coarseSDCSolver->UpdateLastQuadratureSolutionVector(),
-                convergenceCurr);
+            RecvFromPreviousProc(m_SDCSolver[m_nTimeLevel - 1]
+                                     ->UpdateFirstQuadratureSolutionVector(),
+                                 convergencePrev[m_nTimeLevel - 1]);
+            RunSweep(m_time, m_nTimeLevel - 1, true);
+            convergenceCurr = (vL2ErrorMax() < m_tolerPIT &&
+                               convergencePrev[m_nTimeLevel - 1]);
+            SendToNextProc(m_SDCSolver[m_nTimeLevel - 1]
+                               ->UpdateLastQuadratureSolutionVector(),
+                           convergenceCurr);
 
-            // Display L2norm.
-            PrintErrorNorm(true);
-
-            // Correct fine solution and residual.
-            SendSolutionToNextProc(
-                m_fineSDCSolver->UpdateLastQuadratureSolutionVector(),
-                convergenceCurr);
-            CorrectFineSolution();
-            CorrectFineResidual();
-            RecvInitialConditionFromPreviousProc(
-                m_fineSDCSolver->UpdateFirstQuadratureSolutionVector(),
-                convergencePrev);
-            CorrectInitialFineSolution();
-
+            // Coarse-to-fine.
+            for (size_t timeLevel = m_nTimeLevel - 1; timeLevel > 0;
+                 timeLevel--)
+            {
+                // Correct solution and residual.
+                SendToNextProc(m_SDCSolver[timeLevel - 1]
+                                   ->UpdateLastQuadratureSolutionVector(),
+                               convergenceCurr);
+                CorrectSolution(timeLevel - 1);
+                CorrectResidual(timeLevel - 1);
+                RecvFromPreviousProc(
+                    m_SDCSolver[timeLevel - 1]
+                        ->UpdateFirstQuadratureSolutionVector(),
+                    convergencePrev[timeLevel - 1]);
+                CorrectInitialSolution(timeLevel - 1);
+                if (timeLevel - 1 != 0)
+                {
+                    RunSweep(m_time, timeLevel - 1, true);
+                }
+            }
             k++;
         }
 
@@ -194,161 +191,819 @@ void DriverPFASST::v_Execute(std::ostream &out)
         {
             ApplyWindowing();
         }
-        timer.Stop();
+        m_timer.Stop();
 
         // Update field and write output.
-        WriteOutput(chkPts);
-        chkPts += m_numChunks;
-        CPUtime += timer.Elapsed().count();
+        WriteOutput(step, m_time);
+        step += m_numChunks;
+        m_CPUtime += m_timer.Elapsed().count();
     }
 
-    // Post-processing.
-    tComm->Block();
-    PrintHeaderTitle1("SUMMARY");
-    EvaluateExactSolution(m_time + m_chunkTime);
-    SolutionConvergenceSummary(CPUtime);
+    m_comm->GetTimeComm()->Block();
+    PrintHeader("SUMMARY", '*');
+    EvaluateExactSolution(0, m_time + m_chunkTime);
+    SolutionConvergenceSummary(0);
     SpeedUpAnalysis();
 }
 
 /**
  *
  */
-NekDouble DriverPFASST::v_EstimateCommunicationTime(void)
+void DriverPFASST::AssertParameters(void)
 {
-    // Allocate memory.
-    Array<OneD, Array<OneD, NekDouble>> buffer1(m_nVar);
-    Array<OneD, Array<OneD, NekDouble>> buffer2(m_nVar);
+    // Assert time-stepping parameters.
+    for (size_t timeLevel = 0; timeLevel < m_nTimeLevel; timeLevel++)
+    {
+        ASSERTL0(
+            m_nsteps[timeLevel] % m_numChunks == 0,
+            "Total number of steps should be divisible by number of chunks.");
+
+        ASSERTL0(m_timestep[0] == m_timestep[timeLevel],
+                 "All SDC levels should have the same timestep");
+
+        ASSERTL0(m_nsteps[0] == m_nsteps[timeLevel],
+                 "All SDC levels should have the same timestep");
+    }
+
+    // Assert I/O parameters.
+    if (m_checkSteps)
+    {
+        ASSERTL0(m_nsteps[0] % m_checkSteps == 0,
+                 "number of IO_CheckSteps should divide number of steps "
+                 "per time chunk");
+    }
+
+    if (m_infoSteps)
+    {
+        ASSERTL0(m_nsteps[0] % m_infoSteps == 0,
+                 "number of IO_InfoSteps should divide number of steps "
+                 "per time chunk");
+    }
+}
+
+/**
+ *
+ */
+void DriverPFASST::InitialiseSDCScheme(void)
+{
+    m_SDCSolver =
+        Array<OneD, std::shared_ptr<LibUtilities::TimeIntegrationSchemeSDC>>(
+            m_nTimeLevel);
+    for (size_t timeLevel = 0; timeLevel < m_nTimeLevel; timeLevel++)
+    {
+        // Cast pointer for TimeIntegrationSchemeSDC.
+        m_SDCSolver[timeLevel] =
+            std::dynamic_pointer_cast<LibUtilities::TimeIntegrationSchemeSDC>(
+                m_EqSys[timeLevel]->GetTimeIntegrationScheme());
+
+        // Assert if a SDC time-integration is used.
+        ASSERTL0(m_SDCSolver[timeLevel] != nullptr,
+                 "Should only be run with a SDC method");
+
+        // Order storage to list time-integrated fields first.
+        Array<OneD, Array<OneD, NekDouble>> fields(m_nVar);
+        for (size_t i = 0; i < m_nVar; ++i)
+        {
+            fields[i] = m_EqSys[timeLevel]->UpdatePhysField(i);
+        }
+
+        // Initialize SDC scheme.
+        m_SDCSolver[timeLevel]->SetPFASST(timeLevel != 0);
+        m_SDCSolver[timeLevel]->InitializeScheme(
+            m_timestep[timeLevel], fields, 0.0,
+            m_EqSys[timeLevel]->GetTimeIntegrationSchemeOperators());
+    }
+
+    // Alocate memory.
+    m_QuadPts = Array<OneD, size_t>(m_nTimeLevel);
+    for (size_t timeLevel = 0; timeLevel < m_nTimeLevel; timeLevel++)
+    {
+        m_QuadPts[timeLevel] = m_SDCSolver[timeLevel]->GetQuadPtsNumber();
+    }
+
+    m_solutionRest = Array<OneD, SDCarray>(m_nTimeLevel - 1);
+    m_residualRest = Array<OneD, SDCarray>(m_nTimeLevel - 1);
+    m_integralRest = Array<OneD, SDCarray>(m_nTimeLevel - 1);
+    m_correction   = Array<OneD, SDCarray>(m_nTimeLevel - 1);
+    m_storage      = Array<OneD, SDCarray>(m_nTimeLevel - 1);
+    for (size_t timeLevel = 0; timeLevel < m_nTimeLevel - 1; timeLevel++)
+    {
+        m_solutionRest[timeLevel] = SDCarray(m_QuadPts[timeLevel + 1]);
+        m_residualRest[timeLevel] = SDCarray(m_QuadPts[timeLevel + 1]);
+        m_integralRest[timeLevel] = SDCarray(m_QuadPts[timeLevel + 1]);
+        m_correction[timeLevel]   = SDCarray(m_QuadPts[timeLevel + 1]);
+        m_storage[timeLevel]      = SDCarray(m_QuadPts[timeLevel + 1]);
+        for (size_t n = 0; n < m_QuadPts[timeLevel + 1]; ++n)
+        {
+            m_solutionRest[timeLevel][n] =
+                Array<OneD, Array<OneD, NekDouble>>(m_nVar);
+            m_residualRest[timeLevel][n] =
+                Array<OneD, Array<OneD, NekDouble>>(m_nVar);
+            m_integralRest[timeLevel][n] =
+                Array<OneD, Array<OneD, NekDouble>>(m_nVar);
+            m_correction[timeLevel][n] =
+                Array<OneD, Array<OneD, NekDouble>>(m_nVar);
+            m_storage[timeLevel][n] =
+                Array<OneD, Array<OneD, NekDouble>>(m_nVar);
+            for (size_t i = 0; i < m_nVar; ++i)
+            {
+                m_solutionRest[timeLevel][n][i] =
+                    Array<OneD, NekDouble>(m_npts[timeLevel + 1], 0.0);
+                m_residualRest[timeLevel][n][i] =
+                    Array<OneD, NekDouble>(m_npts[timeLevel + 1], 0.0);
+                m_integralRest[timeLevel][n][i] =
+                    Array<OneD, NekDouble>(m_npts[timeLevel + 1], 0.0);
+                m_correction[timeLevel][n][i] =
+                    Array<OneD, NekDouble>(m_npts[timeLevel + 1], 0.0);
+                m_storage[timeLevel][n][i] =
+                    Array<OneD, NekDouble>(m_npts[timeLevel], 0.0);
+            }
+        }
+    }
+}
+
+/**
+ *
+ */
+void DriverPFASST::SetTimeInterpolator(void)
+{
+    // Initialize time interpolator.
+    m_ImatFtoC = Array<OneD, Array<OneD, NekDouble>>(m_nTimeLevel - 1);
+    m_ImatCtoF = Array<OneD, Array<OneD, NekDouble>>(m_nTimeLevel - 1);
+    for (size_t timeLevel = 0; timeLevel < m_nTimeLevel - 1; timeLevel++)
+    {
+        LibUtilities::PointsKey fpoints =
+            m_SDCSolver[timeLevel]->GetPointsKey();
+        LibUtilities::PointsKey cpoints =
+            m_SDCSolver[timeLevel + 1]->GetPointsKey();
+        DNekMatSharedPtr ImatFtoC =
+            LibUtilities::PointsManager()[fpoints]->GetI(cpoints);
+        DNekMatSharedPtr ImatCtoF =
+            LibUtilities::PointsManager()[cpoints]->GetI(fpoints);
+        m_ImatFtoC[timeLevel] = Array<OneD, NekDouble>(
+            m_QuadPts[timeLevel] * m_QuadPts[timeLevel + 1], 0.0);
+        m_ImatCtoF[timeLevel] = Array<OneD, NekDouble>(
+            m_QuadPts[timeLevel] * m_QuadPts[timeLevel + 1], 0.0);
+
+        // Determine if Radau quadrature are used.
+        size_t i0 = m_SDCSolver[timeLevel]->HasFirstQuadrature() ? 0 : 1;
+        size_t j0 = m_SDCSolver[timeLevel + 1]->HasFirstQuadrature() ? 0 : 1;
+
+        // Adapt fine to coarse time interpolator.
+        for (size_t i = i0; i < m_QuadPts[timeLevel]; ++i)
+        {
+            for (size_t j = j0; j < m_QuadPts[timeLevel + 1]; ++j)
+            {
+                m_ImatFtoC[timeLevel][i * m_QuadPts[timeLevel + 1] + j] =
+                    (ImatFtoC->GetPtr())[(i - i0) *
+                                             (m_QuadPts[timeLevel + 1] - j0) +
+                                         (j - j0)];
+            }
+        }
+        if (j0 == 1)
+        {
+            m_ImatFtoC[timeLevel][0] = 1.0;
+        }
+
+        // Adapt coarse to fine time interpolator.
+        for (size_t j = j0; j < m_QuadPts[timeLevel + 1]; ++j)
+        {
+            for (size_t i = i0; i < m_QuadPts[timeLevel]; ++i)
+            {
+                m_ImatCtoF[timeLevel][j * m_QuadPts[timeLevel] + i] =
+                    (ImatCtoF
+                         ->GetPtr())[(j - j0) * (m_QuadPts[timeLevel] - i0) +
+                                     (i - i0)];
+            }
+        }
+        if (i0 == 1)
+        {
+            m_ImatCtoF[timeLevel][0] = 1.0;
+        }
+    }
+}
+
+/**
+ *
+ */
+bool DriverPFASST::IsNotInitialCondition(const size_t n)
+{
+    return !(n == 0 && m_chunkRank == 0);
+}
+
+/**
+ *
+ */
+void DriverPFASST::PropagateQuadratureSolutionAndResidual(
+    const size_t timeLevel, const size_t index)
+{
+    for (size_t n = 0; n < m_QuadPts[timeLevel]; ++n)
+    {
+        if (n != index)
+        {
+            for (size_t i = 0; i < m_nVar; ++i)
+            {
+                Vmath::Vcopy(
+                    m_npts[timeLevel],
+                    m_SDCSolver[timeLevel]->GetSolutionVector()[index][i], 1,
+                    m_SDCSolver[timeLevel]->UpdateSolutionVector()[n][i], 1);
+                Vmath::Vcopy(
+                    m_npts[timeLevel],
+                    m_SDCSolver[timeLevel]->GetResidualVector()[index][i], 1,
+                    m_SDCSolver[timeLevel]->UpdateResidualVector()[n][i], 1);
+            }
+        }
+    }
+}
+
+/**
+ *
+ */
+void DriverPFASST::UpdateFirstQuadrature(const size_t timeLevel)
+{
+    m_SDCSolver[timeLevel]->UpdateFirstQuadrature();
+}
+
+/**
+ *
+ */
+void DriverPFASST::RunSweep(const NekDouble time, const size_t timeLevel,
+                            const bool update)
+{
+    size_t niter = m_SDCSolver[timeLevel]->GetOrder();
+
+    if (update == true)
+    {
+        ResidualEval(m_time, timeLevel, 0);
+    }
+
+    // Start SDC iteration loop.
+    m_SDCSolver[timeLevel]->SetTime(time);
+    for (size_t k = 0; k < niter; k++)
+    {
+        m_SDCSolver[timeLevel]->SDCIterationLoop(m_chunkTime);
+    }
+
+    // Update last quadrature point.
+    m_SDCSolver[timeLevel]->UpdateLastQuadrature();
+}
+
+/**
+ *
+ */
+void DriverPFASST::ResidualEval(const NekDouble time, const size_t timeLevel,
+                                const size_t n)
+{
+    m_SDCSolver[timeLevel]->SetTime(time);
+    m_SDCSolver[timeLevel]->ResidualEval(m_chunkTime, n);
+}
+
+/**
+ *
+ */
+void DriverPFASST::ResidualEval(const NekDouble time, const size_t timeLevel)
+{
+    m_SDCSolver[timeLevel]->SetTime(time);
+    m_SDCSolver[timeLevel]->ResidualEval(m_chunkTime);
+}
+
+/**
+ *
+ */
+void DriverPFASST::IntegratedResidualEval(const size_t timeLevel)
+{
+    m_SDCSolver[timeLevel]->UpdateIntegratedResidualQFint(m_chunkTime);
+}
+
+/**
+ *
+ */
+void DriverPFASST::Interpolate(const size_t coarseLevel, const SDCarray &in,
+                               const size_t fineLevel, SDCarray &out,
+                               bool forced)
+{
+    // Interpolate solution in space.
+    for (size_t n = 0; n < m_QuadPts[coarseLevel]; ++n)
+    {
+        Interpolator(coarseLevel, in[n], fineLevel, m_storage[fineLevel][n]);
+    }
+
+    // Interpolate solution in time.
+    for (size_t n = 0; n < m_QuadPts[fineLevel]; ++n)
+    {
+        if (forced || IsNotInitialCondition(n))
+        {
+            for (size_t i = 0; i < m_nVar; ++i)
+            {
+                Vmath::Smul(m_npts[fineLevel], m_ImatCtoF[fineLevel][n],
+                            m_storage[fineLevel][0][i], 1, out[n][i], 1);
+                for (size_t k = 1; k < m_QuadPts[coarseLevel]; ++k)
+                {
+                    size_t index = k * m_QuadPts[fineLevel] + n;
+                    Vmath::Svtvp(m_npts[fineLevel],
+                                 m_ImatCtoF[fineLevel][index],
+                                 m_storage[fineLevel][k][i], 1, out[n][i], 1,
+                                 out[n][i], 1);
+                }
+            }
+        }
+    }
+}
+
+/**
+ *
+ */
+void DriverPFASST::InterpolateSolution(const size_t timeLevel)
+{
+    size_t coarseLevel = timeLevel;
+    size_t fineLevel   = timeLevel - 1;
+
+    Interpolate(coarseLevel, m_SDCSolver[coarseLevel]->GetSolutionVector(),
+                fineLevel, m_SDCSolver[fineLevel]->UpdateSolutionVector(),
+                false);
+}
+
+/**
+ *
+ */
+void DriverPFASST::InterpolateResidual(const size_t timeLevel)
+{
+    size_t coarseLevel = timeLevel;
+    size_t fineLevel   = timeLevel - 1;
+
+    Interpolate(coarseLevel, m_SDCSolver[coarseLevel]->GetResidualVector(),
+                fineLevel, m_SDCSolver[fineLevel]->UpdateResidualVector(),
+                true);
+}
+
+/**
+ *
+ */
+void DriverPFASST::Restrict(const size_t fineLevel, const SDCarray &in,
+                            const size_t coarseLevel, SDCarray &out)
+{
+    // Restrict fine solution in time.
+    for (size_t n = 0; n < m_QuadPts[coarseLevel]; ++n)
+    {
+        for (size_t i = 0; i < m_nVar; ++i)
+        {
+            Vmath::Smul(m_npts[fineLevel], m_ImatFtoC[fineLevel][n], in[0][i],
+                        1, m_storage[fineLevel][n][i], 1);
+            for (size_t k = 1; k < m_QuadPts[fineLevel]; ++k)
+            {
+                size_t index = k * m_QuadPts[coarseLevel] + n;
+                Vmath::Svtvp(m_npts[fineLevel], m_ImatFtoC[fineLevel][index],
+                             in[k][i], 1, m_storage[fineLevel][n][i], 1,
+                             m_storage[fineLevel][n][i], 1);
+            }
+        }
+    }
+
+    // Restrict fine solution in space.
+    for (size_t n = 0; n < m_QuadPts[coarseLevel]; ++n)
+    {
+        Interpolator(fineLevel, m_storage[fineLevel][n], coarseLevel, out[n]);
+    }
+}
+
+/**
+ *
+ */
+void DriverPFASST::RestrictSolution(const size_t timeLevel)
+{
+    size_t fineLevel   = timeLevel;
+    size_t coarseLevel = timeLevel + 1;
+
+    Restrict(fineLevel, m_SDCSolver[fineLevel]->GetSolutionVector(),
+             coarseLevel, m_SDCSolver[coarseLevel]->UpdateSolutionVector());
+
+    for (size_t n = 0; n < m_QuadPts[coarseLevel]; ++n)
+    {
+        CopySolutionVector(m_SDCSolver[coarseLevel]->GetSolutionVector()[n],
+                           m_solutionRest[fineLevel][n]);
+    }
+}
+
+/**
+ *
+ */
+void DriverPFASST::RestrictResidual(const size_t timeLevel)
+{
+    size_t fineLevel   = timeLevel;
+    size_t coarseLevel = timeLevel + 1;
+
+    ResidualEval(m_time, coarseLevel);
+
+    if (!m_updateResidual)
+    {
+        for (size_t n = 0; n < m_QuadPts[coarseLevel]; ++n)
+        {
+            CopySolutionVector(m_SDCSolver[coarseLevel]->GetResidualVector()[n],
+                               m_residualRest[fineLevel][n]);
+        }
+    }
+}
+
+/**
+ *
+ */
+void DriverPFASST::ComputeFASCorrection(const size_t timeLevel)
+{
+    size_t fineLevel   = timeLevel - 1;
+    size_t coarseLevel = timeLevel;
+
+    if (fineLevel != 0)
+    {
+        // Restrict fine FAS correction term
+        Restrict(fineLevel, m_SDCSolver[fineLevel]->UpdateFAScorrectionVector(),
+                 coarseLevel,
+                 m_SDCSolver[coarseLevel]->UpdateFAScorrectionVector());
+
+        // Restrict fine integrated residual.
+        Restrict(fineLevel,
+                 m_SDCSolver[fineLevel]->GetIntegratedResidualVector(),
+                 coarseLevel, m_integralRest[fineLevel]);
+    }
+    else
+    {
+        // Restrict fine integrated residual.
+        Restrict(
+            fineLevel, m_SDCSolver[fineLevel]->GetIntegratedResidualVector(),
+            coarseLevel, m_SDCSolver[coarseLevel]->UpdateFAScorrectionVector());
+    }
+
+    // Compute coarse FAS correction terms.
+    for (size_t n = 0; n < m_QuadPts[coarseLevel]; ++n)
+    {
+        for (size_t i = 0; i < m_nVar; ++i)
+        {
+            if (fineLevel != 0)
+            {
+                Vmath::Vadd(
+                    m_npts[coarseLevel],
+                    m_SDCSolver[coarseLevel]->GetFAScorrectionVector()[n][i], 1,
+                    m_integralRest[fineLevel][n][i], 1,
+                    m_SDCSolver[coarseLevel]->UpdateFAScorrectionVector()[n][i],
+                    1);
+            }
+
+            Vmath::Vsub(
+                m_npts[coarseLevel],
+                m_SDCSolver[coarseLevel]->GetFAScorrectionVector()[n][i], 1,
+                m_SDCSolver[coarseLevel]->GetIntegratedResidualVector()[n][i],
+                1, m_SDCSolver[coarseLevel]->UpdateFAScorrectionVector()[n][i],
+                1);
+        }
+    }
+}
+
+/**
+ *
+ */
+void DriverPFASST::Correct(const size_t coarseLevel,
+                           const Array<OneD, Array<OneD, NekDouble>> &in,
+                           const size_t fineLevel,
+                           Array<OneD, Array<OneD, NekDouble>> &out,
+                           bool forced)
+{
+    if (forced || IsNotInitialCondition(0))
+    {
+        // Compute difference between coarse solution and restricted
+        // solution.
+        Interpolator(fineLevel, out, coarseLevel, m_correction[fineLevel][0]);
+        for (size_t i = 0; i < m_nVar; ++i)
+        {
+            Vmath::Vsub(m_npts[coarseLevel], in[i], 1,
+                        m_correction[fineLevel][0][i], 1,
+                        m_correction[fineLevel][0][i], 1);
+        }
+
+        // Add correction to fine solution.
+        Interpolator(coarseLevel, m_correction[fineLevel][0], fineLevel,
+                     m_storage[fineLevel][0]);
+        for (size_t i = 0; i < m_nVar; ++i)
+        {
+            Vmath::Vadd(m_npts[fineLevel], m_storage[fineLevel][0][i], 1,
+                        out[i], 1, out[i], 1);
+        }
+    }
+}
+
+/**
+ *
+ */
+void DriverPFASST::CorrectInitialSolution(const size_t timeLevel)
+{
+    size_t fineLevel   = timeLevel;
+    size_t coarseLevel = timeLevel + 1;
+
+    Correct(coarseLevel, m_SDCSolver[coarseLevel]->GetSolutionVector()[0],
+            fineLevel, m_SDCSolver[fineLevel]->UpdateSolutionVector()[0],
+            false);
+}
+
+/**
+ *
+ */
+void DriverPFASST::CorrectInitialResidual(const size_t timeLevel)
+{
+    size_t fineLevel   = timeLevel;
+    size_t coarseLevel = timeLevel + 1;
+
+    Correct(coarseLevel, m_SDCSolver[coarseLevel]->GetResidualVector()[0],
+            fineLevel, m_SDCSolver[fineLevel]->UpdateResidualVector()[0],
+            false);
+}
+
+/**
+ *
+ */
+void DriverPFASST::Correct(const size_t coarseLevel, const SDCarray &rest,
+                           const SDCarray &in, const size_t fineLevel,
+                           SDCarray &out, bool forced)
+{
+    // Compute difference between coarse solution and restricted
+    // solution.
+    for (size_t n = 0; n < m_QuadPts[coarseLevel]; ++n)
+    {
+        if (forced || IsNotInitialCondition(n))
+        {
+            for (size_t i = 0; i < m_nVar; ++i)
+            {
+                Vmath::Vsub(m_npts[coarseLevel], in[n][i], 1, rest[n][i], 1,
+                            m_correction[fineLevel][n][i], 1);
+            }
+        }
+        else
+        {
+            for (size_t i = 0; i < m_nVar; ++i)
+            {
+                Vmath::Zero(m_npts[coarseLevel], m_correction[fineLevel][n][i],
+                            1);
+            }
+        }
+    }
+
+    // Interpolate coarse solution delta in space.
+    for (size_t n = 0; n < m_QuadPts[coarseLevel]; ++n)
+    {
+        Interpolator(coarseLevel, m_correction[fineLevel][n], fineLevel,
+                     m_storage[fineLevel][n]);
+    }
+
+    // Interpolate coarse solution delta in time and correct fine solution.
+    for (size_t n = 0; n < m_QuadPts[fineLevel]; ++n)
+    {
+        if (forced || IsNotInitialCondition(n))
+        {
+            for (size_t i = 0; i < m_nVar; ++i)
+            {
+                for (size_t k = 0; k < m_QuadPts[coarseLevel]; ++k)
+                {
+                    size_t index = k * m_QuadPts[fineLevel] + n;
+                    Vmath::Svtvp(m_npts[fineLevel],
+                                 m_ImatCtoF[fineLevel][index],
+                                 m_storage[fineLevel][k][i], 1, out[n][i], 1,
+                                 out[n][i], 1);
+                }
+            }
+        }
+    }
+}
+
+/**
+ *
+ */
+void DriverPFASST::CorrectSolution(const size_t timeLevel)
+{
+    size_t coarseLevel = timeLevel + 1;
+    size_t fineLevel   = timeLevel;
+
+    Correct(coarseLevel, m_solutionRest[fineLevel],
+            m_SDCSolver[coarseLevel]->GetSolutionVector(), fineLevel,
+            m_SDCSolver[fineLevel]->UpdateSolutionVector(), false);
+}
+
+/**
+ *
+ */
+void DriverPFASST::CorrectResidual(const size_t timeLevel)
+{
+    size_t coarseLevel = timeLevel + 1;
+    size_t fineLevel   = timeLevel;
+
+    // Evaluate fine residual.
+    if (m_updateResidual)
+    {
+        for (size_t n = 1; n < m_QuadPts[fineLevel]; ++n)
+        {
+            ResidualEval(fineLevel, n);
+        }
+    }
+    // Correct fine residual.
+    else
+    {
+        Correct(coarseLevel, m_residualRest[fineLevel],
+                m_SDCSolver[coarseLevel]->GetResidualVector(), fineLevel,
+                m_SDCSolver[fineLevel]->UpdateResidualVector(), false);
+    }
+}
+
+/**
+ *
+ */
+void DriverPFASST::ApplyWindowing(void)
+{
+    // Use last chunk solution as initial condition for the next window.
+    if (m_chunkRank == m_numChunks - 1)
+    {
+        UpdateFirstQuadrature(0);
+        for (size_t timeLevel = 0; timeLevel < m_nTimeLevel - 1; timeLevel++)
+        {
+            Interpolator(timeLevel,
+                         m_SDCSolver[timeLevel]->GetSolutionVector()[0],
+                         timeLevel + 1,
+                         m_SDCSolver[timeLevel + 1]->UpdateSolutionVector()[0]);
+        }
+    }
+
+    // Broadcast I.C. for windowing.
+    for (size_t timeLevel = 0; timeLevel < m_nTimeLevel; timeLevel++)
+    {
+        for (size_t i = 0; i < m_nVar; ++i)
+        {
+            m_comm->GetTimeComm()->Bcast(
+                m_SDCSolver[timeLevel]->UpdateSolutionVector()[0][i],
+                m_numChunks - 1);
+        }
+    }
+}
+
+/**
+ *
+ */
+void DriverPFASST::EvaluateSDCResidualNorm(const size_t timeLevel)
+{
+    // Compute SDC residual norm
     for (size_t i = 0; i < m_nVar; ++i)
     {
-        buffer1[i] = Array<OneD, NekDouble>(m_coarseNpts, 0.0);
-        buffer2[i] = Array<OneD, NekDouble>(m_coarseNpts, 0.0);
+        Vmath::Vadd(
+            m_npts[timeLevel],
+            m_SDCSolver[timeLevel]->GetSolutionVector()[0][i], 1,
+            m_SDCSolver[timeLevel]
+                ->GetIntegratedResidualVector()[m_QuadPts[timeLevel] - 1][i],
+            1, m_exactsoln[i], 1);
+        m_EqSys[timeLevel]->CopyToPhysField(
+            i, m_SDCSolver[timeLevel]
+                   ->GetSolutionVector()[m_QuadPts[timeLevel] - 1][i]);
+        m_vL2Errors[i]   = m_EqSys[timeLevel]->L2Error(i, m_exactsoln[i], 1);
+        m_vLinfErrors[i] = m_EqSys[timeLevel]->LinfError(i, m_exactsoln[i]);
     }
-    // Estimate coarse communication time.
-    return EstimateCommunicationTime(buffer1, buffer2);
 }
 
 /**
  *
  */
-NekDouble DriverPFASST::v_EstimateRestrictionTime(void)
+void DriverPFASST::WriteOutput(const size_t step, const NekDouble time)
 {
-    // Average restriction time over niter iteration.
-    size_t niter = 20;
-    Nektar::LibUtilities::Timer timer;
-    timer.Start();
-    for (size_t n = 0; n < niter; n++)
+    size_t timeLevel        = 0;
+    static size_t IOChkStep = m_checkSteps ? m_checkSteps : m_nsteps[timeLevel];
+    static std::string dirname = m_session->GetSessionName() + ".pit";
+
+    if ((step + 1) % IOChkStep == 0)
     {
-        RestrictFineSolution();
-        SaveCoarseSolution();
-        RestrictFineResidual();
-        SaveCoarseResidual();
-        ComputeFASCorrection();
-        EvaluateSDCResidualNorm();
+        // Compute checkpoint index.
+        size_t nchk = (step + 1) / IOChkStep;
+
+        // Create directory if does not exist.
+        if (!fs::is_directory(dirname))
+        {
+            fs::create_directory(dirname);
+        }
+
+        // Update solution field.
+        UpdateFieldCoeffs(
+            timeLevel,
+            m_SDCSolver[timeLevel]->UpdateLastQuadratureSolutionVector());
+
+        // Set filename.
+        std::string filename = dirname + "/" + m_session->GetSessionName() +
+                               "_" + std::to_string(nchk) + ".fld";
+
+        // Set time metadata.
+        m_EqSys[timeLevel]->SetTime(time);
+
+        // Write checkpoint.
+        m_EqSys[timeLevel]->WriteFld(filename);
     }
-    timer.Stop();
-    return timer.Elapsed().count() / niter;
 }
 
 /**
  *
  */
-NekDouble DriverPFASST::v_EstimateInterpolationTime(void)
+void DriverPFASST::SpeedUpAnalysis(void)
 {
-    // Average interpolation time over niter iteration.
-    size_t niter = 20;
-    Nektar::LibUtilities::Timer timer;
-    timer.Start();
-    for (size_t n = 0; n < niter; n++)
-    {
-        CorrectFineSolution();
-        CorrectFineResidual();
-        CorrectInitialFineSolution();
-    }
-    timer.Stop();
-    return timer.Elapsed().count() / niter;
+    // Print header.
+    PrintHeader("PFASST SPEED-UP ANALYSIS", '*');
+
+    // Mean communication time.
+    NekDouble commTime = EstimateCommunicationTime();
+    PrintHeader("Mean Communication Time = " +
+                    (boost::format("%1$.6e") % commTime).str() + "s",
+                '-');
+
+    // Mean FAS correction time.
+    NekDouble fasTime = EstimateFASCorrectionTime();
+    PrintHeader("Mean FAS Correction Time = " +
+                    (boost::format("%1$.6e") % fasTime).str() + "s",
+                '-');
+
+    // Mean coarse solver time.
+    NekDouble coarseSolveTime = EstimateSolverTime(m_nTimeLevel - 1);
+    PrintHeader("Mean Coarse Solve Time = " +
+                    (boost::format("%1$.6e") % coarseSolveTime).str() + "s",
+                '-');
+
+    // Mean fine solver time.
+    NekDouble fineSolveTime = EstimateSolverTime(0);
+    PrintHeader("Mean Fine Solve Time = " +
+                    (boost::format("%1$.6e") % fineSolveTime).str() + "s",
+                '-');
+
+    // Mean predictor time.
+    NekDouble predictorTime = EstimatePredictorTime();
+    PrintHeader("Mean Predictor Time = " +
+                    (boost::format("%1$.6e") % predictorTime).str() + "s",
+                '-');
+
+    // Mean overhead time.
+    NekDouble overheadTime = EstimateOverheadTime();
+    PrintHeader("Mean Overhead Time = " +
+                    (boost::format("%1$.6e") % overheadTime).str() + "s",
+                '-');
+
+    // Print speedup time.
+    PrintSpeedUp(fineSolveTime, coarseSolveTime, fasTime, commTime,
+                 predictorTime, overheadTime);
 }
 
 /**
  *
  */
-NekDouble DriverPFASST::v_EstimateCoarseSolverTime(void)
+void DriverPFASST::PrintSpeedUp(NekDouble fineSolveTime,
+                                NekDouble coarseSolveTime, NekDouble fasTime,
+                                NekDouble commTime, NekDouble predictTime,
+                                NekDouble overheadTime)
 {
-    // Estimate coarse solver time.
-    size_t niter = 20;
-    Nektar::LibUtilities::Timer timer;
-    timer.Start();
-    for (int i = 0; i < niter; i++)
+    if (m_chunkRank == m_numChunks - 1 &&
+        m_comm->GetSpaceComm()->GetRank() == 0)
     {
-        CoarseResidualEval(0);
-        RunCoarseSweep();
+        // Print maximum theoretical speed-up.
+        PrintHeader("Maximum Speed-up", '-');
+        for (size_t k = 1; k <= m_numChunks; k++)
+        {
+            NekDouble speedup =
+                ComputeSpeedUp(k, fineSolveTime, coarseSolveTime, 0.0, 0.0,
+                               predictTime, overheadTime);
+            std::cout << "Speed-up (" << k << ") = " << speedup << std::endl
+                      << std::flush;
+        }
+
+        // Print speed-up with fas correction.
+        PrintHeader("Speed-up with fas", '-');
+        for (size_t k = 1; k <= m_numChunks; k++)
+        {
+            NekDouble speedup =
+                ComputeSpeedUp(k, fineSolveTime, coarseSolveTime, fasTime, 0.0,
+                               predictTime, overheadTime);
+            std::cout << "Speed-up (" << k << ") = " << speedup << std::endl
+                      << std::flush;
+        }
+
+        // Print speed-up with fas correction and communication.
+        PrintHeader("Speed-up with comm. and fas", '-');
+        for (size_t k = 1; k <= m_numChunks; k++)
+        {
+            NekDouble speedup =
+                ComputeSpeedUp(k, fineSolveTime, coarseSolveTime, fasTime,
+                               commTime, predictTime, overheadTime);
+            std::cout << "Speed-up (" << k << ") = " << speedup << std::endl
+                      << std::flush;
+        }
+        std::cout << "-------------------------------------------" << std::endl
+                  << std::flush;
     }
-    timer.Stop();
-    return timer.Elapsed().count() / niter;
 }
 
 /**
  *
  */
-NekDouble DriverPFASST::v_EstimateFineSolverTime(void)
-{
-    // Estimate coarse solver time.
-    size_t niter = 20;
-    Nektar::LibUtilities::Timer timer;
-    timer.Start();
-    for (int i = 0; i < niter; i++)
-    {
-        FineResidualEval(0);
-        RunFineSweep();
-    }
-    timer.Stop();
-    return timer.Elapsed().count() / niter;
-}
-
-/**
- *
- */
-NekDouble DriverPFASST::v_EstimatePredictorTime(void)
-{
-    // Estimate coarse overhead time.
-    size_t niter = 20;
-    Nektar::LibUtilities::Timer timer;
-    timer.Start();
-    for (int i = 0; i < niter; i++)
-    {
-        RunCoarseSweep();
-        UpdateCoarseFirstQuadrature();
-        CopyQuadratureSolutionAndResidual(m_coarseSDCSolver, 0);
-    }
-    timer.Stop();
-    return timer.Elapsed().count() / niter;
-}
-
-/**
- *
- */
-NekDouble DriverPFASST::v_EstimateOverheadTime(void)
-{
-    // Estimate overhead time.
-    size_t niter = 20;
-    Nektar::LibUtilities::Timer timer;
-    timer.Start();
-    for (int i = 0; i < niter; i++)
-    {
-        InterpolateCoarseSolution();
-        InterpolateCoarseResidual();
-        ApplyWindowing();
-    }
-    timer.Stop();
-    return timer.Elapsed().count() / niter;
-}
-
-/**
- *
- */
-NekDouble DriverPFASST::v_ComputeSpeedUp(
-    const size_t iter, NekDouble fineSolveTime, NekDouble coarseSolveTime,
-    NekDouble restTime, NekDouble interTime, NekDouble commTime,
-    NekDouble predictorTime, NekDouble overheadTime)
+NekDouble DriverPFASST::ComputeSpeedUp(const size_t iter,
+                                       NekDouble fineSolveTime,
+                                       NekDouble coarseSolveTime,
+                                       NekDouble fasTime, NekDouble commTime,
+                                       NekDouble predictorTime,
+                                       NekDouble overheadTime)
 {
     // The speed-up estimate based on "Emmett, M., & Minion, M. (2012). Toward
     // an efficient parallel in time method for partial differential equations.
@@ -358,12 +1013,12 @@ NekDouble DriverPFASST::v_ComputeSpeedUp(
     // turbulence using parareal with spatial coarsening. Computing and
     // Visualization in Science, 19, 31-44".
 
-    size_t Kiter             = m_fineSDCSolver->GetMaxOrder();
+    size_t Kiter             = m_SDCSolver[0]->GetMaxOrder();
     size_t nComm             = (iter * (2 * m_numChunks - iter - 1)) / 2;
     NekDouble ratio          = double(iter) / m_numChunks;
     NekDouble ratioPredictor = predictorTime / fineSolveTime;
     NekDouble ratioSolve     = coarseSolveTime / fineSolveTime;
-    NekDouble ratioFAS       = (restTime + interTime) / fineSolveTime;
+    NekDouble ratioFAS       = fasTime / fineSolveTime;
     NekDouble ratioComm      = commTime / fineSolveTime;
     NekDouble ratioOverhead  = overheadTime / fineSolveTime;
 
@@ -379,662 +1034,124 @@ NekDouble DriverPFASST::v_ComputeSpeedUp(
 /**
  *
  */
-void DriverPFASST::AssertParameters(void)
+NekDouble DriverPFASST::EstimateCommunicationTime(void)
 {
-    // Assert time-stepping parameters.
-    ASSERTL0(
-        m_fineSteps % m_numChunks == 0,
-        "Total number of fine step should be divisible by number of chunks.");
-
-    ASSERTL0(
-        m_coarseSteps % m_numChunks == 0,
-        "Total number of coarse step should be divisible by number of chunks.");
-
-    ASSERTL0(m_coarseTimeStep == m_fineTimeStep,
-             "Please use same timestep for both coarse and fine solver");
-
-    ASSERTL0(m_coarseSteps == m_fineSteps,
-             "Please use same timestep for both coarse and fine solver");
-
-    // Assert I/O parameters.
-    if (m_checkSteps)
-    {
-        ASSERTL0(m_fineSteps % m_checkSteps == 0,
-                 "number of IO_CheckSteps should divide number of fine steps "
-                 "per time chunk");
-    }
-
-    if (m_infoSteps)
-    {
-        ASSERTL0(m_fineSteps % m_infoSteps == 0,
-                 "number of IO_InfoSteps should divide number of fine steps "
-                 "per time chunk");
-    }
-}
-
-/**
- *
- */
-void DriverPFASST::InitialiseSDCScheme(bool pfasst)
-{
-    // Cast pointer for TimeIntegrationSchemeSDC.
-    m_fineSDCSolver =
-        std::dynamic_pointer_cast<LibUtilities::TimeIntegrationSchemeSDC>(
-            m_fineEqSys->GetTimeIntegrationScheme());
-    m_coarseSDCSolver =
-        std::dynamic_pointer_cast<LibUtilities::TimeIntegrationSchemeSDC>(
-            m_coarseEqSys->GetTimeIntegrationScheme());
-
-    // Assert if a SDC time-integration is used.
-    ASSERTL0(m_fineSDCSolver != nullptr,
-             "Should only be run with a SDC method");
-
-    ASSERTL0(m_coarseSDCSolver != nullptr,
-             "Should only be run with a SDC method");
-
-    // Initialize fine SDC scheme.
-    CopyFromFinePhysField(m_tmpfine);
-    m_fineSDCSolver->SetPFASST(pfasst);
-    m_fineSDCSolver->InitializeScheme(
-        m_fineTimeStep, m_tmpfine, 0.0,
-        m_fineEqSys->GetTimeIntegrationSchemeOperators());
-
-    // Initialize coarse SDC scheme.
-    CopyFromCoarsePhysField(m_tmpcoarse);
-    m_coarseSDCSolver->SetPFASST(pfasst);
-    m_coarseSDCSolver->InitializeScheme(
-        m_coarseTimeStep, m_tmpcoarse, 0.0,
-        m_coarseEqSys->GetTimeIntegrationSchemeOperators());
-
-    // Set some member variables.
-    m_fineQuadPts   = m_fineSDCSolver->GetQuadPtsNumber();
-    m_coarseQuadPts = m_coarseSDCSolver->GetQuadPtsNumber();
-
-    // Alocate memory.
-    m_solutionRest =
-        Array<OneD, Array<OneD, Array<OneD, NekDouble>>>(m_coarseQuadPts);
-    m_residualRest =
-        Array<OneD, Array<OneD, Array<OneD, NekDouble>>>(m_coarseQuadPts);
-    m_tmpfine_arr =
-        Array<OneD, Array<OneD, Array<OneD, NekDouble>>>(m_coarseQuadPts);
-    m_tmpcoarse_arr =
-        Array<OneD, Array<OneD, Array<OneD, NekDouble>>>(m_coarseQuadPts);
-    for (size_t n = 0; n < m_coarseQuadPts; ++n)
-    {
-        m_solutionRest[n]  = Array<OneD, Array<OneD, NekDouble>>(m_nVar);
-        m_residualRest[n]  = Array<OneD, Array<OneD, NekDouble>>(m_nVar);
-        m_tmpfine_arr[n]   = Array<OneD, Array<OneD, NekDouble>>(m_nVar);
-        m_tmpcoarse_arr[n] = Array<OneD, Array<OneD, NekDouble>>(m_nVar);
-        for (size_t i = 0; i < m_nVar; ++i)
-        {
-            m_solutionRest[n][i]  = Array<OneD, NekDouble>(m_coarseNpts, 0.0);
-            m_residualRest[n][i]  = Array<OneD, NekDouble>(m_coarseNpts, 0.0);
-            m_tmpfine_arr[n][i]   = Array<OneD, NekDouble>(m_fineNpts, 0.0);
-            m_tmpcoarse_arr[n][i] = Array<OneD, NekDouble>(m_coarseNpts, 0.0);
-        }
-    }
-}
-
-/**
- *
- */
-void DriverPFASST::SetTimeInterpolator(void)
-{
-    // Initialize time interpolator.
-    LibUtilities::PointsKey fpoints = m_fineSDCSolver->GetPointsKey();
-    LibUtilities::PointsKey cpoints = m_coarseSDCSolver->GetPointsKey();
-    DNekMatSharedPtr ImatFtoC =
-        LibUtilities::PointsManager()[fpoints]->GetI(cpoints);
-    DNekMatSharedPtr ImatCtoF =
-        LibUtilities::PointsManager()[cpoints]->GetI(fpoints);
-    m_ImatFtoC = Array<OneD, NekDouble>(m_fineQuadPts * m_coarseQuadPts, 0.0);
-    m_ImatCtoF = Array<OneD, NekDouble>(m_fineQuadPts * m_coarseQuadPts, 0.0);
-
-    // Determine if Radau quadrature are used.
-    int i0 = m_fineSDCSolver->HasFirstQuadrature() ? 0 : 1;
-    int j0 = m_coarseSDCSolver->HasFirstQuadrature() ? 0 : 1;
-
-    // Adapt fine to coarse time interpolator.
-    for (size_t i = i0; i < m_fineQuadPts; ++i)
-    {
-        for (size_t j = j0; j < m_coarseQuadPts; ++j)
-        {
-            m_ImatFtoC[i * m_coarseQuadPts + j] =
-                (ImatFtoC
-                     ->GetPtr())[(i - i0) * (m_coarseQuadPts - j0) + (j - j0)];
-        }
-    }
-    if (j0 == 1)
-    {
-        m_ImatFtoC[0] = 1.0;
-    }
-
-    // Adapt coarse to fine time interpolator.
-    for (size_t j = j0; j < m_coarseQuadPts; ++j)
-    {
-        for (size_t i = i0; i < m_fineQuadPts; ++i)
-        {
-            m_ImatCtoF[j * m_fineQuadPts + i] =
-                (ImatCtoF
-                     ->GetPtr())[(j - j0) * (m_fineQuadPts - i0) + (i - i0)];
-        }
-    }
-    if (i0 == 1)
-    {
-        m_ImatCtoF[0] = 1.0;
-    }
-}
-
-/**
- *
- */
-bool DriverPFASST::IsNotInitialCondition(const size_t n)
-{
-    return !(n == 0 && m_chunkRank == 0);
-}
-
-/**
- *
- */
-void DriverPFASST::SetTime(const NekDouble &time)
-{
-    m_coarseEqSys->SetTime(time);
-    m_coarseSDCSolver->SetTime(time);
-    m_fineEqSys->SetTime(time);
-    m_fineSDCSolver->SetTime(time);
-}
-
-/**
- *
- */
-void DriverPFASST::CopyQuadratureSolutionAndResidual(
-    std::shared_ptr<LibUtilities::TimeIntegrationSchemeSDC> SDCsolver,
-    const int index)
-{
-    int nQuad = SDCsolver->GetQuadPtsNumber();
-    int nVar  = SDCsolver->GetNvars();
-
-    for (int n = 0; n < nQuad; ++n)
-    {
-        if (n != index)
-        {
-            for (int i = 0; i < nVar; ++i)
-            {
-                Vmath::Vcopy(SDCsolver->GetNpoints(),
-                             SDCsolver->GetSolutionVector()[index][i], 1,
-                             SDCsolver->UpdateSolutionVector()[n][i], 1);
-                Vmath::Vcopy(SDCsolver->GetNpoints(),
-                             SDCsolver->GetResidualVector()[index][i], 1,
-                             SDCsolver->UpdateResidualVector()[n][i], 1);
-            }
-        }
-    }
-}
-
-/**
- *
- */
-void DriverPFASST::UpdateCoarseFirstQuadrature(void)
-{
-    m_coarseSDCSolver->UpdateFirstQuadrature();
-}
-
-/**
- *
- */
-void DriverPFASST::UpdateFineFirstQuadrature(void)
-{
-    m_fineSDCSolver->UpdateFirstQuadrature();
-}
-
-/**
- *
- */
-void DriverPFASST::ComputeCoarseInitialGuess(void)
-{
-    m_coarseSDCSolver->ComputeInitialGuess(m_chunkTime);
-    m_coarseSDCSolver->UpdateLastQuadrature();
-}
-
-/**
- *
- */
-void DriverPFASST::ComputeFineInitialGuess(void)
-{
-    m_fineSDCSolver->ComputeInitialGuess(m_chunkTime);
-    m_fineSDCSolver->UpdateLastQuadrature();
-}
-
-/**
- *
- */
-void DriverPFASST::RunCoarseSweep(void)
-{
-    // Start SDC iteration loop.
-    for (size_t k = 0; k < m_coarseSDCSolver->GetOrder(); k++)
-    {
-        m_coarseSDCSolver->SDCIterationLoop(m_chunkTime);
-    }
-
-    // Update last quadrature point.
-    m_coarseSDCSolver->UpdateLastQuadrature();
-}
-
-/**
- *
- */
-void DriverPFASST::RunFineSweep(void)
-{
-    // Start SDC iteration loop.
-    for (size_t k = 0; k < m_fineSDCSolver->GetOrder(); k++)
-    {
-        m_fineSDCSolver->SDCIterationLoop(m_chunkTime);
-    }
-
-    // Update last quadrature point.
-    m_fineSDCSolver->UpdateLastQuadrature();
-}
-
-/**
- *
- */
-void DriverPFASST::CoarseResidualEval(const size_t n)
-{
-    m_coarseSDCSolver->ResidualEval(m_chunkTime, n);
-}
-
-/**
- *
- */
-void DriverPFASST::CoarseResidualEval(void)
-{
-    m_coarseSDCSolver->ResidualEval(m_chunkTime);
-}
-
-/**
- *
- */
-void DriverPFASST::FineResidualEval(const size_t n)
-{
-    m_fineSDCSolver->ResidualEval(m_chunkTime, n);
-}
-
-/**
- *
- */
-void DriverPFASST::FineResidualEval(void)
-{
-    m_fineSDCSolver->ResidualEval(m_chunkTime);
-}
-
-/**
- *
- */
-void DriverPFASST::CoarseIntegratedResidualEval(void)
-{
-    m_coarseSDCSolver->UpdateIntegratedResidualQFint(m_chunkTime);
-}
-
-/**
- *
- */
-void DriverPFASST::FineIntegratedResidualEval(void)
-{
-    m_fineSDCSolver->UpdateIntegratedResidualQFint(m_chunkTime);
-}
-
-/**
- *
- */
-void DriverPFASST::Interpolate(
-    const Array<OneD, Array<OneD, Array<OneD, NekDouble>>> &coarse,
-    Array<OneD, Array<OneD, Array<OneD, NekDouble>>> &fine, bool forced)
-{
-
-    // Interpolate coarse solution in space.
-    for (size_t n = 0; n < m_coarseQuadPts; ++n)
-    {
-        Interpolator(coarse[n], m_tmpfine_arr[n]);
-    }
-
-    // Interpolate coarse solution in time.
-    for (size_t n = 0; n < m_fineQuadPts; ++n)
-    {
-        if (forced || IsNotInitialCondition(n))
-        {
-            for (size_t i = 0; i < m_nVar; ++i)
-            {
-                Vmath::Zero(m_fineNpts, fine[n][i], 1);
-                for (size_t k = 0; k < m_coarseQuadPts; ++k)
-                {
-                    size_t index = k * m_fineQuadPts + n;
-                    Vmath::Svtvp(m_fineNpts, m_ImatCtoF[index],
-                                 m_tmpfine_arr[k][i], 1, fine[n][i], 1,
-                                 fine[n][i], 1);
-                }
-            }
-        }
-    }
-}
-
-/**
- *
- */
-void DriverPFASST::InterpolateCoarseSolution(void)
-{
-    Interpolate(m_coarseSDCSolver->GetSolutionVector(),
-                m_fineSDCSolver->UpdateSolutionVector(), false);
-}
-
-/**
- *
- */
-void DriverPFASST::InterpolateCoarseResidual(void)
-{
-    Interpolate(m_coarseSDCSolver->GetResidualVector(),
-                m_fineSDCSolver->UpdateResidualVector(), true);
-}
-
-/**
- *
- */
-void DriverPFASST::Restrict(
-    const Array<OneD, Array<OneD, Array<OneD, NekDouble>>> &fine,
-    Array<OneD, Array<OneD, Array<OneD, NekDouble>>> &coarse)
-{
-    // Restrict fine solution in time.
-    for (size_t n = 0; n < m_coarseQuadPts; ++n)
+    // Allocate memory.
+    NekDouble commTime = 0.0;
+    Array<OneD, Array<OneD, NekDouble>> buffer1(m_nVar);
+    Array<OneD, Array<OneD, NekDouble>> buffer2(m_nVar);
+    for (size_t timeLevel = 0; timeLevel < m_nTimeLevel; timeLevel++)
     {
         for (size_t i = 0; i < m_nVar; ++i)
         {
-            Vmath::Zero(m_fineNpts, m_tmpfine_arr[n][i], 1);
-            for (size_t k = 0; k < m_fineQuadPts; ++k)
+            buffer1[i] = Array<OneD, NekDouble>(m_npts[timeLevel], 0.0);
+            buffer2[i] = Array<OneD, NekDouble>(m_npts[timeLevel], 0.0);
+        }
+        commTime +=
+            DriverParallelInTime ::EstimateCommunicationTime(buffer1, buffer2);
+    }
+
+    return commTime;
+}
+
+/**
+ *
+ */
+NekDouble DriverPFASST::EstimatePredictorTime(void)
+{
+    // Estimate coarse overhead time.
+    size_t niter = 20;
+    Nektar::LibUtilities::Timer timer;
+    timer.Start();
+    for (size_t i = 0; i < niter; i++)
+    {
+        RunSweep(m_time, m_nTimeLevel - 1);
+        UpdateFirstQuadrature(m_nTimeLevel - 1);
+        PropagateQuadratureSolutionAndResidual(m_nTimeLevel - 1, 0);
+    }
+    timer.Stop();
+    return timer.Elapsed().count() / niter;
+}
+
+/**
+ *
+ */
+NekDouble DriverPFASST::EstimateFASCorrectionTime(void)
+{
+    // Average restriction time over niter iteration.
+    size_t niter = 20;
+    Nektar::LibUtilities::Timer timer;
+    timer.Start();
+    for (size_t n = 0; n < niter; n++)
+    {
+        for (size_t timeLevel = 0; timeLevel < m_nTimeLevel - 1; timeLevel++)
+        {
+            if (timeLevel != 0)
             {
-                size_t index = k * m_coarseQuadPts + n;
-                Vmath::Svtvp(m_fineNpts, m_ImatFtoC[index], fine[k][i], 1,
-                             m_tmpfine_arr[n][i], 1, m_tmpfine_arr[n][i], 1);
+                RunSweep(m_time, timeLevel, true);
+            }
+            RestrictSolution(timeLevel);
+            RestrictResidual(timeLevel);
+            IntegratedResidualEval(timeLevel);
+            IntegratedResidualEval(timeLevel + 1);
+            ComputeFASCorrection(timeLevel + 1);
+        }
+
+        for (size_t timeLevel = m_nTimeLevel - 1; timeLevel > 0; timeLevel--)
+        {
+            CorrectSolution(timeLevel - 1);
+            CorrectResidual(timeLevel - 1);
+            CorrectInitialSolution(timeLevel - 1);
+            if (timeLevel - 1 != 0)
+            {
+                RunSweep(m_time, timeLevel - 1, true);
             }
         }
     }
+    timer.Stop();
+    return timer.Elapsed().count() / niter;
+}
 
-    // Restrict fine solution in space.
-    for (size_t n = 0; n < m_coarseQuadPts; ++n)
+/**
+ *
+ */
+NekDouble DriverPFASST::EstimateSolverTime(size_t timeLevel)
+{
+    // Estimate solver time.
+    size_t niter = 20;
+    Nektar::LibUtilities::Timer timer;
+    timer.Start();
+    for (size_t i = 0; i < niter; i++)
     {
-        Interpolator(m_tmpfine_arr[n], coarse[n]);
+        RunSweep(m_time, timeLevel, true);
     }
+    timer.Stop();
+    return timer.Elapsed().count() / niter;
 }
 
 /**
  *
  */
-void DriverPFASST::RestrictFineSolution(void)
+NekDouble DriverPFASST::EstimateOverheadTime(void)
 {
-    Restrict(m_fineSDCSolver->GetSolutionVector(),
-             m_coarseSDCSolver->UpdateSolutionVector());
-}
-
-/**
- *
- */
-void DriverPFASST::RestrictFineResidual(void)
-{
-    CoarseResidualEval();
-}
-
-/**
- *
- */
-void DriverPFASST::SaveCoarseSolution(void)
-{
-    for (size_t n = 0; n < m_coarseQuadPts; ++n)
+    // Estimate overhead time.
+    size_t niter = 20;
+    Nektar::LibUtilities::Timer timer;
+    timer.Start();
+    for (size_t i = 0; i < niter; i++)
     {
-        CopySolutionVector(m_coarseSDCSolver->GetSolutionVector()[n],
-                           m_solutionRest[n]);
-    }
-}
-
-/**
- *
- */
-void DriverPFASST::SaveCoarseResidual(void)
-{
-    if (!m_updateFineResidual)
-    {
-        for (size_t n = 0; n < m_coarseQuadPts; ++n)
+        ResidualEval(m_time, m_nTimeLevel - 1, 0);
+        PropagateQuadratureSolutionAndResidual(m_nTimeLevel - 1, 0);
+        RunSweep(m_time, m_nTimeLevel - 1);
+        for (size_t timeLevel = m_nTimeLevel - 1; timeLevel > 0; timeLevel--)
         {
-            CopySolutionVector(m_coarseSDCSolver->GetResidualVector()[n],
-                               m_residualRest[n]);
+            InterpolateSolution(timeLevel);
+            InterpolateResidual(timeLevel);
         }
+        ApplyWindowing();
     }
-}
-
-/**
- *
- */
-void DriverPFASST::ComputeFASCorrection()
-{
-    // Compute fine integrated residual.
-    FineIntegratedResidualEval();
-
-    // Compute coarse integrated residual.
-    CoarseIntegratedResidualEval();
-
-    // Restrict fine integratued residual.
-    Restrict(m_fineSDCSolver->GetIntegratedResidualQFintVector(),
-             m_coarseSDCSolver->UpdateFAScorrectionVector());
-
-    // Compute coarse FAS correction terms.
-    for (size_t n = 0; n < m_coarseQuadPts; ++n)
-    {
-        for (size_t i = 0; i < m_nVar; ++i)
-        {
-            Vmath::Vsub(
-                m_coarseNpts, m_coarseSDCSolver->GetFAScorrectionVector()[n][i],
-                1, m_coarseSDCSolver->GetIntegratedResidualQFintVector()[n][i],
-                1, m_coarseSDCSolver->UpdateFAScorrectionVector()[n][i], 1);
-        }
-    }
-}
-
-/**
- *
- */
-void DriverPFASST::Correct(const Array<OneD, Array<OneD, NekDouble>> &coarse,
-                           Array<OneD, Array<OneD, NekDouble>> &fine,
-                           bool forced)
-{
-    if (forced || IsNotInitialCondition(0))
-    {
-        // Compute difference between coarse solution and restricted
-        // solution.
-        Interpolator(fine, m_tmpcoarse);
-        for (size_t i = 0; i < m_nVar; ++i)
-        {
-            Vmath::Vsub(m_coarseNpts, coarse[i], 1, m_tmpcoarse[i], 1,
-                        m_tmpcoarse[i], 1);
-        }
-
-        // Add correction to fine solution.
-        Interpolator(m_tmpcoarse, m_tmpfine);
-        for (size_t i = 0; i < m_nVar; ++i)
-        {
-            Vmath::Vadd(m_fineNpts, m_tmpfine[i], 1, fine[i], 1, fine[i], 1);
-        }
-    }
-}
-
-/**
- *
- */
-void DriverPFASST::CorrectInitialFineSolution(void)
-{
-    Correct(m_coarseSDCSolver->GetSolutionVector()[0],
-            m_fineSDCSolver->UpdateSolutionVector()[0], false);
-}
-
-/**
- *
- */
-void DriverPFASST::CorrectInitialFineResidual(void)
-{
-    Correct(m_coarseSDCSolver->GetResidualVector()[0],
-            m_fineSDCSolver->UpdateResidualVector()[0], false);
-}
-
-/**
- *
- */
-void DriverPFASST::Correct(
-    const Array<OneD, Array<OneD, Array<OneD, NekDouble>>> &rest,
-    const Array<OneD, Array<OneD, Array<OneD, NekDouble>>> &coarse,
-    Array<OneD, Array<OneD, Array<OneD, NekDouble>>> &fine, bool forced)
-{
-    // Compute difference between coarse solution and restricted
-    // solution.
-    for (size_t n = 0; n < m_coarseQuadPts; ++n)
-    {
-        if (forced || IsNotInitialCondition(n))
-        {
-            for (size_t i = 0; i < m_nVar; ++i)
-            {
-                Vmath::Vsub(m_coarseNpts, coarse[n][i], 1, rest[n][i], 1,
-                            m_tmpcoarse_arr[n][i], 1);
-            }
-        }
-        else
-        {
-            for (size_t i = 0; i < m_nVar; ++i)
-            {
-                Vmath::Zero(m_coarseNpts, m_tmpcoarse_arr[n][i], 1);
-            }
-        }
-    }
-
-    // Interpolate coarse solution delta in space.
-    for (size_t n = 0; n < m_coarseQuadPts; ++n)
-    {
-        Interpolator(m_tmpcoarse_arr[n], m_tmpfine_arr[n]);
-    }
-
-    // Interpolate coarse solution delta in time and correct fine solution.
-    for (size_t n = 0; n < m_fineQuadPts; ++n)
-    {
-        if (forced || IsNotInitialCondition(n))
-        {
-            for (size_t i = 0; i < m_nVar; ++i)
-            {
-                for (size_t k = 0; k < m_coarseQuadPts; ++k)
-                {
-                    size_t index = k * m_fineQuadPts + n;
-                    Vmath::Svtvp(m_fineNpts, m_ImatCtoF[index],
-                                 m_tmpfine_arr[k][i], 1, fine[n][i], 1,
-                                 fine[n][i], 1);
-                }
-            }
-        }
-    }
-}
-
-/**
- *
- */
-void DriverPFASST::CorrectFineSolution(void)
-{
-    Correct(m_solutionRest, m_coarseSDCSolver->GetSolutionVector(),
-            m_fineSDCSolver->UpdateSolutionVector(), false);
-}
-
-/**
- *
- */
-void DriverPFASST::CorrectFineResidual(void)
-{
-    // Evaluate fine residual.
-    if (m_updateFineResidual)
-    {
-        for (size_t n = 1; n < m_fineQuadPts; ++n)
-        {
-            FineResidualEval(n);
-        }
-    }
-    // Correct fine residual.
-    else
-    {
-        Correct(m_residualRest, m_coarseSDCSolver->GetResidualVector(),
-                m_fineSDCSolver->UpdateResidualVector(), false);
-    }
-}
-
-/**
- *
- */
-void DriverPFASST::ApplyWindowing(void)
-{
-    LibUtilities::CommSharedPtr tComm = m_session->GetComm()->GetTimeComm();
-
-    // Use last chunk solution as initial condition for the next window.
-    if (m_chunkRank == m_numChunks - 1)
-    {
-        UpdateFineFirstQuadrature();
-        Interpolator(m_fineSDCSolver->GetSolutionVector()[0],
-                     m_coarseSDCSolver->UpdateSolutionVector()[0]);
-    }
-
-    // Broadcast I.C. for windowing.
-    for (size_t i = 0; i < m_nVar; ++i)
-    {
-        tComm->Bcast(m_coarseSDCSolver->UpdateSolutionVector()[0][i],
-                     m_numChunks - 1);
-        tComm->Bcast(m_fineSDCSolver->UpdateSolutionVector()[0][i],
-                     m_numChunks - 1);
-    }
-}
-
-/**
- *
- */
-void DriverPFASST::EvaluateSDCResidualNorm(void)
-{
-    // Update integrated residual
-    FineIntegratedResidualEval();
-
-    // Compute SDC residual norm
-    for (size_t i = 0; i < m_nVar; ++i)
-    {
-        Vmath::Vadd(
-            m_fineNpts, m_fineSDCSolver->GetSolutionVector()[0][i], 1,
-            m_fineSDCSolver
-                ->GetIntegratedResidualQFintVector()[m_fineQuadPts - 1][i],
-            1, m_exactsoln[i], 1);
-        m_fineEqSys->CopyToPhysField(
-            i, m_fineSDCSolver->GetSolutionVector()[m_fineQuadPts - 1][i]);
-        m_vL2Errors[i]   = m_fineEqSys->L2Error(i, m_exactsoln[i], 1);
-        m_vLinfErrors[i] = m_fineEqSys->LinfError(i, m_exactsoln[i]);
-    }
-}
-
-/**
- *
- */
-void DriverPFASST::WriteOutput(size_t chkPts)
-{
-    static size_t IOChkStep   = m_checkSteps ? m_checkSteps : m_fineSteps;
-    static std::string newdir = m_session->GetSessionName() + ".pit";
-
-    if ((chkPts + 1) % IOChkStep == 0)
-    {
-        size_t index         = (chkPts + 1) / IOChkStep;
-        std::string filename = newdir + "/" + m_session->GetSessionName();
-
-        if (!fs::is_directory(newdir))
-        {
-            fs::create_directory(newdir);
-        }
-
-        UpdateSolution(m_fineSDCSolver->UpdateLastQuadratureSolutionVector());
-        m_fineEqSys->WriteFld(filename + "_" +
-                              boost::lexical_cast<std::string>(index) + ".fld");
-    }
+    timer.Stop();
+    return timer.Elapsed().count() / niter;
 }
 
 } // namespace SolverUtils

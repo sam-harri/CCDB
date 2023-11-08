@@ -82,7 +82,6 @@ void QuadIProduct(bool colldir0, bool colldir1, int numElmt, int nquad0,
 
         if (numElmt > 1)
         {
-
             if (colldir1)
             {
                 for (int i = 0; i < nquad1; ++i)
@@ -205,7 +204,6 @@ void HexIProduct(bool colldir0, bool colldir1, bool colldir2, int numElmt,
             {
                 if (colldir0)
                 {
-
                     for (int i = 0; i < nmodes0; ++i)
                     {
                         Vmath::Vcopy(nquad1 * nquad2, &wsp[n * totpoints] + i,

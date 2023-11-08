@@ -108,11 +108,6 @@ public:
     MULTI_REGIONS_EXPORT ExpList(const ExpList &in,
                                  const bool DeclareCoeffPhysArrays = true);
 
-    /// The copy constructor.
-    MULTI_REGIONS_EXPORT ExpList(const ExpListSharedPtr &in,
-                                 const bool DeclareCoeffArrays = true,
-                                 const bool DeclarePhysArrays  = true);
-
     /// Constructor copying only elements defined in eIds.
     MULTI_REGIONS_EXPORT ExpList(const ExpList &in,
                                  const std::vector<unsigned int> &eIDs,
@@ -268,18 +263,20 @@ public:
     /// \f$f(\boldsymbol{x})\f$ with respect to the derivative (in
     /// direction \param dir) of all \em local expansion modes
     /// \f$\phi_n^e(\boldsymbol{x})\f$.
-    MULTI_REGIONS_EXPORT void IProductWRTDerivBase(
+    MULTI_REGIONS_EXPORT inline void IProductWRTDerivBase(
         const int dir, const Array<OneD, const NekDouble> &inarray,
         Array<OneD, NekDouble> &outarray);
+
     MULTI_REGIONS_EXPORT void IProductWRTDirectionalDerivBase(
         const Array<OneD, const NekDouble> &direction,
         const Array<OneD, const NekDouble> &inarray,
         Array<OneD, NekDouble> &outarray);
+
     /// This function calculates the inner product of a
     /// function \f$f(\boldsymbol{x})\f$ with respect to the
     /// derivative of all \em local expansion modes
     /// \f$\phi_n^e(\boldsymbol{x})\f$.
-    MULTI_REGIONS_EXPORT void IProductWRTDerivBase(
+    MULTI_REGIONS_EXPORT inline void IProductWRTDerivBase(
         const Array<OneD, const Array<OneD, NekDouble>> &inarray,
         Array<OneD, NekDouble> &outarray);
     /// This function elementally evaluates the forward transformation
@@ -796,9 +793,6 @@ public:
     /// for boundary average and jump calculations
     MULTI_REGIONS_EXPORT void GetBwdWeight(Array<OneD, NekDouble> &weightAver,
                                            Array<OneD, NekDouble> &weightJump);
-    inline void AddTraceIntegral(const Array<OneD, const NekDouble> &Fx,
-                                 const Array<OneD, const NekDouble> &Fy,
-                                 Array<OneD, NekDouble> &outarray);
     inline void AddTraceIntegral(const Array<OneD, const NekDouble> &Fn,
                                  Array<OneD, NekDouble> &outarray);
     inline void AddFwdBwdTraceIntegral(const Array<OneD, const NekDouble> &Fwd,
@@ -1195,9 +1189,6 @@ protected:
     virtual std::vector<bool> &v_GetLeftAdjacentTraces(void);
     /// Populate \a normals with the normals of all expansions.
     virtual void v_GetNormals(Array<OneD, Array<OneD, NekDouble>> &normals);
-    virtual void v_AddTraceIntegral(const Array<OneD, const NekDouble> &Fx,
-                                    const Array<OneD, const NekDouble> &Fy,
-                                    Array<OneD, NekDouble> &outarray);
     virtual void v_AddTraceIntegral(const Array<OneD, const NekDouble> &Fn,
                                     Array<OneD, NekDouble> &outarray);
     virtual void v_AddFwdBwdTraceIntegral(
@@ -1287,6 +1278,16 @@ protected:
     virtual void v_SmoothField(Array<OneD, NekDouble> &field);
     virtual void v_IProductWRTBase(const Array<OneD, const NekDouble> &inarray,
                                    Array<OneD, NekDouble> &outarray);
+
+    // Define ExpList::IProductWRTDerivBase as virtual function
+    virtual void v_IProductWRTDerivBase(
+        const int dir, const Array<OneD, const NekDouble> &inarray,
+        Array<OneD, NekDouble> &outarray);
+
+    virtual void v_IProductWRTDerivBase(
+        const Array<OneD, const Array<OneD, NekDouble>> &inarray,
+        Array<OneD, NekDouble> &outarray);
+
     virtual void v_GetCoords(
         Array<OneD, NekDouble> &coord_0,
         Array<OneD, NekDouble> &coord_1 = NullNekDouble1DArray,
@@ -1656,6 +1657,26 @@ inline void ExpList::IProductWRTBase(
 {
     v_IProductWRTBase(inarray, outarray);
 }
+/**
+ *
+ */
+inline void ExpList::IProductWRTDerivBase(
+    const int dir, const Array<OneD, const NekDouble> &inarray,
+    Array<OneD, NekDouble> &outarray)
+{
+    v_IProductWRTDerivBase(dir, inarray, outarray);
+}
+
+/**
+ *
+ */
+inline void ExpList::IProductWRTDerivBase(
+    const Array<OneD, const Array<OneD, NekDouble>> &inarray,
+    Array<OneD, NekDouble> &outarray)
+{
+    v_IProductWRTDerivBase(inarray, outarray);
+}
+
 /**
  *
  */
@@ -2157,12 +2178,6 @@ inline const Array<OneD, const int> &ExpList::GetTraceBndMap()
 inline void ExpList::GetNormals(Array<OneD, Array<OneD, NekDouble>> &normals)
 {
     v_GetNormals(normals);
-}
-inline void ExpList::AddTraceIntegral(const Array<OneD, const NekDouble> &Fx,
-                                      const Array<OneD, const NekDouble> &Fy,
-                                      Array<OneD, NekDouble> &outarray)
-{
-    v_AddTraceIntegral(Fx, Fy, outarray);
 }
 inline void ExpList::AddTraceIntegral(const Array<OneD, const NekDouble> &Fn,
                                       Array<OneD, NekDouble> &outarray)

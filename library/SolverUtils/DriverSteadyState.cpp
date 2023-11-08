@@ -65,13 +65,6 @@ DriverSteadyState::DriverSteadyState(
 /**
  *
  */
-DriverSteadyState::~DriverSteadyState()
-{
-}
-
-/**
- *
- */
 void DriverSteadyState::v_InitObject(ostream &out)
 {
     DriverModifiedArnoldi::v_InitObject(out);
@@ -631,13 +624,13 @@ void DriverSteadyState::ConvergenceHistory(
     if (m_comm->GetRank() == 0)
     {
         cout << "SFD - Step: " << left << m_stepCounter + 1
-             << ";\tTime: " << left << m_equ[m_nequ - 1]->GetFinalTime()
+             << ";\tTime: " << left << m_equ[m_nequ - 1]->GetTime()
              << ";\tCPU time = " << left << cpuTime << " s"
              << ";\tTot time = " << left << totalTime << " s"
              << ";\tX = " << left << m_X << ";\tDelta = " << left << m_Delta
              << ";\t|q-qBar|inf = " << left << MaxNormDiff_q_qBar << endl;
         std::ofstream m_file("ConvergenceHistory.txt", std::ios_base::app);
-        m_file << m_stepCounter + 1 << "\t" << m_equ[m_nequ - 1]->GetFinalTime()
+        m_file << m_stepCounter + 1 << "\t" << m_equ[m_nequ - 1]->GetTime()
                << "\t" << totalTime << "\t" << MaxNormDiff_q_qBar << "\t"
                << MaxNormDiff_q1_q0 << endl;
         m_file.close();

@@ -62,6 +62,11 @@ struct Command
     bool m_pythonTest;
 };
 
+/**
+ * @brief The TestData class is responsible for parsing a test XML file and
+ * storing the data.
+ */
+
 class TestData
 {
 public:
@@ -80,6 +85,8 @@ public:
     DependentFile GetDependentFile(unsigned int pId) const;
     unsigned int GetNumDependentFiles() const;
 
+    unsigned int GetNumRuns() const;
+
     void SaveFile();
 
 private:
@@ -89,6 +96,8 @@ private:
     TiXmlDocument *m_doc;
     std::vector<TiXmlElement *> m_metrics;
     std::vector<DependentFile> m_files;
+    /// @brief The number of times to run the test.
+    unsigned int m_runs;
 
     void Parse(TiXmlDocument *pDoc);
     Command ParseCommand(TiXmlElement *pElmt) const;

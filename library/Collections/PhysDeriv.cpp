@@ -63,9 +63,7 @@ class PhysDeriv_StdMat final : public Operator
 public:
     OPERATOR_CREATE(PhysDeriv_StdMat)
 
-    ~PhysDeriv_StdMat() final
-    {
-    }
+    ~PhysDeriv_StdMat() final = default;
 
     void operator()(const Array<OneD, const NekDouble> &input,
                     Array<OneD, NekDouble> &output0,
@@ -196,15 +194,10 @@ private:
                      StdRegions::FactorMap factors)
         : Operator(pCollExp, pGeomData, factors)
     {
-        int nqtot                            = 1;
-        LibUtilities::PointsKeyVector PtsKey = m_stdExp->GetPointsKeys();
-        m_dim                                = PtsKey.size();
-        m_coordim                            = pCollExp[0]->GetCoordim();
+        int nqtot = pCollExp[0]->GetTotPoints();
+        m_dim     = pCollExp[0]->GetShapeDimension();
+        m_coordim = pCollExp[0]->GetCoordim();
 
-        for (int i = 0; i < m_dim; ++i)
-        {
-            nqtot *= PtsKey[i].GetNumPoints();
-        }
         // set up a PhysDeriv StdMat.
         m_derivMat = Array<OneD, DNekMatSharedPtr>(m_dim);
         for (int i = 0; i < m_dim; ++i)
@@ -270,9 +263,7 @@ class PhysDeriv_MatrixFree final : public Operator, MatrixFreeOneInMultiOut
 public:
     OPERATOR_CREATE(PhysDeriv_MatrixFree)
 
-    ~PhysDeriv_MatrixFree() final
-    {
-    }
+    ~PhysDeriv_MatrixFree() final = default;
 
     void operator()(const Array<OneD, const NekDouble> &input,
                     Array<OneD, NekDouble> &output0,
@@ -431,9 +422,7 @@ class PhysDeriv_IterPerExp final : public Operator
 public:
     OPERATOR_CREATE(PhysDeriv_IterPerExp)
 
-    ~PhysDeriv_IterPerExp() final
-    {
-    }
+    ~PhysDeriv_IterPerExp() final = default;
 
     void operator()(const Array<OneD, const NekDouble> &input,
                     Array<OneD, NekDouble> &output0,
@@ -563,15 +552,10 @@ private:
                          StdRegions::FactorMap factors)
         : Operator(pCollExp, pGeomData, factors)
     {
-        int nqtot                            = 1;
-        LibUtilities::PointsKeyVector PtsKey = m_stdExp->GetPointsKeys();
-        m_dim                                = PtsKey.size();
-        m_coordim                            = pCollExp[0]->GetCoordim();
+        int nqtot = pCollExp[0]->GetTotPoints();
+        m_dim     = pCollExp[0]->GetShapeDimension();
+        m_coordim = pCollExp[0]->GetCoordim();
 
-        for (int i = 0; i < m_dim; ++i)
-        {
-            nqtot *= PtsKey[i].GetNumPoints();
-        }
         m_derivFac = pGeomData->GetDerivFactors(pCollExp);
         m_wspSize  = 3 * nqtot * m_numElmt;
     }
@@ -618,9 +602,7 @@ class PhysDeriv_NoCollection final : public Operator
 public:
     OPERATOR_CREATE(PhysDeriv_NoCollection)
 
-    ~PhysDeriv_NoCollection() final
-    {
-    }
+    ~PhysDeriv_NoCollection() final = default;
 
     void operator()(const Array<OneD, const NekDouble> &input,
                     Array<OneD, NekDouble> &output0,
@@ -748,9 +730,7 @@ class PhysDeriv_SumFac_Seg final : public Operator
 public:
     OPERATOR_CREATE(PhysDeriv_SumFac_Seg)
 
-    ~PhysDeriv_SumFac_Seg() final
-    {
-    }
+    ~PhysDeriv_SumFac_Seg() final = default;
 
     void operator()(const Array<OneD, const NekDouble> &input,
                     Array<OneD, NekDouble> &output0,
@@ -864,8 +844,7 @@ private:
         : Operator(pCollExp, pGeomData, factors),
           m_nquad0(m_stdExp->GetNumPoints(0))
     {
-        LibUtilities::PointsKeyVector PtsKey = m_stdExp->GetPointsKeys();
-        m_coordim                            = pCollExp[0]->GetCoordim();
+        m_coordim = pCollExp[0]->GetCoordim();
 
         m_derivFac = pGeomData->GetDerivFactors(pCollExp);
 
@@ -888,9 +867,7 @@ class PhysDeriv_SumFac_Quad final : public Operator
 public:
     OPERATOR_CREATE(PhysDeriv_SumFac_Quad)
 
-    ~PhysDeriv_SumFac_Quad() final
-    {
-    }
+    ~PhysDeriv_SumFac_Quad() final = default;
 
     void operator()(const Array<OneD, const NekDouble> &input,
                     Array<OneD, NekDouble> &output0,
@@ -1036,8 +1013,7 @@ private:
           m_nquad0(m_stdExp->GetNumPoints(0)),
           m_nquad1(m_stdExp->GetNumPoints(1))
     {
-        LibUtilities::PointsKeyVector PtsKey = m_stdExp->GetPointsKeys();
-        m_coordim                            = pCollExp[0]->GetCoordim();
+        m_coordim = pCollExp[0]->GetCoordim();
 
         m_derivFac = pGeomData->GetDerivFactors(pCollExp);
 
@@ -1061,9 +1037,7 @@ class PhysDeriv_SumFac_Tri final : public Operator
 public:
     OPERATOR_CREATE(PhysDeriv_SumFac_Tri)
 
-    ~PhysDeriv_SumFac_Tri() final
-    {
-    }
+    ~PhysDeriv_SumFac_Tri() final = default;
 
     void operator()(const Array<OneD, const NekDouble> &input,
                     Array<OneD, NekDouble> &output0,
@@ -1229,8 +1203,7 @@ private:
           m_nquad0(m_stdExp->GetNumPoints(0)),
           m_nquad1(m_stdExp->GetNumPoints(1))
     {
-        LibUtilities::PointsKeyVector PtsKey = m_stdExp->GetPointsKeys();
-        m_coordim                            = pCollExp[0]->GetCoordim();
+        m_coordim = pCollExp[0]->GetCoordim();
 
         m_derivFac = pGeomData->GetDerivFactors(pCollExp);
 
@@ -1279,9 +1252,7 @@ class PhysDeriv_SumFac_Hex final : public Operator
 public:
     OPERATOR_CREATE(PhysDeriv_SumFac_Hex)
 
-    ~PhysDeriv_SumFac_Hex() final
-    {
-    }
+    ~PhysDeriv_SumFac_Hex() final = default;
 
     void operator()(const Array<OneD, const NekDouble> &input,
                     Array<OneD, NekDouble> &output0,
@@ -1451,8 +1422,6 @@ private:
           m_nquad1(m_stdExp->GetNumPoints(1)),
           m_nquad2(m_stdExp->GetNumPoints(2))
     {
-        LibUtilities::PointsKeyVector PtsKey = m_stdExp->GetPointsKeys();
-
         m_coordim = pCollExp[0]->GetCoordim();
 
         m_derivFac = pGeomData->GetDerivFactors(pCollExp);
@@ -1479,9 +1448,7 @@ class PhysDeriv_SumFac_Tet final : public Operator
 public:
     OPERATOR_CREATE(PhysDeriv_SumFac_Tet)
 
-    ~PhysDeriv_SumFac_Tet() final
-    {
-    }
+    ~PhysDeriv_SumFac_Tet() final = default;
 
     void operator()(const Array<OneD, const NekDouble> &input,
                     Array<OneD, NekDouble> &output0,
@@ -1489,7 +1456,6 @@ public:
                     Array<OneD, NekDouble> &output2,
                     Array<OneD, NekDouble> &wsp) override final
     {
-
         int nPhys = m_stdExp->GetTotPoints();
         int ntot  = m_numElmt * nPhys;
         Array<OneD, NekDouble> tmp0, tmp1, tmp2;
@@ -1520,7 +1486,6 @@ public:
 
         for (int i = 0; i < m_numElmt; ++i)
         {
-
             // dEta1
             for (int j = 0; j < m_nquad2; ++j)
             {
@@ -1578,7 +1543,6 @@ public:
                     Vmath::Smul(m_nqe, m_derivFac[i * 3][e],
                                 Diff[0] + e * m_nqe, 1, t = out[i] + e * m_nqe,
                                 1);
-
                     for (int j = 1; j < 3; ++j)
                     {
                         Vmath::Svtvp(m_nqe, m_derivFac[i * 3 + j][e],
@@ -1620,7 +1584,6 @@ public:
 
         for (int i = 0; i < m_numElmt; ++i)
         {
-
             // dEta1
             for (int j = 0; j < m_nquad2; ++j)
             {
@@ -1673,7 +1636,6 @@ public:
             {
                 Vmath::Smul(m_nqe, m_derivFac[dir * 3][e], Diff[0] + e * m_nqe,
                             1, t = output + e * m_nqe, 1);
-
                 for (int j = 1; j < 3; ++j)
                 {
                     Vmath::Svtvp(m_nqe, m_derivFac[dir * 3 + j][e],
@@ -1714,8 +1676,6 @@ private:
           m_nquad1(m_stdExp->GetNumPoints(1)),
           m_nquad2(m_stdExp->GetNumPoints(2))
     {
-        LibUtilities::PointsKeyVector PtsKey = m_stdExp->GetPointsKeys();
-
         m_coordim = pCollExp[0]->GetCoordim();
 
         m_derivFac = pGeomData->GetDerivFactors(pCollExp);
@@ -1734,6 +1694,7 @@ private:
         m_fac1 = Array<OneD, NekDouble>(m_nquad0 * m_nquad1 * m_nquad2);
         m_fac2 = Array<OneD, NekDouble>(m_nquad0 * m_nquad1 * m_nquad2);
         m_fac3 = Array<OneD, NekDouble>(m_nquad0 * m_nquad1 * m_nquad2);
+
         // calculate 2.0/((1-eta_1)(1-eta_2))
         for (int i = 0; i < m_nquad0; ++i)
         {
@@ -1741,7 +1702,6 @@ private:
             {
                 for (int k = 0; k < m_nquad2; ++k)
                 {
-
                     m_fac0[i + j * m_nquad0 + k * m_nquad0 * m_nquad1] =
                         4.0 / ((1 - z1[j]) * (1 - z2[k]));
                     m_fac1[i + j * m_nquad0 + k * m_nquad0 * m_nquad1] =
@@ -1770,9 +1730,7 @@ class PhysDeriv_SumFac_Prism final : public Operator
 public:
     OPERATOR_CREATE(PhysDeriv_SumFac_Prism)
 
-    ~PhysDeriv_SumFac_Prism() final
-    {
-    }
+    ~PhysDeriv_SumFac_Prism() final = default;
 
     void operator()(const Array<OneD, const NekDouble> &input,
                     Array<OneD, NekDouble> &output0,
@@ -1780,7 +1738,6 @@ public:
                     Array<OneD, NekDouble> &output2,
                     Array<OneD, NekDouble> &wsp) override final
     {
-
         int nPhys = m_stdExp->GetTotPoints();
         int ntot  = m_numElmt * nPhys;
         Array<OneD, NekDouble> tmp0, tmp1, tmp2;
@@ -1803,7 +1760,6 @@ public:
         int cnt = 0;
         for (int i = 0; i < m_numElmt; ++i)
         {
-
             // dEta 1
             for (int j = 0; j < m_nquad2; ++j)
             {
@@ -1887,7 +1843,6 @@ public:
         int cnt = 0;
         for (int i = 0; i < m_numElmt; ++i)
         {
-
             // dEta 1
             for (int j = 0; j < m_nquad2; ++j)
             {
@@ -1971,8 +1926,6 @@ private:
           m_nquad1(m_stdExp->GetNumPoints(1)),
           m_nquad2(m_stdExp->GetNumPoints(2))
     {
-        LibUtilities::PointsKeyVector PtsKey = m_stdExp->GetPointsKeys();
-
         m_coordim = pCollExp[0]->GetCoordim();
 
         m_derivFac = pGeomData->GetDerivFactors(pCollExp);
@@ -2017,9 +1970,7 @@ class PhysDeriv_SumFac_Pyr final : public Operator
 public:
     OPERATOR_CREATE(PhysDeriv_SumFac_Pyr)
 
-    ~PhysDeriv_SumFac_Pyr() final
-    {
-    }
+    ~PhysDeriv_SumFac_Pyr() final = default;
 
     void operator()(const Array<OneD, const NekDouble> &input,
                     Array<OneD, NekDouble> &output0,
@@ -2027,7 +1978,6 @@ public:
                     Array<OneD, NekDouble> &output2,
                     Array<OneD, NekDouble> &wsp) override final
     {
-
         int nPhys = m_stdExp->GetTotPoints();
         int ntot  = m_numElmt * nPhys;
         Array<OneD, NekDouble> tmp0, tmp1, tmp2;
@@ -2050,7 +2000,6 @@ public:
         int cnt = 0;
         for (int i = 0; i < m_numElmt; ++i)
         {
-
             // dEta 1
             for (int j = 0; j < m_nquad2; ++j)
             {
@@ -2169,6 +2118,7 @@ public:
             // dxi2 = (1+eta0)/(1-eta_2) d Eta_0 + d/dEta2;
             Vmath::Vvtvp(nPhys, &m_fac1[0], 1, Diff[0].get() + cnt, 1,
                          Diff[2].get() + cnt, 1, Diff[2].get() + cnt, 1);
+
             // dxi2 = (1+eta1)/(1-eta_2) d Eta_1 + d/dEta2;
             Vmath::Vvtvp(nPhys, &m_fac2[0], 1, Diff[1].get() + cnt, 1,
                          Diff[2].get() + cnt, 1, Diff[2].get() + cnt, 1);
@@ -2233,8 +2183,6 @@ private:
           m_nquad1(m_stdExp->GetNumPoints(1)),
           m_nquad2(m_stdExp->GetNumPoints(2))
     {
-        LibUtilities::PointsKeyVector PtsKey = m_stdExp->GetPointsKeys();
-
         m_coordim = pCollExp[0]->GetCoordim();
 
         m_derivFac = pGeomData->GetDerivFactors(pCollExp);

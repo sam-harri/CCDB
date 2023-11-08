@@ -45,6 +45,8 @@ IF( NEKTAR_SOLVER_PULSEWAVE )
 
         SUBDIRS(Utilities)
 
+    ADD_NEKTAR_PERFORMANCE_TEST(Perf_TwoBifurcations)
+
     ADD_NEKTAR_TEST(55_Artery_Network)
     ADD_NEKTAR_TEST(Bifurcation)
     ADD_NEKTAR_TEST(Junction)

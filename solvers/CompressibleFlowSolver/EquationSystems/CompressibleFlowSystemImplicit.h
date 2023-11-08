@@ -55,6 +55,13 @@ public:
 
     virtual void v_InitObject(bool DeclareFields = true) override;
 
+    virtual void v_DoSolve() override;
+
+    virtual void v_PrintStatusInformation(const int step,
+                                          const NekDouble cpuTime) override;
+
+    virtual void v_PrintSummaryStatistics(const NekDouble intTime) override;
+
     void InitialiseNonlinSysSolver();
 
     void NonlinSysEvaluatorCoeff1D(const Array<OneD, const NekDouble> &inarray,
@@ -98,8 +105,14 @@ public:
 protected:
     bool m_viscousJacFlag;
     bool m_advectionJacFlag;
+    bool m_flagImplicitItsStatistics;
 
     int m_nPadding = 1;
+
+    // Flag to control the update of preconditioning matrix.
+    int m_TotNewtonIts = 0;
+    int m_TotLinIts    = 0;
+    int m_TotImpStages = 0;
 
     /// Estimate the magnitude of each conserved varibles
     Array<OneD, NekDouble> m_magnitdEstimat;

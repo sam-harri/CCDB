@@ -65,7 +65,7 @@ public:
 
 protected:
     SPATIAL_DOMAINS_EXPORT virtual void v_WriteGeometry(
-        std::string &outfilename, bool defaultExp = false,
+        const std::string &outfilename, bool defaultExp = false,
         const LibUtilities::FieldMetaDataMap &metadata =
             LibUtilities::NullFieldMetaDataMap) override;
     SPATIAL_DOMAINS_EXPORT virtual void v_ReadGeometry(

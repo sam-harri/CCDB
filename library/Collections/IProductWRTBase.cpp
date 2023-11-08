@@ -64,9 +64,7 @@ class IProductWRTBase_StdMat final : public Operator
 public:
     OPERATOR_CREATE(IProductWRTBase_StdMat)
 
-    ~IProductWRTBase_StdMat() final
-    {
-    }
+    ~IProductWRTBase_StdMat() final = default;
 
     void operator()(const Array<OneD, const NekDouble> &input,
                     Array<OneD, NekDouble> &output,
@@ -176,9 +174,7 @@ class IProductWRTBase_MatrixFree final : public Operator, MatrixFreeOneInOneOut
 public:
     OPERATOR_CREATE(IProductWRTBase_MatrixFree)
 
-    ~IProductWRTBase_MatrixFree() final
-    {
-    }
+    ~IProductWRTBase_MatrixFree() final = default;
 
     virtual void operator()(const Array<OneD, const NekDouble> &input,
                             Array<OneD, NekDouble> &output,
@@ -277,9 +273,7 @@ OperatorKey IProductWRTBase_MatrixFree::m_typeArr[] = {
         IProductWRTBase_MatrixFree::create, "IProductWRTBase_MatrixFree_Pyr"),
     GetOperatorFactory().RegisterCreatorFunction(
         OperatorKey(eTetrahedron, eIProductWRTBase, eMatrixFree, false),
-        IProductWRTBase_MatrixFree::create, "IProductWRTBase_MatrixFree_Tet")
-
-};
+        IProductWRTBase_MatrixFree::create, "IProductWRTBase_MatrixFree_Tet")};
 
 /**
  * @brief Inner product operator using element-wise operation
@@ -289,9 +283,7 @@ class IProductWRTBase_IterPerExp final : public Operator
 public:
     OPERATOR_CREATE(IProductWRTBase_IterPerExp)
 
-    ~IProductWRTBase_IterPerExp() final
-    {
-    }
+    ~IProductWRTBase_IterPerExp() final = default;
 
     void operator()(const Array<OneD, const NekDouble> &input,
                     Array<OneD, NekDouble> &output,
@@ -340,12 +332,7 @@ private:
         CoalescedGeomDataSharedPtr pGeomData, StdRegions::FactorMap factors)
         : Operator(pCollExp, pGeomData, factors)
     {
-        int nqtot                            = 1;
-        LibUtilities::PointsKeyVector PtsKey = m_stdExp->GetPointsKeys();
-        for (int i = 0; i < PtsKey.size(); ++i)
-        {
-            nqtot *= PtsKey[i].GetNumPoints();
-        }
+        int nqtot = pCollExp[0]->GetTotPoints();
 
         m_jacWStdW = pGeomData->GetJacWithStdWeights(pCollExp);
 
@@ -398,9 +385,7 @@ class IProductWRTBase_NoCollection final : public Operator
 public:
     OPERATOR_CREATE(IProductWRTBase_NoCollection)
 
-    ~IProductWRTBase_NoCollection() final
-    {
-    }
+    ~IProductWRTBase_NoCollection() final = default;
 
     void operator()(const Array<OneD, const NekDouble> &input,
                     Array<OneD, NekDouble> &output,
@@ -501,9 +486,7 @@ class IProductWRTBase_SumFac_Seg final : public Operator
 public:
     OPERATOR_CREATE(IProductWRTBase_SumFac_Seg)
 
-    ~IProductWRTBase_SumFac_Seg() final
-    {
-    }
+    ~IProductWRTBase_SumFac_Seg() final = default;
 
     void operator()(const Array<OneD, const NekDouble> &input,
                     Array<OneD, NekDouble> &output,
@@ -580,9 +563,7 @@ class IProductWRTBase_SumFac_Quad final : public Operator
 public:
     OPERATOR_CREATE(IProductWRTBase_SumFac_Quad)
 
-    ~IProductWRTBase_SumFac_Quad() final
-    {
-    }
+    ~IProductWRTBase_SumFac_Quad() final = default;
 
     void operator()(const Array<OneD, const NekDouble> &input,
                     Array<OneD, NekDouble> &output,
@@ -659,9 +640,7 @@ class IProductWRTBase_SumFac_Tri final : public Operator
 public:
     OPERATOR_CREATE(IProductWRTBase_SumFac_Tri)
 
-    ~IProductWRTBase_SumFac_Tri() final
-    {
-    }
+    ~IProductWRTBase_SumFac_Tri() final = default;
 
     void operator()(const Array<OneD, const NekDouble> &input,
                     Array<OneD, NekDouble> &output,
@@ -743,9 +722,7 @@ class IProductWRTBase_SumFac_Hex final : public Operator
 public:
     OPERATOR_CREATE(IProductWRTBase_SumFac_Hex)
 
-    ~IProductWRTBase_SumFac_Hex() final
-    {
-    }
+    ~IProductWRTBase_SumFac_Hex() final = default;
 
     void operator()(const Array<OneD, const NekDouble> &input,
                     Array<OneD, NekDouble> &output,
@@ -832,9 +809,7 @@ class IProductWRTBase_SumFac_Tet final : public Operator
 public:
     OPERATOR_CREATE(IProductWRTBase_SumFac_Tet)
 
-    ~IProductWRTBase_SumFac_Tet() final
-    {
-    }
+    ~IProductWRTBase_SumFac_Tet() final = default;
 
     void operator()(const Array<OneD, const NekDouble> &input,
                     Array<OneD, NekDouble> &output,
@@ -926,9 +901,7 @@ class IProductWRTBase_SumFac_Prism final : public Operator
 public:
     OPERATOR_CREATE(IProductWRTBase_SumFac_Prism)
 
-    ~IProductWRTBase_SumFac_Prism() final
-    {
-    }
+    ~IProductWRTBase_SumFac_Prism() final = default;
 
     void operator()(const Array<OneD, const NekDouble> &input,
                     Array<OneD, NekDouble> &output,
@@ -1020,9 +993,7 @@ class IProductWRTBase_SumFac_Pyr final : public Operator
 public:
     OPERATOR_CREATE(IProductWRTBase_SumFac_Pyr)
 
-    ~IProductWRTBase_SumFac_Pyr() final
-    {
-    }
+    ~IProductWRTBase_SumFac_Pyr() final = default;
 
     void operator()(const Array<OneD, const NekDouble> &input,
                     Array<OneD, NekDouble> &output,

@@ -258,12 +258,31 @@ ENDMACRO()
 MACRO(ADD_NEKTAR_TEST name)
     CMAKE_PARSE_ARGUMENTS(NEKTEST "LENGTHY" "" "" ${ARGN})
 
-    IF (NOT NEKTEST_LENGTHY OR NEKTAR_TEST_ALL)
+    IF ((NEKTAR_BUILD_TESTS) AND (NOT NEKTEST_LENGTHY OR NEKTAR_TEST_ALL))
         GET_FILENAME_COMPONENT(dir ${CMAKE_CURRENT_SOURCE_DIR} NAME)
         ADD_TEST(NAME ${dir}_${name}
             COMMAND Tester ${CMAKE_CURRENT_SOURCE_DIR}/Tests/${name}.tst)
     ENDIF()
 ENDMACRO(ADD_NEKTAR_TEST)
+
+#
+# ADD_NEKTAR_PERFORMANCE_TEST
+#
+# Adds a performance test with a given name.  The Test Definition File should be in a
+# subdirectory called Tests relative to the CMakeLists.txt file calling this
+# macros. The test file should be called NAME.tst, where NAME is given as a
+# parameter to this macro.
+#
+# Arguments:
+#   - `name`: name of the test file
+#
+MACRO(ADD_NEKTAR_PERFORMANCE_TEST name)
+    IF (NEKTAR_BUILD_PERFORMANCE_TESTS)
+        GET_FILENAME_COMPONENT(dir ${CMAKE_CURRENT_SOURCE_DIR} NAME)
+        ADD_TEST(NAME ${dir}_${name}
+            COMMAND Tester ${CMAKE_CURRENT_SOURCE_DIR}/Tests/${name}.tst)
+    ENDIF()
+ENDMACRO(ADD_NEKTAR_PERFORMANCE_TEST)
 
 #
 # ADD_NEKPY_LIBRARY(name SOURCES src1 src2 ...)

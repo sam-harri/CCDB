@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <test>
-    <description>2D cylinder flow, P=4, parallel HDF5 input/output and Checkpoint filter start time</description>
+    <description>2D cylinder flow, P=4, parallel HDF5 output and Checkpoint filter start time</description>
     <executable>IncNavierStokesSolver</executable>
     <parameters>--io-format Hdf5 CylFlow2D_CheckpointFilter_Hdf5.xml</parameters>
     <processes>2</processes>

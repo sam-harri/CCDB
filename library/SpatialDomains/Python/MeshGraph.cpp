@@ -34,7 +34,11 @@
 
 #include <LibUtilities/Python/NekPyConfig.hpp>
 #include <SpatialDomains/MeshGraph.h>
+#include <SpatialDomains/MeshGraphXml.h>
+#include <SpatialDomains/MeshGraphXmlCompressed.h>
+#include <SpatialDomains/Movement/Movement.h>
 #include <boost/python/suite/indexing/map_indexing_suite.hpp>
+#include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 
 using namespace Nektar;
 using namespace Nektar::SpatialDomains;
@@ -49,11 +53,59 @@ MeshGraphSharedPtr MeshGraph_Read(
     return MeshGraph::Read(session);
 }
 
+/*
+ * @brief Simple wrapper to build Composite objects from lists of
+ * Geometry objects.
+ */
+CompositeSharedPtr Composite_Init(py::list geometries)
+{
+    CompositeSharedPtr composite = std::make_shared<Composite>();
+    composite->m_geomVec.clear();
+    for (int i = 0; i < py::len(geometries); i++)
+    {
+        composite->m_geomVec.emplace_back(
+            py::extract<GeometrySharedPtr>(geometries[i]));
+    }
+    return composite;
+}
+
+/*
+ * @brief Wrapper to construct MeshGraphXml object, initialising mesh
+ * and spatial dimensions.
+ */
+std::shared_ptr<MeshGraph> MeshGraphXml_Init(int meshDim, int spatialDim)
+{
+    auto result = MeshGraphXml::create();
+    result->Empty(meshDim, spatialDim);
+    return result;
+}
+
+/*
+ * @brief Wrapper to construct MeshGraphXmlCompressed object, initialising mesh
+ * and spatial dimensions.
+ */
+std::shared_ptr<MeshGraph> MeshGraphXmlCompressed_Init(int meshDim,
+                                                       int spatialDim)
+{
+    auto result = MeshGraphXmlCompressed::create();
+    result->Empty(meshDim, spatialDim);
+    return result;
+}
+
 /**
  * @brief MeshGraph exports.
  */
 void export_MeshGraph()
 {
+    py::class_<LibUtilities::FieldMetaDataMap>("FieldMetaDataMap")
+        .def(py::map_indexing_suite<LibUtilities::FieldMetaDataMap, true>());
+
+    py::class_<std::vector<GeometrySharedPtr>>("GeometryList")
+        .def(py::vector_indexing_suite<std::vector<GeometrySharedPtr>, true>());
+    py::class_<Composite, std::shared_ptr<Composite>>("Composite", py::init<>())
+        .def("__init__", py::make_constructor(&Composite_Init))
+        .def_readwrite("geometries", &Composite::m_geomVec);
+
     py::class_<PointGeomMap>("PointGeomMap")
         .def(py::map_indexing_suite<PointGeomMap, true>());
     py::class_<SegGeomMap>("SegGeomMap")
@@ -72,12 +124,20 @@ void export_MeshGraph()
         .def(py::map_indexing_suite<HexGeomMap, true>());
     py::class_<CurveMap>("CurveMap")
         .def(py::map_indexing_suite<CurveMap, true>());
+    py::class_<CompositeMap>("CompositeMap")
+        .def(py::map_indexing_suite<CompositeMap, true>());
+    py::class_<std::map<int, CompositeMap>>("DomainMap")
+        .def(py::map_indexing_suite<std::map<int, CompositeMap>, true>());
 
     py::class_<MeshGraph, std::shared_ptr<MeshGraph>, boost::noncopyable>(
         "MeshGraph", py::no_init)
 
         .def("Read", MeshGraph_Read)
         .staticmethod("Read")
+
+        .def("Write", &MeshGraph::WriteGeometry, py::default_call_policies(),
+             (py::arg("outfile"), py::arg("defaultExp") = false,
+              py::arg("metadata") = LibUtilities::NullFieldMetaDataMap))
 
         .def("GetMeshDimension", &MeshGraph::GetMeshDimension)
         .def("GetAllPointGeoms", &MeshGraph::GetAllPointGeoms,
@@ -100,6 +160,14 @@ void export_MeshGraph()
              py::return_internal_reference<>())
         .def("GetCurvedFaces", &MeshGraph::GetCurvedFaces,
              py::return_internal_reference<>())
+        .def("GetComposites", &MeshGraph::GetComposites,
+             py::return_internal_reference<>())
+        .def<std::map<int, CompositeMap> &(MeshGraph::*)()>(
+            "GetDomain", &MeshGraph::GetDomain,
+            py::return_internal_reference<>())
+
+        .def("GetMovement", &MeshGraph::GetMovement,
+             py::return_value_policy<py::return_by_value>())
 
         .def("GetNumElements", &MeshGraph::GetNumElements)
 
@@ -109,4 +177,14 @@ void export_MeshGraph()
              &MeshGraph::SetExpansionInfoToNumModes)
         .def("SetExpansionInfosToPointOrder",
              &MeshGraph::SetExpansionInfoToPointOrder);
+
+    py::class_<MeshGraphXml, py::bases<MeshGraph>,
+               std::shared_ptr<MeshGraphXml>, boost::noncopyable>(
+        "MeshGraphXml", py::no_init)
+        .def("__init__", py::make_constructor(&MeshGraphXml_Init));
+
+    py::class_<MeshGraphXmlCompressed, py::bases<MeshGraphXml>,
+               std::shared_ptr<MeshGraphXmlCompressed>, boost::noncopyable>(
+        "MeshGraphXmlCompressed", py::no_init)
+        .def("__init__", py::make_constructor(&MeshGraphXmlCompressed_Init));
 }

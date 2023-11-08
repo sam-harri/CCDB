@@ -54,9 +54,9 @@ string NekLinSysIterCGLoc::className =
 
 NekLinSysIterCGLoc::NekLinSysIterCGLoc(
     const LibUtilities::SessionReaderSharedPtr &pSession,
-    const LibUtilities::CommSharedPtr &vComm, const int nDimen,
+    const LibUtilities::CommSharedPtr &vRowComm, const int nDimen,
     const NekSysKey &pKey)
-    : NekLinSysIter(pSession, vComm, nDimen, pKey)
+    : NekLinSysIter(pSession, vRowComm, nDimen, pKey)
 {
     m_isLocal = true;
 }
@@ -134,7 +134,7 @@ void NekLinSysIterCGLoc::DoConjugateGradient(
     // evaluate initial residual error for exit check
     m_operator.DoAssembleLoc(r_A, wk, true);
     vExchange[2] = Vmath::Dot(nLocal, wk, r_A);
-    m_Comm->AllReduce(vExchange, Nektar::LibUtilities::ReduceSum);
+    m_rowComm->AllReduce(vExchange, Nektar::LibUtilities::ReduceSum);
 
     eps = vExchange[2];
 
@@ -165,7 +165,7 @@ void NekLinSysIterCGLoc::DoConjugateGradient(
 
     vExchange[0] = Vmath::Dot(nLocal, r_A, w_A);
     vExchange[1] = Vmath::Dot(nLocal, s_A, w_A);
-    m_Comm->AllReduce(vExchange, Nektar::LibUtilities::ReduceSum);
+    m_rowComm->AllReduce(vExchange, Nektar::LibUtilities::ReduceSum);
 
     rho               = vExchange[0];
     mu                = vExchange[1];
@@ -215,7 +215,7 @@ void NekLinSysIterCGLoc::DoConjugateGradient(
         vExchange[2] = Vmath::Dot(nLocal, wk, r_A);
 
         // Perform inner-product exchanges
-        m_Comm->AllReduce(vExchange, Nektar::LibUtilities::ReduceSum);
+        m_rowComm->AllReduce(vExchange, Nektar::LibUtilities::ReduceSum);
 
         rho_new = vExchange[0];
         mu      = vExchange[1];

@@ -5,6 +5,7 @@ CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/tests/Tester.cpp.in
 SET(TESTER_SOURCES
   Metric.cpp
   MetricEigenvalue.cpp
+  MetricExecutionTime.cpp
   MetricFile.cpp
   MetricFileExists.cpp
   MetricL2.cpp
@@ -21,6 +22,7 @@ SET(TESTER_SOURCES
 SET(TESTER_HEADERS
   Metric.h
   MetricEigenvalue.h
+  MetricExecutionTime.h
   MetricFile.h
   MetricFileExists.h
   MetricL2.h

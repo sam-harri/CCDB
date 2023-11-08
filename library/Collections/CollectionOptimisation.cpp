@@ -52,7 +52,8 @@ namespace Collections
 {
 
 // static manager for Operator ImplementationMap
-map<OpImpTimingKey, OperatorImpMap> CollectionOptimisation::m_opImpMap;
+std::map<size_t, map<OpImpTimingKey, OperatorImpMap>>
+    CollectionOptimisation::m_opImpMap;
 
 CollectionOptimisation::CollectionOptimisation(
     LibUtilities::SessionReaderSharedPtr pSession, const int shapedim,
@@ -67,6 +68,7 @@ CollectionOptimisation::CollectionOptimisation(
 
     m_autotune    = false;
     m_maxCollSize = 0;
+    m_timeLevel   = pSession.get() ? pSession->GetTimeLevel() : 0;
     m_defaultType = defaultType == eNoImpType ? eIterPerExp : defaultType;
 
     map<string, LibUtilities::ShapeType> elTypes;
@@ -132,6 +134,8 @@ CollectionOptimisation::CollectionOptimisation(
         bool WriteFullCollections = false;
 
         TiXmlElement *xmlCol = master->FirstChildElement("COLLECTIONS");
+        LibUtilities::SessionReader::GetXMLElementTimeLevel(xmlCol,
+                                                            m_timeLevel);
 
         // Check if user has specified some options
         if (xmlCol)
@@ -393,9 +397,10 @@ OperatorImpMap CollectionOptimisation::SetWithTimings(
 
     // check to see if already defined for this expansion
     OpImpTimingKey OpKey(pExp, pCollExp.size(), pExp->GetNumBases());
-    if (m_opImpMap.count(OpKey) != 0)
+    if (m_opImpMap.count(m_timeLevel) != 0 &&
+        m_opImpMap[m_timeLevel].count(OpKey) != 0)
     {
-        ret = m_opImpMap[OpKey];
+        ret = m_opImpMap[m_timeLevel][OpKey];
         return ret;
     }
 
@@ -410,7 +415,7 @@ OperatorImpMap CollectionOptimisation::SetWithTimings(
 
     if (verbose)
     {
-        cout << "Collection Implemenation for "
+        cout << "Collection Implementation for "
              << LibUtilities::ShapeTypeMap[pExp->DetShapeType()] << " ( ";
         for (int i = 0; i < pExp->GetNumBases(); ++i)
         {
@@ -528,28 +533,35 @@ OperatorImpMap CollectionOptimisation::SetWithTimings(
             cout << ")" << endl;
         }
 
-        // could reset global map if reusing  method?
-        // m_global[OpType][pExp->DetShapeType()] = (ImplementationType)minImp;
         // set up new map
         ret[OpType] = (ImplementationType)minImp;
     }
 
     // store map for use by another expansion.
-    m_opImpMap[OpKey] = ret;
+    if (m_opImpMap.count(m_timeLevel) == 0)
+    {
+        m_opImpMap[m_timeLevel] = map<OpImpTimingKey, OperatorImpMap>();
+    }
+    m_opImpMap[m_timeLevel][OpKey] = ret;
     return ret;
 }
 
 void CollectionOptimisation::UpdateOptFile(std::string sessName,
                                            LibUtilities::CommSharedPtr &comm)
 {
-    std::string outname = sessName + ".opt";
+    if (comm->IsParallelInTime() && comm->GetTimeComm()->GetRank() > 0)
+    {
+        // No need to repeatly update the optfile for each time chunk.
+        return;
+    }
+
+    std::string outname = sessName.substr(0, sessName.find("_xml/")) + ".opt";
 
     TiXmlDocument doc;
     TiXmlElement *root;
     TiXmlElement *xmlCol = new TiXmlElement("COLLECTIONS");
     GlobalOpMap global;
-    int rank   = comm->GetRank();
-    int nprocs = comm->GetSize();
+    int rank = comm->GetSpaceComm()->GetRank();
     if (rank == 0)
     {
         if (!doc.LoadFile(outname)) // set up new file
@@ -559,20 +571,39 @@ void CollectionOptimisation::UpdateOptFile(std::string sessName,
             root = new TiXmlElement("NEKTAR");
             doc.LinkEndChild(root);
             root->LinkEndChild(xmlCol);
+            if (comm->IsParallelInTime())
+            {
+                // Add timelevel tag
+                xmlCol = new TiXmlElement("TIMELEVEL");
+                xmlCol->SetAttribute("VALUE", 0);
+                root->FirstChildElement("COLLECTIONS")->LinkEndChild(xmlCol);
+            }
         }
         else // load file and read operator information
         {
             root   = doc.FirstChildElement("NEKTAR");
             xmlCol = root->FirstChildElement("COLLECTIONS");
-
-            bool verbose = false;
-            ReadCollOps(xmlCol, global, verbose);
+            LibUtilities::SessionReader::GetXMLElementTimeLevel(
+                xmlCol, m_timeLevel, false);
+            if (xmlCol)
+            {
+                // Read existing data
+                bool verbose = false;
+                ReadCollOps(xmlCol, global, verbose);
+            }
+            else
+            {
+                // Add timelevel tag
+                xmlCol = new TiXmlElement("TIMELEVEL");
+                xmlCol->SetAttribute("VALUE", m_timeLevel);
+                root->FirstChildElement("COLLECTIONS")->LinkEndChild(xmlCol);
+            }
         }
     }
 
     // update global with m_opImpMap info
     map<LibUtilities::ShapeType, int> ShapeMaxSize;
-    for (auto &opimp : m_opImpMap)
+    for (auto &opimp : m_opImpMap[m_timeLevel])
     {
         bool updateShape              = true;
         LibUtilities::ShapeType shape = opimp.first.GetShapeType();
@@ -601,34 +632,30 @@ void CollectionOptimisation::UpdateOptFile(std::string sessName,
         }
     }
 
-    // share
-    if (nprocs)
+    // loop over operators
+    for (auto &op : global)
     {
-        // loop over operators
-        for (auto &op : global)
+        // check to see which shapes are defined in this proc
+        Array<OneD, int> ElmtImp(LibUtilities::SIZE_ShapeType, -1);
+        Array<OneD, bool> ElmtDef(LibUtilities::SIZE_ShapeType, false);
+        for (auto &el : op.second)
         {
-            // check to see which shapes are defined in this proc
-            Array<OneD, int> ElmtImp(LibUtilities::SIZE_ShapeType, -1);
-            Array<OneD, bool> ElmtDef(LibUtilities::SIZE_ShapeType, false);
-            for (auto &el : op.second)
-            {
-                ElmtImp[el.first.first] = el.second;
-                ElmtDef[el.first.first] = true;
-            }
+            ElmtImp[el.first.first] = el.second;
+            ElmtDef[el.first.first] = true;
+        }
 
-            comm->AllReduce(ElmtImp, LibUtilities::ReduceMax);
+        comm->GetSpaceComm()->AllReduce(ElmtImp, LibUtilities::ReduceMax);
 
-            // loop over elements and update if not already defined
-            if (rank == 0)
+        // loop over elements and update if not already defined
+        if (rank == 0)
+        {
+            for (int i = 1; i < LibUtilities::SIZE_ShapeType; ++i)
             {
-                for (int i = 1; i < LibUtilities::SIZE_ShapeType; ++i)
+                if ((ElmtImp[i] != -1) && (ElmtDef[i] == false))
                 {
-                    if ((ElmtImp[i] != -1) && (ElmtDef[i] == false))
-                    {
-                        global[op.first]
-                              [ElmtOrder((LibUtilities::ShapeType)i, -1)] =
-                                  (ImplementationType)ElmtImp[i];
-                    }
+                    global[op.first]
+                          [ElmtOrder((LibUtilities::ShapeType)i, -1)] =
+                              (ImplementationType)ElmtImp[i];
                 }
             }
         }

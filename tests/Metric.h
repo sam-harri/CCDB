@@ -61,6 +61,11 @@ inline bool EmptyString(const char *s)
     return std::string(s) == "";
 }
 
+/**
+ * @brief Base class for all metrics.
+ * Metric represents a test metric that can be used to evaluate the
+ * functionality or performance of a Nektar++ executable.
+ */
 class Metric
 {
 public:
@@ -68,9 +73,7 @@ public:
 
     virtual ~Metric() = default;
 
-    /// Perform the test, given the standard output and error streams
     bool Test(std::istream &pStdout, std::istream &pStderr);
-    /// Perform the test, given the standard output and error streams
     void Generate(std::istream &pStdout, std::istream &pStderr);
     /// Return metric type
     std::string GetType()
@@ -82,6 +85,12 @@ public:
     {
         return m_id;
     }
+    /// Return whether this metric supports averaging results from multiple
+    /// runs.
+    bool SupportsAverage() const
+    {
+        return m_average;
+    }
 
 protected:
     /// Stores the ID of this metric.
@@ -90,10 +99,29 @@ protected:
     std::string m_type;
     /// Determines whether to generate this metric or not.
     bool m_generate;
+    /// Indicates whether a metric supports averaging results from multiple
+    /// runs.
+    bool m_average = false;
     /// Pointer to XML structure containing metric definition.
     TiXmlElement *m_metric;
 
-    virtual bool v_Test(std::istream &pStdout, std::istream &pStderr)     = 0;
+    /**
+     * @brief Virtual function to test the metric. Should be redefined in
+     * derived classes.
+     *
+     * @param pStdout Reference to test output stream.
+     * @param pStderr Reference to test error stream.
+     * @return \p true if the test passes, \p false otherwise.
+     */
+    virtual bool v_Test(std::istream &pStdout, std::istream &pStderr) = 0;
+
+    /**
+     * @brief Virtual function to generate the metric. Should be redefined in
+     * derived classes.
+     *
+     * @param pStdout Reference to test output stream.
+     * @param pSrderr Reference to test error stream.
+     */
     virtual void v_Generate(std::istream &pStdout, std::istream &pSrderr) = 0;
 };
 

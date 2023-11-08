@@ -105,12 +105,12 @@ void PtsIO::Import(const string &inFile, PtsFieldSharedPtr &ptsField,
 
             if (i == 0)
             {
-                ImportFieldData(fname, ptsField, Range);
+                v_ImportPtsFieldData(fname, ptsField, Range);
             }
             else
             {
                 LibUtilities::PtsFieldSharedPtr newPtsField;
-                ImportFieldData(fname, newPtsField, Range);
+                v_ImportPtsFieldData(fname, newPtsField, Range);
                 Array<OneD, Array<OneD, NekDouble>> pts;
                 newPtsField->GetPts(pts);
                 ptsField->AddPoints(pts);
@@ -119,7 +119,7 @@ void PtsIO::Import(const string &inFile, PtsFieldSharedPtr &ptsField,
     }
     else
     {
-        ImportFieldData(infile, ptsField, Range);
+        v_ImportPtsFieldData(infile, ptsField, Range);
     }
 }
 
@@ -145,7 +145,7 @@ void PtsIO::Write(const string &outFile,
 
     ptsFile << "<?xml version=\"1.0\" encoding=\"utf-8\" ?>" << endl;
     ptsFile << "<NEKTAR>" << endl;
-    ptsFile << "  <POINTS ";
+    ptsFile << "    <POINTS ";
     ptsFile << "DIM=\"" << ptsField->GetDim() << "\" ";
     string fn = boost::algorithm::join(ptsField->GetFieldNames(), ",");
     ptsFile << "FIELDS=\"" << fn << "\" ";
@@ -163,56 +163,18 @@ void PtsIO::Write(const string &outFile,
         }
         ptsFile << endl;
     }
-    ptsFile << "  </POINTS>" << endl;
+    ptsFile << "    </POINTS>" << endl;
     ptsFile << "</NEKTAR>" << endl;
 
     ptsFile.close();
-
-    // this is what the above cpart would read if tinyxml
-    // supported line breaks
-    /*
-    // Create the file (partition)
-    TiXmlDocument doc;
-    TiXmlDeclaration *decl = new TiXmlDeclaration("1.0", "utf-8", "");
-    doc.LinkEndChild(decl);
-
-    TiXmlElement *root = new TiXmlElement("NEKTAR");
-    doc.LinkEndChild(root);
-
-    TiXmlElement *pointsTag = new TiXmlElement("POINTS");
-    root->LinkEndChild(pointsTag);
-
-    pointsTag->SetAttribute("DIM", ptsField->GetDim());
-
-    string fn = boost::algorithm::join(ptsField->GetFieldNames(), ",");
-    pointsTag->SetAttribute("FIELDS", fn);
-
-    Array <OneD, Array <OneD, NekDouble > > pts;
-    ptsField->GetPts(pts);
-    ostringstream os;
-    for (int i = 0; i < np; ++i)
-    {
-        os << pts[0][i];
-        for (int j = 1; j < nTotvars; ++j)
-        {
-            os << " " << pts[j][i];
-        }
-        os << " ";
-    }
-
-    pointsTag->LinkEndChild(new TiXmlText(os.str()));
-
-    doc.SaveFile(filename);
-    */
-}
-void PtsIO::ImportFieldData(const string inFile, PtsFieldSharedPtr &ptsField,
-                            DomainRangeShPtr &Range)
-{
-    v_ImportFieldData(inFile, ptsField, Range);
 }
 
-void PtsIO::v_ImportFieldData(const string inFile, PtsFieldSharedPtr &ptsField,
-                              DomainRangeShPtr &Range)
+/**
+ *
+ */
+void PtsIO::v_ImportPtsFieldData(const string inFile,
+                                 PtsFieldSharedPtr &ptsField,
+                                 DomainRangeShPtr &Range)
 {
     boost::ignore_unused(Range);
     TiXmlDocument docInput(inFile);
@@ -303,6 +265,9 @@ void PtsIO::v_ImportFieldData(const string inFile, PtsFieldSharedPtr &ptsField,
                                                           ptsInfo);
 }
 
+/**
+ *
+ */
 void PtsIO::SetUpFieldMetaData(const string outname)
 {
     ASSERTL0(!outname.empty(), "Empty path given to SetUpFieldMetaData()");

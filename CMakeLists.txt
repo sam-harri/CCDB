@@ -108,7 +108,12 @@ ENDIF()
 IF (DEFINED NEKTAR_LIB_DIR)
     SET(LIB_DIR ${NEKTAR_LIB_DIR})
 ENDIF()
-SET(CMAKE_INCLUDE_SYSTEM_FLAG_CXX "-isystem ")
+
+IF(MSVC)
+    SET(CMAKE_INCLUDE_SYSTEM_FLAG_CXX "/external:I ")
+ELSE()
+    SET(CMAKE_INCLUDE_SYSTEM_FLAG_CXX "-isystem ")
+ENDIF()
 
 SET(NEKTAR_BIN_DIR bin)
 SET(NEKTAR_LIB_DIR ${LIB_DIR})
@@ -160,13 +165,14 @@ IF(NOT DEFINED CMAKE_MACOSX_RPATH)
 ENDIF()
 
 # Components of the Nektar++ package to build
-OPTION(NEKTAR_BUILD_LIBRARY    "Build main Nektar++ libraries." ON)
-OPTION(NEKTAR_BUILD_DEMOS      "Build demonstration codes."     ON)
-OPTION(NEKTAR_BUILD_SOLVERS    "Build example solvers."         ON)
-OPTION(NEKTAR_BUILD_UTILITIES  "Build utilities."               ON)
-OPTION(NEKTAR_BUILD_UNIT_TESTS "Build unit tests."              ON)
-OPTION(NEKTAR_BUILD_TESTS      "Build regression tests."        ON)
-OPTION(NEKTAR_BUILD_PYTHON     "Build Nektar++ Python bindings" OFF)
+OPTION(NEKTAR_BUILD_LIBRARY           "Build main Nektar++ libraries." ON)
+OPTION(NEKTAR_BUILD_DEMOS             "Build demonstration codes."     ON)
+OPTION(NEKTAR_BUILD_SOLVERS           "Build example solvers."         ON)
+OPTION(NEKTAR_BUILD_UTILITIES         "Build utilities."               ON)
+OPTION(NEKTAR_BUILD_UNIT_TESTS        "Build unit tests."              ON)
+OPTION(NEKTAR_BUILD_TESTS             "Build regression tests."        ON)
+OPTION(NEKTAR_BUILD_PERFORMANCE_TESTS "Build performance tests."       OFF)
+OPTION(NEKTAR_BUILD_PYTHON            "Build Nektar++ Python bindings" OFF)
 
 OPTION(NEKTAR_TEST_ALL "Include full set of regression tests to this build." OFF)
 OPTION(NEKTAR_TEST_USE_HOSTFILE "Use a hostfile to explicitly specify number of
@@ -311,13 +317,13 @@ IF (NEKTAR_BUILD_LIBRARY)
     INSTALL(EXPORT Nektar++Libraries DESTINATION ${NEKTAR_CMAKE_DIR} COMPONENT dev)
 ENDIF (NEKTAR_BUILD_LIBRARY)
 
-IF (NEKTAR_BUILD_TESTS)
+IF (NEKTAR_BUILD_TESTS OR NEKTAR_BUILD_PERFORMANCE_TESTS)
     INCLUDE_DIRECTORIES(tests)
     ADD_SUBDIRECTORY(tests)
     IF (NEKTAR_USE_MPI)
         OPTION(NEKTAR_TEST_FORCEMPIEXEC  "Force all tests to be run through the MPI job launcher."  OFF)
     ENDIF (NEKTAR_USE_MPI)
-ENDIF (NEKTAR_BUILD_TESTS)
+ENDIF (NEKTAR_BUILD_TESTS OR NEKTAR_BUILD_PERFORMANCE_TESTS)
 
 # Compile list of definitions for Nektar++Config.cmake input file. We exclude
 # vtk definitions which should not be required for external builds.

@@ -60,12 +60,11 @@ class BwdTrans_StdMat final : public Operator
 {
 public:
     OPERATOR_CREATE(BwdTrans_StdMat)
-    ~BwdTrans_StdMat() final
-    {
-    }
+
+    ~BwdTrans_StdMat() final = default;
 
     void operator()(const Array<OneD, const NekDouble> &input,
-                    Array<OneD, NekDouble> &output,
+                    Array<OneD, NekDouble> &output0,
                     Array<OneD, NekDouble> &output1,
                     Array<OneD, NekDouble> &output2,
                     Array<OneD, NekDouble> &wsp) override
@@ -73,7 +72,7 @@ public:
         boost::ignore_unused(output1, output2, wsp);
         Blas::Dgemm('N', 'N', m_mat->GetRows(), m_numElmt, m_mat->GetColumns(),
                     1.0, m_mat->GetRawPtr(), m_mat->GetRows(), input.get(),
-                    m_stdExp->GetNcoeffs(), 0.0, output.get(),
+                    m_stdExp->GetNcoeffs(), 0.0, output0.get(),
                     m_stdExp->GetTotPoints());
     }
 
@@ -151,9 +150,7 @@ class BwdTrans_MatrixFree final : public Operator, MatrixFreeOneInOneOut
 public:
     OPERATOR_CREATE(BwdTrans_MatrixFree)
 
-    ~BwdTrans_MatrixFree() final
-    {
-    }
+    ~BwdTrans_MatrixFree() final = default;
 
     void operator()(const Array<OneD, const NekDouble> &input,
                     Array<OneD, NekDouble> &output0,
@@ -259,12 +256,10 @@ class BwdTrans_IterPerExp final : public Operator
 public:
     OPERATOR_CREATE(BwdTrans_IterPerExp)
 
-    ~BwdTrans_IterPerExp() final
-    {
-    }
+    ~BwdTrans_IterPerExp() final = default;
 
     void operator()(const Array<OneD, const NekDouble> &input,
-                    Array<OneD, NekDouble> &output,
+                    Array<OneD, NekDouble> &output0,
                     Array<OneD, NekDouble> &output1,
                     Array<OneD, NekDouble> &output2,
                     Array<OneD, NekDouble> &wsp) override
@@ -277,7 +272,7 @@ public:
 
         for (int i = 0; i < m_numElmt; ++i)
         {
-            m_stdExp->BwdTrans(input + i * nCoeffs, tmp = output + i * nPhys);
+            m_stdExp->BwdTrans(input + i * nCoeffs, tmp = output0 + i * nPhys);
         }
     }
 
@@ -347,12 +342,10 @@ class BwdTrans_NoCollection final : public Operator
 public:
     OPERATOR_CREATE(BwdTrans_NoCollection)
 
-    ~BwdTrans_NoCollection() final
-    {
-    }
+    ~BwdTrans_NoCollection() final = default;
 
     void operator()(const Array<OneD, const NekDouble> &input,
-                    Array<OneD, NekDouble> &output,
+                    Array<OneD, NekDouble> &output0,
                     Array<OneD, NekDouble> &output1,
                     Array<OneD, NekDouble> &output2,
                     Array<OneD, NekDouble> &wsp) override
@@ -366,7 +359,7 @@ public:
         for (int i = 0; i < m_numElmt; ++i)
         {
             m_expList[i]->BwdTrans(input + i * nCoeffs,
-                                   tmp = output + i * nPhys);
+                                   tmp = output0 + i * nPhys);
         }
     }
 
@@ -440,12 +433,10 @@ class BwdTrans_SumFac_Seg final : public Operator
 public:
     OPERATOR_CREATE(BwdTrans_SumFac_Seg)
 
-    ~BwdTrans_SumFac_Seg() final
-    {
-    }
+    ~BwdTrans_SumFac_Seg() final = default;
 
     void operator()(const Array<OneD, const NekDouble> &input,
-                    Array<OneD, NekDouble> &output,
+                    Array<OneD, NekDouble> &output0,
                     Array<OneD, NekDouble> &output1,
                     Array<OneD, NekDouble> &output2,
                     Array<OneD, NekDouble> &wsp) override
@@ -453,7 +444,7 @@ public:
         boost::ignore_unused(output1, output2, wsp);
         if (m_colldir0)
         {
-            Vmath::Vcopy(m_numElmt * m_nmodes0, input.get(), 1, output.get(),
+            Vmath::Vcopy(m_numElmt * m_nmodes0, input.get(), 1, output0.get(),
                          1);
         }
         else
@@ -461,7 +452,7 @@ public:
             // out = B0*in;
             Blas::Dgemm('N', 'N', m_nquad0, m_numElmt, m_nmodes0, 1.0,
                         m_base0.get(), m_nquad0, &input[0], m_nmodes0, 0.0,
-                        &output[0], m_nquad0);
+                        &output0[0], m_nquad0);
         }
     }
 
@@ -514,12 +505,10 @@ class BwdTrans_SumFac_Quad final : public Operator
 public:
     OPERATOR_CREATE(BwdTrans_SumFac_Quad)
 
-    ~BwdTrans_SumFac_Quad() final
-    {
-    }
+    ~BwdTrans_SumFac_Quad() final = default;
 
     void operator()(const Array<OneD, const NekDouble> &input,
-                    Array<OneD, NekDouble> &output,
+                    Array<OneD, NekDouble> &output0,
                     Array<OneD, NekDouble> &output1,
                     Array<OneD, NekDouble> &output2,
                     Array<OneD, NekDouble> &wsp) override
@@ -530,26 +519,23 @@ public:
         if (m_colldir0 && m_colldir1)
         {
             Vmath::Vcopy(m_numElmt * m_nmodes0 * m_nmodes1, input.get(), 1,
-                         output.get(), 1);
+                         output0.get(), 1);
         }
         else if (m_colldir0)
         {
-            Array<OneD, const NekDouble> base1 =
-                m_stdExp->GetBasis(1)->GetBdata();
-
             for (i = 0; i < m_numElmt; ++i)
             {
                 Blas::Dgemm('N', 'T', m_nquad0, m_nquad1, m_nmodes1, 1.0,
                             &input[i * m_nquad0 * m_nmodes1], m_nquad0,
-                            base1.get(), m_nquad1, 0.0,
-                            &output[i * m_nquad0 * m_nquad1], m_nquad0);
+                            m_base1.get(), m_nquad1, 0.0,
+                            &output0[i * m_nquad0 * m_nquad1], m_nquad0);
             }
         }
         else if (m_colldir1)
         {
             Blas::Dgemm('N', 'N', m_nquad0, m_nmodes1 * m_numElmt, m_nmodes0,
                         1.0, m_base0.get(), m_nquad0, &input[0], m_nmodes0, 0.0,
-                        &output[0], m_nquad0);
+                        &output0[0], m_nquad0);
         }
         else
         {
@@ -566,7 +552,7 @@ public:
                 Blas::Dgemm('N', 'T', m_nquad0, m_nquad1, m_nmodes1, 1.0,
                             &wsp[i * m_nquad0 * m_nmodes1], m_nquad0,
                             m_base1.get(), m_nquad1, 0.0,
-                            &output[i * m_nquad0 * m_nquad1], m_nquad0);
+                            &output0[i * m_nquad0 * m_nquad1], m_nquad0);
             }
         }
     }
@@ -628,12 +614,10 @@ class BwdTrans_SumFac_Tri final : public Operator
 public:
     OPERATOR_CREATE(BwdTrans_SumFac_Tri)
 
-    ~BwdTrans_SumFac_Tri() final
-    {
-    }
+    ~BwdTrans_SumFac_Tri() final = default;
 
     void operator()(const Array<OneD, const NekDouble> &input,
-                    Array<OneD, NekDouble> &output,
+                    Array<OneD, NekDouble> &output0,
                     Array<OneD, NekDouble> &output1,
                     Array<OneD, NekDouble> &output2,
                     Array<OneD, NekDouble> &wsp) override
@@ -668,7 +652,7 @@ public:
 
         Blas::Dgemm('N', 'T', m_nquad0, m_nquad1 * m_numElmt, m_nmodes0, 1.0,
                     m_base0.get(), m_nquad0, &wsp[0], m_nquad1 * m_numElmt, 0.0,
-                    &output[0], m_nquad0);
+                    &output0[0], m_nquad0);
     }
 
     void operator()(int dir, const Array<OneD, const NekDouble> &input,
@@ -731,12 +715,10 @@ class BwdTrans_SumFac_Hex final : public Operator
 public:
     OPERATOR_CREATE(BwdTrans_SumFac_Hex)
 
-    ~BwdTrans_SumFac_Hex() final
-    {
-    }
+    ~BwdTrans_SumFac_Hex() final = default;
 
     void operator()(const Array<OneD, const NekDouble> &input,
-                    Array<OneD, NekDouble> &output,
+                    Array<OneD, NekDouble> &output0,
                     Array<OneD, NekDouble> &output1,
                     Array<OneD, NekDouble> &output2,
                     Array<OneD, NekDouble> &wsp) override
@@ -746,7 +728,7 @@ public:
         if (m_colldir0 && m_colldir1 && m_colldir2)
         {
             Vmath::Vcopy(m_numElmt * m_nmodes0 * m_nmodes1 * m_nmodes2,
-                         input.get(), 1, output.get(), 1);
+                         input.get(), 1, output0.get(), 1);
         }
         else
         {
@@ -776,7 +758,7 @@ public:
             // trans wrt a
             Blas::Dgemm('N', 'T', m_nquad0, m_nquad1 * m_nquad2 * m_numElmt,
                         m_nmodes0, 1.0, m_base0.get(), m_nquad0, wsp2.get(),
-                        m_nquad1 * m_nquad2 * m_numElmt, 0.0, output.get(),
+                        m_nquad1 * m_nquad2 * m_numElmt, 0.0, output0.get(),
                         m_nquad0);
         }
     }
@@ -847,12 +829,10 @@ class BwdTrans_SumFac_Tet final : public Operator
 public:
     OPERATOR_CREATE(BwdTrans_SumFac_Tet)
 
-    ~BwdTrans_SumFac_Tet() final
-    {
-    }
+    ~BwdTrans_SumFac_Tet() final = default;
 
     void operator()(const Array<OneD, const NekDouble> &input,
-                    Array<OneD, NekDouble> &output,
+                    Array<OneD, NekDouble> &output0,
                     Array<OneD, NekDouble> &output1,
                     Array<OneD, NekDouble> &output2,
                     Array<OneD, NekDouble> &wsp) override final
@@ -949,7 +929,7 @@ public:
         // Perform summation over '0' direction
         Blas::Dgemm('N', 'T', m_nquad0, m_nquad1 * m_nquad2 * m_numElmt,
                     m_nmodes0, 1.0, m_base0.get(), m_nquad0, tmp1.get(),
-                    m_nquad1 * m_nquad2 * m_numElmt, 0.0, output.get(),
+                    m_nquad1 * m_nquad2 * m_numElmt, 0.0, output0.get(),
                     m_nquad0);
     }
 
@@ -1024,12 +1004,10 @@ class BwdTrans_SumFac_Prism final : public Operator
 public:
     OPERATOR_CREATE(BwdTrans_SumFac_Prism)
 
-    ~BwdTrans_SumFac_Prism() final
-    {
-    }
+    ~BwdTrans_SumFac_Prism() final = default;
 
     void operator()(const Array<OneD, const NekDouble> &input,
-                    Array<OneD, NekDouble> &output,
+                    Array<OneD, NekDouble> &output0,
                     Array<OneD, NekDouble> &output1,
                     Array<OneD, NekDouble> &output2,
                     Array<OneD, NekDouble> &wsp) override final
@@ -1096,7 +1074,7 @@ public:
         // Perform summation over '0' direction
         Blas::Dgemm('N', 'T', m_nquad0, m_nquad1 * m_nquad2 * m_numElmt,
                     m_nmodes0, 1.0, m_base0.get(), m_nquad0, wsp2.get(),
-                    m_nquad1 * m_nquad2 * m_numElmt, 0.0, output.get(),
+                    m_nquad1 * m_nquad2 * m_numElmt, 0.0, output0.get(),
                     m_nquad0);
     }
 
@@ -1170,12 +1148,10 @@ class BwdTrans_SumFac_Pyr final : public Operator
 public:
     OPERATOR_CREATE(BwdTrans_SumFac_Pyr)
 
-    ~BwdTrans_SumFac_Pyr() final
-    {
-    }
+    ~BwdTrans_SumFac_Pyr() final = default;
 
     void operator()(const Array<OneD, const NekDouble> &input,
-                    Array<OneD, NekDouble> &output,
+                    Array<OneD, NekDouble> &output0,
                     Array<OneD, NekDouble> &output1,
                     Array<OneD, NekDouble> &output2,
                     Array<OneD, NekDouble> &wsp) override final
@@ -1262,7 +1238,7 @@ public:
         // Perform summation over '0' direction
         Blas::Dgemm('N', 'T', m_nquad0, m_nquad1 * m_nquad2 * m_numElmt,
                     m_nmodes0, 1.0, m_base0.get(), m_nquad0, wsp2.get(),
-                    m_nquad1 * m_nquad2 * m_numElmt, 0.0, output.get(),
+                    m_nquad1 * m_nquad2 * m_numElmt, 0.0, output0.get(),
                     m_nquad0);
     }
 

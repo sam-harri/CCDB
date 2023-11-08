@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <test>
-    <description>Kovasznay Flow 3D homogeneous 1D, P=4-9, 20 Fourier modes in parallel with HDF5 input - Skew-Symmetric advection(MVM)</description>
+    <description>Kovasznay Flow 3D homogeneous 1D, P=4-9, 20 Fourier modes in parallel with HDF5 output - Skew-Symmetric advection(MVM)</description>
     <executable>IncNavierStokesSolver</executable>
     <parameters>KovaFlow_3DH1D_P5_20modes_MVM_hdf5.xml</parameters>
     <processes>2</processes>

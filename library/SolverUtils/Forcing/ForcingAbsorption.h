@@ -104,6 +104,7 @@ protected:
         const Array<OneD, Array<OneD, NekDouble>> &inarray,
         Array<OneD, Array<OneD, NekDouble>> &outarray,
         const NekDouble &time) override;
+
     SOLVER_UTILS_EXPORT virtual void v_ApplyCoeff(
         const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
         const Array<OneD, Array<OneD, NekDouble>> &inarray,
@@ -111,6 +112,8 @@ protected:
         const NekDouble &time) override;
 
 private:
+    // Save whether the basis contains a homogeneous expansion
+    bool m_homogeneous;
     ForcingAbsorption(const LibUtilities::SessionReaderSharedPtr &pSession,
                       const std::weak_ptr<EquationSystem> &pEquation);
     virtual ~ForcingAbsorption(void){};
@@ -121,6 +124,4 @@ private:
 };
 } // namespace SolverUtils
 } // namespace Nektar
-// Hui XU  21 Jul 2013 Created
-// Yumnah Mohamied May 2014 Modified and generalised.
 #endif

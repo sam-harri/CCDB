@@ -2,7 +2,7 @@
 <NEKTAR>
     <EXPANSIONS>
         <E
-            COMPOSITE="C[1]"
+            COMPOSITE="C[0,1]"
             BASISTYPE="Modified_A,Modified_A,Modified_A" NUMMODES="8,8,8"
             POINTSTYPE="GaussLobattoLegendre,GaussLobattoLegendre,GaussLobattoLegendre"
             NUMPOINTS="8,8,8"

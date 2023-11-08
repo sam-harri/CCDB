@@ -82,7 +82,8 @@ void MeshPartitionPtScotch::v_PartitionGraphImpl(
     boost::ignore_unused(nVertConds, vertSize, edgeWgt, volume);
 
     LibUtilities::CommMpiSharedPtr mpiComm =
-        std::dynamic_pointer_cast<LibUtilities::CommMpi>(m_comm);
+        std::dynamic_pointer_cast<LibUtilities::CommMpi>(
+            m_comm->GetSpaceComm());
 
     ASSERTL0(mpiComm, "PtScotch not supported in serial execution.");
 

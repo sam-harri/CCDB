@@ -721,7 +721,12 @@ void AssemblyMapDG::SetUpUniversalDGMap(const ExpList &locExp)
     {
         tmp[i] = m_globalToUniversalBndMap[i];
     }
-    m_bndGsh = m_gsh = Gs::Init(tmp, m_comm->GetRowComm());
+
+    bool verbose = m_comm->IsParallelInTime()
+                       ? m_comm->GetTimeComm()->GetRank() == 0
+                       : true;
+
+    m_bndGsh = m_gsh = Gs::Init(tmp, m_comm->GetRowComm(), verbose);
     Gs::Unique(tmp, m_comm->GetRowComm());
     for (i = 0; i < m_globalToUniversalBndMap.size(); ++i)
     {

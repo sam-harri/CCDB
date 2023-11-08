@@ -235,6 +235,10 @@ protected:
     void AppendSVVFactors(StdRegions::ConstFactorMap &factors,
                           MultiRegions::VarFactorsMap &varFactorsMap);
 
+    void ComputeGJPNormalVelocity(
+        const Array<OneD, const Array<OneD, NekDouble>> &inarray,
+        StdRegions::VarCoeffMap &varcoeffs);
+
 private:
 };
 
