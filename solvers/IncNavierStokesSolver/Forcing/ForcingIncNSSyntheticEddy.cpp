@@ -69,7 +69,7 @@ void ForcingIncNSSyntheticEddy::v_InitObject(
     const Array<OneD, MultiRegions::ExpListSharedPtr> &pFields,
     const unsigned int &pNumForcingFields, const TiXmlElement *pForce)
 {
-    boost::ignore_unused(pNumForcingFields);
+    boost::ignore_unused(pNumForcingFields, pForce);
     m_session->MatchSolverInfo("Homogeneous", "1D", m_isH1D, false);
 
     // Check if it is not 2D.
@@ -249,6 +249,8 @@ void ForcingIncNSSyntheticEddy::v_Apply(
     const Array<OneD, Array<OneD, NekDouble>> &inarray,
     Array<OneD, Array<OneD, NekDouble>> &outarray, const NekDouble &time)
 {
+    boost::ignore_unused(inarray, time);
+
     // Number of Variables
     int nVars = pFields.size();
     // Total number of coefficients
