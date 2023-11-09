@@ -1460,6 +1460,30 @@ and save the result in test.pts.
     points to be interpolated.}
   \end{center}
 \end{figure}
+
+In practice, it is convenient to use this module interactively to find/visualize/adjust profile distributions.
+This can be achieved by using the NekPy interface. A sample Pyhton script is provieded in the following
+\begin{lstlisting}[style=C++Style, language=Python]
+import sys
+from NekPy.FieldUtils import *
+
+field = Field(sys.argv, forceoutput=True, error=True)
+InputModule.Create("xml", field, "mesh.xml","session.xml").Run()
+InputModule.Create("fld", field, "field.fld").Run() # e.g. x,y,u,v,p
+ProcessModule.Create("wallNormalData", field,
+                    bnd=str(bnd), xorig=str(xorig), projDir=str(projDir),
+                    maxDist=str(maxDist), distH=str(distH), nptsH=str(nptsH),
+                    d=str(d)).Run()
+
+# Get data arrays from interpolation
+y  = field.GetPts(1) 
+u  = field.GetPts(2)
+\end{lstlisting}
+
+
+
+
+
 %
 %
 %

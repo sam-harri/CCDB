@@ -13,6 +13,7 @@ v5.5.0
 - Update AssemblyMap to reduce verbosity when using parallel-in-time (!1651)
 - Tidy-up of Collection library (!1622)
 - Tidy-up of I/O in BasicUtils (!1623)
+- Fix a minor bug in ProcessWallNormalData (!1663)
 
 **CardiacEPSolver**
 - Fix cell model history point filter output after base class change (!1342)
@@ -39,6 +40,7 @@ v5.5.0
 **Miscellaneous**
 - Add a particle tracker utilitiy using equation system infrastructure (!1310)
 - Remove deprecated fs::copy_directory function call (!1662)
+- Added a sample python script for wallnormaldata module (!1663)
 
 v5.4.0
 ------
