@@ -26,6 +26,7 @@ v5.5.0
 **FieldConvert**
 - Fix typo in user-guide and fix but for parallel-in-time FieldConvert (!1645)
 - Fixed FieldConvert -m addfld (!1500)
+- Add a new FieldConvert module to zero a plane in wavespace (!1632)
 - Fix tecplot output for line and plane points (!1497)
 
 **CI**
