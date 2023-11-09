@@ -70,21 +70,16 @@ void ForcingIncNSSyntheticEddy::v_InitObject(
     const unsigned int &pNumForcingFields, const TiXmlElement *pForce)
 {
     boost::ignore_unused(pNumForcingFields, pForce);
-    m_session->MatchSolverInfo("Homogeneous", "1D", m_isH1D, false);
-
-    // Check if it is not 2D.
-    if (pFields[0]->GetGraph()->GetMeshDimension() < 3)
-    {
-        if (!m_isH1D)
-        {
-            NEKERROR(Nektar::ErrorUtil::efatal,
-                     "Sythetic eddy method "
-                     "is only available for three-dimensional simulations");
-        }
-    }
 
     // Space dimension
-    m_spacedim = pFields[0]->GetGraph()->GetMeshDimension() + (m_isH1D ? 1 : 0);
+    m_spacedim = pFields[0]->GetGraph()->GetMeshDimension();
+
+    if (m_spacedim != 3)
+    {
+        NEKERROR(Nektar::ErrorUtil::efatal,
+                "Sythetic eddy method "
+                "only supports fully three-dimensional simulations");     
+    }
 
     // Get gamma parameter
     m_session->LoadParameter("Gamma", m_gamma, 1.4);
