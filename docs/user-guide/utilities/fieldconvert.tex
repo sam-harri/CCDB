@@ -433,7 +433,8 @@ possibly also Reynolds stresses) into single file;
   project the velocity components from Cartesian coordinate system into the new 
   coordinate system;
 \item \inltt{averagefld}: Compute the averaging of several field files;
-\item \inltt{powerspectrum}: Compute power spectrum at given regions from a 3DH1D expansion.
+\item \inltt{powerspectrum}: Compute power spectrum at given regions from a 3DH1D expansion;
+\item \inltt{zero-homo-plane}: Zero a specfied homogeneous plane in wavespace.
 \end{enumerate}
 The module list above can be seen by running the command
 %
@@ -1503,6 +1504,23 @@ filter to process data. See \ref{filters:BodyFittedVelocity}.
     \caption{Body-fitted coordinate system when the geometry has a gap on the surace.}
   \end{center}
 \end{figure}
+%
+%
+%
+
+\subsection{Zero a homogeneous plane in wavespace: \textit{zero-homo-plane} module}
+\label{s:utilities:fieldconvert:sub:zero-homo-plane}
+In cases the users would like to visualize the fluctuations in a 3DH1D flow
+field, the mean mode is expected to be removed (in the Fourier space). This can 
+be achieved by running the current module:
+\begin{lstlisting}[style=BashInputStyle]
+FieldConvert -m zero-homo-plane:planeid=0 mesh.xml session.xml field.fld \
+    field-zeroMean.fld
+\end{lstlisting}
+
+In general, \inltt{planeid} can be any meaningful plane id, which is 0 by 
+default. 
+
 %
 %
 %
