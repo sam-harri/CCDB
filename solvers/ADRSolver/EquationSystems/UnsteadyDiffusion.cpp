@@ -77,16 +77,19 @@ void UnsteadyDiffusion::v_InitObject(bool DeclareFields)
 
     if (m_session->DefinesParameter("d00"))
     {
+        m_d00 = m_session->GetParameter("d00");
         m_varcoeff[StdRegions::eVarCoeffD00] =
             Array<OneD, NekDouble>(npoints, m_session->GetParameter("d00"));
     }
     if (m_session->DefinesParameter("d11"))
     {
+        m_d11 = m_session->GetParameter("d11");
         m_varcoeff[StdRegions::eVarCoeffD11] =
             Array<OneD, NekDouble>(npoints, m_session->GetParameter("d11"));
     }
     if (m_session->DefinesParameter("d22"))
     {
+        m_d22 = m_session->GetParameter("d22");
         m_varcoeff[StdRegions::eVarCoeffD22] =
             Array<OneD, NekDouble>(npoints, m_session->GetParameter("d22"));
     }
@@ -279,12 +282,14 @@ void UnsteadyDiffusion::GetFluxVector(
     unsigned int nConvectiveFields = qfield[0].size();
     unsigned int nPts              = qfield[0][0].size();
 
+    NekDouble d[3] = {m_d00, m_d11, m_d22};
+
     for (unsigned int j = 0; j < nDim; ++j)
     {
         for (unsigned int i = 0; i < nConvectiveFields; ++i)
         {
-            Vmath::Smul(nPts, m_epsilon, qfield[j][i], 1, viscousTensor[j][i],
-                        1);
+            Vmath::Smul(nPts, m_epsilon * d[j], qfield[j][i], 1,
+                        viscousTensor[j][i], 1);
         }
     }
 }

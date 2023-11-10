@@ -204,6 +204,7 @@ IF( NEKTAR_SOLVER_ADR )
     ADD_NEKTAR_TEST(ExDiffusion_2D_LFRHU_deformed_GAUSS LENGTHY)
     ADD_NEKTAR_TEST(ExDiffusion_2D_LFRSD_deformed LENGTHY)
     ADD_NEKTAR_TEST(ExDiffusion_2D_LFRSD_deformed_GAUSS LENGTHY)
+    ADD_NEKTAR_TEST(ExDiffusion_VarCoeff)
 
     # C^0 projection
     ADD_NEKTAR_TEST(Projection2D)

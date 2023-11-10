@@ -16,6 +16,10 @@ v5.5.0
 - Fix a minor bug in ProcessWallNormalData (!1663)
 - Fix Explist::v_GetNormals and GetElmtNormalLength (!1625)
 
+**ADRSolver**
+- Add support for spatially-constant, but variable direction, diffusion to
+  ADRSolver. (!1669)
+
 **CardiacEPSolver**
 - Fix cell model history point filter output after base class change (!1342)
 - Add const qualifier to SetUniversalUniqueMap (!1644)
