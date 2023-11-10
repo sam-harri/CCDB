@@ -15,6 +15,10 @@ v5.5.0
 - Tidy-up of I/O in BasicUtils (!1623)
 - Fix a minor bug in ProcessWallNormalData (!1663)
 
+**ADRSolver**
+- Add support for spatially-constant, but variable direction, diffusion to
+  ADRSolver. (!1669)
+
 **CardiacEPSolver**
 - Fix cell model history point filter output after base class change (!1342)
 - Add const qualifier to SetUniversalUniqueMap (!1644)

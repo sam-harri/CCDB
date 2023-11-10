@@ -97,6 +97,7 @@ protected:
 private:
     NekDouble m_waveFreq;
     NekDouble m_epsilon;
+    NekDouble m_d00 = 1.0, m_d11 = 1.0, m_d22 = 1.0;
     StdRegions::VarCoeffMap m_varcoeff;
 };
 } // namespace Nektar
