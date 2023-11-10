@@ -42,6 +42,10 @@ v5.5.0
 - Add a particle tracker utilitiy using equation system infrastructure (!1310)
 - Remove deprecated fs::copy_directory function call (!1662)
 - Added a sample python script for wallnormaldata module (!1663)
+v5.5.0
+------
+**Library**
+- Fix Explist::v_GetNormals and GetElmtNormalLength (!1625)
 
 v5.4.0
 ------
