@@ -139,11 +139,23 @@
         <E COMPOSITE="C[0]" NUMMODES="13" TYPE="MODIFIED" FIELDS="u" />
         <E COMPOSITE="C[1]" NUMMODES="14" TYPE="MODIFIED" FIELDS="u" />
         <E COMPOSITE="C[2]" NUMMODES="8" TYPE="MODIFIED" FIELDS="u" />
-        <E COMPOSITE="C[3]" NUMMODES="13" TYPE="MODIFIED" FIELDS="u" />
+        <E
+            COMPOSITE="C[3]"
+            BASISTYPE="Modified_A,Modified_B" NUMMODES="12,13"
+            POINTSTYPE="GaussLobattoLegendre,GaussRadauMAlpha1Beta0"
+            NUMPOINTS="14,14"
+            FIELDS="u"
+        />
         <E COMPOSITE="C[4]" NUMMODES="7" TYPE="MODIFIED" FIELDS="u" />
         <E COMPOSITE="C[5]" NUMMODES="18" TYPE="MODIFIED" FIELDS="u" />
         <E COMPOSITE="C[6]" NUMMODES="14" TYPE="MODIFIED" FIELDS="u" />
-        <E COMPOSITE="C[7]" NUMMODES="25" TYPE="MODIFIED" FIELDS="u" />
+        <E
+            COMPOSITE="C[7]"
+            BASISTYPE="Modified_A,Modified_B" NUMMODES="23,25"
+            POINTSTYPE="GaussLobattoLegendre,GaussRadauMAlpha1Beta0"
+            NUMPOINTS="24,25"
+            FIELDS="u"
+        />
         <E COMPOSITE="C[8]" NUMMODES="8" TYPE="MODIFIED" FIELDS="u" />
         <E COMPOSITE="C[9]" NUMMODES="14" TYPE="MODIFIED" FIELDS="u" />
         <E COMPOSITE="C[10]" NUMMODES="8" TYPE="MODIFIED" FIELDS="u" />
@@ -157,17 +169,17 @@
     </EXPANSIONS>
     <CONDITIONS>
         <PARAMETERS>
-            <P> NumSteps       = 10              </P>
-            <P> TimeStep       = 0.0015     </P>
-            <P> IO_CheckSteps  = 1         </P>
-            <P> IO_InfoSteps   = 1                </P>
-            <P> advx           = 1                 </P>
-            <P> advy           = 1.5                 </P>
-            <P> advz           = 2                 </P>
+            <P> NumSteps       = 10                 </P>
+            <P> TimeStep       = 0.0015             </P>
+            <P> IO_CheckSteps  = 1                  </P>
+            <P> IO_InfoSteps   = 1                  </P>
+            <P> advx           = 1                  </P>
+            <P> advy           = 1.5                </P>
+            <P> advz           = 2                  </P>
         </PARAMETERS>
         <SOLVERINFO>
-            <I PROPERTY="EQTYPE"                  VALUE="UnsteadyAdvection"   />
-            <I PROPERTY="Projection"              VALUE="DisContinuous"       />
+            <I PROPERTY="EQTYPE"                VALUE="UnsteadyAdvection"   />
+            <I PROPERTY="Projection"            VALUE="DisContinuous"       />
             <I PROPERTY="AdvectionType"         VALUE="WeakDG"              />
             <I PROPERTY="UpwindType"            VALUE="Upwind"              />
             <I PROPERTY="TimeIntegrationMethod" VALUE="ClassicalRungeKutta4"/>
@@ -198,7 +210,6 @@
         </FUNCTION>
 
         <FUNCTION NAME="InitialConditions">
-            <!--<F VAR="u" FILE="cube_HO_225.chk"/>-->
             <E VAR="u" VALUE="sin(PI*x)*sin(PI*y)" />
         </FUNCTION>
 

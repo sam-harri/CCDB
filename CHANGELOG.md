@@ -1,5 +1,10 @@
 Changelog
 =========
+v5.5.0
+------
+**Library**
+- Fix Explist::v_GetNormals and GetElmtNormalLength (!1625)
+
 v5.4.0
 ------
 **Library**

@@ -4405,10 +4405,12 @@ void AlignFace(const StdRegions::Orientation orient, const int nquad1,
 
 /**
  * For each local element, copy the normals stored in the element list
- * into the array \a normals.
- * @param   normals     Multidimensional array in which to copy normals
- *                      to. Must have dimension equal to or larger than
- *                      the spatial dimension of the elements.
+ * into the array \a normals. This function should only be called by a
+ * trace explist, which has setup the left and right adjacent elements.
+ * @param   normals     Two dimensional array in which to copy normals
+ *                      to. The first dimension is the coordim. The
+ *                      second dimension is the same size as trace phys
+ *                      space.
  */
 void ExpList::v_GetNormals(Array<OneD, Array<OneD, NekDouble>> &normals)
 {
@@ -4457,98 +4459,62 @@ void ExpList::v_GetNormals(Array<OneD, Array<OneD, NekDouble>> &normals)
         break;
         case e1D:
         {
-            SpatialDomains::Geometry1DSharedPtr segGeom;
-            Array<OneD, Array<OneD, NekDouble>> locnormals2;
-            Array<OneD, Array<OneD, NekDouble>> Norms;
-
+            // Process each (trace) expansion.
             for (i = 0; i < m_exp->size(); ++i)
             {
-                LocalRegions::ExpansionSharedPtr loc_exp = (*m_exp)[i];
+                LocalRegions::ExpansionSharedPtr traceExp = (*m_exp)[i];
+                // location of this normal vector in the output array.
+                int offset = m_phys_offset[i];
 
-                LocalRegions::ExpansionSharedPtr loc_elmt =
-                    loc_exp->GetLeftAdjacentElementExp();
+                // Get number of points from left expansion.
+                LocalRegions::ExpansionSharedPtr exp2D =
+                    traceExp->GetLeftAdjacentElementExp();
+                int edgeId = traceExp->GetLeftAdjacentElementTrace();
+                LibUtilities::PointsKey edgePoints =
+                    exp2D->GetTraceBasisKey(edgeId).GetPointsKey();
+                LibUtilities::PointsKey tracePoints =
+                    traceExp->GetBasis(0)->GetPointsKey();
 
-                int edgeNumber = loc_exp->GetLeftAdjacentElementTrace();
-
-                // Get the number of points and normals for this expansion.
-                e_npoints = (*m_exp)[i]->GetNumPoints(0);
-
-                locnormals     = loc_elmt->GetTraceNormal(edgeNumber);
-                int e_nmodes   = loc_exp->GetBasis(0)->GetNumModes();
-                int loc_nmodes = loc_elmt->GetBasis(0)->GetNumModes();
-
-                if (e_nmodes != loc_nmodes)
+                // If right adjacent element exists, then we compare
+                // the left and right side and take the one with
+                // the highest number of points to compute the
+                // local normals. However, it's a question whether
+                // this effort pays off.
+                bool useRight = false;
+                if (traceExp->GetRightAdjacentElementTrace() >= 0)
                 {
-                    if (loc_exp->GetRightAdjacentElementTrace() >= 0)
+                    LocalRegions::ExpansionSharedPtr Rexp2D =
+                        traceExp->GetRightAdjacentElementExp();
+                    int RedgeId = traceExp->GetRightAdjacentElementTrace();
+                    LibUtilities::PointsKey RedgePoints =
+                        Rexp2D->GetTraceBasisKey(RedgeId).GetPointsKey();
+
+                    if (RedgePoints.GetNumPoints() > edgePoints.GetNumPoints())
                     {
-                        LocalRegions::ExpansionSharedPtr loc_elmt =
-                            loc_exp->GetRightAdjacentElementExp();
-
-                        int EdgeNumber =
-                            loc_exp->GetRightAdjacentElementTrace();
-
-                        // Serial case: right element is connected so we can
-                        // just grab that normal.
-                        locnormals = loc_elmt->GetTraceNormal(EdgeNumber);
-
-                        offset = m_phys_offset[i];
-
-                        // Process each point in the expansion.
-                        for (j = 0; j < e_npoints; ++j)
-                        {
-                            // Process each spatial dimension and
-                            // copy the values into the output
-                            // array.
-                            for (k = 0; k < coordim; ++k)
-                            {
-                                normals[k][offset + j] = -locnormals[k][j];
-                            }
-                        }
-                    }
-                    else
-                    {
-                        // Parallel case: need to interpolate normal.
-                        Array<OneD, Array<OneD, NekDouble>> normal(coordim);
-
-                        for (int p = 0; p < coordim; ++p)
-                        {
-                            normal[p] = Array<OneD, NekDouble>(e_npoints, 0.0);
-                            LibUtilities::PointsKey to_key =
-                                loc_exp->GetBasis(0)->GetPointsKey();
-                            LibUtilities::PointsKey from_key =
-                                loc_elmt->GetBasis(0)->GetPointsKey();
-                            LibUtilities::Interp1D(from_key, locnormals[p],
-                                                   to_key, normal[p]);
-                        }
-
-                        offset = m_phys_offset[i];
-
-                        // Process each point in the expansion.
-                        for (j = 0; j < e_npoints; ++j)
-                        {
-                            // Process each spatial dimension and copy the
-                            // values into the output array.
-                            for (k = 0; k < coordim; ++k)
-                            {
-                                normals[k][offset + j] = normal[k][j];
-                            }
-                        }
+                        exp2D      = Rexp2D;
+                        edgeId     = RedgeId;
+                        edgePoints = RedgePoints;
+                        useRight   = true;
                     }
                 }
-                else
-                {
-                    // Get the physical data offset for this expansion.
-                    offset = m_phys_offset[i];
 
-                    // Process each point in the expansion.
-                    for (j = 0; j < e_npoints; ++j)
+                const Array<OneD, const Array<OneD, NekDouble>> &locNormals =
+                    exp2D->GetTraceNormal(edgeId);
+
+                // For unknown reason, GetTraceNormal(2D) returns normals
+                // that has been reoriented to trace order.
+                // So here we don't need to reorient them again.
+                for (int d = 0; d < coordim; ++d)
+                {
+                    LibUtilities::Interp1D(edgePoints, locNormals[d].data(),
+                                           tracePoints,
+                                           normals[d].data() + offset);
+                    // Trace normal direction is always the outward
+                    // direction of the left element.
+                    if (useRight)
                     {
-                        // Process each spatial dimension and copy the values
-                        // into the output array.
-                        for (k = 0; k < coordim; ++k)
-                        {
-                            normals[k][offset + j] = locnormals[k][j];
-                        }
+                        Vmath::Neg((int)tracePoints.GetNumPoints(),
+                                   &normals[d][offset], 1);
                     }
                 }
             }
@@ -4562,20 +4528,33 @@ void ExpList::v_GetNormals(Array<OneD, Array<OneD, NekDouble>> &normals)
             for (i = 0; i < m_exp->size(); ++i)
             {
                 LocalRegions::ExpansionSharedPtr traceExp = (*m_exp)[i];
+                // location of this normal vector in the output array.
+                int offset = m_phys_offset[i];
+
+                // Get the normals from left expansion.
+                // NOTE:
+                // One can choose to compare the left and right side and take
+                // the one with the highest number of points to compute the
+                // local normals. Here are 2 reasons why we don't do so:
+                // 1.
+                // in general two adjacent elements must share a common
+                // cuerved edge/face, which can be precisely described even by
+                // the lower-order side. Even if the two sides are not exactly
+                // the same, it should not affect the convergence of solution.
+                // 2.
+                // In 3D, it's hard to define which is side has higher order.
+                // The left-side may have higher order in axis 0 but lower in
+                // axis 1. It's too complicated and not worth the effort.
                 LocalRegions::ExpansionSharedPtr exp3D =
                     traceExp->GetLeftAdjacentElementExp();
-
-                // Get the number of points and normals for this expansion.
-                int faceNum = traceExp->GetLeftAdjacentElementTrace();
-                int offset  = m_phys_offset[i];
-
+                int faceId = traceExp->GetLeftAdjacentElementTrace();
                 const Array<OneD, const Array<OneD, NekDouble>> &locNormals =
-                    exp3D->GetTraceNormal(faceNum);
+                    exp3D->GetTraceNormal(faceId);
 
-                // Project normals from 3D element onto the same
-                // orientation as the trace expansion.
-                StdRegions::Orientation orient = exp3D->GetTraceOrient(faceNum);
+                StdRegions::Orientation orient = exp3D->GetTraceOrient(faceId);
 
+                // swap local basiskey 0 and 1 if orientation is transposed
+                // (>=9)
                 int fromid0, fromid1;
 
                 if (orient < StdRegions::eDir1FwdDir2_Dir2FwdDir1)
@@ -4590,9 +4569,9 @@ void ExpList::v_GetNormals(Array<OneD, Array<OneD, NekDouble>> &normals)
                 }
 
                 LibUtilities::BasisKey faceBasis0 =
-                    exp3D->GetTraceBasisKey(faceNum, fromid0);
+                    exp3D->GetTraceBasisKey(faceId, fromid0);
                 LibUtilities::BasisKey faceBasis1 =
-                    exp3D->GetTraceBasisKey(faceNum, fromid1);
+                    exp3D->GetTraceBasisKey(faceId, fromid1);
                 LibUtilities::BasisKey traceBasis0 =
                     traceExp->GetBasis(0)->GetBasisKey();
                 LibUtilities::BasisKey traceBasis1 =
@@ -4601,14 +4580,17 @@ void ExpList::v_GetNormals(Array<OneD, Array<OneD, NekDouble>> &normals)
                 const int faceNq0 = faceBasis0.GetNumPoints();
                 const int faceNq1 = faceBasis1.GetNumPoints();
 
-                Array<OneD, int> faceids;
-                exp3D->ReOrientTracePhysMap(orient, faceids, faceNq0, faceNq1);
+                // Reorient normals from stdExp definition onto the same
+                // orientation as the trace expansion.(also match the
+                // swapped local basiskey)
+                Array<OneD, int> map;
+                exp3D->ReOrientTracePhysMap(orient, map, faceNq0, faceNq1);
 
+                // Perform reorientation and interpolation.
                 Array<OneD, NekDouble> traceNormals(faceNq0 * faceNq1);
-
                 for (j = 0; j < coordim; ++j)
                 {
-                    Vmath::Scatr(faceNq0 * faceNq1, locNormals[j], faceids,
+                    Vmath::Scatr(faceNq0 * faceNq1, locNormals[j], map,
                                  traceNormals);
 
                     LibUtilities::Interp2D(
@@ -4627,6 +4609,18 @@ void ExpList::v_GetNormals(Array<OneD, Array<OneD, NekDouble>> &normals)
     }
 }
 
+/**
+ * Returns the element normal length for each trace expansion. The array
+ * has the same size as trace phys space. This function should only be
+ * called by a trace explist, which has setup the left and right adjacent
+ * elements.
+ * This function is only used by DiffusionIP to commpute the penalty.
+ * However, it's a question whether we need to calculate the lengthFwd
+ * and lengthBwd separately, since in most cases, they are equavalent.
+ * Same logic applies to v_GetNormals().
+ * @param   lengthsFwd  Output array of normal lengths for left side.
+ * @param   lengthsBwd  Output array of normal lengths for right side.
+ */
 void ExpList::GetElmtNormalLength(Array<OneD, NekDouble> &lengthsFwd,
                                   Array<OneD, NekDouble> &lengthsBwd)
 {
@@ -4650,8 +4644,7 @@ void ExpList::GetElmtNormalLength(Array<OneD, NekDouble> &lengthsFwd,
             loc_exp    = (*m_exp)[i];
             int offset = m_phys_offset[i];
 
-            int e_nmodes = loc_exp->GetBasis(0)->GetNumModes();
-            e_npoints    = (*m_exp)[i]->GetNumPoints(0);
+            e_npoints = (*m_exp)[i]->GetNumPoints(0);
             if (e_npoints0 < e_npoints)
             {
                 for (int nlr = 0; nlr < 2; nlr++)
@@ -4675,20 +4668,20 @@ void ExpList::GetElmtNormalLength(Array<OneD, NekDouble> &lengthsFwd,
                 if (bndNumber >= 0)
                 {
                     locLeng = loc_elmt->GetElmtBndNormDirElmtLen(bndNumber);
-                    lengAdd[nlr] = locLeng;
 
-                    int loc_nmodes = loc_elmt->GetBasis(0)->GetNumModes();
-                    if (e_nmodes != loc_nmodes)
-                    {
-                        // Parallel case: need to interpolate.
-                        LibUtilities::PointsKey to_key =
-                            loc_exp->GetBasis(0)->GetPointsKey();
-                        LibUtilities::PointsKey from_key =
-                            loc_elmt->GetBasis(0)->GetPointsKey();
-                        LibUtilities::Interp1D(from_key, locLeng, to_key,
-                                               lengintp[nlr]);
-                        lengAdd[nlr] = lengintp[nlr];
-                    }
+                    LibUtilities::PointsKey to_key =
+                        loc_exp->GetBasis(0)->GetPointsKey();
+                    LibUtilities::PointsKey from_key =
+                        loc_elmt->GetTraceBasisKey(bndNumber).GetPointsKey();
+
+                    // For unknown reason, GetTraceNormal(2D) returns normals
+                    // that has been reoriented to trace order.
+                    // So here we don't need to reorient them again.
+
+                    // Always do interpolation
+                    LibUtilities::Interp1D(from_key, locLeng, to_key,
+                                           lengintp[nlr]);
+                    lengAdd[nlr] = lengintp[nlr];
                 }
 
                 for (int j = 0; j < e_npoints; ++j)
