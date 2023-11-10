@@ -569,6 +569,54 @@ iteration, the solver uses the isentropic flow relations combined with the quant
 boundary + one quantity from the interior solution to compute all remaining quantities at the boundary.
 Once this has been done, the flux over the boundary at that iteration can be computed.
 
+\item Subsonic boundary condition enforcing entropy and pressure:
+\begin{lstlisting}[style=XmlStyle]
+<BOUNDARYCONDITIONS>
+  <REGION REF="0">
+    <D VAR="rho"  USERDEFINEDTYPE="EnforceEntropyPressure" VALUE="rhoInf" />
+    <D VAR="rhou" USERDEFINEDTYPE="EnforceEntropyPressure" VALUE="rhoInf*uInf" />
+    <D VAR="rhov" USERDEFINEDTYPE="EnforceEntropyPressure" VALUE="rhoInf*vInf" />
+    <D VAR="rhov" USERDEFINEDTYPE="EnforceEntropyPressure" VALUE="rhoInf*wInf" />
+    <D VAR="E"    USERDEFINEDTYPE="EnforceEntropyPressure" VALUE="pInf/(Gamma-1) + 0.5*rhoInf*(uInf*uInf + vInf*vInf)" />
+  </REGION>
+</BOUNDARYCONDITIONS>
+\end{lstlisting}
+where the input type can be either \inltt{VALUE} or \inltt{FILE} such that the specified entropy and pressure distribution
+(corresponding to the input \inltt{rhoInf}, \inltt{rhoInf*uInf}, \inltt{rhoInf*vInf}, \inltt{rhoInf*wInf}, and \inltt{E})
+will be enforced on the subsonic inflow boundary. 
+If the flow is supersonic, all the conditions are naturelly agreed with the input distribution.
+The following two conditions follows the same rule.
+
+\item Subsonic boundary condition enforcing entropy and velocity:
+\begin{lstlisting}[style=XmlStyle]
+<BOUNDARYCONDITIONS>
+  <REGION REF="0">
+    <D VAR="rho"  USERDEFINEDTYPE="EnforceEntropyVelocity" VALUE="rhoInf" />
+    <D VAR="rhou" USERDEFINEDTYPE="EnforceEntropyVelocity" VALUE="rhoInf*uInf" />
+    <D VAR="rhov" USERDEFINEDTYPE="EnforceEntropyVelocity" VALUE="rhoInf*vInf" />
+    <D VAR="rhov" USERDEFINEDTYPE="EnforceEntropyVelocity" VALUE="rhoInf*wInf" />
+    <D VAR="E"    USERDEFINEDTYPE="EnforceEntropyVelocity" VALUE="pInf/(Gamma-1) + 0.5*rhoInf*(uInf*uInf + vInf*vInf)" />
+  </REGION>
+</BOUNDARYCONDITIONS>
+\end{lstlisting}
+where both tangential and normal velocity components are enforced. Therefore the angle of attack is maintained.
+
+\item Subsonic boundary condition enforcing entropy and total enthalpy:
+\begin{lstlisting}[style=XmlStyle]
+<BOUNDARYCONDITIONS>
+  <REGION REF="0">
+    <D VAR="rho"  USERDEFINEDTYPE="EnforceEntropyTotalEnthalpy" VALUE="rhoInf" />
+    <D VAR="rhou" USERDEFINEDTYPE="EnforceEntropyTotalEnthalpy" VALUE="rhoInf*uInf" />
+    <D VAR="rhov" USERDEFINEDTYPE="EnforceEntropyTotalEnthalpy" VALUE="rhoInf*vInf" />
+    <D VAR="rhov" USERDEFINEDTYPE="EnforceEntropyTotalEnthalpy" VALUE="rhoInf*wInf" />
+    <D VAR="E"    USERDEFINEDTYPE="EnforceEntropyTotalEnthalpy" VALUE="pInf/(Gamma-1) + 0.5*rhoInf*(uInf*uInf + vInf*vInf)" />
+  </REGION>
+</BOUNDARYCONDITIONS>
+\end{lstlisting}
+
+
+
+
 \end{itemize}
 
 \subsection*{Initial conditions and exact solution}

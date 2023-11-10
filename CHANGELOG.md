@@ -24,6 +24,9 @@ v5.5.0
 - Save BndElmtExpansion and avoid re-building (!1648)
 - Add Simo-advection and a switch for Simo-/Dong-advection to VCSImplicit (!1630)
 
+**CompressibleFlowSolver**
+- Add three subsonic inflow boundary conditions: EnforceEntropyPresure, EnforceEntropyVelocity, and EnforceEntropyTotalEnthalpy (!1398)
+
 **FieldConvert**
 - Fix typo in user-guide and fix but for parallel-in-time FieldConvert (!1645)
 - Fixed FieldConvert -m addfld (!1500)
