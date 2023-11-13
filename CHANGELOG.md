@@ -13,7 +13,7 @@ v5.5.0
 - Update AssemblyMap to reduce verbosity when using parallel-in-time (!1651)
 - Tidy-up of Collection library (!1622)
 - Tidy-up of I/O in BasicUtils (!1623)
-- Update to use C++17 nested namespaces (!1556)
+- Update to use C++17 nested namespaces (!1556, !1670)
 - Fix a minor bug in ProcessWallNormalData (!1663)
 - Fix Explist::v_GetNormals and GetElmtNormalLength (!1625)
 

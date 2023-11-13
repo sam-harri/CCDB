@@ -128,7 +128,7 @@ public:
     ~FileSolution() override;
 
 protected:
-    virtual void v_GetVelocity(
+    void v_GetVelocity(
         const Array<OneD, const Array<OneD, NekDouble>> &physfield,
         Array<OneD, Array<OneD, NekDouble>> &velocity) override;
 
@@ -138,7 +138,7 @@ protected:
 
     using SolverUtils::EquationSystem::v_GetPressure;
 
-    virtual void v_GetDensity(
+    void v_GetDensity(
         const Array<OneD, const Array<OneD, NekDouble>> &physfield,
         Array<OneD, NekDouble> &density) override;
 
@@ -164,13 +164,13 @@ protected:
         NekDouble lambda);
 
     /// Initialise the object
-    virtual void v_InitObject(bool DeclareField = true) override;
+    void v_InitObject(bool DeclareField = true) override;
 
-    virtual bool v_PostIntegrate(int step) override;
+    bool v_PostIntegrate(int step) override;
 
-    virtual bool v_RequireFwdTrans() override;
+    bool v_RequireFwdTrans() override;
 
-    virtual void v_DoInitialise(bool dumpInitialConditions) override;
+    void v_DoInitialise(bool dumpInitialConditions) override;
 
     void UpdateField(NekDouble time);
 
@@ -180,6 +180,6 @@ private:
     Array<OneD, Array<OneD, NekDouble>> m_coord;
     std::map<std::string, LibUtilities::EquationSharedPtr> m_solutionFunction;
 };
-} // namespace Nektar
+} // namespace Nektar::SolverUtils
 
 #endif // NEKTAR_SOLVERS_INCNAVIERSTOKES_H
