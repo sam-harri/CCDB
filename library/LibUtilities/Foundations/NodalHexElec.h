@@ -40,15 +40,13 @@
 #include <LibUtilities/Foundations/ManagerAccess.h>
 #include <LibUtilities/Foundations/NodalUtil.h>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 class NodalHexElec : public Points<NekDouble>
 {
 public:
-    virtual ~NodalHexElec()
+    ~NodalHexElec() override
     {
     }
 
@@ -70,11 +68,10 @@ private:
     /// 1D GLL weights.
     Array<OneD, NekDouble> m_ew;
 
-    virtual void v_CalculatePoints() override final;
-    virtual void v_CalculateWeights() override final;
-    virtual void v_CalculateDerivMatrix() override final;
+    void v_CalculatePoints() final;
+    void v_CalculateWeights() final;
+    void v_CalculateDerivMatrix() final;
 };
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities
 
 #endif // NODALHEXELEC_H

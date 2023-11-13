@@ -38,9 +38,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 /**
  * @class GlobalLinSysXxtFull
@@ -253,5 +251,4 @@ void GlobalLinSysXxtFull::v_SolveLinearSystem(
     }
 }
 
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions

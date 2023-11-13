@@ -36,9 +36,7 @@
 
 #include <SolverUtils/Filters/FilterAverageFields.h>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 std::string FilterAverageFields::className =
     GetFilterFactory().RegisterCreatorFunction("AverageFields",
@@ -94,5 +92,4 @@ NekDouble FilterAverageFields::v_GetScale()
     return 1.0 / m_numSamples;
 }
 
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils

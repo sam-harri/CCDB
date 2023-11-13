@@ -46,9 +46,7 @@
 
 #include <LibUtilities/TimeIntegration/TimeIntegrationScheme.h>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -61,7 +59,7 @@ public:
                                       std::vector<NekDouble> freeParams);
 
     /// Destructor
-    virtual ~FractionalInTimeIntegrationScheme()
+    ~FractionalInTimeIntegrationScheme() override
     {
     }
 
@@ -87,38 +85,37 @@ public:
 
 protected:
     // Access methods from the base class that are virtual
-    LUE virtual std::string v_GetName() const override
+    LUE std::string v_GetName() const override
     {
         return m_name;
     }
 
-    LUE virtual std::string v_GetVariant() const override
+    LUE std::string v_GetVariant() const override
     {
         return m_variant;
     }
 
-    LUE virtual size_t v_GetOrder() const override
+    LUE size_t v_GetOrder() const override
     {
         return m_order;
     }
 
-    LUE virtual std::vector<NekDouble> v_GetFreeParams() const override
+    LUE std::vector<NekDouble> v_GetFreeParams() const override
     {
         return m_freeParams;
     }
 
-    LUE virtual TimeIntegrationSchemeType v_GetIntegrationSchemeType()
-        const override
+    LUE TimeIntegrationSchemeType v_GetIntegrationSchemeType() const override
     {
         return m_schemeType;
     }
 
-    LUE virtual NekDouble v_GetTimeStability() const override
+    LUE NekDouble v_GetTimeStability() const override
     {
         return 1.0;
     }
 
-    LUE virtual size_t v_GetNumIntegrationPhases() const override
+    LUE size_t v_GetNumIntegrationPhases() const override
     {
         return 1;
     }
@@ -126,11 +123,11 @@ protected:
     /**
      * \brief Gets the solution vector of the ODE
      */
-    virtual const TripleArray &v_GetSolutionVector() const override
+    const TripleArray &v_GetSolutionVector() const override
     {
         return m_u;
     }
-    virtual TripleArray &v_UpdateSolutionVector() override
+    TripleArray &v_UpdateSolutionVector() override
     {
         return m_u;
     }
@@ -138,22 +135,21 @@ protected:
     /**
      * \brief Sets the solution vector of the ODE
      */
-    virtual void v_SetSolutionVector(const size_t Offset,
-                                     const DoubleArray &y) override
+    void v_SetSolutionVector(const size_t Offset, const DoubleArray &y) override
     {
         m_u[Offset] = y;
     }
 
     // The worker methods from the base class that are virtual
-    LUE virtual void v_InitializeScheme(
+    LUE void v_InitializeScheme(
         const NekDouble deltaT, ConstDoubleArray &y_0, const NekDouble time,
         const TimeIntegrationSchemeOperators &op) override;
 
-    LUE virtual ConstDoubleArray &v_TimeIntegrate(
-        const size_t timestep, const NekDouble delta_t) override;
+    LUE ConstDoubleArray &v_TimeIntegrate(const size_t timestep,
+                                          const NekDouble delta_t) override;
 
-    LUE virtual void v_print(std::ostream &os) const override;
-    LUE virtual void v_printFull(std::ostream &os) const override;
+    LUE void v_print(std::ostream &os) const override;
+    LUE void v_printFull(std::ostream &os) const override;
 
     struct Instance
     {
@@ -306,7 +302,6 @@ LUE std::ostream &operator<<(std::ostream &os,
 LUE std::ostream &operator<<(
     std::ostream &os, const FractionalInTimeIntegrationSchemeSharedPtr &rhs);
 
-} // end namespace LibUtilities
-} // end namespace Nektar
+} // namespace Nektar::LibUtilities
 
 #endif

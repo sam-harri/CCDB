@@ -61,7 +61,7 @@ public:
     /// Name of class
     static std::string className;
 
-    virtual ~ImageWarpingSystem();
+    ~ImageWarpingSystem() override;
 
 protected:
     SolverUtils::RiemannSolverSharedPtr m_riemannSolver;
@@ -83,14 +83,14 @@ protected:
     /// Get the normal velocity
     Array<OneD, NekDouble> &GetNormalVelocity();
 
-    virtual void v_InitObject(bool DeclareField = true) override;
+    void v_InitObject(bool DeclareField = true) override;
 
     // DG Advection routines
     void GetFluxVector(const Array<OneD, Array<OneD, NekDouble>> &physfield,
                        Array<OneD, Array<OneD, Array<OneD, NekDouble>>> &flux);
 
     // Print Summary
-    virtual void v_GenerateSummary(SolverUtils::SummaryList &s) override;
+    void v_GenerateSummary(SolverUtils::SummaryList &s) override;
 };
 } // namespace Nektar
 

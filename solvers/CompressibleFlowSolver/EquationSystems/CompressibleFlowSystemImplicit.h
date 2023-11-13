@@ -51,16 +51,16 @@ public:
     CFSImplicit(const LibUtilities::SessionReaderSharedPtr &pSession,
                 const SpatialDomains::MeshGraphSharedPtr &pGraph);
 
-    virtual ~CFSImplicit();
+    ~CFSImplicit() override;
 
-    virtual void v_InitObject(bool DeclareFields = true) override;
+    void v_InitObject(bool DeclareFields = true) override;
 
-    virtual void v_DoSolve() override;
+    void v_DoSolve() override;
 
-    virtual void v_PrintStatusInformation(const int step,
-                                          const NekDouble cpuTime) override;
+    void v_PrintStatusInformation(const int step,
+                                  const NekDouble cpuTime) override;
 
-    virtual void v_PrintSummaryStatistics(const NekDouble intTime) override;
+    void v_PrintSummaryStatistics(const NekDouble intTime) override;
 
     void InitialiseNonlinSysSolver();
 
@@ -395,7 +395,7 @@ protected:
         const Array<OneD, const Array<OneD, NekDouble>> &inarray,
         Array<OneD, Array<OneD, DNekMatSharedPtr>> &ElmtJac);
 
-    virtual bool v_UpdateTimeStepCheck() override;
+    bool v_UpdateTimeStepCheck() override;
 };
 } // namespace Nektar
 #endif

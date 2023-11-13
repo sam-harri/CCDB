@@ -39,9 +39,7 @@
 
 #include "../Module.h"
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 /**
@@ -58,30 +56,29 @@ public:
     static ModuleKey className;
 
     ProcessPointDataToFld(FieldSharedPtr f);
-    virtual ~ProcessPointDataToFld();
+    ~ProcessPointDataToFld() override;
 
 protected:
     /// Write mesh to output file.
-    virtual void v_Process(po::variables_map &vm) override;
+    void v_Process(po::variables_map &vm) override;
 
-    virtual std::string v_GetModuleName() override
+    std::string v_GetModuleName() override
     {
         return "ProcessPointDataToFld";
     }
 
-    virtual std::string v_GetModuleDescription() override
+    std::string v_GetModuleDescription() override
     {
         return "Projecting data to expansion";
     }
 
-    virtual ModulePriority v_GetModulePriority() override
+    ModulePriority v_GetModulePriority() override
     {
         return eFillExp;
     }
 
 private:
 };
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils
 
 #endif

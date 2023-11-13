@@ -36,9 +36,7 @@
 
 #include <SolverUtils/RiemannSolvers/UpwindSolver.h>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 std::string UpwindSolver::solverName =
     GetRiemannSolverFactory().RegisterCreatorFunction(
@@ -103,5 +101,4 @@ void UpwindSolver::v_Solve(const int nDim,
         }
     }
 }
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils

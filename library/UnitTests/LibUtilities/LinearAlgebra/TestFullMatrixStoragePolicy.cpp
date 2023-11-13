@@ -40,9 +40,7 @@
 #include <boost/test/tools/floating_point_comparison.hpp>
 #include <boost/test/unit_test.hpp>
 
-namespace Nektar
-{
-namespace FullMatrixStoragePolicyUnitTests
+namespace Nektar::FullMatrixStoragePolicyUnitTests
 {
 typedef FullMatrixFuncs Policy;
 
@@ -125,5 +123,4 @@ BOOST_AUTO_TEST_CASE(TestAdvanceFull)
     }
 }
 
-} // namespace FullMatrixStoragePolicyUnitTests
-} // namespace Nektar
+} // namespace Nektar::FullMatrixStoragePolicyUnitTests

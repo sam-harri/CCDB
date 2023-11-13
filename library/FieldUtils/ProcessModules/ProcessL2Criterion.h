@@ -37,9 +37,7 @@
 
 #include "../Module.h"
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 /**
@@ -57,27 +55,26 @@ public:
     static ModuleKey className;
 
     ProcessL2Criterion(FieldSharedPtr f);
-    virtual ~ProcessL2Criterion();
+    ~ProcessL2Criterion() override;
 
 protected:
-    virtual void v_Process(po::variables_map &vm) override;
+    void v_Process(po::variables_map &vm) override;
 
-    virtual std::string v_GetModuleName() override
+    std::string v_GetModuleName() override
     {
         return "ProcessL2Criterion";
     }
 
-    virtual std::string v_GetModuleDescription() override
+    std::string v_GetModuleDescription() override
     {
         return "Calculating Lambda 2 Criterion";
     }
 
-    virtual ModulePriority v_GetModulePriority() override
+    ModulePriority v_GetModulePriority() override
     {
         return eModifyExp;
     }
 };
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils
 
 #endif

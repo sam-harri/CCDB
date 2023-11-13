@@ -65,7 +65,7 @@ public:
     static std::string className;
 
     /// Destructor
-    virtual ~UnsteadyViscousBurgers();
+    ~UnsteadyViscousBurgers() override;
 
 protected:
     bool m_useSpecVanVisc;        // Use Spectral Vanishing Viscosity
@@ -125,10 +125,10 @@ protected:
         Array<OneD, Array<OneD, NekDouble>> &inarray);
 
     /// Initialise the object
-    virtual void v_InitObject(bool DeclareFields = true) override;
+    void v_InitObject(bool DeclareFields = true) override;
 
     /// Print Summary
-    virtual void v_GenerateSummary(SolverUtils::SummaryList &s) override;
+    void v_GenerateSummary(SolverUtils::SummaryList &s) override;
 
 private:
     NekDouble m_waveFreq;

@@ -55,9 +55,7 @@
                                                        factors);               \
     }
 
-namespace Nektar
-{
-namespace Collections
+namespace Nektar::Collections
 {
 
 class CoalescedGeomData;
@@ -192,6 +190,6 @@ bool operator<(OperatorKey const &p1, OperatorKey const &p2);
 /// Stream output operator for OperatorKey objects
 std::ostream &operator<<(std::ostream &os, OperatorKey const &p);
 
-} // namespace Collections
-} // namespace Nektar
+} // namespace Nektar::Collections
+
 #endif

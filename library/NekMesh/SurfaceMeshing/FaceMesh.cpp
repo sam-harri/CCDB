@@ -38,9 +38,7 @@
 #include <limits>
 
 using namespace std;
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 bool FaceMesh::ValidateCurves()
@@ -350,7 +348,9 @@ void FaceMesh::Smoothing()
                                      (ui[1] - uj[1]) * (B[0] - A[0]));
 
                     if (!(lam < 0) && !(lam > 1))
+                    {
                         lambda.push_back(lam);
+                    }
                 }
 
                 if (lambda.size() > 0)
@@ -1192,5 +1192,4 @@ void FaceMesh::OrientateCurves()
         orderedLoops.push_back(cE);
     }
 }
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh

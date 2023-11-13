@@ -37,9 +37,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 ForcingFactory &GetForcingFactory()
 {
@@ -224,5 +222,4 @@ void Forcing::v_ApplyCoeff(
     boost::ignore_unused(fields, inarray, outarray, time);
     ASSERTL0(false, "v_ApplyCoeff not defined");
 }
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils

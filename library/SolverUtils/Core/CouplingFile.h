@@ -37,9 +37,7 @@
 #include <SolverUtils/Core/Coupling.h>
 #include <SolverUtils/Core/SessionFunction.h>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 
 class CouplingFile;
@@ -62,17 +60,17 @@ public:
 
     SOLVER_UTILS_EXPORT CouplingFile(MultiRegions::ExpListSharedPtr field);
 
-    SOLVER_UTILS_EXPORT virtual ~CouplingFile();
+    SOLVER_UTILS_EXPORT ~CouplingFile() override;
 
 protected:
-    SOLVER_UTILS_EXPORT virtual void v_Init() override;
+    SOLVER_UTILS_EXPORT void v_Init() override;
 
-    SOLVER_UTILS_EXPORT virtual void v_Send(
+    SOLVER_UTILS_EXPORT void v_Send(
         const int step, const NekDouble time,
         const Array<OneD, const Array<OneD, NekDouble>> &field,
         std::vector<std::string> &varNames) override;
 
-    SOLVER_UTILS_EXPORT virtual void v_Receive(
+    SOLVER_UTILS_EXPORT void v_Receive(
         const int step, const NekDouble time,
         Array<OneD, Array<OneD, NekDouble>> &field,
         std::vector<std::string> &varNames) override;
@@ -83,7 +81,6 @@ private:
 
     SessionFunctionSharedPtr m_inputFunction;
 };
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils
 
 #endif

@@ -47,9 +47,7 @@
 #include <SolverUtils/RiemannSolvers/RiemannSolver.h>
 #include <SolverUtils/SolverUtilsDeclspec.h>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 
 class Diffusion;
@@ -418,7 +416,6 @@ protected:
         &v_GetTraceNormal();
 };
 
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils
 
 #endif

@@ -40,9 +40,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace SpatialDomains
+namespace Nektar::SpatialDomains
 {
 const unsigned int TetGeom::VertexEdgeConnectivity[4][3] = {
     {0, 2, 3}, {0, 1, 4}, {1, 2, 5}, {3, 4, 5}};
@@ -687,5 +685,4 @@ void TetGeom::SetUpXmap()
     m_xmap = MemoryManager<StdRegions::StdTetExp>::AllocateSharedPtr(A, B, C);
 }
 
-} // namespace SpatialDomains
-} // namespace Nektar
+} // namespace Nektar::SpatialDomains

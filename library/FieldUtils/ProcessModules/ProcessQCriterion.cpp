@@ -42,9 +42,7 @@ using namespace std;
 
 #include "ProcessQCriterion.h"
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 ModuleKey ProcessQCriterion::className =
@@ -232,5 +230,4 @@ void ProcessQCriterion::v_Process(po::variables_map &vm)
     }
 }
 
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

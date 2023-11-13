@@ -37,9 +37,7 @@
 #include <LibUtilities/Communication/Xxt.hpp>
 #include <MultiRegions/GlobalLinSysXxt.h>
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 /**
  * @class GlobalLinSysXxt
@@ -53,7 +51,7 @@ GlobalLinSysXxt::GlobalLinSysXxt(
     const std::shared_ptr<AssemblyMap> &pLocToGloMap)
     : GlobalLinSys(pKey, pExp, pLocToGloMap)
 {
-    m_crsData = 0;
+    m_crsData = nullptr;
 }
 
 GlobalLinSysXxt::~GlobalLinSysXxt()
@@ -61,5 +59,4 @@ GlobalLinSysXxt::~GlobalLinSysXxt()
     Xxt::Finalise(m_crsData);
 }
 
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions

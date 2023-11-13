@@ -37,9 +37,7 @@
 
 #include <NekMesh/NekMeshDeclspec.h>
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 /**
@@ -96,6 +94,5 @@ struct ElmtConfig
 
 NEKMESH_EXPORT bool operator==(ElmtConfig const &c1, ElmtConfig const &c2);
 
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh
 #endif

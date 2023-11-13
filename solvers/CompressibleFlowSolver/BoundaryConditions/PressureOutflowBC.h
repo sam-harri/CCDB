@@ -66,9 +66,9 @@ public:
     static std::string className;
 
 protected:
-    virtual void v_Apply(Array<OneD, Array<OneD, NekDouble>> &Fwd,
-                         Array<OneD, Array<OneD, NekDouble>> &physarray,
-                         const NekDouble &time) override;
+    void v_Apply(Array<OneD, Array<OneD, NekDouble>> &Fwd,
+                 Array<OneD, Array<OneD, NekDouble>> &physarray,
+                 const NekDouble &time) override;
 
 private:
     PressureOutflowBC(
@@ -77,7 +77,7 @@ private:
         const Array<OneD, Array<OneD, NekDouble>> &pTraceNormals,
         const int pSpaceDim, const int bcRegion, const int cnt);
 
-    virtual ~PressureOutflowBC(void){};
+    ~PressureOutflowBC(void) override{};
 
     // Field storage for PressureOutflow
     Array<OneD, NekDouble> m_pressureStorage;

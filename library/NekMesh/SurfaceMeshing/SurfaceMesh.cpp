@@ -37,9 +37,7 @@
 #include <NekMesh/SurfaceMeshing/SurfaceMesh.h>
 
 using namespace std;
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 ModuleKey SurfaceMesh::className = GetModuleFactory().RegisterCreatorFunction(
@@ -141,5 +139,4 @@ void SurfaceMesh::Report()
     m_log(VERBOSE) << "  - Euler-Poincaré: " << ep << endl;
 }
 
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh

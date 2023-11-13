@@ -38,9 +38,7 @@
 #include "OutputFileBase.h"
 #include <tinyxml.h>
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 /// Converter from fld to pts.
@@ -55,30 +53,28 @@ public:
     static ModuleKey m_className[];
 
     OutputPts(FieldSharedPtr f);
-    virtual ~OutputPts();
+    ~OutputPts() override;
 
 protected:
-    virtual std::string v_GetModuleName() override
+    std::string v_GetModuleName() override
     {
         return "OutputPts";
     }
 
     /// Write from pts to output file.
-    virtual void v_OutputFromPts(po::variables_map &vm) override;
+    void v_OutputFromPts(po::variables_map &vm) override;
 
     /// Write from m_exp to output file.
-    virtual void v_OutputFromExp(po::variables_map &vm) override;
+    void v_OutputFromExp(po::variables_map &vm) override;
 
     /// Write from data to output file.
-    virtual void v_OutputFromData(po::variables_map &vm) override;
+    void v_OutputFromData(po::variables_map &vm) override;
 
-    virtual fs::path v_GetPath(std::string &filename,
-                               po::variables_map &vm) override;
+    fs::path v_GetPath(std::string &filename, po::variables_map &vm) override;
 
-    virtual fs::path v_GetFullOutName(std::string &filename,
-                                      po::variables_map &vm) override;
+    fs::path v_GetFullOutName(std::string &filename,
+                              po::variables_map &vm) override;
 };
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils
 
 #endif

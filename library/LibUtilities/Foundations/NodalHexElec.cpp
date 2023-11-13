@@ -34,9 +34,7 @@
 
 #include <LibUtilities/Foundations/NodalHexElec.h>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 bool NodalHexElec::initPointsManager[] = {PointsManager().RegisterCreator(
     PointsKey(0, eNodalHexElec), NodalHexElec::Create)};
@@ -98,5 +96,4 @@ std::shared_ptr<PointsBaseType> NodalHexElec::Create(const PointsKey &key)
     returnval->Initialize();
     return returnval;
 }
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities

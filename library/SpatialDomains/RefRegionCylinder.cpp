@@ -36,9 +36,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace SpatialDomains
+namespace Nektar::SpatialDomains
 {
 
 RefRegionCylinder::RefRegionCylinder(const unsigned int coordim,
@@ -171,5 +169,4 @@ bool RefRegionCylinder::v_Contains(const Array<OneD, NekDouble> &coords)
     }
 }
 
-} // namespace SpatialDomains
-} // namespace Nektar
+} // namespace Nektar::SpatialDomains

@@ -55,9 +55,7 @@
 
 namespace po = boost::program_options;
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 /**
  * Denotes different types of mesh converter modules: so far only
@@ -335,7 +333,6 @@ typedef LibUtilities::NekFactory<ModuleKey, Module, FieldSharedPtr>
 
 FIELD_UTILS_EXPORT ModuleFactory &GetModuleFactory();
 
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils
 
 #endif

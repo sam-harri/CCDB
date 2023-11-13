@@ -39,9 +39,7 @@
 #include <LibUtilities/BasicUtils/FileSystem.h>
 #include <LibUtilities/BasicUtils/H5.h>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 namespace H5
@@ -100,14 +98,14 @@ public:
 
 protected:
     /// Add a child node.
-    TagWriterSharedPtr v_AddChild(const std::string &name)
+    TagWriterSharedPtr v_AddChild(const std::string &name) override
     {
         H5::GroupSharedPtr child = m_Group->CreateGroup(name);
         return TagWriterSharedPtr(new H5TagWriter(child));
     }
 
     /// Set an attribute key/value pair on this tag.
-    void v_SetAttr(const std::string &key, const std::string &val)
+    void v_SetAttr(const std::string &key, const std::string &val) override
     {
         m_Group->SetAttribute(key, val);
     }
@@ -216,19 +214,19 @@ public:
     LIB_UTILITIES_EXPORT FieldIOHdf5(LibUtilities::CommSharedPtr pComm,
                                      bool sharedFilesystem);
 
-    LIB_UTILITIES_EXPORT virtual ~FieldIOHdf5()
+    LIB_UTILITIES_EXPORT ~FieldIOHdf5() override
     {
     }
 
 protected:
-    LIB_UTILITIES_EXPORT virtual void v_Write(
+    LIB_UTILITIES_EXPORT void v_Write(
         const std::string &outFile,
         std::vector<FieldDefinitionsSharedPtr> &fielddefs,
         std::vector<std::vector<NekDouble>> &fielddata,
         const FieldMetaDataMap &fieldinfomap = NullFieldMetaDataMap,
         const bool backup                    = false) override;
 
-    LIB_UTILITIES_EXPORT virtual void v_Import(
+    LIB_UTILITIES_EXPORT void v_Import(
         const std::string &infilename,
         std::vector<FieldDefinitionsSharedPtr> &fielddefs,
         std::vector<std::vector<NekDouble>> &fielddata =
@@ -236,11 +234,11 @@ protected:
         FieldMetaDataMap &fieldinfomap     = NullFieldMetaDataMap,
         const Array<OneD, int> &ElementIDs = NullInt1DArray) override;
 
-    LIB_UTILITIES_EXPORT virtual DataSourceSharedPtr v_ImportFieldMetaData(
-        const std::string &filename,
-        FieldMetaDataMap &fieldmetadatamap) override;
+    LIB_UTILITIES_EXPORT DataSourceSharedPtr
+    v_ImportFieldMetaData(const std::string &filename,
+                          FieldMetaDataMap &fieldmetadatamap) override;
 
-    virtual const std::string &v_GetClassName() const override;
+    const std::string &v_GetClassName() const override;
 
 private:
     struct OffsetHelper
@@ -273,6 +271,5 @@ private:
         const FieldDefinitionsSharedPtr fielddef,
         std::vector<NekDouble> &fielddata);
 };
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities
 #endif

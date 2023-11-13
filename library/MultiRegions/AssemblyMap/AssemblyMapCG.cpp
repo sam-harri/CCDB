@@ -48,9 +48,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 /**
  * @class AssemblyMapCG
@@ -2956,5 +2954,4 @@ const Array<OneD, const int> &AssemblyMapCG::v_GetExtraDirEdges()
 {
     return m_extraDirEdges;
 }
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions

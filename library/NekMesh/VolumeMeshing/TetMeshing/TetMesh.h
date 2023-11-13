@@ -42,9 +42,7 @@
 
 #include <NekMesh/ExtLibInterface/TetGenInterface.h>
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 /**
@@ -86,7 +84,6 @@ private:
 
 typedef std::shared_ptr<TetMesh> TetMeshSharedPtr;
 
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh
 
 #endif

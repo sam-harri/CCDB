@@ -54,9 +54,7 @@
 
 namespace po = boost::program_options;
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 struct Field
@@ -989,7 +987,6 @@ private:
 };
 
 typedef std::shared_ptr<Field> FieldSharedPtr;
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils
 
 #endif

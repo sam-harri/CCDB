@@ -37,9 +37,7 @@
 #include <LibUtilities/Foundations/NodalTetEvenlySpaced.h>
 #include <vector>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 bool NodalTetEvenlySpaced::initPointsManager[] = {
     PointsManager().RegisterCreator(PointsKey(0, eNodalTetEvenlySpaced),
@@ -405,5 +403,4 @@ std::shared_ptr<PointsBaseType> NodalTetEvenlySpaced::Create(
     return returnval;
 }
 
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities

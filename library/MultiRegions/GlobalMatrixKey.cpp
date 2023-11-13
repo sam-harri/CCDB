@@ -36,9 +36,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 GlobalMatrixKey::GlobalMatrixKey(const StdRegions::MatrixType matrixType,
                                  const AssemblyMapSharedPtr &locToGloMap,
@@ -171,5 +169,4 @@ std::ostream &operator<<(std::ostream &os, const GlobalMatrixKey &rhs)
 
     return os;
 }
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions

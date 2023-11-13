@@ -41,9 +41,7 @@
 #include <LibUtilities/BasicConst/NektarUnivTypeDefs.hpp>
 #include <LibUtilities/BasicUtils/ShapeType.hpp>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 // set restriction on domain range for post-processing.
@@ -66,7 +64,5 @@ struct DomainRange
 typedef std::shared_ptr<DomainRange> DomainRangeShPtr;
 static DomainRangeShPtr NullDomainRangeShPtr;
 
-} // namespace LibUtilities
-
-} // namespace Nektar
+} // namespace Nektar::LibUtilities
 #endif

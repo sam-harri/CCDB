@@ -42,9 +42,7 @@ using namespace std;
 
 #include "ProcessConcatenateFld.h"
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 ModuleKey ProcessConcatenateFld::className =
@@ -71,5 +69,4 @@ void ProcessConcatenateFld::v_Process(po::variables_map &vm)
              << "\tFieldConvert file1.fld file2.fld file-conc.fld" << endl;
     }
 }
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

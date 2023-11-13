@@ -37,9 +37,7 @@
 #include <LibUtilities/Foundations/ManagerAccess.h> // for PointsManager, etc
 #include <StdRegions/StdNodalTetExp.h>
 
-namespace Nektar
-{
-namespace StdRegions
+namespace Nektar::StdRegions
 {
 StdNodalTetExp::StdNodalTetExp()
 {
@@ -392,5 +390,4 @@ DNekMatSharedPtr StdNodalTetExp::v_CreateStdMatrix(const StdMatrixKey &mkey)
 {
     return StdNodalTetExp::v_GenMatrix(mkey);
 }
-} // namespace StdRegions
-} // namespace Nektar
+} // namespace Nektar::StdRegions

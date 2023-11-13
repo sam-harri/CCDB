@@ -43,9 +43,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 LibUtilities::ShapeType Prism::m_type =
@@ -231,12 +229,18 @@ unsigned int Prism::GetNumNodes(ElmtConfig pConf)
 {
     int n = pConf.m_order;
     if (pConf.m_faceNodes && pConf.m_volumeNodes)
+    {
         return (n + 1) * (n + 1) * (n + 2) / 2;
+    }
     else if (pConf.m_faceNodes && !pConf.m_volumeNodes)
+    {
         return 3 * (n + 1) * (n + 1) + 2 * (n + 1) * (n + 2) / 2 - 9 * (n + 1) +
                6;
+    }
     else
+    {
         return 9 * (n + 1) - 12;
+    }
 }
 
 SpatialDomains::GeometrySharedPtr Prism::GetGeom(int coordDim)
@@ -567,5 +571,4 @@ void Prism::OrientPrism()
         cerr << "Warning: possible prism orientation problem." << endl;
     }
 }
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh

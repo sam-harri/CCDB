@@ -39,9 +39,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 /**
  * Registers the class with the Factory.
@@ -109,5 +107,4 @@ void PreconditionerLinearWithBlock::v_DoPreconditioner(
                                                         OutputBlock);
 }
 
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions

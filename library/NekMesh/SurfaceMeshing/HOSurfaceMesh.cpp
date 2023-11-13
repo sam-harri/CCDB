@@ -45,9 +45,7 @@
 #include <LocalRegions/MatrixKey.h>
 
 using namespace std;
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 ModuleKey HOSurfaceMesh::className = GetModuleFactory().RegisterCreatorFunction(
@@ -104,7 +102,9 @@ void HOSurfaceMesh::Process()
     {
         vector<EdgeSharedPtr> es = m_mesh->m_element[2][i]->GetEdgeList();
         for (int j = 0; j < es.size(); j++)
+        {
             surfaceEdges.insert(es[j]);
+        }
     }
 
     for (int i = 0; i < m_mesh->m_element[2].size(); i++)
@@ -522,5 +522,4 @@ void HOSurfaceMesh::Process()
 
     m_log(VERBOSE).Newline();
 }
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh

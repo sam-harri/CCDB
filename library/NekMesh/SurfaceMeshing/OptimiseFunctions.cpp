@@ -36,9 +36,7 @@
 #include <NekMesh/SurfaceMeshing/OptimiseFunctions.h>
 
 using namespace std;
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 NekDouble Dot(Array<OneD, NekDouble> a, Array<OneD, NekDouble> b)
@@ -358,5 +356,4 @@ void OptiEdge::Update(Array<OneD, NekDouble> xinew)
         }
     }
 }
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh

@@ -44,9 +44,7 @@
 
 class TiXmlElement;
 
-namespace Nektar
-{
-namespace SpatialDomains
+namespace Nektar::SpatialDomains
 {
 class MeshPartition;
 
@@ -174,7 +172,6 @@ protected:
 
 typedef std::shared_ptr<MeshPartition> MeshPartitionSharedPtr;
 
-} // namespace SpatialDomains
-} // namespace Nektar
+} // namespace Nektar::SpatialDomains
 
 #endif

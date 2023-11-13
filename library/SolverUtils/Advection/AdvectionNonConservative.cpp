@@ -36,9 +36,7 @@
 
 #include <SolverUtils/Advection/AdvectionNonConservative.h>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 std::string AdvectionNonConservative::type =
     GetAdvectionFactory().RegisterCreatorFunction(
@@ -130,5 +128,4 @@ void AdvectionNonConservative::v_Advect(
         }
     }
 }
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils

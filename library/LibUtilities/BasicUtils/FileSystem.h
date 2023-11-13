@@ -41,12 +41,9 @@
 
 namespace fs = boost::filesystem;
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 LIB_UTILITIES_EXPORT std::string PortablePath(
     const boost::filesystem::path &path);
-}
-} // namespace Nektar
+} // namespace Nektar::LibUtilities
 #endif

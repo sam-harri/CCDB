@@ -37,9 +37,7 @@
 
 #include <LibUtilities/BasicUtils/NekInline.hpp>
 
-namespace Nektar
-{
-namespace MatrixFree
+namespace Nektar::MatrixFree
 {
 
 using namespace tinysimd;
@@ -629,7 +627,6 @@ NEK_FORCE_INLINE static void BwdTrans3DKernel(
 
 #endif // SHAPE_DIMENSION
 
-} // namespace MatrixFree
-} // namespace Nektar
+} // namespace Nektar::MatrixFree
 
 #endif

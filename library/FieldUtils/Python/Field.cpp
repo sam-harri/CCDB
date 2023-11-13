@@ -61,7 +61,7 @@ char **ConvertCommandLine(py::list &py_argv)
         p += tmp.size() + 1;
     }
 
-    argv[argc] = NULL;
+    argv[argc] = nullptr;
     return argv;
 }
 

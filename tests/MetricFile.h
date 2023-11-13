@@ -43,7 +43,7 @@ namespace Nektar
 class MetricFile : public Metric
 {
 public:
-    virtual ~MetricFile()
+    ~MetricFile() override
     {
     }
 
@@ -59,8 +59,8 @@ protected:
 
     std::string CalculateHash(std::string filename);
 
-    virtual bool v_Test(std::istream &pStdout, std::istream &pStderr);
-    virtual void v_Generate(std::istream &pStdout, std::istream &pStderr);
+    bool v_Test(std::istream &pStdout, std::istream &pStderr) override;
+    void v_Generate(std::istream &pStdout, std::istream &pStderr) override;
 
     /// Stores filenames to perform hash on.
     std::map<std::string, std::string> m_filehash;

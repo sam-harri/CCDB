@@ -48,9 +48,7 @@ using namespace std;
 
 #include "ProcessQualityMetric.h"
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 ModuleKey ProcessQualityMetric::className =
@@ -564,5 +562,4 @@ Array<OneD, NekDouble> ProcessQualityMetric::GetQ(
 
     return eta;
 }
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

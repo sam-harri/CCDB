@@ -46,9 +46,7 @@ using namespace std;
 #include "ProcessCFL.h"
 #include "ProcessMapping.h"
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 ModuleKey ProcessCFL::className = GetModuleFactory().RegisterCreatorFunction(
@@ -275,5 +273,4 @@ Array<OneD, NekDouble> ProcessCFL::GetMaxStdVelocity(
 
     return maxV;
 }
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

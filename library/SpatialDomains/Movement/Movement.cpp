@@ -43,9 +43,7 @@
 #include <SpatialDomains/Movement/Movement.h>
 #include <tinyxml.h>
 
-namespace Nektar
-{
-namespace SpatialDomains
+namespace Nektar::SpatialDomains
 {
 
 std::string static inline ReadTag(std::string &tagStr)
@@ -408,7 +406,9 @@ void Movement::ReadInterfaces(TiXmlElement *interfacesTag, MeshGraph *meshGraph)
 void Movement::WriteMovement(TiXmlElement *root)
 {
     if (m_zones.size() == 0 && m_interfaces.size() == 0)
+    {
         return;
+    }
     TiXmlElement *movement = new TiXmlElement("MOVEMENT");
     root->LinkEndChild(movement);
 
@@ -534,7 +534,9 @@ void Movement::AddZone(ZoneBaseShPtr zone)
     m_zones[zone->GetId()] = zone;
     MovementType mtype     = zone->GetMovementType();
     if (mtype != MovementType::eFixed && mtype != MovementType::eNone)
+    {
         m_moveFlag = true;
+    }
 }
 
 /// Store an interface pair with this Movement data
@@ -546,5 +548,4 @@ void Movement::AddInterface(std::string name, InterfaceShPtr left,
             MemoryManager<InterfacePair>::AllocateSharedPtr(left, right));
 }
 
-} // namespace SpatialDomains
-} // namespace Nektar
+} // namespace Nektar::SpatialDomains

@@ -35,9 +35,7 @@
 #include <GlobalMapping/MappingXYofXY.h>
 #include <MultiRegions/ExpList.h>
 
-namespace Nektar
-{
-namespace GlobalMapping
+namespace Nektar::GlobalMapping
 {
 
 std::string MappingXYofXY::className =
@@ -484,5 +482,4 @@ void MappingXYofXY::CalculateChristoffel()
     m_fields[0]->SetWaveSpace(waveSpace);
 }
 
-} // namespace GlobalMapping
-} // namespace Nektar
+} // namespace Nektar::GlobalMapping

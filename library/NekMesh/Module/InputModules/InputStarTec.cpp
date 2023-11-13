@@ -46,9 +46,7 @@ using namespace std;
 using namespace Nektar::NekMesh;
 namespace io = boost::iostreams;
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 ModuleKey InputTec::className = GetModuleFactory().RegisterCreatorFunction(
@@ -1095,5 +1093,4 @@ Array<OneD, int> InputTec::SortFaceNodes(vector<NodeSharedPtr> &Vnodes,
 
     return returnval;
 }
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh

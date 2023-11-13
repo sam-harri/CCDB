@@ -53,9 +53,7 @@ typedef bg::model::box<point> box;
 typedef std::pair<box, unsigned int> boxI;
 
 using namespace std;
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 inline box GetBox(ElementSharedPtr el, NekDouble ov)
@@ -295,7 +293,9 @@ void BLMesh::GrowLayers()
                     }
                 }
                 if (hit)
+                {
                     break;
+                }
             }
         }
 
@@ -1167,5 +1167,4 @@ void BLMesh::Setup()
     m_deriv[1] = *nodalPrism.GetVandermondeForDeriv(1) * VandermondeI;
     m_deriv[2] = *nodalPrism.GetVandermondeForDeriv(2) * VandermondeI;
 }
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh

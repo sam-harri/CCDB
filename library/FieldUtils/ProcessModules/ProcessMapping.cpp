@@ -42,9 +42,7 @@ using namespace std;
 
 #include "ProcessMapping.h"
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 ModuleKey ProcessMapping::className =
     GetModuleFactory().RegisterCreatorFunction(
@@ -319,5 +317,4 @@ GlobalMapping::MappingSharedPtr ProcessMapping::GetMapping(FieldSharedPtr f)
 
     return mapping;
 }
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

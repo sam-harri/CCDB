@@ -44,9 +44,7 @@
 
 #include <cmath>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1090,5 +1088,4 @@ std::ostream &operator<<(std::ostream &os,
     return os;
 } // end function operator<<
 
-} // end namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities

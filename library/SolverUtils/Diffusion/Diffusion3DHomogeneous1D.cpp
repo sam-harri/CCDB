@@ -40,9 +40,7 @@ using namespace std;
 
 #include <SolverUtils/Diffusion/Diffusion3DHomogeneous1D.h>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 std::string Diffusion3DHomogeneous1D::type[] = {
     GetDiffusionFactory().RegisterCreatorFunction(
@@ -301,5 +299,4 @@ void Diffusion3DHomogeneous1D::v_Diffuse(
         }
     }
 }
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils

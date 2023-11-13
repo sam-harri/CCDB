@@ -37,9 +37,7 @@
 #include <MultiRegions/ExpList.h>
 #include <SolverUtils/SolverUtilsDeclspec.h>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 
 class Coupling;
@@ -141,7 +139,6 @@ protected:
     SOLVER_UTILS_EXPORT std::vector<int> GenerateVariableMapping(
         std::vector<std::string> &vars, std::vector<std::string> &transVars);
 };
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils
 
 #endif

@@ -39,9 +39,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace LocalRegions
+namespace Nektar::LocalRegions
 {
 
 DNekMatSharedPtr Expansion1D::v_GenMatrix(const StdRegions::StdMatrixKey &mkey)
@@ -527,5 +525,4 @@ void Expansion1D::v_TraceNormLen(const int traceid, NekDouble &h, NekDouble &p)
     p = m_ncoeffs - 1;
 }
 
-} // namespace LocalRegions
-} // namespace Nektar
+} // namespace Nektar::LocalRegions

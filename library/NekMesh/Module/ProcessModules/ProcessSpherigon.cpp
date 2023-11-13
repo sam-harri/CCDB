@@ -57,9 +57,7 @@ using namespace Nektar::NekMesh;
 
 #define TOL_BLEND 1.0e-8
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 ModuleKey ProcessSpherigon::className =
     GetModuleFactory().RegisterCreatorFunction(
@@ -998,5 +996,4 @@ void ProcessSpherigon::Process()
         m_mesh->m_vertexNormals.clear();
     }
 }
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh

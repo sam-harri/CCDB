@@ -48,9 +48,7 @@
 #include <LibUtilities/TimeIntegration/IMEXGearTimeIntegrationScheme.h>
 #include <LibUtilities/TimeIntegration/IMEXdirkTimeIntegrationSchemes.h>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -167,7 +165,7 @@ public:
         }
     }
 
-    virtual ~IMEXTimeIntegrationScheme()
+    ~IMEXTimeIntegrationScheme() override
     {
     }
 
@@ -252,7 +250,9 @@ public:
         for (size_t n = 1; n < 2 * phase->m_order; ++n)
         {
             if (n != phase->m_order)
+            {
                 phase->m_V[n][n - 1] = 1.0; // constant 1
+            }
         }
 
         phase->m_numMultiStepValues         = phase->m_order;
@@ -272,17 +272,17 @@ public:
     }
 
 protected:
-    LUE virtual std::string v_GetFullName() const override
+    LUE std::string v_GetFullName() const override
     {
         return m_integration_phases.back()->m_name;
     }
 
-    LUE virtual std::string v_GetName() const override
+    LUE std::string v_GetName() const override
     {
         return std::string("IMEX");
     }
 
-    LUE virtual NekDouble v_GetTimeStability() const override
+    LUE NekDouble v_GetTimeStability() const override
     {
         return 1.0;
     }
@@ -411,7 +411,6 @@ protected:
 
 }; // end class IMEXOrder4TimeIntegrationScheme
 
-} // end namespace LibUtilities
-} // end namespace Nektar
+} // namespace Nektar::LibUtilities
 
 #endif

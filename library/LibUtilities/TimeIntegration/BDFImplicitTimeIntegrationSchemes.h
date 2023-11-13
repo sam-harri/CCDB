@@ -47,9 +47,7 @@
 
 #include <LibUtilities/TimeIntegration/DIRKTimeIntegrationSchemes.h>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -77,8 +75,10 @@ public:
 
         // Next to last phase
         if (order > 1)
+        {
             BDFImplicitTimeIntegrationScheme::SetupSchemeData(
                 m_integration_phases[order - 2], order - 1);
+        }
 
         // Last phase
         BDFImplicitTimeIntegrationScheme::SetupSchemeData(
@@ -117,7 +117,7 @@ public:
         }
     }
 
-    virtual ~BDFImplicitTimeIntegrationScheme()
+    ~BDFImplicitTimeIntegrationScheme() override
     {
     }
 
@@ -207,12 +207,12 @@ public:
     }
 
 protected:
-    LUE virtual std::string v_GetName() const override
+    LUE std::string v_GetName() const override
     {
         return std::string("BDFImplicit");
     }
 
-    LUE virtual NekDouble v_GetTimeStability() const override
+    LUE NekDouble v_GetTimeStability() const override
     {
         return 1.0;
     }
@@ -345,7 +345,6 @@ protected:
 
 }; // end class BDFImplicitOrder4TimeIntegrationScheme
 
-} // end namespace LibUtilities
-} // end namespace Nektar
+} // namespace Nektar::LibUtilities
 
 #endif

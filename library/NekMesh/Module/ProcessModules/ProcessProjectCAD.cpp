@@ -45,9 +45,7 @@
 using namespace std;
 using namespace Nektar::NekMesh;
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 const NekDouble prismU1[6] = {-1.0, 1.0, 1.0, -1.0, -1.0, -1.0};
@@ -655,5 +653,4 @@ void ProcessProjectCAD::Process()
         }
     }
 }
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh

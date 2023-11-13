@@ -44,9 +44,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 LibUtilities::ShapeType Tetrahedron::m_type =
@@ -340,11 +338,17 @@ unsigned int Tetrahedron::GetNumNodes(ElmtConfig pConf)
 {
     int n = pConf.m_order;
     if (pConf.m_volumeNodes && pConf.m_faceNodes)
+    {
         return (n + 1) * (n + 2) * (n + 3) / 6;
+    }
     else if (!pConf.m_volumeNodes && pConf.m_faceNodes)
+    {
         return 4 * (n + 1) * (n + 2) / 2 - 6 * (n + 1) + 4;
+    }
     else
+    {
         return 6 * (n + 1) - 8;
+    }
 }
 
 void Tetrahedron::GetCurvedNodes(std::vector<NodeSharedPtr> &nodeList) const
@@ -581,5 +585,4 @@ void Tetrahedron::OrientTet()
         }
     }
 }
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh

@@ -37,9 +37,7 @@
 
 #include <NekMesh/Module/Module.h>
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 /**
@@ -49,8 +47,8 @@ class InputNekpp : public NekMesh::InputModule
 {
 public:
     InputNekpp(NekMesh::MeshSharedPtr m);
-    virtual ~InputNekpp();
-    virtual void Process();
+    ~InputNekpp() override;
+    void Process() override;
 
     /// Creates an instance of this class
     static NekMesh::ModuleSharedPtr create(NekMesh::MeshSharedPtr m)
@@ -60,12 +58,11 @@ public:
     /// %ModuleKey for class.
     static NekMesh::ModuleKey className;
 
-    virtual std::string GetModuleName()
+    std::string GetModuleName() override
     {
         return "InputNekpp";
     }
 };
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh
 
 #endif

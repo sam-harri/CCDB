@@ -190,7 +190,7 @@ NekMatrix<NekMatrix<DataType, InnerMatrixType>, BlockMatrixTag>::GetBlockPtr(
     int x = CalculateBlockIndex(row, column);
     if (x == -1)
     {
-        return 0;
+        return nullptr;
     }
     else
     {
@@ -530,7 +530,7 @@ void NekMatrix<NekMatrix<DataType, InnerMatrixType>,
 {
     for (auto &ptr : m_data)
     {
-        if (ptr.get() != 0)
+        if (ptr.get() != nullptr)
         {
             ptr->Transpose();
         }

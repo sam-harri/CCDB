@@ -37,9 +37,7 @@
 
 #include <NekMesh/Module/Module.h>
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 /// Converter for Swansea mesh format.
@@ -54,17 +52,16 @@ public:
     static NekMesh::ModuleKey className;
 
     InputSwan(NekMesh::MeshSharedPtr m);
-    virtual ~InputSwan();
+    ~InputSwan() override;
 
     /// Populate and validate required data structures.
-    virtual void Process();
+    void Process() override;
 
-    virtual std::string GetModuleName()
+    std::string GetModuleName() override
     {
         return "InputSwan";
     }
 };
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh
 
 #endif

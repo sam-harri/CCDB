@@ -41,9 +41,7 @@
 
 #include <LibUtilities/TimeIntegration/TimeIntegrationSchemeSDC.h>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 class ImplicitTimeIntegrationSchemeSDC : public TimeIntegrationSchemeSDC
 {
@@ -75,19 +73,17 @@ public:
     DoubleArray m_tmp; /// Array for temporary storage
 
 protected:
-    LUE virtual void v_InitializeScheme(
+    LUE void v_InitializeScheme(
         const NekDouble deltaT, ConstDoubleArray &y_0, const NekDouble time,
         const TimeIntegrationSchemeOperators &op) override;
 
-    LUE virtual void v_ResidualEval(const NekDouble &delta_t,
-                                    const size_t n) override;
+    LUE void v_ResidualEval(const NekDouble &delta_t, const size_t n) override;
 
-    LUE virtual void v_ResidualEval(const NekDouble &delta_t) override;
+    LUE void v_ResidualEval(const NekDouble &delta_t) override;
 
-    LUE virtual void v_ComputeInitialGuess(const NekDouble &delta_t) override;
+    LUE void v_ComputeInitialGuess(const NekDouble &delta_t) override;
 
-    LUE virtual void v_SDCIterationLoop(const NekDouble &delta_t) override;
-
+    LUE void v_SDCIterationLoop(const NekDouble &delta_t) override;
 }; // end class ImplicitTimeIntegrationSchemeSDC
 
 /**
@@ -207,7 +203,6 @@ void ImplicitTimeIntegrationSchemeSDC::v_SDCIterationLoop(
     }
 }
 
-} // end namespace LibUtilities
-} // end namespace Nektar
+} // namespace Nektar::LibUtilities
 
 #endif

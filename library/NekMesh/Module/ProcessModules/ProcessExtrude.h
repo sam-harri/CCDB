@@ -37,9 +37,7 @@
 
 #include <NekMesh/Module/Module.h>
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 /**
  * @brief This processing module extrudes a 2d mesh in the z direction
@@ -55,16 +53,15 @@ public:
     static NekMesh::ModuleKey className;
 
     ProcessExtrude(NekMesh::MeshSharedPtr m);
-    virtual ~ProcessExtrude();
+    ~ProcessExtrude() override;
 
-    virtual void Process();
+    void Process() override;
 
-    virtual std::string GetModuleName()
+    std::string GetModuleName() override
     {
         return "ProcessExtrude";
     }
 };
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh
 
 #endif

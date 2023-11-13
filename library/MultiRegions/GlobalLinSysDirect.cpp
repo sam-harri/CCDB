@@ -36,9 +36,7 @@
 
 #include <MultiRegions/GlobalLinSysDirect.h>
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 /**
  * @class GlobalLinSysDirect
@@ -58,5 +56,4 @@ GlobalLinSysDirect::~GlobalLinSysDirect()
 {
 }
 
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions

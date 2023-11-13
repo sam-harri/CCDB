@@ -37,9 +37,7 @@
 
 #include "ProcessBoundaryExtract.h"
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 /**
@@ -57,7 +55,7 @@ public:
     static ModuleKey className;
 
     ProcessWallNormalData(FieldSharedPtr f);
-    virtual ~ProcessWallNormalData();
+    ~ProcessWallNormalData() override;
 
     /**
      * @brief Get the normals for a given locCoord
@@ -71,14 +69,14 @@ public:
 
 protected:
     /// Write mesh to output file.
-    virtual void v_Process(po::variables_map &vm) override;
+    void v_Process(po::variables_map &vm) override;
 
-    virtual std::string v_GetModuleName() override
+    std::string v_GetModuleName() override
     {
         return "ProcessWallNormalData";
     }
 
-    virtual std::string v_GetModuleDescription() override
+    std::string v_GetModuleDescription() override
     {
         return "Get the wall-normal data at a given origin.";
     }
@@ -193,7 +191,6 @@ private:
                               const NekDouble maxDist = 1.0,
                               const NekDouble iterTol = 1.0e-8);
 };
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils
 
 #endif

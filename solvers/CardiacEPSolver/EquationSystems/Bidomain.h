@@ -64,14 +64,14 @@ public:
     static std::string className;
 
     /// Desctructor
-    virtual ~Bidomain();
+    ~Bidomain() override;
 
 protected:
     /// Constructor
     Bidomain(const LibUtilities::SessionReaderSharedPtr &pSession,
              const SpatialDomains::MeshGraphSharedPtr &pGraph);
 
-    virtual void v_InitObject(bool DeclareField = true) override;
+    void v_InitObject(bool DeclareField = true) override;
 
     /// Solve for the diffusion term.
     void DoImplicitSolve(
@@ -85,12 +85,12 @@ protected:
                   const NekDouble time);
 
     /// Sets a custom initial condition.
-    virtual void v_SetInitialConditions(NekDouble initialtime,
-                                        bool dumpInitialConditions,
-                                        const int domain) override;
+    void v_SetInitialConditions(NekDouble initialtime,
+                                bool dumpInitialConditions,
+                                const int domain) override;
 
     /// Prints a summary of the model parameters.
-    virtual void v_GenerateSummary(SummaryList &s) override;
+    void v_GenerateSummary(SummaryList &s) override;
 
 private:
     /// Cell model.

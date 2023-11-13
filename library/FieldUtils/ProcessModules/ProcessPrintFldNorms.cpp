@@ -42,9 +42,7 @@ using namespace std;
 
 #include "ProcessPrintFldNorms.h"
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 ModuleKey ProcessPrintFldNorms::className =
@@ -85,5 +83,4 @@ void ProcessPrintFldNorms::v_Process(po::variables_map &vm)
         }
     }
 }
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

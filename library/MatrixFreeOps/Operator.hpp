@@ -45,9 +45,7 @@
 #include <LibUtilities/Foundations/Basis.h>
 #include <LibUtilities/SimdLib/tinysimd.hpp>
 
-namespace Nektar
-{
-namespace MatrixFree
+namespace Nektar::MatrixFree
 {
 
 class Operator;
@@ -102,7 +100,7 @@ public:
     {
     }
 
-    virtual ~BwdTrans() = default;
+    ~BwdTrans() override = default;
 
     MATRIXFREE_EXPORT virtual void operator()(
         const Array<OneD, const NekDouble> &input,
@@ -122,9 +120,9 @@ public:
     {
     }
 
-    virtual ~IProduct() = default;
+    ~IProduct() override = default;
 
-    bool NeedsJac() override final
+    bool NeedsJac() final
     {
         return true;
     }
@@ -149,14 +147,14 @@ public:
     {
     }
 
-    virtual ~IProductWRTDerivBase() = default;
+    ~IProductWRTDerivBase() override = default;
 
-    virtual bool NeedsDF() override final
+    bool NeedsDF() final
     {
         return true;
     }
 
-    virtual bool NeedsJac() override final
+    bool NeedsJac() final
     {
         return true;
     }
@@ -179,9 +177,9 @@ public:
     {
     }
 
-    virtual ~PhysDeriv() = default;
+    ~PhysDeriv() override = default;
 
-    virtual bool NeedsDF() override final
+    bool NeedsDF() final
     {
         return true;
     }
@@ -230,14 +228,14 @@ public:
         }
     }
 
-    virtual ~Helmholtz() = default;
+    ~Helmholtz() override = default;
 
-    virtual bool NeedsDF() override final
+    bool NeedsDF() final
     {
         return true;
     }
 
-    virtual bool NeedsJac() override final
+    bool NeedsJac() final
     {
         return true;
     }
@@ -387,16 +385,16 @@ protected:
         }
     }
 
-    void virtual SetDF(
+    void SetDF(
         const std::shared_ptr<std::vector<vec_t, tinysimd::allocator<vec_t>>>
-            &df) override final
+            &df) final
     {
         m_df = df;
     }
 
-    void virtual SetJac(
+    void SetJac(
         const std::shared_ptr<std::vector<vec_t, tinysimd::allocator<vec_t>>>
-            &jac) override final
+            &jac) final
     {
         m_jac = jac;
     }
@@ -417,7 +415,6 @@ protected:
     std::shared_ptr<std::vector<vec_t, tinysimd::allocator<vec_t>>> m_jac;
 };
 
-} // namespace MatrixFree
-} // namespace Nektar
+} // namespace Nektar::MatrixFree
 
 #endif

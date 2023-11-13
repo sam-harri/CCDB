@@ -65,7 +65,7 @@ public:
         const LibUtilities::SessionReaderSharedPtr &pSession,
         const std::weak_ptr<SolverUtils::EquationSystem> &pEquation,
         const ParamMap &pParams);
-    ~FilterCellHistoryPoints();
+    ~FilterCellHistoryPoints() override;
 
     void SetCellModel(CellModelSharedPtr &pCellModel)
     {
@@ -73,7 +73,7 @@ public:
     }
 
 protected:
-    virtual void v_Update(
+    void v_Update(
         const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
         const NekDouble &time) override;
     virtual void v_WriteData(const int &rank,

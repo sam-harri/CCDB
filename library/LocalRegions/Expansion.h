@@ -44,9 +44,7 @@
 #include <memory>
 #include <vector>
 
-namespace Nektar
-{
-namespace LocalRegions
+namespace Nektar::LocalRegions
 {
 
 class Expansion;
@@ -76,7 +74,7 @@ public:
     LOCAL_REGIONS_EXPORT Expansion(
         SpatialDomains::GeometrySharedPtr pGeom); // default constructor.
     LOCAL_REGIONS_EXPORT Expansion(const Expansion &pSrc); // copy constructor.
-    LOCAL_REGIONS_EXPORT virtual ~Expansion();
+    LOCAL_REGIONS_EXPORT ~Expansion() override;
 
     LOCAL_REGIONS_EXPORT void SetTraceExp(const int traceid,
                                           ExpansionSharedPtr &f);
@@ -302,7 +300,7 @@ protected:
     Array<OneD, NekDouble> GetMFMag(const int dir,
                                     const StdRegions::VarCoeffMap &varcoeffs);
 
-    virtual void v_MultiplyByQuadratureMetric(
+    void v_MultiplyByQuadratureMetric(
         const Array<OneD, const NekDouble> &inarray,
         Array<OneD, NekDouble> &outarray) override;
 
@@ -314,14 +312,14 @@ protected:
     {
     }
 
-    virtual int v_GetCoordim() const override
+    int v_GetCoordim() const override
     {
         return m_geom->GetCoordim();
     }
 
-    virtual void v_GetCoords(Array<OneD, NekDouble> &coords_1,
-                             Array<OneD, NekDouble> &coords_2,
-                             Array<OneD, NekDouble> &coords_3) override;
+    void v_GetCoords(Array<OneD, NekDouble> &coords_1,
+                     Array<OneD, NekDouble> &coords_2,
+                     Array<OneD, NekDouble> &coords_3) override;
 
     virtual DNekScalMatSharedPtr v_GetLocMatrix(
         const LocalRegions::MatrixKey &mkey);
@@ -372,9 +370,9 @@ protected:
 
     virtual StdRegions::Orientation v_GetTraceOrient(int trace);
 
-    virtual void v_SetCoeffsToOrientation(
-        StdRegions::Orientation dir, Array<OneD, const NekDouble> &inarray,
-        Array<OneD, NekDouble> &outarray) override;
+    void v_SetCoeffsToOrientation(StdRegions::Orientation dir,
+                                  Array<OneD, const NekDouble> &inarray,
+                                  Array<OneD, NekDouble> &outarray) override;
 
     virtual void v_GetTraceQFactors(const int trace,
                                     Array<OneD, NekDouble> &outarray);
@@ -478,7 +476,6 @@ inline void Expansion::SetAdjacentElementExp(int traceid,
     }
 }
 
-} // namespace LocalRegions
-} // namespace Nektar
+} // namespace Nektar::LocalRegions
 
 #endif

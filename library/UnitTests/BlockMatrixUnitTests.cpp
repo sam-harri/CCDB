@@ -38,9 +38,7 @@
 #include <boost/test/unit_test.hpp>
 #include <iostream>
 
-namespace Nektar
-{
-namespace BlockMatrixUnitTests
+namespace Nektar::BlockMatrixUnitTests
 {
 BOOST_AUTO_TEST_CASE(TestEqualSizedBlockConstruction)
 {
@@ -500,5 +498,4 @@ BOOST_AUTO_TEST_CASE(TestEmptyRowElementMultiplication)
     BOOST_CHECK_EQUAL(result1, expected_result);
 }
 
-} // namespace BlockMatrixUnitTests
-} // namespace Nektar
+} // namespace Nektar::BlockMatrixUnitTests

@@ -41,9 +41,7 @@ using namespace std;
 #include <LibUtilities/BasicUtils/SharedArray.hpp>
 #include <LibUtilities/BasicUtils/Timer.h>
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 ModuleKey ProcessCreateExp::className =
@@ -260,5 +258,4 @@ void ProcessCreateExp::LoadFieldData(bool useSessionVariables)
     m_f->m_data     = vector<std::vector<NekDouble>>();
 }
 
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

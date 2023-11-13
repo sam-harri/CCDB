@@ -38,9 +38,7 @@
 #include <boost/filesystem/fstream.hpp>
 #include <boost/test/unit_test.hpp>
 
-namespace Nektar
-{
-namespace VarcoeffHashingTest
+namespace Nektar::VarcoeffHashingTest
 {
 using namespace MultiRegions;
 
@@ -328,5 +326,4 @@ BOOST_AUTO_TEST_CASE(TestUnsetGlobalLinSys)
     // Clear for next tests
     contfield->ClearGlobalLinSysManager();
 }
-} // namespace VarcoeffHashingTest
-} // namespace Nektar
+} // namespace Nektar::VarcoeffHashingTest

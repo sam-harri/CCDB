@@ -37,9 +37,7 @@
 
 #include <NekMesh/Module/Module.h>
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 /// Converter for Gmsh files.
@@ -54,7 +52,7 @@ public:
     static NekMesh::ModuleKey className1, className2;
 
     OutputNekpp(NekMesh::MeshSharedPtr m);
-    virtual ~OutputNekpp();
+    ~OutputNekpp() override;
 
     /// Write mesh to output file.
     void Process() override;
@@ -79,7 +77,6 @@ private:
     void TransferComposites(SpatialDomains::MeshGraphSharedPtr graph);
     void TransferDomain(SpatialDomains::MeshGraphSharedPtr graph);
 };
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh
 
 #endif

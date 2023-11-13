@@ -38,9 +38,7 @@
 
 #include "ProcessBoundaryExtract.h"
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 /**
@@ -58,18 +56,18 @@ public:
     static ModuleKey className;
 
     ProcessBodyFittedVelocity(FieldSharedPtr f);
-    virtual ~ProcessBodyFittedVelocity();
+    ~ProcessBodyFittedVelocity() override;
 
 protected:
     /// Write mesh to output file.
-    virtual void v_Process(po::variables_map &vm) override;
+    void v_Process(po::variables_map &vm) override;
 
-    virtual std::string v_GetModuleName() override
+    std::string v_GetModuleName() override
     {
         return "ProcessBodyFittedVelocity";
     }
 
-    virtual std::string v_GetModuleDescription() override
+    std::string v_GetModuleDescription() override
     {
         return "Get velocity in the body-fitted coordinate system.";
     }
@@ -175,7 +173,6 @@ private:
      */
     void GetVelAndConvertToCartSys(Array<OneD, Array<OneD, NekDouble>> &vel);
 };
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils
 
 #endif

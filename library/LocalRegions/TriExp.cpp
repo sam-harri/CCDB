@@ -42,9 +42,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace LocalRegions
+namespace Nektar::LocalRegions
 {
 TriExp::TriExp(const LibUtilities::BasisKey &Ba,
                const LibUtilities::BasisKey &Bb,
@@ -1633,5 +1631,4 @@ void TriExp::v_NormalTraceDerivFactors(
         }
     }
 }
-} // namespace LocalRegions
-} // namespace Nektar
+} // namespace Nektar::LocalRegions

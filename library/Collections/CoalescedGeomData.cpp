@@ -38,9 +38,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace Collections
+namespace Nektar::Collections
 {
 
 const Array<OneD, const NekDouble> &CoalescedGeomData::GetJac(
@@ -367,5 +365,4 @@ bool CoalescedGeomData::IsDeformed(
     return lep->GetMetricInfo()->GetGtype() == SpatialDomains::eDeformed;
 }
 
-} // namespace Collections
-} // namespace Nektar
+} // namespace Nektar::Collections

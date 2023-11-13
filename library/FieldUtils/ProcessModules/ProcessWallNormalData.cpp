@@ -44,9 +44,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 ModuleKey ProcessWallNormalData::className =
@@ -1016,5 +1014,4 @@ void ProcessWallNormalData::GetNormals(
     }
 }
 
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

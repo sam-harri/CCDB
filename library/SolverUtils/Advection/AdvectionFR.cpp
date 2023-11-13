@@ -51,9 +51,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 std::string AdvectionFR::type[] = {
     GetAdvectionFactory().RegisterCreatorFunction("FRDG", AdvectionFR::create),
@@ -1661,5 +1659,4 @@ void AdvectionFR::DivCFlux_3D(
                          numericalFlux, divCFlux);
 }
 
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils

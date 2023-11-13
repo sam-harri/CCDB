@@ -79,7 +79,7 @@ SessionReaderSharedPtr SessionReader_CreateInstance(py::list &ns)
 
     // Also make sure we set argv[argc] = NULL otherwise OpenMPI will also
     // segfault.
-    argv[argc] = NULL;
+    argv[argc] = nullptr;
 
 #ifdef NEKTAR_USE_MPI
     // In the case we're using MPI, it may already have been initialised. So to

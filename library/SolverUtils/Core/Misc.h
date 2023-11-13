@@ -40,9 +40,7 @@
 #include <LibUtilities/BasicConst/NektarUnivTypeDefs.hpp>
 #include <SolverUtils/SolverUtilsDeclspec.h>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 
 typedef std::vector<std::pair<std::string, std::string>> SummaryList;
@@ -59,7 +57,6 @@ SOLVER_UTILS_EXPORT void AddSummaryItem(SummaryList &l, const std::string &name,
 SOLVER_UTILS_EXPORT void AddSummaryItem(SummaryList &l, const std::string &name,
                                         const NekDouble &value);
 
-} // end namespace SolverUtils
-} // end namespace Nektar
+} // namespace Nektar::SolverUtils
 
 #endif

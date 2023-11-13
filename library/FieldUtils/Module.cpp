@@ -39,9 +39,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 /**
  * Returns an instance of the module factory, held as a singleton.
@@ -198,5 +196,4 @@ void InputModule::PrintSummary()
     cout << "Field size = " << m_f->m_data[0].size() * sizeof(NekDouble)
          << endl;
 }
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

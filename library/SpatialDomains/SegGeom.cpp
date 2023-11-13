@@ -40,9 +40,7 @@
 #include <StdRegions/StdRegions.hpp>
 #include <StdRegions/StdSegExp.h>
 
-namespace Nektar
-{
-namespace SpatialDomains
+namespace Nektar::SpatialDomains
 {
 SegGeom::SegGeom()
 {
@@ -493,5 +491,4 @@ NekDouble SegGeom::v_FindDistance(const Array<OneD, const NekDouble> &xs,
     return -1.0;
 }
 
-} // namespace SpatialDomains
-} // namespace Nektar
+} // namespace Nektar::SpatialDomains

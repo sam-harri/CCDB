@@ -36,9 +36,7 @@
 #ifndef NEKTAR_LIBRARY_COLLECTIONS_IPRODUCT_H
 #define NEKTAR_LIBRARY_COLLECTIONS_IPRODUCT_H
 
-namespace Nektar
-{
-namespace Collections
+namespace Nektar::Collections
 {
 
 void QuadIProduct(bool colldir0, bool colldir1, int numElmt, int nquad0,
@@ -93,6 +91,5 @@ void TetIProduct(bool sortTopEdge, int numElmt, int nquad0, int nquad1,
                  const Array<OneD, const NekDouble> &input,
                  Array<OneD, NekDouble> &output, Array<OneD, NekDouble> &wsp);
 
-} // namespace Collections
-} // namespace Nektar
+} // namespace Nektar::Collections
 #endif

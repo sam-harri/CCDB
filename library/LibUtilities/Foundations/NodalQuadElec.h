@@ -39,15 +39,13 @@
 #include <LibUtilities/Foundations/NodalUtil.h>
 #include <memory>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 class NodalQuadElec : public Points<NekDouble>
 {
 public:
-    virtual ~NodalQuadElec()
+    ~NodalQuadElec() override
     {
     }
 
@@ -69,11 +67,10 @@ private:
     /// 1D GLL weights
     Array<OneD, NekDouble> m_ew;
 
-    virtual void v_CalculatePoints() override final;
-    virtual void v_CalculateWeights() override final;
-    virtual void v_CalculateDerivMatrix() override final;
+    void v_CalculatePoints() final;
+    void v_CalculateWeights() final;
+    void v_CalculateDerivMatrix() final;
 };
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities
 
 #endif // NodalQuadElec

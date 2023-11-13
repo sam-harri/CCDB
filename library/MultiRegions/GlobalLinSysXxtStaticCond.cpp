@@ -37,9 +37,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 /**
  * @class GlobalLinSysIterativeStaticCond
@@ -253,5 +251,5 @@ void GlobalLinSysXxtStaticCond::v_SolveLinearSystem(
         Xxt::Solve(pOutput, m_crsData, pInput);
     }
 }
-} // namespace MultiRegions
-} // namespace Nektar
+
+} // namespace Nektar::MultiRegions

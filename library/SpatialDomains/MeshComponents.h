@@ -41,9 +41,7 @@
 #include <SpatialDomains/SpatialDomainsDeclspec.h>
 #include <set>
 
-namespace Nektar
-{
-namespace SpatialDomains
+namespace Nektar::SpatialDomains
 {
 // ------------------------------------------------------------------------
 /// Structure holding graphvertexobject id and local element facet id
@@ -105,7 +103,6 @@ protected:
 private:
 };
 
-} // namespace SpatialDomains
-} // namespace Nektar
+} // namespace Nektar::SpatialDomains
 
 #endif // NEKTAR_SPATIALDOMAINS_MESHCOMPONENTS_H

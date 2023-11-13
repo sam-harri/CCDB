@@ -35,9 +35,7 @@
 
 #include <LibUtilities/Foundations/Graph.h>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 size_t GraphVertexObject::m_nextid = 0;
@@ -63,5 +61,4 @@ bool operator!=(const GraphVertexObject &x, const GraphVertexObject &y)
 {
     return (x.m_id != y.m_id);
 }
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities

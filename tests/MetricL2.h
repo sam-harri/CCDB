@@ -56,7 +56,7 @@ protected:
 
     std::map<std::string, std::string> m_varTolerance;
 
-    virtual void v_Generate(std::istream &pStdout, std::istream &pStderr);
+    void v_Generate(std::istream &pStdout, std::istream &pStderr) override;
 };
 } // namespace Nektar
 

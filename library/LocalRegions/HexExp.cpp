@@ -39,9 +39,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace LocalRegions
+namespace Nektar::LocalRegions
 {
 /**
  * @class HexExp
@@ -1767,5 +1765,4 @@ void HexExp::v_NormalTraceDerivFactors(
         }
     }
 }
-} // namespace LocalRegions
-} // namespace Nektar
+} // namespace Nektar::LocalRegions

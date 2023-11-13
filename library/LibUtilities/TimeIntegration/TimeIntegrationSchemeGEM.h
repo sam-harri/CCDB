@@ -42,9 +42,7 @@
 #include <LibUtilities/BasicUtils/VmathArray.hpp>
 #include <LibUtilities/TimeIntegration/TimeIntegrationScheme.h>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -110,7 +108,7 @@ public:
     }
 
     /// Destructor
-    virtual ~TimeIntegrationSchemeGEM()
+    ~TimeIntegrationSchemeGEM() override
     {
     }
 
@@ -127,25 +125,24 @@ public:
     static std::string className;
 
 protected:
-    LUE virtual std::string v_GetName() const override;
-    LUE virtual std::string v_GetVariant() const override;
-    LUE virtual size_t v_GetOrder() const override;
-    LUE virtual std::vector<NekDouble> v_GetFreeParams() const override;
-    LUE virtual TimeIntegrationSchemeType v_GetIntegrationSchemeType()
-        const override;
-    LUE virtual NekDouble v_GetTimeStability() const override;
-    LUE virtual size_t v_GetNumIntegrationPhases() const override;
-    LUE virtual const TripleArray &v_GetSolutionVector() const override;
-    LUE virtual TripleArray &v_UpdateSolutionVector() override;
-    LUE virtual void v_SetSolutionVector(const size_t Offset,
-                                         const DoubleArray &y) override;
-    LUE virtual void v_InitializeScheme(
+    LUE std::string v_GetName() const override;
+    LUE std::string v_GetVariant() const override;
+    LUE size_t v_GetOrder() const override;
+    LUE std::vector<NekDouble> v_GetFreeParams() const override;
+    LUE TimeIntegrationSchemeType v_GetIntegrationSchemeType() const override;
+    LUE NekDouble v_GetTimeStability() const override;
+    LUE size_t v_GetNumIntegrationPhases() const override;
+    LUE const TripleArray &v_GetSolutionVector() const override;
+    LUE TripleArray &v_UpdateSolutionVector() override;
+    LUE void v_SetSolutionVector(const size_t Offset,
+                                 const DoubleArray &y) override;
+    LUE void v_InitializeScheme(
         const NekDouble deltaT, ConstDoubleArray &y_0, const NekDouble time,
         const TimeIntegrationSchemeOperators &op) override;
-    LUE virtual ConstDoubleArray &v_TimeIntegrate(
-        const size_t timestep, const NekDouble delta_t) override;
-    LUE virtual void v_print(std::ostream &os) const override;
-    LUE virtual void v_printFull(std::ostream &os) const override;
+    LUE ConstDoubleArray &v_TimeIntegrate(const size_t timestep,
+                                          const NekDouble delta_t) override;
+    LUE void v_print(std::ostream &os) const override;
+    LUE void v_printFull(std::ostream &os) const override;
 
     // Variables common to all schemes.
     NekDouble m_time;
@@ -176,7 +173,6 @@ LUE std::ostream &operator<<(std::ostream &os,
 LUE std::ostream &operator<<(std::ostream &os,
                              const TimeIntegrationSchemeGEMSharedPtr &rhs);
 
-} // end namespace LibUtilities
-} // end namespace Nektar
+} // namespace Nektar::LibUtilities
 
 #endif

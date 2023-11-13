@@ -34,9 +34,7 @@
 
 #include "Operator.hpp"
 
-namespace Nektar
-{
-namespace MatrixFree
+namespace Nektar::MatrixFree
 {
 
 OperatorFactory &GetOperatorFactory()
@@ -91,5 +89,4 @@ std::string GetOpstring(LibUtilities::ShapeType shape, bool deformed)
     return op_string;
 }
 
-} // namespace MatrixFree
-} // namespace Nektar
+} // namespace Nektar::MatrixFree

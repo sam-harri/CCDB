@@ -37,9 +37,7 @@
 
 #include <SolverUtils/Driver.h>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 
 /// Base class for the development of solvers.
@@ -85,13 +83,13 @@ protected:
                   const SpatialDomains::MeshGraphSharedPtr pGraph);
 
     /// Destructor
-    virtual ~DriverArnoldi() = default;
+    ~DriverArnoldi() override = default;
 
     /// Virtual function for initialisation implementation.
-    virtual void v_InitObject(std::ostream &out = std::cout) override;
+    void v_InitObject(std::ostream &out = std::cout) override;
 
     /// Virtual function for solve implementation.
-    virtual void v_Execute(std::ostream &out = std::cout) override;
+    void v_Execute(std::ostream &out = std::cout) override;
 
     /// Copy Arnoldi storage to fields.
     void CopyArnoldiArrayToField(Array<OneD, NekDouble> &array);
@@ -123,7 +121,6 @@ protected:
     SOLVER_UTILS_EXPORT void ArnoldiSummary(std::ostream &out);
 };
 
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils
 
 #endif // NEKTAR_SOLVERUTILS_DRIVERARNOLDI_H

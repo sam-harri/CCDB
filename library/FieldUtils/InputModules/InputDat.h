@@ -37,9 +37,7 @@
 
 #include "../Module.h"
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 /// Input module for Xml files.
@@ -47,7 +45,7 @@ class InputDat : public InputModule
 {
 public:
     InputDat(FieldSharedPtr f);
-    virtual ~InputDat();
+    ~InputDat() override;
     /// Creates an instance of this class
     static ModuleSharedPtr create(FieldSharedPtr f)
     {
@@ -57,19 +55,19 @@ public:
     static ModuleKey m_className[];
 
 protected:
-    virtual void v_Process(po::variables_map &vm) override;
+    void v_Process(po::variables_map &vm) override;
 
-    virtual std::string v_GetModuleName() override
+    std::string v_GetModuleName() override
     {
         return "InputDat";
     }
 
-    virtual std::string v_GetModuleDescription() override
+    std::string v_GetModuleDescription() override
     {
         return "Processing input dat file";
     }
 
-    virtual ModulePriority v_GetModulePriority() override
+    ModulePriority v_GetModulePriority() override
     {
         return eCreatePts;
     }
@@ -79,6 +77,5 @@ private:
                                 Array<OneD, Array<OneD, NekDouble>> &pts,
                                 std::vector<Array<OneD, int>> &ptsConn);
 };
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils
 #endif

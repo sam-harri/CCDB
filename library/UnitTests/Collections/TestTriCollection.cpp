@@ -41,9 +41,7 @@
 #include <boost/test/tools/floating_point_comparison.hpp>
 #include <boost/test/unit_test.hpp>
 
-namespace Nektar
-{
-namespace TriCollectionTests
+namespace Nektar::TriCollectionTests
 {
 #define NELMTS 10
 
@@ -3535,5 +3533,4 @@ BOOST_AUTO_TEST_CASE(TestTriHelmholtz_MatrixFree_UniformP_ConstVarDiff)
         BOOST_CHECK_CLOSE(coeffsRef[i], coeffs[i], epsilon);
     }
 }
-} // namespace TriCollectionTests
-} // namespace Nektar
+} // namespace Nektar::TriCollectionTests

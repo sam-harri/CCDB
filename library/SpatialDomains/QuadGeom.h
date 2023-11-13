@@ -42,9 +42,7 @@
 #include <SpatialDomains/SegGeom.h>
 #include <SpatialDomains/SpatialDomainsDeclspec.h>
 
-namespace Nektar
-{
-namespace SpatialDomains
+namespace Nektar::SpatialDomains
 {
 
 class QuadGeom;
@@ -61,7 +59,7 @@ public:
     SPATIAL_DOMAINS_EXPORT QuadGeom(
         const int id, const SegGeomSharedPtr edges[],
         const CurveSharedPtr curve = CurveSharedPtr());
-    SPATIAL_DOMAINS_EXPORT ~QuadGeom();
+    SPATIAL_DOMAINS_EXPORT ~QuadGeom() override;
 
     /// Get the orientation of face1.
     SPATIAL_DOMAINS_EXPORT static StdRegions::Orientation GetFaceOrientation(
@@ -77,21 +75,20 @@ public:
     SPATIAL_DOMAINS_EXPORT static const std::string XMLElementType;
 
 protected:
-    SPATIAL_DOMAINS_EXPORT virtual NekDouble v_GetCoord(
+    SPATIAL_DOMAINS_EXPORT NekDouble v_GetCoord(
         const int i, const Array<OneD, const NekDouble> &Lcoord) override;
-    SPATIAL_DOMAINS_EXPORT virtual void v_GenGeomFactors() override;
-    SPATIAL_DOMAINS_EXPORT virtual void v_FillGeom() override;
-    SPATIAL_DOMAINS_EXPORT virtual int v_GetDir(
-        const int faceidx, const int facedir) const override;
-    SPATIAL_DOMAINS_EXPORT virtual void v_Reset(CurveMap &curvedEdges,
-                                                CurveMap &curvedFaces) override;
-    SPATIAL_DOMAINS_EXPORT virtual void v_Setup() override;
+    SPATIAL_DOMAINS_EXPORT void v_GenGeomFactors() override;
+    SPATIAL_DOMAINS_EXPORT void v_FillGeom() override;
+    SPATIAL_DOMAINS_EXPORT int v_GetDir(const int faceidx,
+                                        const int facedir) const override;
+    SPATIAL_DOMAINS_EXPORT void v_Reset(CurveMap &curvedEdges,
+                                        CurveMap &curvedFaces) override;
+    SPATIAL_DOMAINS_EXPORT void v_Setup() override;
 
 private:
     void SetUpXmap();
 };
 
-} // namespace SpatialDomains
-} // namespace Nektar
+} // namespace Nektar::SpatialDomains
 
 #endif // NEKTAR_SPATIALDOMAINS_QUADGEOM_H

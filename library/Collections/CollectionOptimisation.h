@@ -40,9 +40,7 @@
 #include <LibUtilities/BasicUtils/SessionReader.h>
 #include <tinyxml.h>
 
-namespace Nektar
-{
-namespace Collections
+namespace Nektar::Collections
 {
 
 class OpImpTimingKey
@@ -172,6 +170,5 @@ private:
     void ReadCollOps(TiXmlElement *xmlCol, GlobalOpMap &global, bool verbose);
 };
 
-} // namespace Collections
-} // namespace Nektar
+} // namespace Nektar::Collections
 #endif

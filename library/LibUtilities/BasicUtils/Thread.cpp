@@ -38,9 +38,7 @@
 
 #include "LibUtilities/BasicUtils/Thread.h"
 
-namespace Nektar
-{
-namespace Thread
+namespace Nektar::Thread
 {
 
 /**
@@ -337,5 +335,4 @@ ThreadStartupManager &ThreadStartupManager::operator=(
     return *this;
 }
 
-} // namespace Thread
-} /* namespace Nektar */
+} // namespace Nektar::Thread

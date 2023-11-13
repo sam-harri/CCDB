@@ -39,9 +39,7 @@
 #include <MultiRegions/DisContField3DHomogeneous2D.h>
 #include <MultiRegions/MultiRegionsDeclspec.h>
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 class ContField3DHomogeneous2D : public DisContField3DHomogeneous2D
 {
@@ -63,32 +61,30 @@ public:
         const ContField3DHomogeneous2D &In);
 
     /// Destructor.
-    MULTI_REGIONS_EXPORT virtual ~ContField3DHomogeneous2D();
+    MULTI_REGIONS_EXPORT ~ContField3DHomogeneous2D() override;
 
 protected:
     // virtual functions
 
-    virtual void v_ImposeDirichletConditions(
-        Array<OneD, NekDouble> &outarray) override;
+    void v_ImposeDirichletConditions(Array<OneD, NekDouble> &outarray) override;
 
     /// Template method virtual forwarded for LocalToGlobal()
-    virtual void v_LocalToGlobal(bool useComm) override;
+    void v_LocalToGlobal(bool useComm) override;
 
     /// Template method virtual forwarded for GlobalToLocal()
-    virtual void v_GlobalToLocal(void) override;
+    void v_GlobalToLocal(void) override;
 
     /// Solves the three-dimensional Helmholtz equation, subject to the
     /// boundary conditions specified.
-    virtual GlobalLinSysKey v_HelmSolve(
-        const Array<OneD, const NekDouble> &inarray,
-        Array<OneD, NekDouble> &outarray,
-        const StdRegions::ConstFactorMap &factors,
-        const StdRegions::VarCoeffMap &varcoeff,
-        const MultiRegions::VarFactorsMap &varfactors,
-        const Array<OneD, const NekDouble> &dirForcing,
-        const bool PhysSpaceForcing) override;
+    GlobalLinSysKey v_HelmSolve(const Array<OneD, const NekDouble> &inarray,
+                                Array<OneD, NekDouble> &outarray,
+                                const StdRegions::ConstFactorMap &factors,
+                                const StdRegions::VarCoeffMap &varcoeff,
+                                const MultiRegions::VarFactorsMap &varfactors,
+                                const Array<OneD, const NekDouble> &dirForcing,
+                                const bool PhysSpaceForcing) override;
 
-    virtual void v_ClearGlobalLinSysManager(void) override;
+    void v_ClearGlobalLinSysManager(void) override;
 
 private:
     Array<OneD, NekDouble> m_contCoeffs;
@@ -97,7 +93,6 @@ private:
 typedef std::shared_ptr<ContField3DHomogeneous2D>
     ContField3DHomogeneous2DSharedPtr;
 
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions
 
 #endif // MULTIERGIONS_CONTFIELD3DHOMO1D_H

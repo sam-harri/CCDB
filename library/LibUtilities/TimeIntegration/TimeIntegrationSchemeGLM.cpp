@@ -36,9 +36,7 @@
 
 #include <LibUtilities/TimeIntegration/TimeIntegrationSchemeGLM.h>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 // Access Methods
@@ -160,5 +158,4 @@ std::ostream &operator<<(std::ostream &os,
     return os;
 }
 
-} // end namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities

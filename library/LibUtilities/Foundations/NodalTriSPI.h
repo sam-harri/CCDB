@@ -40,15 +40,13 @@
 #include <LibUtilities/Foundations/ManagerAccess.h>
 #include <LibUtilities/Foundations/NodalUtil.h>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 class NodalTriSPI : public Points<NekDouble>
 {
 public:
-    virtual ~NodalTriSPI()
+    ~NodalTriSPI() override
     {
     }
 
@@ -65,12 +63,11 @@ private:
     NodalTriSPI()                          = delete;
     NodalTriSPI(const NodalTriSPI &points) = delete;
 
-    virtual void v_CalculatePoints() override final;
-    virtual void v_CalculateWeights() override final;
-    virtual void v_CalculateDerivMatrix() override final;
+    void v_CalculatePoints() final;
+    void v_CalculateWeights() final;
+    void v_CalculateDerivMatrix() final;
 };
 
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities
 
 #endif // NODALTRIELEC_H

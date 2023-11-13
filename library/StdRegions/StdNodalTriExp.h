@@ -40,9 +40,7 @@
 #include <StdRegions/StdRegionsDeclspec.h>
 #include <StdRegions/StdTriExp.h>
 
-namespace Nektar
-{
-namespace StdRegions
+namespace Nektar::StdRegions
 {
 class StdNodalTriExp : virtual public StdTriExp
 {
@@ -172,7 +170,6 @@ protected:
 };
 
 typedef std::shared_ptr<StdNodalTriExp> StdNodalTriExpSharedPtr;
-} // namespace StdRegions
-} // namespace Nektar
+} // namespace Nektar::StdRegions
 
 #endif // STDNODALTRIEXP_H

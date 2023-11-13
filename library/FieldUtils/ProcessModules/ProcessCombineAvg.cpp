@@ -42,9 +42,7 @@ using namespace std;
 
 #include "ProcessCombineAvg.h"
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 ModuleKey ProcessCombineAvg::className =
@@ -238,5 +236,4 @@ void ProcessCombineAvg::v_Process(po::variables_map &vm)
             boost::lexical_cast<std::string>(finTime);
     }
 }
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

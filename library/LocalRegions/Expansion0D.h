@@ -41,9 +41,7 @@
 #include <SpatialDomains/Geometry0D.h>
 #include <StdRegions/StdExpansion0D.h>
 
-namespace Nektar
-{
-namespace LocalRegions
+namespace Nektar::LocalRegions
 {
 class Expansion0D;
 typedef std::shared_ptr<Expansion0D> Expansion0DSharedPtr;
@@ -55,7 +53,7 @@ class Expansion0D : virtual public Expansion,
 public:
     LOCAL_REGIONS_EXPORT Expansion0D(SpatialDomains::Geometry0DSharedPtr pGeom);
 
-    LOCAL_REGIONS_EXPORT virtual ~Expansion0D()
+    LOCAL_REGIONS_EXPORT ~Expansion0D() override
     {
     }
 
@@ -69,7 +67,6 @@ inline SpatialDomains::Geometry0DSharedPtr Expansion0D::GetGeom0D() const
 {
     return std::dynamic_pointer_cast<SpatialDomains::Geometry0D>(m_geom);
 }
-} // namespace LocalRegions
-} // namespace Nektar
+} // namespace Nektar::LocalRegions
 
 #endif

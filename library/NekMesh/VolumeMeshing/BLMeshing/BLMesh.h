@@ -38,9 +38,7 @@
 #include <LibUtilities/Memory/NekMemoryManager.hpp>
 #include <NekMesh/MeshElements/Mesh.h>
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 class BLMesh
@@ -139,7 +137,6 @@ private:
 };
 
 typedef std::shared_ptr<BLMesh> BLMeshSharedPtr;
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh
 
 #endif

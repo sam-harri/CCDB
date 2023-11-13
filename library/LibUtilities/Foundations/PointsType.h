@@ -37,9 +37,7 @@
 
 #include <vector>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 enum PointsType
@@ -98,7 +96,6 @@ enum PointsType
 };
 
 static std::vector<LibUtilities::PointsType> NullPointsTypeVector;
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities
 
 #endif

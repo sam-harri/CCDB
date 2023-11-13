@@ -40,9 +40,7 @@
 #include <boost/test/tools/floating_point_comparison.hpp>
 #include <boost/test/unit_test.hpp>
 
-namespace Nektar
-{
-namespace SymmetricMatrixStoragePolicyUnitTests
+namespace Nektar::SymmetricMatrixStoragePolicyUnitTests
 {
 typedef SymmetricMatrixFuncs Policy;
 
@@ -120,5 +118,4 @@ BOOST_AUTO_TEST_CASE(TestAdvanceSymmetric)
         BOOST_CHECK_EQUAL(std::numeric_limits<unsigned int>::max(), curColumn);
     }
 }
-} // namespace SymmetricMatrixStoragePolicyUnitTests
-} // namespace Nektar
+} // namespace Nektar::SymmetricMatrixStoragePolicyUnitTests

@@ -62,7 +62,7 @@ public:
     static std::string className;
 
     /// Destructor
-    virtual ~UnsteadyDiffusion();
+    ~UnsteadyDiffusion() override;
 
 protected:
     bool m_useSpecVanVisc;
@@ -72,12 +72,12 @@ protected:
     SolverUtils::DiffusionSharedPtr m_diffusion;
     SolverUtils::RiemannSolverSharedPtr m_riemannSolver;
 
-    virtual void v_GenerateSummary(SummaryList &s) override;
+    void v_GenerateSummary(SummaryList &s) override;
 
     UnsteadyDiffusion(const LibUtilities::SessionReaderSharedPtr &pSession,
                       const SpatialDomains::MeshGraphSharedPtr &pGraph);
 
-    virtual void v_InitObject(bool DeclareFields = true) override;
+    void v_InitObject(bool DeclareFields = true) override;
 
     void GetFluxVector(
         const Array<OneD, Array<OneD, NekDouble>> &inarray,

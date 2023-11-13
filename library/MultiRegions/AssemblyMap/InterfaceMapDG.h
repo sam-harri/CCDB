@@ -38,9 +38,7 @@
 #include <MultiRegions/ExpList.h>
 #include <SpatialDomains/Movement/Movement.h>
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 
 /**
@@ -268,7 +266,6 @@ private:
 
 typedef std::shared_ptr<InterfaceMapDG> InterfaceMapDGSharedPtr;
 
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions
 
 #endif

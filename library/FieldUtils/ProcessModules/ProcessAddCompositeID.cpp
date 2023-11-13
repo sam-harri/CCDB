@@ -43,9 +43,7 @@ using namespace std;
 
 #include "ProcessAddCompositeID.h"
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 ModuleKey ProcessAddCompositeID::className =
@@ -125,5 +123,4 @@ void ProcessAddCompositeID::v_Process(po::variables_map &vm)
     // forward transform
     exp->FwdTransLocalElmt(exp->GetPhys(), exp->UpdateCoeffs());
 }
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

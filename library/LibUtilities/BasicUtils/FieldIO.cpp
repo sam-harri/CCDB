@@ -58,9 +58,7 @@
 namespace berrc = boost::system::errc;
 namespace ip    = boost::asio::ip;
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 std::string fldCmdFormat = SessionReader::RegisterCmdLineArgument(
@@ -824,5 +822,4 @@ int FieldIO::CheckFieldDefinition(const FieldDefinitionsSharedPtr &fielddefs)
 
     return (int)datasize;
 }
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities

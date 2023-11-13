@@ -42,9 +42,7 @@
 #include <MultiRegions/MultiRegionsDeclspec.h>
 #include <vector>
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 
 enum Homogeneous2DMatType
@@ -95,7 +93,7 @@ public:
     MULTI_REGIONS_EXPORT ExpListHomogeneous2D(
         const ExpListHomogeneous2D &In, const std::vector<unsigned int> &eIDs);
     /// Destructor.
-    MULTI_REGIONS_EXPORT virtual ~ExpListHomogeneous2D();
+    MULTI_REGIONS_EXPORT ~ExpListHomogeneous2D() override;
 
     MULTI_REGIONS_EXPORT void Homogeneous2DTrans(
         const int npts, const Array<OneD, const NekDouble> &inarray,
@@ -151,81 +149,77 @@ protected:
         Homogeneous2DMatType mattype) const;
 
     //  virtual functions
-    virtual size_t v_GetNumElmts(void) override
+    size_t v_GetNumElmts(void) override
     {
         return m_lines[0]->GetExpSize();
     }
 
-    virtual void v_FwdTrans(const Array<OneD, const NekDouble> &inarray,
-                            Array<OneD, NekDouble> &outarray) override;
+    void v_FwdTrans(const Array<OneD, const NekDouble> &inarray,
+                    Array<OneD, NekDouble> &outarray) override;
 
-    virtual void v_FwdTransLocalElmt(
-        const Array<OneD, const NekDouble> &inarray,
-        Array<OneD, NekDouble> &outarray) override;
+    void v_FwdTransLocalElmt(const Array<OneD, const NekDouble> &inarray,
+                             Array<OneD, NekDouble> &outarray) override;
 
-    virtual void v_FwdTransBndConstrained(
-        const Array<OneD, const NekDouble> &inarray,
-        Array<OneD, NekDouble> &outarray) override;
+    void v_FwdTransBndConstrained(const Array<OneD, const NekDouble> &inarray,
+                                  Array<OneD, NekDouble> &outarray) override;
 
-    virtual void v_BwdTrans(const Array<OneD, const NekDouble> &inarray,
-                            Array<OneD, NekDouble> &outarray) override;
+    void v_BwdTrans(const Array<OneD, const NekDouble> &inarray,
+                    Array<OneD, NekDouble> &outarray) override;
 
-    virtual void v_IProductWRTBase(const Array<OneD, const NekDouble> &inarray,
-                                   Array<OneD, NekDouble> &outarray) override;
+    void v_IProductWRTBase(const Array<OneD, const NekDouble> &inarray,
+                           Array<OneD, NekDouble> &outarray) override;
 
-    virtual std::vector<LibUtilities::FieldDefinitionsSharedPtr>
-    v_GetFieldDefinitions(void) override;
+    std::vector<LibUtilities::FieldDefinitionsSharedPtr> v_GetFieldDefinitions(
+        void) override;
 
-    virtual void v_GetFieldDefinitions(
+    void v_GetFieldDefinitions(
         std::vector<LibUtilities::FieldDefinitionsSharedPtr> &fielddef)
         override;
 
-    virtual void v_AppendFieldData(
-        LibUtilities::FieldDefinitionsSharedPtr &fielddef,
-        std::vector<NekDouble> &fielddata) override;
+    void v_AppendFieldData(LibUtilities::FieldDefinitionsSharedPtr &fielddef,
+                           std::vector<NekDouble> &fielddata) override;
 
-    virtual void v_AppendFieldData(
-        LibUtilities::FieldDefinitionsSharedPtr &fielddef,
-        std::vector<NekDouble> &fielddata,
-        Array<OneD, NekDouble> &coeffs) override;
+    void v_AppendFieldData(LibUtilities::FieldDefinitionsSharedPtr &fielddef,
+                           std::vector<NekDouble> &fielddata,
+                           Array<OneD, NekDouble> &coeffs) override;
 
-    virtual void v_ExtractDataToCoeffs(
+    void v_ExtractDataToCoeffs(
         LibUtilities::FieldDefinitionsSharedPtr &fielddef,
         std::vector<NekDouble> &fielddata, std::string &field,
         Array<OneD, NekDouble> &coeffs,
         std::unordered_map<int, int> zIdToPlane) override;
 
-    virtual void v_WriteVtkPieceData(std::ostream &outfile, int expansion,
-                                     std::string var) override;
+    void v_WriteVtkPieceData(std::ostream &outfile, int expansion,
+                             std::string var) override;
 
-    virtual void v_HomogeneousFwdTrans(
-        const int npts, const Array<OneD, const NekDouble> &inarray,
-        Array<OneD, NekDouble> &outarray, bool Shuff = true,
-        bool UnShuff = true) override;
+    void v_HomogeneousFwdTrans(const int npts,
+                               const Array<OneD, const NekDouble> &inarray,
+                               Array<OneD, NekDouble> &outarray,
+                               bool Shuff = true, bool UnShuff = true) override;
 
-    virtual void v_HomogeneousBwdTrans(
-        const int npts, const Array<OneD, const NekDouble> &inarray,
-        Array<OneD, NekDouble> &outarray, bool Shuff = true,
-        bool UnShuff = true) override;
+    void v_HomogeneousBwdTrans(const int npts,
+                               const Array<OneD, const NekDouble> &inarray,
+                               Array<OneD, NekDouble> &outarray,
+                               bool Shuff = true, bool UnShuff = true) override;
 
-    virtual void v_DealiasedProd(const int num_dofs,
-                                 const Array<OneD, NekDouble> &inarray1,
-                                 const Array<OneD, NekDouble> &inarray2,
-                                 Array<OneD, NekDouble> &outarray) override;
+    void v_DealiasedProd(const int num_dofs,
+                         const Array<OneD, NekDouble> &inarray1,
+                         const Array<OneD, NekDouble> &inarray2,
+                         Array<OneD, NekDouble> &outarray) override;
 
-    virtual void v_DealiasedDotProd(
+    void v_DealiasedDotProd(
         const int num_dofs, const Array<OneD, Array<OneD, NekDouble>> &inarray1,
         const Array<OneD, Array<OneD, NekDouble>> &inarray2,
         Array<OneD, Array<OneD, NekDouble>> &outarray) override;
 
-    virtual void v_PhysDeriv(const Array<OneD, const NekDouble> &inarray,
-                             Array<OneD, NekDouble> &out_d0,
-                             Array<OneD, NekDouble> &out_d1,
-                             Array<OneD, NekDouble> &out_d2) override;
+    void v_PhysDeriv(const Array<OneD, const NekDouble> &inarray,
+                     Array<OneD, NekDouble> &out_d0,
+                     Array<OneD, NekDouble> &out_d1,
+                     Array<OneD, NekDouble> &out_d2) override;
 
-    virtual void v_PhysDeriv(Direction edir,
-                             const Array<OneD, const NekDouble> &inarray,
-                             Array<OneD, NekDouble> &out_d) override;
+    void v_PhysDeriv(Direction edir,
+                     const Array<OneD, const NekDouble> &inarray,
+                     Array<OneD, NekDouble> &out_d) override;
 
 private:
     // Padding operations variables
@@ -236,7 +230,6 @@ private:
     DNekMatSharedPtr MatBwdPAD;
 };
 
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions
 
 #endif // EXPLISTHOMO2D_H

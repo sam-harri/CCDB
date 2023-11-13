@@ -38,9 +38,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 /**
  * @class  NekNonlinSysNewton
@@ -188,5 +186,4 @@ void NekNonlinSysNewton::v_SetupNekNonlinSystem(
     m_linsol->SetSysOperators(m_operator);
 }
 
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities

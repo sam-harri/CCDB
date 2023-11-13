@@ -34,9 +34,7 @@
 
 #include <LibUtilities/Foundations/NodalQuadElec.h>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 bool NodalQuadElec::initPointsManager[] = {PointsManager().RegisterCreator(
@@ -92,5 +90,4 @@ std::shared_ptr<PointsBaseType> NodalQuadElec::Create(const PointsKey &key)
     returnval->Initialize();
     return returnval;
 }
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities

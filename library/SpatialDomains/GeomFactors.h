@@ -44,9 +44,7 @@
 #include <StdRegions/StdExpansion.h>
 #include <StdRegions/StdRegions.hpp>
 
-namespace Nektar
-{
-namespace SpatialDomains
+namespace Nektar::SpatialDomains
 {
 // Forward declarations
 class GeomFactors;
@@ -349,7 +347,6 @@ StdRegions::StdExpansionSharedPtr &GeomFactors::GetXmap(void)
     return m_xmap;
 }
 
-} // namespace SpatialDomains
-} // namespace Nektar
+} // namespace Nektar::SpatialDomains
 
 #endif

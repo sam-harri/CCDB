@@ -35,16 +35,14 @@
 #include <NekMesh/MeshElements/Element.h>
 #include <NekMesh/MeshElements/Quadrilateral.h>
 #include <NekMesh/MeshElements/Triangle.h>
+#include <NekMesh/Module/InputModules/InputGmsh.h>
 
-#include "../InputModules/InputGmsh.h"
 #include "OutputGmsh.h"
 
 using namespace std;
 using namespace Nektar::NekMesh;
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 ModuleKey OutputGmsh::className = GetModuleFactory().RegisterCreatorFunction(
@@ -313,5 +311,4 @@ void OutputGmsh::Process()
     }
     m_mshFile << "$EndElements" << endl;
 }
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh

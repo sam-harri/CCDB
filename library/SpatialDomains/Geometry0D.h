@@ -38,9 +38,7 @@
 #include <SpatialDomains/Geometry.h>
 #include <SpatialDomains/SpatialDomainsDeclspec.h>
 
-namespace Nektar
-{
-namespace SpatialDomains
+namespace Nektar::SpatialDomains
 {
 class Geometry0D;
 
@@ -55,18 +53,17 @@ class Geometry0D : public Geometry
 public:
     SPATIAL_DOMAINS_EXPORT Geometry0D();
     SPATIAL_DOMAINS_EXPORT Geometry0D(const int coordim);
-    SPATIAL_DOMAINS_EXPORT virtual ~Geometry0D();
+    SPATIAL_DOMAINS_EXPORT ~Geometry0D() override;
 
     SPATIAL_DOMAINS_EXPORT static const int kDim = 0;
 
 protected:
-    virtual bool v_ContainsPoint(const Array<OneD, const NekDouble> &gloCoord,
-                                 Array<OneD, NekDouble> &locCoord,
-                                 NekDouble tol, NekDouble &dist) override;
-    virtual int v_GetShapeDim() const override;
+    bool v_ContainsPoint(const Array<OneD, const NekDouble> &gloCoord,
+                         Array<OneD, NekDouble> &locCoord, NekDouble tol,
+                         NekDouble &dist) override;
+    int v_GetShapeDim() const override;
 };
 
-} // namespace SpatialDomains
-} // namespace Nektar
+} // namespace Nektar::SpatialDomains
 
 #endif // NEKTAR_SPATIALDOMAINS_GEOMETRY1D_H

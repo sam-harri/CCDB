@@ -39,9 +39,7 @@
 #include <limits>
 #include <type_traits>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 /// checked cast from float types only to int types
 template <class To, class Ti,
@@ -59,7 +57,6 @@ inline To checked_cast(const Ti param)
     return static_cast<To>(param);
 }
 
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities
 
 #endif

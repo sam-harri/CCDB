@@ -37,9 +37,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 /**
  * @class  NekNonlinSys
@@ -150,5 +148,4 @@ NekNonlinSys::~NekNonlinSys()
 {
 }
 
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities

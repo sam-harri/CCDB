@@ -44,9 +44,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 std::string DiffusionLFR::type[] = {
     GetDiffusionFactory().RegisterCreatorFunction("LFRDG", DiffusionLFR::create,
@@ -2282,5 +2280,4 @@ void DiffusionLFR::DivCFlux_2D_Gauss(
     }
 }
 
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils

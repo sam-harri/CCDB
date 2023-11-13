@@ -37,9 +37,7 @@
 
 #include <SolverUtils/Diffusion/Diffusion.h>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 class DiffusionLFRNS : public Diffusion
 {
@@ -56,26 +54,23 @@ protected:
 
     std::string m_diffType;
 
-    virtual void v_InitObject(
+    void v_InitObject(
         LibUtilities::SessionReaderSharedPtr pSession,
         Array<OneD, MultiRegions::ExpListSharedPtr> pFields) override;
 
-    virtual void v_Diffuse(
-        const std::size_t nConvective,
-        const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
-        const Array<OneD, Array<OneD, NekDouble>> &inarray,
-        Array<OneD, Array<OneD, NekDouble>> &outarray,
-        const Array<OneD, Array<OneD, NekDouble>> &pFwd,
-        const Array<OneD, Array<OneD, NekDouble>> &pBwd) override;
+    void v_Diffuse(const std::size_t nConvective,
+                   const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
+                   const Array<OneD, Array<OneD, NekDouble>> &inarray,
+                   Array<OneD, Array<OneD, NekDouble>> &outarray,
+                   const Array<OneD, Array<OneD, NekDouble>> &pFwd,
+                   const Array<OneD, Array<OneD, NekDouble>> &pBwd) override;
 
-    virtual void v_SetHomoDerivs(
-        Array<OneD, Array<OneD, NekDouble>> &deriv) override
+    void v_SetHomoDerivs(Array<OneD, Array<OneD, NekDouble>> &deriv) override
     {
         m_homoDerivs = deriv;
     }
 
-    virtual Array<OneD, Array<OneD, Array<OneD, NekDouble>>> &v_GetFluxTensor()
-        override
+    Array<OneD, Array<OneD, Array<OneD, NekDouble>>> &v_GetFluxTensor() override
     {
         return m_viscTensor;
     }
@@ -188,7 +183,6 @@ private:
 };
 
 typedef std::shared_ptr<DiffusionLFRNS> DiffusionLFRNSSharedPtr;
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils
 
 #endif

@@ -15,12 +15,9 @@
 
 #include "NektarExpMacros.h"
 
-namespace Nektar
-{
-namespace MatrixFree
+namespace Nektar::MatrixFree
 {
 
 NEKTAR_EXPL_DEC_INC_GEN@INST@( @OPERATOR@, @SHAPE@ )
 
-} // namespace MatrixFree
-} // namespace Nektar
+} // namespace Nektar::MatrixFree

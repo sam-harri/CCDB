@@ -59,6 +59,8 @@ IF (NEKTAR_USE_ARPACK)
     ELSE()
     	ADD_CUSTOM_TARGET(arpack-ng-1.0 ALL)
     ENDIF()
+
+    ADD_DEPENDENCIES(thirdparty arpack-ng-1.0)
 ENDIF()
 
 

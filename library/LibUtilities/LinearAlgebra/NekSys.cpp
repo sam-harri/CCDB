@@ -37,9 +37,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 /**
  * @class  NekSys
@@ -106,5 +104,4 @@ void NekSys::v_NekSysInitialGuess(const Array<OneD, const NekDouble> &pInput,
     Vmath::Vcopy(ndim, pInput, 1, pguess, 1);
 }
 
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities

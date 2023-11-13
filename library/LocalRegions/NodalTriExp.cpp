@@ -37,9 +37,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace LocalRegions
+namespace Nektar::LocalRegions
 {
 NodalTriExp::NodalTriExp(const LibUtilities::BasisKey &Ba,
                          const LibUtilities::BasisKey &Bb,
@@ -686,5 +684,4 @@ void NodalTriExp::v_ComputeTraceNormal(const int edge)
     }
 }
 
-} // namespace LocalRegions
-} // namespace Nektar
+} // namespace Nektar::LocalRegions

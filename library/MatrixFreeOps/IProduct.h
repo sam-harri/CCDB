@@ -43,9 +43,7 @@
 
 #include "IProductKernels.hpp"
 
-namespace Nektar
-{
-namespace MatrixFree
+namespace Nektar::MatrixFree
 {
 
 // As each operator has seven shapes over three dimension to get to the
@@ -426,7 +424,6 @@ private:
     int m_nmTot;
 };
 
-} // namespace MatrixFree
-} // namespace Nektar
+} // namespace Nektar::MatrixFree
 
 #endif

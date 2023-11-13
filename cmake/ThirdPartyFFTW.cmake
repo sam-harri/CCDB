@@ -62,6 +62,8 @@ IF (NEKTAR_USE_FFTW)
         SET(FFTW_CONFIG_INCLUDE_DIR ${FFTW_INCLUDE_DIR})
     ENDIF()
 
+    ADD_DEPENDENCIES(thirdparty fftw-3.2.2)
+
     # Test if FFTW path is a system path. Only add to include path if not an
     # implicitly defined CXX include path (due to GCC 6.x now providing its own
     # version of some C header files and -isystem reorders include paths).

@@ -40,9 +40,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace LocalRegions
+namespace Nektar::LocalRegions
 {
 Expansion::Expansion(SpatialDomains::GeometrySharedPtr pGeom)
     : m_indexMapManager(
@@ -72,7 +70,7 @@ Expansion::Expansion(SpatialDomains::GeometrySharedPtr pGeom)
         NEKERROR(ErrorUtil::ewarning, err.str());
     }
 
-    m_traceExp.empty();
+    m_traceExp.clear();
 }
 
 Expansion::Expansion(const Expansion &pSrc)
@@ -931,5 +929,4 @@ void Expansion::v_AlignVectorToCollapsedDir(
     boost::ignore_unused(dir, inarray, outarray);
     NEKERROR(ErrorUtil::efatal, "v_AlignVectorToCollapsedDir is not defined");
 }
-} // namespace LocalRegions
-} // namespace Nektar
+} // namespace Nektar::LocalRegions

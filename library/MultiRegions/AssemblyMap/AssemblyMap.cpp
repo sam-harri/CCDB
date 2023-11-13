@@ -39,9 +39,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 /**
  * @class AssemblyMap
@@ -84,7 +82,7 @@ AssemblyMap::AssemblyMap()
       m_numGlobalBndCoeffs(0), m_numLocalDirBndCoeffs(0),
       m_numGlobalDirBndCoeffs(0), m_solnType(eNoSolnType),
       m_bndSystemBandWidth(0), m_successiveRHS(0),
-      m_linSysIterSolver("ConjugateGradient"), m_gsh(0), m_bndGsh(0)
+      m_linSysIterSolver("ConjugateGradient"), m_gsh(nullptr), m_bndGsh(nullptr)
 {
 }
 
@@ -95,7 +93,7 @@ AssemblyMap::AssemblyMap(const LibUtilities::SessionReaderSharedPtr &pSession,
       m_numLocalBndCoeffs(0), m_numGlobalBndCoeffs(0),
       m_numLocalDirBndCoeffs(0), m_numGlobalDirBndCoeffs(0),
       m_bndSystemBandWidth(0), m_successiveRHS(0),
-      m_linSysIterSolver("ConjugateGradient"), m_gsh(0), m_bndGsh(0)
+      m_linSysIterSolver("ConjugateGradient"), m_gsh(nullptr), m_bndGsh(nullptr)
 {
     // Default value from Solver Info
     m_solnType =
@@ -1311,10 +1309,14 @@ void AssemblyMap::UniversalAssembleBnd(Array<OneD, NekDouble> &pGlobal,
 {
     Array<OneD, NekDouble> tmp(offset);
     if (offset > 0)
+    {
         Vmath::Vcopy(offset, pGlobal, 1, tmp, 1);
+    }
     UniversalAssembleBnd(pGlobal);
     if (offset > 0)
+    {
         Vmath::Vcopy(offset, tmp, 1, pGlobal, 1);
+    }
 }
 
 void AssemblyMap::UniversalAbsMaxBnd(Array<OneD, NekDouble> &bndvals)
@@ -1635,5 +1637,4 @@ void AssemblyMap::PrintStats(std::ostream &out, std::string variable,
     }
     tmp->PrintStats(out, variable, false);
 }
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions

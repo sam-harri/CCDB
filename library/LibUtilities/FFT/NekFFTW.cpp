@@ -36,9 +36,7 @@
 #include <LibUtilities/BasicUtils/VmathArray.hpp>
 #include <LibUtilities/FFT/NekFFTW.h>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 std::string NekFFTW::className =
     GetNektarFFTFactory().RegisterCreatorFunction("NekFFTW", NekFFTW::create);
@@ -140,5 +138,4 @@ void NekFFTW::Reshuffle_Nek2FFTW(Array<OneD, NekDouble> &coef)
 
     return;
 }
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities

@@ -43,9 +43,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace SpatialDomains
+namespace Nektar::SpatialDomains
 {
 
 QuadGeom::QuadGeom()
@@ -498,5 +496,4 @@ void QuadGeom::v_Setup()
     }
 }
 
-} // namespace SpatialDomains
-} // namespace Nektar
+} // namespace Nektar::SpatialDomains

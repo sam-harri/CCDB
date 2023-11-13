@@ -53,9 +53,7 @@
 
 #define LUE LIB_UTILITIES_EXPORT
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 /// Datatype of the NekFactory used to instantiate classes derived from the
@@ -227,7 +225,6 @@ LUE std::ostream &operator<<(std::ostream &os,
 LUE std::ostream &operator<<(std::ostream &os,
                              const TimeIntegrationSchemeSharedPtr &rhs);
 
-} // end of namespace LibUtilities
-} // end of namespace Nektar
+} // namespace Nektar::LibUtilities
 
 #endif

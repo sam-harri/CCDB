@@ -39,9 +39,7 @@
 using namespace std;
 using namespace Nektar::NekMesh;
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 ModuleKey ProcessDetectSurf::className =
@@ -233,5 +231,4 @@ void ProcessDetectSurf::FindContiguousSurface(ElementSharedPtr start,
         }
     }
 }
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh

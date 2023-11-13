@@ -40,9 +40,7 @@
 
 #include <NekMesh/CADSystem/CADObject.h>
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 // forward declarations
@@ -68,7 +66,7 @@ public:
         m_type = CADType::eCurve;
     }
 
-    virtual ~CADCurve()
+    ~CADCurve() override
     {
     }
 
@@ -230,7 +228,6 @@ typedef std::shared_ptr<CADCurve> CADCurveSharedPtr;
 typedef LibUtilities::NekFactory<std::string, CADCurve> CADCurveFactory;
 
 CADCurveFactory &GetCADCurveFactory();
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh
 
 #endif

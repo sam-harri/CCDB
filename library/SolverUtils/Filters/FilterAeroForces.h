@@ -72,7 +72,7 @@ public:
         const std::weak_ptr<EquationSystem> &pEquation,
         const std::map<std::string, std::string> &pParams);
 
-    SOLVER_UTILS_EXPORT virtual ~FilterAeroForces();
+    SOLVER_UTILS_EXPORT ~FilterAeroForces() override;
 
     SOLVER_UTILS_EXPORT void GetForces(
         const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
@@ -83,16 +83,16 @@ public:
         Array<OneD, NekDouble> &moments, const NekDouble &time);
 
 protected:
-    virtual void v_Initialise(
+    void v_Initialise(
         const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
         const NekDouble &time) override;
-    virtual void v_Update(
+    void v_Update(
         const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
         const NekDouble &time) override;
-    virtual void v_Finalise(
+    void v_Finalise(
         const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
         const NekDouble &time) override;
-    virtual bool v_IsTimeDependent() override;
+    bool v_IsTimeDependent() override;
 
 private:
     /// ID's of boundary regions where we want the forces

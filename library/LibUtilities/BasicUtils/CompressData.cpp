@@ -56,9 +56,7 @@
 #define NEKTAR_VERSION "Unknown"
 #endif
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 /**
@@ -153,5 +151,4 @@ void Base64StrToBinaryStr(std::string &base64string,
                                        binary_t(base64string.end()));
 }
 } // namespace CompressData
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities

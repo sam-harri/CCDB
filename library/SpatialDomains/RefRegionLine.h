@@ -38,9 +38,7 @@
 #include <SpatialDomains/RefRegion.h>
 #include <SpatialDomains/SpatialDomainsDeclspec.h>
 
-namespace Nektar
-{
-namespace SpatialDomains
+namespace Nektar::SpatialDomains
 {
 
 /**
@@ -58,7 +56,7 @@ public:
                                          std::vector<unsigned int> numModes,
                                          std::vector<unsigned int> numPoints);
     /// Destructor
-    SPATIAL_DOMAINS_EXPORT virtual ~RefRegionLine();
+    SPATIAL_DOMAINS_EXPORT ~RefRegionLine() override;
 
 protected:
     /// Check if vertex is inside the surface region
@@ -66,7 +64,6 @@ protected:
         const Array<OneD, NekDouble> &coords) override;
 };
 
-} // namespace SpatialDomains
-} // namespace Nektar
+} // namespace Nektar::SpatialDomains
 
 #endif // NEKTAR_SPATIALDOMAINS_REFREGIONLINE_H

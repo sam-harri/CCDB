@@ -37,9 +37,7 @@
 #include <LibUtilities/Foundations/NodalPrismElec.h>
 #include <vector>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 bool NodalPrismElec::initPointsManager[] = {PointsManager().RegisterCreator(
@@ -464,5 +462,4 @@ std::shared_ptr<PointsBaseType> NodalPrismElec::Create(const PointsKey &key)
     return returnval;
 }
 
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities

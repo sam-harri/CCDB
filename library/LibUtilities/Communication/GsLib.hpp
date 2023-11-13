@@ -196,7 +196,7 @@ static inline gs_data *Init(const Nektar::Array<OneD, long> pId,
 #ifdef NEKTAR_USE_MPI
     if (pComm->IsSerial())
     {
-        return 0;
+        return nullptr;
     }
     LibUtilities::CommMpiSharedPtr vCommMpi =
         std::dynamic_pointer_cast<LibUtilities::CommMpi>(pComm);
@@ -278,7 +278,7 @@ static inline void Gather(
     }
     if (pBuffer.size() == 0)
     {
-        nektar_gs(pU.get(), gs_double, pOp, false, pGsh, 0);
+        nektar_gs(pU.get(), gs_double, pOp, false, pGsh, nullptr);
     }
     else
     {

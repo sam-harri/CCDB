@@ -38,9 +38,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 std::string CADSurfOCE::key = GetCADSurfFactory().RegisterCreatorFunction(
@@ -345,5 +343,4 @@ void CADSurfOCE::Test(Array<OneD, NekDouble> uv)
     (void)passed; // suppress warning
 }
 
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh

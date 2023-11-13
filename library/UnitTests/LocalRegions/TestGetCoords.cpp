@@ -37,9 +37,7 @@
 #include <boost/test/tools/floating_point_comparison.hpp>
 #include <boost/test/unit_test.hpp>
 
-namespace Nektar
-{
-namespace HexExpTests
+namespace Nektar::HexExpTests
 {
 SpatialDomains::SegGeomSharedPtr CreateSegGeom(
     unsigned int id, SpatialDomains::PointGeomSharedPtr v0,
@@ -208,5 +206,4 @@ BOOST_AUTO_TEST_CASE(TestScaledAndTranslatedHexExp)
     BOOST_CHECK_CLOSE(c0[4], .44126383098, epsilon);
     BOOST_CHECK_CLOSE(c0[5], .5, epsilon);
 }
-} // namespace HexExpTests
-} // namespace Nektar
+} // namespace Nektar::HexExpTests

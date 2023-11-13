@@ -46,9 +46,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace Collections
+namespace Nektar::Collections
 {
 
 // static manager for Operator ImplementationMap
@@ -697,5 +695,4 @@ void CollectionOptimisation::UpdateOptFile(std::string sessName,
     }
 }
 
-} // namespace Collections
-} // namespace Nektar
+} // namespace Nektar::Collections

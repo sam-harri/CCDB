@@ -63,7 +63,7 @@ public:
 
     friend class MemoryManager<StimulusRect>;
 
-    virtual ~StimulusRect()
+    ~StimulusRect() override
     {
     }
 
@@ -81,10 +81,10 @@ protected:
     NekDouble m_strength;
     NekDouble m_chiCapMembrane;
 
-    virtual void v_Update(Array<OneD, Array<OneD, NekDouble>> &outarray,
-                          const NekDouble time) override;
+    void v_Update(Array<OneD, Array<OneD, NekDouble>> &outarray,
+                  const NekDouble time) override;
 
-    virtual void v_GenerateSummary(SolverUtils::SummaryList &s) override;
+    void v_GenerateSummary(SolverUtils::SummaryList &s) override;
 
 private:
     StimulusRect(const LibUtilities::SessionReaderSharedPtr &pSession,

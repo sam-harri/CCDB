@@ -37,9 +37,7 @@
 
 #include "ProcessBoundaryExtract.h"
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 /**
@@ -57,23 +55,22 @@ public:
     static ModuleKey className;
 
     ProcessScalGrad(FieldSharedPtr f);
-    virtual ~ProcessScalGrad();
+    ~ProcessScalGrad() override;
 
 protected:
     /// Write mesh to output file.
-    virtual void v_Process(po::variables_map &vm) override;
+    void v_Process(po::variables_map &vm) override;
 
-    virtual std::string v_GetModuleName() override
+    std::string v_GetModuleName() override
     {
         return "ProcessScalGrad";
     }
 
-    virtual std::string v_GetModuleDescription() override
+    std::string v_GetModuleDescription() override
     {
         return "Calculating scalar gradient";
     }
 };
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils
 
 #endif

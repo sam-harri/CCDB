@@ -46,9 +46,7 @@
 #undef min
 #endif
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 // Types of geometry types.
@@ -381,7 +379,6 @@ inline int GetNumberOfCoefficients(ShapeType shape, int na, int nb = 0,
 
     return returnval;
 }
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities
 
 #endif

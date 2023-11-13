@@ -63,7 +63,7 @@ public:
         const std::weak_ptr<SolverUtils::EquationSystem> &pEquation,
         const std::map<std::string, std::string> &pParams);
 
-    virtual ~FilterAeroForcesSPM();
+    ~FilterAeroForcesSPM() override;
 
     // Calculates the forces and fills the array 'm_Forces' up
     void CalculateForces(const Array<OneD, Array<OneD, NekDouble>> &pIntVel,
@@ -85,19 +85,19 @@ protected:
     /// Array storing the last value of the aerodynamic forces
     Array<OneD, NekDouble> m_Forces;
 
-    virtual void v_Initialise(
+    void v_Initialise(
         const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
         const NekDouble &time) override;
 
-    virtual void v_Update(
+    void v_Update(
         const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
         const NekDouble &time) override;
 
-    virtual void v_Finalise(
+    void v_Finalise(
         const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
         const NekDouble &time) override;
 
-    virtual bool v_IsTimeDependent() override;
+    bool v_IsTimeDependent() override;
 
 private:
 };

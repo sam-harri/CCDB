@@ -43,9 +43,7 @@ using namespace std;
 #include <MultiRegions/AssemblyMap/AssemblyMapDG.h>
 #include <SolverUtils/UnsteadySystem.h>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 std::string UnsteadySystem::cmdSetStartTime =
     LibUtilities::SessionReader::RegisterCmdLineArgument(
@@ -211,7 +209,7 @@ LibUtilities::TimeIntegrationSchemeOperators &UnsteadySystem::
  */
 void UnsteadySystem::v_DoSolve()
 {
-    ASSERTL0(m_intScheme != 0, "No time integration scheme.");
+    ASSERTL0(m_intScheme != nullptr, "No time integration scheme.");
 
     int i          = 1;
     int nvariables = 0;
@@ -965,5 +963,4 @@ void UnsteadySystem::DoDummyProjection(
     }
 }
 
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils

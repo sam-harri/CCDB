@@ -43,9 +43,7 @@
 using namespace std;
 using namespace Nektar::NekMesh;
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 NodeOptiFactory &GetNodeOptiFactory()
@@ -275,5 +273,4 @@ NodeOptiJob *NodeOpti::GetJob()
 {
     return new NodeOptiJob(this);
 }
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh

@@ -34,9 +34,7 @@
 #ifndef NEKTAR_LIB_UTILITIES_BASIS_TYPE_H
 #define NEKTAR_LIB_UTILITIES_BASIS_TYPE_H
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 enum BasisType
 {
@@ -71,7 +69,6 @@ enum BasisType
                         //!< part of the first mode  \f$ Im[\exp(i \pi  z_i)]\f$
     SIZE_BasisType      //!< Length of enum list
 };
-}
-} // namespace Nektar
+} // namespace Nektar::LibUtilities
 
 #endif

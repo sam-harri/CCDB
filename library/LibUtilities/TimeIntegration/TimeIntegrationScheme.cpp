@@ -39,9 +39,7 @@
 
 #include <LibUtilities/TimeIntegration/TimeIntegrationScheme.h>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 TimeIntegrationSchemeFactory &GetTimeIntegrationSchemeFactory()
@@ -72,5 +70,4 @@ std::ostream &operator<<(std::ostream &os,
     return os;
 }
 
-} // end namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities

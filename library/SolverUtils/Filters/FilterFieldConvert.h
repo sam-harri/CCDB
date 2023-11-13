@@ -43,9 +43,7 @@
 
 using namespace Nektar::FieldUtils;
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 class FilterFieldConvert : public Filter
 {
@@ -71,18 +69,18 @@ public:
         const LibUtilities::SessionReaderSharedPtr &pSession,
         const std::weak_ptr<EquationSystem> &pEquation,
         const ParamMap &pParams);
-    SOLVER_UTILS_EXPORT virtual ~FilterFieldConvert();
+    SOLVER_UTILS_EXPORT ~FilterFieldConvert() override;
 
 protected:
-    SOLVER_UTILS_EXPORT virtual void v_Initialise(
+    SOLVER_UTILS_EXPORT void v_Initialise(
         const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
         const NekDouble &time) override;
     SOLVER_UTILS_EXPORT virtual void v_FillVariablesName(
         const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields);
-    SOLVER_UTILS_EXPORT virtual void v_Update(
+    SOLVER_UTILS_EXPORT void v_Update(
         const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
         const NekDouble &time) override;
-    SOLVER_UTILS_EXPORT virtual void v_Finalise(
+    SOLVER_UTILS_EXPORT void v_Finalise(
         const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
         const NekDouble &time) override;
     SOLVER_UTILS_EXPORT virtual void v_ProcessSample(
@@ -109,7 +107,7 @@ protected:
         const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
         int dump = -1);
 
-    SOLVER_UTILS_EXPORT virtual bool v_IsTimeDependent() override;
+    SOLVER_UTILS_EXPORT bool v_IsTimeDependent() override;
 
     void CreateModules(std::vector<std::string> &modcmds);
 
@@ -140,7 +138,6 @@ protected:
     FieldSharedPtr m_f;
     po::variables_map m_vm;
 };
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils
 
 #endif /* NEKTAR_SOLVERUTILS_FILTERS_FILTERFIELDCONVERT_H */

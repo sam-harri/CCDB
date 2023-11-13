@@ -44,9 +44,7 @@ namespace Nektar
 template <typename Dim, typename DataType> class Array;
 }
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 // Physical Space Interpolation methods
@@ -168,7 +166,6 @@ LIB_UTILITIES_EXPORT void Interp3D(
     const PointsKey &fpoints2, const NekDouble *from, const PointsKey &tpoints0,
     const PointsKey &tpoints1, const PointsKey &tpoints2, NekDouble *to);
 
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities
 
 #endif // FOUNDATIONS_H

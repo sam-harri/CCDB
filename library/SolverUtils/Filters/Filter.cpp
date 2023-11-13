@@ -34,9 +34,7 @@
 
 #include <SolverUtils/Filters/Filter.h>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 FilterFactory &GetFilterFactory()
 {
@@ -54,5 +52,4 @@ Filter::~Filter()
 {
 }
 
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils

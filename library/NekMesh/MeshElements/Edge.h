@@ -41,9 +41,7 @@
 #include <NekMesh/MeshElements/Node.h>
 #include <NekMesh/NekMeshDeclspec.h>
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 class Element;
@@ -155,7 +153,6 @@ struct EdgeHash
     }
 };
 typedef std::unordered_set<EdgeSharedPtr, EdgeHash> EdgeSet;
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh
 
 #endif

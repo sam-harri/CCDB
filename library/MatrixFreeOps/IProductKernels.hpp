@@ -35,9 +35,7 @@
 #ifndef NEKTAR_LIBRARY_MF_IPRODUCT_KERNELS_HPP
 #define NEKTAR_LIBRARY_MF_IPRODUCT_KERNELS_HPP
 
-namespace Nektar
-{
-namespace MatrixFree
+namespace Nektar::MatrixFree
 {
 
 using namespace tinysimd;
@@ -964,7 +962,6 @@ NEK_FORCE_INLINE static void IProduct3DKernel(
 
 #endif // SHAPE_DIMENSION
 
-} // namespace MatrixFree
-} // namespace Nektar
+} // namespace Nektar::MatrixFree
 
 #endif

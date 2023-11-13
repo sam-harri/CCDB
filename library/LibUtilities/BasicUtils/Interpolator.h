@@ -54,9 +54,7 @@
 #include <LibUtilities/BasicUtils/VmathArray.hpp>
 #include <LibUtilities/LibUtilitiesDeclspec.h>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 enum InterpMethod
@@ -224,7 +222,6 @@ private:
 
 typedef std::shared_ptr<Interpolator> InterpolatorSharedPtr;
 
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities
 
 #endif

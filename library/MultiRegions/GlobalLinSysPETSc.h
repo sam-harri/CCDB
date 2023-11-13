@@ -40,9 +40,7 @@
 #include <petscksp.h>
 #include <petscmat.h>
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 // Forward declarations
 class ExpList;
@@ -63,7 +61,7 @@ public:
         const GlobalLinSysKey &pKey, const std::weak_ptr<ExpList> &pExp,
         const std::shared_ptr<AssemblyMap> &pLocToGloMap);
 
-    MULTI_REGIONS_EXPORT virtual ~GlobalLinSysPETSc();
+    MULTI_REGIONS_EXPORT ~GlobalLinSysPETSc() override;
 
 protected:
     /// PETSc matrix object.
@@ -117,11 +115,11 @@ protected:
                              const Array<OneD, const int> &glo2unique,
                              const AssemblyMapSharedPtr &pLocToGloMap);
 
-    virtual void v_SolveLinearSystem(const int pNumRows,
-                                     const Array<OneD, const NekDouble> &pInput,
-                                     Array<OneD, NekDouble> &pOutput,
-                                     const AssemblyMapSharedPtr &locToGloMap,
-                                     const int pNumDir) override;
+    void v_SolveLinearSystem(const int pNumRows,
+                             const Array<OneD, const NekDouble> &pInput,
+                             Array<OneD, NekDouble> &pOutput,
+                             const AssemblyMapSharedPtr &locToGloMap,
+                             const int pNumDir) override;
 
     virtual void v_DoMatrixMultiply(const Array<OneD, const NekDouble> &pInput,
                                     Array<OneD, NekDouble> &pOutput) = 0;
@@ -136,7 +134,6 @@ private:
     static PetscErrorCode DoDestroyMatCtx(Mat M);
     static PetscErrorCode DoDestroyPCCtx(PC pc);
 };
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions
 
 #endif

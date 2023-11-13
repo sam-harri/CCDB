@@ -64,9 +64,9 @@ public:
     static std::string className;
 
 protected:
-    virtual void v_Apply(Array<OneD, Array<OneD, NekDouble>> &Fwd,
-                         Array<OneD, Array<OneD, NekDouble>> &physarray,
-                         const NekDouble &time) override;
+    void v_Apply(Array<OneD, Array<OneD, NekDouble>> &Fwd,
+                 Array<OneD, Array<OneD, NekDouble>> &physarray,
+                 const NekDouble &time) override;
 
 private:
     WallBC(const LibUtilities::SessionReaderSharedPtr &pSession,
@@ -74,7 +74,7 @@ private:
            const Array<OneD, Array<OneD, NekDouble>> &pTraceNormals,
            const int pSpaceDim, const int bcRegion, const int cnt);
 
-    virtual ~WallBC(void){};
+    ~WallBC(void) override{};
 };
 
 } // namespace Nektar

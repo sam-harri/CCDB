@@ -47,9 +47,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 /**
  * Registers the class with the Factory.
@@ -311,6 +309,7 @@ void PreconditionerLinear::v_DoPreconditionerWithNonVertOutput(
             break;
     }
 }
+
 /**
  * Create the inverse multiplicity map.
  * @param   locToGloMap Local to global mapping information.
@@ -340,5 +339,5 @@ void PreconditionerLinear::SetupInvMult(
         m_invMult[i] = 1.0 / vCounts[vMap[i]];
     }
 }
-} // namespace MultiRegions
-} // namespace Nektar
+
+} // namespace Nektar::MultiRegions

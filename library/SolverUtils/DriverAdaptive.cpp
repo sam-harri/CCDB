@@ -47,9 +47,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 
 string DriverAdaptive::className = GetDriverFactory().RegisterCreatorFunction(
@@ -667,5 +665,4 @@ void DriverAdaptive::ReplaceExpansion(
     }
 }
 
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils

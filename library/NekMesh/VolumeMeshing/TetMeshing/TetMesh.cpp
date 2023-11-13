@@ -36,9 +36,7 @@
 #include <NekMesh/VolumeMeshing/TetMeshing/TetMesh.h>
 
 using namespace std;
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 void TetMesh::Mesh()
@@ -138,5 +136,4 @@ void TetMesh::Mesh()
     m_log(VERBOSE) << "  Volume meshing complete: " << m_tetconnect.size()
                    << " tetrahedra generated." << endl;
 }
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh

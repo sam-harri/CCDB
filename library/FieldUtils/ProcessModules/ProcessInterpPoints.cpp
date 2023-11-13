@@ -54,9 +54,7 @@ using namespace std;
 namespace bg  = boost::geometry;
 namespace bgi = boost::geometry::index;
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 ModuleKey ProcessInterpPoints::className =
@@ -629,5 +627,4 @@ void ProcessInterpPoints::PrintProgressbar(const int position,
 {
     LibUtilities::PrintProgressbar(position, goal, "Interpolating");
 }
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

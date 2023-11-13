@@ -34,9 +34,7 @@
 
 #include <LibUtilities/TimeIntegration/TimeIntegrationSchemeGEM.h>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 std::string TimeIntegrationSchemeGEM::v_GetName() const
@@ -446,5 +444,4 @@ std::ostream &operator<<(std::ostream &os,
 
     return os;
 }
-} // end namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities

@@ -42,13 +42,10 @@
 
 #define LUE LIB_UTILITIES_EXPORT
 
+#include <LibUtilities/TimeIntegration/IMEXdirkTimeIntegrationSchemes.h>
 #include <LibUtilities/TimeIntegration/TimeIntegrationSchemeGLM.h>
 
-#include <LibUtilities/TimeIntegration/IMEXdirkTimeIntegrationSchemes.h>
-
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 class CNABTimeIntegrationScheme : public TimeIntegrationSchemeGLM
@@ -74,7 +71,7 @@ public:
         CNABTimeIntegrationScheme::SetupSchemeData(m_integration_phases[1]);
     }
 
-    virtual ~CNABTimeIntegrationScheme()
+    ~CNABTimeIntegrationScheme() override
     {
     }
 
@@ -152,12 +149,12 @@ public:
     }
 
 protected:
-    LUE virtual std::string v_GetName() const override
+    LUE std::string v_GetName() const override
     {
         return std::string("CNAB");
     }
 
-    LUE virtual NekDouble v_GetTimeStability() const override
+    LUE NekDouble v_GetTimeStability() const override
     {
         return 1.0;
     }
@@ -166,7 +163,6 @@ protected:
 
 }; // end class CNABTimeIntegrationScheme
 
-} // end namespace LibUtilities
-} // end namespace Nektar
+} // namespace Nektar::LibUtilities
 
 #endif

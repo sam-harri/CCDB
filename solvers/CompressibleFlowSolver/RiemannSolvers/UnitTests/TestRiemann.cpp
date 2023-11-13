@@ -39,9 +39,7 @@
 #include "../RoeSolver.h"
 #include "../RoeSolverSIMD.h"
 
-namespace Nektar
-{
-namespace RiemannTests
+namespace Nektar::RiemannTests
 {
 BOOST_AUTO_TEST_CASE(RoeAlongXconstSolution)
 {
@@ -444,5 +442,4 @@ BOOST_AUTO_TEST_CASE(RoeAlongXdensityJump)
     }
 }
 
-} // namespace RiemannTests
-} // namespace Nektar
+} // namespace Nektar::RiemannTests

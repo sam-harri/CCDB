@@ -46,9 +46,7 @@
 #define TETLIBRARY
 #include <tetgen.h>
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 /**
@@ -103,6 +101,5 @@ private:
 };
 
 typedef std::shared_ptr<TetGenInterface> TetGenInterfaceSharedPtr;
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh
 #endif

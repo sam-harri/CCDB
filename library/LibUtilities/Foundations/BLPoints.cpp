@@ -37,9 +37,7 @@
 #include <LibUtilities/Foundations/BLPoints.h>
 #include <LibUtilities/Foundations/ManagerAccess.h>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 bool BLPoints::initPointsManager[] = {
     PointsManager().RegisterCreator(PointsKey(0, eBoundaryLayerPoints),
@@ -163,5 +161,4 @@ void BLPoints::CalculateInterpMatrix(
     ASSERTL0(false,
              "CalculateInterpMatrix not available for Boundary Layer Points");
 }
-} // end of namespace LibUtilities
-} // end of namespace Nektar
+} // namespace Nektar::LibUtilities

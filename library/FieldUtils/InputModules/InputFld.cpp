@@ -41,9 +41,7 @@ using namespace std;
 #include "InputFld.h"
 using namespace Nektar;
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 ModuleKey InputFld::m_className[4] = {
@@ -137,5 +135,4 @@ void InputFld::v_Process(po::variables_map &vm)
         }
     }
 }
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

@@ -38,9 +38,7 @@
 #include <LibUtilities/Foundations/ManagerAccess.h> // for BasisManager, etc
 #include <StdRegions/StdExpansion.h>
 
-namespace Nektar
-{
-namespace StdRegions
+namespace Nektar::StdRegions
 {
 /** \brief Default constructor */
 StdExpansion::StdExpansion()
@@ -1703,5 +1701,4 @@ void StdExpansion::EquiSpacedToCoeffs(
     out = (*intmat) * in;
 }
 
-} // namespace StdRegions
-} // namespace Nektar
+} // namespace Nektar::StdRegions

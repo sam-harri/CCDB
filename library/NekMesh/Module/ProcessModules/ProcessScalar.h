@@ -37,9 +37,7 @@
 
 #include <NekMesh/Module/Module.h>
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 /**
@@ -59,17 +57,16 @@ public:
     static NekMesh::ModuleKey className;
 
     ProcessScalar(NekMesh::MeshSharedPtr m);
-    virtual ~ProcessScalar();
+    ~ProcessScalar() override;
 
     /// Write mesh to output file.
-    virtual void Process();
+    void Process() override;
 
-    virtual std::string GetModuleName()
+    std::string GetModuleName() override
     {
         return "ProcessScalar";
     }
 };
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh
 
 #endif

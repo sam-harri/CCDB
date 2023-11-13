@@ -245,7 +245,9 @@ Array<OneD, int> ReadIDsForThisRank(Experiment &exp, FieldIOSharedPtr fio)
     {
         // Find the index of the file that contains the element index we want
         while (!(elStartFile[iFile] <= iEl && iEl < elStopFile[iFile]))
+        {
             iFile++;
+        }
 
         unsigned startInFile = iEl - elStartFile[iFile];
         unsigned stopInFile;
@@ -471,7 +473,9 @@ Results TestRead(Experiment &exp)
 Results TestWrite(Experiment &exp)
 {
     if (exp.verbose)
+    {
         std::cout << "Reading in input: " << exp.dataSource << std::endl;
+    }
 
     std::vector<FieldDefinitionsSharedPtr> fielddefs;
     std::vector<std::vector<NekDouble>> fielddata;

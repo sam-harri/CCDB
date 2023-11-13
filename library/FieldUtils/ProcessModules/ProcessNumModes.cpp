@@ -43,9 +43,7 @@ using namespace std;
 
 #include "ProcessNumModes.h"
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 ModuleKey ProcessNumModes::className =
@@ -137,5 +135,4 @@ void ProcessNumModes::v_Process(po::variables_map &vm)
         }
     }
 }
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

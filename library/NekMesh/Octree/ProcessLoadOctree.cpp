@@ -36,9 +36,7 @@
 #include <NekMesh/Octree/Octree.h>
 
 using namespace std;
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 ModuleKey ProcessLoadOctree::className =
@@ -98,5 +96,4 @@ void ProcessLoadOctree::Process()
         m_mesh->m_octree->WriteOctree(m_config["writeoctree"].as<string>());
     }
 }
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh

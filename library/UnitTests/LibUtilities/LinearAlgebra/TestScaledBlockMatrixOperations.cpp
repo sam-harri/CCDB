@@ -40,9 +40,7 @@
 #include <boost/test/tools/floating_point_comparison.hpp>
 #include <boost/test/unit_test.hpp>
 
-namespace Nektar
-{
-namespace ScaledBlockMatrixUnitTests
+namespace Nektar::ScaledBlockMatrixUnitTests
 {
 BOOST_AUTO_TEST_CASE(TestMatrixVectorMultiplication)
 {
@@ -170,5 +168,4 @@ BOOST_AUTO_TEST_CASE(TestMultiplicationScaledBlock_1)
     BOOST_CHECK_EQUAL(expected_result, result);
     BOOST_CHECK_EQUAL(expected_result, result1);
 }
-} // namespace ScaledBlockMatrixUnitTests
-} // namespace Nektar
+} // namespace Nektar::ScaledBlockMatrixUnitTests

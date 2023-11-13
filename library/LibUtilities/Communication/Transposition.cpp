@@ -40,9 +40,7 @@
 #include <LibUtilities/BasicUtils/Vmath.hpp>     // for Vcopy
 #include <LibUtilities/Foundations/Basis.h>      // for BasisKey
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 /**
  * Constructor for 1D transform.
@@ -623,5 +621,4 @@ void Transposition::TransposeZYtoYZ(const int npts,
     }
 }
 
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities

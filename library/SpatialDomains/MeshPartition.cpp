@@ -62,9 +62,7 @@
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/detail/edge.hpp>
 
-namespace Nektar
-{
-namespace SpatialDomains
+namespace Nektar::SpatialDomains
 {
 
 SPATIAL_DOMAINS_EXPORT MeshPartitionFactory &GetMeshPartitionFactory()
@@ -963,5 +961,4 @@ int MeshPartition::CalculateEdgeWeight(LibUtilities::ShapeType elmtType, int na,
 
     return weight;
 }
-} // namespace SpatialDomains
-} // namespace Nektar
+} // namespace Nektar::SpatialDomains

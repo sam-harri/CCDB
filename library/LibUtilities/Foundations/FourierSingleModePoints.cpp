@@ -37,9 +37,7 @@
 #include <LibUtilities/Foundations/FourierSingleModePoints.h>
 #include <LibUtilities/Foundations/ManagerAccess.h>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 bool FourierSingleModePoints::initPointsManager[] = {
     PointsManager().RegisterCreator(PointsKey(0, eFourierSingleModeSpaced),
@@ -146,5 +144,4 @@ void FourierSingleModePoints::CalculateInterpMatrix(
         "CalculateInterpMatrix not available for Fourier Single Mode Points");
 }
 
-} // end of namespace LibUtilities
-} // end of namespace Nektar
+} // namespace Nektar::LibUtilities

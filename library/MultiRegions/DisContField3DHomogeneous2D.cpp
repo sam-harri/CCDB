@@ -39,9 +39,7 @@
 #include <MultiRegions/DisContField3DHomogeneous2D.h>
 #include <MultiRegions/ExpList2DHomogeneous2D.h>
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 
 DisContField3DHomogeneous2D::DisContField3DHomogeneous2D(void)
@@ -390,5 +388,4 @@ void DisContField3DHomogeneous2D::v_SetBndCondBwdWeight(const int index,
 {
     m_bndCondBndWeight[index] = value;
 }
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions

@@ -40,9 +40,7 @@
 #include <LibUtilities/BasicUtils/Vmath.hpp>
 #include <LibUtilities/LinearAlgebra/NekMatrix.hpp>
 #include <iomanip>
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 // =====================================================================
@@ -334,6 +332,5 @@ protected:
         const Array<OneD, const NekDouble> &pInput,
         Array<OneD, NekDouble> &pguess);
 };
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities
 #endif

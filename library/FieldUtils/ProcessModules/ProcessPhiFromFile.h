@@ -39,9 +39,7 @@
 #include "../Octree.h"
 #include <random>
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 /**
@@ -59,22 +57,22 @@ public:
     static ModuleKey m_className;
 
     ProcessPhiFromFile(FieldSharedPtr f);
-    virtual ~ProcessPhiFromFile();
+    ~ProcessPhiFromFile() override;
 
 protected:
-    virtual void v_Process(po::variables_map &vm) override;
+    void v_Process(po::variables_map &vm) override;
 
-    virtual std::string v_GetModuleName() override
+    std::string v_GetModuleName() override
     {
         return "ProcessPhiFromFile";
     }
 
-    virtual std::string v_GetModuleDescription() override
+    std::string v_GetModuleDescription() override
     {
         return "Processing input STL file to calculate Phi";
     }
 
-    virtual ModulePriority v_GetModulePriority() override
+    ModulePriority v_GetModulePriority() override
     {
         return eModifyExp;
     }
@@ -135,7 +133,6 @@ protected:
 
 private:
 };
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils
 
 #endif // FIELDUTILS_PROCESSPHIFROMFILE

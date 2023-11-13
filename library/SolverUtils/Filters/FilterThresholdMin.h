@@ -37,9 +37,7 @@
 
 #include <SolverUtils/Filters/Filter.h>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 
 class FilterThresholdMin : public Filter
@@ -65,23 +63,23 @@ public:
         const LibUtilities::SessionReaderSharedPtr &pSession,
         const std::weak_ptr<EquationSystem> &pEquation,
         const ParamMap &pParams);
-    SOLVER_UTILS_EXPORT virtual ~FilterThresholdMin();
+    SOLVER_UTILS_EXPORT ~FilterThresholdMin() override;
 
 protected:
     /// Initialises the filter.
-    SOLVER_UTILS_EXPORT virtual void v_Initialise(
+    SOLVER_UTILS_EXPORT void v_Initialise(
         const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
         const NekDouble &time) override;
     /// For each point in domain test if solution is below threshold.
-    SOLVER_UTILS_EXPORT virtual void v_Update(
+    SOLVER_UTILS_EXPORT void v_Update(
         const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
         const NekDouble &time) override;
     /// Finalise the filter and write out data.
-    SOLVER_UTILS_EXPORT virtual void v_Finalise(
+    SOLVER_UTILS_EXPORT void v_Finalise(
         const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
         const NekDouble &time) override;
     /// Indicate that this filter is time dependent.
-    SOLVER_UTILS_EXPORT virtual bool v_IsTimeDependent() override;
+    SOLVER_UTILS_EXPORT bool v_IsTimeDependent() override;
 
 private:
     /// Storage for recording when each point in domain drops below threshold.
@@ -100,7 +98,6 @@ private:
     LibUtilities::FieldIOSharedPtr m_fld;
 };
 
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils
 
 #endif /* FILTERTHRESHOLDMAX_H_ */

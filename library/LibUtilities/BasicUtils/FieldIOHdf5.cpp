@@ -40,9 +40,7 @@
 
 namespace berrc = boost::system::errc;
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 namespace H5
 {
@@ -1362,5 +1360,4 @@ void FieldIOHdf5::ImportHDF5FieldMetaData(DataSourceSharedPtr dataSource,
     }
 }
 
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities

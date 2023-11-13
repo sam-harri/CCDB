@@ -44,9 +44,7 @@ using namespace std;
 #include "ProcessMapping.h"
 #include "ProcessVelocityDivergence.h"
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 ModuleKey ProcessVelocityDivergence::className =
@@ -231,5 +229,4 @@ void ProcessVelocityDivergence::GetVelocity(
     }
 }
 
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

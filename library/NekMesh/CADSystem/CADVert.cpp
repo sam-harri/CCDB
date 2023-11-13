@@ -35,9 +35,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 void CADVert::SetDegen(int s, CADSurfSharedPtr su, NekDouble u, NekDouble v)
@@ -66,5 +64,4 @@ NekDouble CADVert::DistanceTo(Array<OneD, NekDouble> xyz)
                 (m_node->m_z - xyz[2]) * (m_node->m_z - xyz[2]));
 }
 
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh

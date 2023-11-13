@@ -149,6 +149,8 @@ IF (NEKTAR_BUILD_PYTHON)
         ADD_DEFINITIONS(-DBOOST_HAS_NUMPY)
     ENDIF()
     
+    ADD_DEPENDENCIES(thirdparty boost-numpy)
+
     CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/cmake/python/setup.py.in ${CMAKE_BINARY_DIR}/setup.py)
 
     ADD_CUSTOM_TARGET(nekpy-install-user

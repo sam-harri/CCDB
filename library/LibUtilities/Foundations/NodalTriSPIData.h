@@ -35,9 +35,7 @@
 #ifndef NODALTRISPIDATA_H
 #define NODALTRISPIDATA_H
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 const size_t NodalTriSPIAvailable                         = 10;
 static const size_t NodalTriSPINPTS[NodalTriSPIAvailable] = {
@@ -216,7 +214,6 @@ static const NekDouble NodalTriSPIData[][3] = {
     {-0.924487456996639, -0.4144607978125548, 0.0752868215187729},
     {-0.4144607978125548, -0.924487456996639, 0.0752868215187729}};
 
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities
 
 #endif

@@ -36,9 +36,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace SpatialDomains
+namespace Nektar::SpatialDomains
 {
 
 RefRegionParallelogram::RefRegionParallelogram(
@@ -134,5 +132,4 @@ bool RefRegionParallelogram::v_Contains(const Array<OneD, NekDouble> &coords)
     }
 }
 
-} // namespace SpatialDomains
-} // namespace Nektar
+} // namespace Nektar::SpatialDomains

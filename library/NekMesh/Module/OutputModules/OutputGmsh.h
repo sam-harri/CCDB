@@ -38,9 +38,7 @@
 #include <LibUtilities/BasicUtils/HashUtils.hpp>
 #include <NekMesh/Module/Module.h>
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 struct ElmtConfigHash
@@ -64,12 +62,12 @@ public:
     static NekMesh::ModuleKey className;
 
     OutputGmsh(NekMesh::MeshSharedPtr m);
-    virtual ~OutputGmsh();
+    ~OutputGmsh() override;
 
     /// Write mesh to output file.
-    virtual void Process();
+    void Process() override;
 
-    virtual std::string GetModuleName()
+    std::string GetModuleName() override
     {
         return "OutputGmsh";
     }
@@ -79,7 +77,6 @@ private:
         elmMap;
 };
 
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh
 
 #endif

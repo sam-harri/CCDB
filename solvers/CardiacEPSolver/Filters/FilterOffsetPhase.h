@@ -68,19 +68,19 @@ public:
         const LibUtilities::SessionReaderSharedPtr &pSession,
         const std::weak_ptr<SolverUtils::EquationSystem> &pEquation,
         const ParamMap &pParams);
-    ~FilterOffsetPhase();
+    ~FilterOffsetPhase() override;
 
 protected:
-    virtual void v_Initialise(
+    void v_Initialise(
         const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
-        const NekDouble &time);
-    virtual void v_Update(
+        const NekDouble &time) override;
+    void v_Update(
         const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
-        const NekDouble &time);
-    virtual void v_Finalise(
+        const NekDouble &time) override;
+    void v_Finalise(
         const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
-        const NekDouble &time);
-    virtual bool v_IsTimeDependent();
+        const NekDouble &time) override;
+    bool v_IsTimeDependent() override;
 
 private:
     unsigned int m_index;

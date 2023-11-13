@@ -41,9 +41,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace StdRegions
+namespace Nektar::StdRegions
 {
 StdTriExp::StdTriExp()
 {
@@ -1601,5 +1599,4 @@ void StdTriExp::v_GetSimplexEquiSpacedConnectivity(Array<OneD, int> &conn,
         row += np - i;
     }
 }
-} // namespace StdRegions
-} // namespace Nektar
+} // namespace Nektar::StdRegions

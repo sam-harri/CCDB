@@ -42,9 +42,7 @@
 #include "Operator.hpp"
 #include "PhysDerivKernels.hpp"
 
-namespace Nektar
-{
-namespace MatrixFree
+namespace Nektar::MatrixFree
 {
 
 // As each opertor has seven shapes over three dimension to get to the
@@ -507,9 +505,13 @@ struct PhysDerivTemplate
             // if( ndf >= 1 )
             df_tmp[0] = df_ptr[0];
             if (ndf >= 2)
+            {
                 df_tmp[1] = df_ptr[1];
+            }
             if (ndf == 3)
+            {
                 df_tmp[2] = df_ptr[2];
+            }
         }
 
         for (int j = 0; j < nq0; ++j)
@@ -519,17 +521,25 @@ struct PhysDerivTemplate
                 // if( ndf >= 1 )
                 df_tmp[0] = df_ptr[j * ndf]; // load 1x
                 if (ndf >= 2)
+                {
                     df_tmp[1] = df_ptr[j * ndf + 1]; // load 1x
+                }
                 if (ndf == 3)
+                {
                     df_tmp[2] = df_ptr[j * ndf + 2]; // load 1x
+                }
             }
 
             // Multiply by derivative factors
             if (ndf == 3)
+            {
                 out[2][j] = out[0][j] * df_tmp[2]; // Store 1x
+            }
             if (ndf >= 2)
+            {
                 out[1][j] = out[0][j] * df_tmp[1]; // Store 1x
-            out[0][j] *= df_tmp[0];                // Store 1x
+            }
+            out[0][j] *= df_tmp[0]; // Store 1x
         }
     }
 
@@ -817,7 +827,6 @@ private:
     int m_nmTot;
 };
 
-} // namespace MatrixFree
-} // namespace Nektar
+} // namespace Nektar::MatrixFree
 
 #endif

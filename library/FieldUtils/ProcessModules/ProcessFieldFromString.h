@@ -37,9 +37,7 @@
 
 #include "../Module.h"
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 /**
@@ -56,27 +54,26 @@ public:
     static ModuleKey className;
 
     ProcessFieldFromString(FieldSharedPtr f);
-    virtual ~ProcessFieldFromString();
+    ~ProcessFieldFromString() override;
 
 protected:
-    virtual void v_Process(po::variables_map &vm) override;
+    void v_Process(po::variables_map &vm) override;
 
-    virtual std::string v_GetModuleName() override
+    std::string v_GetModuleName() override
     {
         return "ProcessFieldFromString";
     }
 
-    virtual std::string v_GetModuleDescription() override
+    std::string v_GetModuleDescription() override
     {
         return "Calculating new field";
     }
 
-    virtual ModulePriority v_GetModulePriority() override
+    ModulePriority v_GetModulePriority() override
     {
         return eModifyExp;
     }
 };
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils
 
 #endif

@@ -66,7 +66,7 @@ public:
 
     friend class MemoryManager<StimulusCirc>;
 
-    virtual ~StimulusCirc()
+    ~StimulusCirc() override
     {
     }
 
@@ -83,10 +83,10 @@ protected:
     NekDouble v_amp;
     NekDouble m_chiCapMembrane;
 
-    virtual void v_Update(Array<OneD, Array<OneD, NekDouble>> &outarray,
-                          const NekDouble time) override;
+    void v_Update(Array<OneD, Array<OneD, NekDouble>> &outarray,
+                  const NekDouble time) override;
 
-    virtual void v_GenerateSummary(SolverUtils::SummaryList &s) override;
+    void v_GenerateSummary(SolverUtils::SummaryList &s) override;
 
 private:
     StimulusCirc(const LibUtilities::SessionReaderSharedPtr &pSession,

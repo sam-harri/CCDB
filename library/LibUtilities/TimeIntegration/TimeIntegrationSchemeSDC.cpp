@@ -34,9 +34,7 @@
 
 #include <LibUtilities/TimeIntegration/TimeIntegrationSchemeSDC.h>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 std::string TimeIntegrationSchemeSDC::v_GetName() const
@@ -359,5 +357,4 @@ std::ostream &operator<<(std::ostream &os,
     return os;
 }
 
-} // end namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities

@@ -38,9 +38,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 /**
  * @class  NekLinSysIterCGLoc
@@ -244,5 +242,4 @@ void NekLinSysIterCGLoc::DoConjugateGradient(
         k++;
     }
 }
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities

@@ -43,9 +43,7 @@
 #include <SolverUtils/Forcing/Forcing.h>
 #include <SolverUtils/SolverUtilsDeclspec.h>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 class ForcingNoise : public Forcing
 {
@@ -69,12 +67,12 @@ public:
     static std::string className;
 
 protected:
-    SOLVER_UTILS_EXPORT virtual void v_InitObject(
+    SOLVER_UTILS_EXPORT void v_InitObject(
         const Array<OneD, MultiRegions::ExpListSharedPtr> &pFields,
         const unsigned int &pNumForcingFields,
         const TiXmlElement *pForce) override;
 
-    SOLVER_UTILS_EXPORT virtual void v_Apply(
+    SOLVER_UTILS_EXPORT void v_Apply(
         const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
         const Array<OneD, Array<OneD, NekDouble>> &inarray,
         Array<OneD, Array<OneD, NekDouble>> &outarray,
@@ -83,7 +81,7 @@ protected:
 private:
     ForcingNoise(const LibUtilities::SessionReaderSharedPtr &pSession,
                  const std::weak_ptr<EquationSystem> &pEquation);
-    virtual ~ForcingNoise(void){};
+    ~ForcingNoise(void) override{};
 
     int m_index;
     int m_updateFreq;
@@ -91,7 +89,6 @@ private:
     NekDouble m_noise;
 };
 
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils
 
 #endif

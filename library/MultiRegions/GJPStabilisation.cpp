@@ -34,9 +34,7 @@
 
 #include <MultiRegions/GJPStabilisation.h>
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 std::string GJPStabilisation::GJPStabilisationLookupIds[2] = {
     LibUtilities::SessionReader::RegisterEnumValue(
@@ -399,5 +397,4 @@ void GJPStabilisation::MultiplyByStdDerivBaseOnTraceMat(
         cnt1 += rows * it.first;
     }
 }
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions

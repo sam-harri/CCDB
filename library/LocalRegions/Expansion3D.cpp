@@ -45,9 +45,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace LocalRegions
+namespace Nektar::LocalRegions
 {
 //  evaluate additional terms in HDG face. Note that this assumes that
 // edges are unpacked into local cartesian order.
@@ -399,7 +397,9 @@ void Expansion3D::SetFaceToGeomOrientation(const int face,
                 inout[k] = f_in[j];
                 // checking if sign is changing
                 if ((*map1)[j].sign != (*map2)[k].sign)
+                {
                     inout[k] *= -1.0;
+                }
                 break;
             }
         }
@@ -493,11 +493,17 @@ DNekScalMatSharedPtr Expansion3D::CreateMatrix(const MatrixKey &mkey)
                     m_metricinfo->GetDerivFactors(ptsKeys);
                 int dir = 0;
                 if (mkey.GetMatrixType() == StdRegions::eWeakDeriv0)
+                {
                     dir = 0;
+                }
                 if (mkey.GetMatrixType() == StdRegions::eWeakDeriv1)
+                {
                     dir = 1;
+                }
                 if (mkey.GetMatrixType() == StdRegions::eWeakDeriv2)
+                {
                     dir = 2;
+                }
 
                 MatrixKey deriv0key(StdRegions::eWeakDeriv0,
                                     mkey.GetShapeType(), *this);
@@ -3069,5 +3075,4 @@ void Expansion3D::v_TraceNormLen(const int traceid, NekDouble &h, NekDouble &p)
     }
     p = (NekDouble)(GetBasisNumModes(dirn) - 1);
 }
-} // namespace LocalRegions
-} // namespace Nektar
+} // namespace Nektar::LocalRegions

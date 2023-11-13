@@ -38,9 +38,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 LibUtilities::ShapeType Point::m_type =
@@ -68,5 +66,4 @@ unsigned int Point::GetNumNodes(ElmtConfig pConf)
     boost::ignore_unused(pConf);
     return 1;
 }
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh

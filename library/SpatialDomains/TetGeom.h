@@ -39,9 +39,7 @@
 #include <SpatialDomains/SpatialDomainsDeclspec.h>
 #include <SpatialDomains/TriGeom.h>
 
-namespace Nektar
-{
-namespace SpatialDomains
+namespace Nektar::SpatialDomains
 {
 
 class TetGeom : public Geometry3D
@@ -49,7 +47,7 @@ class TetGeom : public Geometry3D
 public:
     SPATIAL_DOMAINS_EXPORT TetGeom();
     SPATIAL_DOMAINS_EXPORT TetGeom(int id, const TriGeomSharedPtr faces[]);
-    SPATIAL_DOMAINS_EXPORT ~TetGeom();
+    SPATIAL_DOMAINS_EXPORT ~TetGeom() override;
 
     SPATIAL_DOMAINS_EXPORT static const int kNverts  = 4;
     SPATIAL_DOMAINS_EXPORT static const int kNedges  = 6;
@@ -59,15 +57,14 @@ public:
     SPATIAL_DOMAINS_EXPORT static const std::string XMLElementType;
 
 protected:
-    virtual int v_GetVertexEdgeMap(const int i, const int j) const override;
-    virtual int v_GetVertexFaceMap(const int i, const int j) const override;
-    virtual int v_GetEdgeFaceMap(const int i, const int j) const override;
-    virtual int v_GetEdgeNormalToFaceVert(const int i,
-                                          const int j) const override;
-    virtual int v_GetDir(const int faceidx, const int facedir) const override;
-    virtual void v_Reset(CurveMap &curvedEdges, CurveMap &curvedFaces) override;
-    virtual void v_Setup() override;
-    virtual void v_GenGeomFactors() override;
+    int v_GetVertexEdgeMap(const int i, const int j) const override;
+    int v_GetVertexFaceMap(const int i, const int j) const override;
+    int v_GetEdgeFaceMap(const int i, const int j) const override;
+    int v_GetEdgeNormalToFaceVert(const int i, const int j) const override;
+    int v_GetDir(const int faceidx, const int facedir) const override;
+    void v_Reset(CurveMap &curvedEdges, CurveMap &curvedFaces) override;
+    void v_Setup() override;
+    void v_GenGeomFactors() override;
 
 private:
     void SetUpLocalEdges();
@@ -86,7 +83,6 @@ typedef std::shared_ptr<TetGeom> TetGeomSharedPtr;
 typedef std::vector<TetGeomSharedPtr> TetGeomVector;
 typedef std::map<int, TetGeomSharedPtr> TetGeomMap;
 
-} // namespace SpatialDomains
-} // namespace Nektar
+} // namespace Nektar::SpatialDomains
 
 #endif // NEKTAR_SPATIALDOMAINS_TETGEOM

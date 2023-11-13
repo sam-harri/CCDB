@@ -37,9 +37,7 @@
 
 #include <NekMesh/Module/Module.h>
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 /**
@@ -59,7 +57,7 @@ public:
     static NekMesh::ModuleKey className;
 
     ProcessJac(NekMesh::MeshSharedPtr m);
-    virtual ~ProcessJac();
+    ~ProcessJac() override;
 
     /// Write mesh to output file.
     void Process() override;
@@ -69,7 +67,6 @@ public:
         return "ProcessJac";
     }
 };
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh
 
 #endif

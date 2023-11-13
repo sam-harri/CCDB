@@ -38,9 +38,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 /**
  * @class  NekLinSysIter
@@ -180,5 +178,4 @@ void NekLinSysIter::Set_Rhs_Magnitude(const Array<OneD, NekDouble> &pIn)
     }
 }
 
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities

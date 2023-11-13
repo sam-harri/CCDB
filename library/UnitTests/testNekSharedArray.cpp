@@ -44,9 +44,7 @@
 #include <boost/test/unit_test.hpp>
 #include <iostream>
 
-namespace Nektar
-{
-namespace SharedArrayUnitTests
+namespace Nektar::SharedArrayUnitTests
 {
 
 class ParameterTestClass
@@ -783,5 +781,4 @@ BOOST_AUTO_TEST_CASE(Test2DEqualOperator)
     }
 }
 
-} // namespace SharedArrayUnitTests
-} // namespace Nektar
+} // namespace Nektar::SharedArrayUnitTests

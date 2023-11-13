@@ -40,9 +40,7 @@
 #include <StdRegions/StdRegionsDeclspec.h>
 #include <tuple>
 
-namespace Nektar
-{
-namespace StdRegions
+namespace Nektar::StdRegions
 {
 typedef std::tuple<unsigned int, unsigned int, unsigned int, unsigned int> Mode;
 
@@ -256,7 +254,6 @@ private:
     STD_REGIONS_EXPORT int GetMode(int I, int J, int K);
 };
 typedef std::shared_ptr<StdPyrExp> StdPyrExpSharedPtr;
-} // namespace StdRegions
-} // namespace Nektar
+} // namespace Nektar::StdRegions
 
 #endif // STDPYREXP_H

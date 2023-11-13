@@ -43,9 +43,7 @@ using namespace std;
 
 #include "ProcessC0Projection.h"
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 ModuleKey ProcessC0Projection::className =
@@ -232,5 +230,4 @@ void ProcessC0Projection::v_Process(po::variables_map &vm)
             tmp = m_f->m_exp[processFields[i]]->UpdatePhys());
     }
 }
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

@@ -42,9 +42,7 @@ using namespace std;
 
 #include "ProcessHomogeneousStretch.h"
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 ModuleKey ProcessHomogeneousStretch::className =
@@ -120,5 +118,4 @@ void ProcessHomogeneousStretch::v_Process(po::variables_map &vm)
         }
     }
 }
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

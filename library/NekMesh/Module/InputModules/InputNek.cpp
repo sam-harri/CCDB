@@ -48,9 +48,7 @@
 using namespace std;
 using namespace Nektar::NekMesh;
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 ModuleKey InputNek::className = GetModuleFactory().RegisterCreatorFunction(
@@ -1129,5 +1127,4 @@ int InputNek::GetNnodes(LibUtilities::ShapeType InputNekEntity)
 
     return nNodes;
 }
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh

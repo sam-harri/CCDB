@@ -49,9 +49,7 @@ extern "C"
 #include <triangle.h>
 }
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 /**
@@ -106,7 +104,7 @@ private:
     public:
         void Run(char *cmd)
         {
-            triangulate(cmd, &in, &out, NULL);
+            triangulate(cmd, &in, &out, nullptr);
         }
         struct triangulateio in, out;
     };
@@ -128,7 +126,6 @@ private:
 };
 
 typedef std::shared_ptr<TriangleInterface> TriangleInterfaceSharedPtr;
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh
 
 #endif

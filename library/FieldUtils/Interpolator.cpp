@@ -41,9 +41,7 @@ using namespace std;
 namespace bg  = boost::geometry;
 namespace bgi = boost::geometry::index;
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 /**
@@ -353,5 +351,4 @@ void Interpolator<T>::Interpolate(
 
 template class Interpolator<std::vector<MultiRegions::ExpListSharedPtr>>;
 template class Interpolator<Array<OneD, MultiRegions::ExpListSharedPtr>>;
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

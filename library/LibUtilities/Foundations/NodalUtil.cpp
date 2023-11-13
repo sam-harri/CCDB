@@ -42,9 +42,7 @@
 #include <LibUtilities/LinearAlgebra/NekVector.hpp>
 #include <LibUtilities/Polylib/Polylib.h>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 /**
@@ -294,9 +292,9 @@ NekVector<NekDouble> NodalUtilTriangle::v_OrthoBasis(const size_t mode)
     std::pair<int, int> modes = m_ordering[mode];
 
     // Calculate Jacobi polynomials
-    Polylib::jacobfd(m_numPoints, &m_eta[0][0], &jacobi_i[0], NULL, modes.first,
-                     0.0, 0.0);
-    Polylib::jacobfd(m_numPoints, &m_eta[1][0], &jacobi_j[0], NULL,
+    Polylib::jacobfd(m_numPoints, &m_eta[0][0], &jacobi_i[0], nullptr,
+                     modes.first, 0.0, 0.0);
+    Polylib::jacobfd(m_numPoints, &m_eta[1][0], &jacobi_j[0], nullptr,
                      modes.second, 2.0 * modes.first + 1.0, 0.0);
 
     NekVector<NekDouble> ret(m_numPoints);
@@ -335,9 +333,9 @@ NekVector<NekDouble> NodalUtilTriangle::v_OrthoBasisDeriv(const size_t dir,
     // Calculate Jacobi polynomials and their derivatives. Note that we use both
     // jacobfd and jacobd since jacobfd is only valid for derivatives in the
     // open interval (-1,1).
-    Polylib::jacobfd(m_numPoints, &m_eta[0][0], &jacobi_i[0], NULL, modes.first,
-                     0.0, 0.0);
-    Polylib::jacobfd(m_numPoints, &m_eta[1][0], &jacobi_j[0], NULL,
+    Polylib::jacobfd(m_numPoints, &m_eta[0][0], &jacobi_i[0], nullptr,
+                     modes.first, 0.0, 0.0);
+    Polylib::jacobfd(m_numPoints, &m_eta[1][0], &jacobi_j[0], nullptr,
                      modes.second, 2.0 * modes.first + 1.0, 0.0);
     Polylib::jacobd(m_numPoints, &m_eta[0][0], &jacobi_di[0], modes.first, 0.0,
                     0.0);
@@ -493,10 +491,10 @@ NekVector<NekDouble> NodalUtilTetrahedron::v_OrthoBasis(const size_t mode)
     std::tie(I, J, K) = m_ordering[mode];
 
     // Calculate Jacobi polynomials
-    Polylib::jacobfd(m_numPoints, &m_eta[0][0], &jacA[0], NULL, I, 0.0, 0.0);
-    Polylib::jacobfd(m_numPoints, &m_eta[1][0], &jacB[0], NULL, J,
+    Polylib::jacobfd(m_numPoints, &m_eta[0][0], &jacA[0], nullptr, I, 0.0, 0.0);
+    Polylib::jacobfd(m_numPoints, &m_eta[1][0], &jacB[0], nullptr, J,
                      2.0 * I + 1.0, 0.0);
-    Polylib::jacobfd(m_numPoints, &m_eta[2][0], &jacC[0], NULL, K,
+    Polylib::jacobfd(m_numPoints, &m_eta[2][0], &jacC[0], nullptr, K,
                      2.0 * (I + J) + 2.0, 0.0);
 
     NekVector<NekDouble> ret(m_numPoints);
@@ -537,10 +535,10 @@ NekVector<NekDouble> NodalUtilTetrahedron::v_OrthoBasisDeriv(const size_t dir,
     std::tie(I, J, K) = m_ordering[mode];
 
     // Calculate Jacobi polynomials
-    Polylib::jacobfd(m_numPoints, &m_eta[0][0], &jacA[0], NULL, I, 0.0, 0.0);
-    Polylib::jacobfd(m_numPoints, &m_eta[1][0], &jacB[0], NULL, J,
+    Polylib::jacobfd(m_numPoints, &m_eta[0][0], &jacA[0], nullptr, I, 0.0, 0.0);
+    Polylib::jacobfd(m_numPoints, &m_eta[1][0], &jacB[0], nullptr, J,
                      2.0 * I + 1.0, 0.0);
-    Polylib::jacobfd(m_numPoints, &m_eta[2][0], &jacC[0], NULL, K,
+    Polylib::jacobfd(m_numPoints, &m_eta[2][0], &jacC[0], nullptr, K,
                      2.0 * (I + J) + 2.0, 0.0);
     Polylib::jacobd(m_numPoints, &m_eta[0][0], &jacDerivA[0], I, 0.0, 0.0);
     Polylib::jacobd(m_numPoints, &m_eta[1][0], &jacDerivB[0], J, 2.0 * I + 1.0,
@@ -712,9 +710,9 @@ NekVector<NekDouble> NodalUtilPrism::v_OrthoBasis(const size_t mode)
     std::tie(I, J, K) = m_ordering[mode];
 
     // Calculate Jacobi polynomials
-    Polylib::jacobfd(m_numPoints, &m_eta[0][0], &jacA[0], NULL, I, 0.0, 0.0);
-    Polylib::jacobfd(m_numPoints, &m_eta[1][0], &jacB[0], NULL, J, 0.0, 0.0);
-    Polylib::jacobfd(m_numPoints, &m_eta[2][0], &jacC[0], NULL, K,
+    Polylib::jacobfd(m_numPoints, &m_eta[0][0], &jacA[0], nullptr, I, 0.0, 0.0);
+    Polylib::jacobfd(m_numPoints, &m_eta[1][0], &jacB[0], nullptr, J, 0.0, 0.0);
+    Polylib::jacobfd(m_numPoints, &m_eta[2][0], &jacC[0], nullptr, K,
                      2.0 * I + 1.0, 0.0);
 
     NekVector<NekDouble> ret(m_numPoints);
@@ -755,9 +753,9 @@ NekVector<NekDouble> NodalUtilPrism::v_OrthoBasisDeriv(const size_t dir,
     std::tie(I, J, K) = m_ordering[mode];
 
     // Calculate Jacobi polynomials
-    Polylib::jacobfd(m_numPoints, &m_eta[0][0], &jacA[0], NULL, I, 0.0, 0.0);
-    Polylib::jacobfd(m_numPoints, &m_eta[1][0], &jacB[0], NULL, J, 0.0, 0.0);
-    Polylib::jacobfd(m_numPoints, &m_eta[2][0], &jacC[0], NULL, K,
+    Polylib::jacobfd(m_numPoints, &m_eta[0][0], &jacA[0], nullptr, I, 0.0, 0.0);
+    Polylib::jacobfd(m_numPoints, &m_eta[1][0], &jacB[0], nullptr, J, 0.0, 0.0);
+    Polylib::jacobfd(m_numPoints, &m_eta[2][0], &jacC[0], nullptr, K,
                      2.0 * I + 1.0, 0.0);
     Polylib::jacobd(m_numPoints, &m_eta[0][0], &jacDerivA[0], I, 0.0, 0.0);
     Polylib::jacobd(m_numPoints, &m_eta[1][0], &jacDerivB[0], J, 0.0, 0.0);
@@ -861,10 +859,10 @@ NekVector<NekDouble> NodalUtilQuad::v_OrthoBasis(const size_t mode)
     std::pair<int, int> modes = m_ordering[mode];
 
     // Calculate Jacobi polynomials
-    Polylib::jacobfd(m_numPoints, &m_xi[0][0], &jacobi_i[0], NULL, modes.first,
-                     0.0, 0.0);
-    Polylib::jacobfd(m_numPoints, &m_xi[1][0], &jacobi_j[0], NULL, modes.second,
-                     0.0, 0.0);
+    Polylib::jacobfd(m_numPoints, &m_xi[0][0], &jacobi_i[0], nullptr,
+                     modes.first, 0.0, 0.0);
+    Polylib::jacobfd(m_numPoints, &m_xi[1][0], &jacobi_j[0], nullptr,
+                     modes.second, 0.0, 0.0);
 
     NekVector<NekDouble> ret(m_numPoints);
 
@@ -892,10 +890,10 @@ NekVector<NekDouble> NodalUtilQuad::v_OrthoBasisDeriv(const size_t dir,
     // Calculate Jacobi polynomials and their derivatives. Note that we use both
     // jacobfd and jacobd since jacobfd is only valid for derivatives in the
     // open interval (-1,1).
-    Polylib::jacobfd(m_numPoints, &m_xi[0][0], &jacobi_i[0], NULL, modes.first,
-                     0.0, 0.0);
-    Polylib::jacobfd(m_numPoints, &m_xi[1][0], &jacobi_j[0], NULL, modes.second,
-                     0.0, 0.0);
+    Polylib::jacobfd(m_numPoints, &m_xi[0][0], &jacobi_i[0], nullptr,
+                     modes.first, 0.0, 0.0);
+    Polylib::jacobfd(m_numPoints, &m_xi[1][0], &jacobi_j[0], nullptr,
+                     modes.second, 0.0, 0.0);
     Polylib::jacobd(m_numPoints, &m_xi[0][0], &jacobi_di[0], modes.first, 0.0,
                     0.0);
     Polylib::jacobd(m_numPoints, &m_xi[1][0], &jacobi_dj[0], modes.second, 0.0,
@@ -978,9 +976,12 @@ NekVector<NekDouble> NodalUtilHex::v_OrthoBasis(const size_t mode)
     std::tie(I, J, K) = m_ordering[mode];
 
     // Calculate Jacobi polynomials
-    Polylib::jacobfd(m_numPoints, &m_xi[0][0], &jacobi_i[0], NULL, I, 0.0, 0.0);
-    Polylib::jacobfd(m_numPoints, &m_xi[1][0], &jacobi_j[0], NULL, J, 0.0, 0.0);
-    Polylib::jacobfd(m_numPoints, &m_xi[2][0], &jacobi_k[0], NULL, K, 0.0, 0.0);
+    Polylib::jacobfd(m_numPoints, &m_xi[0][0], &jacobi_i[0], nullptr, I, 0.0,
+                     0.0);
+    Polylib::jacobfd(m_numPoints, &m_xi[1][0], &jacobi_j[0], nullptr, J, 0.0,
+                     0.0);
+    Polylib::jacobfd(m_numPoints, &m_xi[2][0], &jacobi_k[0], nullptr, K, 0.0,
+                     0.0);
 
     NekVector<NekDouble> ret(m_numPoints);
 
@@ -1006,9 +1007,12 @@ NekVector<NekDouble> NodalUtilHex::v_OrthoBasisDeriv(const size_t dir,
     // Calculate Jacobi polynomials and their derivatives. Note that we use both
     // jacobfd and jacobd since jacobfd is only valid for derivatives in the
     // open interval (-1,1).
-    Polylib::jacobfd(m_numPoints, &m_xi[0][0], &jacobi_i[0], NULL, I, 0.0, 0.0);
-    Polylib::jacobfd(m_numPoints, &m_xi[1][0], &jacobi_j[0], NULL, J, 0.0, 0.0);
-    Polylib::jacobfd(m_numPoints, &m_xi[2][0], &jacobi_k[0], NULL, K, 0.0, 0.0);
+    Polylib::jacobfd(m_numPoints, &m_xi[0][0], &jacobi_i[0], nullptr, I, 0.0,
+                     0.0);
+    Polylib::jacobfd(m_numPoints, &m_xi[1][0], &jacobi_j[0], nullptr, J, 0.0,
+                     0.0);
+    Polylib::jacobfd(m_numPoints, &m_xi[2][0], &jacobi_k[0], nullptr, K, 0.0,
+                     0.0);
     Polylib::jacobd(m_numPoints, &m_xi[0][0], &jacobi_di[0], I, 0.0, 0.0);
     Polylib::jacobd(m_numPoints, &m_xi[1][0], &jacobi_dj[0], J, 0.0, 0.0);
     Polylib::jacobd(m_numPoints, &m_xi[2][0], &jacobi_dk[0], K, 0.0, 0.0);
@@ -1040,5 +1044,4 @@ NekVector<NekDouble> NodalUtilHex::v_OrthoBasisDeriv(const size_t dir,
     return ret;
 }
 
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities

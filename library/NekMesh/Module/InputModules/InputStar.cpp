@@ -942,7 +942,7 @@ void InputStar::InitCCM(void)
     // need to pass in NULL (which always means kCCMIONoErr)
     // and then assign the return value to 'err'.).
     string fname = m_config["infile"].as<string>();
-    m_ccmErr     = CCMIOOpenFile(NULL, fname.c_str(), kCCMIORead, &root);
+    m_ccmErr     = CCMIOOpenFile(nullptr, fname.c_str(), kCCMIORead, &root);
 
     if (m_ccmErr != kCCMIONoErr)
     {
@@ -980,14 +980,14 @@ void InputStar::ReadNodes(std::vector<NodeSharedPtr> &Nodes)
     int dims = 1;
 
     CCMIOReadProcessor(&m_ccmErr, m_ccmProcessor, &vertices, &m_ccmTopology,
-                       NULL, NULL);
+                       nullptr, nullptr);
 
     if (m_ccmErr != kCCMIONoErr)
     {
         m_log(FATAL) << "CCM error: error reading processor" << endl;
     }
 
-    CCMIOEntitySize(&m_ccmErr, vertices, &nVertices, NULL);
+    CCMIOEntitySize(&m_ccmErr, vertices, &nVertices, nullptr);
     if (m_ccmErr != kCCMIONoErr)
     {
         m_log(FATAL) << "CCM error: error reading NextEntitySize in ReadNodes"
@@ -1045,17 +1045,17 @@ void InputStar::ReadInternalFaces(unordered_map<int, vector<int>> &FacesNodes,
 
     // Read the internal faces.
     CCMIOGetEntity(&m_ccmErr, m_ccmTopology, kCCMIOInternalFaces, 0, &id);
-    CCMIOEntitySize(&m_ccmErr, id, &nFaces, NULL);
+    CCMIOEntitySize(&m_ccmErr, id, &nFaces, nullptr);
 
     int nf = nFaces;
     mapData.resize(nf);
     faceCells.resize(2 * nf);
 
-    CCMIOReadFaces(&m_ccmErr, id, kCCMIOInternalFaces, NULL, &size, NULL,
+    CCMIOReadFaces(&m_ccmErr, id, kCCMIOInternalFaces, nullptr, &size, nullptr,
                    kCCMIOStart, kCCMIOEnd);
     faces.resize((size_t)size);
-    CCMIOReadFaces(&m_ccmErr, id, kCCMIOInternalFaces, &mapID, NULL, &faces[0],
-                   kCCMIOStart, kCCMIOEnd);
+    CCMIOReadFaces(&m_ccmErr, id, kCCMIOInternalFaces, &mapID, nullptr,
+                   &faces[0], kCCMIOStart, kCCMIOEnd);
     CCMIOReadFaceCells(&m_ccmErr, id, kCCMIOInternalFaces, &faceCells[0],
                        kCCMIOStart, kCCMIOEnd);
     CCMIOReadMap(&m_ccmErr, mapID, &mapData[0], kCCMIOStart, kCCMIOEnd);
@@ -1123,20 +1123,20 @@ void InputStar::ReadBoundaryFaces(vector<vector<int>> &BndElementFaces,
     vector<int> faces, faceCells, mapData;
     vector<string> facelabel;
 
-    while (CCMIONextEntity(NULL, m_ccmTopology, kCCMIOBoundaryFaces, &index,
+    while (CCMIONextEntity(nullptr, m_ccmTopology, kCCMIOBoundaryFaces, &index,
                            &id) == kCCMIONoErr)
     {
         int boundaryVal;
 
-        CCMIOEntitySize(&m_ccmErr, id, &nFaces, NULL);
+        CCMIOEntitySize(&m_ccmErr, id, &nFaces, nullptr);
         CCMIOSize nf = nFaces;
         mapData.resize(nf);
         faceCells.resize(nf);
-        CCMIOReadFaces(&m_ccmErr, id, kCCMIOBoundaryFaces, NULL, &size, NULL,
-                       kCCMIOStart, kCCMIOEnd);
+        CCMIOReadFaces(&m_ccmErr, id, kCCMIOBoundaryFaces, nullptr, &size,
+                       nullptr, kCCMIOStart, kCCMIOEnd);
 
         faces.resize((size_t)size);
-        CCMIOReadFaces(&m_ccmErr, id, kCCMIOBoundaryFaces, &mapID, NULL,
+        CCMIOReadFaces(&m_ccmErr, id, kCCMIOBoundaryFaces, &mapID, nullptr,
                        &faces[0], kCCMIOStart, kCCMIOEnd);
         CCMIOReadFaceCells(&m_ccmErr, id, kCCMIOBoundaryFaces, &faceCells[0],
                            kCCMIOStart, kCCMIOEnd);
@@ -1147,10 +1147,11 @@ void InputStar::ReadBoundaryFaces(vector<vector<int>> &BndElementFaces,
         // check to see if we have a label for this boundary faces
         int size;
         char *name;
-        if (CCMIOReadOptstr(NULL, id, "Label", &size, NULL) == kCCMIONoErr)
+        if (CCMIOReadOptstr(nullptr, id, "Label", &size, nullptr) ==
+            kCCMIONoErr)
         {
             name = new char[size + 1];
-            CCMIOReadOptstr(NULL, id, "Label", NULL, name);
+            CCMIOReadOptstr(nullptr, id, "Label", nullptr, name);
             Facelabels.push_back(string(name));
         }
         else

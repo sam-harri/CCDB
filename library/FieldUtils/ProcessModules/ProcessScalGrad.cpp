@@ -41,9 +41,7 @@ using namespace std;
 #include <LibUtilities/BasicUtils/SharedArray.hpp>
 #include <MultiRegions/ExpList.h>
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 ModuleKey ProcessScalGrad::className =
@@ -231,5 +229,4 @@ void ProcessScalGrad::v_Process(po::variables_map &vm)
         }
     }
 }
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

@@ -44,9 +44,7 @@ using namespace std;
 
 #include "OutputVtkBase.h"
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 // Disable the base VTK factory if using the VTK library, this is so we can
@@ -143,7 +141,7 @@ void OutputVtkBase::v_OutputFromPts(po::variables_map &vm)
             << numBlocks << "\">" << endl;
     outfile << "      <Points>" << endl;
     outfile << "        <DataArray type=\"Float64\" "
-            << "NumberOfComponents=\"" << 3 << "\" format=\"ascii\">" << endl;
+            << "NumberOfComponents=\"" << 3 << R"(" format="ascii">)" << endl;
     for (i = 0; i < nPts; ++i)
     {
         for (j = 0; j < dim; ++j)
@@ -162,7 +160,7 @@ void OutputVtkBase::v_OutputFromPts(po::variables_map &vm)
     outfile << "      </Points>" << endl;
     outfile << "      <Cells>" << endl;
     outfile << "        <DataArray type=\"Int32\" "
-            << "Name=\"connectivity\" format=\"ascii\">" << endl;
+            << R"(Name="connectivity" format="ascii">)" << endl;
 
     // dump connectivity data if it exists
     outfile << "          ";
@@ -182,7 +180,7 @@ void OutputVtkBase::v_OutputFromPts(po::variables_map &vm)
     }
     outfile << "        </DataArray>" << endl;
     outfile << "        <DataArray type=\"Int32\" "
-            << "Name=\"offsets\" format=\"ascii\">" << endl;
+            << R"(Name="offsets" format="ascii">)" << endl;
 
     outfile << "          ";
     for (i = 0; i < numBlocks; ++i)
@@ -192,7 +190,7 @@ void OutputVtkBase::v_OutputFromPts(po::variables_map &vm)
     outfile << endl;
     outfile << "        </DataArray>" << endl;
     outfile << "        <DataArray type=\"UInt8\" "
-            << "Name=\"types\" format=\"ascii\">" << endl;
+            << R"(Name="types" format="ascii">)" << endl;
     outfile << "          ";
     for (i = 0; i < numBlocks; ++i)
     {
@@ -206,7 +204,7 @@ void OutputVtkBase::v_OutputFromPts(po::variables_map &vm)
     // printing the fields
     for (j = 0; j < nfields; ++j)
     {
-        outfile << "        <DataArray type=\"Float64\" Name=\""
+        outfile << R"(        <DataArray type="Float64" Name=")"
                 << m_f->m_variables[j] << "\">" << endl;
         outfile << "          ";
         for (i = 0; i < fPts->GetNpoints(); ++i)
@@ -335,7 +333,7 @@ fs::path OutputVtkBase::v_GetFullOutName(std::string &filename,
 void OutputVtkBase::WriteVtkHeader(std::ostream &outfile)
 {
     outfile << "<?xml version=\"1.0\"?>" << endl;
-    outfile << "<VTKFile type=\"UnstructuredGrid\" version=\"0.1\" "
+    outfile << R"(<VTKFile type="UnstructuredGrid" version="0.1" )"
             << "byte_order=\"LittleEndian\">" << endl;
     outfile << "  <UnstructuredGrid>" << endl;
 }
@@ -353,21 +351,21 @@ void OutputVtkBase::WriteEmptyVtkPiece(std::ofstream &outfile)
             << "\">" << endl;
     outfile << "      <Points>" << endl;
     outfile << "        <DataArray type=\"Float64\" "
-            << "NumberOfComponents=\"" << 3 << "\" format=\"ascii\">" << endl;
+            << "NumberOfComponents=\"" << 3 << R"(" format="ascii">)" << endl;
     outfile << "        </DataArray>" << endl;
     outfile << "      </Points>" << endl;
     outfile << "      <Cells>" << endl;
     outfile << "        <DataArray type=\"Int32\" "
-            << "Name=\"connectivity\" format=\"ascii\">" << endl;
+            << R"(Name="connectivity" format="ascii">)" << endl;
     outfile << "        </DataArray>" << endl;
     outfile << "        <DataArray type=\"Int32\" "
-            << "Name=\"offsets\" format=\"ascii\">" << endl;
+            << R"(Name="offsets" format="ascii">)" << endl;
 
     outfile << "          ";
     outfile << endl;
     outfile << "        </DataArray>" << endl;
     outfile << "        <DataArray type=\"UInt8\" "
-            << "Name=\"types\" format=\"ascii\">" << endl;
+            << R"(Name="types" format="ascii">)" << endl;
     outfile << "          ";
     outfile << endl;
     outfile << "        </DataArray>" << endl;
@@ -391,11 +389,11 @@ void OutputVtkBase::WritePVtu(po::variables_map &vm)
     string path = LibUtilities::PortablePath(GetPath(filename, vm));
 
     outfile << "<?xml version=\"1.0\"?>" << endl;
-    outfile << "<VTKFile type=\"PUnstructuredGrid\" version=\"0.1\" "
+    outfile << R"(<VTKFile type="PUnstructuredGrid" version="0.1" )"
             << "byte_order=\"LittleEndian\">" << endl;
     outfile << "<PUnstructuredGrid GhostLevel=\"0\">" << endl;
     outfile << "<PPoints> " << endl;
-    outfile << "<PDataArray type=\"Float64\" NumberOfComponents=\"" << 3
+    outfile << R"(<PDataArray type="Float64" NumberOfComponents=")" << 3
             << "\"/> " << endl;
     outfile << "</PPoints>" << endl;
     outfile << "<PCells>" << endl;
@@ -412,7 +410,7 @@ void OutputVtkBase::WritePVtu(po::variables_map &vm)
     outfile << "<PPointData Scalars=\"Material\">" << endl;
     for (int i = 0; i < m_f->m_variables.size(); ++i)
     {
-        outfile << "<PDataArray type=\"Float64\" Name=\"" << m_f->m_variables[i]
+        outfile << R"(<PDataArray type="Float64" Name=")" << m_f->m_variables[i]
                 << "\"/>" << endl;
     }
     outfile << "</PPointData>" << endl;
@@ -462,5 +460,4 @@ std::string OutputVtkBase::PrepareOutput(po::variables_map &vm)
     return filename;
 }
 
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

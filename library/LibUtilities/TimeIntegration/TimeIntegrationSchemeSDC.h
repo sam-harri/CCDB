@@ -46,9 +46,7 @@
 #include <LibUtilities/Polylib/Polylib.h>
 #include <LibUtilities/TimeIntegration/TimeIntegrationScheme.h>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -173,7 +171,7 @@ public:
     }
 
     /// Destructor
-    virtual ~TimeIntegrationSchemeSDC()
+    ~TimeIntegrationSchemeSDC() override
     {
     }
 
@@ -311,34 +309,33 @@ public:
     LUE void UpdateIntegratedResidualQFint(const NekDouble &delta_t);
 
 protected:
-    LUE virtual std::string v_GetName() const override;
-    LUE virtual std::string v_GetVariant() const override;
-    LUE virtual size_t v_GetOrder() const override;
-    LUE virtual std::vector<NekDouble> v_GetFreeParams() const override;
-    LUE virtual TimeIntegrationSchemeType v_GetIntegrationSchemeType()
-        const override;
-    LUE virtual NekDouble v_GetTimeStability() const override;
-    LUE virtual size_t v_GetNumIntegrationPhases() const override;
+    LUE std::string v_GetName() const override;
+    LUE std::string v_GetVariant() const override;
+    LUE size_t v_GetOrder() const override;
+    LUE std::vector<NekDouble> v_GetFreeParams() const override;
+    LUE TimeIntegrationSchemeType v_GetIntegrationSchemeType() const override;
+    LUE NekDouble v_GetTimeStability() const override;
+    LUE size_t v_GetNumIntegrationPhases() const override;
 
     /**
      * \brief Gets the solution vector of the ODE
      */
-    LUE virtual const TripleArray &v_GetSolutionVector() const override;
-    LUE virtual TripleArray &v_UpdateSolutionVector() override;
+    LUE const TripleArray &v_GetSolutionVector() const override;
+    LUE TripleArray &v_UpdateSolutionVector() override;
 
     /**
      * \brief Sets the solution vector of the ODE
      */
-    LUE virtual void v_SetSolutionVector(const size_t Offset,
-                                         const DoubleArray &y) override;
+    LUE void v_SetSolutionVector(const size_t Offset,
+                                 const DoubleArray &y) override;
 
     // The worker methods from the base class that are virtual
-    LUE virtual void v_InitializeScheme(
+    LUE void v_InitializeScheme(
         const NekDouble deltaT, ConstDoubleArray &y_0, const NekDouble time,
         const TimeIntegrationSchemeOperators &op) override;
 
-    LUE virtual ConstDoubleArray &v_TimeIntegrate(
-        const size_t timestep, const NekDouble delta_t) override;
+    LUE ConstDoubleArray &v_TimeIntegrate(const size_t timestep,
+                                          const NekDouble delta_t) override;
 
     LUE virtual void v_ResidualEval(const NekDouble &delta_t, const size_t n)
     {
@@ -368,8 +365,8 @@ protected:
         boost::ignore_unused(delta_t);
     }
 
-    LUE virtual void v_print(std::ostream &os) const override;
-    LUE virtual void v_printFull(std::ostream &os) const override;
+    LUE void v_print(std::ostream &os) const override;
+    LUE void v_printFull(std::ostream &os) const override;
 
     // Variables common to all schemes
     NekDouble m_time;
@@ -406,7 +403,6 @@ protected:
 
 }; // end class TimeIntegrationSchemeSDC
 
-} // end namespace LibUtilities
-} // end namespace Nektar
+} // namespace Nektar::LibUtilities
 
 #endif

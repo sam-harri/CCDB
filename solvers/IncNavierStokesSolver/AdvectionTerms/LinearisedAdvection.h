@@ -106,24 +106,24 @@ protected:
 
     LinearisedAdvection();
 
-    virtual ~LinearisedAdvection();
+    ~LinearisedAdvection() override;
 
-    virtual void v_InitObject(
+    void v_InitObject(
         LibUtilities::SessionReaderSharedPtr pSession,
         Array<OneD, MultiRegions::ExpListSharedPtr> pFields) override;
 
-    virtual void v_Advect(
-        const int nConvectiveFields,
-        const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
-        const Array<OneD, Array<OneD, NekDouble>> &advVel,
-        const Array<OneD, Array<OneD, NekDouble>> &inarray,
-        Array<OneD, Array<OneD, NekDouble>> &outarray, const NekDouble &time,
-        const Array<OneD, Array<OneD, NekDouble>> &pFwd =
-            NullNekDoubleArrayOfArray,
-        const Array<OneD, Array<OneD, NekDouble>> &pBwd =
-            NullNekDoubleArrayOfArray) override;
+    void v_Advect(const int nConvectiveFields,
+                  const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
+                  const Array<OneD, Array<OneD, NekDouble>> &advVel,
+                  const Array<OneD, Array<OneD, NekDouble>> &inarray,
+                  Array<OneD, Array<OneD, NekDouble>> &outarray,
+                  const NekDouble &time,
+                  const Array<OneD, Array<OneD, NekDouble>> &pFwd =
+                      NullNekDoubleArrayOfArray,
+                  const Array<OneD, Array<OneD, NekDouble>> &pBwd =
+                      NullNekDoubleArrayOfArray) override;
 
-    virtual void v_SetBaseFlow(
+    void v_SetBaseFlow(
         const Array<OneD, Array<OneD, NekDouble>> &inarray,
         const Array<OneD, MultiRegions::ExpListSharedPtr> &fields) override;
 

@@ -35,9 +35,7 @@
 #include <LibUtilities/Foundations/NodalTetSPI.h>
 #include <LibUtilities/Foundations/NodalTetSPIData.h>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 bool NodalTetSPI::initPointsManager[] = {PointsManager().RegisterCreator(
@@ -103,5 +101,4 @@ std::shared_ptr<PointsBaseType> NodalTetSPI::Create(const PointsKey &key)
     return returnval;
 }
 
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities

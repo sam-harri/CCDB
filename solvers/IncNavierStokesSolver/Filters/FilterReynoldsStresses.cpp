@@ -34,9 +34,7 @@
 
 #include <IncNavierStokesSolver/Filters/FilterReynoldsStresses.h>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 std::string FilterReynoldsStresses::className =
     GetFilterFactory().RegisterCreatorFunction("ReynoldsStresses",
@@ -319,5 +317,4 @@ NekDouble FilterReynoldsStresses::v_GetScale()
     }
 }
 
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils

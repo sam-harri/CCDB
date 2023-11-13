@@ -44,9 +44,7 @@ using namespace std;
 
 #include "OutputTecplot.h"
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 std::string TecplotZoneTypeMap[] = {"ORDERED",       "LINESEG",     "TRIANGLE",
@@ -1148,5 +1146,4 @@ void OutputTecplot::CalculateConnectivity()
         }
     }
 }
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

@@ -41,9 +41,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 
 string DriverModifiedArnoldi::className =
@@ -427,8 +425,8 @@ void DriverModifiedArnoldi::EV_small(
         alpha[kdim] *
         std::fabs(R[kdim * kdimp + kdim] / R[(kdim - 1) * kdimp + kdim - 1]);
 
-    Lapack::dgeev_('N', 'V', kdim, &H[0], kdim, &wr[0], &wi[0], 0, 1, &zvec[0],
-                   kdim, &rwork[0], lwork, ier);
+    Lapack::dgeev_('N', 'V', kdim, &H[0], kdim, &wr[0], &wi[0], nullptr, 1,
+                   &zvec[0], kdim, &rwork[0], lwork, ier);
 
     ASSERTL0(!ier, "Error with dgeev");
 
@@ -685,5 +683,4 @@ void DriverModifiedArnoldi::EV_big(Array<OneD, Array<OneD, NekDouble>> &bvecs,
     }
 }
 
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils

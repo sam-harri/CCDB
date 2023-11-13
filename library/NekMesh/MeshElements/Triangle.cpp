@@ -40,9 +40,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 LibUtilities::ShapeType Triangle::m_type =
@@ -158,9 +156,13 @@ unsigned int Triangle::GetNumNodes(ElmtConfig pConf)
 {
     int n = pConf.m_order;
     if (!pConf.m_faceNodes)
+    {
         return (n + 1) + 2 * (n - 1) + 1;
+    }
     else
+    {
         return (n + 1) * (n + 2) / 2;
+    }
 }
 
 void Triangle::GetCurvedNodes(std::vector<NodeSharedPtr> &nodeList) const
@@ -298,5 +300,4 @@ Array<OneD, NekDouble> Triangle::Normal(bool inward)
     return ret;
 }
 
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh

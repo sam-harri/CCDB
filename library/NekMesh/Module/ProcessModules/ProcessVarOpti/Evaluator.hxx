@@ -39,9 +39,7 @@
 
 #include <LibUtilities/BasicConst/NektarUnivTypeDefs.hpp>
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 using namespace std;
@@ -274,7 +272,6 @@ template <> inline NekDouble FrobeniusNorm<3>(NekDouble inarray[][3])
            inarray[2][2] * inarray[2][2];
 }
 
-} // namespace NekMesh
 } // namespace Nektar
 
 #endif

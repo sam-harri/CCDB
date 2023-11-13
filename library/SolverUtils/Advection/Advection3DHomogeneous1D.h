@@ -40,9 +40,7 @@
 #include <SolverUtils/Advection/Advection.h>
 #include <SolverUtils/Advection/HomogeneousRSScalar.hpp>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 class Advection3DHomogeneous1D : public Advection
 {
@@ -58,20 +56,20 @@ protected:
 
     std::string m_advType;
 
-    virtual void v_InitObject(
+    void v_InitObject(
         LibUtilities::SessionReaderSharedPtr pSession,
         Array<OneD, MultiRegions::ExpListSharedPtr> pFields) override;
 
-    virtual void v_Advect(
-        const int nConvField,
-        const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
-        const Array<OneD, Array<OneD, NekDouble>> &advVel,
-        const Array<OneD, Array<OneD, NekDouble>> &inarray,
-        Array<OneD, Array<OneD, NekDouble>> &outarray, const NekDouble &time,
-        const Array<OneD, Array<OneD, NekDouble>> &pFwd =
-            NullNekDoubleArrayOfArray,
-        const Array<OneD, Array<OneD, NekDouble>> &pBwd =
-            NullNekDoubleArrayOfArray) override;
+    void v_Advect(const int nConvField,
+                  const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
+                  const Array<OneD, Array<OneD, NekDouble>> &advVel,
+                  const Array<OneD, Array<OneD, NekDouble>> &inarray,
+                  Array<OneD, Array<OneD, NekDouble>> &outarray,
+                  const NekDouble &time,
+                  const Array<OneD, Array<OneD, NekDouble>> &pFwd =
+                      NullNekDoubleArrayOfArray,
+                  const Array<OneD, Array<OneD, NekDouble>> &pBwd =
+                      NullNekDoubleArrayOfArray) override;
 
 private:
     SolverUtils::AdvectionSharedPtr m_planeAdv;
@@ -93,7 +91,6 @@ private:
         const Array<OneD, Array<OneD, NekDouble>> &physfield,
         Array<OneD, Array<OneD, Array<OneD, NekDouble>>> &flux);
 };
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils
 
 #endif

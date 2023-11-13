@@ -37,9 +37,7 @@
 
 #include <SolverUtils/Filters/Filter.h>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 class FilterEnergy : public Filter
 {
@@ -63,19 +61,19 @@ public:
         const LibUtilities::SessionReaderSharedPtr &pSession,
         const std::weak_ptr<EquationSystem> &pEquation,
         const ParamMap &pParams);
-    SOLVER_UTILS_EXPORT ~FilterEnergy();
+    SOLVER_UTILS_EXPORT ~FilterEnergy() override;
 
 protected:
-    SOLVER_UTILS_EXPORT virtual void v_Initialise(
+    SOLVER_UTILS_EXPORT void v_Initialise(
         const Array<OneD, const MultiRegions::ExpListSharedPtr> &pField,
         const NekDouble &time) override;
-    SOLVER_UTILS_EXPORT virtual void v_Update(
+    SOLVER_UTILS_EXPORT void v_Update(
         const Array<OneD, const MultiRegions::ExpListSharedPtr> &pField,
         const NekDouble &time) override;
-    SOLVER_UTILS_EXPORT virtual void v_Finalise(
+    SOLVER_UTILS_EXPORT void v_Finalise(
         const Array<OneD, const MultiRegions::ExpListSharedPtr> &pField,
         const NekDouble &time) override;
-    SOLVER_UTILS_EXPORT virtual bool v_IsTimeDependent() override;
+    SOLVER_UTILS_EXPORT bool v_IsTimeDependent() override;
 
 private:
     unsigned int m_index;
@@ -87,7 +85,6 @@ private:
     LibUtilities::CommSharedPtr m_comm;
     Array<OneD, unsigned int> m_planes;
 };
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils
 
 #endif

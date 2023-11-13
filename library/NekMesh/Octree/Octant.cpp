@@ -35,9 +35,7 @@
 #include <NekMesh/Octree/Octant.h>
 
 using namespace std;
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 inline OctantFace GetReverseFace(OctantFace f)
@@ -500,5 +498,4 @@ bool operator==(OctantSharedPtr const &p1, OctantSharedPtr const &p2)
 
     return false;
 }
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh

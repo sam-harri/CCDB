@@ -38,9 +38,7 @@
 #include <LibUtilities/Foundations/Points.h>
 #include <memory>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 class PolyEPoints : public Points<NekDouble>
@@ -48,7 +46,7 @@ class PolyEPoints : public Points<NekDouble>
 public:
     typedef Points<NekDouble> PointsBaseType;
 
-    virtual ~PolyEPoints()
+    ~PolyEPoints() override
     {
     }
 
@@ -60,11 +58,11 @@ public:
     }
 
 protected:
-    LIB_UTILITIES_EXPORT virtual const std::shared_ptr<NekMatrix<NekDouble>> v_GetI(
+    LIB_UTILITIES_EXPORT const std::shared_ptr<NekMatrix<NekDouble>> v_GetI(
         const PointsKey &pkey) override;
-    LIB_UTILITIES_EXPORT virtual const std::shared_ptr<NekMatrix<NekDouble>> v_GetI(
+    LIB_UTILITIES_EXPORT const std::shared_ptr<NekMatrix<NekDouble>> v_GetI(
         const Array<OneD, const NekDouble> &x) override;
-    LIB_UTILITIES_EXPORT virtual const std::shared_ptr<NekMatrix<NekDouble>> v_GetI(
+    LIB_UTILITIES_EXPORT const std::shared_ptr<NekMatrix<NekDouble>> v_GetI(
         size_t numpoints, const Array<OneD, const NekDouble> &x) override;
 
 private:
@@ -73,16 +71,15 @@ private:
     PolyEPoints()                          = delete;
     PolyEPoints(const PolyEPoints &points) = delete;
 
-    virtual void v_CalculatePoints() override final;
-    virtual void v_CalculateWeights() override final;
-    virtual void v_CalculateDerivMatrix() override final;
+    void v_CalculatePoints() final;
+    void v_CalculateWeights() final;
+    void v_CalculateDerivMatrix() final;
 
     void CalculateInterpMatrix(size_t npts,
                                const Array<OneD, const NekDouble> &xpoints,
                                Array<OneD, NekDouble> &interp);
 
 }; // class PolyEPoints
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities
 
 #endif // POLYEPOINTS_H

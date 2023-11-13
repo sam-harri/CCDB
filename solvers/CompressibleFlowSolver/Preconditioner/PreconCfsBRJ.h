@@ -68,7 +68,7 @@ public:
     PreconCfsBRJ(const Array<OneD, MultiRegions::ExpListSharedPtr> &pFields,
                  const LibUtilities::SessionReaderSharedPtr &pSession,
                  const LibUtilities::CommSharedPtr &vComm);
-    ~PreconCfsBRJ(){};
+    ~PreconCfsBRJ() override{};
 
 protected:
     int m_PreconItsStep;
@@ -91,20 +91,20 @@ protected:
 
     PrecType m_PreconMatStorage;
 
-    virtual void v_InitObject() override;
+    void v_InitObject() override;
 
-    virtual void v_DoPreconCfs(
+    void v_DoPreconCfs(
         const Array<OneD, MultiRegions::ExpListSharedPtr> &pFields,
         const Array<OneD, NekDouble> &pInput, Array<OneD, NekDouble> &pOutput,
         const bool &flag) override;
 
-    virtual void v_BuildPreconCfs(
+    void v_BuildPreconCfs(
         const Array<OneD, MultiRegions::ExpListSharedPtr> &pFields,
         const Array<OneD, const Array<OneD, NekDouble>> &intmp,
         const NekDouble time, const NekDouble lambda) override;
 
-    virtual bool v_UpdatePreconMatCheck(const Array<OneD, const NekDouble> &res,
-                                        const NekDouble dtLambda) override;
+    bool v_UpdatePreconMatCheck(const Array<OneD, const NekDouble> &res,
+                                const NekDouble dtLambda) override;
 
 private:
     void DoNullPrecon(const Array<OneD, NekDouble> &pInput,

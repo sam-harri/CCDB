@@ -37,9 +37,7 @@
 
 #include "../Module.h"
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 /**
  * @brief This processing module calculates the number of DOF.
@@ -55,28 +53,27 @@ public:
     static ModuleKey className;
 
     ProcessDOF(FieldSharedPtr f);
-    virtual ~ProcessDOF();
+    ~ProcessDOF() override;
 
 protected:
     /// Write mesh to output file.
-    virtual void v_Process(po::variables_map &vm) override;
+    void v_Process(po::variables_map &vm) override;
 
-    virtual std::string v_GetModuleName() override
+    std::string v_GetModuleName() override
     {
         return "ProcessDOF";
     }
 
-    virtual std::string v_GetModuleDescription() override
+    std::string v_GetModuleDescription() override
     {
         return "Calculating number of DOF";
     }
 
-    virtual ModulePriority v_GetModulePriority() override
+    ModulePriority v_GetModulePriority() override
     {
         return eModifyExp;
     }
 };
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils
 
 #endif

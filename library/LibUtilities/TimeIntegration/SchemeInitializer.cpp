@@ -58,9 +58,7 @@
 
 #include <LibUtilities/BasicUtils/SessionReader.h>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 // Register all the schemes with the Time Integration Scheme Factory...
@@ -217,5 +215,4 @@ std::string TimeIntegrationSchemeGEM::className =
     GetTimeIntegrationSchemeFactory().RegisterCreatorFunction(
         "ExtrapolationMethod", TimeIntegrationSchemeGEM::create);
 
-} // end namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities

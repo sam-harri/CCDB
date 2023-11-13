@@ -67,23 +67,23 @@ public:
                     const ParamMap &pParams);
 
     /// Destructor for the benchmark filter.
-    virtual ~FilterBenchmark();
+    ~FilterBenchmark() override;
 
 protected:
     /// Initialises the benchmark filter and allocates storage.
-    virtual void v_Initialise(
+    void v_Initialise(
         const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
         const NekDouble &time) override;
     /// Update recorded times.
-    virtual void v_Update(
+    void v_Update(
         const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
         const NekDouble &time) override;
     /// Finalises the benchmark filter and write out recorded data.
-    virtual void v_Finalise(
+    void v_Finalise(
         const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
         const NekDouble &time) override;
     /// Identifies that the benchmark filter is time dependent.
-    virtual bool v_IsTimeDependent() override;
+    bool v_IsTimeDependent() override;
 
 private:
     /// Storage for activation and repolarisation times.

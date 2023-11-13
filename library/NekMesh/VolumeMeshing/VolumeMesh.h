@@ -37,9 +37,7 @@
 
 #include <NekMesh/Module/Module.h>
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 class VolumeMesh : public ProcessModule
@@ -53,16 +51,15 @@ public:
     static ModuleKey className;
 
     VolumeMesh(MeshSharedPtr m);
-    virtual ~VolumeMesh();
+    ~VolumeMesh() override;
 
-    virtual void Process();
+    void Process() override;
 
-    virtual std::string GetModuleName()
+    std::string GetModuleName() override
     {
         return "VolumeMesh";
     }
 };
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh
 
 #endif

@@ -36,9 +36,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 std::string GlobalLinSysIterative::IteratSolverlookupIds[4] = {
     LibUtilities::SessionReader::RegisterEnumValue(
@@ -223,14 +221,18 @@ void GlobalLinSysIterative::DoProjection(
         if (m_verbose)
         {
             if (m_root)
+            {
                 cout << "SuccessiveRHS: " << m_prevBasis.size()
                      << "-bases projection reduces L2-norm of RHS from "
                      << std::sqrt(rhsNorm) << " to ";
+            }
             NekDouble tmprhsNorm =
                 Vmath::Dot2(nNonDir, pb_s + nDir, pb_s + nDir, m_map + nDir);
             vComm->AllReduce(tmprhsNorm, Nektar::LibUtilities::ReduceSum);
             if (m_root)
+            {
                 cout << std::sqrt(tmprhsNorm) << endl;
+            }
         }
 
         // solve the system with projected rhs
@@ -314,7 +316,9 @@ void GlobalLinSysIterative::UpdateKnownSolutions(
     for (int i = 0; i < m_prevBasis.size(); ++i)
     {
         if (i == insertLocation)
+        {
             continue;
+        }
         int skip = i > insertLocation;
         y_s[i - skip] =
             Vmath::Dot2(nNonDir, m_prevBasis[i], tmpAx_s + nDir, m_map + nDir);
@@ -330,12 +334,16 @@ void GlobalLinSysIterative::UpdateKnownSolutions(
         for (int i = 0; i < m_numSuccessiveRHS; ++i)
         {
             if (i == insertLocation)
+            {
                 continue;
+            }
             int iskip = i > insertLocation;
             for (int j = i; j < m_numSuccessiveRHS; ++j)
             {
                 if (j == insertLocation)
+                {
                     continue;
+                }
                 int jskip = j > insertLocation;
                 tilCoeffMatrix->SetValue(i - iskip, j - jskip,
                                          m_coeffMatrix->GetValue(i, j));
@@ -381,11 +389,15 @@ void GlobalLinSysIterative::UpdateKnownSolutions(
         residual -= y_s[i] * invMy_s[i];
     }
     if (m_verbose && m_root)
+    {
         cout << "SuccessiveRHS: residual " << residual;
+    }
     if (residual < epsilon)
     {
         if (m_verbose && m_root)
+        {
             cout << " < " << epsilon << ", reject" << endl;
+        }
         return;
     }
 
@@ -401,7 +413,9 @@ void GlobalLinSysIterative::UpdateKnownSolutions(
         for (int i = 0; i < m_numSuccessiveRHS; ++i)
         {
             if (i == insertLocation)
+            {
                 continue;
+            }
             int iskip = i > insertLocation;
             newCoeffMatrix->SetValue(insertLocation, i, y_s[i - iskip]);
         }
@@ -428,11 +442,15 @@ void GlobalLinSysIterative::UpdateKnownSolutions(
     if (info3)
     {
         if (m_verbose && m_root)
+        {
             cout << " >= " << epsilon << ", reject (Dsptrf fails)" << endl;
+        }
         return;
     }
     if (m_verbose && m_root)
+    {
         cout << " >= " << epsilon << ", accept" << endl;
+    }
 
     // if success, update basis, rhs, coefficient matrix, and its factor
     if (m_prevBasis.size() < m_numSuccessiveRHS)
@@ -495,5 +513,4 @@ void GlobalLinSysIterative::Set_Rhs_Magnitude(const NekVector<NekDouble> &pIn)
     }
 }
 
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions

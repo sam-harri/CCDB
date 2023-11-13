@@ -108,7 +108,7 @@ public:
 #endif
 #endif
 
-        data = NULL;
+        data = nullptr;
     }
 
 #ifdef NEKTAR_MEMORY_POOL_ENABLED
@@ -260,11 +260,8 @@ public:
         return &r;
     }
 
-    pointer allocate(size_type n,
-                     std::allocator<void>::const_pointer hint =
-                         0) // typename MemoryManager<void>::pointer hint = 0)
+    pointer allocate(size_type n)
     {
-        boost::ignore_unused(hint);
         return RawAllocate(n);
     }
 

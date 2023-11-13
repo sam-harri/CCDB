@@ -50,9 +50,7 @@
 namespace bg  = boost::geometry;
 namespace bgi = boost::geometry::index;
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 class ForcingAbsorption : public Forcing
 {
@@ -94,18 +92,18 @@ protected:
         const Array<OneD, Array<OneD, NekDouble>> &inarray,
         const NekDouble &time);
 
-    SOLVER_UTILS_EXPORT virtual void v_InitObject(
+    SOLVER_UTILS_EXPORT void v_InitObject(
         const Array<OneD, MultiRegions::ExpListSharedPtr> &pFields,
         const unsigned int &pNumForcingFields,
         const TiXmlElement *pForce) override;
 
-    SOLVER_UTILS_EXPORT virtual void v_Apply(
+    SOLVER_UTILS_EXPORT void v_Apply(
         const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
         const Array<OneD, Array<OneD, NekDouble>> &inarray,
         Array<OneD, Array<OneD, NekDouble>> &outarray,
         const NekDouble &time) override;
 
-    SOLVER_UTILS_EXPORT virtual void v_ApplyCoeff(
+    SOLVER_UTILS_EXPORT void v_ApplyCoeff(
         const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
         const Array<OneD, Array<OneD, NekDouble>> &inarray,
         Array<OneD, Array<OneD, NekDouble>> &outarray,
@@ -116,12 +114,12 @@ private:
     bool m_homogeneous;
     ForcingAbsorption(const LibUtilities::SessionReaderSharedPtr &pSession,
                       const std::weak_ptr<EquationSystem> &pEquation);
-    virtual ~ForcingAbsorption(void){};
+    ~ForcingAbsorption(void) override{};
 
     void CalcAbsorption(
         const Array<OneD, MultiRegions::ExpListSharedPtr> &pFields,
         const TiXmlElement *pForce);
 };
-} // namespace SolverUtils
-} // namespace Nektar
+
+} // namespace Nektar::SolverUtils
 #endif

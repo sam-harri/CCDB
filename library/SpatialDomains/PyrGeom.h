@@ -38,9 +38,7 @@
 #include <SpatialDomains/Geometry3D.h>
 #include <SpatialDomains/SpatialDomainsDeclspec.h>
 
-namespace Nektar
-{
-namespace SpatialDomains
+namespace Nektar::SpatialDomains
 {
 
 class PyrGeom : public Geometry3D
@@ -48,7 +46,7 @@ class PyrGeom : public Geometry3D
 public:
     SPATIAL_DOMAINS_EXPORT PyrGeom();
     SPATIAL_DOMAINS_EXPORT PyrGeom(int id, const Geometry2DSharedPtr faces[]);
-    SPATIAL_DOMAINS_EXPORT ~PyrGeom();
+    SPATIAL_DOMAINS_EXPORT ~PyrGeom() override;
 
     SPATIAL_DOMAINS_EXPORT static const int kNverts  = 5;
     SPATIAL_DOMAINS_EXPORT static const int kNedges  = 8;
@@ -58,11 +56,11 @@ public:
     SPATIAL_DOMAINS_EXPORT static const std::string XMLElementType;
 
 protected:
-    virtual void v_GenGeomFactors();
-    virtual int v_GetEdgeNormalToFaceVert(const int i, const int j) const;
-    virtual int v_GetDir(const int faceidx, const int facedir) const;
-    virtual void v_Reset(CurveMap &curvedEdges, CurveMap &curvedFaces);
-    virtual void v_Setup();
+    void v_GenGeomFactors() override;
+    int v_GetEdgeNormalToFaceVert(const int i, const int j) const override;
+    int v_GetDir(const int faceidx, const int facedir) const override;
+    void v_Reset(CurveMap &curvedEdges, CurveMap &curvedFaces) override;
+    void v_Setup() override;
 
 private:
     void SetUpLocalEdges();
@@ -76,7 +74,6 @@ private:
 
 typedef std::shared_ptr<PyrGeom> PyrGeomSharedPtr;
 typedef std::map<int, PyrGeomSharedPtr> PyrGeomMap;
-} // namespace SpatialDomains
-} // namespace Nektar
+} // namespace Nektar::SpatialDomains
 
 #endif // NEKTAR_SPATIALDOMAINS_PYRGEOM_H

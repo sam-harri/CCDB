@@ -44,9 +44,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace LocalRegions
+namespace Nektar::LocalRegions
 {
 QuadExp::QuadExp(const LibUtilities::BasisKey &Ba,
                  const LibUtilities::BasisKey &Bb,
@@ -1793,5 +1791,4 @@ void QuadExp::v_NormalTraceDerivFactors(
         }
     }
 }
-} // namespace LocalRegions
-} // namespace Nektar
+} // namespace Nektar::LocalRegions

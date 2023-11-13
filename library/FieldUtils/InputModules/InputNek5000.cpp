@@ -43,9 +43,7 @@ using namespace std;
 
 #include "InputNek5000.h"
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 ModuleKey InputNek5000::m_className[1] = {
@@ -273,5 +271,4 @@ void InputNek5000::v_Process(po::variables_map &vm)
     // save field names
     m_f->m_variables = m_f->m_fielddef[0]->m_fields;
 }
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

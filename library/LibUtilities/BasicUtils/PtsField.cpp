@@ -37,9 +37,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 PtsField::PtsField(const int dim,
@@ -272,5 +270,4 @@ void PtsField::SetBoxSize(const vector<NekDouble> boxSize)
 {
     m_boxSize = boxSize;
 }
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities

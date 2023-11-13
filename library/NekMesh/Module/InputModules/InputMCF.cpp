@@ -45,9 +45,7 @@
 using namespace std;
 using namespace Nektar::NekMesh;
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 ModuleKey InputMCF::className = GetModuleFactory().RegisterCreatorFunction(
@@ -760,5 +758,4 @@ void InputMCF::Process()
 
     m_log(VERBOSE) << "Input mesh generation complete." << endl;
 }
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh

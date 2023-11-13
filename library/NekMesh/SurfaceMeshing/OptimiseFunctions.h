@@ -40,9 +40,7 @@
 #include <NekMesh/CADSystem/CADSurf.h>
 #include <NekMesh/Optimisation/OptimiseObj.h>
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 class OptiEdge : public OptiObj
@@ -58,14 +56,14 @@ public:
         o   = ob;
     };
 
-    ~OptiEdge(){};
+    ~OptiEdge() override{};
 
-    NekDouble F(Array<OneD, NekDouble> xitst);
-    DNekMat dF(Array<OneD, NekDouble> xitst);
-    Array<OneD, NekDouble> Getxi();
-    Array<OneD, NekDouble> Getli();
-    Array<OneD, NekDouble> Getui();
-    void Update(Array<OneD, NekDouble> xinew);
+    NekDouble F(Array<OneD, NekDouble> xitst) override;
+    DNekMat dF(Array<OneD, NekDouble> xitst) override;
+    Array<OneD, NekDouble> Getxi() override;
+    Array<OneD, NekDouble> Getli() override;
+    Array<OneD, NekDouble> Getui() override;
+    void Update(Array<OneD, NekDouble> xinew) override;
 
     Array<OneD, NekDouble> GetSolution()
     {
@@ -79,6 +77,5 @@ private:
 };
 typedef std::shared_ptr<OptiEdge> OptiEdgeSharedPtr;
 
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh
 #endif

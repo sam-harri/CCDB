@@ -65,9 +65,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 std::string CADSystemOCE::key = GetEngineFactory().RegisterCreatorFunction(
@@ -299,23 +297,31 @@ bool CADSystemOCE::LoadCAD()
         {
             if (!Model->Value(i)->DynamicType()->SubType(
                     "StepRepr_RepresentationItem"))
+            {
                 continue;
+            }
 
             Handle(StepRepr_RepresentationItem) enti =
                 Handle(StepRepr_RepresentationItem)::DownCast(Model->Value(i));
             Handle(TCollection_HAsciiString) name = enti->Name();
 
             if (name->IsEmpty())
+            {
                 continue;
+            }
 
             Handle(Transfer_Binder) binder = TP->Find(Model->Value(i));
             if (binder.IsNull() || !binder->HasResult())
+            {
                 continue;
+            }
 
             TopoDS_Shape S = TransferBRep::ShapeResult(TP, binder);
 
             if (S.IsNull())
+            {
                 continue;
+            }
 
             if (S.ShapeType() == TopAbs_FACE)
             {
@@ -1232,5 +1238,4 @@ TopoDS_Shape CADSystemOCE::BuildGeo(string geo)
     return cVolumes.begin()->second;
 }
 
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh

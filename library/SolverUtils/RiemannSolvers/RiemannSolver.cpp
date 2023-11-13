@@ -57,9 +57,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 /**
  * Retrieves the singleton instance of the Riemann solver factory.
@@ -553,5 +551,4 @@ void RiemannSolver::v_CalcFluxJacobian(
     NEKERROR(ErrorUtil::efatal, "v_CalcFluxJacobian not specified.");
 }
 
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils

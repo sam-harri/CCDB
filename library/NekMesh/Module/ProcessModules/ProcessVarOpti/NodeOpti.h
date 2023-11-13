@@ -44,9 +44,7 @@
 #include "Evaluator.hxx"
 #include "ProcessVarOpti.h"
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 class NodeOptiJob;
@@ -152,9 +150,9 @@ public:
     {
     }
 
-    ~NodeOpti3D3D(){};
+    ~NodeOpti3D3D() override{};
 
-    void Optimise();
+    void Optimise() override;
 
     static int m_type;
     static NodeOptiSharedPtr create(
@@ -178,9 +176,9 @@ public:
     {
     }
 
-    ~NodeOpti2D2D(){};
+    ~NodeOpti2D2D() override{};
 
-    void Optimise();
+    void Optimise() override;
 
     static int m_type;
     static NodeOptiSharedPtr create(
@@ -200,7 +198,7 @@ public:
     {
     }
 
-    void Run()
+    void Run() override
     {
         node->Optimise();
     }
@@ -986,7 +984,6 @@ NekDouble NodeOpti::GetFunctional(NekDouble &minJacNew, bool gradient)
     return integral;
     // return sqrt(m_grad[0]*m_grad[0] + m_grad[1]*m_grad[1]);
 }
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh
 
 #endif

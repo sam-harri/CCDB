@@ -38,9 +38,7 @@
 #include <LibUtilities/Foundations/Points.h>
 #include <LibUtilities/LinearAlgebra/NekMatrix.hpp>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 /// Describes the specification for a Basis.
 class BasisKey
@@ -352,7 +350,6 @@ LIB_UTILITIES_EXPORT std::ostream &operator<<(std::ostream &os,
 static BasisSharedPtr NullBasisSharedPtr;
 static Array<OneD, BasisSharedPtr> NullBasisSharedPtr1DArray;
 
-} // end of namespace LibUtilities
-} // end of namespace Nektar
+} // namespace Nektar::LibUtilities
 
 #endif // NEKTAR_LIB_UTILIITIES_FOUNDATIONS_BASIS_H

@@ -63,13 +63,13 @@ public:
     /// Name of class
     static std::string className;
 
-    virtual ~NonlinearSWE();
+    ~NonlinearSWE() override;
 
 protected:
     NonlinearSWE(const LibUtilities::SessionReaderSharedPtr &pSession,
                  const SpatialDomains::MeshGraphSharedPtr &pGraph);
 
-    virtual void v_InitObject(bool DeclareFields = true) override;
+    void v_InitObject(bool DeclareFields = true) override;
 
     void DoOdeRhs(const Array<OneD, const Array<OneD, NekDouble>> &inarray,
                   Array<OneD, Array<OneD, NekDouble>> &outarray,
@@ -83,11 +83,11 @@ protected:
         const Array<OneD, const Array<OneD, NekDouble>> &physfield,
         Array<OneD, Array<OneD, Array<OneD, NekDouble>>> &flux);
 
-    virtual void v_GenerateSummary(SolverUtils::SummaryList &s) override;
+    void v_GenerateSummary(SolverUtils::SummaryList &s) override;
 
-    virtual void v_PrimitiveToConservative() override;
+    void v_PrimitiveToConservative() override;
 
-    virtual void v_ConservativeToPrimitive() override;
+    void v_ConservativeToPrimitive() override;
 
 private:
     void NumericalFlux1D(Array<OneD, Array<OneD, NekDouble>> &physfield,

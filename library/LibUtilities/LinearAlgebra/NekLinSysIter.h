@@ -38,9 +38,7 @@
 
 #include <LibUtilities/BasicUtils/NekFactory.hpp>
 #include <LibUtilities/LinearAlgebra/NekSys.h>
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 class NekLinSysIter;
@@ -73,7 +71,7 @@ public:
         const LibUtilities::SessionReaderSharedPtr &pSession,
         const LibUtilities::CommSharedPtr &vRowComm, const int nDimen,
         const NekSysKey &pKey);
-    LIB_UTILITIES_EXPORT virtual ~NekLinSysIter();
+    LIB_UTILITIES_EXPORT ~NekLinSysIter() override;
 
     LIB_UTILITIES_EXPORT void SetUniversalUniqueMap(
         const Array<OneD, const int> &map);
@@ -126,11 +124,10 @@ protected:
     void Set_Rhs_Magnitude(const Array<OneD, NekDouble> &pIn);
     void SetUniversalUniqueMap();
 
-    virtual void v_InitObject() override;
+    void v_InitObject() override;
 
 private:
 };
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities
 
 #endif

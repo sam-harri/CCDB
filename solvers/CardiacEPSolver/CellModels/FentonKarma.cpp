@@ -667,7 +667,7 @@ void FentonKarma::v_Update(
     const NekDouble *u = &inarray[0][0];
     const NekDouble *v = &inarray[1][0];
     const NekDouble *w = &inarray[2][0];
-    const NekDouble *y = isCF3 ? &inarray[3][0] : 0;
+    const NekDouble *y = isCF3 ? &inarray[3][0] : nullptr;
     NekDouble *u_new   = &outarray[0][0];
     NekDouble *v_new   = &outarray[1][0];
     NekDouble *w_new   = &outarray[2][0];

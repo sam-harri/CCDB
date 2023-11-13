@@ -38,9 +38,7 @@
 using namespace std;
 using namespace Nektar::NekMesh;
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 std::mutex mtx;
@@ -443,5 +441,4 @@ void NodeOpti1D2D::ProcessGradient()
                 d2[3] * (grad[2] * d2[3] + grad[3] * d2[4]) +
                 d2[4] * (grad[3] * d2[3] + grad[4] * d2[4]);
 }
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh

@@ -40,9 +40,7 @@
 
 #include <LibUtilities/BasicUtils/Timer.h>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 std::string DiffusionIP::type = GetDiffusionFactory().RegisterCreatorFunction(
     "InteriorPenalty", DiffusionIP::create, "Interior Penalty");
@@ -903,5 +901,4 @@ void DiffusionIP::ApplyFluxBndConds(
     }
 }
 
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils

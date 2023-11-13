@@ -44,9 +44,7 @@
 
 typedef Nektar::LibUtilities::PtsFieldSharedPtr PtsFieldSharedPtr;
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 using namespace NekMesh;
@@ -137,7 +135,7 @@ public:
     {
     }
 
-    void Run()
+    void Run() override
     {
         el->Evaluate();
 
@@ -152,7 +150,6 @@ private:
     bool m_update;
 };
 
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh
 
 #endif

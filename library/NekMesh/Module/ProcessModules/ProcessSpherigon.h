@@ -35,12 +35,10 @@
 #ifndef UTILITIES_NEKMESH_PROCESSJAC
 #define UTILITIES_NEKMESH_PROCESSJAC
 
-#include "../InputModules/InputPly.h"
+#include <NekMesh/Module/InputModules/InputPly.h>
 #include <NekMesh/Module/Module.h>
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 class ProcessSpherigon : public NekMesh::ProcessModule
@@ -54,12 +52,12 @@ public:
     static NekMesh::ModuleKey className;
 
     ProcessSpherigon(NekMesh::MeshSharedPtr m);
-    virtual ~ProcessSpherigon();
+    ~ProcessSpherigon() override;
 
     /// Write mesh to output file.
-    virtual void Process();
+    void Process() override;
 
-    virtual std::string GetModuleName()
+    std::string GetModuleName() override
     {
         return "ProcessSpherigon";
     }
@@ -78,7 +76,6 @@ protected:
         std::map<int, NekMesh::NodeSharedPtr> &surfverts);
 };
 
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh
 
 #endif

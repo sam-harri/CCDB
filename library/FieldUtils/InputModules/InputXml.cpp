@@ -43,9 +43,7 @@ using namespace std;
 #include "InputXml.h"
 using namespace Nektar;
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 ModuleKey InputXml::m_className[5] = {
@@ -272,5 +270,4 @@ void InputXml::v_Process(po::variables_map &vm)
         }
     }
 }
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

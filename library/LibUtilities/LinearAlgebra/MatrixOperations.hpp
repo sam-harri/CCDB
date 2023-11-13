@@ -148,7 +148,7 @@ void NekMultiplyFullMatrixFullMatrix(
     typename std::enable_if<
         CanGetRawPtr<NekMatrix<LhsDataType, LhsMatrixType>>::value &&
         CanGetRawPtr<NekMatrix<RhsDataType, RhsMatrixType>>::value>::type *p =
-        0)
+        nullptr)
 {
     boost::ignore_unused(p);
 

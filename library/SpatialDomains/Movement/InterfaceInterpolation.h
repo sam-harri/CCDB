@@ -39,10 +39,7 @@
 #include <SpatialDomains/GeomFactors.h>
 #include <SpatialDomains/MeshGraph.h>
 
-namespace Nektar
-{
-
-namespace SpatialDomains
+namespace Nektar::SpatialDomains
 {
 
 // Fwd def to allow for inclusion in meshgraph
@@ -159,7 +156,6 @@ public:
 
 typedef std::shared_ptr<InterfacePair> InterfacePairShPtr;
 
-} // namespace SpatialDomains
-} // namespace Nektar
+} // namespace Nektar::SpatialDomains
 
 #endif // NEKTAR_SPATIALDOMAINS_INTERFACEINTERPOLATION_H

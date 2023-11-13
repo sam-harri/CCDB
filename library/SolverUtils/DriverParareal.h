@@ -37,9 +37,7 @@
 
 #include <SolverUtils/DriverParallelInTime.h>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 
 /// Base class for the development of solvers.
@@ -69,15 +67,14 @@ protected:
         const SpatialDomains::MeshGraphSharedPtr pGraph);
 
     /// Destructor
-    SOLVER_UTILS_EXPORT virtual ~DriverParareal() = default;
+    SOLVER_UTILS_EXPORT ~DriverParareal() override = default;
 
     /// Virtual function for initialisation implementation.
-    SOLVER_UTILS_EXPORT virtual void v_InitObject(
+    SOLVER_UTILS_EXPORT void v_InitObject(
         std::ostream &out = std::cout) override;
 
     /// Virtual function for solve implementation.
-    SOLVER_UTILS_EXPORT virtual void v_Execute(
-        std::ostream &out = std::cout) override;
+    SOLVER_UTILS_EXPORT void v_Execute(std::ostream &out = std::cout) override;
 
     static std::string driverLookupId;
 
@@ -134,7 +131,6 @@ private:
     Array<OneD, Array<OneD, NekDouble>> m_coarseSolution;
 };
 
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils
 
 #endif // NEKTAR_SOLVERUTILS_DRIVERPARAREAL_H

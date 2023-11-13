@@ -42,9 +42,7 @@ using namespace std;
 
 #include "ProcessHomogeneousPlane.h"
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 ModuleKey ProcessHomogeneousPlane::className =
@@ -168,5 +166,4 @@ void ProcessHomogeneousPlane::v_Process(po::variables_map &vm)
         }
     }
 }
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

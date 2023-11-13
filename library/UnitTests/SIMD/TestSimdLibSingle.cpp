@@ -79,9 +79,7 @@
 #undef USING_SCALAR
 #endif
 
-namespace Nektar
-{
-namespace SimdLibTests
+namespace Nektar::SimdLibTests
 {
 using namespace tinysimd;
 using vec_t = simd<float>;
@@ -807,5 +805,4 @@ BOOST_AUTO_TEST_CASE(SimdLibFloat_io)
     std::cout << avec << std::endl;
 }
 
-} // namespace SimdLibTests
-} // namespace Nektar
+} // namespace Nektar::SimdLibTests

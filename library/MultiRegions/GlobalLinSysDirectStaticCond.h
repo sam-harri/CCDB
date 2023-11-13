@@ -38,9 +38,7 @@
 #include <MultiRegions/GlobalLinSysStaticCond.h>
 #include <MultiRegions/MultiRegionsDeclspec.h>
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 // Forward declarations
 class ExpList;
@@ -84,12 +82,12 @@ public:
         const DNekScalBlkMatSharedPtr pInvD,
         const std::shared_ptr<AssemblyMap> &locToGloMap);
 
-    MULTI_REGIONS_EXPORT virtual ~GlobalLinSysDirectStaticCond();
+    MULTI_REGIONS_EXPORT ~GlobalLinSysDirectStaticCond() override;
 
 protected:
-    virtual void v_AssembleSchurComplement(
+    void v_AssembleSchurComplement(
         std::shared_ptr<AssemblyMap> pLocToGloMap) override;
-    virtual GlobalLinSysStaticCondSharedPtr v_Recurse(
+    GlobalLinSysStaticCondSharedPtr v_Recurse(
         const GlobalLinSysKey &mkey, const std::weak_ptr<ExpList> &pExpList,
         const DNekScalBlkMatSharedPtr pSchurCompl,
         const DNekScalBlkMatSharedPtr pBinvD, const DNekScalBlkMatSharedPtr pC,
@@ -102,13 +100,12 @@ private:
         const std::shared_ptr<AssemblyMap> &locToGloMap);
 
     /// Solve the linear system for given input and output vectors.
-    virtual void v_SolveLinearSystem(const int pNumRows,
-                                     const Array<OneD, const NekDouble> &pInput,
-                                     Array<OneD, NekDouble> &pOutput,
-                                     const AssemblyMapSharedPtr &locToGloMap,
-                                     const int pNumDir) override;
+    void v_SolveLinearSystem(const int pNumRows,
+                             const Array<OneD, const NekDouble> &pInput,
+                             Array<OneD, NekDouble> &pOutput,
+                             const AssemblyMapSharedPtr &locToGloMap,
+                             const int pNumDir) override;
 };
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions
 
 #endif

@@ -48,9 +48,7 @@
 
 #define OUTPUT_FREQ 0
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 
 using namespace std;
@@ -113,8 +111,9 @@ void CouplingCwipi::InterpCallback(
 
 CouplingCwipi::CouplingCwipi(MultiRegions::ExpListSharedPtr field)
     : Coupling(field), m_sendHandle(-1), m_recvHandle(-1), m_lastSend(-1E6),
-      m_lastReceive(-1E6), m_points(NULL), m_coords(NULL), m_connecIdx(NULL),
-      m_connec(NULL), m_rValsInterl(NULL), m_sValsInterl(NULL)
+      m_lastReceive(-1E6), m_points(nullptr), m_coords(nullptr),
+      m_connecIdx(nullptr), m_connec(nullptr), m_rValsInterl(nullptr),
+      m_sValsInterl(nullptr)
 {
     // defaults
     m_config["GEOMTOL"]      = "0.1";
@@ -270,7 +269,7 @@ void CouplingCwipi::SetupReceive()
     m_recvField->GetCoords(coords[0], coords[1], coords[2]);
 
     m_points = (double *)malloc(sizeof(double) * 3 * m_nPoints);
-    ASSERTL1(m_points != NULL, "malloc failed for m_points");
+    ASSERTL1(m_points != nullptr, "malloc failed for m_points");
 
     for (int i = 0; i < m_nPoints; ++i)
     {
@@ -298,7 +297,7 @@ void CouplingCwipi::SetupReceive()
     cwipi_set_points_to_locate(m_couplingName.c_str(), m_nPoints, m_points);
 
     m_rValsInterl = (double *)malloc(sizeof(double) * m_nPoints * m_nRecvVars);
-    ASSERTL1(m_rValsInterl != NULL, "malloc failed for m_rValsInterl");
+    ASSERTL1(m_rValsInterl != nullptr, "malloc failed for m_rValsInterl");
 }
 
 void CouplingCwipi::SetupSend()
@@ -306,7 +305,7 @@ void CouplingCwipi::SetupSend()
     // this array is never used because of our send callback method
     m_sValsInterl = (double *)malloc(
         sizeof(double) * m_evalField->GetGraph()->GetNvertices() * m_nSendVars);
-    ASSERTL1(m_sValsInterl != NULL, "malloc failed for m_sValsInterl");
+    ASSERTL1(m_sValsInterl != nullptr, "malloc failed for m_sValsInterl");
     for (int i = 0; i < m_evalField->GetGraph()->GetNvertices() * m_nSendVars;
          ++i)
     {
@@ -449,14 +448,14 @@ void CouplingCwipi::AnnounceMesh()
 
     // allocate CWIPI arrays
     m_coords = (double *)malloc(sizeof(double) * 3 * nVerts);
-    ASSERTL1(m_coords != NULL, "malloc failed for m_coords");
+    ASSERTL1(m_coords != nullptr, "malloc failed for m_coords");
     int tmp = 2 * seggeom.size() + 3 * trigeom.size() + 4 * quadgeom.size() +
               4 * tetgeom.size() + 5 * pyrgeom.size() + 6 * prismgeom.size() +
               8 * hexgeom.size();
     m_connec = (int *)malloc(sizeof(int) * tmp);
-    ASSERTL1(m_connec != NULL, "malloc failed for m_connec");
+    ASSERTL1(m_connec != nullptr, "malloc failed for m_connec");
     m_connecIdx = (int *)malloc(sizeof(int) * (nElts + 1));
-    ASSERTL1(m_connecIdx != NULL, "malloc failed for m_connecIdx");
+    ASSERTL1(m_connecIdx != nullptr, "malloc failed for m_connecIdx");
 
     m_connecIdx[0] = 0;
     int coordsPos  = 0;
@@ -1066,5 +1065,4 @@ void CouplingCwipi::DumpRawFields(const NekDouble time,
         cout << "DumpRawFields total time: " << timer1.TimePerTest(1) << endl;
     }
 }
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils

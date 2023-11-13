@@ -38,9 +38,7 @@
 #include <MultiRegions/MultiRegionsDeclspec.h>
 #include <MultiRegions/Preconditioner.h>
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 class PreconditionerLinearWithLowEnergy;
 typedef std::shared_ptr<PreconditionerLinearWithLowEnergy>
@@ -69,7 +67,7 @@ public:
         const AssemblyMapSharedPtr &pLocToGloMap);
 
     MULTI_REGIONS_EXPORT
-    virtual ~PreconditionerLinearWithLowEnergy()
+    ~PreconditionerLinearWithLowEnergy() override
     {
     }
 
@@ -79,33 +77,31 @@ protected:
 
     Array<OneD, NekDouble> m_invMultiplicity;
 
-    virtual void v_InitObject() override;
+    void v_InitObject() override;
 
-    virtual void v_DoTransformBasisToLowEnergy(
+    void v_DoTransformBasisToLowEnergy(Array<OneD, NekDouble> &pInOut) override;
+
+    void v_DoTransformCoeffsFromLowEnergy(
         Array<OneD, NekDouble> &pInOut) override;
 
-    virtual void v_DoTransformCoeffsFromLowEnergy(
-        Array<OneD, NekDouble> &pInOut) override;
-
-    virtual void v_DoTransformCoeffsToLowEnergy(
+    void v_DoTransformCoeffsToLowEnergy(
         const Array<OneD, NekDouble> &pInput,
         Array<OneD, NekDouble> &pOutput) override;
 
-    virtual void v_DoTransformBasisFromLowEnergy(
+    void v_DoTransformBasisFromLowEnergy(
         const Array<OneD, NekDouble> &pInput,
         Array<OneD, NekDouble> &pOutput) override;
 
-    virtual DNekScalMatSharedPtr v_TransformedSchurCompl(
+    DNekScalMatSharedPtr v_TransformedSchurCompl(
         int n, int offset,
         const std::shared_ptr<DNekScalMat> &loc_mat) override;
 
-    virtual void v_DoPreconditioner(const Array<OneD, NekDouble> &pInput,
-                                    Array<OneD, NekDouble> &pOutput,
-                                    const bool &isLocal = false) override;
+    void v_DoPreconditioner(const Array<OneD, NekDouble> &pInput,
+                            Array<OneD, NekDouble> &pOutput,
+                            const bool &isLocal = false) override;
 
-    virtual void v_BuildPreconditioner() override;
+    void v_BuildPreconditioner() override;
 };
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions
 
 #endif

@@ -13,6 +13,7 @@ v5.5.0
 - Update AssemblyMap to reduce verbosity when using parallel-in-time (!1651)
 - Tidy-up of Collection library (!1622)
 - Tidy-up of I/O in BasicUtils (!1623)
+- Update to use C++17 nested namespaces (!1556)
 - Fix a minor bug in ProcessWallNormalData (!1663)
 - Fix Explist::v_GetNormals and GetElmtNormalLength (!1625)
 
@@ -41,6 +42,7 @@ v5.5.0
 **CI**
 - Disable macOS Intel runner (!1655)
 - Upgrade Win10 runners (!1656)
+- Add `clang-tidy` support to CI for static analysis (!1556)
 
 **NekMesh**
 - Replace deprecated boost::filesystem functions (!1654)

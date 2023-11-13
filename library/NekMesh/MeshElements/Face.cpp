@@ -38,9 +38,7 @@
 
 #include <LibUtilities/Foundations/ManagerAccess.h>
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 void Face::GetCurvedNodes(std::vector<NodeSharedPtr> &nodeList)
@@ -409,5 +407,4 @@ SpatialDomains::Geometry2DSharedPtr Face::GetGeom(int coordDim)
     return ret;
 }
 
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh

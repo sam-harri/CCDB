@@ -39,9 +39,7 @@
 #include <boost/test/tools/floating_point_comparison.hpp>
 #include <boost/test/unit_test.hpp>
 
-namespace Nektar
-{
-namespace VmathSIMDUnitTests
+namespace Nektar::VmathSIMDUnitTests
 {
 BOOST_AUTO_TEST_CASE(TestVadd)
 {
@@ -344,5 +342,4 @@ BOOST_AUTO_TEST_CASE(TestGathrInt)
     }
 }
 
-} // namespace VmathSIMDUnitTests
-} // namespace Nektar
+} // namespace Nektar::VmathSIMDUnitTests

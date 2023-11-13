@@ -41,9 +41,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 std::string Advection3DHomogeneous1D::type[] = {
     GetAdvectionFactory().RegisterCreatorFunction(
@@ -254,5 +252,4 @@ void Advection3DHomogeneous1D::ModifiedFluxVector(
     // Increment the plane counter.
     m_planeCounter = (m_planeCounter + 1) % m_numPlanes;
 }
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils

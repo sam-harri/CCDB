@@ -40,9 +40,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace LocalRegions
+namespace Nektar::LocalRegions
 {
 
 /**
@@ -1380,5 +1378,4 @@ void SegExp::MultiplyByElmtInvMass(const Array<OneD, const NekDouble> &inarray,
     out = (*matsys) * in;
 }
 
-} // namespace LocalRegions
-} // namespace Nektar
+} // namespace Nektar::LocalRegions

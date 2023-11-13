@@ -39,9 +39,7 @@
 
 #include <LibUtilities/BasicUtils/PtsField.h>
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 /**
@@ -58,25 +56,25 @@ public:
     static ModuleKey className;
 
     ProcessInterpPoints(FieldSharedPtr f);
-    virtual ~ProcessInterpPoints();
+    ~ProcessInterpPoints() override;
 
 protected:
     /// Write mesh to output file.
-    virtual void v_Process(po::variables_map &vm) override;
+    void v_Process(po::variables_map &vm) override;
 
     void PrintProgressbar(const int position, const int goal) const;
 
-    virtual std::string v_GetModuleName() override
+    std::string v_GetModuleName() override
     {
         return "ProcessInterpPoints";
     }
 
-    virtual std::string v_GetModuleDescription() override
+    std::string v_GetModuleDescription() override
     {
         return "Interpolating to points";
     }
 
-    virtual ModulePriority v_GetModulePriority() override
+    ModulePriority v_GetModulePriority() override
     {
         return eCreatePts;
     }
@@ -91,7 +89,6 @@ private:
 
     void calcCp0();
 };
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils
 
 #endif

@@ -40,9 +40,7 @@
 
 #include <LibUtilities/TimeIntegration/TimeIntegrationScheme.h>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 /**
@@ -57,7 +55,7 @@ public:
     {
         boost::ignore_unused(variant, order, freeParams);
     }
-    virtual ~NoSchemeTimeIntegrationScheme()
+    ~NoSchemeTimeIntegrationScheme() override
     {
     }
 
@@ -72,16 +70,15 @@ public:
     }
 
     // Access methods
-    LUE virtual std::string v_GetName() const override;
+    LUE std::string v_GetName() const override;
     // Values stored by each integration phase.
-    LUE virtual std::string v_GetVariant() const override;
-    LUE virtual size_t v_GetOrder() const override;
-    LUE virtual std::vector<NekDouble> v_GetFreeParams() const override;
+    LUE std::string v_GetVariant() const override;
+    LUE size_t v_GetOrder() const override;
+    LUE std::vector<NekDouble> v_GetFreeParams() const override;
 
-    LUE virtual NekDouble v_GetTimeStability() const override;
+    LUE NekDouble v_GetTimeStability() const override;
 
-    LUE virtual TimeIntegrationSchemeType v_GetIntegrationSchemeType()
-        const override;
+    LUE TimeIntegrationSchemeType v_GetIntegrationSchemeType() const override;
 
     LUE size_t v_GetNumIntegrationPhases() const override;
 
@@ -99,16 +96,16 @@ public:
     }
 
     // The worker methods
-    LUE virtual void v_InitializeScheme(
+    LUE void v_InitializeScheme(
         const NekDouble deltaT, ConstDoubleArray &y_0, const NekDouble time,
         const TimeIntegrationSchemeOperators &op) override;
 
-    LUE virtual ConstDoubleArray &v_TimeIntegrate(
-        const size_t timestep, const NekDouble delta_t) override;
+    LUE ConstDoubleArray &v_TimeIntegrate(const size_t timestep,
+                                          const NekDouble delta_t) override;
 
-    LUE virtual void v_print(std::ostream &os) const override;
-    LUE virtual void v_printFull(std::ostream &os) const override;
-    LUE virtual TripleArray &v_UpdateSolutionVector() override;
+    LUE void v_print(std::ostream &os) const override;
+    LUE void v_printFull(std::ostream &os) const override;
+    LUE TripleArray &v_UpdateSolutionVector() override;
 
     static std::string className;
 
@@ -119,7 +116,6 @@ protected:
 
 }; // end class TimeIntegrationScheme
 
-} // end of namespace LibUtilities
-} // end of namespace Nektar
+} // namespace Nektar::LibUtilities
 
 #endif

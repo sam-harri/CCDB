@@ -43,9 +43,7 @@ using namespace std;
 
 #include "ProcessDeform.h"
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 ModuleKey ProcessDeform::className = GetModuleFactory().RegisterCreatorFunction(
     ModuleKey(eProcessModule, "deform"), ProcessDeform::create,
@@ -79,5 +77,4 @@ void ProcessDeform::v_Process(po::variables_map &vm)
 
     GlobalMapping::UpdateGeometry(m_f->m_graph, exp, phys, false);
 }
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

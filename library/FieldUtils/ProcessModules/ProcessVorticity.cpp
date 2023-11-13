@@ -44,9 +44,7 @@ using namespace std;
 #include "ProcessMapping.h"
 #include "ProcessVorticity.h"
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 ModuleKey ProcessVorticity::className =
@@ -254,5 +252,4 @@ void ProcessVorticity::GetVelocity(Array<OneD, Array<OneD, NekDouble>> &vel,
     }
 }
 
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

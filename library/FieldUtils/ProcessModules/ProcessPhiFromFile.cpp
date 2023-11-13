@@ -40,9 +40,7 @@
 using namespace Nektar;
 using namespace std;
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 ModuleKey ProcessPhiFromFile::m_className = {
@@ -620,5 +618,4 @@ Array<OneD, NekDouble> ProcessPhiFromFile::Vector2edge(
 
     return out;
 }
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

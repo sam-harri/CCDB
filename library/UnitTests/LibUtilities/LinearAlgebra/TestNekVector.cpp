@@ -38,9 +38,7 @@
 #include <boost/test/tools/floating_point_comparison.hpp>
 #include <boost/test/unit_test.hpp>
 
-namespace Nektar
-{
-namespace VariableSizedNekVectorUnitTests
+namespace Nektar::VariableSizedNekVectorUnitTests
 {
 BOOST_AUTO_TEST_CASE(TestConstructorWithArrayAndUserSpecifiedSize)
 {
@@ -111,5 +109,4 @@ BOOST_AUTO_TEST_CASE(TestVectorAddition)
     BOOST_CHECK_EQUAL(expected_result, result);
 }
 
-} // namespace VariableSizedNekVectorUnitTests
-} // namespace Nektar
+} // namespace Nektar::VariableSizedNekVectorUnitTests

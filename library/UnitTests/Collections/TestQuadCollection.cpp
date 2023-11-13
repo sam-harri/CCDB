@@ -39,9 +39,7 @@
 #include <boost/test/tools/floating_point_comparison.hpp>
 #include <boost/test/unit_test.hpp>
 
-namespace Nektar
-{
-namespace QuadCollectionTests
+namespace Nektar::QuadCollectionTests
 {
 SpatialDomains::SegGeomSharedPtr CreateSegGeom(
     unsigned int id, SpatialDomains::PointGeomSharedPtr v0,
@@ -3288,5 +3286,4 @@ BOOST_AUTO_TEST_CASE(TestQuadHelmholtz_MatrixFree_UniformP_ConstVarDiff)
         BOOST_CHECK_CLOSE(coeffsRef[i], coeffs[i], epsilon);
     }
 }
-} // namespace QuadCollectionTests
-} // namespace Nektar
+} // namespace Nektar::QuadCollectionTests

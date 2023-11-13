@@ -40,9 +40,7 @@
 using namespace std;
 namespace io = boost::iostreams;
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 /**
@@ -233,7 +231,9 @@ void Module::ProcessVertices()
 void Module::ProcessEdges(bool ReprocessEdges)
 {
     if (m_mesh->m_expDim < 2)
+    {
         return;
+    }
 
     if (ReprocessEdges)
     {
@@ -348,7 +348,9 @@ void Module::ProcessEdges(bool ReprocessEdges)
 void Module::ProcessFaces(bool ReprocessFaces)
 {
     if (m_mesh->m_expDim < 3)
+    {
         return;
+    }
 
     if (ReprocessFaces)
     {
@@ -996,5 +998,4 @@ void InputModule::PrintSummary()
                    << m_mesh->GetNumBndryElements() << endl;
 }
 
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh

@@ -43,9 +43,7 @@
 #include <NekMesh/MeshElements/Element.h>
 #include <NekMesh/NekMeshDeclspec.h>
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 class Octree;
@@ -154,7 +152,6 @@ public:
 /// Shared pointer to a mesh.
 typedef std::shared_ptr<Mesh> MeshSharedPtr;
 
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh
 
 #endif

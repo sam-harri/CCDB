@@ -62,9 +62,9 @@ public:
         const LibUtilities::SessionReaderSharedPtr &pSession,
         const SpatialDomains::MeshGraphSharedPtr &pGraph);
 
-    virtual ~VelocityCorrectionScheme();
+    ~VelocityCorrectionScheme() override;
 
-    virtual void v_InitObject(bool DeclareField = true) override;
+    void v_InitObject(bool DeclareField = true) override;
 
     void SetUpPressureForcing(
         const Array<OneD, const Array<OneD, NekDouble>> &fields,
@@ -170,19 +170,19 @@ protected:
         const Array<OneD, Array<OneD, NekDouble>> &inarray);
 
     // Virtual functions
-    virtual bool v_PostIntegrate(int step) override;
+    bool v_PostIntegrate(int step) override;
 
-    virtual void v_GenerateSummary(SolverUtils::SummaryList &s) override;
+    void v_GenerateSummary(SolverUtils::SummaryList &s) override;
 
-    virtual void v_TransCoeffToPhys(void) override;
+    void v_TransCoeffToPhys(void) override;
 
-    virtual void v_TransPhysToCoeff(void) override;
+    void v_TransPhysToCoeff(void) override;
 
-    virtual void v_DoInitialise(bool dumpInitialConditions = true) override;
+    void v_DoInitialise(bool dumpInitialConditions = true) override;
 
-    virtual Array<OneD, bool> v_GetSystemSingularChecks() override;
+    Array<OneD, bool> v_GetSystemSingularChecks() override;
 
-    virtual int v_GetForceDimension() override;
+    int v_GetForceDimension() override;
 
     virtual void v_SetUpPressureForcing(
         const Array<OneD, const Array<OneD, NekDouble>> &fields,
@@ -208,7 +208,7 @@ protected:
         const Array<OneD, const Array<OneD, NekDouble>> &inarray,
         Array<OneD, Array<OneD, NekDouble>> &outarray, const NekDouble time);
 
-    virtual bool v_RequireFwdTrans() override
+    bool v_RequireFwdTrans() override
     {
         return false;
     }

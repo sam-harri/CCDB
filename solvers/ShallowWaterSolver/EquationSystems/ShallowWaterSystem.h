@@ -62,7 +62,7 @@ public:
     static std::string className;
 
     /// Destructor
-    virtual ~ShallowWaterSystem();
+    ~ShallowWaterSystem() override;
 
 protected:
     SolverUtils::RiemannSolverSharedPtr m_riemannSolver;
@@ -88,10 +88,10 @@ protected:
     ShallowWaterSystem(const LibUtilities::SessionReaderSharedPtr &pSession,
                        const SpatialDomains::MeshGraphSharedPtr &pGraph);
 
-    virtual void v_InitObject(bool DeclareFields = true) override;
+    void v_InitObject(bool DeclareFields = true) override;
 
     /// Print a summary of time stepping parameters.
-    virtual void v_GenerateSummary(SolverUtils::SummaryList &s) override;
+    void v_GenerateSummary(SolverUtils::SummaryList &s) override;
 
     void PrimitiveToConservative()
     {

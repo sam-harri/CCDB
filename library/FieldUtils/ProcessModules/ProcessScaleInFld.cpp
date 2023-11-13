@@ -42,9 +42,7 @@ using namespace std;
 
 #include "ProcessScaleInFld.h"
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 ModuleKey ProcessScaleInFld::className =
@@ -79,5 +77,4 @@ void ProcessScaleInFld::v_Process(po::variables_map &vm)
                     &(m_f->m_data[i][0]), 1);
     }
 }
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

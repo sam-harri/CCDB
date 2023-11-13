@@ -42,9 +42,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 // Forward declaration for typedefs
 ExpListHomogeneous2D::ExpListHomogeneous2D(const ExpansionType type)
@@ -800,7 +798,7 @@ void ExpListHomogeneous2D::v_WriteVtkPieceData(std::ostream &outfile,
     int npoints_per_line = m_lines[0]->GetTotPoints();
 
     // printing the fields of that zone
-    outfile << "        <DataArray type=\"Float64\" Name=\"" << var << "\">"
+    outfile << R"(        <DataArray type="Float64" Name=")" << var << "\">"
             << endl;
     outfile << "          ";
     for (int n = 0; n < m_lines.size(); ++n)
@@ -1106,5 +1104,4 @@ void ExpListHomogeneous2D::SetPaddingBase(void)
     MatFwdPAD = StdQuad.GetStdMatrix(matkey1);
     MatBwdPAD = StdQuad.GetStdMatrix(matkey2);
 }
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions

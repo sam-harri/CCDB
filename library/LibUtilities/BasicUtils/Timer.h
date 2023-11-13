@@ -43,9 +43,7 @@
 #include <LibUtilities/Communication/CommSerial.h>
 #include <LibUtilities/LibUtilitiesDeclspec.h>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 class Timer
@@ -90,7 +88,6 @@ private:
         m_elapsedRegion;
 };
 
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities
 
 #endif // NEKTAR_LIB_UTILITIES_BASIC_UTILS_TIMER_H

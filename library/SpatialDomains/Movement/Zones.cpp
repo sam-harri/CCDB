@@ -39,9 +39,7 @@
 #include <SpatialDomains/Movement/Zones.h>
 #include <tinyxml.h>
 
-namespace Nektar
-{
-namespace SpatialDomains
+namespace Nektar::SpatialDomains
 {
 
 ZoneBase::ZoneBase(MovementType type, int indx, int domainID,
@@ -310,5 +308,4 @@ bool ZonePrescribe::v_Move(NekDouble time)
     return true;
 }
 
-} // namespace SpatialDomains
-} // namespace Nektar
+} // namespace Nektar::SpatialDomains

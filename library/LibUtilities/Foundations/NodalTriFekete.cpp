@@ -35,9 +35,7 @@
 #include <LibUtilities/Foundations/NodalTriFekete.h>
 #include <LibUtilities/Foundations/NodalTriFeketeData.h>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 bool NodalTriFekete::initPointsManager[] = {PointsManager().RegisterCreator(
     PointsKey(0, eNodalTriFekete), NodalTriFekete::Create)};
@@ -333,5 +331,4 @@ void NodalTriFekete::NodalPointReorder2d()
     return;
 }
 
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities

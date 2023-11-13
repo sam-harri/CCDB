@@ -39,9 +39,7 @@
 #include <MultiRegions/MultiRegionsDeclspec.h>
 #include <MultiRegions/Preconditioner.h>
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 // Forward declarations
 class ExpList;
@@ -55,7 +53,7 @@ public:
         const GlobalLinSysKey &pKey, const std::weak_ptr<ExpList> &pExpList,
         const std::shared_ptr<AssemblyMap> &pLocToGloMap);
 
-    MULTI_REGIONS_EXPORT virtual ~GlobalLinSysIterative();
+    MULTI_REGIONS_EXPORT ~GlobalLinSysIterative() override;
 
     void DoMatrixMultiply(const Array<OneD, NekDouble> &pInput,
                           Array<OneD, NekDouble> &pOutput)
@@ -157,7 +155,6 @@ private:
         m_precon->DoAssembleLoc(pInput, pOutput, ZeroDir);
     }
 };
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions
 
 #endif

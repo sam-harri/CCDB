@@ -35,9 +35,7 @@
 #include <GlobalMapping/MappingXofXZ.h>
 #include <MultiRegions/ExpList.h>
 
-namespace Nektar
-{
-namespace GlobalMapping
+namespace Nektar::GlobalMapping
 {
 
 std::string MappingXofXZ::className =
@@ -389,5 +387,4 @@ void MappingXofXZ::v_UpdateGeomInfo()
     m_fields[0]->SetWaveSpace(waveSpace);
 }
 
-} // namespace GlobalMapping
-} // namespace Nektar
+} // namespace Nektar::GlobalMapping

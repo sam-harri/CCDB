@@ -43,13 +43,10 @@
 #ifdef NEKTAR_USE_MPI
 #include <mpi.h>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 typedef MPI_Datatype CommDataType;
-}
-} // namespace Nektar
+} // namespace Nektar::LibUtilities
 
 #elif NEKTAR_USING_PETSC
 

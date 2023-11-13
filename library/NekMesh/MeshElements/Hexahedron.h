@@ -38,9 +38,7 @@
 #include <NekMesh/MeshElements/Element.h>
 #include <NekMesh/NekMeshDeclspec.h>
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 /**
  * @brief A 3-dimensional six-faced element.
@@ -67,21 +65,21 @@ public:
                               std::vector<int> pTagList);
     /// copy hex element
     NEKMESH_EXPORT Hexahedron(const Hexahedron &pSrc);
-    NEKMESH_EXPORT virtual ~Hexahedron()
+    NEKMESH_EXPORT ~Hexahedron() override
     {
     }
 
-    NEKMESH_EXPORT virtual SpatialDomains::GeometrySharedPtr GetGeom(
-        int coordDim);
-    NEKMESH_EXPORT virtual StdRegions::Orientation GetEdgeOrient(
-        int edgeId, EdgeSharedPtr edge);
-    NEKMESH_EXPORT virtual void MakeOrder(
-        int order, SpatialDomains::GeometrySharedPtr geom,
-        LibUtilities::PointsType pType, int coordDim, int &id,
-        bool justConfig = false);
+    NEKMESH_EXPORT SpatialDomains::GeometrySharedPtr GetGeom(
+        int coordDim) override;
+    NEKMESH_EXPORT StdRegions::Orientation GetEdgeOrient(
+        int edgeId, EdgeSharedPtr edge) override;
+    NEKMESH_EXPORT void MakeOrder(int order,
+                                  SpatialDomains::GeometrySharedPtr geom,
+                                  LibUtilities::PointsType pType, int coordDim,
+                                  int &id, bool justConfig = false) override;
 
     NEKMESH_EXPORT static unsigned int GetNumNodes(ElmtConfig pConf);
-    NEKMESH_EXPORT virtual int GetFaceVertex(int i, int j)
+    NEKMESH_EXPORT int GetFaceVertex(int i, int j) override
     {
         return m_faceIds[i][j];
     }
@@ -89,7 +87,6 @@ public:
 private:
     static int m_faceIds[6][4];
 };
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh
 
 #endif

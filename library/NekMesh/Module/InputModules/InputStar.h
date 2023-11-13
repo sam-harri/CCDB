@@ -39,9 +39,7 @@
 
 #include <libccmio/ccmio.h>
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 /// Converter for VTK files.
 class InputStar : public NekMesh::InputModule
@@ -55,14 +53,14 @@ public:
     static NekMesh::ModuleKey className;
 
     InputStar(NekMesh::MeshSharedPtr m);
-    virtual ~InputStar();
+    ~InputStar() override;
 
     /// Populate and validate required data structures.
-    virtual void Process();
+    void Process() override;
 
     void ReadZone(int &nComposite);
 
-    virtual std::string GetModuleName()
+    std::string GetModuleName() override
     {
         return "InputStar";
     }
@@ -110,7 +108,6 @@ private:
 
     void SetupElements(void);
 };
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh
 
 #endif

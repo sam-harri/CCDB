@@ -65,7 +65,7 @@ struct MetricRegexFieldValue
 class MetricRegex : public Metric
 {
 public:
-    virtual ~MetricRegex()
+    ~MetricRegex() override
     {
     }
 
@@ -88,8 +88,8 @@ protected:
 
     MetricRegex(TiXmlElement *metric, bool generate);
 
-    virtual bool v_Test(std::istream &pStdout, std::istream &pStderr);
-    virtual void v_Generate(std::istream &pStdout, std::istream &pStderr);
+    bool v_Test(std::istream &pStdout, std::istream &pStderr) override;
+    void v_Generate(std::istream &pStdout, std::istream &pStderr) override;
 };
 } // namespace Nektar
 

@@ -40,9 +40,7 @@
 #include <MultiRegions/MultiRegionsDeclspec.h>
 #include <MultiRegions/Preconditioner.h>
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 class PreconditionerBlock;
 typedef std::shared_ptr<PreconditionerBlock> PreconditionerBlockSharedPtr;
@@ -70,7 +68,7 @@ public:
         const AssemblyMapSharedPtr &pLocToGloMap);
 
     MULTI_REGIONS_EXPORT
-    virtual ~PreconditionerBlock()
+    ~PreconditionerBlock() override
     {
     }
 
@@ -78,18 +76,17 @@ protected:
     bool m_isFull;
     DNekBlkMatSharedPtr m_blkMat;
 
-    virtual void v_InitObject() override;
-    virtual void v_DoPreconditioner(const Array<OneD, NekDouble> &pInput,
-                                    Array<OneD, NekDouble> &pOutput,
-                                    const bool &isLocal = false) override;
+    void v_InitObject() override;
+    void v_DoPreconditioner(const Array<OneD, NekDouble> &pInput,
+                            Array<OneD, NekDouble> &pOutput,
+                            const bool &isLocal = false) override;
 
-    virtual void v_BuildPreconditioner() override;
+    void v_BuildPreconditioner() override;
 
 private:
     void BlockPreconditionerCG(void);
     void BlockPreconditionerHDG(void);
 };
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions
 
 #endif

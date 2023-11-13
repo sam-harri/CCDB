@@ -40,9 +40,7 @@
 
 #include <StdRegions/StdExpansion.h>
 
-namespace Nektar
-{
-namespace Collections
+namespace Nektar::Collections
 {
 
 using namespace tinysimd;
@@ -91,7 +89,6 @@ typedef std::shared_ptr<CoalescedGeomData> CoalescedGeomDataSharedPtr;
 
 static CoalescedGeomDataSharedPtr GeomDataNull;
 
-} // namespace Collections
-} // namespace Nektar
+} // namespace Nektar::Collections
 
 #endif

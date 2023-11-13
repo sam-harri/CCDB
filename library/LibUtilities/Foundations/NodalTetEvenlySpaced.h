@@ -40,14 +40,12 @@
 #include <LibUtilities/Foundations/ManagerAccess.h>
 #include <LibUtilities/Foundations/NodalUtil.h>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 class NodalTetEvenlySpaced : public Points<NekDouble>
 {
 public:
-    virtual ~NodalTetEvenlySpaced()
+    ~NodalTetEvenlySpaced() override
     {
     }
 
@@ -59,7 +57,7 @@ public:
         const PointsKey &key);
 
 protected:
-    virtual const MatrixSharedPtrType v_GetI(const PointsKey &pkey) override
+    const MatrixSharedPtrType v_GetI(const PointsKey &pkey) override
     {
         ASSERTL0(pkey.GetPointsDim() == 3,
                  "NodalTetEvenlySpaced Points can only interp to other "
@@ -69,7 +67,7 @@ protected:
         return GetI(x, y, z);
     }
 
-    virtual const MatrixSharedPtrType v_GetI(
+    const MatrixSharedPtrType v_GetI(
         const Array<OneD, const NekDouble> &x,
         const Array<OneD, const NekDouble> &y,
         const Array<OneD, const NekDouble> &z) override
@@ -95,16 +93,15 @@ private:
 
     void NodalPointReorder3d();
 
-    virtual void v_CalculatePoints() override final;
-    virtual void v_CalculateWeights() override final;
-    virtual void v_CalculateDerivMatrix() override final;
+    void v_CalculatePoints() final;
+    void v_CalculateWeights() final;
+    void v_CalculateDerivMatrix() final;
 
     void CalculateInterpMatrix(const Array<OneD, const NekDouble> &xi,
                                const Array<OneD, const NekDouble> &yi,
                                const Array<OneD, const NekDouble> &zi,
                                Array<OneD, NekDouble> &interp);
 }; // end of NodalTetEvenlySpaced
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities
 
 #endif // NODALTETEVENLYSPACED_H

@@ -41,9 +41,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 
 string DriverSteadyState::className =
@@ -665,5 +663,4 @@ void DriverSteadyState::PrintSummarySFD()
          << endl;
 }
 
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils

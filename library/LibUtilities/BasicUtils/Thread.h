@@ -45,9 +45,7 @@
 
 #include <LibUtilities/BasicUtils/NekFactory.hpp>
 
-namespace Nektar
-{
-namespace Thread
+namespace Nektar::Thread
 {
 
 /**
@@ -440,23 +438,23 @@ class ThreadStartupManager : public ThreadManager
 public:
     ThreadStartupManager();
     ThreadStartupManager(const ThreadStartupManager &src) = default;
-    virtual ~ThreadStartupManager();
+    ~ThreadStartupManager() override;
 
 protected:
-    virtual void v_QueueJobs(std::vector<ThreadJob *> &joblist) override;
-    virtual void v_QueueJob(ThreadJob *job) override;
-    virtual unsigned int v_GetNumWorkers() override;
-    virtual unsigned int v_GetWorkerNum() override;
-    virtual void v_SetNumWorkers(const unsigned int num) override;
-    virtual void v_SetNumWorkers() override;
-    virtual unsigned int v_GetMaxNumWorkers() override;
-    virtual void v_Wait() override;
-    virtual void v_SetChunkSize(unsigned int chnk) override;
-    virtual void v_SetSchedType(SchedType s) override;
-    virtual bool v_InThread() override;
-    virtual void v_Hold() override;
-    virtual bool v_IsInitialised() override;
-    virtual const std::string &v_GetType() const override;
+    void v_QueueJobs(std::vector<ThreadJob *> &joblist) override;
+    void v_QueueJob(ThreadJob *job) override;
+    unsigned int v_GetNumWorkers() override;
+    unsigned int v_GetWorkerNum() override;
+    void v_SetNumWorkers(const unsigned int num) override;
+    void v_SetNumWorkers() override;
+    unsigned int v_GetMaxNumWorkers() override;
+    void v_Wait() override;
+    void v_SetChunkSize(unsigned int chnk) override;
+    void v_SetSchedType(SchedType s) override;
+    bool v_InThread() override;
+    void v_Hold() override;
+    bool v_IsInitialised() override;
+    const std::string &v_GetType() const override;
 
 private:
     // Do not allow assignment as m_type is const
@@ -465,7 +463,5 @@ private:
     const std::string m_type;
 };
 
-} // namespace Thread
-
-} // namespace Nektar
+} // namespace Nektar::Thread
 #endif /* THREAD_H_ */

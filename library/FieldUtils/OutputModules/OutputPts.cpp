@@ -45,9 +45,7 @@ using namespace std;
 
 #include "OutputPts.h"
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 ModuleKey OutputPts::m_className[5] = {
@@ -141,5 +139,4 @@ fs::path OutputPts::v_GetFullOutName(std::string &filename,
     return fs::path(filename);
 }
 
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

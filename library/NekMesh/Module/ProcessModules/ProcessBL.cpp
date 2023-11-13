@@ -49,9 +49,7 @@
 using namespace std;
 using namespace Nektar::NekMesh;
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 ModuleKey ProcessBL::className = GetModuleFactory().RegisterCreatorFunction(
     ModuleKey(eProcessModule, "bl"), ProcessBL::create,
@@ -1529,5 +1527,4 @@ void ProcessBL::BoundaryLayer3D()
     ProcessElements();
     ProcessComposites();
 }
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh

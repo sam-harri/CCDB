@@ -38,9 +38,7 @@
 #include <MultiRegions/MultiRegionsDeclspec.h>
 #include <MultiRegions/Preconditioner.h>
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 class PreconditionerDiagonal;
 typedef std::shared_ptr<PreconditionerDiagonal> PreconditionerDiagonalSharedPtr;
@@ -69,20 +67,20 @@ public:
         const AssemblyMapSharedPtr &pLocToGloMap);
 
     MULTI_REGIONS_EXPORT
-    virtual ~PreconditionerDiagonal()
+    ~PreconditionerDiagonal() override
     {
     }
 
 protected:
     Array<OneD, NekDouble> m_diagonals;
 
-    virtual void v_InitObject() override;
+    void v_InitObject() override;
 
-    virtual void v_DoPreconditioner(const Array<OneD, NekDouble> &pInput,
-                                    Array<OneD, NekDouble> &pOutput,
-                                    const bool &IsLocal = false) override;
+    void v_DoPreconditioner(const Array<OneD, NekDouble> &pInput,
+                            Array<OneD, NekDouble> &pOutput,
+                            const bool &IsLocal = false) override;
 
-    virtual void v_BuildPreconditioner() override;
+    void v_BuildPreconditioner() override;
 
 private:
     void DiagonalPreconditionerSum(void);
@@ -119,17 +117,17 @@ public:
         const AssemblyMapSharedPtr &pLocToGloMap);
 
     MULTI_REGIONS_EXPORT
-    virtual ~PreconditionerNull()
+    ~PreconditionerNull() override
     {
     }
 
-    virtual void v_InitObject() override;
+    void v_InitObject() override;
 
-    virtual void v_DoPreconditioner(const Array<OneD, NekDouble> &pInput,
-                                    Array<OneD, NekDouble> &pOutput,
-                                    const bool &isLocal = false) override;
+    void v_DoPreconditioner(const Array<OneD, NekDouble> &pInput,
+                            Array<OneD, NekDouble> &pOutput,
+                            const bool &isLocal = false) override;
 
-    virtual void v_BuildPreconditioner() override;
+    void v_BuildPreconditioner() override;
 
 private:
     static std::string lookupIds[];
@@ -163,18 +161,18 @@ public:
         const AssemblyMapSharedPtr &pLocToGloMap);
 
     MULTI_REGIONS_EXPORT
-    virtual ~PreconditionerJacobi()
+    ~PreconditionerJacobi() override
     {
     }
 
 protected:
-    virtual void v_InitObject() override;
+    void v_InitObject() override;
 
-    virtual void v_BuildPreconditioner() override;
+    void v_BuildPreconditioner() override;
 
-    virtual void v_DoPreconditioner(const Array<OneD, NekDouble> &pInput,
-                                    Array<OneD, NekDouble> &pOutput,
-                                    const bool &IsLocal = false) override;
+    void v_DoPreconditioner(const Array<OneD, NekDouble> &pInput,
+                            Array<OneD, NekDouble> &pOutput,
+                            const bool &IsLocal = false) override;
 
 private:
     int m_niter;
@@ -183,7 +181,6 @@ private:
     static std::string def;
 };
 
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions
 
 #endif

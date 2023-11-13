@@ -73,7 +73,7 @@ template <typename DataType> struct ConsistentObjectAccess<DataType *>
 {
     static const DataType &const_reference(DataType *o)
     {
-        ASSERTL1(o != 0, "Can't dereference null pointer.");
+        ASSERTL1(o != nullptr, "Can't dereference null pointer.");
         return *o;
     }
     static const DataType *const_pointer(DataType *o)
@@ -82,12 +82,12 @@ template <typename DataType> struct ConsistentObjectAccess<DataType *>
     }
     static bool ReferencesObject(DataType *o)
     {
-        return o != 0;
+        return o != nullptr;
     }
 
     static DataType &reference(DataType *o)
     {
-        ASSERTL1(o != 0, "Can't dereference null pointer.");
+        ASSERTL1(o != nullptr, "Can't dereference null pointer.");
         return *o;
     }
     static DataType *pointer(DataType *o)

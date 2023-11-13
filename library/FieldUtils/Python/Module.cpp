@@ -307,7 +307,7 @@ void ModuleCapsuleDestructor(void *ptr)
 void ModuleCapsuleDestructor(PyObject *ptr)
 {
     ModuleRegisterHelper *tmp =
-        (ModuleRegisterHelper *)PyCapsule_GetPointer(ptr, 0);
+        (ModuleRegisterHelper *)PyCapsule_GetPointer(ptr, nullptr);
     delete tmp;
 }
 #endif
@@ -358,7 +358,7 @@ void Module_Register(ModuleType const &modType, std::string const &modName,
         py::handle<>(PyCObject_FromVoidPtr(helper, ModuleCapsuleDestructor)));
 #else
     py::object capsule(
-        py::handle<>(PyCapsule_New(helper, 0, ModuleCapsuleDestructor)));
+        py::handle<>(PyCapsule_New(helper, nullptr, ModuleCapsuleDestructor)));
 #endif
 
     // Embed this in __main__.

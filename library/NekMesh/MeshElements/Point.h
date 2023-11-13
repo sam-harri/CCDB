@@ -38,9 +38,7 @@
 #include <NekMesh/MeshElements/Element.h>
 #include <NekMesh/NekMeshDeclspec.h>
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 /**
  * @brief A 0-dimensional vertex.
@@ -61,13 +59,12 @@ public:
     NEKMESH_EXPORT Point(ElmtConfig pConf, std::vector<NodeSharedPtr> pNodeList,
                          std::vector<int> pTagList);
     NEKMESH_EXPORT Point(const Point &pSrc);
-    NEKMESH_EXPORT virtual ~Point()
+    NEKMESH_EXPORT ~Point() override
     {
     }
 
     NEKMESH_EXPORT static unsigned int GetNumNodes(ElmtConfig pConf);
 };
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh
 
 #endif

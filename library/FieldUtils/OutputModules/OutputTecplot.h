@@ -38,9 +38,7 @@
 #include "OutputFileBase.h"
 #include <tinyxml.h>
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 enum TecplotZoneType
@@ -69,30 +67,29 @@ public:
 
     static ModuleKey m_className;
     OutputTecplot(FieldSharedPtr f);
-    virtual ~OutputTecplot();
+    ~OutputTecplot() override;
 
 protected:
-    virtual void v_Process(po::variables_map &vm) override;
+    void v_Process(po::variables_map &vm) override;
 
-    virtual std::string v_GetModuleName() override
+    std::string v_GetModuleName() override
     {
         return "OutputTecplot";
     }
 
     /// Write from pts to output file.
-    virtual void v_OutputFromPts(po::variables_map &vm) override;
+    void v_OutputFromPts(po::variables_map &vm) override;
 
     /// Write from m_exp to output file.
-    virtual void v_OutputFromExp(po::variables_map &vm) override;
+    void v_OutputFromExp(po::variables_map &vm) override;
 
     /// Write from data to output file.
-    virtual void v_OutputFromData(po::variables_map &vm) override;
+    void v_OutputFromData(po::variables_map &vm) override;
 
-    virtual fs::path v_GetPath(std::string &filename,
-                               po::variables_map &vm) override;
+    fs::path v_GetPath(std::string &filename, po::variables_map &vm) override;
 
-    virtual fs::path v_GetFullOutName(std::string &filename,
-                                      po::variables_map &vm) override;
+    fs::path v_GetFullOutName(std::string &filename,
+                              po::variables_map &vm) override;
 
     /// True if writing binary field output
     bool m_binary;
@@ -161,20 +158,19 @@ public:
         m_binary = true;
     }
 
-    virtual ~OutputTecplotBinary()
+    ~OutputTecplotBinary() override
     {
     }
 
 protected:
     void WriteDoubleOrFloat(std::ofstream &outfile,
                             Array<OneD, NekDouble> &data);
-    virtual void v_WriteTecplotHeader(std::ofstream &outfile,
-                                      std::vector<std::string> &var) override;
-    virtual void v_WriteTecplotZone(std::ofstream &outfile) override;
-    virtual void v_WriteTecplotConnectivity(std::ofstream &outfile) override;
+    void v_WriteTecplotHeader(std::ofstream &outfile,
+                              std::vector<std::string> &var) override;
+    void v_WriteTecplotZone(std::ofstream &outfile) override;
+    void v_WriteTecplotConnectivity(std::ofstream &outfile) override;
 };
 
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils
 
 #endif

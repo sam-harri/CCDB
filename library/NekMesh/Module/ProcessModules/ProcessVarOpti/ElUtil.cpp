@@ -40,9 +40,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 std::mutex mtx2;
@@ -834,5 +832,4 @@ ElUtilJob *ElUtil::GetJob(bool update)
 {
     return new ElUtilJob(this, update);
 }
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh

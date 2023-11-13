@@ -53,7 +53,7 @@ public:
 protected:
     MetricPyUnitTest(TiXmlElement *metric, bool generate);
 
-    virtual void v_Generate(std::istream &pStdout, std::istream &pStderr);
+    void v_Generate(std::istream &pStdout, std::istream &pStderr) override;
 };
 
 } // namespace Nektar

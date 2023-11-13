@@ -36,9 +36,7 @@
 #include <UnitTests/util.h>
 #include <fstream>
 
-namespace Nektar
-{
-namespace UnitTests
+namespace Nektar::UnitTests
 {
 void RedirectCerrIfNeeded()
 {
@@ -48,5 +46,4 @@ void RedirectCerrIfNeeded()
         ErrorUtil::SetErrorStream(out);
     }
 }
-} // namespace UnitTests
-} // namespace Nektar
+} // namespace Nektar::UnitTests

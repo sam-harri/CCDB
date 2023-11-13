@@ -37,9 +37,7 @@
 #include <memory>
 #include <vector>
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 class Octree
@@ -208,5 +206,4 @@ private:
     void AdvanceToStats(int nodeID);
     void SetNeighbours(int nodeID);
 };
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

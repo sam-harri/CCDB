@@ -37,9 +37,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 /**
@@ -79,7 +77,9 @@ bool operator==(HOSurfSharedPtr const &p1, HOSurfSharedPtr const &p2)
     for (int i = 0; i < ids1.size(); ++i)
     {
         if (ids1[i] != ids2[i])
+        {
             return false;
+        }
     }
 
     return true;
@@ -199,5 +199,4 @@ bool operator<(FaceSharedPtr const &p1, FaceSharedPtr const &p2)
     return p1->m_id < p2->m_id;
 }
 
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh

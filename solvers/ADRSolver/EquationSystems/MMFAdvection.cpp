@@ -204,7 +204,7 @@ MMFAdvection::~MMFAdvection()
 
 void MMFAdvection::v_DoSolve()
 {
-    ASSERTL0(m_intScheme != 0, "No time integration scheme.");
+    ASSERTL0(m_intScheme != nullptr, "No time integration scheme.");
 
     int i, nchk = 1;
     int nvariables = 0;

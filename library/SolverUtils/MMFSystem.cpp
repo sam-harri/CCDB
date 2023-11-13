@@ -35,9 +35,7 @@
 #include <MultiRegions/AssemblyMap/AssemblyMapDG.h>
 #include <SolverUtils/MMFSystem.h>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 
 MMFSystem::MMFSystem(const LibUtilities::SessionReaderSharedPtr &pSession,
@@ -150,21 +148,37 @@ void MMFSystem::SetUpMovingFrames(
     m_session->LoadParameter("MMFCircCentreY", m_MMFfactors[3], 0.0);
 
     if (conn == "TangentX")
+    {
         m_MMFdir = SpatialDomains::eTangentX;
+    }
     if (conn == "TangentY")
+    {
         m_MMFdir = SpatialDomains::eTangentY;
+    }
     if (conn == "TangentXY")
+    {
         m_MMFdir = SpatialDomains::eTangentXY;
+    }
     if (conn == "TangentZ")
+    {
         m_MMFdir = SpatialDomains::eTangentZ;
+    }
     if (conn == "TangentCircular")
+    {
         m_MMFdir = SpatialDomains::eTangentCircular;
+    }
     if (conn == "TangentIrregular")
+    {
         m_MMFdir = SpatialDomains::eTangentIrregular;
+    }
     if (conn == "TangentNonconvex")
+    {
         m_MMFdir = SpatialDomains::eTangentNonconvex;
+    }
     if (conn == "LOCAL")
+    {
         m_MMFdir = SpatialDomains::eLOCAL;
+    }
 
     // Get Tangetn vectors from GeomFactors2D, Orthonormalized = true
     m_fields[0]->GetMovingFrames(m_MMFdir, m_MMFfactors, m_movingframes);
@@ -2502,5 +2516,4 @@ void MMFSystem::v_GenerateSummary(SummaryList &s)
         AddSummaryItem(s, "MMFCircCentreY", m_MMFfactors[3]);
     }
 }
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils

@@ -50,9 +50,7 @@
 
 #include "CADObject.h"
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 // forward declorators
@@ -295,7 +293,6 @@ typedef LibUtilities::NekFactory<std::string, CADSystem, std::string>
     EngineFactory;
 
 EngineFactory &GetEngineFactory();
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh
 
 #endif

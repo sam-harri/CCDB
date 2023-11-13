@@ -42,9 +42,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace SpatialDomains
+namespace Nektar::SpatialDomains
 {
 const unsigned int PyrGeom::EdgeNormalToFaceVert[5][4] = {
     {4, 5, 6, 7}, {1, 3, 6, 7}, {0, 2, 4, 7}, {1, 3, 4, 5}, {0, 2, 5, 6}};
@@ -748,5 +746,4 @@ void PyrGeom::SetUpXmap()
     m_xmap = MemoryManager<StdRegions::StdPyrExp>::AllocateSharedPtr(A1, A2, C);
 }
 
-} // namespace SpatialDomains
-} // namespace Nektar
+} // namespace Nektar::SpatialDomains

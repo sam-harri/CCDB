@@ -41,9 +41,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace SpatialDomains
+namespace Nektar::SpatialDomains
 {
 
 const unsigned int HexGeom::VertexEdgeConnectivity[8][3] = {
@@ -828,5 +826,4 @@ void HexGeom::SetUpXmap()
     m_xmap = MemoryManager<StdRegions::StdHexExp>::AllocateSharedPtr(A, B, C);
 }
 
-} // namespace SpatialDomains
-} // namespace Nektar
+} // namespace Nektar::SpatialDomains

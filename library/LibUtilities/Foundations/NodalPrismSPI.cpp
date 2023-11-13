@@ -34,9 +34,7 @@
 
 #include <LibUtilities/Foundations/NodalPrismSPI.h>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 bool NodalPrismSPI::initPointsManager[] = {PointsManager().RegisterCreator(
     PointsKey(0, eNodalPrismSPI), NodalPrismSPI::Create)};
@@ -99,5 +97,4 @@ std::shared_ptr<PointsBaseType> NodalPrismSPI::Create(const PointsKey &key)
     return returnval;
 }
 
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities

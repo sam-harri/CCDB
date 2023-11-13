@@ -46,9 +46,7 @@
 using namespace std;
 using namespace Nektar::NekMesh;
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 /**
  * @brief Default constructor.
@@ -125,5 +123,4 @@ void ProcessCurvedEdges::Process()
         }
     }
 }
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh

@@ -80,21 +80,19 @@ public:
                             const Array<OneD, int> pVel,
                             const SolverUtils::AdvectionSharedPtr advObject);
 
-    virtual ~WeakPressureExtrapolate();
+    ~WeakPressureExtrapolate() override;
 
 protected:
-    virtual void v_EvaluatePressureBCs(
+    void v_EvaluatePressureBCs(
         const Array<OneD, const Array<OneD, NekDouble>> &fields,
         const Array<OneD, const Array<OneD, NekDouble>> &N,
         NekDouble kinvis) override;
 
-    virtual void v_MountHOPBCs(
-        int HBCdata, NekDouble kinvis, Array<OneD, NekDouble> &Q,
-        Array<OneD, const NekDouble> &Advection) override;
+    void v_MountHOPBCs(int HBCdata, NekDouble kinvis, Array<OneD, NekDouble> &Q,
+                       Array<OneD, const NekDouble> &Advection) override;
 
-    virtual void v_AddNormVelOnOBC(
-        const int nbcoeffs, const int nreg,
-        Array<OneD, Array<OneD, NekDouble>> &u) override;
+    void v_AddNormVelOnOBC(const int nbcoeffs, const int nreg,
+                           Array<OneD, Array<OneD, NekDouble>> &u) override;
 
     static std::string solverTypeLookupId;
 };

@@ -45,9 +45,7 @@
 
 #include <LibUtilities/TimeIntegration/TimeIntegrationSchemeGLM.h>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -80,7 +78,7 @@ public:
             m_integration_phases[0], variant, order, freeParams);
     }
 
-    virtual ~RungeKuttaTimeIntegrationScheme()
+    ~RungeKuttaTimeIntegrationScheme() override
     {
     }
 
@@ -276,12 +274,12 @@ public:
     }
 
 protected:
-    LUE virtual std::string v_GetName() const override
+    LUE std::string v_GetName() const override
     {
         return std::string("RungeKutta");
     }
 
-    LUE virtual NekDouble v_GetTimeStability() const override
+    LUE NekDouble v_GetTimeStability() const override
     {
         if (GetOrder() == 1 || GetOrder() == 2)
         {
@@ -571,7 +569,6 @@ protected:
 
 }; // end class RungeKutta3_SSPTimeIntegrationScheme
 
-} // end namespace LibUtilities
-} // end namespace Nektar
+} // namespace Nektar::LibUtilities
 
 #endif

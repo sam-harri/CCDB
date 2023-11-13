@@ -43,9 +43,7 @@ using namespace std;
 
 #include "ProcessInnerProduct.h"
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 ModuleKey ProcessInnerProduct::className =
@@ -248,5 +246,4 @@ NekDouble ProcessInnerProduct::IProduct(
     }
     return totiprod;
 }
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

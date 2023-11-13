@@ -42,10 +42,7 @@
 #include <SpatialDomains/SpatialDomainsDeclspec.h>
 #include <StdRegions/StdRegions.hpp>
 
-namespace Nektar
-{
-
-namespace SpatialDomains
+namespace Nektar::SpatialDomains
 {
 class SegGeom;
 typedef std::shared_ptr<SegGeom> SegGeomSharedPtr;
@@ -63,7 +60,7 @@ public:
 
     SPATIAL_DOMAINS_EXPORT SegGeomSharedPtr GenerateOneSpaceDimGeom(void);
 
-    SPATIAL_DOMAINS_EXPORT ~SegGeom();
+    SPATIAL_DOMAINS_EXPORT ~SegGeom() override;
 
     SPATIAL_DOMAINS_EXPORT static StdRegions::Orientation GetEdgeOrientation(
         const SegGeom &edge1, const SegGeom &edge2);
@@ -79,17 +76,17 @@ protected:
     SpatialDomains::PointGeomSharedPtr m_verts[kNverts];
     StdRegions::Orientation m_porient[kNverts];
 
-    virtual PointGeomSharedPtr v_GetVertex(const int i) const override;
+    PointGeomSharedPtr v_GetVertex(const int i) const override;
     virtual LibUtilities::ShapeType v_GetShapeType() const;
-    virtual void v_GenGeomFactors() override;
-    virtual void v_FillGeom() override;
-    virtual void v_Reset(CurveMap &curvedEdges, CurveMap &curvedFaces) override;
-    virtual void v_Setup() override;
-    virtual NekDouble v_GetCoord(
-        const int i, const Array<OneD, const NekDouble> &Lcoord) override;
-    virtual int v_GetNumVerts() const override;
-    virtual NekDouble v_FindDistance(const Array<OneD, const NekDouble> &xs,
-                                     Array<OneD, NekDouble> &xi) override;
+    void v_GenGeomFactors() override;
+    void v_FillGeom() override;
+    void v_Reset(CurveMap &curvedEdges, CurveMap &curvedFaces) override;
+    void v_Setup() override;
+    NekDouble v_GetCoord(const int i,
+                         const Array<OneD, const NekDouble> &Lcoord) override;
+    int v_GetNumVerts() const override;
+    NekDouble v_FindDistance(const Array<OneD, const NekDouble> &xs,
+                             Array<OneD, NekDouble> &xi) override;
 
 private:
     /// Boolean indicating whether object owns the data
@@ -97,7 +94,6 @@ private:
 
     void SetUpXmap();
 };
-} // namespace SpatialDomains
-} // namespace Nektar
+} // namespace Nektar::SpatialDomains
 
 #endif // NEKTAR_SPATIALDOMAINS_SEGGEOM_H

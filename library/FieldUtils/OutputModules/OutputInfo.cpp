@@ -44,9 +44,7 @@ using namespace std;
 
 #include "OutputInfo.h"
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 ModuleKey OutputInfo::m_className = GetModuleFactory().RegisterCreatorFunction(
@@ -128,5 +126,4 @@ void OutputInfo::v_Process(po::variables_map &vm)
     fldXml->WriteMultiFldFileIDs(infofile, filenames, ElementIDs);
 }
 
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

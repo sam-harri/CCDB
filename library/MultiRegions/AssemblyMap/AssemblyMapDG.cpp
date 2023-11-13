@@ -47,9 +47,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 AssemblyMapDG::AssemblyMapDG() : m_numDirichletBndPhys(0)
 {
@@ -915,5 +913,4 @@ AssemblyCommDGSharedPtr AssemblyMapDG::GetAssemblyCommDG()
     return m_assemblyComm;
 }
 
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions

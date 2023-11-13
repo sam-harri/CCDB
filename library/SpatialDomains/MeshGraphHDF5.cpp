@@ -54,9 +54,7 @@
 using namespace std;
 using namespace Nektar::LibUtilities;
 
-namespace Nektar
-{
-namespace SpatialDomains
+namespace Nektar::SpatialDomains
 {
 
 /// Version of the Nektar++ HDF5 geometry format, which is embedded into the
@@ -1660,7 +1658,9 @@ void MeshGraphHDF5::v_WriteGeometry(
     }
 
     if (m_movement)
+    {
         m_movement->WriteMovement(root);
+    }
 
     doc->SaveFile(filenameXml);
 
@@ -1707,5 +1707,4 @@ void MeshGraphHDF5::v_WriteGeometry(
     WriteDomain(m_domain);
 }
 
-} // namespace SpatialDomains
-} // namespace Nektar
+} // namespace Nektar::SpatialDomains

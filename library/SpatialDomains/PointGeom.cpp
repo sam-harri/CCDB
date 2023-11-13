@@ -38,9 +38,7 @@
 #include <SpatialDomains/SegGeom.h>
 #include <StdRegions/StdRegions.hpp>
 
-namespace Nektar
-{
-namespace SpatialDomains
+namespace Nektar::SpatialDomains
 {
 PointGeom::PointGeom() : NekPoint<NekDouble>(0.0, 0.0, 0.0)
 {
@@ -233,5 +231,4 @@ void PointGeom::v_GenGeomFactors()
 {
 }
 
-} // namespace SpatialDomains
-} // namespace Nektar
+} // namespace Nektar::SpatialDomains

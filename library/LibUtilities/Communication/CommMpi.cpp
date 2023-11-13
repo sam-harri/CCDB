@@ -38,9 +38,7 @@
 
 #include <LibUtilities/Communication/CommMpi.h>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 std::string CommMpi::className = GetCommFactory().RegisterCreatorFunction(
@@ -598,5 +596,4 @@ std::pair<CommSharedPtr, CommSharedPtr> CommMpi::v_SplitCommNode()
     return ret;
 }
 
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities

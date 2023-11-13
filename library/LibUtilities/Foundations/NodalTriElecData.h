@@ -32,9 +32,7 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 static const size_t perm3A_2d[3][3] = {
     {0, 1, 2}, {2, 0, 1}, {0, 2, 1}}; // Works for aab
@@ -269,5 +267,4 @@ static const NekDouble NodalTriElecData[][6] = {
     {0, 0, 1, 0.4883520007, 0.2978352313, 0.2138127680},
     {0, 0, 1, 0.4806452274, 0.3853613574, 0.1339934152}};
 
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities

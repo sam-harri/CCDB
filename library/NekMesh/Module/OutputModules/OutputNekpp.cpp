@@ -57,9 +57,7 @@ namespace io = boost::iostreams;
 using namespace Nektar::NekMesh;
 using namespace Nektar::SpatialDomains;
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 ModuleKey OutputNekpp::className1 = GetModuleFactory().RegisterCreatorFunction(
     ModuleKey(eOutputModule, "xml"), OutputNekpp::create,
@@ -807,5 +805,4 @@ void OutputNekpp::TransferDomain(MeshGraphSharedPtr graph)
     }
 }
 
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh

@@ -47,9 +47,7 @@
 #define ISTTY isatty(fileno(stdout))
 #endif
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 /**
@@ -107,7 +105,6 @@ inline int PrintProgressbar(const int position, const int goal,
     }
 }
 
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities
 
 #endif // NEKTAR_LIBUTILITIES_PROGRESSBAR_HPP

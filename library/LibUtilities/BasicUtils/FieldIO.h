@@ -44,9 +44,7 @@
 
 #include <LibUtilities/BasicUtils/NekFactory.hpp>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 typedef std::map<std::string, std::string> FieldMetaDataMap;
@@ -373,6 +371,5 @@ inline DataSourceSharedPtr FieldIO::ImportFieldMetaData(
     return v_ImportFieldMetaData(filename, fieldmetadatamap);
 }
 
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities
 #endif

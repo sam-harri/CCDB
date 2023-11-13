@@ -50,7 +50,7 @@ template <typename T, typename F> void NekMatrixCapsuleDestructor(void *ptr)
 template <typename T, typename F> void NekMatrixCapsuleDestructor(PyObject *ptr)
 {
     std::shared_ptr<NekMatrix<T, F>> *mat =
-        (std::shared_ptr<NekMatrix<T, F>> *)PyCapsule_GetPointer(ptr, 0);
+        (std::shared_ptr<NekMatrix<T, F>> *)PyCapsule_GetPointer(ptr, nullptr);
     delete mat;
 }
 #endif
@@ -70,7 +70,7 @@ template <typename T> struct NekMatrixToPython
 #else
         py::object capsule(py::handle<>(PyCapsule_New(
             (void *)new std::shared_ptr<NekMatrix<T, StandardMatrixTag>>(mat),
-            NULL,
+            nullptr,
             (PyCapsule_Destructor)&NekMatrixCapsuleDestructor<
                 T, StandardMatrixTag>)));
 #endif

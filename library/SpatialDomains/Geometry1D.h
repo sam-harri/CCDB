@@ -40,9 +40,7 @@
 #include <SpatialDomains/SpatialDomainsDeclspec.h>
 #include <StdRegions/StdExpansion1D.h>
 
-namespace Nektar
-{
-namespace SpatialDomains
+namespace Nektar::SpatialDomains
 {
 
 class Geometry1D;
@@ -56,17 +54,16 @@ class Geometry1D : public Geometry
 public:
     SPATIAL_DOMAINS_EXPORT Geometry1D();
     SPATIAL_DOMAINS_EXPORT Geometry1D(const int coordim);
-    SPATIAL_DOMAINS_EXPORT virtual ~Geometry1D();
+    SPATIAL_DOMAINS_EXPORT ~Geometry1D() override;
 
     SPATIAL_DOMAINS_EXPORT static const int kDim = 1;
 
 protected:
-    virtual int v_GetShapeDim() const override;
-    virtual NekDouble v_GetLocCoords(const Array<OneD, const NekDouble> &coords,
-                                     Array<OneD, NekDouble> &Lcoords) override;
+    int v_GetShapeDim() const override;
+    NekDouble v_GetLocCoords(const Array<OneD, const NekDouble> &coords,
+                             Array<OneD, NekDouble> &Lcoords) override;
 };
 
-} // namespace SpatialDomains
-} // namespace Nektar
+} // namespace Nektar::SpatialDomains
 
 #endif // NEKTAR_SPATIALDOMAINS_GEOMETRY1D_H

@@ -37,9 +37,7 @@
 #include <CompressibleFlowSolver/Misc/VariableConverter.h>
 #include <SolverUtils/Filters/FilterMaxMinFields.h>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 std::string FilterMaxMinFields::className =
     GetFilterFactory().RegisterCreatorFunction("MaxMinFields",
@@ -235,5 +233,4 @@ NekDouble FilterMaxMinFields::v_GetScale()
     return 1.0;
 }
 
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils

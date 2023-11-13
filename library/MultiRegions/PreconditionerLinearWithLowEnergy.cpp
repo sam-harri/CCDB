@@ -40,9 +40,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 /**
  * Registers the class with the Factory.
@@ -191,5 +189,4 @@ void PreconditionerLinearWithLowEnergy::v_DoPreconditioner(
     Vmath::Vadd(nGlobHomBndDofs, pOutput, 1, OutputLowEnergy, 1, pOutput, 1);
 }
 
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions

@@ -38,9 +38,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 /**
  * @class  NekLinSysIterCG
@@ -245,5 +243,4 @@ void NekLinSysIterCG::DoConjugateGradient(
         rho   = rho_new;
     }
 }
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities

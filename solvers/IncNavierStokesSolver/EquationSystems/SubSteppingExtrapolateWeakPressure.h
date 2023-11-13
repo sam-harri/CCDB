@@ -76,16 +76,15 @@ public:
         MultiRegions::ExpListSharedPtr pPressure, const Array<OneD, int> pVel,
         const SolverUtils::AdvectionSharedPtr advObject);
 
-    virtual ~SubSteppingExtrapolateWeakPressure();
+    ~SubSteppingExtrapolateWeakPressure() override;
 
 protected:
-    virtual void v_SubStepSetPressureBCs(
+    void v_SubStepSetPressureBCs(
         const Array<OneD, const Array<OneD, NekDouble>> &inarray,
         NekDouble Aii_Dt, NekDouble kinvis) override;
 
-    virtual void v_AddNormVelOnOBC(
-        const int nbcoeffs, const int nreg,
-        Array<OneD, Array<OneD, NekDouble>> &u) override;
+    void v_AddNormVelOnOBC(const int nbcoeffs, const int nreg,
+                           Array<OneD, Array<OneD, NekDouble>> &u) override;
 };
 } // namespace Nektar
 #endif

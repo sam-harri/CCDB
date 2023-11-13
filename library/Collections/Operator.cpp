@@ -35,9 +35,7 @@
 #include <Collections/Collection.h>
 #include <Collections/Operator.h>
 
-namespace Nektar
-{
-namespace Collections
+namespace Nektar::Collections
 {
 
 /**
@@ -129,5 +127,4 @@ std::ostream &operator<<(std::ostream &os, OperatorKey const &p)
     return os;
 }
 
-} // namespace Collections
-} // namespace Nektar
+} // namespace Nektar::Collections

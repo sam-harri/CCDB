@@ -39,9 +39,7 @@
 #include <SpatialDomains/QuadGeom.h>
 #include <SpatialDomains/TriGeom.h>
 
-namespace Nektar
-{
-namespace SpatialDomains
+namespace Nektar::SpatialDomains
 {
 
 class PrismGeom : public Geometry3D
@@ -49,7 +47,7 @@ class PrismGeom : public Geometry3D
 public:
     SPATIAL_DOMAINS_EXPORT PrismGeom();
     SPATIAL_DOMAINS_EXPORT PrismGeom(int id, const Geometry2DSharedPtr faces[]);
-    SPATIAL_DOMAINS_EXPORT ~PrismGeom();
+    SPATIAL_DOMAINS_EXPORT ~PrismGeom() override;
 
     SPATIAL_DOMAINS_EXPORT static const int kNverts  = 6;
     SPATIAL_DOMAINS_EXPORT static const int kNedges  = 9;
@@ -59,15 +57,14 @@ public:
     SPATIAL_DOMAINS_EXPORT static const std::string XMLElementType;
 
 protected:
-    virtual void v_GenGeomFactors() override;
-    virtual int v_GetVertexEdgeMap(const int i, const int j) const override;
-    virtual int v_GetVertexFaceMap(const int i, const int j) const override;
-    virtual int v_GetEdgeFaceMap(const int i, const int j) const override;
-    virtual int v_GetEdgeNormalToFaceVert(const int i,
-                                          const int j) const override;
-    virtual int v_GetDir(const int faceidx, const int facedir) const override;
-    virtual void v_Reset(CurveMap &curvedEdges, CurveMap &curvedFaces) override;
-    virtual void v_Setup() override;
+    void v_GenGeomFactors() override;
+    int v_GetVertexEdgeMap(const int i, const int j) const override;
+    int v_GetVertexFaceMap(const int i, const int j) const override;
+    int v_GetEdgeFaceMap(const int i, const int j) const override;
+    int v_GetEdgeNormalToFaceVert(const int i, const int j) const override;
+    int v_GetDir(const int faceidx, const int facedir) const override;
+    void v_Reset(CurveMap &curvedEdges, CurveMap &curvedFaces) override;
+    void v_Setup() override;
 
 private:
     void SetUpLocalEdges();
@@ -84,7 +81,6 @@ private:
 
 typedef std::shared_ptr<PrismGeom> PrismGeomSharedPtr;
 typedef std::map<int, PrismGeomSharedPtr> PrismGeomMap;
-} // namespace SpatialDomains
-} // namespace Nektar
+} // namespace Nektar::SpatialDomains
 
 #endif // NEKTAR_SPATIALDOMAINS_PRISMGEOM_H

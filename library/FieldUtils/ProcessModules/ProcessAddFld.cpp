@@ -42,9 +42,7 @@ using namespace std;
 
 #include "ProcessAddFld.h"
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 ModuleKey ProcessAddFld::className = GetModuleFactory().RegisterCreatorFunction(
@@ -195,5 +193,4 @@ void ProcessAddFld::v_Process(po::variables_map &vm)
         }
     }
 }
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

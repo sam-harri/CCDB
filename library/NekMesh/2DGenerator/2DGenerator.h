@@ -41,9 +41,7 @@
 
 #include <LibUtilities/Interpreter/Interpreter.h>
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 /**
@@ -61,9 +59,9 @@ public:
 
     Generator2D(MeshSharedPtr m);
 
-    virtual ~Generator2D();
+    ~Generator2D() override;
 
-    virtual void Process() override;
+    void Process() override;
 
 private:
     void FindBLEnds();
@@ -102,7 +100,6 @@ private:
     /// map of BL curve nodes to adjacent edges
     std::map<NodeSharedPtr, std::vector<EdgeSharedPtr>> m_nodesToEdge;
 };
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh
 
 #endif

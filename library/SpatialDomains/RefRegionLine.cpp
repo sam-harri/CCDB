@@ -36,9 +36,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace SpatialDomains
+namespace Nektar::SpatialDomains
 {
 
 RefRegionLine::RefRegionLine(const unsigned int coordim, NekDouble radius,
@@ -85,5 +83,4 @@ bool RefRegionLine::v_Contains(const Array<OneD, NekDouble> &coords)
     return false;
 }
 
-} // namespace SpatialDomains
-} // namespace Nektar
+} // namespace Nektar::SpatialDomains

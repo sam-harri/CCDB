@@ -40,9 +40,7 @@
 #include <MultiRegions/MultiRegionsDeclspec.h>
 #include <vector>
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 
 // Forward declaration for typedefs
@@ -83,7 +81,7 @@ public:
         const ExpList2DHomogeneous1D &In);
 
     /// Destructor.
-    MULTI_REGIONS_EXPORT virtual ~ExpList2DHomogeneous1D();
+    MULTI_REGIONS_EXPORT ~ExpList2DHomogeneous1D() override;
 
 protected:
     /// Definition of the total number of degrees of freedom and
@@ -93,27 +91,24 @@ protected:
 
     //  virtual functions
 
-    virtual void v_GetCoords(Array<OneD, NekDouble> &coord_0,
-                             Array<OneD, NekDouble> &coord_1,
-                             Array<OneD, NekDouble> &coord_2) override;
+    void v_GetCoords(Array<OneD, NekDouble> &coord_0,
+                     Array<OneD, NekDouble> &coord_1,
+                     Array<OneD, NekDouble> &coord_2) override;
 
-    virtual void v_GetCoords(const int eid, Array<OneD, NekDouble> &xc0,
-                             Array<OneD, NekDouble> &xc1,
-                             Array<OneD, NekDouble> &xc2) override;
+    void v_GetCoords(const int eid, Array<OneD, NekDouble> &xc0,
+                     Array<OneD, NekDouble> &xc1,
+                     Array<OneD, NekDouble> &xc2) override;
 
-    virtual void v_WriteTecplotZone(std::ostream &outfile,
-                                    int expansion) override;
+    void v_WriteTecplotZone(std::ostream &outfile, int expansion) override;
 
-    virtual void v_WriteVtkPieceHeader(std::ostream &outfile, int expansion,
-                                       int istrip) override;
+    void v_WriteVtkPieceHeader(std::ostream &outfile, int expansion,
+                               int istrip) override;
 
-    virtual void v_GetNormals(
-        Array<OneD, Array<OneD, NekDouble>> &normals) override;
+    void v_GetNormals(Array<OneD, Array<OneD, NekDouble>> &normals) override;
 
 private:
 };
 
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions
 
 #endif // EXPLIST3DHOMO1D_H

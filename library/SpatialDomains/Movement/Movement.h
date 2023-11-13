@@ -42,10 +42,7 @@
 #include <SpatialDomains/Movement/InterfaceInterpolation.h>
 #include <SpatialDomains/Movement/Zones.h>
 
-namespace Nektar
-{
-
-namespace SpatialDomains
+namespace Nektar::SpatialDomains
 {
 
 typedef std::map<std::pair<int, std::string>, InterfacePairShPtr>
@@ -105,7 +102,6 @@ private:
 
 typedef std::shared_ptr<Movement> MovementSharedPtr;
 
-} // namespace SpatialDomains
-} // namespace Nektar
+} // namespace Nektar::SpatialDomains
 
 #endif // NEKTAR_SPATIALDOMAINS_MOVEMENT_H

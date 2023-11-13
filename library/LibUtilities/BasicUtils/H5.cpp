@@ -41,11 +41,7 @@
 #include <LibUtilities/Communication/CommMpi.h>
 #endif
 
-namespace Nektar
-{
-namespace LibUtilities
-{
-namespace H5
+namespace Nektar::LibUtilities::H5
 {
 
 Object::Object() : m_Id(H5I_INVALID_HID)
@@ -419,7 +415,7 @@ DataSpaceSharedPtr DataSpace::Scalar()
 DataSpaceSharedPtr DataSpace::OneD(hsize_t size)
 {
     DataSpaceSharedPtr ans(new DataSpace);
-    H5_CONSTRUCT(ans->m_Id, H5Screate_simple, (1, &size, NULL));
+    H5_CONSTRUCT(ans->m_Id, H5Screate_simple, (1, &size, nullptr));
     return ans;
 }
 
@@ -434,14 +430,16 @@ DataSpace::DataSpace(hid_t id) : Object(id)
 DataSpace::DataSpace(const std::vector<hsize_t> &dims) : Object()
 {
     int rank = dims.size();
-    H5_CONSTRUCT(m_Id, H5Screate_simple, (rank, &dims[0], NULL));
+    H5_CONSTRUCT(m_Id, H5Screate_simple, (rank, &dims[0], nullptr));
 }
 
 DataSpace::DataSpace(const hsize_t size, const hsize_t max) : Object()
 {
-    const hsize_t *max_p = NULL;
+    const hsize_t *max_p = nullptr;
     if (max != (H5S_UNLIMITED - 1))
+    {
         max_p = &max;
+    }
     H5_CONSTRUCT(m_Id, H5Screate_simple, (1, &size, max_p));
 }
 
@@ -466,24 +464,24 @@ void DataSpace::v_Close()
 void DataSpace::SelectRange(const hsize_t start, const hsize_t count)
 {
     H5_CALL(H5Sselect_hyperslab,
-            (m_Id, H5S_SELECT_SET, &start, NULL, &count, NULL));
+            (m_Id, H5S_SELECT_SET, &start, nullptr, &count, nullptr));
 }
 void DataSpace::AppendRange(const hsize_t start, const hsize_t count)
 {
     H5_CALL(H5Sselect_hyperslab,
-            (m_Id, H5S_SELECT_OR, &start, NULL, &count, NULL));
+            (m_Id, H5S_SELECT_OR, &start, nullptr, &count, nullptr));
 }
 void DataSpace::SelectRange(const std::vector<hsize_t> start,
                             const std::vector<hsize_t> count)
 {
     H5_CALL(H5Sselect_hyperslab,
-            (m_Id, H5S_SELECT_SET, &start[0], NULL, &count[0], NULL));
+            (m_Id, H5S_SELECT_SET, &start[0], nullptr, &count[0], nullptr));
 }
 void DataSpace::AppendRange(const std::vector<hsize_t> start,
                             const std::vector<hsize_t> count)
 {
     H5_CALL(H5Sselect_hyperslab,
-            (m_Id, H5S_SELECT_OR, &start[0], NULL, &count[0], NULL));
+            (m_Id, H5S_SELECT_OR, &start[0], nullptr, &count[0], nullptr));
 }
 void DataSpace::SetSelection(const hsize_t num_elmt,
                              const std::vector<hsize_t> &coords)
@@ -513,7 +511,7 @@ std::vector<hsize_t> DataSpace::GetDims()
 {
     int ndims = H5Sget_simple_extent_ndims(m_Id);
     std::vector<hsize_t> ret(ndims, 0);
-    H5Sget_simple_extent_dims(m_Id, &ret[0], NULL);
+    H5Sget_simple_extent_dims(m_Id, &ret[0], nullptr);
     return ret;
 }
 
@@ -721,6 +719,4 @@ DataSpaceSharedPtr DataSet::GetSpace() const
 {
     return DataSpaceSharedPtr(new DataSpace(H5Dget_space(m_Id)));
 }
-} // namespace H5
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities::H5

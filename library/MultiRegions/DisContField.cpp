@@ -47,9 +47,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 /**
  * @class DisContField
@@ -4423,5 +4421,4 @@ void DisContField::v_AddTraceIntegralToOffDiag(
     m_trace->IProductWRTBase(BwdFlux, FCoeffs);
     m_locTraceToTraceMap->AddTraceCoeffsToFieldCoeffs(0, FCoeffs, outarray);
 }
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions

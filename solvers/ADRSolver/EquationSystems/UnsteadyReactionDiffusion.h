@@ -63,14 +63,14 @@ public:
     static std::string className;
 
     /// Destructor
-    virtual ~UnsteadyReactionDiffusion();
+    ~UnsteadyReactionDiffusion() override;
 
 protected:
     UnsteadyReactionDiffusion(
         const LibUtilities::SessionReaderSharedPtr &pSession,
         const SpatialDomains::MeshGraphSharedPtr &pGraph);
 
-    virtual void v_InitObject(bool DeclareFields = true) override;
+    void v_InitObject(bool DeclareFields = true) override;
 
     void DoOdeRhs(const Array<OneD, const Array<OneD, NekDouble>> &inarray,
                   Array<OneD, Array<OneD, NekDouble>> &outarray,

@@ -36,9 +36,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 
 std::string DriverArpack::arpackProblemTypeLookupIds[6] = {
@@ -252,7 +250,9 @@ void DriverArpack::v_Execute(ostream &out)
         }
 
         if (ido == 99)
+        {
             break;
+        }
 
         switch (ido)
         {
@@ -416,5 +416,4 @@ void DriverArpack::v_Execute(ostream &out)
     }
 }
 
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils
