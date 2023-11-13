@@ -15,7 +15,7 @@
         </metric>
         <metric type="ExecutionTime" id="1">
             <regex>^.*Execute\s*(\d+\.?\d*).*</regex>
-            <value tolerance="5e-1" hostname="42.debian-bullseye-performance-build-and-test">9.65058</value>
+            <value tolerance="5e-1" hostname="42.debian-bullseye-performance-build-and-test">8.96658</value>
         </metric>
     </metrics>
 </test>
