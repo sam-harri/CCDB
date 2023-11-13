@@ -277,18 +277,14 @@ void AllToAllV::PerformExchange(const Array<OneD, NekDouble> &testFwd,
     Array<OneD, NekDouble> sendBuff(m_allVEdgeIndex.size(), -1);
     Array<OneD, NekDouble> recvBuff(m_allVEdgeIndex.size(), -1);
 
-    for (size_t i = 0; i < m_allVEdgeIndex.size(); ++i)
-    {
-        sendBuff[i] = testFwd[m_allVEdgeIndex[i]];
-    }
+    Vmath::Gathr(int(m_allVEdgeIndex.size()), testFwd.data(),
+                 m_allVEdgeIndex.data(), sendBuff.data());
 
     m_comm->AlltoAllv(sendBuff, m_allVSendCount, m_allVSendDisp, recvBuff,
                       m_allVSendCount, m_allVSendDisp);
 
-    for (size_t i = 0; i < m_allVEdgeIndex.size(); ++i)
-    {
-        testBwd[m_allVEdgeIndex[i]] = recvBuff[i];
-    }
+    Vmath::Scatr(int(m_allVEdgeIndex.size()), recvBuff.data(),
+                 m_allVEdgeIndex.data(), testBwd.data());
 }
 
 void NeighborAllToAllV::PerformExchange(const Array<OneD, NekDouble> &testFwd,
@@ -296,18 +292,14 @@ void NeighborAllToAllV::PerformExchange(const Array<OneD, NekDouble> &testFwd,
 {
     Array<OneD, NekDouble> sendBuff(m_edgeTraceIndex.size(), -1);
     Array<OneD, NekDouble> recvBuff(m_edgeTraceIndex.size(), -1);
-    for (size_t i = 0; i < m_edgeTraceIndex.size(); ++i)
-    {
-        sendBuff[i] = testFwd[m_edgeTraceIndex[i]];
-    }
+    Vmath::Gathr(int(m_edgeTraceIndex.size()), testFwd.data(),
+                 m_edgeTraceIndex.data(), sendBuff.data());
 
     m_comm->NeighborAlltoAllv(sendBuff, m_sendCount, m_sendDisp, recvBuff,
                               m_sendCount, m_sendDisp);
 
-    for (size_t i = 0; i < m_edgeTraceIndex.size(); ++i)
-    {
-        testBwd[m_edgeTraceIndex[i]] = recvBuff[i];
-    }
+    Vmath::Scatr(int(m_edgeTraceIndex.size()), recvBuff.data(),
+                 m_edgeTraceIndex.data(), testBwd.data());
 }
 
 void Pairwise::PerformExchange(const Array<OneD, NekDouble> &testFwd,
@@ -317,10 +309,8 @@ void Pairwise::PerformExchange(const Array<OneD, NekDouble> &testFwd,
     m_comm->StartAll(m_recvRequest);
 
     // Fill send buffer from Fwd trace
-    for (size_t i = 0; i < m_edgeTraceIndex.size(); ++i)
-    {
-        m_sendBuff[i] = testFwd[m_edgeTraceIndex[i]];
-    }
+    Vmath::Gathr(int(m_edgeTraceIndex.size()), testFwd.data(),
+                 m_edgeTraceIndex.data(), m_sendBuff.data());
 
     // Perform send posts
     m_comm->StartAll(m_sendRequest);
@@ -330,10 +320,8 @@ void Pairwise::PerformExchange(const Array<OneD, NekDouble> &testFwd,
     m_comm->WaitAll(m_recvRequest);
 
     // Fill Bwd trace from recv buffer
-    for (size_t i = 0; i < m_edgeTraceIndex.size(); ++i)
-    {
-        testBwd[m_edgeTraceIndex[i]] = m_recvBuff[i];
-    }
+    Vmath::Scatr(int(m_edgeTraceIndex.size()), m_recvBuff.data(),
+                 m_edgeTraceIndex.data(), testBwd.data());
 }
 
 AssemblyCommDG::AssemblyCommDG(
