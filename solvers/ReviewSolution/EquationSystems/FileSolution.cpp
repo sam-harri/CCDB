@@ -788,4 +788,4 @@ NekDouble FileFieldInterpolator::GetStartTime()
 {
     return m_timeStart;
 }
-} // namespace Nektar
+} // namespace Nektar::SolverUtils

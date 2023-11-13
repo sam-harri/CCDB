@@ -43,9 +43,7 @@ using namespace std;
 
 #include "ProcessZeroHomogeneousPlane.h"
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 ModuleKey ProcessZeroHomogeneousPlane::className =
@@ -122,5 +120,4 @@ void ProcessZeroHomogeneousPlane::v_Process(po::variables_map &vm)
         NEKERROR(ErrorUtil::efatal, "Plane not found.");
     }
 }
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

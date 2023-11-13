@@ -86,9 +86,9 @@ protected:
     // space for the specified region.
     Array<OneD, Array<OneD, NekDouble>> m_bndPhys;
 
-    virtual void v_Apply(Array<OneD, Array<OneD, NekDouble>> &Fwd,
-                         Array<OneD, Array<OneD, NekDouble>> &physarray,
-                         const NekDouble &time);
+    void v_Apply(Array<OneD, Array<OneD, NekDouble>> &Fwd,
+                 Array<OneD, Array<OneD, NekDouble>> &physarray,
+                 const NekDouble &time) override;
 
     void GenerateRotationMatrices(
         const Array<OneD, const Array<OneD, NekDouble>> &normals);
@@ -115,7 +115,7 @@ private:
         const Array<OneD, Array<OneD, NekDouble>> &pTraceNormals,
         const int pSpaceDim, const int bcRegion, const int cnt);
 
-    virtual ~EnforceEntropyPressure(void){};
+    ~EnforceEntropyPressure(void) override{};
 };
 
 } // namespace Nektar
