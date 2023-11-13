@@ -51,9 +51,7 @@
 #include <LibUtilities/BasicUtils/FileSystem.h>
 #include <LibUtilities/BasicUtils/ParseUtils.h>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 CsvIO::CsvIO(CommSharedPtr pComm, bool sharedFilesystem)
@@ -282,5 +280,4 @@ std::string CsvIO::v_GetFileEnding() const
     return "csv";
 }
 
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities

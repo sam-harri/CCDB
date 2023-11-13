@@ -37,9 +37,7 @@
 
 #include <LibUtilities/TimeIntegration/NoSchemeTimeIntegrationScheme.h>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 // Access Methods
@@ -118,5 +116,4 @@ void NoSchemeTimeIntegrationScheme::v_printFull(std::ostream &os) const
     os << "Time Integration Scheme: " << GetFullName() << std::endl;
 }
 
-} // end namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities

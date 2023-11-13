@@ -43,9 +43,7 @@
 #include <LibUtilities/LinearAlgebra/NekMatrix.hpp>
 #include <LibUtilities/LinearAlgebra/NekTypeDefs.hpp>
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 std::string GlobalLinSys::lookupIds[12] = {
     LibUtilities::SessionReader::RegisterEnumValue(
@@ -427,5 +425,4 @@ void GlobalLinSys::v_Initialise(
     boost::ignore_unused(pLocToGloMap);
     NEKERROR(ErrorUtil::efatal, "Method does not exist");
 }
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions

@@ -44,7 +44,7 @@ namespace Nektar
 class MetricNoWarning : public Metric
 {
 public:
-    virtual ~MetricNoWarning(){};
+    ~MetricNoWarning() override{};
 
     static MetricSharedPtr create(TiXmlElement *metric, bool generate)
     {
@@ -63,8 +63,8 @@ protected:
     // Constructor
     MetricNoWarning(TiXmlElement *metric, bool generate);
 
-    virtual bool v_Test(std::istream &pStdout, std::istream &pStderr);
-    virtual void v_Generate(std::istream &pStdout, std::istream &pStderr);
+    bool v_Test(std::istream &pStdout, std::istream &pStderr) override;
+    void v_Generate(std::istream &pStdout, std::istream &pStderr) override;
 };
 
 } // namespace Nektar

@@ -39,9 +39,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 Array<OneD, NekDouble> CADCurve::NormalWRT(NekDouble t, int surf)
@@ -102,5 +100,4 @@ CADOrientation::Orientation CADCurve::GetOrienationWRT(int surf)
     m_log(FATAL) << "Unable to find surface in adjacency list." << endl;
     return CADOrientation::eUnknown;
 }
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh

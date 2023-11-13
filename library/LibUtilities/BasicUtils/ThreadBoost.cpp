@@ -38,9 +38,7 @@
 #include <algorithm>
 #include <iostream>
 
-namespace Nektar
-{
-namespace Thread
+namespace Nektar::Thread
 {
 
 std::string ThreadManagerBoost::className =
@@ -446,5 +444,4 @@ void ThreadWorkerBoost::RunJobs()
     }
 }
 
-} // namespace Thread
-} /* namespace Nektar */
+} // namespace Nektar::Thread

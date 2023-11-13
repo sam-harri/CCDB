@@ -44,9 +44,7 @@
 
 namespace berrc = boost::system::errc;
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 std::string FieldIOXml::className = GetFieldIOFactory().RegisterCreatorFunction(
@@ -201,7 +199,9 @@ void FieldIOXml::v_Write(const std::string &outFile,
                 for (int i = 0; i < fielddefs[f]->m_numHomogeneousDir; ++i)
                 {
                     if (!first)
+                    {
                         homoLenStringStream << ",";
+                    }
                     homoLenStringStream
                         << fielddefs[f]->m_homogeneousLengths[i];
                     first = false;
@@ -597,9 +597,9 @@ DataSourceSharedPtr FieldIOXml::v_ImportFieldMetaData(
 {
     DataSourceSharedPtr doc    = XmlDataSource::create(filename);
     XmlDataSourceSharedPtr xml = std::static_pointer_cast<XmlDataSource>(doc);
-    TiXmlElement *metadata     = 0;
-    TiXmlElement *master       = 0; // Master tag within which all data is
-                                    // contained.
+    TiXmlElement *metadata     = nullptr;
+    TiXmlElement *master       = nullptr; // Master tag within which all data is
+                                          // contained.
 
     master = xml->Get().FirstChildElement("NEKTAR");
     ASSERTL0(master, "Unable to find NEKTAR tag in file.");
@@ -736,7 +736,7 @@ void FieldIOXml::ImportFieldDefs(
     XmlDataSourceSharedPtr xml =
         std::static_pointer_cast<XmlDataSource>(dataSource);
     TiXmlElement *master =
-        NULL; // Master tag within which all data is contained.
+        nullptr; // Master tag within which all data is contained.
 
     master = xml->Get().FirstChildElement("NEKTAR");
     ASSERTL0(master, "Unable to find NEKTAR tag in file.");
@@ -1054,7 +1054,7 @@ void FieldIOXml::ImportFieldData(
         std::static_pointer_cast<XmlDataSource>(dataSource);
 
     TiXmlElement *master =
-        NULL; // Master tag within which all data is contained.
+        nullptr; // Master tag within which all data is contained.
 
     master = xml->Get().FirstChildElement("NEKTAR");
     ASSERTL0(master, "Unable to find NEKTAR tag in file.");
@@ -1112,5 +1112,4 @@ void FieldIOXml::ImportFieldData(
         master = master->NextSiblingElement("NEKTAR");
     }
 }
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities

@@ -37,9 +37,7 @@
 
 #include <NekMesh/Module/Module.h>
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 /// Dummy Output Module for no output file
@@ -55,17 +53,16 @@ public:
     static NekMesh::ModuleKey className;
 
     OutputStdOut(NekMesh::MeshSharedPtr m);
-    virtual ~OutputStdOut();
+    ~OutputStdOut() override;
 
     /// Process is essentially an empty function
-    virtual void Process();
+    void Process() override;
 
-    virtual std::string GetModuleName()
+    std::string GetModuleName() override
     {
         return "OutputStdOut";
     }
 };
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh
 
 #endif

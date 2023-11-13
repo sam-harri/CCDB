@@ -43,9 +43,7 @@ using namespace std;
 
 #include "OutputFld.h"
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 ModuleKey OutputFld::m_className[2] = {
@@ -190,5 +188,4 @@ std::string OutputFld::GetIOFormat()
     return iofmt;
 }
 
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

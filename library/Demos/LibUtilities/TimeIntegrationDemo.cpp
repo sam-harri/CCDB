@@ -259,7 +259,7 @@ public:
 
     // -----------------------------------------------------------------
     void EvaluateExactSolution(Array<OneD, Array<OneD, double>> &outarray,
-                               const NekDouble time) const;
+                               const NekDouble time) const override;
 
     // -----------------------------------------------------------------
 
@@ -305,9 +305,13 @@ public:
 
         // Initialize a random seed using the time.
         if (test)
+        {
             srand(0);
+        }
         else
-            srand(time(NULL));
+        {
+            srand(time(nullptr));
+        }
 
         // Randomly generate the jacobian in a way that essentially
         // ensures diagonalizability with real eigenvalues and
@@ -369,7 +373,7 @@ public:
 
     // -----------------------------------------------------------------
     void EvaluateExactSolution(Array<OneD, Array<OneD, double>> &outarray,
-                               const NekDouble time) const;
+                               const NekDouble time) const override;
     // -----------------------------------------------------------------
 
     Array<OneD, std::complex<NekDouble>> &GetLambda()
@@ -405,9 +409,13 @@ public:
         m_alpha = alpha;
 
         if (test)
+        {
             srand(0);
+        }
         else
-            srand(time(NULL));
+        {
+            srand(time(nullptr));
+        }
 
         // Initial values set to zero
         m_u0 = Array<OneD, Array<OneD, NekDouble>>(m_nVars);
@@ -433,7 +441,7 @@ public:
 
     // -----------------------------------------------------------------
     void EvaluateExactSolution(Array<OneD, Array<OneD, double>> &outarray,
-                               const NekDouble time) const;
+                               const NekDouble time) const override;
     // -----------------------------------------------------------------
 
 private:
@@ -798,8 +806,10 @@ int main(int argc, char *argv[])
 
     // Write the time step and time
     if (printS || L2)
+    {
         std::cout << "Time step: " << timeStep << "  "
                   << "Time: " << time << std::endl;
+    }
 
     solverSharedPtr->GetMinMaxValues(exactSol, approxSol, printS);
 
@@ -1169,26 +1179,34 @@ void DemoSolver::GenerateGnuplotScript(const std::string &method) const
             outfile << "set title 'Approximate vs exact solution using method ";
 
             if (m_nVars > 1)
+            {
                 outfile << method << "'" << std::endl
                         << "set xlabel 'variable'" << std::endl
                         << "set ylabel 'u'" << std::endl;
+            }
             else
+            {
                 outfile << method << "'" << std::endl
                         << "set xlabel 'x'" << std::endl
                         << "set ylabel 'u'" << std::endl;
+            }
         }
         else if (j == 0)
         {
             outfile << "set title 'Error using method ";
 
             if (m_nVars > 1)
+            {
                 outfile << method << "'" << std::endl
                         << "set xlabel 'variable'" << std::endl
                         << "set ylabel 'u'" << std::endl;
+            }
             else
+            {
                 outfile << method << "'" << std::endl
                         << "set xlabel 'x'" << std::endl
                         << "set ylabel 'u'" << std::endl;
+            }
         }
         else if (j == 1)
         {

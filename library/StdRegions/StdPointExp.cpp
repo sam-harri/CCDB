@@ -38,9 +38,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace StdRegions
+namespace Nektar::StdRegions
 {
 
 StdPointExp::StdPointExp()
@@ -203,5 +201,4 @@ DNekMatSharedPtr StdPointExp::v_CreateStdMatrix(const StdMatrixKey &mkey)
     return v_GenMatrix(mkey);
 }
 
-} // namespace StdRegions
-} // namespace Nektar
+} // namespace Nektar::StdRegions

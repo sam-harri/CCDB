@@ -38,9 +38,7 @@
 #include <NekMesh/CADSystem/CADVert.h>
 #include <NekMesh/CADSystem/OCE/OpenCascade.h>
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 class CADVertOCE : public CADVert
@@ -60,13 +58,13 @@ public:
     {
     }
 
-    ~CADVertOCE()
+    ~CADVertOCE() override
     {
     }
 
     void Initialise(int i, TopoDS_Shape in);
 
-    NekDouble DistanceTo(Array<OneD, NekDouble> l)
+    NekDouble DistanceTo(Array<OneD, NekDouble> l) override
     {
         gp_Pnt lp(l[0], l[1], l[2]);
         return m_occVert.Distance(lp);
@@ -77,7 +75,6 @@ private:
     gp_Pnt m_occVert;
 };
 
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh
 
 #endif

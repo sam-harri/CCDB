@@ -47,10 +47,7 @@
 #include <cmath>
 #include <vector>
 
-namespace tinysimd
-{
-
-namespace abi
+namespace tinysimd::abi
 {
 
 template <typename scalarType, int width = 0> struct avx2
@@ -58,9 +55,12 @@ template <typename scalarType, int width = 0> struct avx2
     using type = void;
 };
 
-} // namespace abi
+} // namespace tinysimd::abi
 
 #if defined(__AVX2__) && defined(NEKTAR_ENABLE_SIMD_AVX2)
+
+namespace tinysimd
+{
 
 // forward declaration of concrete types
 template <typename T> struct avx2Long4;
@@ -969,7 +969,6 @@ inline bool operator&&(avx2Mask8 lhs, bool rhs)
     return tmp && rhs;
 }
 
-#endif // defined(__AVX2__)
-
 } // namespace tinysimd
+#endif // defined(__AVX2__)
 #endif

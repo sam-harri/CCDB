@@ -39,9 +39,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 /**
  * @class ContField
@@ -1061,5 +1059,4 @@ void ContField::v_UnsetGlobalLinSys(GlobalLinSysKey key,
     m_globalLinSysManager.DeleteObject(key);
 }
 
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions

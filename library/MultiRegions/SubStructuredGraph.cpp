@@ -65,9 +65,7 @@ using std::max;
     }
 #endif
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 PatchMap::PatchMap(void)
 {
@@ -1025,5 +1023,4 @@ void NoReordering(const BoostGraph &graph, Array<OneD, int> &perm,
         iperm[i] = i;
     }
 }
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions

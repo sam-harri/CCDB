@@ -37,9 +37,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 using namespace Nektar::NekMesh;
@@ -309,5 +307,4 @@ bool ProcessLinear::Invalid(ElementSharedPtr el, NekDouble thr)
 
     return false;
 }
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh

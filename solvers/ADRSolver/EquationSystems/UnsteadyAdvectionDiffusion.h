@@ -63,7 +63,7 @@ public:
     static std::string className;
 
     /// Destructor
-    virtual ~UnsteadyAdvectionDiffusion();
+    ~UnsteadyAdvectionDiffusion() override;
 
 protected:
     bool m_subSteppingScheme;
@@ -126,13 +126,13 @@ protected:
         const Array<OneD, const Array<OneD, NekDouble>> &velfield);
 
     /// Initialise the object
-    virtual void v_InitObject(bool DeclareFields = true) override;
+    void v_InitObject(bool DeclareFields = true) override;
 
     /// Print Summary
-    virtual void v_GenerateSummary(SolverUtils::SummaryList &s) override;
+    void v_GenerateSummary(SolverUtils::SummaryList &s) override;
 
     /// PreIntegration step for substepping.
-    virtual bool v_PreIntegrate(int step) override;
+    bool v_PreIntegrate(int step) override;
 
     // SubsStepping methods -> Probably could be set up in separate class
     void SubStepAdvance(int nstep, NekDouble time);

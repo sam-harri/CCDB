@@ -149,14 +149,39 @@ include:
   before_script:
     - apt-get update && apt-get install -y clang-format-$CL_F_VER git-core
   script:
-    - echo `which clang-format-$CL_F_VER`
-    - ln -s `which clang-format-$CL_F_VER` /usr/bin/clang-format
     - cd "$CI_PROJECT_DIR"
     - find $TARGETS -iname "*.cpp" -o -iname "*.h" -o -iname "*.hpp" | 
-      xargs clang-format-11 --dry-run -Werror
+      xargs clang-format-$CL_F_VER --dry-run -Werror
   allow_failure: true
   timeout: 15m
 
+.clang-tidy-template: &clang-tidy-template
+  <<: *execution-conditions
+  image: $CI_REGISTRY_IMAGE:env-ubuntu-jammy-full
+  needs: ["ubuntu-jammy-full-build-env"]
+  stage: quality-checks
+  variables:
+    NUM_CPUS: 8
+    CL_T_VER: 14
+    CL_F_VER: 11
+    TARGETS: library solvers templates tests utilities
+  before_script:
+    - git config --global --add safe.directory "$CI_PROJECT_DIR"
+  script:
+    - cd "$CI_PROJECT_DIR"
+    - EXPORT_COMPILE_COMMANDS=1 BUILD_TYPE=full bash -x .gitlab-ci/build-and-test.sh
+    - run-clang-tidy-$CL_T_VER -p build -header-filter='(library|solver|tests)' -j$NUM_CPUS -fix -clang-tidy-binary=clang-tidy-$CL_T_VER -clang-apply-replacements-binary=clang-apply-replacements-$CL_T_VER
+    - find $TARGETS -iname "*.cpp" -o -iname "*.h" -o -iname "*.hpp" | xargs clang-format-$CL_F_VER -i
+    - git diff > clang-tidy.diff
+    - if [ -s clang-tidy.diff ]; then echo "Found changes in clang-tidy"; exit 1; fi
+  allow_failure: true
+  timeout: 1h
+  artifacts:
+    expire_in: 1 month
+    when: on_failure
+    paths:
+      - clang-tidy.diff
+  
 .header-format-template: &header-format-template
   <<: *execution-conditions
   image: debian:11-slim
@@ -354,7 +379,6 @@ debian-bullseye-xml-format:
   <<: *xml-format-template
   needs: []
 
-
 # DOCUMENTATION
 debian-bookworm-documentation-build-env:
   <<: *execution-conditions
@@ -533,7 +557,11 @@ ubuntu-bionic-full-warnings:
   <<: *compiler-warning-template
   needs: ["ubuntu-bionic-full-build-and-test"]
 
-
+## CLANG-TIDY
+ubuntu-jammy-clang-tidy:
+  <<: *clang-tidy-template
+  needs: []
+  
 ################################################
 ###################  FEDORA  ###################
 ################################################

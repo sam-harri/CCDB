@@ -47,9 +47,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 std::string FilterAeroForces::className =
     GetFilterFactory().RegisterCreatorFunction("AeroForces",
@@ -1953,5 +1951,4 @@ void FilterAeroForces::CalculateForcesMapping(
     }
 }
 
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils

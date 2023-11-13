@@ -70,7 +70,7 @@ struct MetricExecutionTimeFieldValue
 class MetricExecutionTime : public Metric
 {
 public:
-    virtual ~MetricExecutionTime()
+    ~MetricExecutionTime() override
     {
     }
 
@@ -91,8 +91,8 @@ protected:
 
     MetricExecutionTime(TiXmlElement *metric, bool generate);
 
-    virtual bool v_Test(std::istream &pStdout, std::istream &pStderr);
-    virtual void v_Generate(std::istream &pStdout, std::istream &pStderr);
+    bool v_Test(std::istream &pStdout, std::istream &pStderr) override;
+    void v_Generate(std::istream &pStdout, std::istream &pStderr) override;
 };
 } // namespace Nektar
 

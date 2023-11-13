@@ -43,9 +43,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace SpatialDomains
+namespace Nektar::SpatialDomains
 {
 
 Geometry3D::Geometry3D()
@@ -593,5 +591,4 @@ void Geometry3D::v_CalculateInverseIsoParam()
     }
 }
 
-} // namespace SpatialDomains
-} // namespace Nektar
+} // namespace Nektar::SpatialDomains

@@ -40,9 +40,7 @@
 #include <StdRegions/StdExpansion0D.h>
 #include <StdRegions/StdRegionsDeclspec.h>
 
-namespace Nektar
-{
-namespace StdRegions
+namespace Nektar::StdRegions
 {
 class StdPointExp : virtual public StdExpansion0D
 {
@@ -50,97 +48,95 @@ public:
     STD_REGIONS_EXPORT StdPointExp();
     STD_REGIONS_EXPORT StdPointExp(const LibUtilities::BasisKey &Ba);
     STD_REGIONS_EXPORT StdPointExp(const StdPointExp &T);
-    STD_REGIONS_EXPORT virtual ~StdPointExp() override;
+    STD_REGIONS_EXPORT ~StdPointExp() override;
 
 protected:
     //----------------------------
     // Evaluations Methods
     //---------------------------
-    STD_REGIONS_EXPORT virtual void v_GetCoords(
+    STD_REGIONS_EXPORT void v_GetCoords(
         Array<OneD, NekDouble> &coords_0, Array<OneD, NekDouble> &coords_1,
         Array<OneD, NekDouble> &coords_2) override;
 
     //----------------------------
     // Helper functions
     //---------------------------
-    STD_REGIONS_EXPORT virtual LibUtilities::ShapeType v_DetShapeType()
-        const override;
+    STD_REGIONS_EXPORT LibUtilities::ShapeType v_DetShapeType() const override;
 
     //-----------------------------
     // Transforms
     //-----------------------------
-    STD_REGIONS_EXPORT virtual void v_BwdTrans(
+    STD_REGIONS_EXPORT void v_BwdTrans(
         const Array<OneD, const NekDouble> &inarray,
         Array<OneD, NekDouble> &outarray) override;
-    STD_REGIONS_EXPORT virtual void v_FwdTrans(
+    STD_REGIONS_EXPORT void v_FwdTrans(
         const Array<OneD, const NekDouble> &inarray,
         Array<OneD, NekDouble> &outarray) override;
-    STD_REGIONS_EXPORT virtual void v_BwdTrans_SumFac(
+    STD_REGIONS_EXPORT void v_BwdTrans_SumFac(
         const Array<OneD, const NekDouble> &inarray,
         Array<OneD, NekDouble> &outarray) override;
 
     //----------------------------
     // Inner product functions
     //----------------------------
-    STD_REGIONS_EXPORT virtual void v_IProductWRTBase(
+    STD_REGIONS_EXPORT void v_IProductWRTBase(
         const Array<OneD, const NekDouble> &inarray,
         Array<OneD, NekDouble> &outarray) override;
-    STD_REGIONS_EXPORT virtual void v_IProductWRTBase(
+    STD_REGIONS_EXPORT void v_IProductWRTBase(
         const Array<OneD, const NekDouble> &base,
         const Array<OneD, const NekDouble> &inarray,
         Array<OneD, NekDouble> &outarray, int coll_check) override;
-    STD_REGIONS_EXPORT virtual void v_IProductWRTBase_SumFac(
+    STD_REGIONS_EXPORT void v_IProductWRTBase_SumFac(
         const Array<OneD, const NekDouble> &inarray,
         Array<OneD, NekDouble> &outarray,
         bool multiplybyweights = true) override;
-    STD_REGIONS_EXPORT virtual void v_IProductWRTDerivBase(
+    STD_REGIONS_EXPORT void v_IProductWRTDerivBase(
         const int dir, const Array<OneD, const NekDouble> &inarray,
         Array<OneD, NekDouble> &outarray) override;
 
     //---------------------------
     // Evaluations Methods
     //---------------------------
-    STD_REGIONS_EXPORT virtual DNekMatSharedPtr v_GenMatrix(
-        const StdMatrixKey &mkey) override;
-    STD_REGIONS_EXPORT virtual DNekMatSharedPtr v_CreateStdMatrix(
-        const StdMatrixKey &mkey) override;
+    STD_REGIONS_EXPORT DNekMatSharedPtr
+    v_GenMatrix(const StdMatrixKey &mkey) override;
+    STD_REGIONS_EXPORT DNekMatSharedPtr
+    v_CreateStdMatrix(const StdMatrixKey &mkey) override;
 
 private:
-    virtual int v_GetNverts() const override final
+    int v_GetNverts() const final
     {
         return 1;
     }
 
-    virtual int v_NumBndryCoeffs() const override final
+    int v_NumBndryCoeffs() const final
     {
         return 0;
     }
 
-    virtual int v_NumDGBndryCoeffs() const override final
+    int v_NumDGBndryCoeffs() const final
     {
         return 0;
     }
 
-    virtual int v_GetTraceNcoeffs(const int i) const override final
-    {
-        boost::ignore_unused(i);
-        return 0;
-    }
-
-    virtual int v_GetTraceIntNcoeffs(const int i) const override final
+    int v_GetTraceNcoeffs(const int i) const final
     {
         boost::ignore_unused(i);
         return 0;
     }
 
-    virtual int v_GetTraceNumPoints(const int i) const override final
+    int v_GetTraceIntNcoeffs(const int i) const final
     {
         boost::ignore_unused(i);
         return 0;
     }
 
-    virtual int v_GetVertexMap(int localVertexId,
-                               bool useCoeffPacking = false) override
+    int v_GetTraceNumPoints(const int i) const final
+    {
+        boost::ignore_unused(i);
+        return 0;
+    }
+
+    int v_GetVertexMap(int localVertexId, bool useCoeffPacking = false) override
     {
         boost::ignore_unused(localVertexId, useCoeffPacking);
         ASSERTL2(localVertexId == 0, "Only single point in StdPointExp!");
@@ -150,7 +146,6 @@ private:
 
 // type defines for use of PointExp in a boost vector
 typedef std::shared_ptr<StdPointExp> StdPointExpSharedPtr;
-} // namespace StdRegions
-} // namespace Nektar
+} // namespace Nektar::StdRegions
 
 #endif // STDPOINTEXP_H

@@ -54,9 +54,7 @@
 
 namespace io = boost::iostreams;
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 /**
  * Denotes different types of mesh converter modules: so far only
@@ -290,7 +288,6 @@ typedef LibUtilities::NekFactory<ModuleKey, Module, MeshSharedPtr>
     ModuleFactory;
 
 NEKMESH_EXPORT ModuleFactory &GetModuleFactory();
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh
 
 #endif

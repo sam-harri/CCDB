@@ -34,9 +34,7 @@
 
 #include <LibUtilities/BasicUtils/ParseUtils.h>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 
 using namespace std;
@@ -148,5 +146,4 @@ vector<int> Coupling::GenerateVariableMapping(vector<string> &vars,
 
     return transToVars;
 }
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils

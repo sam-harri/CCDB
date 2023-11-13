@@ -50,9 +50,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace SpatialDomains
+namespace Nektar::SpatialDomains
 {
 
 std::string MeshGraphXml::className =
@@ -949,7 +947,7 @@ void MeshGraphXml::v_ReadCurves()
 
 void MeshGraphXml::ReadDomain()
 {
-    TiXmlElement *domain = NULL;
+    TiXmlElement *domain = nullptr;
     /// Look for data in DOMAIN block.
     domain = m_xmlGeom->FirstChildElement("DOMAIN");
 
@@ -1287,7 +1285,7 @@ void MeshGraphXml::ReadElements()
 
 void MeshGraphXml::v_ReadElements1D()
 {
-    TiXmlElement *field = NULL;
+    TiXmlElement *field = nullptr;
 
     /// Look for elements in ELEMENT block.
     field = m_xmlGeom->FirstChildElement("ELEMENT");
@@ -1858,7 +1856,7 @@ void MeshGraphXml::v_ReadElements3D()
 
 void MeshGraphXml::ReadComposites()
 {
-    TiXmlElement *field = NULL;
+    TiXmlElement *field = nullptr;
 
     /// Look for elements in ELEMENT block.
     field = m_xmlGeom->FirstChildElement("COMPOSITE");
@@ -2803,7 +2801,9 @@ void MeshGraphXml::v_WriteGeometry(
     }
 
     if (m_movement)
+    {
         m_movement->WriteMovement(root);
+    }
 
     // Save file.
     doc.SaveFile(outfilename);
@@ -3291,5 +3291,4 @@ CompositeOrdering MeshGraphXml::CreateCompositeOrdering()
     return ret;
 }
 
-} // namespace SpatialDomains
-} // namespace Nektar
+} // namespace Nektar::SpatialDomains

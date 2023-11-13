@@ -37,9 +37,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 
 /**
@@ -435,7 +433,9 @@ void DriverArnoldi::MaskInit()
                 }
             }
             if (unmask == 1)
+            {
                 break;
+            }
         }
         for (int j = 0; j < m_nfields; ++j)
         {
@@ -452,5 +452,4 @@ void DriverArnoldi::MaskInit()
     }
 }
 
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils

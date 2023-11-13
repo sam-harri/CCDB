@@ -41,9 +41,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 // Forward declaration for typedefs
 ExpListHomogeneous1D::ExpListHomogeneous1D(const ExpansionType type)
@@ -1296,7 +1294,7 @@ void ExpListHomogeneous1D::v_WriteVtkPieceData(std::ostream &outfile,
     }
 
     // printing the fields of that zone
-    outfile << "        <DataArray type=\"Float64\" Name=\"" << var << "\">"
+    outfile << R"(        <DataArray type="Float64" Name=")" << var << "\">"
             << endl;
     outfile << "          ";
     for (int n = 0; n < m_planes.size(); ++n)
@@ -1668,5 +1666,4 @@ NekDouble ExpListHomogeneous1D::v_Integral(
 
     return val;
 }
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions

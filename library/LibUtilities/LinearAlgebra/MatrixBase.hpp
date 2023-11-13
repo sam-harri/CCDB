@@ -133,7 +133,7 @@ private:
 template <typename DataType> class Matrix : public ConstMatrix<DataType>
 {
 public:
-    LIB_UTILITIES_EXPORT virtual ~Matrix();
+    LIB_UTILITIES_EXPORT ~Matrix() override;
 
     LIB_UTILITIES_EXPORT void SetValue(
         unsigned int row, unsigned int column,

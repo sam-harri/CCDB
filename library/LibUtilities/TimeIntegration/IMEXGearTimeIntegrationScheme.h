@@ -46,9 +46,7 @@
 
 #include <LibUtilities/TimeIntegration/IMEXdirkTimeIntegrationSchemes.h>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 class IMEXGearTimeIntegrationScheme : public TimeIntegrationSchemeGLM
@@ -72,7 +70,7 @@ public:
         IMEXGearTimeIntegrationScheme::SetupSchemeData(m_integration_phases[1]);
     }
 
-    virtual ~IMEXGearTimeIntegrationScheme()
+    ~IMEXGearTimeIntegrationScheme() override
     {
     }
 
@@ -147,12 +145,12 @@ public:
     }
 
 protected:
-    LUE virtual std::string v_GetName() const override
+    LUE std::string v_GetName() const override
     {
         return std::string("IMEX");
     }
 
-    LUE virtual NekDouble v_GetTimeStability() const override
+    LUE NekDouble v_GetTimeStability() const override
     {
         return 1.0;
     }
@@ -161,7 +159,6 @@ protected:
 
 }; // end class IMEXGearTimeIntegrationScheme
 
-} // end namespace LibUtilities
-} // end namespace Nektar
+} // namespace Nektar::LibUtilities
 
 #endif

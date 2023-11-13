@@ -32,9 +32,7 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 static const size_t perm4_3d[4][4] = {{0, 1, 2, 3},
                                       {3, 0, 1, 2},
@@ -173,5 +171,4 @@ static const NekDouble NodalTetElecData[][9] = {
     {0, 0, 0, 0, 1, 0.2707097521, 0.5811217960, 0.1481684519, 0.0000000000},
     {0, 0, 0, 0, 1, 0.3019928872, 0.4393774966, 0.1776946096, 0.0809350066}};
 
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities

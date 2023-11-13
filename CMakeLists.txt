@@ -23,8 +23,8 @@ IF (POLICY CMP0074)
     CMAKE_POLICY(SET CMP0074 OLD)
 ENDIF()
 
-# Nektar++ requires C++14.
-SET(CMAKE_CXX_STANDARD 14 CACHE STRING "Default value for CXX_STANDARD property of targets")
+# Nektar++ requires C++17.
+SET(CMAKE_CXX_STANDARD 17 CACHE STRING "Default value for CXX_STANDARD property of targets")
 SET(CMAKE_CXX_STANDARD_REQUIRED ON)
 SET(CMAKE_CXX_EXTENSIONS OFF)
 
@@ -240,6 +240,9 @@ ENDIF()
 
 # Find ThirdParty libraries and headers.
 # --------------------------------------
+
+# Add custom target for third-party compilations.
+ADD_CUSTOM_TARGET(thirdparty)
 
 # Need to find MPI first, as other packages depend on the compiler wrappers
 INCLUDE (ThirdPartyMPI)

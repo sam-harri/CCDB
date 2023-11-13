@@ -183,7 +183,9 @@ void StorageSmvBsr<DataType>::const_iterator::forward()
 {
     while ((m_iter.storageindex + 1 < m_val.size()) &&
            (m_val[++m_iter.storageindex] <= NekConstants::kNekSparseNonZeroTol))
+    {
         ;
+    }
 
     m_iter.nnzindex++;
 
@@ -550,7 +552,9 @@ void StorageSmvBsr<DataType>::Multiply_generic(const int mb, const double *val,
     const int mm       = lb * lb;
     double *pc         = c;
     for (int i = 0; i != mb * lb; i++)
+    {
         *pc++ = 0;
+    }
 
     pc = c;
     for (int i = 0; i != mb; i++)
@@ -614,7 +618,9 @@ void StorageSmvBsr<DataType>::processBcoInput(const IndexType blkRows,
         {
             m_val[blkSize * (tmp[rowcoord]) + i] = value[i];
             if (std::abs(value[i]) > NekConstants::kNekSparseNonZeroTol)
+            {
                 m_nnz++;
+            }
         }
 
         m_indx[tmp[rowcoord]] = colcoord;

@@ -37,9 +37,7 @@
 #include <GlobalMapping/MappingTranslation.h>
 #include <MultiRegions/ExpList.h>
 
-namespace Nektar
-{
-namespace GlobalMapping
+namespace Nektar::GlobalMapping
 {
 
 std::string MappingTranslation::className =
@@ -280,5 +278,4 @@ void MappingTranslation::v_UpdateGeomInfo()
 {
 }
 
-} // namespace GlobalMapping
-} // namespace Nektar
+} // namespace Nektar::GlobalMapping

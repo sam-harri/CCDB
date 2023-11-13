@@ -40,9 +40,7 @@
 #include <StdRegions/StdExpansion.h>
 #include <StdRegions/StdRegionsDeclspec.h>
 
-namespace Nektar
-{
-namespace StdRegions
+namespace Nektar::StdRegions
 {
 
 class StdExpansion2D : virtual public StdExpansion
@@ -53,7 +51,7 @@ public:
                                       const LibUtilities::BasisKey &Ba,
                                       const LibUtilities::BasisKey &Bb);
     STD_REGIONS_EXPORT StdExpansion2D(const StdExpansion2D &T);
-    STD_REGIONS_EXPORT virtual ~StdExpansion2D() override;
+    STD_REGIONS_EXPORT ~StdExpansion2D() override;
 
     // Generic operations in different element
 
@@ -161,18 +159,18 @@ protected:
      *  \param coords the coordinates of the single point
      *  \return returns the value of the expansion at the single point
      */
-    STD_REGIONS_EXPORT virtual NekDouble v_PhysEvaluate(
-        const Array<OneD, const NekDouble> &coords,
-        const Array<OneD, const NekDouble> &physvals) override;
+    STD_REGIONS_EXPORT NekDouble
+    v_PhysEvaluate(const Array<OneD, const NekDouble> &coords,
+                   const Array<OneD, const NekDouble> &physvals) override;
 
-    STD_REGIONS_EXPORT virtual NekDouble v_PhysEvaluate(
-        const Array<OneD, DNekMatSharedPtr> &I,
-        const Array<OneD, const NekDouble> &physvals) override;
+    STD_REGIONS_EXPORT NekDouble
+    v_PhysEvaluate(const Array<OneD, DNekMatSharedPtr> &I,
+                   const Array<OneD, const NekDouble> &physvals) override;
 
-    STD_REGIONS_EXPORT virtual NekDouble v_PhysEvaluate(
-        const Array<OneD, NekDouble> &coord,
-        const Array<OneD, const NekDouble> &inarray,
-        std::array<NekDouble, 3> &firstOrderDerivs) override;
+    STD_REGIONS_EXPORT NekDouble
+    v_PhysEvaluate(const Array<OneD, NekDouble> &coord,
+                   const Array<OneD, const NekDouble> &inarray,
+                   std::array<NekDouble, 3> &firstOrderDerivs) override;
 
     STD_REGIONS_EXPORT virtual void v_BwdTrans_SumFacKernel(
         const Array<OneD, const NekDouble> &base0,
@@ -188,34 +186,34 @@ protected:
         Array<OneD, NekDouble> &outarray, Array<OneD, NekDouble> &wsp,
         bool doCheckCollDir0, bool doCheckCollDir1) = 0;
 
-    STD_REGIONS_EXPORT virtual void v_LaplacianMatrixOp_MatFree(
+    STD_REGIONS_EXPORT void v_LaplacianMatrixOp_MatFree(
         const Array<OneD, const NekDouble> &inarray,
         Array<OneD, NekDouble> &outarray,
         const StdRegions::StdMatrixKey &mkey) override;
-    STD_REGIONS_EXPORT virtual void v_HelmholtzMatrixOp_MatFree(
+    STD_REGIONS_EXPORT void v_HelmholtzMatrixOp_MatFree(
         const Array<OneD, const NekDouble> &inarray,
         Array<OneD, NekDouble> &outarray,
         const StdRegions::StdMatrixKey &mkey) override;
 
-    STD_REGIONS_EXPORT virtual void v_GetTraceCoeffMap(
+    STD_REGIONS_EXPORT void v_GetTraceCoeffMap(
         const unsigned int traceid,
         Array<OneD, unsigned int> &maparray) override;
 
-    STD_REGIONS_EXPORT virtual void v_GetElmtTraceToTraceMap(
+    STD_REGIONS_EXPORT void v_GetElmtTraceToTraceMap(
         const unsigned int eid, Array<OneD, unsigned int> &maparray,
         Array<OneD, int> &signarray, Orientation edgeOrient, int P,
         int Q) override;
 
-    STD_REGIONS_EXPORT virtual void v_GetTraceToElementMap(
+    STD_REGIONS_EXPORT void v_GetTraceToElementMap(
         const int eid, Array<OneD, unsigned int> &maparray,
         Array<OneD, int> &signarray, Orientation edgeOrient = eForwards,
         int P = -1, int Q = -1) override;
 
-    STD_REGIONS_EXPORT virtual void v_GenStdMatBwdDeriv(
-        const int dir, DNekMatSharedPtr &mat) override;
+    STD_REGIONS_EXPORT void v_GenStdMatBwdDeriv(const int dir,
+                                                DNekMatSharedPtr &mat) override;
 
 private:
-    virtual int v_GetShapeDimension() const override final
+    int v_GetShapeDimension() const final
     {
         return 2;
     }
@@ -223,7 +221,6 @@ private:
 
 typedef std::shared_ptr<StdExpansion2D> StdExpansion2DSharedPtr;
 
-} // namespace StdRegions
-} // namespace Nektar
+} // namespace Nektar::StdRegions
 
 #endif // STDEXP2D_H

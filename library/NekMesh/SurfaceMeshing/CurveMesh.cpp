@@ -36,9 +36,7 @@
 #include <NekMesh/SurfaceMeshing/CurveMesh.h>
 
 using namespace std;
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 void CurveMesh::ReMesh()
@@ -457,5 +455,4 @@ void CurveMesh::PeriodicOverwrite(CurveMeshSharedPtr from)
         m_meshedges.push_back(e);
     }
 }
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh

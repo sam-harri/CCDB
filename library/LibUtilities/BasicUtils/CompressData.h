@@ -42,9 +42,7 @@
 // Buffer size for zlib compression/decompression
 #define CHUNK 16384
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 enum EndianType
@@ -226,6 +224,5 @@ int ZlibDecodeFromBase64Str(std::string &in64, std::vector<T> &out)
 }
 
 } // namespace CompressData
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities
 #endif

@@ -39,9 +39,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 std::string FilterEnergy1D::className =
     GetFilterFactory().RegisterCreatorFunction("Energy1D",
@@ -179,5 +177,4 @@ bool FilterEnergy1D::v_IsTimeDependent()
 {
     return true;
 }
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils

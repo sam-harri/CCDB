@@ -37,9 +37,7 @@
 
 #include <NekMesh/Module/Module.h>
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 class HOSurfaceMesh : public ProcessModule
@@ -53,16 +51,15 @@ public:
     static ModuleKey className;
 
     HOSurfaceMesh(MeshSharedPtr m);
-    virtual ~HOSurfaceMesh();
+    ~HOSurfaceMesh() override;
 
-    virtual void Process();
+    void Process() override;
 
-    virtual std::string GetModuleName()
+    std::string GetModuleName() override
     {
         return "HOSurfMesh";
     }
 };
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh
 
 #endif

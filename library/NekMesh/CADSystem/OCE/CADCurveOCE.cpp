@@ -36,9 +36,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 std::string CADCurveOCE::key = GetCADCurveFactory().RegisterCreatorFunction(
@@ -200,5 +198,4 @@ Array<OneD, NekDouble> CADCurveOCE::GetMinMax()
 
     return locs;
 }
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh

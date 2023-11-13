@@ -38,9 +38,7 @@
 #include <MultiRegions/MultiRegionsDeclspec.h>
 #include <MultiRegions/Preconditioner.h>
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 class PreconditionerLinearWithBlock;
 typedef std::shared_ptr<PreconditionerLinearWithBlock>
@@ -69,7 +67,7 @@ public:
         const AssemblyMapSharedPtr &pLocToGloMap);
 
     MULTI_REGIONS_EXPORT
-    virtual ~PreconditionerLinearWithBlock()
+    ~PreconditionerLinearWithBlock() override
     {
     }
 
@@ -77,15 +75,14 @@ protected:
     PreconditionerSharedPtr m_linSpacePrecon;
     PreconditionerSharedPtr m_blockPrecon;
 
-    virtual void v_InitObject() override;
+    void v_InitObject() override;
 
-    virtual void v_DoPreconditioner(const Array<OneD, NekDouble> &pInput,
-                                    Array<OneD, NekDouble> &pOutput,
-                                    const bool &isLocal = false) override;
+    void v_DoPreconditioner(const Array<OneD, NekDouble> &pInput,
+                            Array<OneD, NekDouble> &pOutput,
+                            const bool &isLocal = false) override;
 
-    virtual void v_BuildPreconditioner() override;
+    void v_BuildPreconditioner() override;
 };
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions
 
 #endif

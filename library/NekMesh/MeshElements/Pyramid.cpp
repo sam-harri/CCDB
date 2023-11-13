@@ -37,9 +37,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 LibUtilities::ShapeType Pyramid::type =
@@ -184,5 +182,4 @@ unsigned int Pyramid::GetNumNodes(ElmtConfig pConf)
         return 5 + 8 * (n - 1);
     }
 }
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh

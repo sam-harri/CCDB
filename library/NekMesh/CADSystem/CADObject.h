@@ -39,9 +39,7 @@
 #include <NekMesh/Module/Log.hpp>
 #include <NekMesh/NekMeshDeclspec.h>
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 namespace CADType
@@ -157,7 +155,6 @@ protected:
 };
 
 typedef std::shared_ptr<CADObject> CADObjectSharedPtr;
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh
 
 #endif

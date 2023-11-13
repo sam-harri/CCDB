@@ -39,9 +39,7 @@
 #include "petscsys.h"
 #endif
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 /**
@@ -169,5 +167,4 @@ template <> CommDataType &CommDataTypeTraits<long double>::GetDataType()
     return type;
 }
 
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities

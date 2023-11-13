@@ -38,9 +38,7 @@
 #include <NekMesh/CADSystem/CADCurve.h>
 #include <NekMesh/CADSystem/OCE/OpenCascade.h>
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 class CADCurveOCE : public CADCurve
@@ -57,22 +55,22 @@ public:
     {
     }
 
-    ~CADCurveOCE()
+    ~CADCurveOCE() override
     {
     }
 
-    virtual Array<OneD, NekDouble> GetBounds();
-    virtual void GetBounds(NekDouble &tmin, NekDouble &tmax);
-    virtual NekDouble Length(NekDouble ti, NekDouble tf);
-    virtual Array<OneD, NekDouble> P(NekDouble t);
-    virtual void P(NekDouble t, NekDouble &x, NekDouble &y, NekDouble &z);
-    virtual Array<OneD, NekDouble> D2(NekDouble t);
-    virtual NekDouble tAtArcLength(NekDouble s);
-    virtual Array<OneD, NekDouble> GetMinMax();
-    virtual NekDouble loct(Array<OneD, NekDouble> xyz, NekDouble &t);
-    virtual NekDouble GetMinDistance(Array<OneD, NekDouble> &xyz);
-    virtual NekDouble Curvature(NekDouble t);
-    virtual Array<OneD, NekDouble> N(NekDouble t);
+    Array<OneD, NekDouble> GetBounds() override;
+    void GetBounds(NekDouble &tmin, NekDouble &tmax) override;
+    NekDouble Length(NekDouble ti, NekDouble tf) override;
+    Array<OneD, NekDouble> P(NekDouble t) override;
+    void P(NekDouble t, NekDouble &x, NekDouble &y, NekDouble &z) override;
+    Array<OneD, NekDouble> D2(NekDouble t) override;
+    NekDouble tAtArcLength(NekDouble s) override;
+    Array<OneD, NekDouble> GetMinMax() override;
+    NekDouble loct(Array<OneD, NekDouble> xyz, NekDouble &t) override;
+    NekDouble GetMinDistance(Array<OneD, NekDouble> &xyz) override;
+    NekDouble Curvature(NekDouble t) override;
+    Array<OneD, NekDouble> N(NekDouble t) override;
 
     void Initialise(int i, TopoDS_Shape in);
 
@@ -84,7 +82,6 @@ private:
     /// store the parametric bounds of the curve
     Array<OneD, NekDouble> m_b;
 };
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh
 
 #endif

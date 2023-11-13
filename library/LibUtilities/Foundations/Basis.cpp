@@ -36,9 +36,7 @@
 #include <LibUtilities/Foundations/ManagerAccess.h>
 #include <LibUtilities/Polylib/Polylib.h>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 bool Basis::initBasisManager = {
     BasisManager().RegisterGlobalCreator(Basis::Create)};
@@ -245,7 +243,8 @@ void Basis::GenBasis()
 
             for (p = 0; p < numModes; ++p, mode += numPoints)
             {
-                Polylib::jacobfd(numPoints, z.data(), mode, NULL, p, 0.0, 0.0);
+                Polylib::jacobfd(numPoints, z.data(), mode, nullptr, p, 0.0,
+                                 0.0);
                 // normalise
                 scal = sqrt(0.5 * (2.0 * p + 1.0));
                 for (i = 0; i < numPoints; ++i)
@@ -281,7 +280,7 @@ void Basis::GenBasis()
             {
                 for (size_t q = 0; q < numModes - p; ++q, mode += numPoints)
                 {
-                    Polylib::jacobfd(numPoints, z.data(), mode, NULL, q,
+                    Polylib::jacobfd(numPoints, z.data(), mode, nullptr, q,
                                      2 * p + 1.0, 0.0);
                     for (size_t j = 0; j < numPoints; ++j)
                     {
@@ -320,7 +319,7 @@ void Basis::GenBasis()
                 {
                     for (size_t r = 0; r <= R - p - q; ++r, mode += numPoints)
                     {
-                        Polylib::jacobfd(numPoints, z.data(), mode, NULL, r,
+                        Polylib::jacobfd(numPoints, z.data(), mode, nullptr, r,
                                          2 * p + 2 * q + 2.0, 0.0);
                         for (size_t k = 0; k < numPoints; ++k)
                         {
@@ -382,7 +381,7 @@ void Basis::GenBasis()
                         // size_t pq = max(p + q -1,0);
                         size_t pq = std::max(p + q, size_t(0));
 
-                        Polylib::jacobfd(numPoints, z.data(), mode, NULL, r,
+                        Polylib::jacobfd(numPoints, z.data(), mode, nullptr, r,
                                          2 * pq + 2.0, 0.0);
                         for (size_t k = 0; k < numPoints; ++k)
                         {
@@ -421,7 +420,7 @@ void Basis::GenBasis()
 
             for (p = 2; p < numModes; ++p, mode += numPoints)
             {
-                Polylib::jacobfd(numPoints, z.data(), mode, NULL, p - 2, 1.0,
+                Polylib::jacobfd(numPoints, z.data(), mode, nullptr, p - 2, 1.0,
                                  1.0);
 
                 for (i = 0; i < numPoints; ++i)
@@ -468,7 +467,7 @@ void Basis::GenBasis()
 
             for (q = 2; q < numModes; ++q, mode += numPoints)
             {
-                Polylib::jacobfd(numPoints, z.data(), mode, NULL, q - 2, 1.0,
+                Polylib::jacobfd(numPoints, z.data(), mode, nullptr, q - 2, 1.0,
                                  1.0);
 
                 for (i = 0; i < numPoints; ++i)
@@ -487,7 +486,7 @@ void Basis::GenBasis()
 
             for (q = 2; q < numModes; ++q, mode += numPoints)
             {
-                Polylib::jacobfd(numPoints, z.data(), mode, NULL, q - 2, 1.0,
+                Polylib::jacobfd(numPoints, z.data(), mode, nullptr, q - 2, 1.0,
                                  1.0);
 
                 for (i = 0; i < numPoints; ++i)
@@ -512,7 +511,7 @@ void Basis::GenBasis()
 
                 for (q = 1; q < numModes - p; ++q, mode += numPoints)
                 {
-                    Polylib::jacobfd(numPoints, z.data(), mode, NULL, q - 1,
+                    Polylib::jacobfd(numPoints, z.data(), mode, nullptr, q - 1,
                                      2 * p - 1, 1.0);
 
                     for (i = 0; i < numPoints; ++i)
@@ -670,8 +669,8 @@ void Basis::GenBasis()
                     // interior
                     for (size_t r = 1; r < numModes - std::max(p, q); ++r)
                     {
-                        Polylib::jacobfd(numPoints, z.data(), mode, NULL, r - 1,
-                                         2 * p + 2 * q - 3, 1.0);
+                        Polylib::jacobfd(numPoints, z.data(), mode, nullptr,
+                                         r - 1, 2 * p + 2 * q - 3, 1.0);
 
                         for (i = 0; i < numPoints; ++i)
                         {
@@ -816,7 +815,7 @@ void Basis::GenBasis()
 
             for (p = 0, scal = 1; p < numModes; ++p, mode += numPoints)
             {
-                Polylib::jacobfd(numPoints, z.data(), mode, NULL, p, -0.5,
+                Polylib::jacobfd(numPoints, z.data(), mode, nullptr, p, -0.5,
                                  -0.5);
 
                 for (i = 0; i < numPoints; ++i)
@@ -937,5 +936,4 @@ bool operator!=(const BasisKey &x, const BasisKey *y)
     return (!(x == *y));
 }
 
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities

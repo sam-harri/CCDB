@@ -40,9 +40,7 @@ using namespace std;
 #include <NekMesh/MeshElements/Element.h>
 #include <SpatialDomains/MeshGraph.h>
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 using namespace Nektar::NekMesh;
@@ -323,5 +321,4 @@ void InputNekpp::Process()
     }
     ProcessComposites();
 }
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh

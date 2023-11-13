@@ -63,7 +63,7 @@ public:
 
     friend class MemoryManager<StimulusPoint>;
 
-    virtual ~StimulusPoint()
+    ~StimulusPoint() override
     {
     }
 
@@ -73,10 +73,10 @@ public:
 protected:
     NekDouble m_strength;
 
-    virtual void v_Update(Array<OneD, Array<OneD, NekDouble>> &outarray,
-                          const NekDouble time) override;
+    void v_Update(Array<OneD, Array<OneD, NekDouble>> &outarray,
+                  const NekDouble time) override;
 
-    virtual void v_GenerateSummary(SolverUtils::SummaryList &s) override;
+    void v_GenerateSummary(SolverUtils::SummaryList &s) override;
 
 private:
     StimulusPoint(const LibUtilities::SessionReaderSharedPtr &pSession,

@@ -39,9 +39,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 void TetGenInterface::InitialMesh(map<int, NodeSharedPtr> tgidton,
@@ -78,7 +76,7 @@ void TetGenInterface::InitialMesh(map<int, NodeSharedPtr> tgidton,
         f->numberofpolygons        = 1;
         f->polygonlist             = new tetgenio::polygon[f->numberofpolygons];
         f->numberofholes           = 0;
-        f->holelist                = NULL;
+        f->holelist                = nullptr;
         p                          = &f->polygonlist[0];
         p->numberofvertices        = 3;
         p->vertexlist              = new int[p->numberofvertices];
@@ -102,7 +100,7 @@ void TetGenInterface::InitialMesh(map<int, NodeSharedPtr> tgidton,
     }
     else
     {
-        surface.holelist = NULL;
+        surface.holelist = nullptr;
     }
 
     string cmd = "pYzqQ";
@@ -174,5 +172,4 @@ void TetGenInterface::freetet()
     output.clean_memory();
 #endif
 }
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh

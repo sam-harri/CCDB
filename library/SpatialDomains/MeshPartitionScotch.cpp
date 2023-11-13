@@ -36,9 +36,7 @@
 
 #include <SpatialDomains/MeshPartitionScotch.h>
 
-namespace Nektar
-{
-namespace SpatialDomains
+namespace Nektar::SpatialDomains
 {
 
 std::string MeshPartitionScotch::className =
@@ -73,8 +71,8 @@ void MeshPartitionScotch::v_PartitionGraphImpl(
     boost::ignore_unused(nVertConds, edgeWgt);
 
     int wgtflag = 0;
-    int *vwgt   = 0;
-    int *vsize  = 0;
+    int *vwgt   = nullptr;
+    int *vsize  = nullptr;
     if (vertWgt.size() > 0)
     {
         wgtflag += 1;
@@ -110,18 +108,20 @@ void MeshPartitionScotch::PartGraphVKway(
     SCOTCH_Num *nghbtab;
     SCOTCH_Num commvol;
 
-    vsize2  = ((*wgtflag & 1) != 0) ? vsize : NULL;
-    vwgt2   = ((*wgtflag & 2) != 0) ? vwgt : NULL;
+    vsize2  = ((*wgtflag & 1) != 0) ? vsize : nullptr;
+    vwgt2   = ((*wgtflag & 2) != 0) ? vwgt : nullptr;
     baseval = *numflag;
     vertnbr = *n;
     edgetax = adjncy - baseval;
 
     // If no communication load   data provided
-    if (vsize2 == NULL)
+    if (vsize2 == nullptr)
     {
-        if (PartGraph2(n, xadj, adjncy, vwgt2, NULL, numflag, nparts, part,
+        if (PartGraph2(n, xadj, adjncy, vwgt2, nullptr, numflag, nparts, part,
                        SCOTCH_STRATQUALITY, 0.01) != 0)
+        {
             return;
+        }
     }
 
     // Will have to turn communication volumes into edge loads
@@ -134,7 +134,7 @@ void MeshPartitionScotch::PartGraphVKway(
 
         edgenbr = xadj[vertnbr] - baseval;
         if ((edlotax = (SCOTCH_Num *)malloc(edgenbr * sizeof(SCOTCH_Num))) ==
-            NULL)
+            nullptr)
         {
             return;
         }
@@ -166,10 +166,13 @@ void MeshPartitionScotch::PartGraphVKway(
         free(edlotax + baseval);
 
         if (o != 0)
+        {
             return;
+        }
     }
 
-    if ((nghbtab = (SCOTCH_Num *)malloc(*nparts * sizeof(SCOTCH_Num))) == NULL)
+    if ((nghbtab = (SCOTCH_Num *)malloc(*nparts * sizeof(SCOTCH_Num))) ==
+        nullptr)
     {
         return;
     }
@@ -189,8 +192,10 @@ void MeshPartitionScotch::PartGraphVKway(
         partval          = part[vertnum];
         nghbtab[partval] = vertnum; // Do not count local neighbors in
                                     // communication volume
-        if (vsize2 != NULL)
+        if (vsize2 != nullptr)
+        {
             vsizval = vsize2[vertnum];
+        }
 
         // Based traversal of edge array adjncy
         for (edgennd = xadj[vertnum + 1]; edgenum < edgennd; edgenum++)
@@ -238,8 +243,9 @@ int MeshPartitionScotch::PartGraph2(
     vertnbr = *n;
 
     o = 1; // Assume something will go wrong
-    if (SCOTCH_graphBuild(grafdat, baseval, vertnbr, xadj, xadj + 1, vwgt, NULL,
-                          xadj[vertnbr] - baseval, adjncy, adjwgt) == 0)
+    if (SCOTCH_graphBuild(grafdat, baseval, vertnbr, xadj, xadj + 1, vwgt,
+                          nullptr, xadj[vertnbr] - baseval, adjncy,
+                          adjwgt) == 0)
     {
         SCOTCH_stratInit(&stradat);
         SCOTCH_stratGraphMapBuild(&stradat, flagval, *nparts, kbalval);
@@ -253,18 +259,21 @@ int MeshPartitionScotch::PartGraph2(
     SCOTCH_graphExit(grafdat);
 
     if (o != 0)
+    {
         return (1);
+    }
 
     if (baseval != 0)
     { // MeTiS part array is based, Scotch is not
         SCOTCH_Num vertnum;
 
         for (vertnum = 0; vertnum < vertnbr; vertnum++)
+        {
             part[vertnum] += baseval;
+        }
     }
 
     return (0);
 }
 
-} // namespace SpatialDomains
-} // namespace Nektar
+} // namespace Nektar::SpatialDomains

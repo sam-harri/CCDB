@@ -40,9 +40,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 /**
  * @class GlobalLinSysPETScFull
@@ -223,5 +221,4 @@ void GlobalLinSysPETScFull::v_DoMatrixMultiply(
     m_locToGloMap->Assemble(tmp1, output);
 }
 
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions

@@ -40,9 +40,7 @@
 #include <boost/test/tools/floating_point_comparison.hpp>
 #include <boost/test/unit_test.hpp>
 
-namespace Nektar
-{
-namespace BandedMatrixStoragePolicyUnitTests
+namespace Nektar::BandedMatrixStoragePolicyUnitTests
 {
 typedef BandedMatrixFuncs Policy;
 
@@ -204,5 +202,4 @@ BOOST_AUTO_TEST_CASE(TestSetValue)
     m.SetValue(3, 3, 30);
     BOOST_CHECK_EQUAL(30, m(3, 3));
 }
-} // namespace BandedMatrixStoragePolicyUnitTests
-} // namespace Nektar
+} // namespace Nektar::BandedMatrixStoragePolicyUnitTests

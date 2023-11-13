@@ -44,10 +44,7 @@
 #include <array>
 #include <unordered_map>
 
-namespace Nektar
-{
-
-namespace SpatialDomains
+namespace Nektar::SpatialDomains
 {
 
 class Geometry; // Forward declaration for typedef.
@@ -697,7 +694,6 @@ inline void Geometry::SetUpCoeffs(const int nCoeffs)
     }
 }
 
-} // namespace SpatialDomains
-} // namespace Nektar
+} // namespace Nektar::SpatialDomains
 
 #endif // NEKTAR_SPATIALDOMAINS_GEOMETRY_H

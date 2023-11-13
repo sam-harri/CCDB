@@ -40,9 +40,7 @@
 #include <SpatialDomains/MeshEntities.hpp>
 #include <SpatialDomains/MeshGraph.h>
 
-namespace Nektar
-{
-namespace SpatialDomains
+namespace Nektar::SpatialDomains
 {
 
 class MeshGraphHDF5 : public MeshGraph
@@ -52,7 +50,7 @@ public:
     {
     }
 
-    virtual ~MeshGraphHDF5()
+    ~MeshGraphHDF5() override
     {
     }
 
@@ -64,13 +62,13 @@ public:
     static std::string className, cmdSwitch;
 
 protected:
-    SPATIAL_DOMAINS_EXPORT virtual void v_WriteGeometry(
+    SPATIAL_DOMAINS_EXPORT void v_WriteGeometry(
         const std::string &outfilename, bool defaultExp = false,
         const LibUtilities::FieldMetaDataMap &metadata =
             LibUtilities::NullFieldMetaDataMap) override;
-    SPATIAL_DOMAINS_EXPORT virtual void v_ReadGeometry(
+    SPATIAL_DOMAINS_EXPORT void v_ReadGeometry(
         LibUtilities::DomainRangeShPtr rng, bool fillGraph) override;
-    SPATIAL_DOMAINS_EXPORT virtual void v_PartitionMesh(
+    SPATIAL_DOMAINS_EXPORT void v_PartitionMesh(
         LibUtilities::SessionReaderSharedPtr session) override;
 
 private:
@@ -117,7 +115,6 @@ private:
     static const unsigned int FORMAT_VERSION;
 };
 
-} // namespace SpatialDomains
-} // namespace Nektar
+} // namespace Nektar::SpatialDomains
 
 #endif

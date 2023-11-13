@@ -37,9 +37,7 @@
 
 #include <NekMesh/Module/Module.h>
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 /**
@@ -49,8 +47,8 @@ class InputGmsh : public NekMesh::InputModule
 {
 public:
     InputGmsh(NekMesh::MeshSharedPtr m);
-    virtual ~InputGmsh();
-    virtual void Process();
+    ~InputGmsh() override;
+    void Process() override;
 
     /// Creates an instance of this class
     static NekMesh::ModuleSharedPtr create(NekMesh::MeshSharedPtr m)
@@ -68,7 +66,7 @@ public:
     static std::vector<int> CreateReordering(unsigned int InputGmshEntity,
                                              Logger &log);
 
-    virtual std::string GetModuleName()
+    std::string GetModuleName() override
     {
         return "InputGmsh";
     }
@@ -101,7 +99,6 @@ private:
     void SaveNode(int id, NekDouble x = 0, NekDouble y = 0, NekDouble z = 0);
     void ReadNextElement(int tag = 0, int elm_type = 0);
 };
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh
 
 #endif

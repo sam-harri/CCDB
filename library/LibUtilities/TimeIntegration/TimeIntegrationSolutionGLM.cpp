@@ -36,9 +36,7 @@
 
 #include <LibUtilities/TimeIntegration/TimeIntegrationSchemeGLM.h>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 TimeIntegrationSolutionGLM::TimeIntegrationSolutionGLM(
@@ -106,5 +104,4 @@ TimeIntegrationSolutionGLM::TimeIntegrationSolutionGLM(
 {
 }
 
-} // end namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities

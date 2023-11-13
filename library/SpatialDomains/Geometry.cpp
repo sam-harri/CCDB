@@ -40,9 +40,7 @@
 #include <SpatialDomains/Geometry1D.h>
 #include <SpatialDomains/Geometry2D.h>
 
-namespace Nektar
-{
-namespace SpatialDomains
+namespace Nektar::SpatialDomains
 {
 
 // static class property
@@ -586,5 +584,4 @@ bool Geometry::ClampLocCoords(Array<OneD, NekDouble> &locCoord, NekDouble tol)
     return clamp;
 }
 
-} // namespace SpatialDomains
-} // namespace Nektar
+} // namespace Nektar::SpatialDomains

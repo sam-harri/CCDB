@@ -40,9 +40,7 @@
 #include <LibUtilities/BasicUtils/SharedArray.hpp>
 #include <LibUtilities/Memory/NekMemoryManager.hpp>
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 enum SPType
@@ -179,12 +177,12 @@ public:
         m_type = eRCBoundary;
     }
 
-    ~CPoint(){};
+    ~CPoint() override{};
 
     /**
      * @brief get mesh spacing paramter
      */
-    NekDouble GetDelta()
+    NekDouble GetDelta() override
     {
         return m_delta;
     }
@@ -192,7 +190,7 @@ public:
     /**
      * @brief get mesh refinement spacing paramter
      */
-    NekDouble GetRDelta()
+    NekDouble GetRDelta() override
     {
         return m_rdelta;
     }
@@ -200,7 +198,7 @@ public:
     /**
      * @brief gets the corresponding cad information for the point
      */
-    void GetCAD(int &surf, Array<OneD, NekDouble> &uv)
+    void GetCAD(int &surf, Array<OneD, NekDouble> &uv) override
     {
         surf = sid;
         uv   = m_uv;
@@ -211,7 +209,7 @@ public:
         m_rdelta = i;
     }
 
-    void SetDelta(NekDouble i)
+    void SetDelta(NekDouble i) override
     {
         m_delta = i;
     }
@@ -246,31 +244,31 @@ public:
         m_type = ePBoundary;
     }
 
-    ~BPoint(){};
+    ~BPoint() override{};
 
     /**
      * @brief gets the corresponding cad information for the point
      */
-    void GetCAD(int &surf, Array<OneD, NekDouble> &uv)
+    void GetCAD(int &surf, Array<OneD, NekDouble> &uv) override
     {
         surf = sid;
         uv   = m_uv;
     }
 
-    NekDouble GetDelta()
+    NekDouble GetDelta() override
     {
         NEKERROR(ErrorUtil::efatal, "Cannot retrieve delta from this type");
         return 0.0;
     }
 
-    void SetDelta(NekDouble i)
+    void SetDelta(NekDouble i) override
     {
         boost::ignore_unused(i);
         NEKERROR(ErrorUtil::efatal,
                  "Cannot assign refinement delta to this type");
     }
 
-    NekDouble GetRDelta()
+    NekDouble GetRDelta() override
     {
         NEKERROR(ErrorUtil::efatal,
                  "Cannot retrieve refinment delta from this type");
@@ -308,12 +306,12 @@ public:
         m_type = eSrcPoint;
     }
 
-    ~SrcPoint(){};
+    ~SrcPoint() override{};
 
     /**
      * @brief get mesh spacing paramter
      */
-    NekDouble GetRDelta()
+    NekDouble GetRDelta() override
     {
         return m_rdelta;
     }
@@ -323,19 +321,19 @@ public:
         m_rdelta = i;
     }
 
-    NekDouble GetDelta()
+    NekDouble GetDelta() override
     {
         NEKERROR(ErrorUtil::efatal, "Cannot retrieve delta from this type");
         return 0.0;
     }
 
-    void SetDelta(NekDouble i)
+    void SetDelta(NekDouble i) override
     {
         boost::ignore_unused(i);
         NEKERROR(ErrorUtil::efatal, "Cannot assign delta to this type");
     }
 
-    void GetCAD(int &surf, Array<OneD, NekDouble> &uv)
+    void GetCAD(int &surf, Array<OneD, NekDouble> &uv) override
     {
         boost::ignore_unused(surf, uv);
         NEKERROR(ErrorUtil::efatal, "Cannot retrieve CAD from this type")
@@ -347,7 +345,6 @@ private:
 };
 typedef std::shared_ptr<SrcPoint> SrcPointSharedPtr;
 
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh
 
 #endif

@@ -46,9 +46,7 @@ using namespace std;
 
 #include <LibUtilities/TimeIntegration/TimeIntegrationSchemeGLM.h>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -87,7 +85,7 @@ public:
         }
     }
 
-    virtual ~DIRKTimeIntegrationScheme()
+    ~DIRKTimeIntegrationScheme() override
     {
     }
 
@@ -335,12 +333,12 @@ public:
     }
 
 protected:
-    LUE virtual std::string v_GetName() const override
+    LUE std::string v_GetName() const override
     {
         return std::string("DIRK");
     }
 
-    LUE virtual NekDouble v_GetTimeStability() const override
+    LUE NekDouble v_GetTimeStability() const override
     {
         return 1.0;
     }
@@ -503,7 +501,6 @@ protected:
     static std::string TimeIntegrationMethodLookupId;
 }; // end class DIRKOrder4_ES6TimeIntegrationScheme
 
-} // end namespace LibUtilities
-} // end namespace Nektar
+} // namespace Nektar::LibUtilities
 
 #endif

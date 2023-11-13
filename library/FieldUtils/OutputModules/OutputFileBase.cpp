@@ -41,9 +41,7 @@ using namespace std;
 #include <boost/format.hpp>
 #include <iomanip>
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 OutputFileBase::OutputFileBase(FieldSharedPtr f) : OutputModule(f)
@@ -462,5 +460,4 @@ void OutputFileBase::PrintErrorFromExp()
     }
 }
 
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

@@ -40,9 +40,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace StdRegions
+namespace Nektar::StdRegions
 {
 StdHexExp::StdHexExp()
 {
@@ -2577,5 +2575,4 @@ void StdHexExp::v_GetSimplexEquiSpacedConnectivity(Array<OneD, int> &conn,
         plane += np * np;
     }
 }
-} // namespace StdRegions
-} // namespace Nektar
+} // namespace Nektar::StdRegions

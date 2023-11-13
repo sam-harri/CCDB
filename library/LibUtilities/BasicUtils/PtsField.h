@@ -45,9 +45,7 @@
 #include <LibUtilities/BasicUtils/SharedArray.hpp>
 #include <LibUtilities/BasicUtils/VmathArray.hpp>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 enum PtsType
@@ -189,7 +187,6 @@ private:
 
 typedef std::shared_ptr<PtsField> PtsFieldSharedPtr;
 static PtsFieldSharedPtr NullPtsField;
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities
 
 #endif

@@ -40,13 +40,7 @@
 #include <LibUtilities/BasicUtils/SharedArray.hpp>
 #include <map>
 
-namespace Nektar
-{
-
-/** \brief The namespace associated with the the StdRegions library
- * (\ref pageStdRegions "StdRegions introduction")
- */
-namespace StdRegions
+namespace Nektar::StdRegions
 {
 enum ElementType
 {
@@ -489,7 +483,6 @@ const NekDouble kSVVDGFilter[9][11] = {
     {0, 0, 0, 0, 0, 0, 0.0023592, 0.23683, 0.17196, 1, 0},
     {0, 0, 0, 0, 0, 0, 0, 0.0026055, 0.28682, 0.22473, 1}};
 
-} // namespace StdRegions
-} // namespace Nektar
+} // namespace Nektar::StdRegions
 
 #endif // STDREGIONS_H

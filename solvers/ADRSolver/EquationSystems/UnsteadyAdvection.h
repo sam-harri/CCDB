@@ -61,7 +61,7 @@ public:
     static std::string className;
 
     /// Destructor
-    virtual ~UnsteadyAdvection();
+    ~UnsteadyAdvection() override;
 
 protected:
     bool m_useGJPStabilisation;
@@ -107,10 +107,10 @@ protected:
     Array<OneD, NekDouble> &GetNormalVelocity();
 
     /// Initialise the object
-    virtual void v_InitObject(bool DeclareFields = true) override;
+    void v_InitObject(bool DeclareFields = true) override;
 
     /// Print Summary
-    virtual void v_GenerateSummary(SolverUtils::SummaryList &s) override;
+    void v_GenerateSummary(SolverUtils::SummaryList &s) override;
 
 private:
     NekDouble m_waveFreq;

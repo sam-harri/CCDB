@@ -42,9 +42,7 @@
 #include <boost/algorithm/string.hpp>
 
 using namespace std;
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 void Octree::Process()
@@ -961,9 +959,13 @@ void Octree::CompileSourcePointList()
                     uv[0] = k * du + bounds[0];
                     uv[1] = j * dv + bounds[2];
                     if (j == 40 - 1)
+                    {
                         uv[1] = bounds[3];
+                    }
                     if (k == 40 - 1)
+                    {
                         uv[0] = bounds[1];
+                    }
                     samplepoints[k][j] = surf->P(uv);
                 }
             }
@@ -994,9 +996,13 @@ void Octree::CompileSourcePointList()
                              samplepoints[k][j + 1][2]));
 
                     if (deltau > DeltaU)
+                    {
                         DeltaU = deltau;
+                    }
                     if (deltav > DeltaV)
+                    {
                         DeltaV = deltav;
+                    }
                 }
             }
 
@@ -1018,9 +1024,13 @@ void Octree::CompileSourcePointList()
                     // this prevents round off error at the end of the surface
                     // may not be neseercary but works
                     if (j == nu - 1)
+                    {
                         uv[0] = bounds[1];
+                    }
                     if (k == nv - 1)
+                    {
                         uv[1] = bounds[3];
+                    }
 
                     NekDouble C = surf->Curvature(uv);
 
@@ -1123,5 +1133,4 @@ NekDouble Octree::ddx(OctantSharedPtr i, OctantSharedPtr j)
 {
     return fabs(i->GetDelta() - j->GetDelta()) / i->Distance(j);
 }
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh

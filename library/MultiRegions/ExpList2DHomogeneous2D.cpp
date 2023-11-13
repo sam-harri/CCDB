@@ -39,9 +39,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 // Forward declaration for typedefs
 ExpList2DHomogeneous2D::ExpList2DHomogeneous2D() : ExpListHomogeneous2D(eNoType)
@@ -335,7 +333,7 @@ void ExpList2DHomogeneous2D::v_WriteVtkPieceHeader(std::ostream &outfile,
             << ntotminus << "\">" << endl;
     outfile << "      <Points>" << endl;
     outfile << "        <DataArray type=\"Float32\" "
-            << "NumberOfComponents=\"3\" format=\"ascii\">" << endl;
+            << R"(NumberOfComponents="3" format="ascii">)" << endl;
     outfile << "          ";
     for (i = 0; i < ntot; ++i)
     {
@@ -350,7 +348,7 @@ void ExpList2DHomogeneous2D::v_WriteVtkPieceHeader(std::ostream &outfile,
     outfile << "      </Points>" << endl;
     outfile << "      <Cells>" << endl;
     outfile << "        <DataArray type=\"Int32\" "
-            << "Name=\"connectivity\" format=\"ascii\">" << endl;
+            << R"(Name="connectivity" format="ascii">)" << endl;
     for (i = 0; i < nquad0; ++i)
     {
         for (j = 0; j < nquad1 - 1; ++j)
@@ -363,7 +361,7 @@ void ExpList2DHomogeneous2D::v_WriteVtkPieceHeader(std::ostream &outfile,
     outfile << endl;
     outfile << "        </DataArray>" << endl;
     outfile << "        <DataArray type=\"Int32\" "
-            << "Name=\"offsets\" format=\"ascii\">" << endl;
+            << R"(Name="offsets" format="ascii">)" << endl;
     for (i = 0; i < ntotminus; ++i)
     {
         outfile << i * 4 + 4 << " ";
@@ -371,7 +369,7 @@ void ExpList2DHomogeneous2D::v_WriteVtkPieceHeader(std::ostream &outfile,
     outfile << endl;
     outfile << "        </DataArray>" << endl;
     outfile << "        <DataArray type=\"UInt8\" "
-            << "Name=\"types\" format=\"ascii\">" << endl;
+            << R"(Name="types" format="ascii">)" << endl;
     for (i = 0; i < ntotminus; ++i)
     {
         outfile << "9 ";
@@ -382,5 +380,4 @@ void ExpList2DHomogeneous2D::v_WriteVtkPieceHeader(std::ostream &outfile,
     outfile << "      <PointData>" << endl;
 }
 
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions

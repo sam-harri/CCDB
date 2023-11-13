@@ -85,7 +85,8 @@ void NekMultiplyBandedMatrix(
     DataType *result, const NekMatrix<LhsDataType, MatrixType> &lhs,
     const DataType *rhs,
     typename std::enable_if<
-        CanGetRawPtr<NekMatrix<LhsDataType, MatrixType>>::value>::type *p = 0)
+        CanGetRawPtr<NekMatrix<LhsDataType, MatrixType>>::value>::type *p =
+        nullptr)
 {
     boost::ignore_unused(p);
 
@@ -110,7 +111,7 @@ void NekMultiplyBandedMatrix(
     const DataType *rhs,
     typename std::enable_if<
         !CanGetRawPtr<NekMatrix<LhsDataType, BlockMatrixTag>>::value>::type *p =
-        0)
+        nullptr)
 {
     boost::ignore_unused(result, lhs, rhs, p);
 
@@ -478,7 +479,7 @@ void NekMultiplySymmetricMatrix(
     const DataType *rhs,
     typename std::enable_if<
         CanGetRawPtr<NekMatrix<InnerMatrixType, MatrixTag>>::value>::type *p =
-        0)
+        nullptr)
 {
     boost::ignore_unused(p);
 
@@ -501,7 +502,7 @@ void NekMultiplySymmetricMatrix(
     const DataType *rhs,
     typename std::enable_if<
         !CanGetRawPtr<NekMatrix<InnerMatrixType, MatrixTag>>::value>::type *p =
-        0)
+        nullptr)
 {
     boost::ignore_unused(p);
 
@@ -514,7 +515,7 @@ void NekMultiplyFullMatrix(
     const DataType *rhs,
     typename std::enable_if<
         CanGetRawPtr<NekMatrix<InnerMatrixType, MatrixTag>>::value>::type *p =
-        0)
+        nullptr)
 {
     boost::ignore_unused(p);
 
@@ -540,7 +541,7 @@ void NekMultiplyFullMatrix(
     const DataType *rhs,
     typename std::enable_if<
         !CanGetRawPtr<NekMatrix<InnerMatrixType, MatrixTag>>::value>::type *p =
-        0)
+        nullptr)
 {
     boost::ignore_unused(p);
 

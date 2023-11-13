@@ -44,9 +44,7 @@
 #include <MultiRegions/MultiRegionsDeclspec.h>
 #include <SpatialDomains/Conditions.h>
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 class DisContField3DHomogeneous1D : public ExpList3DHomogeneous1D
 {
@@ -73,7 +71,7 @@ public:
         const bool DeclarePlanesSetCoeffPhys = true);
 
     /// Destructor.
-    MULTI_REGIONS_EXPORT virtual ~DisContField3DHomogeneous1D();
+    MULTI_REGIONS_EXPORT ~DisContField3DHomogeneous1D() override;
 
     MULTI_REGIONS_EXPORT void SetupBoundaryConditions(
         const LibUtilities::BasisKey &HomoBasis, const NekDouble lhom,
@@ -120,49 +118,47 @@ protected:
     /// Set up all DG member variables and maps
     MULTI_REGIONS_EXPORT void SetUpDG();
 
-    virtual GlobalLinSysKey v_HelmSolve(
-        const Array<OneD, const NekDouble> &inarray,
-        Array<OneD, NekDouble> &outarray,
-        const StdRegions::ConstFactorMap &factors,
-        const StdRegions::VarCoeffMap &varcoeff,
-        const MultiRegions::VarFactorsMap &varfactors,
-        const Array<OneD, const NekDouble> &dirForcing,
-        const bool PhysSpaceForcing) override;
+    GlobalLinSysKey v_HelmSolve(const Array<OneD, const NekDouble> &inarray,
+                                Array<OneD, NekDouble> &outarray,
+                                const StdRegions::ConstFactorMap &factors,
+                                const StdRegions::VarCoeffMap &varcoeff,
+                                const MultiRegions::VarFactorsMap &varfactors,
+                                const Array<OneD, const NekDouble> &dirForcing,
+                                const bool PhysSpaceForcing) override;
 
     /// @todo Fix in another way considering all the planes
-    virtual ExpListSharedPtr &v_GetTrace() override;
+    ExpListSharedPtr &v_GetTrace() override;
 
     /// @todo Fix in another way considering all the planes
-    virtual AssemblyMapDGSharedPtr &v_GetTraceMap() override;
+    AssemblyMapDGSharedPtr &v_GetTraceMap() override;
 
-    virtual void v_ExtractTracePhys(const Array<OneD, const NekDouble> &inarray,
-                                    Array<OneD, NekDouble> &outarray) override;
+    void v_ExtractTracePhys(const Array<OneD, const NekDouble> &inarray,
+                            Array<OneD, NekDouble> &outarray) override;
 
-    virtual void v_ExtractTracePhys(Array<OneD, NekDouble> &outarray) override;
+    void v_ExtractTracePhys(Array<OneD, NekDouble> &outarray) override;
 
-    virtual const Array<OneD, const int> &v_GetTraceBndMap() override;
+    const Array<OneD, const int> &v_GetTraceBndMap() override;
 
-    virtual void v_GetBndElmtExpansion(
-        int i, std::shared_ptr<ExpList> &result,
-        const bool DeclareCoeffPhysArrays) override;
+    void v_GetBndElmtExpansion(int i, std::shared_ptr<ExpList> &result,
+                               const bool DeclareCoeffPhysArrays) override;
 
-    virtual void v_GetBoundaryToElmtMap(Array<OneD, int> &ElmtID,
-                                        Array<OneD, int> &EdgeID) override;
+    void v_GetBoundaryToElmtMap(Array<OneD, int> &ElmtID,
+                                Array<OneD, int> &EdgeID) override;
 
-    virtual void v_GetBCValues(Array<OneD, NekDouble> &BndVals,
-                               const Array<OneD, NekDouble> &TotField,
-                               int BndID) override;
+    void v_GetBCValues(Array<OneD, NekDouble> &BndVals,
+                       const Array<OneD, NekDouble> &TotField,
+                       int BndID) override;
 
-    virtual void v_NormVectorIProductWRTBase(Array<OneD, const NekDouble> &V1,
-                                             Array<OneD, const NekDouble> &V2,
-                                             Array<OneD, NekDouble> &outarray,
-                                             int BndID) override;
+    void v_NormVectorIProductWRTBase(Array<OneD, const NekDouble> &V1,
+                                     Array<OneD, const NekDouble> &V2,
+                                     Array<OneD, NekDouble> &outarray,
+                                     int BndID) override;
 
-    virtual void v_GetBoundaryNormals(
+    void v_GetBoundaryNormals(
         int i, Array<OneD, Array<OneD, NekDouble>> &normals) override;
 
     /// @todo Fix Robin BCs for homogeneous case
-    virtual std::map<int, RobinBCInfoSharedPtr> v_GetRobinBCInfo() override;
+    std::map<int, RobinBCInfoSharedPtr> v_GetRobinBCInfo() override;
 
     /**
      * \brief This function evaluates the boundary conditions
@@ -196,27 +192,25 @@ protected:
      * \param time The time at which the boundary conditions should be
      * evaluated
      */
-    virtual void v_EvaluateBoundaryConditions(
+    void v_EvaluateBoundaryConditions(
         const NekDouble time = 0.0, const std::string varName = "",
         const NekDouble x2_in = NekConstants::kNekUnsetDouble,
         const NekDouble x3_in = NekConstants::kNekUnsetDouble) override;
 
-    virtual const Array<OneD, const MultiRegions::ExpListSharedPtr>
+    const Array<OneD, const MultiRegions::ExpListSharedPtr>
         &v_GetBndCondExpansions(void) override;
 
-    virtual const Array<OneD, const SpatialDomains::BoundaryConditionShPtr>
+    const Array<OneD, const SpatialDomains::BoundaryConditionShPtr>
         &v_GetBndConditions() override;
 
-    virtual std::shared_ptr<ExpList> &v_UpdateBndCondExpansion(int i) override;
+    std::shared_ptr<ExpList> &v_UpdateBndCondExpansion(int i) override;
 
-    virtual Array<OneD, SpatialDomains::BoundaryConditionShPtr>
-        &v_UpdateBndConditions() override;
+    Array<OneD, SpatialDomains::BoundaryConditionShPtr> &v_UpdateBndConditions()
+        override;
 
-    virtual void v_SetBndCondBwdWeight(const int index,
-                                       const NekDouble value) override;
+    void v_SetBndCondBwdWeight(const int index, const NekDouble value) override;
 };
 typedef std::shared_ptr<DisContField3DHomogeneous1D>
     DisContField3DHomogeneous1DSharedPtr;
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions
 #endif

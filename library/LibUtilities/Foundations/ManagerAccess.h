@@ -39,9 +39,7 @@
 #include <LibUtilities/Foundations/Basis.h>
 #include <LibUtilities/Foundations/Points.h>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 typedef NekManager<PointsKey, Points<NekDouble>, PointsKey::opLess>
@@ -51,6 +49,5 @@ typedef NekManager<BasisKey, Basis, BasisKey::opLess> BasisManagerT;
 LIB_UTILITIES_EXPORT PointsManagerT &PointsManager(void);
 LIB_UTILITIES_EXPORT BasisManagerT &BasisManager(void);
 
-} // end of namespace LibUtilities
-} // end of namespace Nektar
+} // namespace Nektar::LibUtilities
 #endif // NEKTAR_LIB_UTILIITIES_FOUNDATIONS_MANAGER_ACCESS_H

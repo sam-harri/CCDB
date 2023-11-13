@@ -38,9 +38,7 @@
 #include <boost/test/tools/floating_point_comparison.hpp>
 #include <boost/test/unit_test.hpp>
 
-namespace Nektar
-{
-namespace TriangularMatrixVectorMultiplicationUnitTests
+namespace Nektar::TriangularMatrixVectorMultiplicationUnitTests
 {
 BOOST_AUTO_TEST_CASE(TestUpperTriangularMatrixVectorMultiplication)
 {
@@ -213,5 +211,4 @@ BOOST_AUTO_TEST_CASE(TestLowerTriangularTransposeSolve)
 
     BOOST_CHECK_EQUAL(expected_result, x);
 }
-} // namespace TriangularMatrixVectorMultiplicationUnitTests
-} // namespace Nektar
+} // namespace Nektar::TriangularMatrixVectorMultiplicationUnitTests

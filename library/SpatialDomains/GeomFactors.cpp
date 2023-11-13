@@ -35,9 +35,7 @@
 #include <LibUtilities/Foundations/Interp.h>
 #include <SpatialDomains/GeomFactors.h>
 
-namespace Nektar
-{
-namespace SpatialDomains
+namespace Nektar::SpatialDomains
 {
 /**
  * @class GeomFactors
@@ -946,5 +944,4 @@ void GeomFactors::VectorCrossProd(
     Vmath::Vvtvm(nq, v1[0], 1, v2[1], 1, temp, 1, v3[2], 1);
 }
 
-} // namespace SpatialDomains
-} // namespace Nektar
+} // namespace Nektar::SpatialDomains

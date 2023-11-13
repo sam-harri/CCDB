@@ -43,9 +43,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 /**
  * Registers the class with the Factory.
@@ -817,5 +815,4 @@ void PreconditionerBlock::v_DoPreconditioner(
         z = M * r;
     }
 }
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions

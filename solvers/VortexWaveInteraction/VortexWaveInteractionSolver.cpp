@@ -37,11 +37,6 @@
 using namespace std;
 using namespace Nektar;
 
-#if defined(_MSC_VER)
-#include <windows.h>
-#undef MoveFile
-#endif
-
 void DoFixedForcingIteration(VortexWaveInteraction &vwi);
 void Mvdir(string dir, NekDouble dir_ending);
 

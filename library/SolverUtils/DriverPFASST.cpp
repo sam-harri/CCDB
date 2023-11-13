@@ -39,9 +39,7 @@
 #include <SolverUtils/DriverPFASST.h>
 #include <boost/format.hpp>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 std::string DriverPFASST::className =
     GetDriverFactory().RegisterCreatorFunction("PFASST", DriverPFASST::create);
@@ -1154,5 +1152,4 @@ NekDouble DriverPFASST::EstimateOverheadTime(void)
     return timer.Elapsed().count() / niter;
 }
 
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils

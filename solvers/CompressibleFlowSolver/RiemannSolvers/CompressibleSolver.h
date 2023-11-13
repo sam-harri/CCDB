@@ -59,10 +59,9 @@ protected:
 
     using ND = NekDouble;
 
-    virtual void v_Solve(const int nDim,
-                         const Array<OneD, const Array<OneD, ND>> &Fwd,
-                         const Array<OneD, const Array<OneD, ND>> &Bwd,
-                         Array<OneD, Array<OneD, ND>> &flux) override;
+    void v_Solve(const int nDim, const Array<OneD, const Array<OneD, ND>> &Fwd,
+                 const Array<OneD, const Array<OneD, ND>> &Bwd,
+                 Array<OneD, Array<OneD, ND>> &flux) override;
 
     virtual void v_ArraySolve(const Array<OneD, const Array<OneD, ND>> &Fwd,
                               const Array<OneD, const Array<OneD, ND>> &Bwd,

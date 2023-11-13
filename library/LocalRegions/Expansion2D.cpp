@@ -47,9 +47,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace LocalRegions
+namespace Nektar::LocalRegions
 {
 Expansion2D::Expansion2D(SpatialDomains::Geometry2DSharedPtr pGeom)
     : StdExpansion(), Expansion(pGeom), StdExpansion2D()
@@ -162,11 +160,17 @@ DNekScalMatSharedPtr Expansion2D::CreateMatrix(const MatrixKey &mkey)
                     m_metricinfo->GetDerivFactors(ptsKeys);
                 int dir = 0;
                 if (mkey.GetMatrixType() == StdRegions::eWeakDeriv0)
+                {
                     dir = 0;
+                }
                 if (mkey.GetMatrixType() == StdRegions::eWeakDeriv1)
+                {
                     dir = 1;
+                }
                 if (mkey.GetMatrixType() == StdRegions::eWeakDeriv2)
+                {
                     dir = 2;
+                }
 
                 MatrixKey deriv0key(StdRegions::eWeakDeriv0,
                                     mkey.GetShapeType(), *this);
@@ -588,11 +592,17 @@ DNekScalMatSharedPtr Expansion2D::CreateMatrix(const MatrixKey &mkey)
                     m_metricinfo->GetDerivFactors(ptsKeys);
                 int dir = 0;
                 if (mkey.GetMatrixType() == StdRegions::eIProductWRTDerivBase0)
+                {
                     dir = 0;
+                }
                 if (mkey.GetMatrixType() == StdRegions::eIProductWRTDerivBase1)
+                {
                     dir = 1;
+                }
                 if (mkey.GetMatrixType() == StdRegions::eIProductWRTDerivBase2)
+                {
                     dir = 2;
+                }
 
                 MatrixKey iProdDeriv0Key(StdRegions::eIProductWRTDerivBase0,
                                          mkey.GetShapeType(), *this);
@@ -2371,5 +2381,4 @@ void Expansion2D::v_TraceNormLen(const int traceid, NekDouble &h, NekDouble &p)
 
     p = (NekDouble)(GetBasisNumModes(dirn) - 1);
 }
-} // namespace LocalRegions
-} // namespace Nektar
+} // namespace Nektar::LocalRegions

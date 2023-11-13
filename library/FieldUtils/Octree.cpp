@@ -36,9 +36,7 @@
 #include <cmath>
 #include <stdexcept>
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 /**
@@ -674,5 +672,4 @@ int Octree::Octant::GetLocInNode(const Array<OneD, NekDouble> &coords)
 
     return position;
 }
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

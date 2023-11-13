@@ -41,9 +41,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace SpatialDomains
+namespace Nektar::SpatialDomains
 {
 
 const unsigned int PrismGeom::VertexEdgeConnectivity[6][3] = {
@@ -802,5 +800,4 @@ void PrismGeom::SetUpXmap()
     m_xmap = MemoryManager<StdRegions::StdPrismExp>::AllocateSharedPtr(A, B, C);
 }
 
-} // namespace SpatialDomains
-} // namespace Nektar
+} // namespace Nektar::SpatialDomains

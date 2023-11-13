@@ -42,9 +42,7 @@
 #include <NekMesh/MeshElements/Triangle.h>
 #include <NekMesh/Module/Module.h>
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 /**
@@ -54,8 +52,8 @@ class InputNek5000 : public NekMesh::InputModule
 {
 public:
     InputNek5000(NekMesh::MeshSharedPtr p_m);
-    virtual ~InputNek5000();
-    virtual void Process();
+    ~InputNek5000() override;
+    void Process() override;
 
     /// Creates an instance of this class.
     static NekMesh::ModuleSharedPtr create(NekMesh::MeshSharedPtr m)
@@ -65,7 +63,7 @@ public:
     /// %ModuleKey for class.
     static NekMesh::ModuleKey className;
 
-    virtual std::string GetModuleName()
+    std::string GetModuleName() override
     {
         return "InputNek5000";
     }
@@ -73,7 +71,6 @@ public:
 private:
     void LoadHOSurfaces();
 };
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh
 
 #endif

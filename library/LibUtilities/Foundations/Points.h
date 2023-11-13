@@ -44,10 +44,7 @@
 #include <LibUtilities/Foundations/FoundationsFwd.hpp>
 #include <LibUtilities/LinearAlgebra/NekMatrixFwd.hpp>
 
-namespace Nektar
-{
-
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 /// Defines a specification for a set of points.
@@ -510,7 +507,6 @@ private:
     Points()                  = delete;
 };
 
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities
 
 #endif // NEKTAR_LIB_UTILITIES_FOUNDATIONS_POINTS_H

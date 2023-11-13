@@ -39,9 +39,7 @@
 
 #include <SolverUtils/Diffusion/DiffusionLDG.h>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 std::string DiffusionLDG::type = GetDiffusionFactory().RegisterCreatorFunction(
     "LDG", DiffusionLDG::create, "Local Discontinuous Galkerin");
@@ -490,5 +488,4 @@ void DiffusionLDG::ApplyVectorBCs(
     }
 }
 
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils

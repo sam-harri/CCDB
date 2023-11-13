@@ -38,9 +38,7 @@ using namespace std;
 
 #include "ProcessSurfDistance.h"
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 ModuleKey ProcessSurfDistance::className =
@@ -236,5 +234,4 @@ void ProcessSurfDistance::v_Process(po::variables_map &vm)
                                      BndExp[i]->UpdateCoeffs());
     }
 }
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

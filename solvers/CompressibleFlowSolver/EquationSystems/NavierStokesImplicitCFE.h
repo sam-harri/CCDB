@@ -67,7 +67,7 @@ public:
     // Name of class
     static std::string className;
 
-    virtual ~NavierStokesImplicitCFE();
+    ~NavierStokesImplicitCFE() override;
 
     typedef std::function<void(
         const Array<OneD, NekDouble> &, const NekDouble &,
@@ -81,26 +81,25 @@ protected:
         const LibUtilities::SessionReaderSharedPtr &pSession,
         const SpatialDomains::MeshGraphSharedPtr &pGraph);
 
-    virtual void v_InitObject(bool DeclareFields = true) override;
+    void v_InitObject(bool DeclareFields = true) override;
 
-    virtual void v_DoDiffusionCoeff(
+    void v_DoDiffusionCoeff(
         const Array<OneD, const Array<OneD, NekDouble>> &inarray,
         Array<OneD, Array<OneD, NekDouble>> &outarray,
         const Array<OneD, const Array<OneD, NekDouble>> &pFwd,
         const Array<OneD, const Array<OneD, NekDouble>> &pBwd) override;
 
-    virtual void v_DoDiffusion(
-        const Array<OneD, Array<OneD, NekDouble>> &inarray,
-        Array<OneD, Array<OneD, NekDouble>> &outarray,
-        const Array<OneD, Array<OneD, NekDouble>> &pFwd,
-        const Array<OneD, Array<OneD, NekDouble>> &pBwd) override final
+    void v_DoDiffusion(const Array<OneD, Array<OneD, NekDouble>> &inarray,
+                       Array<OneD, Array<OneD, NekDouble>> &outarray,
+                       const Array<OneD, Array<OneD, NekDouble>> &pFwd,
+                       const Array<OneD, Array<OneD, NekDouble>> &pBwd) final
     {
         boost::ignore_unused(inarray, outarray, pFwd, pBwd);
         NEKERROR(ErrorUtil::efatal,
                  "v_DoDiffusion is not implemented for implicit solvers");
     }
 
-    virtual void v_MinusDiffusionFluxJacPoint(
+    void v_MinusDiffusionFluxJacPoint(
         const int nConvectiveFields, const int nElmtPnt,
         const Array<OneD, const Array<OneD, NekDouble>> &locVars,
         const TensorOfArray3D<NekDouble> &locDerv,
@@ -109,14 +108,14 @@ protected:
         const Array<OneD, NekDouble> &normals, DNekMatSharedPtr &wspMat,
         Array<OneD, Array<OneD, NekDouble>> &PntJacArray) override;
 
-    virtual void v_GetFluxDerivJacDirctn(
+    void v_GetFluxDerivJacDirctn(
         const MultiRegions::ExpListSharedPtr &explist,
         const Array<OneD, const Array<OneD, NekDouble>> &normals,
         const int nDervDir,
         const Array<OneD, const Array<OneD, NekDouble>> &inarray,
         TensorOfArray5D<NekDouble> &ElmtJacArray, const int nFluxDir) override;
 
-    virtual void v_GetFluxDerivJacDirctnElmt(
+    void v_GetFluxDerivJacDirctnElmt(
         const int nConvectiveFields, const int nElmtPnt, const int nDervDir,
         const Array<OneD, const Array<OneD, NekDouble>> &locVars,
         const Array<OneD, NekDouble> &locmu,
@@ -124,7 +123,7 @@ protected:
         DNekMatSharedPtr &wspMat,
         Array<OneD, Array<OneD, NekDouble>> &PntJacArray) override;
 
-    virtual void v_GetFluxDerivJacDirctn(
+    void v_GetFluxDerivJacDirctn(
         const MultiRegions::ExpListSharedPtr &explist,
         const Array<OneD, const Array<OneD, NekDouble>> &normals,
         const int nDervDir,
@@ -137,13 +136,13 @@ protected:
         const NekDouble mu, const NekDouble DmuDT,
         const Array<OneD, NekDouble> &normals, DNekMatSharedPtr &fluxJac);
 
-    virtual void v_CalcPhysDeriv(
+    void v_CalcPhysDeriv(
         const Array<OneD, const Array<OneD, NekDouble>> &inarray,
         TensorOfArray3D<NekDouble> &qfield) override;
 
-    virtual void v_CalcMuDmuDT(
-        const Array<OneD, const Array<OneD, NekDouble>> &inarray,
-        Array<OneD, NekDouble> &mu, Array<OneD, NekDouble> &DmuDT) override;
+    void v_CalcMuDmuDT(const Array<OneD, const Array<OneD, NekDouble>> &inarray,
+                       Array<OneD, NekDouble> &mu,
+                       Array<OneD, NekDouble> &DmuDT) override;
 
     /**
      * @brief return part of viscous Jacobian:
@@ -237,8 +236,7 @@ protected:
                         const Array<OneD, const Array<OneD, NekDouble>> &qfield,
                         DNekMatSharedPtr &OutputMatrix);
 
-    virtual bool v_SupportsShockCaptType(
-        const std::string type) const override final;
+    bool v_SupportsShockCaptType(const std::string type) const final;
 };
 } // namespace Nektar
 #endif

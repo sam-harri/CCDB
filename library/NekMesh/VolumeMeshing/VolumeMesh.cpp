@@ -43,9 +43,7 @@
 #include <NekMesh/VolumeMeshing/TetMeshing/TetMesh.h>
 
 using namespace std;
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 ModuleKey VolumeMesh::className = GetModuleFactory().RegisterCreatorFunction(
@@ -318,5 +316,4 @@ void VolumeMesh::Process()
     ProcessComposites();
 }
 
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh

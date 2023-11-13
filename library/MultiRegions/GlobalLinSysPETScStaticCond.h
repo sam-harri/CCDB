@@ -39,9 +39,7 @@
 #include <MultiRegions/GlobalLinSysStaticCond.h>
 #include <MultiRegions/MultiRegionsDeclspec.h>
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 // Forward declarations
 class ExpList;
@@ -86,39 +84,36 @@ public:
         const std::shared_ptr<AssemblyMap> &locToGloMap,
         const PreconditionerSharedPtr pPrecon = PreconditionerSharedPtr());
 
-    MULTI_REGIONS_EXPORT virtual ~GlobalLinSysPETScStaticCond();
+    MULTI_REGIONS_EXPORT ~GlobalLinSysPETScStaticCond() override;
 
 protected:
-    virtual void v_InitObject() override;
+    void v_InitObject() override;
 
     /// Assemble the Schur complement matrix.
-    virtual void v_AssembleSchurComplement(
+    void v_AssembleSchurComplement(
         std::shared_ptr<AssemblyMap> locToGloMap) override;
-    virtual void v_DoMatrixMultiply(const Array<OneD, const NekDouble> &input,
-                                    Array<OneD, NekDouble> &output) override;
-    virtual DNekScalBlkMatSharedPtr v_GetStaticCondBlock(
-        unsigned int n) override;
-    virtual void v_PreSolve(int scLevel,
-                            Array<OneD, NekDouble> &F_bBnd) override;
-    virtual void v_SolveLinearSystem(const int pNumRows,
-                                     const Array<OneD, const NekDouble> &pInput,
-                                     Array<OneD, NekDouble> &pOutput,
-                                     const AssemblyMapSharedPtr &locToGloMap,
-                                     const int pNumDir) override;
+    void v_DoMatrixMultiply(const Array<OneD, const NekDouble> &input,
+                            Array<OneD, NekDouble> &output) override;
+    DNekScalBlkMatSharedPtr v_GetStaticCondBlock(unsigned int n) override;
+    void v_PreSolve(int scLevel, Array<OneD, NekDouble> &F_bBnd) override;
+    void v_SolveLinearSystem(const int pNumRows,
+                             const Array<OneD, const NekDouble> &pInput,
+                             Array<OneD, NekDouble> &pOutput,
+                             const AssemblyMapSharedPtr &locToGloMap,
+                             const int pNumDir) override;
 
-    virtual void v_BasisFwdTransform(Array<OneD, NekDouble> &pInOut) override;
-    virtual void v_CoeffsBwdTransform(Array<OneD, NekDouble> &pInOut) override;
-    virtual void v_CoeffsFwdTransform(const Array<OneD, NekDouble> &pInput,
-                                      Array<OneD, NekDouble> &pOutput) override;
+    void v_BasisFwdTransform(Array<OneD, NekDouble> &pInOut) override;
+    void v_CoeffsBwdTransform(Array<OneD, NekDouble> &pInOut) override;
+    void v_CoeffsFwdTransform(const Array<OneD, NekDouble> &pInput,
+                              Array<OneD, NekDouble> &pOutput) override;
 
-    virtual GlobalLinSysStaticCondSharedPtr v_Recurse(
+    GlobalLinSysStaticCondSharedPtr v_Recurse(
         const GlobalLinSysKey &mkey, const std::weak_ptr<ExpList> &pExpList,
         const DNekScalBlkMatSharedPtr pSchurCompl,
         const DNekScalBlkMatSharedPtr pBinvD, const DNekScalBlkMatSharedPtr pC,
         const DNekScalBlkMatSharedPtr pInvD,
         const std::shared_ptr<AssemblyMap> &locToGloMap) override;
 };
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions
 
 #endif

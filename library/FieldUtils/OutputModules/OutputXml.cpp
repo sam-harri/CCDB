@@ -40,9 +40,7 @@ using namespace std;
 
 #include "OutputXml.h"
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 ModuleKey OutputXml::m_className = GetModuleFactory().RegisterCreatorFunction(
@@ -71,5 +69,4 @@ void OutputXml::v_Process(po::variables_map &vm)
     m_f->m_graph->WriteGeometry(filename);
     cout << "Written file: " << filename << endl;
 }
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

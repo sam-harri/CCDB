@@ -36,9 +36,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 
 std::string Driver::evolutionOperatorLookupIds[6] = {
@@ -208,5 +206,4 @@ void Driver::v_InitObject(ostream &out)
     }
 }
 
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils

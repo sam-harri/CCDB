@@ -40,9 +40,7 @@
 #include <MultiRegions/MultiRegionsDeclspec.h>
 #include <MultiRegions/Preconditioner.h>
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 enum LinearPreconSolver
 {
@@ -76,7 +74,7 @@ public:
         const AssemblyMapSharedPtr &pLocToGloMap);
 
     MULTI_REGIONS_EXPORT
-    virtual ~PreconditionerLinear()
+    ~PreconditionerLinear() override
     {
     }
 
@@ -86,18 +84,18 @@ protected:
 
     Array<OneD, NekDouble> m_invMult;
 
-    virtual void v_InitObject() override;
+    void v_InitObject() override;
 
-    virtual void v_DoPreconditionerWithNonVertOutput(
+    void v_DoPreconditionerWithNonVertOutput(
         const Array<OneD, NekDouble> &pInput, Array<OneD, NekDouble> &pOutput,
         const Array<OneD, NekDouble> &pNonVertOutput,
         Array<OneD, NekDouble> &pVertForce) override;
 
-    virtual void v_DoPreconditioner(const Array<OneD, NekDouble> &pInput,
-                                    Array<OneD, NekDouble> &pOutput,
-                                    const bool &isLocal = false) override;
+    void v_DoPreconditioner(const Array<OneD, NekDouble> &pInput,
+                            Array<OneD, NekDouble> &pOutput,
+                            const bool &isLocal = false) override;
 
-    virtual void v_BuildPreconditioner() override;
+    void v_BuildPreconditioner() override;
 
     void SetupInvMult(const std::shared_ptr<AssemblyMap> &pLocToGloMap);
 
@@ -105,7 +103,6 @@ private:
     static std::string solveType;
     static std::string solveTypeIds[];
 };
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions
 
 #endif

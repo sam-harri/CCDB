@@ -41,9 +41,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 /**
  * @class GlobalLinSysStaticCond
@@ -584,5 +582,4 @@ void GlobalLinSysStaticCond::ConstructNextLevelCondensedSystem(
         v_Recurse(m_linSysKey, m_expList, blkMatrices[0], blkMatrices[1],
                   blkMatrices[2], blkMatrices[3], pLocToGloMap);
 }
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions

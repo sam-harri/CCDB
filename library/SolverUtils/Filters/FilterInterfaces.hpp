@@ -41,9 +41,7 @@
 #include <LibUtilities/BasicUtils/SharedArray.hpp>
 #include <SolverUtils/SolverUtilsDeclspec.h>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 
 class FluidInterface
@@ -224,7 +222,6 @@ inline void FluidInterface::GetMovingFrameAngles(
     v_GetMovingFrameAngles(vFrameTheta);
 }
 
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils
 
 #endif

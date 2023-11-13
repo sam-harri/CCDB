@@ -37,9 +37,7 @@
 
 #include <NekMesh/Module/Module.h>
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 /// Converter for Ply files.
@@ -54,12 +52,12 @@ public:
     static NekMesh::ModuleKey className;
 
     InputPly(NekMesh::MeshSharedPtr m);
-    virtual ~InputPly();
+    ~InputPly() override;
 
     /// Populate and validate required data structures.
-    virtual void Process();
+    void Process() override;
 
-    virtual std::string GetModuleName()
+    std::string GetModuleName() override
     {
         return "InputPly";
     }
@@ -70,7 +68,6 @@ private:
 };
 
 typedef std::shared_ptr<InputPly> InputPlySharedPtr;
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh
 
 #endif

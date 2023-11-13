@@ -38,9 +38,7 @@
 #include <boost/test/tools/floating_point_comparison.hpp>
 #include <boost/test/unit_test.hpp>
 
-namespace Nektar
-{
-namespace ConsistentObjectAccessUnitTests
+namespace Nektar::ConsistentObjectAccessUnitTests
 {
 BOOST_AUTO_TEST_CASE(TestValueTypes)
 {
@@ -85,7 +83,7 @@ BOOST_AUTO_TEST_CASE(TestPointerTypes)
     BOOST_CHECK_EQUAL(d1, ConsistentObjectAccess<double *>::const_pointer(d1));
     BOOST_CHECK(ConsistentObjectAccess<double *>::ReferencesObject(d1));
     BOOST_CHECK(!ConsistentObjectAccess<double *>::ReferencesObject(
-        static_cast<double *>(0)));
+        static_cast<double *>(nullptr)));
 
     BOOST_CHECK_EQUAL(*d2,
                       ConsistentObjectAccess<const double *>::reference(d2));
@@ -100,20 +98,20 @@ BOOST_AUTO_TEST_CASE(TestPointerTypes)
         d2, ConsistentObjectAccess<const double *>::const_pointer(d2));
     BOOST_CHECK(ConsistentObjectAccess<const double *>::ReferencesObject(d2));
     BOOST_CHECK(!ConsistentObjectAccess<const double *>::ReferencesObject(
-        static_cast<const double *>(0)));
+        static_cast<const double *>(nullptr)));
 
 #if defined(NEKTAR_DEBUG) || defined(NEKTAR_FULLDEBUG)
     BOOST_CHECK_THROW(ConsistentObjectAccess<double *>::const_reference(
-                          static_cast<double *>(0)),
+                          static_cast<double *>(nullptr)),
                       ErrorUtil::NekError);
     BOOST_CHECK_THROW(ConsistentObjectAccess<const double *>::const_reference(
-                          static_cast<const double *>(0)),
+                          static_cast<const double *>(nullptr)),
                       ErrorUtil::NekError);
-    BOOST_CHECK_THROW(
-        ConsistentObjectAccess<double *>::reference(static_cast<double *>(0)),
-        ErrorUtil::NekError);
+    BOOST_CHECK_THROW(ConsistentObjectAccess<double *>::reference(
+                          static_cast<double *>(nullptr)),
+                      ErrorUtil::NekError);
     BOOST_CHECK_THROW(ConsistentObjectAccess<const double *>::reference(
-                          static_cast<const double *>(0)),
+                          static_cast<const double *>(nullptr)),
                       ErrorUtil::NekError);
 #endif
 }
@@ -194,5 +192,4 @@ BOOST_AUTO_TEST_CASE(TestSharedPointerTypes)
 #endif
 }
 
-} // namespace ConsistentObjectAccessUnitTests
-} // namespace Nektar
+} // namespace Nektar::ConsistentObjectAccessUnitTests

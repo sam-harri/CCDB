@@ -42,9 +42,7 @@
 #include <memory>
 #include <ostream>
 
-namespace Nektar
-{
-namespace LocalRegions
+namespace Nektar::LocalRegions
 {
 struct IndexValue
 {
@@ -126,7 +124,6 @@ LOCAL_REGIONS_EXPORT std::ostream &operator<<(std::ostream &os,
 
 typedef std::shared_ptr<IndexMapKey> IndexMapKeySharedPtr;
 typedef std::shared_ptr<IndexMapValues> IndexMapValuesSharedPtr;
-} // namespace LocalRegions
-} // namespace Nektar
+} // namespace Nektar::LocalRegions
 
 #endif

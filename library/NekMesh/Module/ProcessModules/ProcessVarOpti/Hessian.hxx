@@ -37,9 +37,7 @@
 
 #include <NekMesh/Module/ProcessModules/ProcessVarOpti/NodeOpti.h>
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 /**
@@ -254,7 +252,6 @@ template <> void NodeOpti::MinEigen<3>(NekDouble &val)
     }
 }
 
-} // namespace NekMesh
 } // namespace Nektar
 
 #endif

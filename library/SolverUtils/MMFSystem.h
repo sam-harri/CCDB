@@ -37,9 +37,7 @@
 
 #include <SolverUtils/UnsteadySystem.h>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 
 enum SurfaceType
@@ -162,9 +160,9 @@ public:
         const LibUtilities::SessionReaderSharedPtr &pSession,
         const SpatialDomains::MeshGraphSharedPtr &pGraph);
 
-    SOLVER_UTILS_EXPORT virtual ~MMFSystem();
+    SOLVER_UTILS_EXPORT ~MMFSystem() override;
 
-    SOLVER_UTILS_EXPORT virtual void v_GenerateSummary(SummaryList &s) override;
+    SOLVER_UTILS_EXPORT void v_GenerateSummary(SummaryList &s) override;
 
     SOLVER_UTILS_EXPORT void MMFInitObject(
         const Array<OneD, const Array<OneD, NekDouble>> &Anisotropy,
@@ -381,7 +379,6 @@ protected:
 
 // Shared pointer to an MMFSystem class
 typedef std::shared_ptr<MMFSystem> MMFSystemSharedPtr;
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils
 
 #endif

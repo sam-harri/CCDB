@@ -165,7 +165,7 @@ protected:
     CoupledLinearNS(const LibUtilities::SessionReaderSharedPtr &pSesssion,
                     const SpatialDomains::MeshGraphSharedPtr &pGraph);
 
-    virtual void v_InitObject(bool DeclareField = true) override;
+    void v_InitObject(bool DeclareField = true) override;
 
     static std::string solverTypeLookupId;
 
@@ -202,21 +202,21 @@ private:
         CoupledLocalToGlobalC0ContMapSharedPtr &locToGloMap,
         const NekDouble lambda_imag = NekConstants::kNekUnsetDouble);
 
-    virtual void v_GenerateSummary(SolverUtils::SummaryList &s) override;
+    void v_GenerateSummary(SolverUtils::SummaryList &s) override;
 
-    virtual void v_DoInitialise(bool dumpInitialConditions = true) override;
+    void v_DoInitialise(bool dumpInitialConditions = true) override;
 
-    virtual void v_DoSolve(void) override;
+    void v_DoSolve(void) override;
 
-    virtual bool v_NegatedOp(void) override;
+    bool v_NegatedOp(void) override;
 
-    virtual void v_TransCoeffToPhys(void) override;
+    void v_TransCoeffToPhys(void) override;
 
-    virtual void v_TransPhysToCoeff(void) override;
+    void v_TransPhysToCoeff(void) override;
 
-    virtual void v_Output(void) override;
+    void v_Output(void) override;
 
-    virtual int v_GetForceDimension(void) override;
+    int v_GetForceDimension(void) override;
 };
 
 } // namespace Nektar

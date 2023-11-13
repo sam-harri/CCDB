@@ -34,9 +34,7 @@
 
 #include <MultiRegions/GlobalLinSysDirectStaticCond.h>
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 /**
  * @class GlobalLinSysDirect
@@ -306,5 +304,5 @@ void GlobalLinSysDirectStaticCond::v_SolveLinearSystem(
 
     pLocToGloMap->GlobalToLocalBnd(global, pOutput);
 }
-} // namespace MultiRegions
-} // namespace Nektar
+
+} // namespace Nektar::MultiRegions

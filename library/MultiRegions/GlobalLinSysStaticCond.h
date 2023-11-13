@@ -41,9 +41,7 @@
 #include <MultiRegions/GlobalLinSysIterative.h>
 #include <MultiRegions/GlobalMatrix.h>
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 // Forward declarations
 class ExpList;
@@ -60,7 +58,7 @@ public:
                            const std::weak_ptr<ExpList> &pExpList,
                            const std::shared_ptr<AssemblyMap> &locToGloMap);
 
-    virtual ~GlobalLinSysStaticCond();
+    ~GlobalLinSysStaticCond() override;
 
 protected:
     virtual void v_PreSolve(int scLevel, Array<OneD, NekDouble> &F_bnd)
@@ -90,7 +88,7 @@ protected:
         boost::ignore_unused(pLoctoGloMap);
     }
 
-    virtual int v_GetNumBlocks() override;
+    int v_GetNumBlocks() override;
 
     virtual GlobalLinSysStaticCondSharedPtr v_Recurse(
         const GlobalLinSysKey &mkey, const std::weak_ptr<ExpList> &pExpList,
@@ -118,17 +116,16 @@ protected:
 
     /// Solve the linear system for given input and output vectors
     /// using a specified local to global map.
-    virtual void v_Solve(const Array<OneD, const NekDouble> &in,
-                         Array<OneD, NekDouble> &out,
-                         const AssemblyMapSharedPtr &locToGloMap,
-                         const Array<OneD, const NekDouble> &dirForcing =
-                             NullNekDouble1DArray) override;
+    void v_Solve(const Array<OneD, const NekDouble> &in,
+                 Array<OneD, NekDouble> &out,
+                 const AssemblyMapSharedPtr &locToGloMap,
+                 const Array<OneD, const NekDouble> &dirForcing =
+                     NullNekDouble1DArray) override;
 
-    virtual void v_InitObject() override;
+    void v_InitObject() override;
 
     /// Initialise this object
-    virtual void v_Initialise(
-        const std::shared_ptr<AssemblyMap> &locToGloMap) override;
+    void v_Initialise(const std::shared_ptr<AssemblyMap> &locToGloMap) override;
 
     /// Set up the storage for the Schur complement or the top level
     /// of the multi-level Schur complement.
@@ -138,7 +135,6 @@ protected:
     void ConstructNextLevelCondensedSystem(
         const std::shared_ptr<AssemblyMap> &locToGloMap);
 };
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions
 
 #endif

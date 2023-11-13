@@ -35,9 +35,7 @@
 #include <LibUtilities/BasicUtils/SharedArray.hpp>
 #include <SolverUtils/RiemannSolvers/RiemannSolver.h>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 /**
  * @brief Wrapper class for Riemann solver scalars.
@@ -116,5 +114,4 @@ private:
     Array<OneD, Array<OneD, NekDouble>> m_tmp2;
     std::string m_desc;
 };
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils

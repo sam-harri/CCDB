@@ -38,9 +38,7 @@
 
 #include <LibUtilities/BasicUtils/SharedArray.hpp>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 // Typedefs double arrays
@@ -139,7 +137,6 @@ enum TimeIntegrationSchemeType
     eFractionalInTime,   //!< Fractional in Time scheme
 };
 
-} // end namespace LibUtilities
-} // end namespace Nektar
+} // namespace Nektar::LibUtilities
 
 #endif

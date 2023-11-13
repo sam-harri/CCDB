@@ -43,9 +43,7 @@ using namespace std;
 
 #include "ProcessBoundaryExtract.h"
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 ModuleKey ProcessBoundaryExtract::className =
@@ -132,5 +130,4 @@ void ProcessBoundaryExtract::v_Process(po::variables_map &vm)
         }
     }
 }
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

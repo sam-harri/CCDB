@@ -39,10 +39,7 @@
 #include <LibUtilities/BasicUtils/Equation.h>
 #include <SpatialDomains/MeshGraph.h>
 
-namespace Nektar
-{
-
-namespace SpatialDomains
+namespace Nektar::SpatialDomains
 {
 
 /// Enum of zone movement type
@@ -168,7 +165,7 @@ struct ZoneRotate final : public ZoneBase
         const LibUtilities::EquationSharedPtr &angularVelEqn);
 
     /// Default destructor
-    virtual ~ZoneRotate() = default;
+    ~ZoneRotate() override = default;
 
     /// Return the angular velocity of the zone at @param time
     SPATIAL_DOMAINS_EXPORT NekDouble GetAngularVel(NekDouble &time) const;
@@ -204,7 +201,7 @@ protected:
     DNekMat m_W2 = DNekMat(3, 3, 0.0);
 
     /// Virtual function for movement of the zone at @param time
-    SPATIAL_DOMAINS_EXPORT virtual bool v_Move(NekDouble time) final;
+    SPATIAL_DOMAINS_EXPORT bool v_Move(NekDouble time) final;
 };
 
 /// Translating zone: addition of a constant vector to every point
@@ -228,7 +225,7 @@ struct ZoneTranslate final : public ZoneBase
     }
 
     /// Default destructor
-    virtual ~ZoneTranslate() = default;
+    ~ZoneTranslate() override = default;
 
     /// Returns the velocity of the zone
     inline std::vector<NekDouble> GetVel() const
@@ -240,7 +237,7 @@ protected:
     std::vector<NekDouble> m_velocity;
 
     /// Virtual function for movement of the zone at @param time
-    SPATIAL_DOMAINS_EXPORT virtual bool v_Move(NekDouble time) final;
+    SPATIAL_DOMAINS_EXPORT bool v_Move(NekDouble time) final;
 };
 
 /// Prescribed zone: applies equation to every point
@@ -268,7 +265,7 @@ struct ZonePrescribe final : public ZoneBase
     }
 
     /// Default destructor
-    virtual ~ZonePrescribe() = default;
+    ~ZonePrescribe() override = default;
 
     /**
      * Returns point @param x @param y @param z deformation in the x direction
@@ -342,7 +339,7 @@ protected:
     LibUtilities::EquationSharedPtr m_zDeform;
 
     /// Virtual function for movement of the zone at @param time
-    SPATIAL_DOMAINS_EXPORT virtual bool v_Move(NekDouble time) final;
+    SPATIAL_DOMAINS_EXPORT bool v_Move(NekDouble time) final;
 };
 
 /// Fixed zone: does not move
@@ -356,11 +353,11 @@ struct ZoneFixed final : public ZoneBase
     }
 
     /// Default destructor
-    virtual ~ZoneFixed() = default;
+    ~ZoneFixed() override = default;
 
 protected:
     /// Virtual function for movement of the zone at @param time
-    SPATIAL_DOMAINS_EXPORT virtual bool v_Move(NekDouble time) final;
+    SPATIAL_DOMAINS_EXPORT bool v_Move(NekDouble time) final;
 };
 
 typedef std::shared_ptr<ZoneRotate> ZoneRotateShPtr;
@@ -368,7 +365,6 @@ typedef std::shared_ptr<ZoneTranslate> ZoneTranslateShPtr;
 typedef std::shared_ptr<ZonePrescribe> ZonePrescribeShPtr;
 typedef std::shared_ptr<ZoneFixed> ZoneFixedShPtr;
 
-} // namespace SpatialDomains
-} // namespace Nektar
+} // namespace Nektar::SpatialDomains
 
 #endif // NEKTAR_SPATIALDOMAINS_ZONES_H

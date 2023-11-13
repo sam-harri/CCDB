@@ -42,9 +42,7 @@
 #include <MultiRegions/MultiRegionsDeclspec.h>
 #include <MultiRegions/Preconditioner.h>
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 class PreconditionerLowEnergy;
 typedef std::shared_ptr<PreconditionerLowEnergy>
@@ -73,7 +71,7 @@ public:
         const AssemblyMapSharedPtr &pLocToGloMap);
 
     MULTI_REGIONS_EXPORT
-    virtual ~PreconditionerLowEnergy()
+    ~PreconditionerLowEnergy() override
     {
     }
 
@@ -90,29 +88,28 @@ protected:
     // are in R and Rinv
     std::vector<std::pair<int, int>> m_sameBlock;
 
-    virtual void v_InitObject() override;
+    void v_InitObject() override;
 
-    virtual void v_DoPreconditioner(const Array<OneD, NekDouble> &pInput,
-                                    Array<OneD, NekDouble> &pOutput,
-                                    const bool &isLocal = false) override;
+    void v_DoPreconditioner(const Array<OneD, NekDouble> &pInput,
+                            Array<OneD, NekDouble> &pOutput,
+                            const bool &isLocal = false) override;
 
-    virtual void v_BuildPreconditioner() override;
+    void v_BuildPreconditioner() override;
 
-    virtual DNekScalMatSharedPtr v_TransformedSchurCompl(
+    DNekScalMatSharedPtr v_TransformedSchurCompl(
         int n, int offset,
         const std::shared_ptr<DNekScalMat> &loc_mat) override;
 
-    virtual void v_DoTransformBasisToLowEnergy(
+    void v_DoTransformBasisToLowEnergy(Array<OneD, NekDouble> &pInOut) override;
+
+    void v_DoTransformCoeffsFromLowEnergy(
         Array<OneD, NekDouble> &pInOut) override;
 
-    virtual void v_DoTransformCoeffsFromLowEnergy(
-        Array<OneD, NekDouble> &pInOut) override;
-
-    virtual void v_DoTransformBasisFromLowEnergy(
+    void v_DoTransformBasisFromLowEnergy(
         const Array<OneD, NekDouble> &pInput,
         Array<OneD, NekDouble> &pOutput) override;
 
-    virtual void v_DoTransformCoeffsToLowEnergy(
+    void v_DoTransformCoeffsToLowEnergy(
         const Array<OneD, NekDouble> &pInput,
         Array<OneD, NekDouble> &pOutput) override;
 
@@ -168,7 +165,6 @@ private:
     SpatialDomains::PrismGeomSharedPtr CreateRefPrismGeom(void);
     SpatialDomains::HexGeomSharedPtr CreateRefHexGeom(void);
 };
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions
 
 #endif

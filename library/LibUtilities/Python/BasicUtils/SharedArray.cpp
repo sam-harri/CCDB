@@ -49,7 +49,7 @@ template <typename T> void CapsuleDestructor(void *ptr)
 #else
 template <typename T> void CapsuleDestructor(PyObject *ptr)
 {
-    Array<OneD, T> *tmp = (Array<OneD, T> *)PyCapsule_GetPointer(ptr, 0);
+    Array<OneD, T> *tmp = (Array<OneD, T> *)PyCapsule_GetPointer(ptr, nullptr);
     delete tmp;
 }
 #endif
@@ -66,7 +66,7 @@ template <typename T> struct OneDArrayToPython
             new Array<OneD, T>(arr), CapsuleDestructor<T>)));
 #else
         py::object capsule(py::handle<>(
-            PyCapsule_New(new Array<OneD, T>(arr), 0,
+            PyCapsule_New(new Array<OneD, T>(arr), nullptr,
                           (PyCapsule_Destructor)&CapsuleDestructor<T>)));
 #endif
         PyObject *tmp =
@@ -98,20 +98,20 @@ template <typename T> struct PythonToOneDArray
                 np::dtype::get_builtin<typename boost::remove_const<T>::type>();
             if (dtype != array.get_dtype())
             {
-                return 0;
+                return nullptr;
             }
 
             // Check shape is 1D
             if (array.get_nd() != 1)
             {
-                return 0;
+                return nullptr;
             }
         }
         catch (boost::python::error_already_set &)
         {
             py::handle_exception();
             PyErr_Clear();
-            return 0;
+            return nullptr;
         }
 
         return objPtr;
@@ -155,7 +155,7 @@ template <typename T> struct PythonToOneDArray
         if (PyCapsule_CheckExact(base.ptr()))
         {
             ptr = reinterpret_cast<Array<OneD, T> *>(
-                PyCapsule_GetPointer(base.ptr(), 0));
+                PyCapsule_GetPointer(base.ptr(), nullptr));
         }
 #endif
 

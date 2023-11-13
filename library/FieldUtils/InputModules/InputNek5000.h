@@ -37,9 +37,7 @@
 
 #include "../Module.h"
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 /**
@@ -49,7 +47,7 @@ class InputNek5000 : public InputModule
 {
 public:
     InputNek5000(FieldSharedPtr f);
-    virtual ~InputNek5000();
+    ~InputNek5000() override;
 
     /// Creates an instance of this class
     static ModuleSharedPtr create(FieldSharedPtr f)
@@ -60,26 +58,25 @@ public:
     static ModuleKey m_className[];
 
 protected:
-    virtual void v_Process(po::variables_map &vm) override;
+    void v_Process(po::variables_map &vm) override;
 
-    virtual std::string v_GetModuleName() override
+    std::string v_GetModuleName() override
     {
         return "InputNek5000";
     }
 
-    virtual std::string v_GetModuleDescription() override
+    std::string v_GetModuleDescription() override
     {
         return "Processing Nek5000 field file";
     }
 
-    virtual ModulePriority v_GetModulePriority() override
+    ModulePriority v_GetModulePriority() override
     {
         return eCreateFieldData;
     }
 
 private:
 };
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils
 
 #endif

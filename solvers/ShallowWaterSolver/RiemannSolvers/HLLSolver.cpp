@@ -83,16 +83,24 @@ void HLLSolver::v_PointSolve(NekDouble hL, NekDouble huL, NekDouble hvL,
     // Compute SL
     NekDouble SL;
     if (hstar > hL)
+    {
         SL = uL - cL * sqrt(0.5 * ((hstar * hstar + hstar * hL) / (hL * hL)));
+    }
     else
+    {
         SL = uL - cL;
+    }
 
     // Compute SR
     NekDouble SR;
     if (hstar > hR)
+    {
         SR = uR + cR * sqrt(0.5 * ((hstar * hstar + hstar * hR) / (hR * hR)));
+    }
     else
+    {
         SR = uR + cR;
+    }
 
     if (SL >= 0)
     {

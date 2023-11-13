@@ -55,9 +55,7 @@
 
 class TiXmlDocument;
 
-namespace Nektar
-{
-namespace SpatialDomains
+namespace Nektar::SpatialDomains
 {
 typedef std::map<int, std::pair<LibUtilities::ShapeType, std::vector<int>>>
     CompositeDescriptor;
@@ -419,11 +417,15 @@ public:
     {
         auto it1 = m_triGeoms.find(gID);
         if (it1 != m_triGeoms.end())
+        {
             return it1->second;
+        }
 
         auto it2 = m_quadGeoms.find(gID);
         if (it2 != m_quadGeoms.end())
+        {
             return it2->second;
+        }
 
         return Geometry2DSharedPtr();
     };
@@ -609,6 +611,6 @@ inline bool MeshGraph::ExpansionInfoDefined(const std::string var)
     return m_expansionMapShPtrMap.count(var);
 }
 
-} // namespace SpatialDomains
-} // namespace Nektar
+} // namespace Nektar::SpatialDomains
+
 #endif

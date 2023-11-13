@@ -46,9 +46,7 @@
 #include "IProductKernels.hpp"
 #include "PhysDerivKernels.hpp"
 
-namespace Nektar
-{
-namespace MatrixFree
+namespace Nektar::MatrixFree
 {
 
 // As each opertor has seven shapes over three dimension to get to the
@@ -579,7 +577,6 @@ private:
     std::vector<vec_t, allocator<vec_t>> m_h0, m_h1, m_h2, m_h3;
 };
 
-} // namespace MatrixFree
-} // namespace Nektar
+} // namespace Nektar::MatrixFree
 
 #endif

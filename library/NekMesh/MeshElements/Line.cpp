@@ -38,9 +38,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 LibUtilities::ShapeType Line::m_type =
@@ -183,5 +181,4 @@ unsigned int Line::GetNumNodes(ElmtConfig pConf)
 {
     return pConf.m_order + 1;
 }
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh

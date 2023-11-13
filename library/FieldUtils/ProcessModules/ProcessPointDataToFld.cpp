@@ -45,9 +45,7 @@ using namespace std;
 
 #include "ProcessPointDataToFld.h"
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 ModuleKey ProcessPointDataToFld::className =
@@ -229,5 +227,4 @@ void ProcessPointDataToFld::v_Process(po::variables_map &vm)
         m_f->m_variables.push_back(fieldPts->GetFieldName(j));
     }
 }
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

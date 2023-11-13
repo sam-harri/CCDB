@@ -35,9 +35,7 @@
 #include <LibUtilities/Foundations/NodalTetElec.h>
 #include <LibUtilities/Foundations/NodalTetElecData.h>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 bool NodalTetElec::initPointsManager[] = {PointsManager().RegisterCreator(
     PointsKey(0, eNodalTetElec), NodalTetElec::Create)};
@@ -651,5 +649,4 @@ void NodalTetElec::NodalPointReorder3d()
     }
 }
 
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities

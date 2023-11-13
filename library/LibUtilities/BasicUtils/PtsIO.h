@@ -50,9 +50,7 @@
 #include <LibUtilities/BasicUtils/PtsField.h>
 #include <LibUtilities/BasicUtils/SharedArray.hpp>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 typedef std::map<std::string, std::string> PtsMetaDataMap;
@@ -64,7 +62,7 @@ public:
     LIB_UTILITIES_EXPORT PtsIO(LibUtilities::CommSharedPtr pComm,
                                bool sharedFilesystem = false);
 
-    LIB_UTILITIES_EXPORT virtual ~PtsIO()
+    LIB_UTILITIES_EXPORT ~PtsIO() override
     {
     }
 
@@ -82,7 +80,7 @@ protected:
         const std::string inFile, PtsFieldSharedPtr &ptsField,
         DomainRangeShPtr &Range = NullDomainRangeShPtr);
 
-    LIB_UTILITIES_EXPORT virtual std::string v_GetFileEnding() const override
+    LIB_UTILITIES_EXPORT std::string v_GetFileEnding() const override
     {
         return "pts";
     };
@@ -90,6 +88,5 @@ protected:
 };
 
 typedef std::shared_ptr<PtsIO> PtsIOSharedPtr;
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities
 #endif

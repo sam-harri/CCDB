@@ -39,9 +39,7 @@
 #include <MultiRegions/Preconditioner.h>
 #include <cmath>
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 
 // register default solver value as diagonal
@@ -240,5 +238,4 @@ Array<OneD, NekDouble> Preconditioner::AssembleStaticCondGlobalDiagonals()
 
     return diagonals;
 }
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions

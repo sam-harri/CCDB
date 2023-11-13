@@ -38,9 +38,7 @@
 
 #include <StdRegions/StdPrismExp.h>
 
-namespace Nektar
-{
-namespace StdRegions
+namespace Nektar::StdRegions
 {
 class StdNodalPrismExp final : public StdPrismExp
 {
@@ -51,7 +49,7 @@ public:
                                         const LibUtilities::BasisKey &Bc,
                                         const LibUtilities::PointsType Ntype);
     STD_REGIONS_EXPORT StdNodalPrismExp(const StdNodalPrismExp &T);
-    STD_REGIONS_EXPORT virtual ~StdNodalPrismExp() override;
+    STD_REGIONS_EXPORT ~StdNodalPrismExp() override;
 
     //-------------------------------
     // Nodal basis specific routines
@@ -136,6 +134,5 @@ protected:
 };
 
 typedef std::shared_ptr<StdNodalPrismExp> StdNodalPrismExpSharedPtr;
-} // namespace StdRegions
-} // namespace Nektar
+} // namespace Nektar::StdRegions
 #endif // STDNODALTETEXP_H

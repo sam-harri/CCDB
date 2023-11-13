@@ -38,9 +38,7 @@
 
 #include <LibUtilities/Memory/NekMemoryManager.hpp>
 
-namespace Nektar
-{
-namespace MemManagerUnitTests
+namespace Nektar::MemManagerUnitTests
 {
 BOOST_AUTO_TEST_CASE(testParameterizedConstructors)
 {
@@ -81,10 +79,10 @@ BOOST_AUTO_TEST_CASE(testParameterizedConstructors)
     MemoryManager<CountedObject<int>>::Deallocate(ob3);
     MemoryManager<CountedObject<int>>::Deallocate(ob4);
 
-    BOOST_CHECK(ob1 == NULL);
-    BOOST_CHECK(ob2 == NULL);
-    BOOST_CHECK(ob3 == NULL);
-    BOOST_CHECK(ob4 == NULL);
+    BOOST_CHECK(ob1 == nullptr);
+    BOOST_CHECK(ob2 == nullptr);
+    BOOST_CHECK(ob3 == nullptr);
+    BOOST_CHECK(ob4 == nullptr);
 
     BOOST_CHECK_EQUAL(CountedObject<int>::numberDefaultConstructed, 1u);
     BOOST_CHECK_EQUAL(CountedObject<int>::numberOf1ParameterConstructions, 1u);
@@ -159,5 +157,4 @@ BOOST_AUTO_TEST_CASE(ReproduceMemoryErrors)
     std::shared_ptr<int> m1 = MemoryManager<int>::AllocateSharedPtr();
     m1                      = MemoryManager<int>::AllocateSharedPtr();
 }
-} // namespace MemManagerUnitTests
-} // namespace Nektar
+} // namespace Nektar::MemManagerUnitTests

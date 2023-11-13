@@ -38,9 +38,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 /**
  * @class  NekLinSysIterGMRES
@@ -598,5 +596,4 @@ void NekLinSysIterGMRES::DoBackward(const int number,
         y[i] = sum / A[i][i];
     }
 }
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities

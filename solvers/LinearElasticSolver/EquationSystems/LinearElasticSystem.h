@@ -106,12 +106,11 @@ protected:
     /// Storage for the thermal stress terms.
     Array<OneD, Array<OneD, Array<OneD, NekDouble>>> m_stress;
 
-    virtual void v_InitObject(bool DeclareFields = true) override;
-    virtual void v_GenerateSummary(SolverUtils::SummaryList &s) override;
-    virtual void v_DoSolve() override;
-    virtual void v_ExtraFldOutput(
-        std::vector<Array<OneD, NekDouble>> &fieldcoeffs,
-        std::vector<std::string> &variables) override;
+    void v_InitObject(bool DeclareFields = true) override;
+    void v_GenerateSummary(SolverUtils::SummaryList &s) override;
+    void v_DoSolve() override;
+    void v_ExtraFldOutput(std::vector<Array<OneD, NekDouble>> &fieldcoeffs,
+                          std::vector<std::string> &variables) override;
 };
 
 } // namespace Nektar

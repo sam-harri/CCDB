@@ -43,9 +43,7 @@
 #include <boost/algorithm/string.hpp>
 
 using namespace std;
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 ModuleKey Generator2D::className = GetModuleFactory().RegisterCreatorFunction(
@@ -919,5 +917,4 @@ void Generator2D::Report()
     m_log(VERBOSE) << "  - Triangles     : " << ts << endl;
     m_log(VERBOSE) << "  - Euler-Poincaré: " << ep << endl;
 }
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh

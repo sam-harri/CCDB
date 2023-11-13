@@ -37,9 +37,7 @@
 
 #include <LibUtilities/Foundations/PointsType.h>
 
-namespace Nektar
-{
-namespace SpatialDomains
+namespace Nektar::SpatialDomains
 {
 // Note: the following structs are defined using 64 bit ints so
 // that the structs are memory aligned in both 64 bit and 32
@@ -141,6 +139,5 @@ struct MeshEntity
     std::vector<unsigned int> list;
     bool ghost;
 };
-} // namespace SpatialDomains
-} // namespace Nektar
+} // namespace Nektar::SpatialDomains
 #endif

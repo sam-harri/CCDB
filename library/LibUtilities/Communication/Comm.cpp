@@ -36,9 +36,7 @@
 
 #include <LibUtilities/Communication/Comm.h>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 Comm::Comm(int narg, char *arg[])
 {
@@ -76,5 +74,4 @@ std::pair<CommSharedPtr, CommSharedPtr> Comm::v_SplitCommNode()
     return std::make_pair(CommSharedPtr(), CommSharedPtr());
 }
 
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities

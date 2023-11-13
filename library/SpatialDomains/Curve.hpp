@@ -38,9 +38,7 @@
 #include <SpatialDomains/PointGeom.h>
 #include <unordered_map>
 
-namespace Nektar
-{
-namespace SpatialDomains
+namespace Nektar::SpatialDomains
 {
 struct Curve
 {
@@ -59,7 +57,6 @@ struct Curve
 
 typedef std::shared_ptr<Curve> CurveSharedPtr;
 typedef std::unordered_map<int, CurveSharedPtr> CurveMap;
-} // namespace SpatialDomains
-} // namespace Nektar
+} // namespace Nektar::SpatialDomains
 
 #endif

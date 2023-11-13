@@ -35,9 +35,7 @@
 #include <LibUtilities/Foundations/FourierPoints.h>
 #include <LibUtilities/Foundations/ManagerAccess.h>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 bool FourierPoints::initPointsManager[] = {PointsManager().RegisterCreator(
     PointsKey(0, eFourierEvenlySpaced), FourierPoints::Create)};
@@ -187,5 +185,4 @@ NekDouble FourierPoints::PeriodicSincFunction(const NekDouble x,
     return y;
 }
 
-} // end of namespace LibUtilities
-} // end of namespace Nektar
+} // namespace Nektar::LibUtilities

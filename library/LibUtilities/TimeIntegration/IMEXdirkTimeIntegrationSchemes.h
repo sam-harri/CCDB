@@ -45,9 +45,7 @@
 
 #include <LibUtilities/TimeIntegration/TimeIntegrationSchemeGLM.h>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -88,7 +86,7 @@ public:
         }
     }
 
-    virtual ~IMEXdirkTimeIntegrationScheme()
+    ~IMEXdirkTimeIntegrationScheme() override
     {
     }
 
@@ -425,17 +423,17 @@ public:
     }
 
 protected:
-    LUE virtual std::string v_GetFullName() const override
+    LUE std::string v_GetFullName() const override
     {
         return m_integration_phases.back()->m_name;
     }
 
-    LUE virtual std::string v_GetName() const override
+    LUE std::string v_GetName() const override
     {
         return std::string("IMEX");
     }
 
-    LUE virtual NekDouble v_GetTimeStability() const override
+    LUE NekDouble v_GetTimeStability() const override
     {
         return 1.0;
     }
@@ -456,7 +454,7 @@ public:
         boost::ignore_unused(freeParams);
     }
 
-    virtual ~IMEXdirk_1_1_1TimeIntegrationScheme()
+    ~IMEXdirk_1_1_1TimeIntegrationScheme() override
     {
     }
 
@@ -494,7 +492,7 @@ public:
         boost::ignore_unused(freeParams);
     }
 
-    virtual ~IMEXdirk_1_2_1TimeIntegrationScheme()
+    ~IMEXdirk_1_2_1TimeIntegrationScheme() override
     {
     }
 
@@ -532,7 +530,7 @@ public:
         boost::ignore_unused(freeParams);
     }
 
-    virtual ~IMEXdirk_1_2_2TimeIntegrationScheme()
+    ~IMEXdirk_1_2_2TimeIntegrationScheme() override
     {
     }
 
@@ -570,7 +568,7 @@ public:
         boost::ignore_unused(freeParams);
     }
 
-    virtual ~IMEXdirk_2_2_2TimeIntegrationScheme()
+    ~IMEXdirk_2_2_2TimeIntegrationScheme() override
     {
     }
 
@@ -608,7 +606,7 @@ public:
         boost::ignore_unused(freeParams);
     }
 
-    virtual ~IMEXdirk_2_3_2TimeIntegrationScheme()
+    ~IMEXdirk_2_3_2TimeIntegrationScheme() override
     {
     }
 
@@ -647,7 +645,7 @@ public:
         boost::ignore_unused(freeParams);
     }
 
-    virtual ~IMEXdirk_2_3_3TimeIntegrationScheme()
+    ~IMEXdirk_2_3_3TimeIntegrationScheme() override
     {
     }
 
@@ -686,7 +684,7 @@ public:
         boost::ignore_unused(freeParams);
     }
 
-    virtual ~IMEXdirk_3_4_3TimeIntegrationScheme()
+    ~IMEXdirk_3_4_3TimeIntegrationScheme() override
     {
     }
 
@@ -725,7 +723,7 @@ public:
         boost::ignore_unused(freeParams);
     }
 
-    virtual ~IMEXdirk_4_4_3TimeIntegrationScheme()
+    ~IMEXdirk_4_4_3TimeIntegrationScheme() override
     {
     }
 
@@ -750,7 +748,6 @@ protected:
 
 }; // end class IMEXdirk_4_4_3TimeIntegrationScheme
 
-} // end namespace LibUtilities
-} // end namespace Nektar
+} // namespace Nektar::LibUtilities
 
 #endif

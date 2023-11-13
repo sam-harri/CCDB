@@ -35,12 +35,9 @@
 #ifndef NEKTAR_UNIT_TESTS_UTIL_H
 #define NEKTAR_UNIT_TESTS_UTIL_H
 
-namespace Nektar
-{
-namespace UnitTests
+namespace Nektar::UnitTests
 {
 void RedirectCerrIfNeeded();
-}
-} // namespace Nektar
+} // namespace Nektar::UnitTests
 
 #endif // NEKTAR_UNIT_TESTS_UTIL_H

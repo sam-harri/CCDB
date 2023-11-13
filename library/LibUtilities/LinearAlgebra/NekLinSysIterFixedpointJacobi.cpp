@@ -38,9 +38,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 /**
  * @class  NekLinSysIterFixedpointJacobi
@@ -100,5 +98,4 @@ int NekLinSysIterFixedpointJacobi::v_SolveSystem(
 
     return niterations;
 }
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities

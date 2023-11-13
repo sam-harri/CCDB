@@ -43,9 +43,7 @@
 using namespace std;
 using namespace Nektar::NekMesh;
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 ModuleKey ProcessExtractTetPrismInterface::className =
@@ -149,5 +147,4 @@ void ProcessExtractTetPrismInterface::Process()
     ProcessElements();
     ProcessComposites();
 }
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh

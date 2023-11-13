@@ -45,9 +45,7 @@ using namespace std;
 
 #include "InputSemtex.h"
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 ModuleKey InputSemtex::m_className[1] = {
@@ -276,5 +274,4 @@ void InputSemtex::v_Process(po::variables_map &vm)
     m_f->m_variables = m_f->m_fielddef[0]->m_fields;
 }
 
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

@@ -41,9 +41,7 @@
 #include <limits>
 #include <type_traits>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 /// compare reals of same type with relative tolerance
 template <
@@ -84,7 +82,6 @@ inline bool IsRealClose(T1 &&lhs, T2 &&rhs,
     return std::abs(lhs - rhs) < tol;
 }
 
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities
 
 #endif

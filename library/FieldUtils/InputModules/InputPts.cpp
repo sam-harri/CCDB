@@ -46,9 +46,7 @@ using namespace std;
 
 #include "InputPts.h"
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 ModuleKey InputPts::m_className[5] = {
@@ -112,5 +110,4 @@ void InputPts::v_Process(po::variables_map &vm)
         m_f->m_variables.push_back(m_f->m_fieldPts->GetFieldName(j));
     }
 }
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

@@ -70,9 +70,7 @@ using namespace std;
 namespace po = boost::program_options;
 namespace io = boost::iostreams;
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 /**
  * @class SessionReader
@@ -184,7 +182,7 @@ CmdLineArgMap &SessionReader::GetCmdLineArgMap()
  */
 SessionReader::SessionReader(int argc, char *argv[])
 {
-    m_xmlDoc    = 0;
+    m_xmlDoc    = nullptr;
     m_filenames = ParseCommandLineArguments(argc, argv);
 
     ASSERTL0(m_filenames.size() > 0, "No session file(s) given.");
@@ -208,7 +206,7 @@ SessionReader::SessionReader(int argc, char *argv[])
 
     m_interpreter = MemoryManager<Interpreter>::AllocateSharedPtr();
     m_interpreter->SetRandomSeed((m_comm->GetSpaceComm()->GetRank() + 1) *
-                                 (unsigned int)time(NULL));
+                                 (unsigned int)time(nullptr));
 }
 
 /**
@@ -221,7 +219,7 @@ SessionReader::SessionReader(int argc, char *argv[],
     ASSERTL0(pFilenames.size() > 0, "No filenames specified.");
 
     ParseCommandLineArguments(argc, argv);
-    m_xmlDoc    = 0;
+    m_xmlDoc    = nullptr;
     m_filenames = pFilenames;
 
     m_sessionName = ParseSessionName(m_filenames);
@@ -250,7 +248,7 @@ SessionReader::SessionReader(int argc, char *argv[],
 
     m_interpreter = MemoryManager<Interpreter>::AllocateSharedPtr();
     m_interpreter->SetRandomSeed((m_comm->GetSpaceComm()->GetRank() + 1) *
-                                 (unsigned int)time(NULL));
+                                 (unsigned int)time(nullptr));
 
     // Set time level (Parallel-in-Time)
     m_timeLevel = timelevel;
@@ -707,7 +705,9 @@ bool SessionReader::DefinesElement(const std::string &pPath) const
     {
         vReturn = vReturn->FirstChildElement(st[i].c_str());
         if (!vReturn)
+        {
             return false;
+        }
     }
     return true;
 }
@@ -2413,13 +2413,19 @@ void SessionReader::ParseEquals(const std::string &line, std::string &lhs,
     size_t end = line.find_first_of("=");
     // Check for no parameter name
     if (beg == end)
+    {
         throw 1;
+    }
     // Check for no parameter value
     if (end != line.find_last_of("="))
+    {
         throw 1;
+    }
     // Check for no equals sign
     if (end == std::string::npos)
+    {
         throw 1;
+    }
 
     lhs = line.substr(line.find_first_not_of(" "), end - beg);
     lhs = lhs.substr(0, lhs.find_last_not_of(" ") + 1);
@@ -2543,5 +2549,4 @@ TiXmlElement *GetChildElementOrThrow(const std::string &filename,
     return element;
 }
 
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities

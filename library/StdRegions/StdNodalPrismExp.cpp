@@ -37,9 +37,7 @@
 #include <LibUtilities/Foundations/ManagerAccess.h> // for PointsManager, etc
 #include <StdRegions/StdNodalPrismExp.h>
 
-namespace Nektar
-{
-namespace StdRegions
+namespace Nektar::StdRegions
 {
 
 StdNodalPrismExp::StdNodalPrismExp()
@@ -388,5 +386,4 @@ DNekMatSharedPtr StdNodalPrismExp::v_CreateStdMatrix(const StdMatrixKey &mkey)
 {
     return StdNodalPrismExp::v_GenMatrix(mkey);
 }
-} // namespace StdRegions
-} // namespace Nektar
+} // namespace Nektar::StdRegions

@@ -59,17 +59,17 @@ public:
     static std::string className1;
     static std::string className2;
 
-    virtual ~Helmholtz();
+    ~Helmholtz() override;
 
 protected:
     Helmholtz(const LibUtilities::SessionReaderSharedPtr &pSession,
               const SpatialDomains::MeshGraphSharedPtr &pGraph);
 
-    virtual void v_InitObject(bool DeclareFields = true) override;
-    virtual void v_GenerateSummary(SolverUtils::SummaryList &s) override;
+    void v_InitObject(bool DeclareFields = true) override;
+    void v_GenerateSummary(SolverUtils::SummaryList &s) override;
 
 private:
-    virtual Array<OneD, bool> v_GetSystemSingularChecks() override;
+    Array<OneD, bool> v_GetSystemSingularChecks() override;
 };
 } // namespace Nektar
 

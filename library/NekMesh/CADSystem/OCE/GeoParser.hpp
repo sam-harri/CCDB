@@ -39,9 +39,7 @@
 #include <LibUtilities/Interpreter/Interpreter.h>
 #include <NekMesh/Module/Log.hpp>
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 namespace qi  = boost::spirit::qi;
@@ -286,5 +284,4 @@ struct GeoParser : qi::grammar<Iterator, GeoAst::GeoFile(), Skipper>
     /// Logger for warnings.
     Logger &m_log;
 };
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh

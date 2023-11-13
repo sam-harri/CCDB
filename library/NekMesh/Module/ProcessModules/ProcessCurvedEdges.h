@@ -37,25 +37,23 @@
 
 #include <NekMesh/Module/Module.h>
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 class ProcessCurvedEdges : public NekMesh::ProcessModule
 {
 public:
     ProcessCurvedEdges(NekMesh::MeshSharedPtr m);
-    virtual ~ProcessCurvedEdges();
+    ~ProcessCurvedEdges() override;
 
     /// Write mesh to output file.
-    virtual void Process();
+    void Process() override;
     void GenerateEdgeNodes(NekMesh::EdgeSharedPtr edge)
     {
         v_GenerateEdgeNodes(edge);
     }
 
-    virtual std::string GetModuleName()
+    std::string GetModuleName() override
     {
         return "ProcessCurvedEdges";
     }
@@ -63,7 +61,6 @@ public:
 protected:
     virtual void v_GenerateEdgeNodes(NekMesh::EdgeSharedPtr edge) = 0;
 };
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh
 
 #endif

@@ -36,9 +36,7 @@
 
 #include <SolverUtils/Filters/FilterCheckpoint.h>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 std::string FilterCheckpoint::className =
     GetFilterFactory().RegisterCreatorFunction("Checkpoint",
@@ -138,5 +136,4 @@ bool FilterCheckpoint::v_IsTimeDependent()
 {
     return true;
 }
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils

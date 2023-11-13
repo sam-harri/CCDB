@@ -42,9 +42,7 @@
 #undef max
 #endif
 
-namespace Nektar
-{
-namespace StdRegions
+namespace Nektar::StdRegions
 {
 StdExpansion3D::StdExpansion3D()
 {
@@ -258,7 +256,7 @@ NekDouble StdExpansion3D::v_PhysEvaluate(
     Array<OneD, NekDouble> sumFactorization_r = Array<OneD, NekDouble>(Qz);
 
     // Lagrangian interpolation matrix
-    NekDouble *interpolatingNodes = 0;
+    NekDouble *interpolatingNodes = nullptr;
 
     // Interpolate first coordinate direction
     interpolatingNodes = &I[0]->GetPtr()[0];
@@ -618,5 +616,4 @@ LibUtilities::BasisKey EvaluateTriFaceBasisKey(
     // Keep things happy by returning a value.
     return LibUtilities::NullBasisKey;
 }
-} // namespace StdRegions
-} // namespace Nektar
+} // namespace Nektar::StdRegions

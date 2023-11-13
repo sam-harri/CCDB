@@ -39,9 +39,7 @@
 
 #include <SolverUtils/DriverArnoldi.h>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 
 /// Base class for the development of solvers.
@@ -75,13 +73,13 @@ protected:
                  const SpatialDomains::MeshGraphSharedPtr pGraph);
 
     /// Destructor
-    virtual ~DriverArpack() = default;
+    ~DriverArpack() override = default;
 
     /// Virtual function for initialisation implementation.
-    virtual void v_InitObject(std::ostream &out = std::cout) override;
+    void v_InitObject(std::ostream &out = std::cout) override;
 
     /// Virtual function for solve implementation.
-    virtual void v_Execute(std::ostream &out = std::cout) override;
+    void v_Execute(std::ostream &out = std::cout) override;
 
     static std::string driverLookupId;
 
@@ -91,7 +89,6 @@ private:
     static std::string ArpackProblemTypeTrans[];
 };
 
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils
 
 #endif // NEKTAR_SOLVERUTILS_DRIVERARPACK_H

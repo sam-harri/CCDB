@@ -37,9 +37,7 @@
 
 #include "../Module.h"
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 /// This processing module scales the input fld file
@@ -54,23 +52,23 @@ public:
     static ModuleKey className;
 
     ProcessQualityMetric(FieldSharedPtr f);
-    virtual ~ProcessQualityMetric();
+    ~ProcessQualityMetric() override;
 
 protected:
     /// Write mesh to output file.
-    virtual void v_Process(po::variables_map &vm) override;
+    void v_Process(po::variables_map &vm) override;
 
-    virtual std::string v_GetModuleName() override
+    std::string v_GetModuleName() override
     {
         return "ProcessQualityMetric";
     }
 
-    virtual std::string v_GetModuleDescription() override
+    std::string v_GetModuleDescription() override
     {
         return "Adding quality metric to field";
     }
 
-    virtual ModulePriority v_GetModulePriority() override
+    ModulePriority v_GetModulePriority() override
     {
         return eModifyExp;
     }
@@ -78,7 +76,6 @@ protected:
 private:
     Array<OneD, NekDouble> GetQ(LocalRegions::ExpansionSharedPtr e, bool s);
 };
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils
 
 #endif

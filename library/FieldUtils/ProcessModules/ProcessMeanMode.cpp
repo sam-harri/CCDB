@@ -40,9 +40,7 @@ using namespace std;
 
 #include <LibUtilities/BasicUtils/SharedArray.hpp>
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 ModuleKey ProcessMeanMode::className =
@@ -66,5 +64,4 @@ void ProcessMeanMode::v_Process(po::variables_map &vm)
 
     ProcessHomogeneousPlane::v_Process(vm);
 }
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

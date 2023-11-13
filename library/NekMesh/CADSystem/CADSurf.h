@@ -40,9 +40,7 @@
 
 #include <NekMesh/CADSystem/CADObject.h>
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 class CADCurve;
@@ -82,7 +80,7 @@ public:
         m_orientation = CADOrientation::eForwards;
     }
 
-    virtual ~CADSurf()
+    ~CADSurf() override
     {
     }
 
@@ -208,7 +206,7 @@ public:
     /**
      * @brief query reversed normal
      */
-    CADOrientation::Orientation Orientation()
+    CADOrientation::Orientation Orientation() override
     {
         return m_orientation;
     }
@@ -226,7 +224,6 @@ typedef std::shared_ptr<CADSurf> CADSurfSharedPtr;
 typedef LibUtilities::NekFactory<std::string, CADSurf> CADSurfFactory;
 
 CADSurfFactory &GetCADSurfFactory();
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh
 
 #endif

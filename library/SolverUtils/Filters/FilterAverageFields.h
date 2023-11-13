@@ -37,9 +37,7 @@
 
 #include <SolverUtils/Filters/FilterFieldConvert.h>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 class FilterAverageFields : public FilterFieldConvert
 {
@@ -65,29 +63,28 @@ public:
         const LibUtilities::SessionReaderSharedPtr &pSession,
         const std::weak_ptr<EquationSystem> &pEquation,
         const ParamMap &pParams);
-    SOLVER_UTILS_EXPORT virtual ~FilterAverageFields();
+    SOLVER_UTILS_EXPORT ~FilterAverageFields() override;
 
 protected:
-    virtual void v_ProcessSample(
+    void v_ProcessSample(
         const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
         std::vector<Array<OneD, NekDouble>> &fieldcoeffs,
         const NekDouble &time) override;
-    virtual void v_PrepareOutput(
+    void v_PrepareOutput(
         const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
         const NekDouble &time) override;
-    virtual NekDouble v_GetScale() override;
-    virtual std::string v_GetFileSuffix() override
+    NekDouble v_GetScale() override;
+    std::string v_GetFileSuffix() override
     {
         return "_avg";
     }
-    virtual void v_FillVariablesName(
+    void v_FillVariablesName(
         const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields)
         override
     {
         FilterFieldConvert::v_FillVariablesName(pFields);
     }
 };
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils
 
 #endif /* NEKTAR_SOLVERUTILS_FILTERS_FILTERCHECKPOINT_H */

@@ -38,9 +38,7 @@
 
 #include <SolverUtils/Filters/FilterFieldConvert.h>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 class FilterMovingAverage : public FilterFieldConvert
 {
@@ -66,21 +64,20 @@ public:
         const LibUtilities::SessionReaderSharedPtr &pSession,
         const std::weak_ptr<EquationSystem> &pEquation,
         const ParamMap &pParams);
-    SOLVER_UTILS_EXPORT virtual ~FilterMovingAverage();
+    SOLVER_UTILS_EXPORT ~FilterMovingAverage() override;
 
 protected:
-    virtual void v_ProcessSample(
+    void v_ProcessSample(
         const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
         std::vector<Array<OneD, NekDouble>> &fieldcoeffs,
         const NekDouble &time) override;
-    virtual std::string v_GetFileSuffix() override
+    std::string v_GetFileSuffix() override
     {
         return "_movAvg";
     }
 
     NekDouble m_alpha;
 };
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils
 
 #endif /* NEKTAR_SOLVERUTILS_FILTERS_FILTERMOVINGAVERAGE_H */

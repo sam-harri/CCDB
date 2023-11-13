@@ -37,9 +37,7 @@
 #include <LibUtilities/Foundations/ManagerAccess.h>
 #include <LibUtilities/LinearAlgebra/NekTypeDefs.hpp>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 void InterpCoeff1D(const BasisKey &fbasis0,
                    const Array<OneD, const NekDouble> &from,
@@ -154,5 +152,4 @@ void InterpCoeff3D(const BasisKey &fbasis0, const BasisKey &fbasis1,
     Blas::Dgemm('N', 'T', tnm0 * tnm1, tnm2, fnm2, 1.0, wsp1.get(), tnm0 * tnm1,
                 ft2->GetPtr().get(), tnm2, 0.0, to, tnm0 * tnm1);
 }
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities

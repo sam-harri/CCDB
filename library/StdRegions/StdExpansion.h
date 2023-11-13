@@ -47,18 +47,13 @@
 #include <StdRegions/StdMatrixKey.h>
 #include <StdRegions/StdRegions.hpp>
 #include <StdRegions/StdRegionsDeclspec.h>
-namespace Nektar
-{
-namespace LocalRegions
+namespace Nektar::LocalRegions
 {
 class MatrixKey;
 class Expansion;
-} // namespace LocalRegions
-} // namespace Nektar
+} // namespace Nektar::LocalRegions
 
-namespace Nektar
-{
-namespace StdRegions
+namespace Nektar::StdRegions
 {
 
 /** \brief The base class for all shapes
@@ -1809,7 +1804,6 @@ inline void StdExpansion::FwdTrans(const Array<OneD, const NekDouble> &inarray,
     v_FwdTrans(inarray, outarray);
 }
 
-} // namespace StdRegions
-} // namespace Nektar
+} // namespace Nektar::StdRegions
 
 #endif // STANDARDDEXPANSION_H

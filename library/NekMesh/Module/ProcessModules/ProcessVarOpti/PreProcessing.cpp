@@ -41,9 +41,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 map<LibUtilities::ShapeType, DerivUtilSharedPtr> ProcessVarOpti::BuildDerivUtil(
@@ -109,7 +107,7 @@ map<LibUtilities::ShapeType, DerivUtilSharedPtr> ProcessVarOpti::BuildDerivUtil(
         der->ptsStd = u1[0].size();
         der->pts    = u2[0].size();
 
-        LibUtilities::NodalUtil *nodalUtil = NULL;
+        LibUtilities::NodalUtil *nodalUtil = nullptr;
 
         if (it.first == LibUtilities::eTriangle)
         {
@@ -774,5 +772,4 @@ LibUtilities::Interpolator ProcessVarOpti::GetField(
 
     return ret;
 }
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh

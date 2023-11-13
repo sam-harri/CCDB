@@ -52,9 +52,7 @@ namespace bgi = boost::geometry::index;
 
 using namespace std;
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 ModuleKey ProcessIsoContour::className =
@@ -667,10 +665,14 @@ void Iso::Condense(void)
     vector<IsoVertex> vert;
 
     if (!m_ntris)
+    {
         return;
+    }
 
     if (m_condensed)
+    {
         return;
+    }
     m_condensed = true;
 
     vert.reserve(m_ntris / 6);
@@ -779,7 +781,9 @@ void Iso::GlobalCondense(vector<IsoSharedPtr> &iso, bool verbose)
     Array<OneD, Array<OneD, int>> vidmap;
 
     if (m_condensed)
+    {
         return;
+    }
     m_condensed = true;
 
     vidmap = Array<OneD, Array<OneD, int>>(niso);
@@ -1233,5 +1237,4 @@ void Iso::SeparateRegions(vector<IsoSharedPtr> &sep_iso, int minsize,
     }
 }
 
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

@@ -36,9 +36,7 @@
 
 #include <SolverUtils/Filters/FilterError.h>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 std::string FilterError::className =
     GetFilterFactory().RegisterCreatorFunction("Error", FilterError::create);
@@ -178,5 +176,4 @@ bool FilterError::v_IsTimeDependent()
 {
     return true;
 }
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils

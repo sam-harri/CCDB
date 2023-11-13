@@ -45,9 +45,7 @@
 #include <SolverUtils/UnsteadySystem.h>
 #include <complex>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 class FileFieldInterpolator;
 typedef std::shared_ptr<FileFieldInterpolator> FileFieldInterpolatorSharedPtr;
@@ -127,14 +125,14 @@ public:
     static std::string className;
 
     /// Destructor
-    virtual ~FileSolution();
+    ~FileSolution() override;
 
 protected:
     virtual void v_GetVelocity(
         const Array<OneD, const Array<OneD, NekDouble>> &physfield,
         Array<OneD, Array<OneD, NekDouble>> &velocity) override;
 
-    virtual void v_GetPressure(
+    void v_GetPressure(
         const Array<OneD, const Array<OneD, NekDouble>> &physfield,
         Array<OneD, NekDouble> &pressure) override;
 
@@ -144,7 +142,7 @@ protected:
         const Array<OneD, const Array<OneD, NekDouble>> &physfield,
         Array<OneD, NekDouble> &density) override;
 
-    virtual bool v_HasConstantDensity() override;
+    bool v_HasConstantDensity() override;
 
     /// Session reader
     FileSolution(const LibUtilities::SessionReaderSharedPtr &pSession,
@@ -182,7 +180,6 @@ private:
     Array<OneD, Array<OneD, NekDouble>> m_coord;
     std::map<std::string, LibUtilities::EquationSharedPtr> m_solutionFunction;
 };
-} // namespace SolverUtils
 } // namespace Nektar
 
 #endif // NEKTAR_SOLVERS_INCNAVIERSTOKES_H

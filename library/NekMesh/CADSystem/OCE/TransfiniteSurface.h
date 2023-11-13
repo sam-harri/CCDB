@@ -129,7 +129,7 @@ public:
      * then given a value #m_val \f$ a \f$ this will be defined by \f$
      * \mathbf{c}_2(1-a) \f$.
      */
-    virtual gp_Pnt EndPoint() const override
+    gp_Pnt EndPoint() const override
     {
         return m_uvDir ? m_edges[2]->Value(Map(0, 1 - m_val))
                        : m_edges[1]->Value(Map(0, m_val));
@@ -140,7 +140,7 @@ public:
      * true, then given a value #m_val \f$ a \f$ this will be defined by \f$
      * \mathbf{c}_0(a) \f$.
      */
-    virtual gp_Pnt StartPoint() const override
+    gp_Pnt StartPoint() const override
     {
         return m_uvDir ? m_edges[0]->Value(Map(0, m_val))
                        : m_edges[3]->Value(Map(0, 1 - m_val));
@@ -149,7 +149,7 @@ public:
     /**
      * @brief Reverses the direction of the curve. Unimplemented in this class.
      */
-    virtual void Reverse() override
+    void Reverse() override
     {
         throw new NekMeshError("Unsupported function.");
         ;
@@ -159,8 +159,7 @@ public:
      * @brief Returns the reversed parameter for this curve. Unimplemented in
      * this class.
      */
-    virtual Standard_Real ReversedParameter(
-        const Standard_Real U) const override
+    Standard_Real ReversedParameter(const Standard_Real U) const override
     {
         boost::ignore_unused(U);
         throw new NekMeshError("Unsupported function.");
@@ -171,8 +170,8 @@ public:
      * @brief Returns the transformed parameter for this curve. Unimplemented in
      * this class.
      */
-    virtual Standard_Real TransformedParameter(const Standard_Real U,
-                                               const gp_Trsf &T) const override
+    Standard_Real TransformedParameter(const Standard_Real U,
+                                       const gp_Trsf &T) const override
     {
         boost::ignore_unused(U, T);
         throw new NekMeshError("Unsupported function.");
@@ -183,8 +182,7 @@ public:
      * @brief Returns a parametric transformation for this curve. Unimplemented
      * in this class.
      */
-    virtual Standard_Real ParametricTransformation(
-        const gp_Trsf &T) const override
+    Standard_Real ParametricTransformation(const gp_Trsf &T) const override
     {
         boost::ignore_unused(T);
         throw new NekMeshError("Unsupported function.");
@@ -195,7 +193,7 @@ public:
      * @brief Defines the lower range of the parametrisation. Always `0.0` for
      * this class.
      */
-    virtual Standard_Real FirstParameter() const override
+    Standard_Real FirstParameter() const override
     {
         return 0.0;
     }
@@ -204,7 +202,7 @@ public:
      * @brief Defines the upper range of the parametrisation. Always `1.0` for
      * this class.
      */
-    virtual Standard_Real LastParameter() const override
+    Standard_Real LastParameter() const override
     {
         return 1.0;
     }
@@ -213,7 +211,7 @@ public:
      * @brief Determines whether this curve is closed; always true for this
      * class.
      */
-    virtual Standard_Boolean IsClosed() const override
+    Standard_Boolean IsClosed() const override
     {
         return true;
     }
@@ -222,7 +220,7 @@ public:
      * @brief Determines whether this curve is periodic; always false for this
      * class.
      */
-    virtual Standard_Boolean IsPeriodic() const override
+    Standard_Boolean IsPeriodic() const override
     {
         return false;
     }
@@ -231,7 +229,7 @@ public:
      * @brief Determines the period of this curve, which is not defined for this
      * class.
      */
-    virtual Standard_Real Period() const override
+    Standard_Real Period() const override
     {
         throw new NekMeshError("Unsupported function.");
         return 0.0;
@@ -241,7 +239,7 @@ public:
      * @brief Returns the continuity of this curve; we only define up to
      * second-order derivatives, so return C^2 continuity.
      */
-    virtual GeomAbs_Shape Continuity() const override
+    GeomAbs_Shape Continuity() const override
     {
         return GeomAbs_C2;
     }
@@ -251,7 +249,7 @@ public:
      * differentiable for a given order \f$ N \f$; we only define up to
      * second-order derivatives, so return true only if \f$ 0\leq N\leq 2 \f$.
      */
-    virtual Standard_Boolean IsCN(const Standard_Integer N) const override
+    Standard_Boolean IsCN(const Standard_Integer N) const override
     {
         if (N > 2 || N < 0)
         {
@@ -266,7 +264,7 @@ public:
      *
      * This evaluates the expression from Geom_TransfiniteSurface::D0.
      */
-    virtual void D0(const Standard_Real U1, gp_Pnt &P) const override
+    void D0(const Standard_Real U1, gp_Pnt &P) const override
     {
         double U = m_uvDir ? m_val : U1;
         double V = m_uvDir ? U1 : m_val;
@@ -290,8 +288,7 @@ public:
      *
      * This evaluates the expression from Geom_TransfiniteSurface::D1.
      */
-    virtual void D1(const Standard_Real U1, gp_Pnt &P,
-                    gp_Vec &V1) const override
+    void D1(const Standard_Real U1, gp_Pnt &P, gp_Vec &V1) const override
     {
         double U = m_uvDir ? m_val : U1;
         double V = m_uvDir ? U1 : m_val;
@@ -349,8 +346,8 @@ public:
      *
      * This evaluates the expression from Geom_TransfiniteSurface::D2.
      */
-    virtual void D2(const Standard_Real U1, gp_Pnt &P, gp_Vec &V1,
-                    gp_Vec &V2) const override
+    void D2(const Standard_Real U1, gp_Pnt &P, gp_Vec &V1,
+            gp_Vec &V2) const override
     {
         double U = m_uvDir ? m_val : U1;
         double V = m_uvDir ? U1 : m_val;
@@ -422,8 +419,8 @@ public:
      * Since we're lazy and D3 isn't called in the mesh generation pipeline,
      * this isn't implemented in this class (even though it is well-defined).
      */
-    virtual void D3(const Standard_Real U, gp_Pnt &P, gp_Vec &V1, gp_Vec &V2,
-                    gp_Vec &V3) const override
+    void D3(const Standard_Real U, gp_Pnt &P, gp_Vec &V1, gp_Vec &V2,
+            gp_Vec &V3) const override
     {
         boost::ignore_unused(U, P, V1, V2, V3);
         throw new NekMeshError("Unsupported function.");
@@ -436,8 +433,7 @@ public:
      * Since we're lazy and DN isn't called in the mesh generation pipeline,
      * this isn't implemented in this class (even though it is well-defined).
      */
-    virtual gp_Vec DN(const Standard_Real U,
-                      const Standard_Integer N) const override
+    gp_Vec DN(const Standard_Real U, const Standard_Integer N) const override
     {
         boost::ignore_unused(U, N);
         throw new NekMeshError("Unsupported function.");
@@ -447,7 +443,7 @@ public:
     /**
      * @brief Returns a copy of this geometry.
      */
-    virtual Handle(Geom_Geometry) Copy() const override
+    Handle(Geom_Geometry) Copy() const override
     {
         Handle(Geom_TransfiniteCurve) tmp = new Geom_TransfiniteCurve(
             m_uvDir, m_val, m_edges, m_fwd, m_clims, m_verts);
@@ -458,7 +454,7 @@ public:
      * @brief Transform this shape according to the transformation @p
      * T. Unimplemented in this class.
      */
-    virtual void Transform(const gp_Trsf &T) override
+    void Transform(const gp_Trsf &T) override
     {
         throw new NekMeshError("Unsupported function.");
 
@@ -554,13 +550,12 @@ public:
     /**
      * @brief Reverses the direction of U. Unimplemented in this class.
      */
-    virtual void UReverse() override
+    void UReverse() override
     {
         throw new NekMeshError("Unsupported function.");
     }
 
-    virtual Standard_Real UReversedParameter(
-        const Standard_Real U) const override
+    Standard_Real UReversedParameter(const Standard_Real U) const override
     {
         boost::ignore_unused(U);
         throw new NekMeshError("Unsupported function.");
@@ -570,13 +565,12 @@ public:
     /**
      * @brief Reverses the direction of V. Unimplemented in this class.
      */
-    virtual void VReverse() override
+    void VReverse() override
     {
         throw new NekMeshError("Unsupported function.");
     }
 
-    virtual Standard_Real VReversedParameter(
-        const Standard_Real V) const override
+    Standard_Real VReversedParameter(const Standard_Real V) const override
     {
         boost::ignore_unused(V);
         throw new NekMeshError("Unsupported function.");
@@ -587,7 +581,7 @@ public:
      * @brief Transform this shape according to the transformation @p
      * T. Unimplemented in this class.
      */
-    virtual void Transform(const gp_Trsf &T) override
+    void Transform(const gp_Trsf &T) override
     {
         throw new NekMeshError("Unsupported function.");
 
@@ -603,21 +597,21 @@ public:
         }
     }
 
-    virtual Handle(Geom_Geometry) Copy() const override
+    Handle(Geom_Geometry) Copy() const override
     {
         Handle(Geom_TransfiniteSurface) tmp =
             new Geom_TransfiniteSurface(m_edges, m_fwd, m_clims, m_verts);
         return tmp;
     }
 
-    virtual void TransformParameters(Standard_Real &U, Standard_Real &V,
-                                     const gp_Trsf &T) const override
+    void TransformParameters(Standard_Real &U, Standard_Real &V,
+                             const gp_Trsf &T) const override
     {
         boost::ignore_unused(U, V, T);
         throw new NekMeshError("Unsupported function.");
     }
 
-    virtual gp_GTrsf2d ParametricTransformation(const gp_Trsf &T) const override
+    gp_GTrsf2d ParametricTransformation(const gp_Trsf &T) const override
     {
         boost::ignore_unused(T);
         throw new NekMeshError("Unsupported function.");
@@ -629,8 +623,8 @@ public:
      * that \f$ U_{\min{}} = V_{\min{}} = 0 \f$ and \f$ U_{\max{}} = V_{\max{}}
      * = 1 \f$.
      */
-    virtual void Bounds(Standard_Real &U1, Standard_Real &U2, Standard_Real &V1,
-                        Standard_Real &V2) const override
+    void Bounds(Standard_Real &U1, Standard_Real &U2, Standard_Real &V1,
+                Standard_Real &V2) const override
     {
         U1 = V1 = 0.0;
         U2 = V2 = 1.0;
@@ -640,7 +634,7 @@ public:
      * @brief Returns whether the surface is closed in the \f$ u\f$ direction,
      * which is always true for this surface.
      */
-    virtual Standard_Boolean IsUClosed() const override
+    Standard_Boolean IsUClosed() const override
     {
         return true;
     }
@@ -649,7 +643,7 @@ public:
      * @brief Returns whether the surface is closed in the \f$ v\f$ direction,
      * which is always true for this surface.
      */
-    virtual Standard_Boolean IsVClosed() const override
+    Standard_Boolean IsVClosed() const override
     {
         return true;
     }
@@ -658,7 +652,7 @@ public:
      * @brief Returns whether the surface is periodic in the \f$ u\f$ direction,
      * which is always false for this surface.
      */
-    virtual Standard_Boolean IsUPeriodic() const override
+    Standard_Boolean IsUPeriodic() const override
     {
         return false;
     }
@@ -667,7 +661,7 @@ public:
      * @brief Returns the period of this surface in the \f$ u\f$ direction,
      * which is not defined for this surface.
      */
-    virtual Standard_Real UPeriod() const override
+    Standard_Real UPeriod() const override
     {
         throw new NekMeshError("Unsupported function.");
         return 0.0;
@@ -677,7 +671,7 @@ public:
      * @brief Returns whether the surface is periodic in the \f$ v\f$ direction,
      * which is always false for this surface.
      */
-    virtual Standard_Boolean IsVPeriodic() const override
+    Standard_Boolean IsVPeriodic() const override
     {
         return false;
     }
@@ -686,7 +680,7 @@ public:
      * @brief Returns the period of this surface in the \f$ v\f$ direction,
      * which is not defined for this surface.
      */
-    virtual Standard_Real VPeriod() const override
+    Standard_Real VPeriod() const override
     {
         throw new NekMeshError("Unsupported function.");
         return 0.0;
@@ -696,7 +690,7 @@ public:
      * @brief Construct an isoline in the \f$ v\f$ direction of the surface
      * according to a fixed parameter @p U.
      */
-    virtual Handle(Geom_Curve) UIso(const Standard_Real U) const override
+    Handle(Geom_Curve) UIso(const Standard_Real U) const override
     {
         Handle(Geom_Curve) c = new Geom_TransfiniteCurve(
             true, U, m_edges, m_fwd, m_clims, m_verts);
@@ -707,7 +701,7 @@ public:
      * @brief Construct an isoline in the \f$ u\f$ direction of the surface
      * according to a fixed parameter @p V.
      */
-    virtual Handle(Geom_Curve) VIso(const Standard_Real V) const override
+    Handle(Geom_Curve) VIso(const Standard_Real V) const override
     {
         Handle(Geom_Curve) c = new Geom_TransfiniteCurve(
             false, V, m_edges, m_fwd, m_clims, m_verts);
@@ -718,7 +712,7 @@ public:
      * @brief Returns the continuity of this curve; we only define up to
      * second-order derivatives, so return C^2 continuity.
      */
-    virtual GeomAbs_Shape Continuity() const override
+    GeomAbs_Shape Continuity() const override
     {
         return GeomAbs_C2;
     }
@@ -729,7 +723,7 @@ public:
      * only define up to second-order derivatives, so return true only if \f$
      * 0\leq N\leq 2 \f$.
      */
-    virtual Standard_Boolean IsCNu(const Standard_Integer N) const override
+    Standard_Boolean IsCNu(const Standard_Integer N) const override
     {
         if (N > 2 || N < 0)
         {
@@ -744,7 +738,7 @@ public:
      * only define up to second-order derivatives, so return true only if \f$
      * 0\leq N\leq 2 \f$.
      */
-    virtual Standard_Boolean IsCNv(const Standard_Integer N) const override
+    Standard_Boolean IsCNv(const Standard_Integer N) const override
     {
         if (N > 2 || N < 0)
         {
@@ -765,8 +759,8 @@ public:
      * & - [ (1-u)(1-v) P_0 + u(1-v) P_1 + uv P_2 + (1-u)v P_3 ]
      * \f}
      */
-    virtual void D0(const Standard_Real U, const Standard_Real V,
-                    gp_Pnt &P) const override
+    void D0(const Standard_Real U, const Standard_Real V,
+            gp_Pnt &P) const override
     {
         gp_XYZ c0 = m_edges[0]->Value(Map(0, U)).XYZ();
         gp_XYZ c1 = m_edges[1]->Value(Map(1, V)).XYZ();
@@ -809,8 +803,8 @@ public:
      * where \f$ \mathbf{c}'_i \f$ denotes the derivative of curve \f$ i \f$,
      * which can be obtained from the D1 routines of each curve.
      */
-    virtual void D1(const Standard_Real U, const Standard_Real V, gp_Pnt &P,
-                    gp_Vec &D1U, gp_Vec &D1V) const override
+    void D1(const Standard_Real U, const Standard_Real V, gp_Pnt &P,
+            gp_Vec &D1U, gp_Vec &D1V) const override
     {
         // Compute first-order derivatives from OCC curves.
         gp_Pnt t0, t1, t2, t3;
@@ -878,9 +872,9 @@ public:
      * where \f$ \mathbf{c}'_i \f$ denotes the derivative of curve \f$ i \f$,
      * which can be obtained from the D1 routines of each curve.
      */
-    virtual void D2(const Standard_Real U, const Standard_Real V, gp_Pnt &P,
-                    gp_Vec &D1U, gp_Vec &D1V, gp_Vec &D2U, gp_Vec &D2V,
-                    gp_Vec &D2UV) const override
+    void D2(const Standard_Real U, const Standard_Real V, gp_Pnt &P,
+            gp_Vec &D1U, gp_Vec &D1V, gp_Vec &D2U, gp_Vec &D2V,
+            gp_Vec &D2UV) const override
     {
         gp_Pnt t0, t1, t2, t3;
         gp_Vec d0, d1, d2, d3, dd0, dd1, dd2, dd3;
@@ -942,10 +936,10 @@ public:
      * @brief Compute a point on the curve @p P, alongside its first-, second-
      * and third-order derivatives.
      */
-    virtual void D3(const Standard_Real U, const Standard_Real V, gp_Pnt &P,
-                    gp_Vec &D1U, gp_Vec &D1V, gp_Vec &D2U, gp_Vec &D2V,
-                    gp_Vec &D2UV, gp_Vec &D3U, gp_Vec &D3V, gp_Vec &D3UUV,
-                    gp_Vec &D3UVV) const override
+    void D3(const Standard_Real U, const Standard_Real V, gp_Pnt &P,
+            gp_Vec &D1U, gp_Vec &D1V, gp_Vec &D2U, gp_Vec &D2V, gp_Vec &D2UV,
+            gp_Vec &D3U, gp_Vec &D3V, gp_Vec &D3UUV,
+            gp_Vec &D3UVV) const override
     {
         gp_Pnt t0, t1, t2, t3;
         gp_Vec d0, d1, d2, d3, dd0, dd1, dd2, dd3;
@@ -1030,9 +1024,9 @@ public:
      * Since we're lazy and DN isn't called in the mesh generation pipeline,
      * this isn't implemented in this class (even though it is well-defined).
      */
-    virtual gp_Vec DN(const Standard_Real U, const Standard_Real V,
-                      const Standard_Integer Nu,
-                      const Standard_Integer Nv) const override
+    gp_Vec DN(const Standard_Real U, const Standard_Real V,
+              const Standard_Integer Nu,
+              const Standard_Integer Nv) const override
     {
         boost::ignore_unused(U, V, Nu, Nv);
         throw new NekMeshError("Unsupported function.");

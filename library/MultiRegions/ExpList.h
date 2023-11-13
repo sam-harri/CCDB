@@ -53,9 +53,7 @@
 #include <SpatialDomains/Movement/Movement.h>
 #include <tinyxml.h>
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 
 // Forward declarations
@@ -2313,7 +2311,6 @@ inline std::vector<bool> &ExpList::GetLeftAdjacentTraces(void)
 
 const static Array<OneD, ExpListSharedPtr> NullExpListSharedPtrArray;
 
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions
 
 #endif // EXPLIST_H

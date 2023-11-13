@@ -64,11 +64,11 @@ public:
                           const SpatialDomains::MeshGraphSharedPtr &pGraph);
 
     // Destructor
-    virtual ~SmoothedProfileMethod();
+    ~SmoothedProfileMethod() override;
 
-    virtual void v_InitObject(bool DeclareField = true) override;
+    void v_InitObject(bool DeclareField = true) override;
 
-    virtual void v_GenerateSummary(SolverUtils::SummaryList &s) override;
+    void v_GenerateSummary(SolverUtils::SummaryList &s) override;
 
 protected:
     /// Correction pressure field for SPM
@@ -98,7 +98,7 @@ protected:
     static std::string solverTypeLookupId;
 
     // Interface for 'v_SolveUnsteadyStokesSystem'
-    virtual void v_SolveUnsteadyStokesSystem(
+    void v_SolveUnsteadyStokesSystem(
         const Array<OneD, const Array<OneD, NekDouble>> &inarray,
         Array<OneD, Array<OneD, NekDouble>> &outarray, NekDouble time,
         NekDouble a_iixDt) override;

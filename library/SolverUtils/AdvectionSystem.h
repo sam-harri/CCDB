@@ -38,9 +38,7 @@
 #include <SolverUtils/Advection/Advection.h>
 #include <SolverUtils/UnsteadySystem.h>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 
 /// A base class for PDEs which include an advection component
@@ -51,10 +49,9 @@ public:
         const LibUtilities::SessionReaderSharedPtr &pSession,
         const SpatialDomains::MeshGraphSharedPtr &pGraph);
 
-    SOLVER_UTILS_EXPORT virtual ~AdvectionSystem();
+    SOLVER_UTILS_EXPORT ~AdvectionSystem() override;
 
-    SOLVER_UTILS_EXPORT virtual void v_InitObject(
-        bool DeclareField = true) override;
+    SOLVER_UTILS_EXPORT void v_InitObject(bool DeclareField = true) override;
 
     /// Returns the advection object held by this instance.
     SOLVER_UTILS_EXPORT AdvectionSharedPtr GetAdvObject()
@@ -71,7 +68,7 @@ protected:
     /// Advection term
     SolverUtils::AdvectionSharedPtr m_advObject;
 
-    SOLVER_UTILS_EXPORT virtual bool v_PostIntegrate(int step) override;
+    SOLVER_UTILS_EXPORT bool v_PostIntegrate(int step) override;
 
     SOLVER_UTILS_EXPORT virtual Array<OneD, NekDouble> v_GetMaxStdVelocity(
         const NekDouble SpeedSoundFactor = 1.0)
@@ -95,7 +92,6 @@ private:
 /// Shared pointer to an AdvectionSystem class
 typedef std::shared_ptr<AdvectionSystem> AdvectionSystemSharedPtr;
 
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils
 
 #endif

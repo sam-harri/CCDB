@@ -41,9 +41,7 @@ using namespace std;
 
 #include "OutputStdOut.h"
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 ModuleKey OutputStdOut::m_className =
@@ -64,5 +62,4 @@ void OutputStdOut::v_Process(po::variables_map &vm)
     boost::ignore_unused(vm);
 }
 
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

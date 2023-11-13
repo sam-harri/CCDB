@@ -39,9 +39,7 @@
 #include <NekMesh/MeshElements/Mesh.h>
 #include <NekMesh/SurfaceMeshing/CurveMesh.h>
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 /**
@@ -164,7 +162,6 @@ private:
 };
 
 typedef std::shared_ptr<FaceMesh> FaceMeshSharedPtr;
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh
 
 #endif

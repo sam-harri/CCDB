@@ -46,9 +46,7 @@
                      std::string(#scotchFunc));                                \
     }
 
-namespace Nektar
-{
-namespace SpatialDomains
+namespace Nektar::SpatialDomains
 {
 
 std::string MeshPartitionPtScotch::className =
@@ -91,7 +89,8 @@ void MeshPartitionPtScotch::v_PartitionGraphImpl(
     SCOTCH_CALL(SCOTCH_dgraphInit, (&scGraph, mpiComm->GetComm()));
     SCOTCH_CALL(SCOTCH_dgraphBuild,
                 (&scGraph, 0, nVerts, nVerts, &xadj[0], &xadj[1], &vertWgt[0],
-                 NULL, adjcy.size(), adjcy.size(), &adjcy[0], NULL, NULL));
+                 nullptr, adjcy.size(), adjcy.size(), &adjcy[0], nullptr,
+                 nullptr));
     SCOTCH_CALL(SCOTCH_dgraphCheck, (&scGraph));
 
     SCOTCH_Strat strat;
@@ -102,5 +101,4 @@ void MeshPartitionPtScotch::v_PartitionGraphImpl(
     SCOTCH_CALL(SCOTCH_dgraphPart, (&scGraph, nparts, &strat, &part[0]));
 }
 
-} // namespace SpatialDomains
-} // namespace Nektar
+} // namespace Nektar::SpatialDomains

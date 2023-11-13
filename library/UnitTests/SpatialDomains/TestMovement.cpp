@@ -40,9 +40,7 @@
 #include <boost/test/tools/floating_point_comparison.hpp>
 #include <boost/test/unit_test.hpp>
 
-namespace Nektar
-{
-namespace MovementTests
+namespace Nektar::MovementTests
 {
 
 LibUtilities::SessionReaderSharedPtr CreateSession()
@@ -329,5 +327,4 @@ BOOST_AUTO_TEST_CASE(TestWriteMovement)
 
     delete nektar;
 }
-} // namespace MovementTests
-} // namespace Nektar
+} // namespace Nektar::MovementTests

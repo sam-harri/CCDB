@@ -248,7 +248,7 @@ MMFSWE::~MMFSWE()
 
 void MMFSWE::v_DoSolve()
 {
-    ASSERTL0(m_intScheme != 0, "No time integration scheme.");
+    ASSERTL0(m_intScheme != nullptr, "No time integration scheme.");
 
     int i, nchk = 1;
     int nvariables = 0;
@@ -904,21 +904,33 @@ void MMFSWE::Computehhuhvflux(NekDouble hL, NekDouble uL, NekDouble vL,
 
     // Compute SL
     if (hstar > hL)
+    {
         SL = uL - cL * sqrt(0.5 * ((hstar * hstar + hstar * hL) / (hL * hL)));
+    }
     else
+    {
         SL = uL - cL;
+    }
 
     // Compute SR
     if (hstar > hR)
+    {
         SR = uR + cR * sqrt(0.5 * ((hstar * hstar + hstar * hR) / (hR * hR)));
+    }
     else
+    {
         SR = uR + cR;
+    }
 
     if (fabs(hR * (uR - SR) - hL * (uL - SL)) <= 1.0e-15)
+    {
         Sstar = 0.0;
+    }
     else
+    {
         Sstar = (SL * hR * (uR - SR) - SR * hL * (uL - SL)) /
                 (hR * (uR - SR) - hL * (uL - SL));
+    }
 
     if (SL >= 0)
     {
@@ -1117,9 +1129,13 @@ void MMFSWE::RusanovFlux(const int index, NekDouble hL, NekDouble uL,
 
     NekDouble S;
     if (SL > SR)
+    {
         S = SL;
+    }
     else
+    {
         S = SR;
+    }
 
     // uRF = uR component in moving frames e^{Fwd}
     // vRF = vR component in moving frames e^{Fwd}

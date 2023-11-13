@@ -49,9 +49,7 @@
 
 #include <LibUtilities/BasicUtils/ErrorUtil.hpp>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 #ifdef NEKTAR_USE_THREAD_SAFETY
@@ -290,7 +288,6 @@ private:
 #endif
 };
 
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities
 
 #endif

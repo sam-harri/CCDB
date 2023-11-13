@@ -59,9 +59,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 
 std::string EquationSystem::equationSystemTypeLookupIds[2] = {
@@ -1621,5 +1619,4 @@ void EquationSystem::v_ExtraFldOutput(
     boost::ignore_unused(fieldcoeffs, variables);
 }
 
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils

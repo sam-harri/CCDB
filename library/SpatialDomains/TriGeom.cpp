@@ -43,9 +43,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace SpatialDomains
+namespace Nektar::SpatialDomains
 {
 
 TriGeom::TriGeom()
@@ -574,5 +572,4 @@ void TriGeom::SetUpXmap()
     m_xmap = MemoryManager<StdRegions::StdTriExp>::AllocateSharedPtr(B0, B1);
 }
 
-} // namespace SpatialDomains
-} // namespace Nektar
+} // namespace Nektar::SpatialDomains

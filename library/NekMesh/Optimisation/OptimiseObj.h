@@ -39,9 +39,7 @@
 
 #include <LibUtilities/LinearAlgebra/NekTypeDefs.hpp>
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 class OptiObj
@@ -101,6 +99,5 @@ public:
 };
 typedef std::shared_ptr<OptiObj> OptiObjSharedPtr;
 
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh
 #endif

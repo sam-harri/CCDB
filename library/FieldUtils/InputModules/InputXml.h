@@ -37,9 +37,7 @@
 
 #include "../Module.h"
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 /**
@@ -49,7 +47,7 @@ class InputXml : public InputModule
 {
 public:
     InputXml(FieldSharedPtr f);
-    virtual ~InputXml();
+    ~InputXml() override;
     /// Creates an instance of this class
     static ModuleSharedPtr create(FieldSharedPtr f)
     {
@@ -59,26 +57,25 @@ public:
     static ModuleKey m_className[];
 
 protected:
-    virtual void v_Process(po::variables_map &vm) override;
+    void v_Process(po::variables_map &vm) override;
 
-    virtual std::string v_GetModuleName() override
+    std::string v_GetModuleName() override
     {
         return "InputXml";
     }
 
-    virtual std::string v_GetModuleDescription() override
+    std::string v_GetModuleDescription() override
     {
         return "Processing input xml file";
     }
 
-    virtual ModulePriority v_GetModulePriority() override
+    ModulePriority v_GetModulePriority() override
     {
         return eCreateGraph;
     }
 
 private:
 };
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils
 
 #endif

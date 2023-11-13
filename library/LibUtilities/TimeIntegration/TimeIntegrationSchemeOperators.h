@@ -49,9 +49,7 @@
 
 #define LUE LIB_UTILITIES_EXPORT
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 class TimeIntegrationSchemeOperators;
@@ -140,7 +138,6 @@ protected:
 private:
 };
 
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities
 
 #endif

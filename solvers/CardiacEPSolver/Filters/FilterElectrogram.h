@@ -68,23 +68,23 @@ public:
         const ParamMap &pParams);
 
     /// Electrogram filter destructor
-    virtual ~FilterElectrogram();
+    ~FilterElectrogram() override;
 
 protected:
     /// Initialises the electrogram filter and open output file.
-    virtual void v_Initialise(
+    void v_Initialise(
         const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
         const NekDouble &time) override;
     /// Compute extracellular potential at egm points at current time.
-    virtual void v_Update(
+    void v_Update(
         const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
         const NekDouble &time) override;
     /// Finalise the electrogram filter and close output file.
-    virtual void v_Finalise(
+    void v_Finalise(
         const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
         const NekDouble &time) override;
     /// Filter is time-dependent and should be called at each time-step.
-    virtual bool v_IsTimeDependent() override;
+    bool v_IsTimeDependent() override;
 
 private:
     /// Gradient of the radius from each electrogram point in x-direction

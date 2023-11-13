@@ -42,9 +42,7 @@ using namespace std;
 
 #include "ProcessRemoveField.h"
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 ModuleKey ProcessRemoveField::className =
@@ -94,5 +92,4 @@ void ProcessRemoveField::v_Process(po::variables_map &vm)
         }
     }
 }
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

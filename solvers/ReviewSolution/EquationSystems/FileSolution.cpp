@@ -57,9 +57,7 @@
 #include <tinyxml.h>
 using namespace std;
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 /**
  * Constructor. Creates ...
@@ -790,5 +788,4 @@ NekDouble FileFieldInterpolator::GetStartTime()
 {
     return m_timeStart;
 }
-} // namespace SolverUtils
 } // namespace Nektar

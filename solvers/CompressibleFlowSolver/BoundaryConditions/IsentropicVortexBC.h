@@ -65,9 +65,9 @@ public:
     static std::string className;
 
 protected:
-    virtual void v_Apply(Array<OneD, Array<OneD, NekDouble>> &Fwd,
-                         Array<OneD, Array<OneD, NekDouble>> &physarray,
-                         const NekDouble &time) override;
+    void v_Apply(Array<OneD, Array<OneD, NekDouble>> &Fwd,
+                 Array<OneD, Array<OneD, NekDouble>> &physarray,
+                 const NekDouble &time) override;
 
 private:
     IsentropicVortexBC(
@@ -82,7 +82,7 @@ private:
                                   Array<OneD, Array<OneD, NekDouble>> &u,
                                   NekDouble time, const int o = 0);
 
-    virtual ~IsentropicVortexBC(void){};
+    ~IsentropicVortexBC(void) override{};
 };
 
 } // namespace Nektar

@@ -39,9 +39,7 @@
 #include <SpatialDomains/RefRegionParallelogram.h>
 #include <SpatialDomains/RefRegionSphere.h>
 
-namespace Nektar
-{
-namespace SpatialDomains
+namespace Nektar::SpatialDomains
 {
 
 RefRegion::RefRegion(const unsigned int coordim, NekDouble radius,
@@ -58,5 +56,4 @@ RefRegion::~RefRegion()
 {
 }
 
-} // namespace SpatialDomains
-} // namespace Nektar
+} // namespace Nektar::SpatialDomains

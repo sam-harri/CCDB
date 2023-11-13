@@ -37,9 +37,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace Collections
+namespace Nektar::Collections
 {
 
 /**
@@ -90,5 +88,4 @@ void Collection::Initialise(const OperatorType opType,
         }
     }
 }
-} // namespace Collections
-} // namespace Nektar
+} // namespace Nektar::Collections

@@ -38,9 +38,7 @@
 #include "../Module.h"
 #include <tinyxml.h>
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 /// Converter from fld to vtk.
@@ -48,23 +46,23 @@ class OutputFileBase : public OutputModule
 {
 public:
     OutputFileBase(FieldSharedPtr f);
-    virtual ~OutputFileBase();
+    ~OutputFileBase() override;
 
 protected:
     /// Write fld to output file.
-    virtual void v_Process(po::variables_map &vm) override;
+    void v_Process(po::variables_map &vm) override;
 
-    virtual std::string v_GetModuleName() override
+    std::string v_GetModuleName() override
     {
         return "OutputFileBase";
     }
 
-    virtual std::string v_GetModuleDescription() override
+    std::string v_GetModuleDescription() override
     {
         return "Writing file";
     }
 
-    virtual ModulePriority v_GetModulePriority() override
+    ModulePriority v_GetModulePriority() override
     {
         return eOutput;
     }
@@ -112,7 +110,6 @@ private:
 
     void PrintErrorFromExp();
 };
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils
 
 #endif

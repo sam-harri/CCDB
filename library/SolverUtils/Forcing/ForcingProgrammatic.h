@@ -43,9 +43,7 @@
 #include <SolverUtils/Forcing/Forcing.h>
 #include <SolverUtils/SolverUtilsDeclspec.h>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 //  Forward declaration
 class ForcingProgrammatic;
@@ -79,12 +77,12 @@ public:
     SOLVER_UTILS_EXPORT Array<OneD, Array<OneD, NekDouble>> &UpdateForces();
 
 protected:
-    SOLVER_UTILS_EXPORT virtual void v_InitObject(
+    SOLVER_UTILS_EXPORT void v_InitObject(
         const Array<OneD, MultiRegions::ExpListSharedPtr> &pFields,
         const unsigned int &pNumForcingFields,
         const TiXmlElement *pForce) override;
 
-    SOLVER_UTILS_EXPORT virtual void v_Apply(
+    SOLVER_UTILS_EXPORT void v_Apply(
         const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
         const Array<OneD, Array<OneD, NekDouble>> &inarray,
         Array<OneD, Array<OneD, NekDouble>> &outarray,
@@ -93,10 +91,9 @@ protected:
 private:
     ForcingProgrammatic(const LibUtilities::SessionReaderSharedPtr &pSession,
                         const std::weak_ptr<EquationSystem> &pEquation);
-    virtual ~ForcingProgrammatic(void){};
+    ~ForcingProgrammatic(void) override{};
 };
 
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils
 
 #endif

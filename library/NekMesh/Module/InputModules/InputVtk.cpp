@@ -45,9 +45,7 @@
 using namespace std;
 using namespace Nektar::NekMesh;
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 ModuleKey InputVtk::className = GetModuleFactory().RegisterCreatorFunction(
@@ -101,7 +99,7 @@ void InputVtk::Process()
 
 #if VTK_MAJOR_VERSION >= 9 ||                                                  \
     (VTK_MAJOR_VERSION >= 8 && VTK_MINOR_VERSION >= 90)
-    const vtkIdType *pts = 0;
+    const vtkIdType *pts = nullptr;
 #else
     vtkIdType *pts = 0;
 #endif
@@ -169,5 +167,4 @@ void InputVtk::Process()
     ProcessElements();
     ProcessComposites();
 }
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh

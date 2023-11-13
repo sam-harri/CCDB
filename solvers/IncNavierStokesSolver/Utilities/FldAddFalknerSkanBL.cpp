@@ -443,14 +443,18 @@ int main(int argc, char *argv[])
     Exp[1] = Exp2D_vk;
 
     if (stability_solver == "velocity_correction_scheme")
+    {
         Exp[2] = Exp2D_pk;
+    }
 
     //! Expansion coefficient extraction (necessary to write the .fld file)
     Exp[0]->FwdTrans(Exp2D_uk->GetPhys(), Exp[0]->UpdateCoeffs());
     Exp[1]->FwdTrans(Exp2D_vk->GetPhys(), Exp[1]->UpdateCoeffs());
 
     if (stability_solver == "velocity_correction_scheme")
+    {
         Exp[2]->FwdTrans(Exp2D_pk->GetPhys(), Exp[2]->UpdateCoeffs());
+    }
     //! --------------------------------------------------------------------------------------------
 
     //! Generation .FLD file with one field only (at the moment)
@@ -460,10 +464,14 @@ int main(int argc, char *argv[])
 
     //! Definition of the number of the fields
     if (stability_solver == "coupled_scheme")
+    {
         nFields = 2;
+    }
 
     if (stability_solver == "velocity_correction_scheme")
+    {
         nFields = 3;
+    }
 
     //! Definition of the Field
     std::vector<LibUtilities::FieldDefinitionsSharedPtr> FieldDef =

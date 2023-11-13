@@ -82,7 +82,7 @@ MetricExecutionTime::MetricExecutionTime(TiXmlElement *metric, bool generate)
     else
     {
         // Set the regex to a default value.
-        m_regex = "^.*Total Computation Time\\s*=\\s*(\\d+\\.?\\d*).*";
+        m_regex = R"(^.*Total Computation Time\s*=\s*(\d+\.?\d*).*)";
     }
 
     // Inform the Tester this metric supports averaging data from multiple runs.

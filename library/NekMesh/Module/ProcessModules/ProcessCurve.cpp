@@ -49,9 +49,7 @@
 using namespace std;
 using namespace Nektar::NekMesh;
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 ModuleKey ProcessCurve::className = GetModuleFactory().RegisterCreatorFunction(
@@ -226,5 +224,4 @@ NekDouble ProcessCurve::EvaluateCoordinate(NekDouble xCoord)
     }
 }
 
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh

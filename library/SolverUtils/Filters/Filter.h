@@ -42,9 +42,7 @@
 
 #include <SolverUtils/SolverUtilsDeclspec.h>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 class Filter;
 class EquationSystem;
@@ -122,6 +120,5 @@ inline bool Filter::IsTimeDependent()
 {
     return v_IsTimeDependent();
 }
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils
 #endif /* NEKTAR_SOLVERUTILS_FILTER_FILTER_H */

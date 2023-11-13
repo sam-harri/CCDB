@@ -37,14 +37,12 @@
 
 #include <LibUtilities/Foundations/Points.h>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 class BLPoints : public Points<NekDouble>
 {
 public:
-    virtual ~BLPoints()
+    ~BLPoints() override
     {
     }
 
@@ -107,12 +105,12 @@ public:
     }
 
 protected:
-    LIB_UTILITIES_EXPORT virtual const MatrixSharedPtrType v_GetI(
-        const PointsKey &pkey) override final;
-    LIB_UTILITIES_EXPORT virtual const MatrixSharedPtrType v_GetI(
-        const Array<OneD, const NekDouble> &x) override final;
-    LIB_UTILITIES_EXPORT virtual const MatrixSharedPtrType v_GetI(
-        size_t numpoints, const Array<OneD, const NekDouble> &x) override final;
+    LIB_UTILITIES_EXPORT const MatrixSharedPtrType
+    v_GetI(const PointsKey &pkey) final;
+    LIB_UTILITIES_EXPORT const MatrixSharedPtrType
+    v_GetI(const Array<OneD, const NekDouble> &x) final;
+    LIB_UTILITIES_EXPORT const MatrixSharedPtrType
+    v_GetI(size_t numpoints, const Array<OneD, const NekDouble> &x) final;
 
 private:
     static bool initPointsManager[];
@@ -120,15 +118,14 @@ private:
     BLPoints()                       = delete;
     BLPoints(const BLPoints &points) = delete;
 
-    virtual void v_CalculatePoints() override;
-    virtual void v_CalculateWeights() override;
-    virtual void v_CalculateDerivMatrix() override;
+    void v_CalculatePoints() override;
+    void v_CalculateWeights() override;
+    void v_CalculateDerivMatrix() override;
 
     void CalculateInterpMatrix(size_t npts,
                                const Array<OneD, const NekDouble> &xpoints,
                                Array<OneD, NekDouble> &interp);
 }; // class BLPoints
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities
 
 #endif // BLPoints_H

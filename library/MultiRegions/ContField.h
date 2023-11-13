@@ -45,9 +45,7 @@
 #include <MultiRegions/MultiRegionsDeclspec.h>
 #include <SpatialDomains/Conditions.h>
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 
 /// This class is the abstraction of a global continuous two-
@@ -88,7 +86,7 @@ public:
         const ExpList &In);
 
     /// The default destructor.
-    MULTI_REGIONS_EXPORT virtual ~ContField();
+    MULTI_REGIONS_EXPORT ~ContField() override;
 
     /// Assembles the global coefficients \f$\boldsymbol{\hat{u}}_g\f$
     /// from the local coefficients \f$\boldsymbol{\hat{u}}_l\f$.
@@ -177,60 +175,60 @@ protected:
     GenGlobalLinSys(const GlobalLinSysKey &mkey);
 
     /// Impose the Dirichlet Boundary Conditions on outarray
-    MULTI_REGIONS_EXPORT virtual void v_ImposeDirichletConditions(
+    MULTI_REGIONS_EXPORT void v_ImposeDirichletConditions(
         Array<OneD, NekDouble> &outarray) override;
 
-    MULTI_REGIONS_EXPORT virtual void v_FillBndCondFromField(
+    MULTI_REGIONS_EXPORT void v_FillBndCondFromField(
         const Array<OneD, NekDouble> coeffs) override;
 
-    MULTI_REGIONS_EXPORT virtual void v_FillBndCondFromField(
+    MULTI_REGIONS_EXPORT void v_FillBndCondFromField(
         const int nreg, const Array<OneD, NekDouble> coeffs) override;
 
     /// Gathers the global coefficients \f$\boldsymbol{\hat{u}}_g\f$
     /// from the local coefficients \f$\boldsymbol{\hat{u}}_l\f$.
-    MULTI_REGIONS_EXPORT virtual void v_LocalToGlobal(
+    MULTI_REGIONS_EXPORT void v_LocalToGlobal(
         const Array<OneD, const NekDouble> &inarray,
         Array<OneD, NekDouble> &outarray, bool useComm) override;
 
-    MULTI_REGIONS_EXPORT virtual void v_LocalToGlobal(bool useComm) override;
+    MULTI_REGIONS_EXPORT void v_LocalToGlobal(bool useComm) override;
 
     /// Scatters from the global coefficients
     /// \f$\boldsymbol{\hat{u}}_g\f$ to the local coefficients
     /// \f$\boldsymbol{\hat{u}}_l\f$.
-    MULTI_REGIONS_EXPORT virtual void v_GlobalToLocal(
+    MULTI_REGIONS_EXPORT void v_GlobalToLocal(
         const Array<OneD, const NekDouble> &inarray,
         Array<OneD, NekDouble> &outarray) override;
 
-    MULTI_REGIONS_EXPORT virtual void v_GlobalToLocal(void) override;
+    MULTI_REGIONS_EXPORT void v_GlobalToLocal(void) override;
 
     /// Template method virtual forwarder for FwdTrans().
-    MULTI_REGIONS_EXPORT virtual void v_FwdTrans(
+    MULTI_REGIONS_EXPORT void v_FwdTrans(
         const Array<OneD, const NekDouble> &inarray,
         Array<OneD, NekDouble> &outarray) override;
 
     /// Template method virtual forwarded for SmoothField().
-    MULTI_REGIONS_EXPORT virtual void v_SmoothField(
+    MULTI_REGIONS_EXPORT void v_SmoothField(
         Array<OneD, NekDouble> &field) override;
 
     /// Template method virtual forwarder for MultiplyByInvMassMatrix().
-    MULTI_REGIONS_EXPORT virtual void v_MultiplyByInvMassMatrix(
+    MULTI_REGIONS_EXPORT void v_MultiplyByInvMassMatrix(
         const Array<OneD, const NekDouble> &inarray,
         Array<OneD, NekDouble> &outarray) override;
 
     /// Solves the two-dimensional Helmholtz equation, subject to the
     /// boundary conditions specified.
-    MULTI_REGIONS_EXPORT virtual GlobalLinSysKey v_HelmSolve(
-        const Array<OneD, const NekDouble> &inarray,
-        Array<OneD, NekDouble> &outarray,
-        const StdRegions::ConstFactorMap &factors,
-        const StdRegions::VarCoeffMap &varcoeff,
-        const MultiRegions::VarFactorsMap &varfactors,
-        const Array<OneD, const NekDouble> &dirForcing,
-        const bool PhysSpaceForcing) override;
+    MULTI_REGIONS_EXPORT GlobalLinSysKey
+    v_HelmSolve(const Array<OneD, const NekDouble> &inarray,
+                Array<OneD, NekDouble> &outarray,
+                const StdRegions::ConstFactorMap &factors,
+                const StdRegions::VarCoeffMap &varcoeff,
+                const MultiRegions::VarFactorsMap &varfactors,
+                const Array<OneD, const NekDouble> &dirForcing,
+                const bool PhysSpaceForcing) override;
 
     // Solve the linear advection problem assuming that m_coeffs
     // vector contains an intial estimate for solution
-    MULTI_REGIONS_EXPORT virtual GlobalLinSysKey
+    MULTI_REGIONS_EXPORT GlobalLinSysKey
     v_LinearAdvectionDiffusionReactionSolve(
         const Array<OneD, const NekDouble> &inarray,
         Array<OneD, NekDouble> &outarray,
@@ -242,7 +240,7 @@ protected:
 
     // Solve the linear advection problem assuming that m_coeff
     // vector contains an intial estimate for solution
-    MULTI_REGIONS_EXPORT virtual void v_LinearAdvectionReactionSolve(
+    MULTI_REGIONS_EXPORT void v_LinearAdvectionReactionSolve(
         const Array<OneD, Array<OneD, NekDouble>> &velocity,
         const Array<OneD, const NekDouble> &inarray,
         Array<OneD, NekDouble> &outarray, const NekDouble lambda,
@@ -254,10 +252,10 @@ protected:
         &v_GetBndCondExpansions() override;
 
     /// Template method virtual forwarder for GetBndConditions().
-    MULTI_REGIONS_EXPORT virtual const Array<
+    MULTI_REGIONS_EXPORT const Array<
         OneD, const SpatialDomains ::BoundaryConditionShPtr>
         &v_GetBndConditions() override;
-    MULTI_REGIONS_EXPORT virtual void v_ClearGlobalLinSysManager(void) override;
+    MULTI_REGIONS_EXPORT void v_ClearGlobalLinSysManager(void) override;
 
     // Get manager pool count; intended for unit tests
     MULTI_REGIONS_EXPORT int v_GetPoolCount(std::string) override;
@@ -369,7 +367,6 @@ inline int ContField::GetGlobalMatrixNnz(const GlobalMatrixKey &gkey)
     return 0;
 }
 
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions
 
 #endif // MULTIERGIONS_CONTFIELD2D_H

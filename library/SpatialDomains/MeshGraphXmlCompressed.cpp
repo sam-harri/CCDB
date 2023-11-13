@@ -56,9 +56,7 @@
 #include <tinyxml.h>
 using namespace std;
 
-namespace Nektar
-{
-namespace SpatialDomains
+namespace Nektar::SpatialDomains
 {
 
 std::string MeshGraphXmlCompressed::className =
@@ -619,7 +617,7 @@ void MeshGraphXmlCompressed::v_ReadFaces()
 
 void MeshGraphXmlCompressed::v_ReadElements1D()
 {
-    TiXmlElement *field = NULL;
+    TiXmlElement *field = nullptr;
 
     /// Look for elements in ELEMENT block.
     field = m_xmlGeom->FirstChildElement("ELEMENT");
@@ -1404,5 +1402,4 @@ void MeshGraphXmlCompressed::v_WriteCurves(TiXmlElement *geomTag,
 
     geomTag->LinkEndChild(curveTag);
 }
-} // namespace SpatialDomains
-} // namespace Nektar
+} // namespace Nektar::SpatialDomains

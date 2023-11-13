@@ -50,9 +50,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 
 std::string ForcingMovingReferenceFrame::classNameBody =
@@ -603,5 +601,4 @@ void ForcingMovingReferenceFrame::CheckForRestartTheta(
     }
 }
 
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils

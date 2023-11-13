@@ -40,10 +40,7 @@
 #include <StdRegions/StdRegions.hpp>
 #include <memory>
 
-namespace Nektar
-{
-
-namespace SpatialDomains
+namespace Nektar::SpatialDomains
 {
 
 class PointGeom;
@@ -63,7 +60,7 @@ public:
                                      NekDouble x, NekDouble y, NekDouble z);
     SPATIAL_DOMAINS_EXPORT PointGeom(const PointGeom &T);
 
-    SPATIAL_DOMAINS_EXPORT ~PointGeom();
+    SPATIAL_DOMAINS_EXPORT ~PointGeom() override;
 
     SPATIAL_DOMAINS_EXPORT int GetVid()
     {
@@ -97,11 +94,10 @@ public:
                                                   const PointGeom &y);
 
 protected:
-    virtual void v_GenGeomFactors() override;
-    virtual PointGeomSharedPtr v_GetVertex(int i) const override;
+    void v_GenGeomFactors() override;
+    PointGeomSharedPtr v_GetVertex(int i) const override;
 };
 
-} // namespace SpatialDomains
-} // namespace Nektar
+} // namespace Nektar::SpatialDomains
 
 #endif // NEKTAR_SPATIALDOMAINS_POINTGEOM_H

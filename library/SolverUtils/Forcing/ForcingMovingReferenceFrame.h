@@ -50,9 +50,7 @@
 #include <boost/numeric/ublas/vector.hpp>
 #include <cmath>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 
 namespace bn = boost::numeric;
@@ -81,18 +79,18 @@ public:
     static std::string classNameBody;
 
 protected:
-    SOLVER_UTILS_EXPORT virtual void v_InitObject(
+    SOLVER_UTILS_EXPORT void v_InitObject(
         const Array<OneD, MultiRegions::ExpListSharedPtr> &pFields,
         const unsigned int &pNumForcingFields,
         const TiXmlElement *pForce) override;
 
-    SOLVER_UTILS_EXPORT virtual void v_Apply(
+    SOLVER_UTILS_EXPORT void v_Apply(
         const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
         const Array<OneD, Array<OneD, NekDouble>> &inarray,
         Array<OneD, Array<OneD, NekDouble>> &outarray,
         const NekDouble &time) override;
 
-    SOLVER_UTILS_EXPORT virtual void v_PreApply(
+    SOLVER_UTILS_EXPORT void v_PreApply(
         const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
         const Array<OneD, Array<OneD, NekDouble>> &inarray,
         Array<OneD, Array<OneD, NekDouble>> &outarray,
@@ -153,7 +151,7 @@ private:
         const LibUtilities::SessionReaderSharedPtr &pSession,
         const std::weak_ptr<EquationSystem> &pEquation);
 
-    virtual ~ForcingMovingReferenceFrame(void){};
+    ~ForcingMovingReferenceFrame(void) override{};
 
     void Update(const NekDouble &time);
     void UpdateTheta(const NekDouble &time);
@@ -168,7 +166,6 @@ private:
                      Array<OneD, Array<OneD, NekDouble>> &outarray);
 };
 
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils
 
 #endif

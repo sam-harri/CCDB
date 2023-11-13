@@ -45,9 +45,7 @@
 #include <NekMesh/MeshElements/Face.h>
 #include <NekMesh/NekMeshDeclspec.h>
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 /**
@@ -69,10 +67,14 @@ public:
     /// boundary elements).
     size_t GetId() const
     {
-        if (m_faceLink.get() != 0)
+        if (m_faceLink.get() != nullptr)
+        {
             return m_faceLink->m_id;
-        if (m_edgeLink.get() != 0)
+        }
+        if (m_edgeLink.get() != nullptr)
+        {
             return m_edgeLink->m_id;
+        }
         return m_id;
     }
     /// Returns the expansion dimension of the element.
@@ -93,10 +95,14 @@ public:
     /// Returns the tag which defines the element shape.
     std::string GetTag() const
     {
-        if (m_faceLink.get() != 0)
+        if (m_faceLink.get() != nullptr)
+        {
             return "F";
-        if (m_edgeLink.get() != 0)
+        }
+        if (m_edgeLink.get() != nullptr)
+        {
             return "E";
+        }
         return m_tag;
     }
     /// Access a vertex node.
@@ -500,13 +506,13 @@ struct element_id_less_than
     bool operator()(const pT a, const pT b) const
     {
         // check for 0
-        if (a.get() == 0)
+        if (a.get() == nullptr)
         {
             // if b is also 0, then they are equal, hence a is not
             // less than b
-            return b.get() != 0;
+            return b.get() != nullptr;
         }
-        else if (b.get() == 0)
+        else if (b.get() == nullptr)
         {
             return false;
         }
@@ -516,7 +522,6 @@ struct element_id_less_than
         }
     }
 };
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh
 
 #endif

@@ -77,10 +77,10 @@ public:
                         const Array<OneD, int> pVel,
                         const SolverUtils::AdvectionSharedPtr advObject);
 
-    virtual ~ImplicitExtrapolate();
+    ~ImplicitExtrapolate() override;
 
 protected:
-    virtual void v_EvaluatePressureBCs(
+    void v_EvaluatePressureBCs(
         const Array<OneD, const Array<OneD, NekDouble>> &fields,
         const Array<OneD, const Array<OneD, NekDouble>> &N,
         NekDouble kinvis) override;

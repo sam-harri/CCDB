@@ -41,9 +41,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace StdRegions
+namespace Nektar::StdRegions
 {
 
 StdQuadExp::StdQuadExp()
@@ -1648,5 +1646,4 @@ void StdQuadExp::v_GetSimplexEquiSpacedConnectivity(Array<OneD, int> &conn,
     }
 }
 
-} // namespace StdRegions
-} // namespace Nektar
+} // namespace Nektar::StdRegions

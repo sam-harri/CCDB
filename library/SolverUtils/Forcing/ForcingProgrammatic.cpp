@@ -36,9 +36,7 @@
 
 #include <SolverUtils/Forcing/ForcingProgrammatic.h>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 
 std::string ForcingProgrammatic::className =
@@ -87,5 +85,4 @@ void ForcingProgrammatic::v_Apply(
     }
 }
 
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils

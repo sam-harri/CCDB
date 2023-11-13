@@ -70,13 +70,13 @@ public:
         const LibUtilities::SessionReaderSharedPtr &pSession,
         const std::weak_ptr<SolverUtils::EquationSystem> &pEquation,
         const ParamMap &pParams);
-    ~FilterMovingBody();
+    ~FilterMovingBody() override;
 
-    virtual void v_Initialise(
+    void v_Initialise(
         const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
         const NekDouble &time) override;
 
-    virtual void v_Update(
+    void v_Update(
         const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
         const NekDouble &time) override
     {
@@ -93,11 +93,11 @@ public:
         const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
         Array<OneD, NekDouble> &MotionVars, const NekDouble &time);
 
-    virtual void v_Finalise(
+    void v_Finalise(
         const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
         const NekDouble &time) override;
 
-    virtual bool v_IsTimeDependent() override;
+    bool v_IsTimeDependent() override;
 
 private:
     /// ID's of boundary regions where we want the forces

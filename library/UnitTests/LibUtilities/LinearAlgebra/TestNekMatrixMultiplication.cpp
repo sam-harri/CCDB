@@ -39,13 +39,7 @@
 #include <functional>
 #include <iostream>
 
-namespace Nektar
-{
-
-// Note - All tests should excercise both the blas and normal code.
-// The easiest way to do this is to perform one test with integers and
-// one with doubles.
-namespace MatrixMultiplicationTests
+namespace Nektar::MatrixMultiplicationTests
 {
 BOOST_AUTO_TEST_CASE(TestStandardFullTimesStandardFull)
 {
@@ -215,5 +209,4 @@ BOOST_AUTO_TEST_CASE(TestScaledFullTimesVector)
         BOOST_CHECK_CLOSE(result[3], 1095.0, epsilon);
     }
 }
-} // namespace MatrixMultiplicationTests
-} // namespace Nektar
+} // namespace Nektar::MatrixMultiplicationTests

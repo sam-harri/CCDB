@@ -39,9 +39,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace StdRegions
+namespace Nektar::StdRegions
 {
 StdNodalTriExp::StdNodalTriExp(const LibUtilities::BasisKey &Ba,
                                const LibUtilities::BasisKey &Bb,
@@ -447,5 +445,4 @@ void StdNodalTriExp::v_HelmholtzMatrixOp(
 // Private helper functions
 //---------------------------------------
 
-} // namespace StdRegions
-} // namespace Nektar
+} // namespace Nektar::StdRegions

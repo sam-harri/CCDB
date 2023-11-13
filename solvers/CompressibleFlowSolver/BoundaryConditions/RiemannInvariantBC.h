@@ -66,9 +66,9 @@ public:
     static std::string className;
 
 protected:
-    virtual void v_Apply(Array<OneD, Array<OneD, NekDouble>> &Fwd,
-                         Array<OneD, Array<OneD, NekDouble>> &physarray,
-                         const NekDouble &time) override;
+    void v_Apply(Array<OneD, Array<OneD, NekDouble>> &Fwd,
+                 Array<OneD, Array<OneD, NekDouble>> &physarray,
+                 const NekDouble &time) override;
 
     /// Reference normal velocity
     Array<OneD, NekDouble> m_VnInf;
@@ -80,7 +80,7 @@ private:
         const Array<OneD, Array<OneD, NekDouble>> &pTraceNormals,
         const int pSpaceDim, const int bcRegion, const int cnt);
 
-    virtual ~RiemannInvariantBC(void){};
+    ~RiemannInvariantBC(void) override{};
 };
 
 } // namespace Nektar

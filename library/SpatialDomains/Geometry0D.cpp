@@ -34,9 +34,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 #include <SpatialDomains/Geometry0D.h>
 
-namespace Nektar
-{
-namespace SpatialDomains
+namespace Nektar::SpatialDomains
 {
 
 Geometry0D::Geometry0D() : Geometry()
@@ -66,5 +64,4 @@ bool Geometry0D::v_ContainsPoint(const Array<OneD, const NekDouble> &gloCoord,
     return false;
 }
 
-} // namespace SpatialDomains
-} // namespace Nektar
+} // namespace Nektar::SpatialDomains

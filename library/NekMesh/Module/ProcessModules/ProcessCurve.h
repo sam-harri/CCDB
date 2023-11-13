@@ -39,9 +39,7 @@
 #include <LibUtilities/BasicUtils/PtsField.h>
 #include <LibUtilities/Interpreter/Interpreter.h>
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 class ProcessCurve : public ProcessCurvedEdges
@@ -55,15 +53,15 @@ public:
     static NekMesh::ModuleKey className;
 
     ProcessCurve(NekMesh::MeshSharedPtr m);
-    virtual ~ProcessCurve();
+    ~ProcessCurve() override;
 
-    virtual std::string GetModuleName()
+    std::string GetModuleName() override
     {
         return "ProcessCurve";
     }
 
 protected:
-    void v_GenerateEdgeNodes(NekMesh::EdgeSharedPtr edge);
+    void v_GenerateEdgeNodes(NekMesh::EdgeSharedPtr edge) override;
 
 private:
     NekDouble EvaluateCoordinate(NekDouble xCoord);
@@ -73,7 +71,6 @@ private:
     int m_fExprId;
     LibUtilities::PtsFieldSharedPtr m_fieldPts;
 };
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh
 
 #endif

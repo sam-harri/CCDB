@@ -89,7 +89,7 @@ public:
             : m_data(d), m_end(e),
               m_curRow(std::numeric_limits<unsigned int>::max()),
               m_curColumn(std::numeric_limits<unsigned int>::max()),
-              m_matrix(NULL),
+              m_matrix(nullptr),
               m_curIndex(std::numeric_limits<unsigned int>::max()),
               m_transpose('N')
         {
@@ -100,7 +100,7 @@ public:
         }
 
         iterator_impl(MatrixType *m, char transpose, bool isEnd = false)
-            : m_data(NULL), m_end(NULL), m_curRow(0), m_curColumn(0),
+            : m_data(nullptr), m_end(nullptr), m_curRow(0), m_curColumn(0),
               m_matrix(m), m_curIndex(0), m_transpose(transpose)
         {
             if (isEnd)
@@ -522,15 +522,15 @@ protected:
 
     LIB_UTILITIES_EXPORT void ResizeDataArrayIfNeeded();
 
-    LIB_UTILITIES_EXPORT virtual
-        typename boost::call_traits<DataType>::value_type
-        v_GetValue(unsigned int row, unsigned int column) const override;
+    LIB_UTILITIES_EXPORT
+    typename boost::call_traits<DataType>::value_type v_GetValue(
+        unsigned int row, unsigned int column) const override;
 
-    LIB_UTILITIES_EXPORT virtual unsigned int v_GetStorageSize() const override;
+    LIB_UTILITIES_EXPORT unsigned int v_GetStorageSize() const override;
 
     // We need to rethink class structure a little.  This shouldn't be
     // necessary.
-    LIB_UTILITIES_EXPORT virtual void v_SetValue(
+    LIB_UTILITIES_EXPORT void v_SetValue(
         unsigned int row, unsigned int column,
         typename boost::call_traits<DataType>::const_reference d) override;
 

@@ -37,9 +37,7 @@
 #define NEKTAR_LIB_UTILITIES_LINEAR_ALGEBRA_NEK_LINSYS_ITERAT_FIXEDPOINTJACOBI_H
 
 #include <LibUtilities/LinearAlgebra/NekLinSysIter.h>
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 /// A global linear system.
 class NekLinSysIterFixedpointJacobi;
@@ -70,20 +68,18 @@ public:
         const LibUtilities::SessionReaderSharedPtr &pSession,
         const LibUtilities::CommSharedPtr &vRowComm, const int nDimen,
         const NekSysKey &pKey);
-    LIB_UTILITIES_EXPORT ~NekLinSysIterFixedpointJacobi();
+    LIB_UTILITIES_EXPORT ~NekLinSysIterFixedpointJacobi() override;
 
 protected:
-    virtual void v_InitObject() override;
+    void v_InitObject() override;
 
-    virtual int v_SolveSystem(const int nGlobal,
-                              const Array<OneD, const NekDouble> &pInput,
-                              Array<OneD, NekDouble> &pOutput, const int nDir,
-                              const NekDouble tol,
-                              const NekDouble factor) override;
+    int v_SolveSystem(const int nGlobal,
+                      const Array<OneD, const NekDouble> &pInput,
+                      Array<OneD, NekDouble> &pOutput, const int nDir,
+                      const NekDouble tol, const NekDouble factor) override;
 
 private:
 };
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities
 
 #endif

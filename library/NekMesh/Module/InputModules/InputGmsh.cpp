@@ -52,9 +52,7 @@ using namespace std;
 
 using namespace Nektar::NekMesh;
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 ModuleKey InputGmsh::className = GetModuleFactory().RegisterCreatorFunction(
@@ -2036,5 +2034,4 @@ std::map<unsigned int, ElmtConfig> InputGmsh::GenElmMap()
     return tmp;
 }
 
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh

@@ -47,9 +47,7 @@
 
 #include <LibUtilities/TimeIntegration/DIRKTimeIntegrationSchemes.h>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -119,7 +117,7 @@ public:
         }
     }
 
-    virtual ~AdamsMoultonTimeIntegrationScheme()
+    ~AdamsMoultonTimeIntegrationScheme() override
     {
     }
 
@@ -216,12 +214,12 @@ public:
     }
 
 protected:
-    LUE virtual std::string v_GetName() const override
+    LUE std::string v_GetName() const override
     {
         return std::string("AdamsMoulton");
     }
 
-    LUE virtual NekDouble v_GetTimeStability() const override
+    LUE NekDouble v_GetTimeStability() const override
     {
         return 1.0;
     }
@@ -358,7 +356,6 @@ protected:
 
 }; // end class AdamsMoultonOrder4TimeIntegrationScheme
 
-} // end namespace LibUtilities
-} // end namespace Nektar
+} // namespace Nektar::LibUtilities
 
 #endif

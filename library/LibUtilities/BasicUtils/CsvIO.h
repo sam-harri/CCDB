@@ -46,9 +46,7 @@
 #include <LibUtilities/BasicUtils/SharedArray.hpp>
 #include <LibUtilities/Communication/Comm.h>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 class CsvIO : public PtsIO
@@ -57,7 +55,7 @@ public:
     LIB_UTILITIES_EXPORT CsvIO(LibUtilities::CommSharedPtr pComm,
                                bool sharedFilesystem = false);
 
-    LIB_UTILITIES_EXPORT virtual ~CsvIO()
+    LIB_UTILITIES_EXPORT ~CsvIO() override
     {
     }
 
@@ -66,14 +64,13 @@ public:
                                     const bool backup = false);
 
 protected:
-    LIB_UTILITIES_EXPORT virtual void v_ImportPtsFieldData(
+    LIB_UTILITIES_EXPORT void v_ImportPtsFieldData(
         const std::string inFile, PtsFieldSharedPtr &ptsField,
         DomainRangeShPtr &Range) override;
 
-    LIB_UTILITIES_EXPORT virtual std::string v_GetFileEnding() const override;
+    LIB_UTILITIES_EXPORT std::string v_GetFileEnding() const override;
 };
 
 typedef std::shared_ptr<CsvIO> CsvIOSharedPtr;
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities
 #endif

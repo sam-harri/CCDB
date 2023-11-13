@@ -53,12 +53,12 @@ public:
 protected:
     HLLCSolver(const LibUtilities::SessionReaderSharedPtr &pSession);
 
-    virtual void v_PointSolve(NekDouble rhoL, NekDouble rhouL, NekDouble rhovL,
-                              NekDouble rhowL, NekDouble EL, NekDouble rhoR,
-                              NekDouble rhouR, NekDouble rhovR, NekDouble rhowR,
-                              NekDouble ER, NekDouble &rhof, NekDouble &rhouf,
-                              NekDouble &rhovf, NekDouble &rhowf,
-                              NekDouble &Ef) override;
+    void v_PointSolve(NekDouble rhoL, NekDouble rhouL, NekDouble rhovL,
+                      NekDouble rhowL, NekDouble EL, NekDouble rhoR,
+                      NekDouble rhouR, NekDouble rhovR, NekDouble rhowR,
+                      NekDouble ER, NekDouble &rhof, NekDouble &rhouf,
+                      NekDouble &rhovf, NekDouble &rhowf,
+                      NekDouble &Ef) override;
 };
 } // namespace Nektar
 

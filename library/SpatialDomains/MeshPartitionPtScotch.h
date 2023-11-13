@@ -37,9 +37,7 @@
 #include <LibUtilities/Memory/NekMemoryManager.hpp>
 #include <SpatialDomains/MeshPartition.h>
 
-namespace Nektar
-{
-namespace SpatialDomains
+namespace Nektar::SpatialDomains
 {
 
 class MeshPartitionPtScotch : public MeshPartition
@@ -63,18 +61,18 @@ public:
                           LibUtilities::CommSharedPtr comm, int meshDim,
                           std::map<int, MeshEntity> element,
                           CompositeDescriptor compMap);
-    virtual ~MeshPartitionPtScotch();
+    ~MeshPartitionPtScotch() override;
 
 protected:
-    virtual void v_PartitionGraphImpl(
-        int &nVerts, int &nVertConds, Nektar::Array<Nektar::OneD, int> &xadj,
-        Nektar::Array<Nektar::OneD, int> &adjcy,
-        Nektar::Array<Nektar::OneD, int> &vertWgt,
-        Nektar::Array<Nektar::OneD, int> &vertSize,
-        Nektar::Array<Nektar::OneD, int> &edgeWgt, int &nparts, int &volume,
-        Nektar::Array<Nektar::OneD, int> &part) override final;
+    void v_PartitionGraphImpl(int &nVerts, int &nVertConds,
+                              Nektar::Array<Nektar::OneD, int> &xadj,
+                              Nektar::Array<Nektar::OneD, int> &adjcy,
+                              Nektar::Array<Nektar::OneD, int> &vertWgt,
+                              Nektar::Array<Nektar::OneD, int> &vertSize,
+                              Nektar::Array<Nektar::OneD, int> &edgeWgt,
+                              int &nparts, int &volume,
+                              Nektar::Array<Nektar::OneD, int> &part) final;
 };
-} // namespace SpatialDomains
-} // namespace Nektar
+} // namespace Nektar::SpatialDomains
 
 #endif

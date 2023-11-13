@@ -41,9 +41,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 /**
  * @class GlobalLinSysIterativeStaticCond
@@ -250,7 +248,7 @@ void GlobalLinSysIterativeStaticCond::PrepareLocalSchurComplement()
             // Assemble dense storage blocks.
             DNekScalMatSharedPtr loc_mat;
             m_denseBlocks.resize(nBlk);
-            double *ptr = 0;
+            double *ptr = nullptr;
 
             if (MultiRegions::eContiguous == storageStrategy)
             {
@@ -524,6 +522,7 @@ GlobalLinSysStaticCondSharedPtr GlobalLinSysIterativeStaticCond::v_Recurse(
     sys->Initialise(l2gMap);
     return sys;
 }
+
 /**
  *
  */
@@ -588,5 +587,5 @@ void GlobalLinSysIterativeStaticCond::v_SolveLinearSystem(
         }
     }
 }
-} // namespace MultiRegions
-} // namespace Nektar
+
+} // namespace Nektar::MultiRegions

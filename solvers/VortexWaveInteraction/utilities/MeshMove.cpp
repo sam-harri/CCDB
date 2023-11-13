@@ -3948,11 +3948,11 @@ void Replacevertices(string filename, Array<OneD, NekDouble> newx,
     ASSERTL0(loadOkaynew, errstr.c_str());
 
     TiXmlHandle docHandlenew(&docnew);
-    TiXmlElement *meshnew   = NULL;
-    TiXmlElement *masternew = NULL;
-    TiXmlElement *condnew   = NULL;
-    TiXmlElement *Parsnew   = NULL;
-    TiXmlElement *parnew    = NULL;
+    TiXmlElement *meshnew   = nullptr;
+    TiXmlElement *masternew = nullptr;
+    TiXmlElement *condnew   = nullptr;
+    TiXmlElement *Parsnew   = nullptr;
+    TiXmlElement *parnew    = nullptr;
 
     // Master tag within which all data is contained.
 
@@ -3979,13 +3979,19 @@ void Replacevertices(string filename, Array<OneD, NekDouble> newx,
             int end = line.find_first_of("=");
             // Check for no parameter name
             if (beg == end)
+            {
                 throw 1;
+            }
             // Check for no parameter value
             if (end != line.find_last_of("="))
+            {
                 throw 1;
+            }
             // Check for no equals sign
             if (end == std::string::npos)
+            {
                 throw 1;
+            }
             lhs = line.substr(line.find_first_not_of(" "), end - beg);
             lhs = lhs.substr(0, lhs.find_last_not_of(" ") + 1);
 

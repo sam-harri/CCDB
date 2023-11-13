@@ -42,9 +42,7 @@ using namespace std;
 
 #include "ProcessMean.h"
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 ModuleKey ProcessMean::className = GetModuleFactory().RegisterCreatorFunction(
@@ -89,5 +87,4 @@ void ProcessMean::v_Process(po::variables_map &vm)
         }
     }
 }
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

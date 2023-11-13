@@ -42,9 +42,7 @@
 
 #include <NekMesh/MeshElements/Node.h>
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 // forward decleration
@@ -72,7 +70,7 @@ public:
         m_type = CADType::eVert;
     }
 
-    virtual ~CADVert(){};
+    ~CADVert() override{};
 
     /**
      * @brief Get x,y,z location of the vertex
@@ -142,7 +140,6 @@ typedef LibUtilities::NekFactory<std::string, CADVert> CADVertFactory;
 
 CADVertFactory &GetCADVertFactory();
 
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh
 
 #endif

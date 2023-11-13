@@ -38,9 +38,7 @@
 #include <SolverUtils/DriverParallelInTime.h>
 #include <boost/format.hpp>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 
 /**
@@ -690,5 +688,4 @@ void InterpExp1ToExp2(
     }
 }
 
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils

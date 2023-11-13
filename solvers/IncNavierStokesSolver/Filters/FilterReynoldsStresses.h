@@ -37,9 +37,7 @@
 
 #include <SolverUtils/Filters/FilterFieldConvert.h>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 class FilterReynoldsStresses : public FilterFieldConvert
 {
@@ -66,24 +64,24 @@ public:
         const LibUtilities::SessionReaderSharedPtr &pSession,
         const std::weak_ptr<SolverUtils::EquationSystem> &pEquation,
         const std::map<std::string, std::string> &pParams);
-    SOLVER_UTILS_EXPORT ~FilterReynoldsStresses();
+    SOLVER_UTILS_EXPORT ~FilterReynoldsStresses() override;
 
 protected:
-    virtual void v_Initialise(
+    void v_Initialise(
         const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
         const NekDouble &time) override;
-    virtual void v_FillVariablesName(
+    void v_FillVariablesName(
         const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields)
         override;
-    virtual void v_ProcessSample(
+    void v_ProcessSample(
         const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
         std::vector<Array<OneD, NekDouble>> &fieldcoeffs,
         const NekDouble &time) override;
-    virtual void v_PrepareOutput(
+    void v_PrepareOutput(
         const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
         const NekDouble &time) override;
-    virtual NekDouble v_GetScale() override;
-    virtual std::string v_GetFileSuffix() override
+    NekDouble v_GetScale() override;
+    std::string v_GetFileSuffix() override
     {
         return "_stress";
     }
@@ -93,7 +91,6 @@ protected:
     NekDouble m_alpha;
     bool m_movAvg;
 };
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils
 
 #endif /* NEKTAR_SOLVERUTILS_FILTERS_FILTERREYNOLDSSTRESES_H */

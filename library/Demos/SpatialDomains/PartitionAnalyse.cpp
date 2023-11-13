@@ -51,15 +51,15 @@ public:
         m_size = size;
         m_type = "Faux parallel";
     }
-    FauxComm(int size) : CommSerial(0, NULL)
+    FauxComm(int size) : CommSerial(0, nullptr)
     {
         m_size = size;
         m_type = "Faux parallel";
     }
-    virtual ~FauxComm()
+    ~FauxComm() override
     {
     }
-    void v_SplitComm(int pRows, int pColumns, int pTime)
+    void v_SplitComm(int pRows, int pColumns, int pTime) override
     {
         m_commRow    = std::shared_ptr<FauxComm>(new FauxComm(pColumns));
         m_commColumn = std::shared_ptr<FauxComm>(new FauxComm(pRows));

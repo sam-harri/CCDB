@@ -37,9 +37,7 @@
 
 #include <SolverUtils/Filters/FilterMovingAverage.h>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 std::string FilterMovingAverage::className =
     GetFilterFactory().RegisterCreatorFunction("MovingAverage",
@@ -125,5 +123,4 @@ void FilterMovingAverage::v_ProcessSample(
     }
 }
 
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils

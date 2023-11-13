@@ -36,9 +36,7 @@
 
 #include <StdRegions/StdExpansion1D.h>
 
-namespace Nektar
-{
-namespace StdRegions
+namespace Nektar::StdRegions
 {
 StdExpansion1D::StdExpansion1D()
 {
@@ -111,5 +109,4 @@ NekDouble StdExpansion1D::v_PhysEvaluate(
     return 0;
 }
 
-} // namespace StdRegions
-} // namespace Nektar
+} // namespace Nektar::StdRegions

@@ -44,9 +44,7 @@
 #include <SpatialDomains/Geometry.h>
 #include <StdRegions/StdExpansion.h>
 
-namespace Nektar
-{
-namespace Collections
+namespace Nektar::Collections
 {
 
 /**
@@ -161,7 +159,6 @@ inline bool Collection::HasOperator(const OperatorType &op)
     return (m_ops.find(op) != m_ops.end());
 }
 
-} // namespace Collections
-} // namespace Nektar
+} // namespace Nektar::Collections
 
 #endif

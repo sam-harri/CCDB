@@ -34,9 +34,7 @@
 
 #include "LibUtilities/BasicUtils/FileSystem.h"
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 /**
  * \brief create portable path on different platforms for
@@ -48,5 +46,4 @@ std::string PortablePath(const boost::filesystem::path &path)
     temp.make_preferred();
     return temp.string();
 }
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities

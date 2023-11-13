@@ -39,17 +39,12 @@
 #include <LibUtilities/Communication/Comm.h>
 #include <LibUtilities/LibUtilitiesDeclspec.h>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 class BasisKey;
-}
-} // namespace Nektar
+} // namespace Nektar::LibUtilities
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 enum TranspositionDir
 {
@@ -163,6 +158,5 @@ private:
 };
 
 typedef std::shared_ptr<Transposition> TranspositionSharedPtr;
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities
 #endif

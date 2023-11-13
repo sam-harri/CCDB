@@ -38,9 +38,7 @@
 #include <LibUtilities/BasicUtils/Timer.h>
 #include <SolverUtils/DriverModifiedArnoldi.h>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 
 class DriverSteadyState : public DriverModifiedArnoldi
@@ -69,15 +67,14 @@ protected:
         const SpatialDomains::MeshGraphSharedPtr pGraph);
 
     /// Destructor
-    SOLVER_UTILS_EXPORT virtual ~DriverSteadyState() = default;
+    SOLVER_UTILS_EXPORT ~DriverSteadyState() override = default;
 
     /// Initialises EquationSystem class members.
-    SOLVER_UTILS_EXPORT virtual void v_InitObject(
+    SOLVER_UTILS_EXPORT void v_InitObject(
         std::ostream &out = std::cout) override;
 
     /// Virtual function for solve implementation.
-    SOLVER_UTILS_EXPORT virtual void v_Execute(
-        std::ostream &out = std::cout) override;
+    SOLVER_UTILS_EXPORT void v_Execute(std::ostream &out = std::cout) override;
 
 private:
     int m_stepCounter;
@@ -147,7 +144,6 @@ private:
     static std::string driverLookupId;
 };
 
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils
 
 #endif // NEKTAR_SOLVERUTILS_DRIVERSTEADYSTATE_H

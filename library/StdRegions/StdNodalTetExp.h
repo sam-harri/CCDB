@@ -38,9 +38,7 @@
 
 #include <StdRegions/StdTetExp.h>
 
-namespace Nektar
-{
-namespace StdRegions
+namespace Nektar::StdRegions
 {
 class StdNodalTetExp : virtual public StdTetExp
 {
@@ -136,6 +134,5 @@ protected:
 };
 
 typedef std::shared_ptr<StdNodalTetExp> StdNodalTetExpSharedPtr;
-} // namespace StdRegions
-} // namespace Nektar
+} // namespace Nektar::StdRegions
 #endif // STDNODALTETEXP_H

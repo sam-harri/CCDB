@@ -46,9 +46,7 @@ using namespace std;
 #include <StdRegions/StdSegExp.h>
 #include <StdRegions/StdTriExp.h>
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 struct TriFaceIDs
 {
@@ -132,7 +130,7 @@ void ProcessDisplacement::v_Process(po::variables_map &vm)
     vector<string> files;
     files.push_back(toFile);
     LibUtilities::SessionReaderSharedPtr bndSession =
-        LibUtilities::SessionReader::CreateInstance(0, NULL, files);
+        LibUtilities::SessionReader::CreateInstance(0, nullptr, files);
     SpatialDomains::MeshGraphSharedPtr bndGraph =
         SpatialDomains::MeshGraph::Read(bndSession);
 
@@ -301,5 +299,4 @@ void ProcessDisplacement::v_Process(po::variables_map &vm)
                                             bndCondExpW->UpdateCoeffs());
     }
 }
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

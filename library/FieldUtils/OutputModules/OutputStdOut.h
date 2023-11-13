@@ -38,9 +38,7 @@
 #include "../Module.h"
 #include <tinyxml.h>
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 class OutputStdOut : public OutputModule
@@ -54,28 +52,27 @@ public:
     static ModuleKey m_className;
 
     OutputStdOut(FieldSharedPtr f);
-    virtual ~OutputStdOut();
+    ~OutputStdOut() override;
 
 protected:
     /// Write fld to output file.
-    virtual void v_Process(po::variables_map &vm) override;
+    void v_Process(po::variables_map &vm) override;
 
-    virtual std::string v_GetModuleName() override
+    std::string v_GetModuleName() override
     {
         return "OutputStdOut";
     }
 
-    virtual std::string v_GetModuleDescription() override
+    std::string v_GetModuleDescription() override
     {
         return "Output written to StdOut";
     }
 
-    virtual ModulePriority v_GetModulePriority() override
+    ModulePriority v_GetModulePriority() override
     {
         return eOutput;
     }
 };
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils
 
 #endif

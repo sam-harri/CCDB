@@ -40,9 +40,7 @@
 #include <boost/core/ignore_unused.hpp>
 #include <boost/program_options.hpp>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 std::string FilterFieldConvert::className =
     GetFilterFactory().RegisterCreatorFunction("FieldConvert",
@@ -791,5 +789,4 @@ void FilterFieldConvert::CheckModules(std::vector<ModuleSharedPtr> &modules)
     }
 }
 
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils

@@ -47,9 +47,7 @@
 using std::cout;
 using std::endl;
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 std::string FilterBodyFittedVelocity::className =
     GetFilterFactory().RegisterCreatorFunction(
@@ -503,5 +501,4 @@ NekDouble FilterBodyFittedVelocity::v_GetScale()
     return 1.0;
 }
 
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils

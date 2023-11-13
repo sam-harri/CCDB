@@ -35,9 +35,7 @@
 #ifndef NEKTAR_LIBRARY_MF_IPRODUCTWRTDERIVBASE_KERNELS_H
 #define NEKTAR_LIBRARY_MF_IPRODUCTWRTDERIVBASE_KERNELS_H
 
-namespace Nektar
-{
-namespace MatrixFree
+namespace Nektar::MatrixFree
 {
 
 // The dimension and shape kernels. NOTE: They are NOT duplicate
@@ -59,7 +57,9 @@ NEK_FORCE_INLINE static void IProductWRTDerivBaseSegKernel(
     if (!DEFORMED)
     {
         for (int d = 0; d < ndf; ++d)
+        {
             df_tmp[d] = df_ptr[d];
+        }
     }
 
     for (int i = 0; i < nq0; ++i)
@@ -67,12 +67,16 @@ NEK_FORCE_INLINE static void IProductWRTDerivBaseSegKernel(
         if (DEFORMED)
         {
             for (int d = 0; d < ndf; ++d)
+            {
                 df_tmp[d] = df_ptr[i * ndf + d];
+            }
         }
 
         tmp0[i] = df_tmp[0] * tmpIn[0][i];
         for (int d = 1; d < ndf; ++d)
+        {
             tmp0[i] += (df_tmp[d] * tmpIn[d][i]);
+        }
     }
 }
 
@@ -569,7 +573,6 @@ NEK_FORCE_INLINE static void IProductWRTDerivBase3DKernel(
 
 #endif // SHAPE_DIMENSION
 
-} // namespace MatrixFree
-} // namespace Nektar
+} // namespace Nektar::MatrixFree
 
 #endif

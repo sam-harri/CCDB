@@ -34,9 +34,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 #include <SpatialDomains/Geometry1D.h>
 
-namespace Nektar
-{
-namespace SpatialDomains
+namespace Nektar::SpatialDomains
 {
 
 Geometry1D::Geometry1D()
@@ -96,5 +94,4 @@ NekDouble Geometry1D::v_GetLocCoords(const Array<OneD, const NekDouble> &coords,
     }
     return dist;
 }
-} // namespace SpatialDomains
-} // namespace Nektar
+} // namespace Nektar::SpatialDomains

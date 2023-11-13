@@ -42,9 +42,7 @@
 #include <NekMesh/MeshElements/Triangle.h>
 #include <NekMesh/Module/Module.h>
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 enum NekCurve
@@ -60,8 +58,8 @@ class InputNek : public NekMesh::InputModule
 {
 public:
     InputNek(NekMesh::MeshSharedPtr p_m);
-    virtual ~InputNek();
-    virtual void Process();
+    ~InputNek() override;
+    void Process() override;
 
     /// Creates an instance of this class.
     static NekMesh::ModuleSharedPtr create(NekMesh::MeshSharedPtr m)
@@ -71,7 +69,7 @@ public:
     /// %ModuleKey for class.
     static NekMesh::ModuleKey className;
 
-    virtual std::string GetModuleName()
+    std::string GetModuleName() override
     {
         return "InputNek";
     }
@@ -95,7 +93,6 @@ private:
      */
     std::map<int, int> hoMap;
 };
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh
 
 #endif

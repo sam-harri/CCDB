@@ -36,9 +36,7 @@
 #include <MultiRegions/ExpList.h>
 #include <iomanip>
 
-namespace Nektar
-{
-namespace GlobalMapping
+namespace Nektar::GlobalMapping
 {
 
 std::string MappingGeneral::className =
@@ -453,5 +451,4 @@ void MappingGeneral::CalculateChristoffel()
     m_fields[0]->SetWaveSpace(waveSpace);
 }
 
-} // namespace GlobalMapping
-} // namespace Nektar
+} // namespace Nektar::GlobalMapping

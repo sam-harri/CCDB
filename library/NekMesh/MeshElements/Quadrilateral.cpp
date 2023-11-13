@@ -39,9 +39,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 LibUtilities::ShapeType Quadrilateral::m_type =
@@ -265,9 +263,12 @@ unsigned int Quadrilateral::GetNumNodes(ElmtConfig pConf)
 {
     int n = pConf.m_order;
     if (!pConf.m_faceNodes)
+    {
         return 4 * n;
+    }
     else
+    {
         return (n + 1) * (n + 1);
+    }
 }
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh

@@ -40,9 +40,7 @@
 
 #include <UnitTests/LibUtilities/LinearAlgebra/TestCombinationRunner.h>
 
-namespace Nektar
-{
-namespace ScaledMatrixUnitTests
+namespace Nektar::ScaledMatrixUnitTests
 {
 typedef NekMatrix<double> InnerMatrix;
 typedef NekMatrix<InnerMatrix, ScaledMatrixTag> SMat;
@@ -473,5 +471,4 @@ BOOST_AUTO_TEST_CASE(TestScaledTMatrixVectorMultiply)
         BOOST_CHECK_EQUAL(expected_result, result2);
     }
 }
-} // namespace ScaledMatrixUnitTests
-} // namespace Nektar
+} // namespace Nektar::ScaledMatrixUnitTests

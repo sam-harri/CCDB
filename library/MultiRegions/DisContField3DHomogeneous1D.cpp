@@ -40,9 +40,7 @@
 #include <MultiRegions/DisContField3DHomogeneous1D.h>
 #include <MultiRegions/ExpList2DHomogeneous1D.h>
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 
 DisContField3DHomogeneous1D::DisContField3DHomogeneous1D(void)
@@ -769,5 +767,4 @@ void DisContField3DHomogeneous1D::v_SetBndCondBwdWeight(const int index,
 {
     m_bndCondBndWeight[index] = value;
 }
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions

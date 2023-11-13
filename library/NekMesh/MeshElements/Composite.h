@@ -38,9 +38,7 @@
 #include <NekMesh/MeshElements/Element.h>
 #include <NekMesh/NekMeshDeclspec.h>
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 /**
  * @brief A composite is a collection of elements.
@@ -71,7 +69,6 @@ typedef std::shared_ptr<Composite> CompositeSharedPtr;
 /// Container of composites; key is the composite id, value is the
 /// composite.
 typedef std::map<unsigned int, CompositeSharedPtr> CompositeMap;
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh
 
 #endif

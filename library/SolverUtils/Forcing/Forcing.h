@@ -43,9 +43,7 @@
 #include <SolverUtils/Core/SessionFunction.h>
 #include <SolverUtils/SolverUtilsDeclspec.h>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 //  Forward declaration
 class Forcing;
@@ -165,7 +163,6 @@ protected:
         const NekDouble pTime, const LibUtilities::EquationSharedPtr &pEqn,
         Array<OneD, NekDouble> &pArray);
 };
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils
 
 #endif

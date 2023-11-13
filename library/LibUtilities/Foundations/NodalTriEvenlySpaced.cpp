@@ -37,9 +37,7 @@
 #include <LibUtilities/Foundations/NodalTriEvenlySpaced.h>
 #include <vector>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 bool NodalTriEvenlySpaced::initPointsManager[] = {
     PointsManager().RegisterCreator(PointsKey(0, eNodalTriEvenlySpaced),
@@ -246,5 +244,4 @@ void NodalTriEvenlySpaced::NodalPointReorder2d()
     }
 }
 
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities

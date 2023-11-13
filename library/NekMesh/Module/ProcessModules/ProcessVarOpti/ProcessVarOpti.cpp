@@ -62,9 +62,7 @@
 using namespace std;
 using namespace Nektar::NekMesh;
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 ModuleKey ProcessVarOpti::className =
@@ -434,12 +432,12 @@ public:
     {
     }
 
-    virtual ~NodalUtilTriMonomial()
+    ~NodalUtilTriMonomial() override
     {
     }
 
 protected:
-    virtual NekVector<NekDouble> v_OrthoBasis(const size_t mode) override
+    NekVector<NekDouble> v_OrthoBasis(const size_t mode) override
     {
         // Monomial basis.
         std::pair<int, int> modes = m_ordering[mode];
@@ -454,15 +452,15 @@ protected:
         return ret;
     }
 
-    virtual NekVector<NekDouble> v_OrthoBasisDeriv(const size_t dir,
-                                                   const size_t mode) override
+    NekVector<NekDouble> v_OrthoBasisDeriv(const size_t dir,
+                                           const size_t mode) override
     {
         boost::ignore_unused(dir, mode);
         NEKERROR(ErrorUtil::efatal, "OrthoBasisDeriv: not supported");
         return NekVector<NekDouble>();
     }
 
-    virtual std::shared_ptr<NodalUtil> v_CreateUtil(
+    std::shared_ptr<NodalUtil> v_CreateUtil(
         Array<OneD, Array<OneD, NekDouble>> &xi) override
     {
         return MemoryManager<NodalUtilTriMonomial>::AllocateSharedPtr(
@@ -543,5 +541,4 @@ void ProcessVarOpti::Analytics()
         }
     }
 }
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh

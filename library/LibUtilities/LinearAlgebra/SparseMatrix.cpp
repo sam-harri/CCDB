@@ -250,9 +250,13 @@ void NekSparseMatrix<SparseStorageType>::writeBlockSparsityPatternTo(
         const IndexType col = entry->first.second;
 
         if (blk_row != row / blockSize)
+        {
             continue;
+        }
         if (blk_col != col / blockSize)
+        {
             continue;
+        }
         grid[row % blockSize][col % blockSize]++;
     }
 

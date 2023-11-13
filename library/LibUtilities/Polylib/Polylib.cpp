@@ -164,7 +164,9 @@ void zwgj(double *z, double *w, const int np, const double alpha,
           gammaFracGammaF(np + 1, beta, np + 1, apb);
 
     for (i = 0; i < np; ++i)
+    {
         w[i] = fac / (w[i] * w[i] * (one - z[i] * z[i]));
+    }
 
     return;
 }
@@ -195,14 +197,16 @@ void zwgrjm(double *z, double *w, const int np, const double alpha,
 
         z[0] = -one;
         jacobz(np - 1, z + 1, alpha, beta + 1);
-        jacobfd(np, z, w, NULL, np - 1, alpha, beta);
+        jacobfd(np, z, w, nullptr, np - 1, alpha, beta);
 
         fac = pow(two, apb) * gammaFracGammaF(np, alpha, np, 0.0) *
               gammaFracGammaF(np, beta, np + 1, apb);
         fac /= (beta + np);
 
         for (i = 0; i < np; ++i)
+        {
             w[i] = fac * (1 - z[i]) / (w[i] * w[i]);
+        }
         w[0] *= (beta + one);
     }
 
@@ -236,14 +240,16 @@ void zwgrjp(double *z, double *w, const int np, const double alpha,
 
         jacobz(np - 1, z, alpha + 1, beta);
         z[np - 1] = one;
-        jacobfd(np, z, w, NULL, np - 1, alpha, beta);
+        jacobfd(np, z, w, nullptr, np - 1, alpha, beta);
 
         fac = pow(two, apb) * gammaFracGammaF(np, alpha, np, 0.0) *
               gammaFracGammaF(np, beta, np + 1, apb);
         fac /= (alpha + np);
 
         for (i = 0; i < np; ++i)
+        {
             w[i] = fac * (1 + z[i]) / (w[i] * w[i]);
+        }
         w[np - 1] *= (alpha + one);
     }
 
@@ -284,14 +290,16 @@ void zwglj(double *z, double *w, const int np, const double alpha,
         z[0]      = -one;
         z[np - 1] = one;
         jacobz(np - 2, z + 1, alpha + one, beta + one);
-        jacobfd(np, z, w, NULL, np - 1, alpha, beta);
+        jacobfd(np, z, w, nullptr, np - 1, alpha, beta);
 
         fac = pow(two, apb + 1) * gammaFracGammaF(np, alpha, np, 0.0) *
               gammaFracGammaF(np, beta, np + 1, apb);
         fac /= (np - 1);
 
         for (i = 0; i < np; ++i)
+        {
             w[i] = fac / (w[i] * w[i]);
+        }
         w[0] *= (beta + one);
         w[np - 1] *= (alpha + one);
     }
@@ -668,11 +676,15 @@ void Dgj(double *D, const double *z, const int np, const double alpha,
             {
 
                 if (i != j)
+                {
                     D[i * np + j] = pd[j] / (pd[i] * (z[j] - z[i]));
+                }
                 else
+                {
                     D[i * np + j] =
                         (alpha - beta + (alpha + beta + two) * z[j]) /
                         (two * (one - z[j] * z[j]));
+                }
             }
         }
         free(pd);
@@ -711,23 +723,31 @@ void Dgrjm(double *D, const double *z, const int np, const double alpha,
         pd[0] /= gammaF(beta + two);
         jacobd(np - 1, z + 1, pd + 1, np - 1, alpha, beta + 1);
         for (i = 1; i < np; ++i)
+        {
             pd[i] *= (1 + z[i]);
+        }
 
         for (i = 0; i < np; i++)
         {
             for (j = 0; j < np; j++)
             {
                 if (i != j)
+                {
                     D[i * np + j] = pd[j] / (pd[i] * (z[j] - z[i]));
+                }
                 else
                 {
                     if (j == 0)
+                    {
                         D[i * np + j] = -(np + alpha + beta + one) *
                                         (np - one) / (two * (beta + two));
+                    }
                     else
+                    {
                         D[i * np + j] =
                             (alpha - beta + one + (alpha + beta + one) * z[j]) /
                             (two * (one - z[j] * z[j]));
+                    }
                 }
             }
         }
@@ -765,7 +785,9 @@ void Dgrjp(double *D, const double *z, const int np, const double alpha,
 
         jacobd(np - 1, z, pd, np - 1, alpha + 1, beta);
         for (i = 0; i < np - 1; ++i)
+        {
             pd[i] *= (1 - z[i]);
+        }
         pd[np - 1] = -gammaFracGammaF(np + 1, alpha, np, 0.0);
         pd[np - 1] /= gammaF(alpha + two);
 
@@ -774,16 +796,22 @@ void Dgrjp(double *D, const double *z, const int np, const double alpha,
             for (j = 0; j < np; j++)
             {
                 if (i != j)
+                {
                     D[i * np + j] = pd[j] / (pd[i] * (z[j] - z[i]));
+                }
                 else
                 {
                     if (j == np - 1)
+                    {
                         D[i * np + j] = (np + alpha + beta + one) * (np - one) /
                                         (two * (alpha + two));
+                    }
                     else
+                    {
                         D[i * np + j] =
                             (alpha - beta - one + (alpha + beta + one) * z[j]) /
                             (two * (one - z[j] * z[j]));
+                    }
                 }
             }
         }
@@ -823,7 +851,9 @@ void Dglj(double *D, const double *z, const int np, const double alpha,
         pd[0] /= gammaF(beta + two);
         jacobd(np - 2, z + 1, pd + 1, np - 2, alpha + 1, beta + 1);
         for (i = 1; i < np - 1; ++i)
+        {
             pd[i] *= (one - z[i] * z[i]);
+        }
         pd[np - 1] = -two * gammaFracGammaF(np, alpha, np - 1, 0.0);
         pd[np - 1] /= gammaF(alpha + two);
 
@@ -832,20 +862,28 @@ void Dglj(double *D, const double *z, const int np, const double alpha,
             for (j = 0; j < np; j++)
             {
                 if (i != j)
+                {
                     D[i * np + j] = pd[j] / (pd[i] * (z[j] - z[i]));
+                }
                 else
                 {
                     if (j == 0)
+                    {
                         D[i * np + j] =
                             (alpha - (np - 1) * (np + alpha + beta)) /
                             (two * (beta + two));
+                    }
                     else if (j == np - 1)
+                    {
                         D[i * np + j] =
                             -(beta - (np - 1) * (np + alpha + beta)) /
                             (two * (alpha + two));
+                    }
                     else
+                    {
                         D[i * np + j] = (alpha - beta + (alpha + beta) * z[j]) /
                                         (two * (one - z[j] * z[j]));
+                    }
                 }
             }
         }
@@ -884,7 +922,9 @@ double hgj(const int i, const double z, const double *zgj, const int np,
     zi = *(zgj + i);
     dz = z - zi;
     if (fabs(dz) < EPS)
+    {
         return 1.0;
+    }
 
     return laginterp(z, i, zgj, np);
 }
@@ -920,7 +960,9 @@ double hgrjm(const int i, const double z, const double *zgrj, const int np,
     zi = *(zgrj + i);
     dz = z - zi;
     if (fabs(dz) < EPS)
+    {
         return 1.0;
+    }
 
     return laginterp(z, i, zgrj, np);
 }
@@ -955,7 +997,9 @@ double hgrjp(const int i, const double z, const double *zgrj, const int np,
     zi = *(zgrj + i);
     dz = z - zi;
     if (fabs(dz) < EPS)
+    {
         return 1.0;
+    }
 
     return laginterp(z, i, zgrj, np);
 }
@@ -991,7 +1035,9 @@ double hglj(const int i, const double z, const double *zglj, const int np,
     zi = *(zglj + i);
     dz = z - zi;
     if (fabs(dz) < EPS)
+    {
         return 1.0;
+    }
 
     return laginterp(z, i, zglj, np);
 }
@@ -1210,25 +1256,43 @@ void jacobfd(const int np, const double *z, double *poly_in, double *polyd,
     double zero = 0.0, one = 1.0, two = 2.0;
 
     if (!np)
+    {
         return;
+    }
 
     if (n == 0)
     {
         if (poly_in)
+        {
             for (i = 0; i < np; ++i)
+            {
                 poly_in[i] = one;
+            }
+        }
         if (polyd)
+        {
             for (i = 0; i < np; ++i)
+            {
                 polyd[i] = zero;
+            }
+        }
     }
     else if (n == 1)
     {
         if (poly_in)
+        {
             for (i = 0; i < np; ++i)
+            {
                 poly_in[i] = 0.5 * (alpha - beta + (alpha + beta + two) * z[i]);
+            }
+        }
         if (polyd)
+        {
             for (i = 0; i < np; ++i)
+            {
                 polyd[i] = 0.5 * (alpha + beta + two);
+            }
+        }
     }
     else
     {
@@ -1321,14 +1385,20 @@ void jacobd(const int np, const double *z, double *polyd, const int n,
     int i;
     double one = 1.0;
     if (n == 0)
+    {
         for (i = 0; i < np; ++i)
+        {
             polyd[i] = 0.0;
+        }
+    }
     else
     {
         // jacobf(np,z,polyd,n-1,alpha+one,beta+one);
-        jacobfd(np, z, polyd, NULL, n - 1, alpha + one, beta + one);
+        jacobfd(np, z, polyd, nullptr, n - 1, alpha + one, beta + one);
         for (i = 0; i < np; ++i)
+        {
             polyd[i] *= 0.5 * (alpha + beta + (double)n + one);
+        }
     }
     return;
 }
@@ -1349,9 +1419,13 @@ double gammaF(const double x)
     double gamma = 1.0;
 
     if (x == -0.5)
+    {
         gamma = -2.0 * sqrt(M_PI);
+    }
     else if (!x)
+    {
         return gamma;
+    }
     else if ((x - (int)x) == 0.5)
     {
         int n      = (int)x;
@@ -1376,7 +1450,9 @@ double gammaF(const double x)
         }
     }
     else
+    {
         fprintf(stderr, "%lf is not of integer or half order\n", x);
+    }
     return gamma;
 }
 
@@ -1406,12 +1482,16 @@ double gammaFracGammaF(const int x, const double alpha, const int y,
         if (X > Y)
         {
             for (int tmp = X - 1; tmp > Y - 1; tmp -= 1)
+            {
                 gamma *= tmp;
+            }
         }
         else if (Y > X)
         {
             for (int tmp = Y - 1; tmp > X - 1; tmp -= 1)
+            {
                 gamma *= tmp;
+            }
             gamma = 1. / gamma;
         }
     }
@@ -1422,12 +1502,16 @@ double gammaFracGammaF(const int x, const double alpha, const int y,
         if (X > Y)
         {
             for (int tmp = int(X); tmp > int(Y); tmp -= 1)
+            {
                 gamma *= tmp - 0.5;
+            }
         }
         else if (Y > X)
         {
             for (int tmp = int(Y); tmp > int(X); tmp -= 1)
+            {
                 gamma *= tmp - 0.5;
+            }
             gamma = 1. / gamma;
         }
     }
@@ -1492,7 +1576,9 @@ std::complex<Nektar::NekDouble> ImagBesselComp(
     {
         z = z * (1.0 / i / (i + n) * zarg);
         if (abs(z) <= tol)
+        {
             break;
+        }
         zbes = zbes + z;
         i++;
     }
@@ -1522,25 +1608,33 @@ static void Jacobz(const int n, double *z, const double alpha,
     double one = 1.0, two = 2.0;
 
     if (!n)
+    {
         return;
+    }
 
     for (k = 0; k < n; ++k)
     {
         r = -cos((two * (double)k + one) * dth);
         if (k)
+        {
             r = 0.5 * (r + rlast);
+        }
 
         for (j = 1; j < STOP; ++j)
         {
             jacobfd(1, &r, &poly, &pder, n, alpha, beta);
 
             for (i = 0, sum = 0.0; i < k; ++i)
+            {
                 sum += one / (r - z[i]);
+            }
 
             delr = -poly / (pder - sum * poly);
             r += delr;
             if (fabs(delr) < EPS)
+            {
                 break;
+            }
         }
         z[k]  = r;
         rlast = r;
@@ -1612,7 +1706,9 @@ static void RecCoeff(const int n, double *a, double *b, const double alpha,
     double apb, apbi, a2b2;
 
     if (!n)
+    {
         return;
+    }
 
     // generate normalised terms
     apb  = alpha + beta;
@@ -1686,7 +1782,9 @@ static void TriQL(const int n, double *d, double *e, double **z)
             {
                 dd = fabs(d[m]) + fabs(d[m + 1]);
                 if (fabs(e[m]) + dd == dd)
+                {
                     break;
+                }
             }
             if (m != l)
             {
@@ -1747,11 +1845,13 @@ static void TriQL(const int n, double *d, double *e, double **z)
         k = i;
         p = d[i];
         for (l = i + 1; l < n; ++l)
+        {
             if (d[l] < p)
             {
                 k = l;
                 p = d[l];
             }
+        }
         d[k] = d[i];
         d[i] = p;
 

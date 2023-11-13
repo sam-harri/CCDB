@@ -62,7 +62,7 @@ public:
     static std::string className;
 
     /// Destructor
-    virtual ~UnsteadyInviscidBurger();
+    ~UnsteadyInviscidBurger() override;
 
 protected:
     SolverUtils::RiemannSolverSharedPtr m_riemannSolver;
@@ -93,7 +93,7 @@ protected:
     Array<OneD, NekDouble> &GetNormalVelocity();
 
     /// Initialise the object
-    virtual void v_InitObject(bool DeclareFields = true) override;
+    void v_InitObject(bool DeclareFields = true) override;
 
 private:
 };

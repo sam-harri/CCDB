@@ -41,9 +41,7 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/core/ignore_unused.hpp>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 std::string FilterIntegral::className =
     GetFilterFactory().RegisterCreatorFunction("Integral",
@@ -375,5 +373,4 @@ bool FilterIntegral::v_IsTimeDependent()
     return true;
 }
 
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils

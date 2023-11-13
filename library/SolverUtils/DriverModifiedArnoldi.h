@@ -38,9 +38,7 @@
 
 #include <SolverUtils/DriverArnoldi.h>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 
 class DriverModifiedArnoldi : public DriverArnoldi
@@ -69,13 +67,13 @@ protected:
                           const SpatialDomains::MeshGraphSharedPtr pGraph);
 
     /// Destructor
-    virtual ~DriverModifiedArnoldi() = default;
+    ~DriverModifiedArnoldi() override = default;
 
     /// Virtual function for initialisation implementation.
-    virtual void v_InitObject(std::ostream &out = std::cout) override;
+    void v_InitObject(std::ostream &out = std::cout) override;
 
     /// Virtual function for solve implementation.
-    virtual void v_Execute(std::ostream &out = std::cout) override;
+    void v_Execute(std::ostream &out = std::cout) override;
 
     static std::string driverLookupId;
 
@@ -113,7 +111,6 @@ private:
                 Array<OneD, NekDouble> &wr, Array<OneD, NekDouble> &wi);
 };
 
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils
 
 #endif // NEKTAR_SOLVERS_AUXILIARY_ADRBASE_H

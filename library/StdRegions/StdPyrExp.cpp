@@ -40,9 +40,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace StdRegions
+namespace Nektar::StdRegions
 {
 StdPyrExp::StdPyrExp(const LibUtilities::BasisKey &Ba,
                      const LibUtilities::BasisKey &Bb,
@@ -2199,5 +2197,4 @@ void StdPyrExp::v_ReduceOrderCoeffs(int numMin,
     StdPyrExp::FwdTrans(phys_tmp, outarray);
 }
 
-} // namespace StdRegions
-} // namespace Nektar
+} // namespace Nektar::StdRegions

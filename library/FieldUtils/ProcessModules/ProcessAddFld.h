@@ -37,9 +37,7 @@
 
 #include "../Module.h"
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 /**
@@ -57,28 +55,28 @@ public:
     static ModuleKey className;
 
     ProcessAddFld(FieldSharedPtr f);
-    virtual ~ProcessAddFld();
+    ~ProcessAddFld() override;
 
 protected:
     /// Write mesh to output file.
-    virtual void v_Process(po::variables_map &vm) override;
+    void v_Process(po::variables_map &vm) override;
 
-    virtual std::string v_GetModuleName() override
+    std::string v_GetModuleName() override
     {
         return "ProcessAddFld";
     }
 
-    virtual std::string v_GetModuleDescription() override
+    std::string v_GetModuleDescription() override
     {
         return "Adding new fld to input fld";
     }
 
-    virtual ModulePriority v_GetModulePriority() override
+    ModulePriority v_GetModulePriority() override
     {
         return m_priority;
     }
 
-    virtual std::vector<ModuleKey> v_GetModulePrerequisites() override
+    std::vector<ModuleKey> v_GetModulePrerequisites() override
     {
         return {{eProcessModule, "createExp"}};
     }
@@ -86,7 +84,6 @@ protected:
 private:
     ModulePriority m_priority;
 };
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils
 
 #endif

@@ -36,9 +36,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 ElementFactory &GetElementFactory()
@@ -227,5 +225,4 @@ string Element::GetXmlCurveString()
     return s.str();
 }
 
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh

@@ -42,9 +42,7 @@
 #include <MultiRegions/SubStructuredGraph.h>
 #include <vector>
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 // Forward declarations
 class AssemblyMap;
@@ -520,7 +518,6 @@ private:
     PatchMapSharedPtr m_patchMapFromPrevLevel;
 };
 
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions
 
 #endif // MULTIREGIONS_ASSEMBLY_MAP_H

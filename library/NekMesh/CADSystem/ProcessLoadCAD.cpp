@@ -39,9 +39,7 @@
 #include <boost/filesystem.hpp>
 
 using namespace std;
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 ModuleKey ProcessLoadCAD::className =
@@ -130,5 +128,4 @@ void ProcessLoadCAD::Process()
 
     ASSERTL0(m_mesh->m_cad->LoadCAD(), "Failed to load CAD");
 }
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh

@@ -46,10 +46,7 @@
 #include "traits.hpp"
 #include <vector>
 
-namespace tinysimd
-{
-
-namespace abi
+namespace tinysimd::abi
 {
 
 template <typename scalarType, int width = 0> struct avx512
@@ -57,9 +54,12 @@ template <typename scalarType, int width = 0> struct avx512
     using type = void;
 };
 
-} // namespace abi
+} // namespace tinysimd::abi
 
 #if defined(__AVX512F__) && defined(NEKTAR_ENABLE_SIMD_AVX512)
+
+namespace tinysimd
+{
 
 // forward declaration of concrete types
 template <typename T> struct avx512Long8;
@@ -978,7 +978,8 @@ inline bool operator&&(avx512Mask16 lhs, bool rhs)
     return tmp && rhs;
 }
 
+} // namespace tinysimd
+
 #endif // defined(__avx512__)
 
-} // namespace tinysimd
 #endif

@@ -34,9 +34,7 @@
 
 #include <LibUtilities/Foundations/ManagerAccess.h>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 PointsManagerT &PointsManager(void)
@@ -51,5 +49,4 @@ BasisManagerT &BasisManager(void)
     return instance;
 }
 
-} // end of namespace LibUtilities
-} // end of namespace Nektar
+} // namespace Nektar::LibUtilities

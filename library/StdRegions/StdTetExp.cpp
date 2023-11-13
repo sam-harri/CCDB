@@ -39,9 +39,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace StdRegions
+namespace Nektar::StdRegions
 {
 StdTetExp::StdTetExp()
 {
@@ -2316,5 +2314,4 @@ void StdTetExp::v_GetSimplexEquiSpacedConnectivity(Array<OneD, int> &conn,
     }
 }
 
-} // namespace StdRegions
-} // namespace Nektar
+} // namespace Nektar::StdRegions

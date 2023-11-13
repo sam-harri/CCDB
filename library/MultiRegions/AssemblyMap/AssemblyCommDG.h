@@ -38,9 +38,7 @@
 #include <LibUtilities/BasicUtils/Timer.h>
 #include <MultiRegions/ExpList.h>
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 
 /**
@@ -301,7 +299,6 @@ private:
 
 typedef std::shared_ptr<AssemblyCommDG> AssemblyCommDGSharedPtr;
 
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions
 
 #endif

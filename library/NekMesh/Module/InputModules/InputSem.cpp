@@ -39,9 +39,7 @@
 using namespace std;
 using namespace Nektar::NekMesh;
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 ModuleKey InputSem::className = GetModuleFactory().RegisterCreatorFunction(
@@ -180,7 +178,9 @@ void InputSem::Process()
     {
         getline(m_fileStream, line);
         if (line.length() < 7)
+        {
             continue;
+        }
         ss.clear();
         ss.str(line);
         double x = 0, y = 0, z = 0;
@@ -664,5 +664,4 @@ void InputSem::insertEdge(int elmt, int side, int tagId)
         LibUtilities::eSegment, conf, edgeNodes, tags);
     m_mesh->m_element[1].push_back(E);
 }
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh

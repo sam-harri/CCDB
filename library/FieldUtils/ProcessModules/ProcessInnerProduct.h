@@ -37,9 +37,7 @@
 
 #include "../Module.h"
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 /**
@@ -57,23 +55,23 @@ public:
     static ModuleKey className;
 
     ProcessInnerProduct(FieldSharedPtr f);
-    virtual ~ProcessInnerProduct();
+    ~ProcessInnerProduct() override;
 
 protected:
     /// Write mesh to output file.
-    virtual void v_Process(po::variables_map &vm) override;
+    void v_Process(po::variables_map &vm) override;
 
-    virtual std::string v_GetModuleName() override
+    std::string v_GetModuleName() override
     {
         return "ProcessInnerProduct";
     }
 
-    virtual std::string v_GetModuleDescription() override
+    std::string v_GetModuleDescription() override
     {
         return "Evaluating inner product";
     }
 
-    virtual ModulePriority v_GetModulePriority() override
+    ModulePriority v_GetModulePriority() override
     {
         return eModifyExp;
     }
@@ -83,7 +81,6 @@ private:
                        FieldSharedPtr &fromField,
                        Array<OneD, const Array<OneD, NekDouble>> &SaveFld);
 };
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils
 
 #endif

@@ -34,9 +34,7 @@
 
 #include <NekMesh/MeshElements/Node.h>
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 /// Define node equality based on coordinate with optional custom tolerance
@@ -59,5 +57,4 @@ NEKMESH_EXPORT bool IsNodeClose(const Node &n1, const Node &n2,
            LibUtilities::IsRealClose(n1.m_z, n2.m_z, tol);
 }
 
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh

@@ -39,9 +39,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace StdRegions
+namespace Nektar::StdRegions
 {
 
 StdPrismExp::StdPrismExp()
@@ -1775,7 +1773,9 @@ void StdPrismExp::v_GetTraceInteriorToElementMap(
     // Triangular faces are processed in the above switch loop; for
     // remaining quad faces, set up orientation if necessary.
     if (fid == 1 || fid == 3)
+    {
         return;
+    }
 
     if (faceOrient == eDir1FwdDir1_Dir2BwdDir2 ||
         faceOrient == eDir1BwdDir1_Dir2BwdDir2 ||
@@ -2207,5 +2207,4 @@ void StdPrismExp::v_ReduceOrderCoeffs(
     OrthoPrismExp->BwdTrans(coeff_tmp1, phys_tmp);
     StdPrismExp::FwdTrans(phys_tmp, outarray);
 }
-} // namespace StdRegions
-} // namespace Nektar
+} // namespace Nektar::StdRegions

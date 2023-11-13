@@ -36,9 +36,7 @@
 
 #include <SolverUtils/Advection/Advection.h>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 
 /**
@@ -332,5 +330,4 @@ void Advection::v_SetBaseFlow(
              "A baseflow is not appropriate for this advection type.");
 }
 
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils

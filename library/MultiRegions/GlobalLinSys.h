@@ -40,9 +40,7 @@
 #include <MultiRegions/GlobalLinSysKey.h>
 #include <MultiRegions/MultiRegionsDeclspec.h>
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 // Forward declarations
 class ExpList;
@@ -232,7 +230,6 @@ inline int GlobalLinSys::GetNumBlocks()
 {
     return v_GetNumBlocks();
 }
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions
 
 #endif

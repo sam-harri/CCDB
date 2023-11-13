@@ -35,9 +35,7 @@
 #ifndef NEKTAR_LIBRARY_MF_HELMHOLTZ_KERNELS_H
 #define NEKTAR_LIBRARY_MF_HELMHOLTZ_KERNELS_H
 
-namespace Nektar
-{
-namespace MatrixFree
+namespace Nektar::MatrixFree
 {
 
 using namespace tinysimd;
@@ -1507,7 +1505,6 @@ NEK_FORCE_INLINE static void DiffusionCoeff3DKernel(
 
 #endif // SHAPE_DIMENSION
 
-} // namespace MatrixFree
-} // namespace Nektar
+} // namespace Nektar::MatrixFree
 
 #endif

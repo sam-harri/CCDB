@@ -43,9 +43,7 @@ using namespace std;
 
 #include "ProcessHalfModeToFourier.h"
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 ModuleKey ProcessHalfModeToFourier::className =
@@ -155,5 +153,4 @@ void ProcessHalfModeToFourier::v_Process(po::variables_map &vm)
         }
     }
 }
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

@@ -39,9 +39,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace StdRegions
+namespace Nektar::StdRegions
 {
 /** \brief defult constructor */
 StdSegExp::StdSegExp()
@@ -946,5 +944,4 @@ void StdSegExp::v_GetElmtTraceToTraceMap(const unsigned int eid,
     }
 }
 
-} // namespace StdRegions
-} // namespace Nektar
+} // namespace Nektar::StdRegions

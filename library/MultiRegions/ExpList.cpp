@@ -75,9 +75,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 /**
  * @class ExpList
@@ -3317,7 +3315,7 @@ void ExpList::v_WriteTecplotField(std::ostream &outfile, int expansion)
 void ExpList::WriteVtkHeader(std::ostream &outfile)
 {
     outfile << "<?xml version=\"1.0\"?>" << endl;
-    outfile << "<VTKFile type=\"UnstructuredGrid\" version=\"0.1\" "
+    outfile << R"(<VTKFile type="UnstructuredGrid" version="0.1" )"
             << "byte_order=\"LittleEndian\">" << endl;
     outfile << "  <UnstructuredGrid>" << endl;
 }
@@ -3354,7 +3352,7 @@ void ExpList::v_WriteVtkPieceHeader(std::ostream &outfile, int expansion,
             << ntotminus << "\">" << endl;
     outfile << "      <Points>" << endl;
     outfile << "        <DataArray type=\"Float64\" "
-            << "NumberOfComponents=\"3\" format=\"ascii\">" << endl;
+            << R"(NumberOfComponents="3" format="ascii">)" << endl;
     outfile << "          ";
     for (i = 0; i < ntot; ++i)
     {
@@ -3370,7 +3368,7 @@ void ExpList::v_WriteVtkPieceHeader(std::ostream &outfile, int expansion,
     outfile << "      </Points>" << endl;
     outfile << "      <Cells>" << endl;
     outfile << "        <DataArray type=\"Int32\" "
-            << "Name=\"connectivity\" format=\"ascii\">" << endl;
+            << R"(Name="connectivity" format="ascii">)" << endl;
 
     int ns = 0; // pow(2,dim) for later usage
     string ostr;
@@ -3443,7 +3441,7 @@ void ExpList::v_WriteVtkPieceHeader(std::ostream &outfile, int expansion,
     outfile << endl;
     outfile << "        </DataArray>" << endl;
     outfile << "        <DataArray type=\"Int32\" "
-            << "Name=\"offsets\" format=\"ascii\">" << endl;
+            << R"(Name="offsets" format="ascii">)" << endl;
     for (i = 0; i < ntotminus; ++i)
     {
         outfile << i * ns + ns << " ";
@@ -3451,7 +3449,7 @@ void ExpList::v_WriteVtkPieceHeader(std::ostream &outfile, int expansion,
     outfile << endl;
     outfile << "        </DataArray>" << endl;
     outfile << "        <DataArray type=\"UInt8\" "
-            << "Name=\"types\" format=\"ascii\">" << endl;
+            << R"(Name="types" format="ascii">)" << endl;
     for (i = 0; i < ntotminus; ++i)
     {
         outfile << ostr;
@@ -3476,7 +3474,7 @@ void ExpList::v_WriteVtkPieceData(std::ostream &outfile, int expansion,
     int nq = (*m_exp)[expansion]->GetTotPoints();
 
     // printing the fields of that zone
-    outfile << "        <DataArray type=\"Float64\" Name=\"" << var << "\">"
+    outfile << R"(        <DataArray type="Float64" Name=")" << var << "\">"
             << endl;
     outfile << "          ";
 
@@ -6376,5 +6374,4 @@ const LocTraceToTraceMapSharedPtr &ExpList::v_GetLocTraceToTraceMap() const
     return NullLocTraceToTraceMapSharedPtr;
 }
 
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions

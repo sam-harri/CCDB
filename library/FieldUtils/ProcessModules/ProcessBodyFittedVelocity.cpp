@@ -49,9 +49,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 ModuleKey ProcessBodyFittedVelocity::className =
@@ -905,5 +903,4 @@ void ProcessBodyFittedVelocity::GetVelAndConvertToCartSys(
     }
 }
 
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

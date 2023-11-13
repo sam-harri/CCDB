@@ -40,9 +40,7 @@
 
 #include <LibUtilities/BasicUtils/Timer.h>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 std::string AdvectionWeakDG::type =
     GetAdvectionFactory().RegisterCreatorFunction(
@@ -232,5 +230,4 @@ void AdvectionWeakDG::AdvectTraceFlux(
     timer.AccumulateRegion("AdvWeakDG:_Riemann", 10);
 }
 
-} // end of namespace SolverUtils
-} // end of namespace Nektar
+} // namespace Nektar::SolverUtils

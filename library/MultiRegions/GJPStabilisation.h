@@ -40,9 +40,7 @@
 #include <MultiRegions/GlobalMatrix.h>
 #include <MultiRegions/MultiRegionsDeclspec.h>
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 
 class GJPStabilisation
@@ -103,6 +101,5 @@ private:
 };
 
 typedef std::shared_ptr<GJPStabilisation> GJPStabilisationSharedPtr;
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions
 #endif // GJP

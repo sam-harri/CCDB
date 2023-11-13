@@ -43,6 +43,10 @@ else
     TEST_JOBS="1"
 fi
 
+if [[ $EXPORT_COMPILE_COMMANDS != "" ]]; then
+    BUILD_OPTS="$BUILD_OPTS -DCMAKE_EXPORT_COMPILE_COMMANDS=ON"
+fi
+
 # Custom compiler
 if [[ $BUILD_CC != "" ]]; then
    BUILD_OPTS="$BUILD_OPTS -DCMAKE_C_COMPILER=${BUILD_CC}"
@@ -54,14 +58,20 @@ if [[ $BUILD_FC != "" ]]; then
    BUILD_OPTS="$BUILD_OPTS -DCMAKE_Fortran_COMPILER=${BUILD_FC}"
 fi
 
-rm -rf build && mkdir -p build && (cd build && cmake -G 'Unix Makefiles' $BUILD_OPTS ..) && \
-    make -C build -j $NUM_CPUS all 2>&1 && \
-    make -C build -j $NUM_CPUS install && \
-    (cd build && ctest -j $TEST_JOBS --output-on-failure)
+rm -rf build && mkdir -p build && (cd build && cmake -G 'Unix Makefiles' $BUILD_OPTS ..)
+
+if [[ $EXPORT_COMPILE_COMMANDS != "" ]]; then
+    # If we are just exporting compile commands for clang-tidy, just build any
+    # third-party dependencies that we need.
+    make -C build -j $NUM_CPUS thirdparty 2>&1
+else
+    # Otherwise build and test the code.
+    make -C build -j $NUM_CPUS all 2>&1 && make -C build -j $NUM_CPUS install && \
+        (cd build && ctest -j $TEST_JOBS --output-on-failure)
+fi
 
 exit_code=$?
-if [[ $exit_code -ne 0 ]]
-then
+if [[ $exit_code -ne 0 ]]; then
     [[ $OS_VERSION != "macos" ]] && rm -rf build/dist
     exit $exit_code
 fi

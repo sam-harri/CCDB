@@ -40,9 +40,7 @@
 #include <MultiRegions/MultiRegionsDeclspec.h>
 #include <vector>
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 
 // Forward declaration for typedefs
@@ -93,7 +91,7 @@ public:
             Collections::eNoImpType);
 
     /// Destructor.
-    MULTI_REGIONS_EXPORT virtual ~ExpList3DHomogeneous2D();
+    MULTI_REGIONS_EXPORT ~ExpList3DHomogeneous2D() override;
 
 protected:
     /// Definition of the total number of degrees of freedom and
@@ -102,28 +100,26 @@ protected:
     void SetCoeffPhys(void);
 
     //  virtual functions
-    virtual void v_GetCoords(Array<OneD, NekDouble> &coord_0,
-                             Array<OneD, NekDouble> &coord_1,
-                             Array<OneD, NekDouble> &coord_2) override;
+    void v_GetCoords(Array<OneD, NekDouble> &coord_0,
+                     Array<OneD, NekDouble> &coord_1,
+                     Array<OneD, NekDouble> &coord_2) override;
 
-    virtual void v_GetCoords(const int eid, Array<OneD, NekDouble> &xc0,
-                             Array<OneD, NekDouble> &xc1,
-                             Array<OneD, NekDouble> &xc2) override final;
+    void v_GetCoords(const int eid, Array<OneD, NekDouble> &xc0,
+                     Array<OneD, NekDouble> &xc1,
+                     Array<OneD, NekDouble> &xc2) final;
 
-    virtual void v_WriteTecplotZone(std::ostream &outfile,
-                                    int expansion) override;
+    void v_WriteTecplotZone(std::ostream &outfile, int expansion) override;
 
-    virtual void v_WriteVtkPieceHeader(std::ostream &outfile, int expansion,
-                                       int istrip) override;
+    void v_WriteVtkPieceHeader(std::ostream &outfile, int expansion,
+                               int istrip) override;
 
-    virtual NekDouble v_L2(const Array<OneD, const NekDouble> &inarray,
-                           const Array<OneD, const NekDouble> &soln =
-                               NullNekDouble1DArray) override;
+    NekDouble v_L2(const Array<OneD, const NekDouble> &inarray,
+                   const Array<OneD, const NekDouble> &soln =
+                       NullNekDouble1DArray) override;
 
 private:
 };
 
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions
 
 #endif // EXPLIST3DHOMO2D_H

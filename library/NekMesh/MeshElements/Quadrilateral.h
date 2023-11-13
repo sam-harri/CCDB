@@ -38,9 +38,7 @@
 #include <NekMesh/MeshElements/Element.h>
 #include <NekMesh/NekMeshDeclspec.h>
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 /**
@@ -63,25 +61,24 @@ public:
                                  std::vector<NodeSharedPtr> pNodeList,
                                  std::vector<int> pTagList);
     NEKMESH_EXPORT Quadrilateral(const Quadrilateral &pSrc);
-    NEKMESH_EXPORT virtual ~Quadrilateral()
+    NEKMESH_EXPORT ~Quadrilateral() override
     {
     }
 
-    NEKMESH_EXPORT virtual SpatialDomains::GeometrySharedPtr GetGeom(
-        int coordDim);
-    NEKMESH_EXPORT virtual void GetCurvedNodes(
-        std::vector<NodeSharedPtr> &nodeList) const;
-    NEKMESH_EXPORT virtual StdRegions::Orientation GetEdgeOrient(
-        int edgeId, EdgeSharedPtr edge);
-    NEKMESH_EXPORT virtual void MakeOrder(
-        int order, SpatialDomains::GeometrySharedPtr geom,
-        LibUtilities::PointsType pType, int coordDim, int &id,
-        bool justConfig = false);
+    NEKMESH_EXPORT SpatialDomains::GeometrySharedPtr GetGeom(
+        int coordDim) override;
+    NEKMESH_EXPORT void GetCurvedNodes(
+        std::vector<NodeSharedPtr> &nodeList) const override;
+    NEKMESH_EXPORT StdRegions::Orientation GetEdgeOrient(
+        int edgeId, EdgeSharedPtr edge) override;
+    NEKMESH_EXPORT void MakeOrder(int order,
+                                  SpatialDomains::GeometrySharedPtr geom,
+                                  LibUtilities::PointsType pType, int coordDim,
+                                  int &id, bool justConfig = false) override;
 
     NEKMESH_EXPORT static unsigned int GetNumNodes(ElmtConfig pConf);
 };
 
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh
 
 #endif

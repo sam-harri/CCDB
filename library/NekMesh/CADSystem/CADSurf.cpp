@@ -44,9 +44,7 @@ typedef bg::model::d2::point_xy<double> point_xy;
 
 using namespace std;
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 void CADSurf::OrientateEdges(CADSurfSharedPtr surf,
@@ -165,5 +163,4 @@ void CADSurf::OrientateEdges(CADSurfSharedPtr surf,
         }
     }
 }
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh

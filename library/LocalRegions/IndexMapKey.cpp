@@ -35,9 +35,7 @@
 #include <LocalRegions/IndexMapKey.h>
 #include <LocalRegions/LocalRegions.hpp>
 
-namespace Nektar
-{
-namespace LocalRegions
+namespace Nektar::LocalRegions
 {
 IndexMapKey::IndexMapKey(const IndexMapType indexmapType,
                          const LibUtilities::ShapeType shapeType,
@@ -189,5 +187,4 @@ std::ostream &operator<<(std::ostream &os, const IndexMapKey &rhs)
        << std::endl;
     return os;
 }
-} // namespace LocalRegions
-} // namespace Nektar
+} // namespace Nektar::LocalRegions

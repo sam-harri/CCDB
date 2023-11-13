@@ -36,9 +36,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 EngineFactory &GetEngineFactory()
@@ -106,5 +104,4 @@ Array<OneD, NekDouble> CADSystem::GetPeriodicTranslationVector(int first,
     return ret;
 }
 
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh

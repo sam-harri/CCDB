@@ -37,9 +37,7 @@
 
 #include <SolverUtils/Filters/Filter.h>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 class FilterIntegral : public Filter
 {
@@ -67,7 +65,7 @@ public:
         const ParamMap &pParams);
 
     /// Default destructor
-    SOLVER_UTILS_EXPORT virtual ~FilterIntegral() = default;
+    SOLVER_UTILS_EXPORT ~FilterIntegral() override = default;
 
 protected:
     /**
@@ -77,9 +75,9 @@ protected:
      * @param pFields Field data
      * @param time Current time
      */
-    virtual void v_Initialise(
+    void v_Initialise(
         const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
-        const NekDouble &time) override final;
+        const NekDouble &time) final;
 
     /**
      * Performs the integration on the stored composite expansions and outputs
@@ -88,9 +86,9 @@ protected:
      * @param pFields Field data
      * @param time Current time
      */
-    virtual void v_Update(
+    void v_Update(
         const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
-        const NekDouble &time) override final;
+        const NekDouble &time) final;
 
     /**
      * Closes the output data file
@@ -98,12 +96,12 @@ protected:
      * @param pFields Field data
      * @param time Current time
      */
-    virtual void v_Finalise(
+    void v_Finalise(
         const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
-        const NekDouble &time) override final;
+        const NekDouble &time) final;
 
     /// Returns true as filter depends on time
-    virtual bool v_IsTimeDependent() override final;
+    bool v_IsTimeDependent() final;
 
 private:
     size_t m_index = 0;
@@ -125,7 +123,6 @@ private:
     std::map<int, std::vector<std::pair<LocalRegions::ExpansionSharedPtr, int>>>
         m_compExpMap;
 };
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils
 
 #endif /* NEKTAR_SOLVERUTILS_FILTERS_FILTERIntegral_H */

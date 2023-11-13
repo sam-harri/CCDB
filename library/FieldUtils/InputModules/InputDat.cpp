@@ -46,9 +46,7 @@ using namespace std;
 
 #include "InputDat.h"
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 ModuleKey InputDat::m_className[1] = {
@@ -219,5 +217,4 @@ void InputDat::ReadTecplotFEBlockZone(std::ifstream &datFile, string &line,
 
     getline(datFile, line);
 }
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

@@ -39,9 +39,7 @@
 #include <NekMesh/CADSystem/CADSurf.h>
 #include <NekMesh/MeshElements/Edge.h>
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 using namespace std;
@@ -189,5 +187,4 @@ void Edge::MakeOrder(int order, SpatialDomains::GeometrySharedPtr geom,
         }
     }
 }
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh

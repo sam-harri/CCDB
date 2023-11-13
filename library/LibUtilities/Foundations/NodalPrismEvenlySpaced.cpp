@@ -37,9 +37,7 @@
 #include <LibUtilities/Foundations/NodalPrismEvenlySpaced.h>
 #include <vector>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 bool NodalPrismEvenlySpaced::initPointsManager[] = {
     PointsManager().RegisterCreator(PointsKey(0, eNodalPrismEvenlySpaced),
@@ -443,5 +441,4 @@ std::shared_ptr<PointsBaseType> NodalPrismEvenlySpaced::Create(
 
     return returnval;
 }
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities

@@ -49,9 +49,7 @@ using namespace std;
 
 #include "ProcessInterpPtsToPts.h"
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 ModuleKey ProcessInterpPtsToPts::className =
@@ -487,5 +485,4 @@ void ProcessInterpPtsToPts::PrintProgressbar(const int position,
 {
     LibUtilities::PrintProgressbar(position, goal, "Interpolating");
 }
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

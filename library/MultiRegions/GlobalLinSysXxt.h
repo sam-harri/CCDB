@@ -44,9 +44,7 @@ namespace Xxt
 struct crs_data;
 }
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 // Forward declarations
 
@@ -61,7 +59,7 @@ public:
         const GlobalLinSysKey &pKey, const std::weak_ptr<ExpList> &pExp,
         const std::shared_ptr<AssemblyMap> &pLocToGloMap);
 
-    MULTI_REGIONS_EXPORT virtual ~GlobalLinSysXxt();
+    MULTI_REGIONS_EXPORT ~GlobalLinSysXxt() override;
 
 protected:
     struct Xxt::crs_data *m_crsData;
@@ -69,6 +67,5 @@ protected:
     Array<OneD, unsigned int> m_Aj;
     Array<OneD, double> m_Ar;
 };
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions
 #endif /* GLOBALLINSYSXXT_H_ */

@@ -40,9 +40,7 @@
 #include <LibUtilities/LinearAlgebra/NekVector.hpp>
 #include <vector>
 
-namespace Nektar
-{
-namespace NekLinAlgTests
+namespace Nektar::NekLinAlgTests
 {
 BOOST_AUTO_TEST_CASE(TestGramSchmidtOrthogonalizationBookExample)
 {
@@ -66,5 +64,4 @@ BOOST_AUTO_TEST_CASE(TestGramSchmidtOrthogonalizationBookExample)
     BOOST_CHECK_CLOSE(q[1][1], .85890, epsilon);
     BOOST_CHECK_CLOSE(q[1][2], -.22890, epsilon);
 }
-} // namespace NekLinAlgTests
-} // namespace Nektar
+} // namespace Nektar::NekLinAlgTests

@@ -38,9 +38,7 @@
 
 #include <utility>
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 
 AllToAll::AllToAll(const LibUtilities::CommSharedPtr &comm, const int &maxQuad,
@@ -746,5 +744,4 @@ std::tuple<NekDouble, NekDouble, NekDouble> AssemblyCommDG::Timing(
     return std::make_tuple(avgTime, minTime[0], maxTime[0]);
 }
 
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions

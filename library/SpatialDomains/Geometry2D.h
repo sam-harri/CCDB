@@ -42,10 +42,7 @@
 #include <SpatialDomains/Geometry.h>
 #include <SpatialDomains/SpatialDomainsDeclspec.h>
 
-namespace Nektar
-{
-
-namespace SpatialDomains
+namespace Nektar::SpatialDomains
 {
 
 class Geometry0D;
@@ -70,7 +67,7 @@ class Geometry2D : public Geometry
 public:
     SPATIAL_DOMAINS_EXPORT Geometry2D();
     SPATIAL_DOMAINS_EXPORT Geometry2D(const int coordim, CurveSharedPtr curve);
-    SPATIAL_DOMAINS_EXPORT virtual ~Geometry2D();
+    SPATIAL_DOMAINS_EXPORT ~Geometry2D() override;
 
     SPATIAL_DOMAINS_EXPORT static const int kDim = 2;
     SPATIAL_DOMAINS_EXPORT CurveSharedPtr GetCurve()
@@ -86,9 +83,9 @@ protected:
     Array<OneD, int> m_manifold;
     Array<OneD, Array<OneD, NekDouble>> m_edgeNormal;
 
-    SPATIAL_DOMAINS_EXPORT virtual NekDouble v_GetLocCoords(
-        const Array<OneD, const NekDouble> &coords,
-        Array<OneD, NekDouble> &Lcoords) override;
+    SPATIAL_DOMAINS_EXPORT NekDouble
+    v_GetLocCoords(const Array<OneD, const NekDouble> &coords,
+                   Array<OneD, NekDouble> &Lcoords) override;
 
     void NewtonIterationForLocCoord(const Array<OneD, const NekDouble> &coords,
                                     const Array<OneD, const NekDouble> &ptsx,
@@ -97,24 +94,22 @@ protected:
                                     NekDouble &dist);
     void NewtonIterationForLocCoord(const Array<OneD, const NekDouble> &coords,
                                     Array<OneD, NekDouble> &Lcoords);
-    virtual void v_CalculateInverseIsoParam() override;
-    virtual int v_AllLeftCheck(
-        const Array<OneD, const NekDouble> &gloCoord) override;
+    void v_CalculateInverseIsoParam() override;
+    int v_AllLeftCheck(const Array<OneD, const NekDouble> &gloCoord) override;
 
     //---------------------------------------
     // Helper functions
     //---------------------------------------
-    virtual int v_GetShapeDim() const override;
-    virtual PointGeomSharedPtr v_GetVertex(int i) const override;
-    virtual Geometry1DSharedPtr v_GetEdge(int i) const override;
-    virtual int v_GetNumVerts() const override;
-    virtual int v_GetNumEdges() const override;
-    virtual StdRegions::Orientation v_GetEorient(const int i) const override;
-    virtual NekDouble v_FindDistance(const Array<OneD, const NekDouble> &xs,
-                                     Array<OneD, NekDouble> &xi) override;
+    int v_GetShapeDim() const override;
+    PointGeomSharedPtr v_GetVertex(int i) const override;
+    Geometry1DSharedPtr v_GetEdge(int i) const override;
+    int v_GetNumVerts() const override;
+    int v_GetNumEdges() const override;
+    StdRegions::Orientation v_GetEorient(const int i) const override;
+    NekDouble v_FindDistance(const Array<OneD, const NekDouble> &xs,
+                             Array<OneD, NekDouble> &xi) override;
 };
 
-} // namespace SpatialDomains
-} // namespace Nektar
+} // namespace Nektar::SpatialDomains
 
 #endif // NEKTAR_SPATIALDOMAINS_GEOMETRY2D_H

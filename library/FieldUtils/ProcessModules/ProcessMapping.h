@@ -38,9 +38,7 @@
 #include "../Module.h"
 #include <GlobalMapping/Mapping.h>
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 /**
@@ -58,30 +56,29 @@ public:
     static ModuleKey className;
 
     ProcessMapping(FieldSharedPtr f);
-    virtual ~ProcessMapping();
+    ~ProcessMapping() override;
 
     static GlobalMapping::MappingSharedPtr GetMapping(FieldSharedPtr f);
 
 protected:
     /// Write mesh to output file.
-    virtual void v_Process(po::variables_map &vm) override;
+    void v_Process(po::variables_map &vm) override;
 
-    virtual std::string v_GetModuleName() override
+    std::string v_GetModuleName() override
     {
         return "ProcessMapping";
     }
 
-    virtual std::string v_GetModuleDescription() override
+    std::string v_GetModuleDescription() override
     {
         return "Applying mapping to field";
     }
 
-    virtual ModulePriority v_GetModulePriority() override
+    ModulePriority v_GetModulePriority() override
     {
         return eModifyExp;
     }
 };
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils
 
 #endif

@@ -45,9 +45,7 @@ using namespace std;
 
 #include "ProcessEquiSpacedOutput.h"
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 ModuleKey ProcessEquiSpacedOutput::className =
@@ -871,5 +869,4 @@ void ProcessEquiSpacedOutput::GenOrthoModes(
             break;
     }
 }
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

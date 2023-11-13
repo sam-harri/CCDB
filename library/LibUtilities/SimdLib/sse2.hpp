@@ -46,10 +46,7 @@
 #include "traits.hpp"
 #include <cstdint>
 
-namespace tinysimd
-{
-
-namespace abi
+namespace tinysimd::abi
 {
 
 template <typename scalarType> struct sse2
@@ -57,9 +54,12 @@ template <typename scalarType> struct sse2
     using type = void;
 };
 
-} // namespace abi
+} // namespace tinysimd::abi
 
 #if defined(__SSE2__) && defined(NEKTAR_ENABLE_SIMD_SSE2)
+
+namespace tinysimd
+{
 
 // forward declaration of concrete types
 template <typename T> struct sse2Int4;
@@ -183,7 +183,8 @@ template <typename T> struct sse2Int4
     }
 };
 
+} // namespace tinysimd
+
 #endif // defined(__SSE2__) && defined(NEKTAR_ENABLE_SIMD_SSE2)
 
-} // namespace tinysimd
 #endif

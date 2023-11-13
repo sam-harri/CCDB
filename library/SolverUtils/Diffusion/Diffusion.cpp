@@ -34,9 +34,7 @@
 
 #include <SolverUtils/Diffusion/Diffusion.h>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 DiffusionFactory &GetDiffusionFactory()
 {
@@ -110,5 +108,4 @@ void Diffusion::v_DiffuseTraceFlux(
     NEKERROR(ErrorUtil::efatal, "Not defined function DiffuseTraceFLux.");
 }
 
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils

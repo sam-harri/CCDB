@@ -42,9 +42,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace SpatialDomains
+namespace Nektar::SpatialDomains
 {
 
 Geometry2D::Geometry2D()
@@ -637,5 +635,4 @@ void Geometry2D::v_CalculateInverseIsoParam()
     m_invIsoParam[1][1] = m_isoParameter[0][1] * Jac;
 }
 
-} // namespace SpatialDomains
-} // namespace Nektar
+} // namespace Nektar::SpatialDomains

@@ -38,9 +38,7 @@
 #include <NekMesh/MeshElements/Element.h>
 #include <NekMesh/NekMeshDeclspec.h>
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 /**
  * @brief A 3-dimensional square-based pyramidic element
@@ -62,14 +60,14 @@ public:
                            std::vector<NodeSharedPtr> pNodeList,
                            std::vector<int> pTagList);
     NEKMESH_EXPORT Pyramid(const Pyramid &pSrc);
-    NEKMESH_EXPORT virtual ~Pyramid()
+    NEKMESH_EXPORT ~Pyramid() override
     {
     }
 
-    NEKMESH_EXPORT virtual SpatialDomains::GeometrySharedPtr GetGeom(
-        int coordDim);
+    NEKMESH_EXPORT SpatialDomains::GeometrySharedPtr GetGeom(
+        int coordDim) override;
     NEKMESH_EXPORT static unsigned int GetNumNodes(ElmtConfig pConf);
-    NEKMESH_EXPORT virtual int GetFaceVertex(int i, int j)
+    NEKMESH_EXPORT int GetFaceVertex(int i, int j) override
     {
         return m_faceIds[i][j];
     }
@@ -82,7 +80,6 @@ public:
 private:
     static int m_faceIds[5][4];
 };
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh
 
 #endif

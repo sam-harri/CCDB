@@ -40,9 +40,7 @@
 #include <boost/test/tools/floating_point_comparison.hpp>
 #include <boost/test/unit_test.hpp>
 
-namespace Nektar
-{
-namespace BlockMatrixUnitTests
+namespace Nektar::BlockMatrixUnitTests
 {
 BOOST_AUTO_TEST_CASE(TestRowsAndColumnsPerBlockAccess)
 {
@@ -838,5 +836,4 @@ BOOST_AUTO_TEST_CASE(TestBlockMatrixErrorFrom6_10)
     //#endif
 }
 
-} // namespace BlockMatrixUnitTests
-} // namespace Nektar
+} // namespace Nektar::BlockMatrixUnitTests

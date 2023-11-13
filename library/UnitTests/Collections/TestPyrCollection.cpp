@@ -41,9 +41,7 @@
 #include <boost/test/tools/floating_point_comparison.hpp>
 #include <boost/test/unit_test.hpp>
 
-namespace Nektar
-{
-namespace PyrCollectionTests
+namespace Nektar::PyrCollectionTests
 {
 #define NELMTS 10
 
@@ -3397,5 +3395,4 @@ BOOST_AUTO_TEST_CASE(TestPyrHelmholtz_MatrixFree_UniformP_ConstVarDiff)
         BOOST_CHECK_CLOSE(coeffsRef[i], coeffs[i], epsilon);
     }
 }
-} // namespace PyrCollectionTests
-} // namespace Nektar
+} // namespace Nektar::PyrCollectionTests

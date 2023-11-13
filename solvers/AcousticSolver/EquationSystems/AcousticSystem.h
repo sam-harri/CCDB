@@ -63,7 +63,7 @@ public:
     friend class MemoryManager<AcousticSystem>;
 
     /// Destructor
-    virtual ~AcousticSystem();
+    ~AcousticSystem() override;
 
 protected:
     /// indices of the fields
@@ -83,7 +83,7 @@ protected:
     AcousticSystem(const LibUtilities::SessionReaderSharedPtr &pSession,
                    const SpatialDomains::MeshGraphSharedPtr &pGraph);
 
-    virtual void v_InitObject(bool DeclareFields = true) override;
+    void v_InitObject(bool DeclareFields = true) override;
 
     void DoOdeRhs(const Array<OneD, const Array<OneD, NekDouble>> &inarray,
                   Array<OneD, Array<OneD, NekDouble>> &outarray,
@@ -109,16 +109,15 @@ protected:
         Array<OneD, Array<OneD, NekDouble>> &BfFwd,
         Array<OneD, Array<OneD, NekDouble>> &physarray) = 0;
 
-    virtual bool v_PreIntegrate(int step) override;
+    bool v_PreIntegrate(int step) override;
 
-    virtual void v_Output() override;
+    void v_Output() override;
 
-    virtual Array<OneD, NekDouble> v_GetMaxStdVelocity(
+    Array<OneD, NekDouble> v_GetMaxStdVelocity(
         const NekDouble SpeedSoundFactor) override;
 
-    virtual void v_ExtraFldOutput(
-        std::vector<Array<OneD, NekDouble>> &fieldcoeffs,
-        std::vector<std::string> &variables) override;
+    void v_ExtraFldOutput(std::vector<Array<OneD, NekDouble>> &fieldcoeffs,
+                          std::vector<std::string> &variables) override;
 
     const Array<OneD, const Array<OneD, NekDouble>> &GetNormals();
 

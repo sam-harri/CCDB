@@ -42,9 +42,7 @@
 #include <MultiRegions/ExpList.h>
 #include <SpatialDomains/MeshGraph.h>
 
-namespace Nektar
-{
-namespace GlobalMapping
+namespace Nektar::GlobalMapping
 {
 
 /// Adds a summary item to the summary info list
@@ -53,7 +51,6 @@ GLOBAL_MAPPING_EXPORT void UpdateGeometry(
     Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
     Array<OneD, Array<OneD, NekDouble>> &PhysVals, bool modal = true);
 
-} // namespace GlobalMapping
-} // namespace Nektar
+} // namespace Nektar::GlobalMapping
 
 #endif

@@ -38,9 +38,7 @@
 #include <SpatialDomains/Conditions.h>
 #include <vector>
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 
 // Orientation of adjacent edge for use with boundary
@@ -196,7 +194,6 @@ struct RotPeriodicInfo
     NekDouble m_tol;
 };
 
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions
 
 #endif

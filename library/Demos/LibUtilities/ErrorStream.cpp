@@ -60,7 +60,7 @@ int main(int argc, char *argv[])
     try
     {
         char *fake_argv[3] = {(char *)"ErrorStream", (char *)"missing.xml",
-                              NULL};
+                              nullptr};
         LibUtilities::SessionReaderSharedPtr session =
             LibUtilities::SessionReader::CreateInstance(2, fake_argv);
         session->InitSession();

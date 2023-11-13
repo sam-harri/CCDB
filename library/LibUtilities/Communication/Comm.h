@@ -46,9 +46,7 @@
 #include <LibUtilities/BasicUtils/SharedArray.hpp>
 #include <LibUtilities/Communication/CommDataType.h>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 // Forward declarations
 class Comm;
@@ -501,7 +499,7 @@ template <class T> T Comm::Gather(const int rootProc, T &val)
 
     unsigned nOut = amRoot ? GetSize() * nEl : 0;
     T ans(nOut);
-    void *recvbuf = amRoot ? CommDataTypeTraits<T>::GetPointer(ans) : NULL;
+    void *recvbuf = amRoot ? CommDataTypeTraits<T>::GetPointer(ans) : nullptr;
 
     v_Gather(CommDataTypeTraits<T>::GetPointer(val), nEl,
              CommDataTypeTraits<T>::GetDataType(), recvbuf, nEl,
@@ -520,7 +518,7 @@ template <class T> T Comm::Scatter(const int rootProc, T &pData)
     bool amRoot  = (GetRank() == rootProc);
     unsigned nEl = CommDataTypeTraits<T>::GetCount(pData) / GetSize();
 
-    void *sendbuf = amRoot ? CommDataTypeTraits<T>::GetPointer(pData) : NULL;
+    void *sendbuf = amRoot ? CommDataTypeTraits<T>::GetPointer(pData) : nullptr;
     T ans(nEl);
 
     v_Scatter(sendbuf, nEl, CommDataTypeTraits<T>::GetDataType(),
@@ -815,7 +813,6 @@ std::pair<CommSharedPtr, CommSharedPtr> Comm::SplitCommNode()
     return v_SplitCommNode();
 }
 
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities
 
 #endif

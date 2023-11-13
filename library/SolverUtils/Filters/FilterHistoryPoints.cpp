@@ -42,9 +42,7 @@ using namespace std;
 #include <boost/core/ignore_unused.hpp>
 #include <boost/format.hpp>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 std::string FilterHistoryPoints::className =
     GetFilterFactory().RegisterCreatorFunction("HistoryPoints",
@@ -704,5 +702,4 @@ bool FilterHistoryPoints::v_IsTimeDependent()
 {
     return true;
 }
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils

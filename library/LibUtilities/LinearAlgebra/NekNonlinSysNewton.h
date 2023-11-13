@@ -38,9 +38,7 @@
 
 #include <LibUtilities/LinearAlgebra/NekNonlinSys.h>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 class NekNonlinSysNewton;
@@ -68,7 +66,7 @@ public:
         const LibUtilities::SessionReaderSharedPtr &pSession,
         const LibUtilities::CommSharedPtr &vRowComm, const int nscale,
         const NekSysKey &pKey);
-    LIB_UTILITIES_EXPORT ~NekNonlinSysNewton();
+    LIB_UTILITIES_EXPORT ~NekNonlinSysNewton() override;
 
 protected:
     NekDouble m_SysResNorm0;
@@ -78,28 +76,27 @@ protected:
     NekDouble m_forcingGamma    = 1.0;
     NekDouble m_forcingAlpha    = 0.5 * (1.0 + sqrt(5));
 
-    virtual void v_InitObject() override;
+    void v_InitObject() override;
 
-    virtual int v_SolveSystem(const int nGlobal,
-                              const Array<OneD, const NekDouble> &pInput,
-                              Array<OneD, NekDouble> &pOutput, const int nDir,
-                              const NekDouble tol,
-                              const NekDouble factor) override;
+    int v_SolveSystem(const int nGlobal,
+                      const Array<OneD, const NekDouble> &pInput,
+                      Array<OneD, NekDouble> &pOutput, const int nDir,
+                      const NekDouble tol, const NekDouble factor) override;
 
-    virtual bool v_ConvergenceCheck(
-        const int nIteration, const Array<OneD, const NekDouble> &Residual,
-        const NekDouble tol) override;
+    bool v_ConvergenceCheck(const int nIteration,
+                            const Array<OneD, const NekDouble> &Residual,
+                            const NekDouble tol) override;
 
-    virtual void v_SetupNekNonlinSystem(
-        const int nGlobal, const Array<OneD, const NekDouble> &pInput,
-        const Array<OneD, const NekDouble> &pSource, const int nDir) override;
+    void v_SetupNekNonlinSystem(const int nGlobal,
+                                const Array<OneD, const NekDouble> &pInput,
+                                const Array<OneD, const NekDouble> &pSource,
+                                const int nDir) override;
 
 private:
     NekDouble CalcInexactNewtonForcing(const int &k,
                                        const NekDouble &resnormOld,
                                        const NekDouble &resnorm);
 };
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities
 
 #endif

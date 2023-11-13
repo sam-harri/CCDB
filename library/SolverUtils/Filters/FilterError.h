@@ -37,9 +37,7 @@
 
 #include <SolverUtils/Filters/Filter.h>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 class FilterError : public Filter
 {
@@ -64,19 +62,19 @@ public:
         const LibUtilities::SessionReaderSharedPtr &pSession,
         const std::weak_ptr<EquationSystem> &pEquation,
         const ParamMap &pParams);
-    SOLVER_UTILS_EXPORT virtual ~FilterError() = default;
+    SOLVER_UTILS_EXPORT ~FilterError() override = default;
 
 protected:
-    virtual void v_Initialise(
+    void v_Initialise(
         const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
-        const NekDouble &time) override final;
-    virtual void v_Update(
+        const NekDouble &time) final;
+    void v_Update(
         const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
-        const NekDouble &time) override final;
-    virtual void v_Finalise(
+        const NekDouble &time) final;
+    void v_Finalise(
         const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
-        const NekDouble &time) override final;
-    virtual bool v_IsTimeDependent() override final;
+        const NekDouble &time) final;
+    bool v_IsTimeDependent() final;
 
 private:
     size_t m_index = 0;
@@ -86,7 +84,6 @@ private:
     std::ofstream m_outFile;
     LibUtilities::CommSharedPtr m_comm;
 };
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils
 
 #endif /* NEKTAR_SOLVERUTILS_FILTERS_FILTERERROR_H */

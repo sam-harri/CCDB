@@ -37,9 +37,7 @@
 #define NEKTAR_LIB_UTILITIES_LINEAR_ALGEBRA_NEK_LINSYS_ITERAT_GMRES_H
 
 #include <LibUtilities/LinearAlgebra/NekLinSysIter.h>
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 /// A global linear system.
 class NekLinSysIterGMRES;
@@ -67,7 +65,7 @@ public:
         const LibUtilities::SessionReaderSharedPtr &pSession,
         const LibUtilities::CommSharedPtr &vRowComm, const int nDimen,
         const NekSysKey &pKey = NekSysKey());
-    LIB_UTILITIES_EXPORT ~NekLinSysIterGMRES();
+    LIB_UTILITIES_EXPORT ~NekLinSysIterGMRES() override;
 
     LIB_UTILITIES_EXPORT int GetMaxLinIte()
     {
@@ -88,13 +86,12 @@ protected:
     bool m_DifferenceFlag0 = false;
     bool m_DifferenceFlag1 = false;
 
-    virtual void v_InitObject() override;
+    void v_InitObject() override;
 
-    virtual int v_SolveSystem(const int nGlobal,
-                              const Array<OneD, const NekDouble> &pInput,
-                              Array<OneD, NekDouble> &pOutput, const int nDir,
-                              const NekDouble tol,
-                              const NekDouble factor) override;
+    int v_SolveSystem(const int nGlobal,
+                      const Array<OneD, const NekDouble> &pInput,
+                      Array<OneD, NekDouble> &pOutput, const int nDir,
+                      const NekDouble tol, const NekDouble factor) override;
 
 private:
     /// Actual iterative solve-GMRES
@@ -132,7 +129,6 @@ private:
     static std::string lookupIds[];
     static std::string def;
 };
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities
 
 #endif

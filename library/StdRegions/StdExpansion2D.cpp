@@ -40,9 +40,7 @@
 #undef max
 #endif
 
-namespace Nektar
-{
-namespace StdRegions
+namespace Nektar::StdRegions
 {
 StdExpansion2D::StdExpansion2D()
 {
@@ -499,5 +497,4 @@ void StdExpansion2D::v_GetTraceToElementMap(const int eid,
     }
 }
 
-} // namespace StdRegions
-} // namespace Nektar
+} // namespace Nektar::StdRegions

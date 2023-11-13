@@ -51,7 +51,7 @@ void CapsuleDestructor(void *ptr)
 #else
 void CapsuleDestructor(PyObject *ptr)
 {
-    VarCoeffEntry *tmp = (VarCoeffEntry *)PyCapsule_GetPointer(ptr, 0);
+    VarCoeffEntry *tmp = (VarCoeffEntry *)PyCapsule_GetPointer(ptr, nullptr);
     delete tmp;
 }
 #endif
@@ -68,7 +68,7 @@ struct VarCoeffEntryToPython
             new VarCoeffEntry(entry), CapsuleDestructor)));
 #else
         py::object capsule(py::handle<>(
-            PyCapsule_New(new VarCoeffEntry(entry), 0,
+            PyCapsule_New(new VarCoeffEntry(entry), nullptr,
                           (PyCapsule_Destructor)&CapsuleDestructor)));
 #endif
         PyObject *tmp =
@@ -101,20 +101,20 @@ struct PythonToVarCoeffEntry
                 typename boost::remove_const<NekDouble>::type>();
             if (dtype != array.get_dtype())
             {
-                return 0;
+                return nullptr;
             }
 
             // Check shape is 1D
             if (array.get_nd() != 1)
             {
-                return 0;
+                return nullptr;
             }
         }
         catch (boost::python::error_already_set &)
         {
             py::handle_exception();
             PyErr_Clear();
-            return 0;
+            return nullptr;
         }
 
         return objPtr;

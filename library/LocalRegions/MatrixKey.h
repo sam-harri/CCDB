@@ -39,9 +39,7 @@
 #include <SpatialDomains/GeomFactors.h>
 #include <StdRegions/StdMatrixKey.h>
 
-namespace Nektar
-{
-namespace LocalRegions
+namespace Nektar::LocalRegions
 {
 
 class MatrixKey : public StdRegions::StdMatrixKey
@@ -62,7 +60,7 @@ public:
 
     LOCAL_REGIONS_EXPORT MatrixKey(const StdRegions::StdMatrixKey &mkey);
 
-    virtual ~MatrixKey()
+    ~MatrixKey() override
     {
     }
 
@@ -92,7 +90,6 @@ protected:
 private:
 };
 
-} // namespace LocalRegions
-} // namespace Nektar
+} // namespace Nektar::LocalRegions
 
 #endif // STDMATRIXKEY_H

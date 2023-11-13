@@ -48,9 +48,7 @@
 #include <vtkXMLMultiBlockDataWriter.h>
 #include <vtkXMLUnstructuredGridWriter.h>
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 ModuleKey OutputVtk::m_className = GetModuleFactory().RegisterCreatorFunction(
@@ -1535,7 +1533,7 @@ void OutputVtk::WritePVtu(po::variables_map &vm)
         LibUtilities::PortablePath(OutputVtkBase::v_GetPath(filename, vm));
 
     outfile << "<?xml version=\"1.0\"?>" << endl;
-    outfile << "<VTKFile type=\"PUnstructuredGrid\" version=\"0.1\" "
+    outfile << R"(<VTKFile type="PUnstructuredGrid" version="0.1" )"
             << "byte_order=\"LittleEndian\">" << endl;
     outfile << "  <PUnstructuredGrid GhostLevel=\"0\">" << endl;
 
@@ -1553,7 +1551,7 @@ void OutputVtk::WritePVtu(po::variables_map &vm)
 
     // Add point coordinates
     outfile << "    <PPoints> " << endl;
-    outfile << "      <PDataArray type=\"Float64\" NumberOfComponents=\"" << 3
+    outfile << R"(      <PDataArray type="Float64" NumberOfComponents=")" << 3
             << "\"/> " << endl;
     outfile << "    </PPoints>" << endl;
 
@@ -1574,7 +1572,7 @@ void OutputVtk::WritePVtu(po::variables_map &vm)
     outfile << "    <PPointData>" << endl;
     for (auto &var : m_f->m_variables)
     {
-        outfile << "      <PDataArray type=\"Float64\" Name=\"" << var << "\"/>"
+        outfile << R"(      <PDataArray type="Float64" Name=")" << var << "\"/>"
                 << endl;
     }
     outfile << "    </PPointData>" << endl;
@@ -1656,5 +1654,4 @@ void OutputVtk::v_OutputFromExp(po::variables_map &vm)
     }
 }
 
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

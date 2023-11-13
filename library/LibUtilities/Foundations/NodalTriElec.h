@@ -39,15 +39,13 @@
 #include <LibUtilities/Foundations/NodalUtil.h>
 #include <memory>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 class NodalTriElec : public Points<NekDouble>
 {
 public:
-    virtual ~NodalTriElec()
+    ~NodalTriElec() override
     {
     }
 
@@ -59,7 +57,7 @@ public:
     }
 
 protected:
-    virtual const MatrixSharedPtrType v_GetI(const PointsKey &pkey) override
+    const MatrixSharedPtrType v_GetI(const PointsKey &pkey) override
     {
         ASSERTL0(pkey.GetPointsDim() == 2,
                  "NodalTriElec Points can only interpolate to other 2d "
@@ -69,7 +67,7 @@ protected:
         return GetI(x, y);
     }
 
-    virtual const MatrixSharedPtrType v_GetI(
+    const MatrixSharedPtrType v_GetI(
         const Array<OneD, const NekDouble> &x,
         const Array<OneD, const NekDouble> &y) override
     {
@@ -93,15 +91,14 @@ private:
 
     void NodalPointReorder2d();
 
-    virtual void v_CalculatePoints() override final;
-    virtual void v_CalculateWeights() override final;
-    virtual void v_CalculateDerivMatrix() override final;
+    void v_CalculatePoints() final;
+    void v_CalculateWeights() final;
+    void v_CalculateDerivMatrix() final;
 
     void CalculateInterpMatrix(const Array<OneD, const NekDouble> &xia,
                                const Array<OneD, const NekDouble> &yia,
                                Array<OneD, NekDouble> &interp);
 };
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities
 
 #endif // NODALTRIELEC_H

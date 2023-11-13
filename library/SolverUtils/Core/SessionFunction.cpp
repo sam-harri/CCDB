@@ -42,9 +42,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 
 /**
@@ -521,5 +519,4 @@ void SessionFunction::EvaluatePts(string pFieldName,
 }
 
 // end of namespaces
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils

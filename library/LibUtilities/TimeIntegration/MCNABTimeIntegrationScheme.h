@@ -44,9 +44,7 @@
 
 #include <LibUtilities/TimeIntegration/TimeIntegrationSchemeGLM.h>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 class MCNABTimeIntegrationScheme : public TimeIntegrationSchemeGLM
@@ -74,7 +72,7 @@ public:
         MCNABTimeIntegrationScheme::SetupSchemeData(m_integration_phases[2]);
     }
 
-    virtual ~MCNABTimeIntegrationScheme()
+    ~MCNABTimeIntegrationScheme() override
     {
     }
 
@@ -154,12 +152,12 @@ public:
     }
 
 protected:
-    LUE virtual std::string v_GetName() const override
+    LUE std::string v_GetName() const override
     {
         return std::string("MCNAB");
     }
 
-    LUE virtual NekDouble v_GetTimeStability() const override
+    LUE NekDouble v_GetTimeStability() const override
     {
         return 1.0;
     }
@@ -168,7 +166,6 @@ protected:
 
 }; // end class MCNABTimeIntegrationScheme
 
-} // end namespace LibUtilities
-} // end namespace Nektar
+} // namespace Nektar::LibUtilities
 
 #endif

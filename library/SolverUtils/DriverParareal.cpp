@@ -38,9 +38,7 @@
 #include <SolverUtils/DriverParareal.h>
 #include <boost/format.hpp>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 std::string DriverParareal::className =
     GetDriverFactory().RegisterCreatorFunction("Parareal",
@@ -664,5 +662,4 @@ NekDouble DriverParareal::EstimatePredictorTime(void)
     return EstimateSolverTime(m_coarseLevel, 10);
 }
 
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils

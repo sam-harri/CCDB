@@ -46,9 +46,7 @@ namespace bgi = boost::geometry::index;
 using namespace std;
 using namespace Nektar::NekMesh;
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 ModuleKey ProcessInsertSurface::className =
@@ -208,5 +206,4 @@ void ProcessInsertSurface::Process()
         }
     }
 }
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh

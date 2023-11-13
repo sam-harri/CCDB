@@ -36,9 +36,7 @@
 
 #include <LibUtilities/FFT/NektarFFT.h>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 /**
  * @class NektarFFT
@@ -102,5 +100,4 @@ void NektarFFT::v_FFTBwdTrans(Array<OneD, NekDouble> &coef,
     boost::ignore_unused(coef, phys);
 }
 
-} // end namespace LibUtilities
-} // end of namespace Nektar
+} // namespace Nektar::LibUtilities

@@ -32,9 +32,7 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 enum EvolutionOperatorType
 {
@@ -45,5 +43,4 @@ enum EvolutionOperatorType
     eSkewSymmetric,
     eAdaptiveSFD
 };
-}
-} // namespace Nektar
+} // namespace Nektar::SolverUtils

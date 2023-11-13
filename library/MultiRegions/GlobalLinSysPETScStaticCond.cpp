@@ -42,9 +42,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 /**
  * @class GlobalLinSysPETSc
@@ -391,5 +389,4 @@ GlobalLinSysStaticCondSharedPtr GlobalLinSysPETScStaticCond::v_Recurse(
     sys->Initialise(l2gMap);
     return sys;
 }
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions

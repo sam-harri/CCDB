@@ -36,9 +36,7 @@
 #include <LibUtilities/Foundations/ManagerAccess.h>
 #include <LibUtilities/Polylib/Polylib.h>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 bool GaussPoints::initPointsManager[] = {
     PointsManager().RegisterCreator(PointsKey(0, eGaussGaussLegendre),
@@ -456,5 +454,4 @@ std::shared_ptr<NekMatrix<NekDouble>> GaussPoints::
     return returnval;
 }
 
-} // end of namespace LibUtilities
-} // end of namespace Nektar
+} // namespace Nektar::LibUtilities

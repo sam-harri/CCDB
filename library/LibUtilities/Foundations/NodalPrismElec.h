@@ -39,14 +39,12 @@
 #include <LibUtilities/Foundations/NodalUtil.h>
 #include <memory>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 class NodalPrismElec : public Points<NekDouble>
 {
 public:
-    virtual ~NodalPrismElec()
+    ~NodalPrismElec() override
     {
     }
 
@@ -58,7 +56,7 @@ public:
         const PointsKey &key);
 
 protected:
-    virtual const MatrixSharedPtrType v_GetI(const PointsKey &pkey) override
+    const MatrixSharedPtrType v_GetI(const PointsKey &pkey) override
     {
         ASSERTL0(pkey.GetPointsDim() == 3,
                  "NodalPrismElec Points can only interp to "
@@ -68,7 +66,7 @@ protected:
         return GetI(x, y, z);
     }
 
-    virtual const MatrixSharedPtrType v_GetI(
+    const MatrixSharedPtrType v_GetI(
         const Array<OneD, const NekDouble> &x,
         const Array<OneD, const NekDouble> &y,
         const Array<OneD, const NekDouble> &z) override
@@ -94,9 +92,9 @@ private:
 
     void NodalPointReorder3d();
 
-    virtual void v_CalculatePoints() override final;
-    virtual void v_CalculateWeights() override final;
-    virtual void v_CalculateDerivMatrix() override final;
+    void v_CalculatePoints() final;
+    void v_CalculateWeights() final;
+    void v_CalculateDerivMatrix() final;
 
     void CalculateInterpMatrix(const Array<OneD, const NekDouble> &xi,
                                const Array<OneD, const NekDouble> &yi,
@@ -104,7 +102,6 @@ private:
                                Array<OneD, NekDouble> &interp);
 };
 
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities
 
 #endif // NODALPRISMELEC_H

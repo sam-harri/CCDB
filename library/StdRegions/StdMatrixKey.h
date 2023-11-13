@@ -40,9 +40,7 @@
 #include <StdRegions/StdRegions.hpp>
 #include <StdRegions/StdRegionsDeclspec.h>
 
-namespace Nektar
-{
-namespace StdRegions
+namespace Nektar::StdRegions
 {
 
 class StdExpansion;
@@ -202,7 +200,6 @@ STD_REGIONS_EXPORT std::ostream &operator<<(std::ostream &os,
 
 typedef std::shared_ptr<StdMatrixKey> StdMatrixKeySharedPtr;
 
-} // namespace StdRegions
-} // namespace Nektar
+} // namespace Nektar::StdRegions
 
 #endif

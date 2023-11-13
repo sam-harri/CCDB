@@ -34,9 +34,7 @@
 
 #include "InterfaceMapDG.h"
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 
 InterfaceTrace::InterfaceTrace(
@@ -598,5 +596,4 @@ void InterfaceExchange::CalcRankDistances()
     }
 }
 
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions

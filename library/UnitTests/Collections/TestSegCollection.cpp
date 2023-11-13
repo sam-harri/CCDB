@@ -39,9 +39,7 @@
 #include <boost/test/tools/floating_point_comparison.hpp>
 #include <boost/test/unit_test.hpp>
 
-namespace Nektar
-{
-namespace SegCollectionTests
+namespace Nektar::SegCollectionTests
 {
 SpatialDomains::SegGeomSharedPtr CreateSegGeom(
     unsigned int id, SpatialDomains::PointGeomSharedPtr v0,
@@ -1797,6 +1795,4 @@ BOOST_AUTO_TEST_CASE(
         BOOST_CHECK_CLOSE(coeffs1[i], coeffs2[i], epsilon);
     }
 }
-} // namespace SegCollectionTests
-
-} // namespace Nektar
+} // namespace Nektar::SegCollectionTests

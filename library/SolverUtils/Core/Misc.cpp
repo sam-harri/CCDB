@@ -39,9 +39,7 @@
 #include <boost/format.hpp>
 #include <boost/lexical_cast.hpp>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 /**
  * Adds an item to a SummaryList
@@ -65,5 +63,4 @@ void AddSummaryItem(SummaryList &l, const std::string &name,
     l.push_back(std::make_pair(name, str(boost::format("%g") % value)));
 }
 
-} // end namespace SolverUtils
-} // end namespace Nektar
+} // namespace Nektar::SolverUtils

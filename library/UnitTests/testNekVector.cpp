@@ -43,9 +43,7 @@
 using std::cout;
 using std::endl;
 
-namespace Nektar
-{
-namespace UnitTests
+namespace Nektar::UnitTests
 {
 using namespace Nektar;
 
@@ -403,5 +401,4 @@ BOOST_AUTO_TEST_CASE(TestVectorConstructorsWithSizeArguments)
     }
 }
 
-} // namespace UnitTests
-} // namespace Nektar
+} // namespace Nektar::UnitTests

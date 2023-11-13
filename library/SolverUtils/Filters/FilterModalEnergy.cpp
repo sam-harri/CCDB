@@ -41,9 +41,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 std::string FilterModalEnergy::className =
     GetFilterFactory().RegisterCreatorFunction("ModalEnergy",
@@ -640,5 +638,4 @@ bool FilterModalEnergy::v_IsTimeDependent()
 {
     return true;
 }
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils

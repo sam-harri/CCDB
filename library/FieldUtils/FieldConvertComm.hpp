@@ -37,9 +37,7 @@
 
 #include <LibUtilities/Communication/CommSerial.h>
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 class FieldConvertComm : public LibUtilities::CommSerial
@@ -52,16 +50,16 @@ public:
         m_rank = rank;
         m_type = "FieldConvert parallel";
     }
-    FieldConvertComm(int size, int rank) : CommSerial(0, NULL)
+    FieldConvertComm(int size, int rank) : CommSerial(0, nullptr)
     {
         m_size = size;
         m_rank = rank;
         m_type = "FieldConvert parallel";
     }
-    virtual ~FieldConvertComm()
+    ~FieldConvertComm() override
     {
     }
-    void v_SplitComm(int pRows, int pColumns, int pTime)
+    void v_SplitComm(int pRows, int pColumns, int pTime) override
     {
         ASSERTL0(pTime == 1,
                  "FieldConvertComm does not support parallel in time!");
@@ -73,17 +71,17 @@ public:
     }
 
 protected:
-    int v_GetRank(void)
+    int v_GetRank(void) override
     {
         return m_rank;
     }
 
-    bool v_TreatAsRankZero(void)
+    bool v_TreatAsRankZero(void) override
     {
         return true;
     }
 
-    bool v_IsSerial(void)
+    bool v_IsSerial(void) override
     {
         return true;
     }
@@ -96,6 +94,5 @@ protected:
 private:
     int m_rank;
 };
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils
 #endif

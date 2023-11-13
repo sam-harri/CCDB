@@ -42,9 +42,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 std::string GlobalMatrix::def =
     LibUtilities::SessionReader::RegisterDefaultSolverInfo(
@@ -95,7 +93,9 @@ GlobalMatrix::GlobalMatrix(const LibUtilities::SessionReaderSharedPtr &pSession,
     bcols = columns / block_size + (columns % block_size > 0);
 
     if (rows % block_size > 0)
+    {
         m_copyOp = true;
+    }
 
     if (m_copyOp)
     {
@@ -155,7 +155,9 @@ void GlobalMatrix::Multiply(const Array<OneD, const NekDouble> &in,
     if (!m_copyOp)
     {
         if (m_smvbsrmatrix)
+        {
             m_smvbsrmatrix->Multiply(in, out);
+        }
     }
     else
     {
@@ -164,7 +166,9 @@ void GlobalMatrix::Multiply(const Array<OneD, const NekDouble> &in,
         Vmath::Vcopy(m_rows, &in[0], 1, &m_tmpin[0], 1);
 
         if (m_smvbsrmatrix)
+        {
             m_smvbsrmatrix->Multiply(m_tmpin, m_tmpout);
+        }
 
         Vmath::Vcopy(m_rows, &m_tmpout[0], 1, &out[0], 1);
     }
@@ -175,16 +179,19 @@ void GlobalMatrix::Multiply(const Array<OneD, const NekDouble> &in,
 unsigned long GlobalMatrix::GetMulCallsCounter() const
 {
     if (m_smvbsrmatrix)
+    {
         return m_smvbsrmatrix->GetMulCallsCounter();
+    }
     return -1;
 }
 
 unsigned int GlobalMatrix::GetNumNonZeroEntries() const
 {
     if (m_smvbsrmatrix)
+    {
         return m_smvbsrmatrix->GetNumNonZeroEntries();
+    }
     return -1;
 }
 
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions

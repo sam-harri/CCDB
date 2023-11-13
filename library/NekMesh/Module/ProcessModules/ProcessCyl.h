@@ -37,9 +37,7 @@
 
 #include "ProcessCurvedEdges.h"
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 class ProcessCyl : public ProcessCurvedEdges
@@ -53,17 +51,16 @@ public:
     static NekMesh::ModuleKey className;
 
     ProcessCyl(NekMesh::MeshSharedPtr m);
-    virtual ~ProcessCyl();
+    ~ProcessCyl() override;
 
-    virtual std::string GetModuleName()
+    std::string GetModuleName() override
     {
         return "ProcessCyl";
     }
 
 protected:
-    void v_GenerateEdgeNodes(NekMesh::EdgeSharedPtr edge);
+    void v_GenerateEdgeNodes(NekMesh::EdgeSharedPtr edge) override;
 };
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh
 
 #endif

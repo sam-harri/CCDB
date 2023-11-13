@@ -39,9 +39,7 @@
 #include <SpatialDomains/MeshGraph.h>
 #include <SpatialDomains/MeshPartition.h>
 
-namespace Nektar
-{
-namespace SpatialDomains
+namespace Nektar::SpatialDomains
 {
 
 class MeshGraphXml : public MeshGraph
@@ -51,7 +49,7 @@ public:
     {
     }
 
-    virtual ~MeshGraphXml()
+    ~MeshGraphXml() override
     {
     }
 
@@ -70,13 +68,13 @@ protected:
     // some of these functions are going to be virtual because they will be
     // inherited by the XmlCompressed version
 
-    SPATIAL_DOMAINS_EXPORT virtual void v_WriteGeometry(
+    SPATIAL_DOMAINS_EXPORT void v_WriteGeometry(
         const std::string &outfilename, bool defaultExp = false,
         const LibUtilities::FieldMetaDataMap &metadata =
             LibUtilities::NullFieldMetaDataMap) override;
-    SPATIAL_DOMAINS_EXPORT virtual void v_ReadGeometry(
+    SPATIAL_DOMAINS_EXPORT void v_ReadGeometry(
         LibUtilities::DomainRangeShPtr rng, bool fillGraph) override;
-    SPATIAL_DOMAINS_EXPORT virtual void v_PartitionMesh(
+    SPATIAL_DOMAINS_EXPORT void v_PartitionMesh(
         LibUtilities::SessionReaderSharedPtr session) override;
 
     virtual void v_ReadVertices();
@@ -124,7 +122,6 @@ protected:
     CompositeOrdering CreateCompositeOrdering();
 };
 
-} // namespace SpatialDomains
-} // namespace Nektar
+} // namespace Nektar::SpatialDomains
 
 #endif

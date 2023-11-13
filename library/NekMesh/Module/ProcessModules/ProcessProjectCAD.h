@@ -50,9 +50,7 @@ typedef bg::model::point<float, 3, bg::cs::cartesian> point;
 typedef bg::model::box<point> box;
 typedef std::pair<box, unsigned> boxI;
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 class ProcessProjectCAD : public NekMesh::ProcessModule
@@ -66,12 +64,12 @@ public:
     static NekMesh::ModuleKey className;
 
     ProcessProjectCAD(NekMesh::MeshSharedPtr m);
-    virtual ~ProcessProjectCAD();
+    ~ProcessProjectCAD() override;
 
     /// Write mesh to output file.
-    virtual void Process();
+    void Process() override;
 
-    virtual std::string GetModuleName()
+    std::string GetModuleName() override
     {
         return "ProcessProjectCAD";
     }
@@ -82,7 +80,6 @@ private:
 
     bool IsNotValid(std::vector<NekMesh::ElementSharedPtr> &els);
 };
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh
 
 #endif

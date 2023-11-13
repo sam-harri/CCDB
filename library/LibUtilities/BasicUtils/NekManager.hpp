@@ -47,9 +47,7 @@
 
 #include <LibUtilities/BasicUtils/ErrorUtil.hpp>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 #ifdef NEKTAR_USE_THREAD_SAFETY
 typedef boost::unique_lock<boost::shared_mutex> WriteLock;
@@ -335,7 +333,6 @@ template <typename KeyType, typename ValueT, typename opLessCreator>
 typename boost::shared_mutex
     NekManager<KeyType, ValueT, opLessCreator>::m_mutex;
 #endif
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities
 
 #endif // NEKTAR_LIB_UTILITIES_BASIC_UTILS_NEK_MANAGER_HPP

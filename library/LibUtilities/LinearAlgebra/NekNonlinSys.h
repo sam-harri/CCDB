@@ -39,9 +39,7 @@
 #include <LibUtilities/LinearAlgebra/NekLinSysIter.h>
 #include <LibUtilities/LinearAlgebra/NekSys.h>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 class NekNonlinSys;
 
@@ -60,7 +58,7 @@ public:
         const LibUtilities::SessionReaderSharedPtr &pSession,
         const LibUtilities::CommSharedPtr &vRowComm, const int nDimen,
         const NekSysKey &pKey);
-    LIB_UTILITIES_EXPORT ~NekNonlinSys();
+    LIB_UTILITIES_EXPORT ~NekNonlinSys() override;
 
     LIB_UTILITIES_EXPORT const Array<OneD, const NekDouble> &GetRefSolution()
         const
@@ -134,7 +132,9 @@ protected:
     Array<OneD, NekDouble> m_DeltSltn;
     Array<OneD, NekDouble> m_SourceVec;
 
-    virtual void v_InitObject();
+    bool m_ResidualUpdated = false;
+
+    void v_InitObject() override;
 
     LIB_UTILITIES_EXPORT virtual void v_SetupNekNonlinSystem(
         const int nGlobal, const Array<OneD, const NekDouble> &pInput,
@@ -142,6 +142,5 @@ protected:
 
 private:
 };
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities
 #endif

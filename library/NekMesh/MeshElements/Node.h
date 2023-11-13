@@ -45,9 +45,7 @@
 #include <NekMesh/CADSystem/CADSystem.h>
 #include <SpatialDomains/PointGeom.h>
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 class Node;
 typedef std::shared_ptr<Node> NodeSharedPtr;
@@ -226,7 +224,9 @@ public:
         NekDouble an = atan2(sinw, cosw);
 
         if (an < 0)
+        {
             an += 6.2831853071796;
+        }
 
         return an;
     }
@@ -458,7 +458,6 @@ struct NodeHash
     }
 };
 typedef std::unordered_set<NodeSharedPtr, NodeHash> NodeSet;
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh
 
 #endif

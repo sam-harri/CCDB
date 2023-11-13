@@ -40,9 +40,7 @@
 
 #include <LibUtilities/Communication/CommSerial.h>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 std::string CommSerial::className = GetCommFactory().RegisterCreatorFunction(
     "Serial", CommSerial::create, "Single-process serial communication.");
@@ -353,5 +351,4 @@ CommSharedPtr CommSerial::v_CommCreateIf(int flag)
     }
 }
 
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities
