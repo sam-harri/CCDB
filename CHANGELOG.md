@@ -16,6 +16,7 @@ v5.5.0
 - Update to use C++17 nested namespaces (!1556, !1670)
 - Fix a minor bug in ProcessWallNormalData (!1663)
 - Fix Explist::v_GetNormals and GetElmtNormalLength (!1625)
+- Replace `boost::random` with `std::random` (!1673)
 
 **ADRSolver**
 - Add support for spatially-constant, but variable direction, diffusion to

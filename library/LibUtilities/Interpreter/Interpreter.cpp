@@ -43,23 +43,16 @@
 #include <boost/spirit/include/classic_push_back_actor.hpp>
 #include <boost/spirit/include/classic_symbols.hpp>
 
-#include <boost/random/mersenne_twister.hpp>
-#include <boost/random/normal_distribution.hpp>
-#include <boost/random/variate_generator.hpp>
-
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/math/special_functions/bessel.hpp>
 
 namespace bsp = boost::spirit::classic;
 
+#include <cmath>
 #include <map>
+#include <random>
 #include <string>
 #include <vector>
-#if defined(__INTEL_COMPILER)
-#include <mathimf.h>
-#else
-#include <cmath>
-#endif
 
 namespace Nektar::LibUtilities
 {
@@ -75,10 +68,10 @@ NekDouble sign(NekDouble arg)
 // purposes.
 NekDouble awgn(NekDouble sigma)
 {
-    boost::mt19937 rng;
-    boost::variate_generator<boost::mt19937 &, boost::normal_distribution<>>
-        _normal(rng, boost::normal_distribution<>(0, sigma));
-    return _normal();
+
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    return std::normal_distribution<>(0, sigma)(gen);
 }
 
 static NekDouble rad(NekDouble x, NekDouble y)
@@ -1314,7 +1307,7 @@ private:
     Timer m_timer;
     NekDouble m_total_eval_time;
 
-    boost::mt19937 m_generator;
+    std::mt19937 m_generator;
 
     // ======================================================
     //  A map of (external) mathematical functions
@@ -1333,7 +1326,7 @@ private:
     typedef std::vector<NekDouble> &vr;
     typedef const std::vector<NekDouble> &cvr;
     typedef const int ci;
-    typedef boost::mt19937 &rgt;
+    typedef std::mt19937 &rgt;
 
     ///  Factory method which makes code little less messy
     template <typename StepType>
@@ -2173,21 +2166,16 @@ private:
         {
             // assuming the argument to AWGN does not depend on spatial
             // variables =>
-            boost::variate_generator<boost::mt19937 &,
-                                     boost::normal_distribution<>>
-                _normal(rng,
-                        boost::normal_distribution<>(0, state[storeIdx * n]));
+            std::normal_distribution<> _normal(0, state[storeIdx * n]);
             for (int i = 0; i < n; i++)
             {
-                state[storeIdx * n + i] = _normal();
+                state[storeIdx * n + i] = _normal(rng);
             }
         }
         void run_once() override
         {
-            boost::variate_generator<boost::mt19937 &,
-                                     boost::normal_distribution<>>
-                _normal(rng, boost::normal_distribution<>(0, state[storeIdx]));
-            state[storeIdx] = _normal();
+            std::normal_distribution<> _normal(0, state[storeIdx]);
+            state[storeIdx] = _normal(rng);
         }
     };
 };
