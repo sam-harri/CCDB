@@ -111,14 +111,12 @@ void NekLinSysIterCGLoc::DoConjugateGradient(
     Array<OneD, NekDouble> q_A(nLocal, 0.0);
     Array<OneD, NekDouble> wk(nLocal, 0.0);
 
-    int k;
     NekDouble alpha;
     NekDouble beta;
     NekDouble rho;
     NekDouble rho_new;
     NekDouble mu;
     NekDouble eps;
-    NekDouble min_resid;
     Array<OneD, NekDouble> vExchange(3, 0.0);
 
     // Copy initial residual from input
@@ -132,6 +130,7 @@ void NekLinSysIterCGLoc::DoConjugateGradient(
     // evaluate initial residual error for exit check
     m_operator.DoAssembleLoc(r_A, wk, true);
     vExchange[2] = Vmath::Dot(nLocal, wk, r_A);
+
     m_rowComm->AllReduce(vExchange, Nektar::LibUtilities::ReduceSum);
 
     eps = vExchange[2];
@@ -159,15 +158,13 @@ void NekLinSysIterCGLoc::DoConjugateGradient(
     m_operator.DoNekSysPrecon(r_A, w_A, true);
     m_operator.DoNekSysLhsEval(w_A, s_A);
 
-    k = 0;
-
     vExchange[0] = Vmath::Dot(nLocal, r_A, w_A);
     vExchange[1] = Vmath::Dot(nLocal, s_A, w_A);
+
     m_rowComm->AllReduce(vExchange, Nektar::LibUtilities::ReduceSum);
 
     rho               = vExchange[0];
     mu                = vExchange[1];
-    min_resid         = m_rhs_magnitude;
     beta              = 0.0;
     alpha             = rho / mu;
     m_totalIterations = 1;
@@ -175,7 +172,7 @@ void NekLinSysIterCGLoc::DoConjugateGradient(
     // Continue until convergence
     while (true)
     {
-        if (k >= m_maxiter)
+        if (m_totalIterations > m_maxiter)
         {
             if (m_root)
             {
@@ -206,8 +203,10 @@ void NekLinSysIterCGLoc::DoConjugateGradient(
 
         // <r_{k+1}, w_{k+1}>
         vExchange[0] = Vmath::Dot(nLocal, r_A, w_A);
+
         // <s_{k+1}, w_{k+1}>
         vExchange[1] = Vmath::Dot(nLocal, s_A, w_A);
+
         // <r_{k+1}, r_{k+1}>
         m_operator.DoAssembleLoc(r_A, wk, true);
         vExchange[2] = Vmath::Dot(nLocal, wk, r_A);
@@ -233,13 +232,11 @@ void NekLinSysIterCGLoc::DoConjugateGradient(
             }
             break;
         }
-        min_resid = min(min_resid, eps);
 
         // Compute search direction and solution coefficients
         beta  = rho_new / rho;
         alpha = rho_new / (mu - rho_new * beta / alpha);
         rho   = rho_new;
-        k++;
     }
 }
 } // namespace Nektar::LibUtilities

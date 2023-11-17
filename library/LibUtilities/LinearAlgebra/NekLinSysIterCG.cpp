@@ -157,11 +157,9 @@ void NekLinSysIterCG::DoConjugateGradient(
     }
 
     m_operator.DoNekSysPrecon(r_A, tmp = w_A + nDir);
-
     m_operator.DoNekSysLhsEval(w_A, s_A);
 
     vExchange[0] = Vmath::Dot2(nNonDir, r_A, w_A + nDir, m_map + nDir);
-
     vExchange[1] = Vmath::Dot2(nNonDir, s_A + nDir, w_A + nDir, m_map + nDir);
 
     m_rowComm->AllReduce(vExchange, Nektar::LibUtilities::ReduceSum);
