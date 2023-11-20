@@ -837,7 +837,7 @@ void MMFSystem::CopyBoundaryTrace(const Array<OneD, const NekDouble> &Fwd,
                                   const BoundaryCopyType BDCopyType,
                                   const int var, const std::string BDtype)
 {
-    int id1, id2, npts, nptselem, cnt = 0, bdrycnt = 0;
+    int id1, id2, npts, nptselem, cnt = 0;
     Array<OneD, NekDouble> Dirichlet, x0, x1, x2;
 
     // loop over Boundary Regions
@@ -879,14 +879,12 @@ void MMFSystem::CopyBoundaryTrace(const Array<OneD, const NekDouble> &Fwd,
                     case eDirichlet:
                     {
                         Vmath::Vcopy(npts, &Dirichlet[id1], 1, &Bwd[id2], 1);
-                        bdrycnt++;
                     }
                     break;
 
                     case eFwdEQBwd:
                     {
                         Vmath::Vcopy(npts, &Fwd[id2], 1, &Bwd[id2], 1);
-                        bdrycnt++;
                     }
                     break;
 
@@ -894,7 +892,6 @@ void MMFSystem::CopyBoundaryTrace(const Array<OneD, const NekDouble> &Fwd,
                     {
                         Vmath::Vcopy(npts, &Fwd[id2], 1, &Bwd[id2], 1);
                         Vmath::Neg(npts, &Bwd[id2], 1);
-                        bdrycnt++;
                     }
                     break;
 

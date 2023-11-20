@@ -748,8 +748,6 @@ void PulseWaveSystem::GetCommArray(
             // Set up a set the domain ids listed in the ordering of
             // the SharedProc unique numbering
             set<int> doneDom;
-            NekDouble maxdom = Vmath::Vmax(totShared, shareddom, 1);
-            maxdom++;
             for (size_t i = 0; i < nShrProc; ++i)
             {
                 int minId =

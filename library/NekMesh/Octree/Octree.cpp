@@ -313,10 +313,8 @@ void Octree::SubDivide()
             dividelist.push_back(sublist);
         }
         // then loop over building sublists until no more are required
-        int ct2 = 0;
         while (true)
         {
-            ct2++;
             vector<OctantSharedPtr> newsublist,
                 previouslist = dividelist.back();
             for (int i = 0; i < previouslist.size(); i++)

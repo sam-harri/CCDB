@@ -186,8 +186,7 @@ void FaceMesh::Mesh()
 
     pplanemesh->Extract(m_connec);
 
-    bool repeat     = true;
-    int meshcounter = 1;
+    bool repeat = true;
 
     // continuously remesh until all triangles conform to the spacing in the
     // octree
@@ -202,8 +201,6 @@ void FaceMesh::Mesh()
         pplanemesh->AssignStiener(m_stienerpoints);
         pplanemesh->Mesh();
         pplanemesh->Extract(m_connec);
-        meshcounter++;
-        //    break;
     }
 
     // build a local version of the mesh (one set of triangles).  this is done
@@ -558,8 +555,6 @@ void FaceMesh::DiagonalSwap()
         EdgeSet edges  = m_localEdges;
         m_localEdges.clear();
 
-        int swappedEdges = 0;
-
         EdgeSet::iterator it;
 
         for (it = edges.begin(); it != edges.end(); it++)
@@ -871,8 +866,6 @@ void FaceMesh::DiagonalSwap()
 
                 m_localElements[id1] = ntri1;
                 m_localElements[id2] = ntri2;
-
-                swappedEdges++;
             }
             else
             {

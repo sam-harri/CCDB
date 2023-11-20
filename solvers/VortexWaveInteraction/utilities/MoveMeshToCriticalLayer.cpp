@@ -465,16 +465,12 @@ void TurnOffEdges(TiXmlElement *doc, SpatialDomains::SegGeomMap &meshedges,
     TiXmlElement *field = doc->FirstChildElement("COMPOSITE");
     ASSERTL0(field, "Unable to find COMPOSITE tag in file.");
 
-    int nextCompositeNumber = -1;
-
     /// All elements are of the form: "<C ID = "N"> ... </C>".
     /// Read the ID field first.
     TiXmlElement *composite = field->FirstChildElement("C");
 
     while (composite)
     {
-        nextCompositeNumber++;
-
         int indx;
         int err = composite->QueryIntAttribute("ID", &indx);
         ASSERTL0(err == TIXML_SUCCESS, "Unable to read attribute ID.");
@@ -627,7 +623,6 @@ void RedefineVertices(TiXmlElement *doc, Array<OneD, NekDouble> &dvertx,
     TiXmlElement *vertex = element->FirstChildElement("V");
 
     int indx;
-    int nextVertexNumber = -1;
     int err; /// Error value returned by TinyXML.
 
     vector<NekDouble> xpts, ypts, zpts;
@@ -635,8 +630,6 @@ void RedefineVertices(TiXmlElement *doc, Array<OneD, NekDouble> &dvertx,
 
     while (vertex)
     {
-        nextVertexNumber++;
-
         TiXmlAttribute *vertexAttr = vertex->FirstAttribute();
         std::string attrName(vertexAttr->Name());
 

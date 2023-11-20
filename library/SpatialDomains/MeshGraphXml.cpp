@@ -555,12 +555,9 @@ void MeshGraphXml::v_ReadVertices()
     TiXmlElement *vertex = element->FirstChildElement("V");
 
     int indx;
-    int nextVertexNumber = -1;
 
     while (vertex)
     {
-        nextVertexNumber++;
-
         TiXmlAttribute *vertexAttr = vertex->FirstAttribute();
         std::string attrName(vertexAttr->Name());
 
@@ -729,13 +726,9 @@ void MeshGraphXml::v_ReadCurves()
     TiXmlElement *edgelement = field->FirstChildElement("E");
 
     int edgeindx, edgeid;
-    int nextEdgeNumber = -1;
 
     while (edgelement)
     {
-        /// These should be ordered.
-        nextEdgeNumber++;
-
         std::string edge(edgelement->ValueStr());
         ASSERTL0(edge == "E",
                  (std::string("Unknown 3D curve type:") + edge).c_str());

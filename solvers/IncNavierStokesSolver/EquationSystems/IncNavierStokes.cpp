@@ -773,12 +773,9 @@ void IncNavierStokes::SetUpWomersley(const int fldid, const int bndid,
     TiXmlElement *fval = coeff->FirstChildElement("F");
 
     int indx;
-    int nextFourierCoeff = -1;
 
     while (fval)
     {
-        nextFourierCoeff++;
-
         TiXmlAttribute *fvalAttr = fval->FirstAttribute();
         std::string attrName(fvalAttr->Name());
 
