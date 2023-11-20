@@ -35,7 +35,6 @@
 #include <CardiacEPSolver/CellModels/CellModel.h>
 #include <CardiacEPSolver/Stimuli/Stimulus.h>
 #include <MultiRegions/ExpList.h>
-#include <SpatialDomains/MeshComponents.h>
 
 using namespace std;
 using namespace Nektar;

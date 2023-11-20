@@ -276,6 +276,13 @@ debian-bookworm-full-avx512-build-and-test:
   tags:
     - avx512
 
+debian-bookworm-full-clang15-build-and-test:
+  <<: *build-and-test-template
+  needs: ["debian-bookworm-full-build-env"]
+  variables:
+    BUILD_CC: clang-15
+    BUILD_CXX: clang++-15
+
 debian-bullseye-default-build-and-test:
   <<: *build-and-test-template
   needs: ["debian-bullseye-default-build-env"]
@@ -336,6 +343,10 @@ debian-bookworm-full-avx2-warnings:
 debian-bookworm-full-avx512-warnings:
   <<: *compiler-warning-template
   needs: ["debian-bookworm-full-avx512-build-and-test"]
+
+debian-bookworm-full-clang15-warnings:
+  <<: *compiler-warning-template
+  needs: ["debian-bookworm-full-clang15-build-and-test"]
 
 debian-bullseye-default-warnings:
   <<: *compiler-warning-template

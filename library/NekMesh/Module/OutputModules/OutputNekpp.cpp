@@ -595,8 +595,6 @@ void OutputNekpp::TransferComposites(MeshGraphSharedPtr graph)
     SpatialDomains::CompositeMap &comps = graph->GetComposites();
     map<int, string> &compLabels        = graph->GetCompositesLabels();
 
-    int j = 0;
-
     for (auto &it : m_mesh->m_composite)
     {
         if (it.second->m_items.size() > 0)
@@ -719,7 +717,6 @@ void OutputNekpp::TransferComposites(MeshGraphSharedPtr graph)
 
             comps[indx] = curVector;
         }
-        j++;
     }
 
     if (m_config["chkbndcomp"].beenSet)

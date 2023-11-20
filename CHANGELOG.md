@@ -46,6 +46,7 @@ v5.5.0
 - Disable macOS Intel runner (!1655)
 - Upgrade Win10 runners (!1656)
 - Add `clang-tidy` support to CI for static analysis (!1556)
+- Add `clang-15` tester (!1671)
 
 **NekMesh**
 - Replace deprecated boost::filesystem functions (!1654)

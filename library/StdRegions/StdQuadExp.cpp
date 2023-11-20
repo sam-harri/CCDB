@@ -1431,9 +1431,6 @@ void StdQuadExp::v_SVVLaplacianFilter(Array<OneD, NekDouble> &array,
         int cutoff = (int)(mkey.GetConstFactor(eFactorSVVCutoffRatio) *
                            min(nmodes_a, nmodes_b));
 
-        // counters for scanning through orthocoeffs array
-        int cnt = 0;
-
         //------"New" Version August 22nd '13--------------------
         for (int j = 0; j < nmodes_a; ++j)
         {
@@ -1451,7 +1448,6 @@ void StdQuadExp::v_SVVLaplacianFilter(Array<OneD, NekDouble> &array,
                 {
                     orthocoeffs[j * nmodes_b + k] *= 0.0;
                 }
-                cnt++;
             }
         }
     }

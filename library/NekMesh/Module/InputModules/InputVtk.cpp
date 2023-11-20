@@ -130,7 +130,7 @@ void InputVtk::Process()
     for (int c = 0; c < numCellTypes; ++c)
     {
         vtkCells[c]->InitTraversal();
-        for (int i = 0; vtkCells[c]->GetNextCell(npts, pts); ++i)
+        while (vtkCells[c]->GetNextCell(npts, pts))
         {
             for (int j = 0; j < npts - vtkNumPoints[c] + 1; ++j)
             {

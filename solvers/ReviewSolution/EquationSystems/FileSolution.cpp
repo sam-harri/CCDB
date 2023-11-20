@@ -33,8 +33,16 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/algorithm/string.hpp>
+#include <algorithm>
+#include <fstream>
 #include <iomanip>
+#include <iostream>
+#include <sstream>
+
+#include <boost/algorithm/string.hpp>
+#include <boost/format.hpp>
+
+#include <tinyxml.h>
 
 #include <LibUtilities/BasicUtils/Timer.h>
 #include <LibUtilities/Communication/Comm.h>
@@ -45,16 +53,12 @@
 #include <LibUtilities/BasicUtils/FileSystem.h>
 #include <LibUtilities/BasicUtils/PtsIO.h>
 #include <LibUtilities/Polylib/Polylib.h>
-#include <algorithm>
-#include <fstream>
-#include <iostream>
-#include <sstream>
 
 #include <LibUtilities/BasicUtils/ParseUtils.h>
 #include <ReviewSolution/EquationSystems/FileSolution.h>
 #include <SolverUtils/Forcing/ForcingMovingReferenceFrame.h>
 #include <StdRegions/StdSegExp.h>
-#include <tinyxml.h>
+
 using namespace std;
 
 namespace Nektar::SolverUtils
@@ -654,23 +658,22 @@ void FileFieldInterpolator::DFT(
     {
         ASSERTL0(file.find("%d", found + 1) == string::npos,
                  "There are more than one '%d'.");
-        char *buffer = new char[file.length() + 8];
-        int nstart   = m_start;
+        int nstart = m_start;
         std::vector<NekDouble> times;
         for (int i = nstart; i < nstart + m_slices * m_skip; i += m_skip)
         {
-            sprintf(buffer, file.c_str(), i);
-            ImportFldBase(buffer, pFields, (i - nstart) / m_skip, params);
+            auto fmt = boost::format(file) % i;
+            ImportFldBase(fmt.str(), pFields, (i - nstart) / m_skip, params);
+
             if (m_session->GetComm()->GetRank() == 0)
             {
-                cout << "read base flow file " << buffer << endl;
+                cout << "read base flow file " << fmt.str() << endl;
             }
             if (timefromfile && params.count("time"))
             {
                 times.push_back(params["time"]);
             }
         }
-        delete[] buffer;
         if (timefromfile && times.size() == m_slices && m_slices > 1)
         {
             m_timeStart = times[0];

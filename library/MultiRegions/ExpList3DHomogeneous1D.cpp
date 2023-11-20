@@ -319,9 +319,7 @@ void ExpList3DHomogeneous1D::v_WriteTecplotConnectivity(std::ostream &outfile,
     const int nElmt     = m_planes[0]->GetExpSize();
     const int nPlanes   = m_planes.size();
 
-    int cnt  = 0;
-    int cnt2 = 0;
-    for (int i = 0; i < nElmt; ++i)
+    for (int i = 0, cnt = 0; i < nElmt; ++i)
     {
         const int np0 = (*m_exp)[i]->GetNumPoints(0);
         const int np1 = (*m_exp)[i]->GetNumPoints(1);
@@ -342,7 +340,6 @@ void ExpList3DHomogeneous1D::v_WriteTecplotConnectivity(std::ostream &outfile,
                     outfile << cnt + j * np0 + (k - 1) + o2 + 1 << " ";
                     outfile << cnt + j * np0 + k + o2 + 1 << " ";
                     outfile << cnt + j * np0 + k + o1 + 1 << endl;
-                    cnt2++;
                 }
             }
         }

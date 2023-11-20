@@ -76,7 +76,7 @@ int main(int argc, char *argv[])
 
     // Generate the polygons from the triangle strips
     vtkStrips->InitTraversal();
-    for (int i = 0; vtkStrips->GetNextCell(npts, pts); ++i)
+    while (vtkStrips->GetNextCell(npts, pts))
     {
         for (int j = 0; j < npts - 2; ++j)
         {
