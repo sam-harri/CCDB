@@ -2,7 +2,7 @@
 import sys
 from NekPy.FieldUtils import *
 
-field = Field(sys.argv, forceoutput=True, error=True)
+field = Field(sys.argv, force_output=True, error=True)
 
 InputModule.Create("pts", field, "chan3D_pts.pts").Run()
 OutputModule.Create("csv", field, "chan3D_pts.csv").Run()

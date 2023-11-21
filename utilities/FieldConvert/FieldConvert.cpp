@@ -55,6 +55,7 @@ int main(int argc, char *argv[])
     timer.Start();
 
     po::options_description desc("Available options");
+    po::options_description dep("Deprecated options");
 
     // clang-format off
     desc.add_options()
@@ -67,11 +68,11 @@ int main(int argc, char *argv[])
          "Number of planes in the z-direction for output of "
          "Homogeneous 1D expansion(for .dat, .vtu).")
         ("error,e", "Write error of fields for regression checking")
-        ("forceoutput,f", "Force the output to be written without any checks")
+        ("force-output,f", "Force the output to be written without any checks")
         ("range,r", po::value<string>(),
          "Define output range i.e. (-r xmin,xmax,ymin,ymax,zmin,zmax) "
          "in which any vertex is contained.")
-        ("noequispaced", "Do not use equispaced output.")
+        ("no-equispaced", "Do not use equispaced output.")
         ("nparts", po::value<int>(),
          "Define nparts if running serial problem to mimic "
          "parallel run with many partitions.")
@@ -91,8 +92,8 @@ int main(int argc, char *argv[])
          "Print options for a module.")
         ("module,m", po::value<vector<string>>(),
          "Specify modules which are to be used.")
-        ("useSessionVariables", "Use variables defined in session for output")
-        ("useSessionExpansion", "Use expansion defined in session.")
+        ("use-session-variables", "Use variables defined in session for output")
+        ("use-session-expansion", "Use expansion defined in session.")
         ("verbose,v", "Enable verbose mode.");
     // clang-format on
 
@@ -100,8 +101,22 @@ int main(int argc, char *argv[])
     hidden.add_options()("input-file", po::value<vector<string>>(),
                          "Input filename");
 
+    // Deprecated options: introduced in 5.4.0 to homogenise command-line
+    // options to use '-' instead of camelCase or no spaces.
+    std::map<std::string, std::string> deprecated = {
+        {"forceoutput", "force-output"},
+        {"noequispaced", "no-equispaced"},
+        {"useSessionVariables", "use-session-variables"},
+        {"useSessionExpansion", "use-session-expansion"}};
+
+    for (auto &d : deprecated)
+    {
+        std::string description = "Deprecated: use --" + d.second;
+        dep.add_options()(d.first.c_str(), description.c_str());
+    }
+
     po::options_description cmdline_options;
-    cmdline_options.add(hidden).add(desc);
+    cmdline_options.add(hidden).add(desc).add(dep);
 
     po::positional_options_description p;
     p.add("input-file", -1);
@@ -125,10 +140,21 @@ int main(int argc, char *argv[])
     }
 
     // If NEKTAR_DISABLE_BACKUPS environment variable is set, enable the
-    // forceoutput option.
+    // force-output option.
     if (std::getenv("NEKTAR_DISABLE_BACKUPS") != nullptr)
     {
-        vm.insert(std::make_pair("forceoutput", po::variable_value()));
+        vm.insert(std::make_pair("force-output", po::variable_value()));
+    }
+
+    // Deal with deprecated options.
+    for (auto &d : deprecated)
+    {
+        if (vm.count(d.first))
+        {
+            std::cerr << "WARNING: --" << d.first << " deprecated: use --"
+                      << d.second << std::endl;
+            vm.emplace(d.second, po::variable_value(vm[d.first]));
+        }
     }
 
     // Print available modules.

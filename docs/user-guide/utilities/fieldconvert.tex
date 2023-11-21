@@ -359,7 +359,7 @@ directory containing the mesh partitioned into 2.
 import sys
 from NekPy.FieldUtils import *
 
-field = Field(sys.argv, nparts=2, forceoutput=True, error=True)
+field = Field(sys.argv, nparts=2, force_output=True, error=True)
 
 inputxml   = InputModule.Create("xml",   field, "session_xml")
 inputfld   = InputModule.Create("fld",   field, "field.fld")
@@ -1191,7 +1191,7 @@ FieldConvert file.xml file.dat
 \end{lstlisting}
 
 In this case the pointdatatofld module should be used without the
-\inltt{--noequispaced} option. However this can lead to problems when
+\inltt{--no-equispaced} option. However this can lead to problems when
 peforming an elemental forward projection/transform since the mass
 matrix in a deformed element can be singular as the equispaced points
 do not have a sufficiently accurate quadrature rule that spans the
@@ -1199,7 +1199,7 @@ polynomial space. Therefore it is advisable to use the set of points
 given by
 
 \begin{lstlisting}[style=BashInputStyle]
-FieldConvert --noequispaced file.xml file.dat
+FieldConvert --no-equispaced file.xml file.dat
 \end{lstlisting}
 
 which produces a set of points at the gaussian collapsed

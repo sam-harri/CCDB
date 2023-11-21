@@ -2,7 +2,7 @@
 import sys
 from NekPy.FieldUtils import *
 
-field = Field(sys.argv, forceoutput=True, error=True)
+field = Field(sys.argv, force_output=True, error=True)
 
 InputModule.Create("xml", field, "interptest.xml").Run()
 ProcessModule.Create("interpfield", field, fromxml="interptest.xml", fromfld="interptest.fld").Run()

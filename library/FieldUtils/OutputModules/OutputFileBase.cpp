@@ -78,7 +78,7 @@ void OutputFileBase::v_Process(po::variables_map &vm)
     else if (m_f->m_exp.size())
     {
         // reset expansion definition to use equispaced points if required.
-        if (m_requireEquiSpaced && (vm.count("noequispaced") == 0) &&
+        if (m_requireEquiSpaced && (vm.count("no-equispaced") == 0) &&
             m_f->m_exp[0]->GetNumElmts() != 0)
         {
             ConvertExpToEquispaced(vm);
@@ -275,7 +275,7 @@ bool OutputFileBase::WriteFile(std::string &filename, po::variables_map &vm)
     comm->GetSpaceComm()->AllReduce(count, LibUtilities::ReduceSum);
 
     int writeFile = 1;
-    if (count && (vm.count("forceoutput") == 0))
+    if (count && (vm.count("force-output") == 0))
     {
         if (vm.count("nparts") == 0) // do not do check if --nparts is enabled.
         {

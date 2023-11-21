@@ -2,7 +2,7 @@
 import sys
 from NekPy.FieldUtils import *
 
-field = Field(sys.argv, forceoutput=True, error=True)
+field = Field(sys.argv, force_output=True, error=True)
 
 ProcessModule.Create("interppoints", field, fromxml="chan3D.xml", fromfld="chan3D.fld", topts="chan3D_pts.pts").Run()
 OutputModule.Create("pts", field, "out.pts").Run()

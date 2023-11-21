@@ -256,12 +256,12 @@ FilterFieldConvert::FilterFieldConvert(
                 "Homogeneous 1D expansion(for .dat, .vtu).")
             ("error,e",
                 "Write error of fields for regression checking")
-            ("forceoutput,f",
+            ("force-output,f",
                 "Force the output to be written without any checks")
             ("range,r", po::value<std::string>(),
                 "Define output range i.e. (-r xmin,xmax,ymin,ymax,zmin,zmax) "
                 "in which any vertex is contained.")
-            ("noequispaced",
+            ("no-equispaced",
                 "Do not use equispaced output.")
             ("nparts", po::value<int>(),
                 "Define nparts if running serial problem to mimic "
@@ -282,9 +282,9 @@ FilterFieldConvert::FilterFieldConvert(
                 "Print options for a module.")
             ("module,m", po::value<std::vector<std::string> >(),
                 "Specify modules which are to be used.")
-            ("useSessionVariables",
+            ("use-session-variables",
                 "Use variables defined in session for output")
-            ("useSessionExpansion",
+            ("use-session-expansion",
                 "Use expansion defined in session.")
             ("verbose,v",
                 "Enable verbose mode.");
@@ -322,7 +322,7 @@ FilterFieldConvert::FilterFieldConvert(
             std::cerr << desc;
         }
     }
-    m_vm.insert(std::make_pair("forceoutput", po::variable_value()));
+    m_vm.insert(std::make_pair("force-output", po::variable_value()));
 }
 
 FilterFieldConvert::~FilterFieldConvert()

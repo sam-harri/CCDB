@@ -138,7 +138,8 @@ struct Field
             // check to see if fld file defined so can use in
             // expansion defintion if required
 
-            bool expFromFld = fldfilegiven && !vm.count("useSessionExpansion");
+            bool expFromFld =
+                fldfilegiven && !vm.count("use-session-expansion");
 
             // load fielddef header if fld file is defined. This gives
             // precedence to Homogeneous definition in fld file
@@ -250,7 +251,7 @@ struct Field
             m_session->LoadParameter("Strip_Z", nstrips, 1);
             std::vector<std::string> vars = m_session->GetVariables();
 
-            if (vm.count("useSessionVariables"))
+            if (vm.count("use-session-variables"))
             {
                 m_variables = vars;
             }

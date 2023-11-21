@@ -87,8 +87,8 @@ void NewPartition(FieldSharedPtr f, py::list &py_argv, int part)
 // Returns: f
 FieldSharedPtr Field_Init(py::list &py_argv, int nparts = 0,
                           int output_points = 0, int output_points_hom_z = 0,
-                          bool error = false, bool forceoutput = false,
-                          std::string domain = "", bool noequispaced = false,
+                          bool error = false, bool force_output = false,
+                          std::string domain = "", bool no_equispaced = false,
                           int npz = 0, std::string onlyshape = "",
                           int part_only = 0, int part_only_overlapping = 0,
                           bool useSessionVariables = false,
@@ -136,9 +136,9 @@ FieldSharedPtr Field_Init(py::list &py_argv, int nparts = 0,
         f->m_vm.insert(std::make_pair("error", po::variable_value()));
     }
 
-    if (forceoutput)
+    if (force_output)
     {
-        f->m_vm.insert(std::make_pair("forceoutput", po::variable_value()));
+        f->m_vm.insert(std::make_pair("force-output", po::variable_value()));
     }
 
     if (domain.size())
@@ -147,9 +147,9 @@ FieldSharedPtr Field_Init(py::list &py_argv, int nparts = 0,
             std::make_pair("range", po::variable_value(domain, false)));
     }
 
-    if (noequispaced)
+    if (no_equispaced)
     {
-        f->m_vm.insert(std::make_pair("noequispaced", po::variable_value()));
+        f->m_vm.insert(std::make_pair("no-equispaced", po::variable_value()));
     }
 
     if (npz)
@@ -179,13 +179,13 @@ FieldSharedPtr Field_Init(py::list &py_argv, int nparts = 0,
     if (useSessionVariables)
     {
         f->m_vm.insert(
-            std::make_pair("useSessionVariables", po::variable_value()));
+            std::make_pair("use_session_variables", po::variable_value()));
     }
 
     if (useSessionExpansion)
     {
         f->m_vm.insert(
-            std::make_pair("useSessionExpansion", po::variable_value()));
+            std::make_pair("use_session_expansion", po::variable_value()));
     }
 
     if (verbose)
@@ -226,11 +226,11 @@ void export_Field()
                  (py::arg("py_argv"), py::arg("nparts") = 0,
                   py::arg("output_points")       = 0,
                   py::arg("output_points_hom_z") = 0, py::arg("error") = false,
-                  py::arg("forceoutput") = false, py::arg("domain") = "",
-                  py::arg("noequispaced") = false, py::arg("npz") = 0,
+                  py::arg("force_output") = false, py::arg("domain") = "",
+                  py::arg("no_equispaced") = false, py::arg("npz") = 0,
                   py::arg("onlyshape") = "", py::arg("part_only") = 0,
                   py::arg("part_only_overlapping") = 0,
-                  py::arg("useSessionVariables")   = false,
-                  py::arg("useSessionExpansion")   = false,
+                  py::arg("use_session_variables") = false,
+                  py::arg("use_session_expansion") = false,
                   py::arg("verbose")               = false)));
 }
