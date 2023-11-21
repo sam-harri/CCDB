@@ -1094,10 +1094,9 @@ void PulseWaveSystem::SetUpDomainInterfaceBCs(
             }
         }
 
-        ASSERTL1(domvids.size() == 2,
-                 "Failed to find two end points "
-                 "of a domain (domvids = " +
-                     boost::lexical_cast<std::string>(domvids.size()) + ")");
+        ASSERTL1(domvids.size() == 2, "Failed to find two end points "
+                                      "of a domain (domvids = " +
+                                          std::to_string(domvids.size()) + ")");
 
         size_t nprocs = domComm[d]->GetSize();
 

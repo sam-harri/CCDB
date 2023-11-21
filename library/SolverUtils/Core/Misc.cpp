@@ -53,7 +53,7 @@ void AddSummaryItem(SummaryList &l, const std::string &name,
 /// Adds a summary item to the summary info list
 void AddSummaryItem(SummaryList &l, const std::string &name, const int &value)
 {
-    l.push_back(std::make_pair(name, boost::lexical_cast<std::string>(value)));
+    l.push_back(std::make_pair(name, std::to_string(value)));
 }
 
 /// Adds a summary item to the summary info list

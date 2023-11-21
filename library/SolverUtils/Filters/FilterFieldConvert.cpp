@@ -501,8 +501,7 @@ void FilterFieldConvert::v_Update(
     {
         m_fieldMetaData["FinalTime"] = boost::lexical_cast<std::string>(time);
         v_PrepareOutput(pFields, time);
-        m_fieldMetaData["FilterFileNum"] =
-            boost::lexical_cast<std::string>(++m_outputIndex);
+        m_fieldMetaData["FilterFileNum"] = std::to_string(++m_outputIndex);
         OutputField(pFields, m_outputIndex);
     }
 }

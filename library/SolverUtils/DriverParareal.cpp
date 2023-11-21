@@ -407,12 +407,11 @@ void DriverParareal::CopyConvergedCheckPoints(const size_t w, const size_t k)
 
             // Input directory name.
             std::string indir = m_EqSys[m_fineLevel]->GetSessionName() + "_" +
-                                boost::lexical_cast<std::string>(j - 1) +
-                                ".pit";
+                                std::to_string(j - 1) + ".pit";
 
             /// Output directory name.
             std::string outdir = m_EqSys[m_fineLevel]->GetSessionName() + "_" +
-                                 boost::lexical_cast<std::string>(j) + ".pit";
+                                 std::to_string(j) + ".pit";
 
             // Number of checkpoint by chunk.
             size_t nChkPts = m_nsteps[m_fineLevel] / m_checkSteps;
@@ -423,9 +422,9 @@ void DriverParareal::CopyConvergedCheckPoints(const size_t w, const size_t k)
             for (size_t i = 0; i < nChkPts; i++)
             {
                 // Filename corresponding to checkpoint iChkPts.
-                std::string filename =
-                    m_EqSys[m_fineLevel]->GetSessionName() + "_" +
-                    boost::lexical_cast<std::string>(iChkPts + i) + ".chk";
+                std::string filename = m_EqSys[m_fineLevel]->GetSessionName() +
+                                       "_" + std::to_string(iChkPts + i) +
+                                       ".chk";
 
                 // Intput full file name.
                 std::string infullname = indir + "/" + filename;

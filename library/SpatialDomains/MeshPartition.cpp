@@ -337,9 +337,7 @@ void MeshPartition::PrintPartInfo(std::ostream &out)
             ASSERTL0(it->second.size() == m_dim,
                      " Number of directional"
                      " modes in expansion spec for element id = " +
-                         boost::lexical_cast<std::string>(elid) +
-                         " and field " +
-                         boost::lexical_cast<std::string>(it->first) +
+                         std::to_string(elid) + " and field " + it->first +
                          " does not correspond to mesh dimension");
 
             int na = it->second[0];
@@ -477,9 +475,7 @@ void MeshPartition::WeightElements()
             ASSERTL0(it->second.size() == m_dim,
                      " Number of directional"
                      " modes in expansion spec for element id = " +
-                         boost::lexical_cast<std::string>(elid) +
-                         " and field " +
-                         boost::lexical_cast<std::string>(it->first) +
+                         std::to_string(elid) + " and field " + it->first +
                          " does not correspond to mesh dimension");
 
             int na = it->second[0];

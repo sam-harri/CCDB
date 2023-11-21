@@ -2974,15 +2974,14 @@ void PolyInterp(Array<OneD, NekDouble> xpol, Array<OneD, NekDouble> ypol,
     if (info < 0)
     {
         std::string message =
-            "ERROR: The " + boost::lexical_cast<std::string>(-info) +
+            "ERROR: The " + std::to_string(-info) +
             "th parameter had an illegal parameter for dgetrf";
         ASSERTL0(false, message.c_str());
     }
     else if (info > 0)
     {
-        std::string message =
-            "ERROR: Element u_" + boost::lexical_cast<std::string>(info) +
-            boost::lexical_cast<std::string>(info) + " is 0 from dgetrf";
+        std::string message = "ERROR: Element u_" + std::to_string(info) +
+                              std::to_string(info) + " is 0 from dgetrf";
         ASSERTL0(false, message.c_str());
     }
 
@@ -2993,15 +2992,14 @@ void PolyInterp(Array<OneD, NekDouble> xpol, Array<OneD, NekDouble> ypol,
     if (info < 0)
     {
         std::string message =
-            "ERROR: The " + boost::lexical_cast<std::string>(-info) +
+            "ERROR: The " + std::to_string(-info) +
             "th parameter had an illegal parameter for dgetrf";
         ASSERTL0(false, message.c_str());
     }
     else if (info > 0)
     {
-        std::string message =
-            "ERROR: Element u_" + boost::lexical_cast<std::string>(info) +
-            boost::lexical_cast<std::string>(info) + " is 0 from dgetrf";
+        std::string message = "ERROR: Element u_" + std::to_string(info) +
+                              std::to_string(info) + " is 0 from dgetrf";
         ASSERTL0(false, message.c_str());
     }
     /*
@@ -3076,15 +3074,14 @@ void PolyFit(int polyorder, int npoints, Array<OneD, NekDouble> xin,
     if (info < 0)
     {
         std::string message =
-            "ERROR: The " + boost::lexical_cast<std::string>(-info) +
+            "ERROR: The " + std::to_string(-info) +
             "th parameter had an illegal parameter for dgetrf";
         ASSERTL0(false, message.c_str());
     }
     else if (info > 0)
     {
-        std::string message =
-            "ERROR: Element u_" + boost::lexical_cast<std::string>(info) +
-            boost::lexical_cast<std::string>(info) + " is 0 from dgetrf";
+        std::string message = "ERROR: Element u_" + std::to_string(info) +
+                              std::to_string(info) + " is 0 from dgetrf";
         ASSERTL0(false, message.c_str());
     }
     // N means no transponse (direct matrix)
@@ -3094,15 +3091,14 @@ void PolyFit(int polyorder, int npoints, Array<OneD, NekDouble> xin,
     if (info < 0)
     {
         std::string message =
-            "ERROR: The " + boost::lexical_cast<std::string>(-info) +
+            "ERROR: The " + std::to_string(-info) +
             "th parameter had an illegal parameter for dgetrf";
         ASSERTL0(false, message.c_str());
     }
     else if (info > 0)
     {
-        std::string message =
-            "ERROR: Element u_" + boost::lexical_cast<std::string>(info) +
-            boost::lexical_cast<std::string>(info) + " is 0 from dgetrf";
+        std::string message = "ERROR: Element u_" + std::to_string(info) +
+                              std::to_string(info) + " is 0 from dgetrf";
         ASSERTL0(false, message.c_str());
     }
 

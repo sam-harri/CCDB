@@ -151,7 +151,7 @@ protected:
 
     virtual std::string v_GetCellVarName(size_t idx)
     {
-        return "Var" + boost::lexical_cast<std::string>(idx);
+        return "Var" + std::to_string(idx);
     }
 
     virtual void v_SetInitialConditions() = 0;

@@ -298,7 +298,7 @@ void GlobalLinSysIterativeStaticCond::PrepareLocalSchurComplement()
                 loc_lda = loc_mat->GetRows();
 
                 ASSERTL1(loc_lda >= 0,
-                         boost::lexical_cast<std::string>(n) +
+                         std::to_string(n) +
                              "-th "
                              "matrix block in Schur complement has "
                              "rank 0!");
@@ -330,7 +330,7 @@ void GlobalLinSysIterativeStaticCond::PrepareLocalSchurComplement()
                     loc_lda = loc_mat->GetRows();
 
                     ASSERTL1(loc_lda == partitions[part].second,
-                             boost::lexical_cast<std::string>(n) +
+                             std::to_string(n) +
                                  "-th"
                                  " matrix block in Schur complement has "
                                  "unexpected rank");

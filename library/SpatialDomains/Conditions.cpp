@@ -356,8 +356,7 @@ void BoundaryConditions::ReadBoundaryConditions(TiXmlElement *conditions)
                  "Error reading boundary region reference.");
 
         ASSERTL0(m_boundaryConditions.count(boundaryRegionID) == 0,
-                 "Boundary region '" +
-                     boost::lexical_cast<std::string>(boundaryRegionID) +
+                 "Boundary region '" + std::to_string(boundaryRegionID) +
                      "' appears multiple times.");
 
         // Find the boundary region corresponding to this ID.

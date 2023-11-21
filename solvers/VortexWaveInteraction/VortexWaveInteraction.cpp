@@ -281,7 +281,7 @@ VortexWaveInteraction::VortexWaveInteraction(int argc, char *argv[])
             break;
             case eFixedAlphaWaveForcing:
             {
-                string nstr = boost::lexical_cast<std::string>(m_iterStart);
+                string nstr = std::to_string(m_iterStart);
                 cout << "Restarting from iteration " << m_iterStart << endl;
                 std::string rstfile = "cp -f Save/" + m_sessionName + ".rst." +
                                       nstr + " " + m_sessionName + ".rst";
@@ -1122,9 +1122,8 @@ void VortexWaveInteraction::SaveFile(string file, string dir, int n)
         opendir[dir] = 1;
     }
 
-    string savefile =
-        dir + "/" + file + "." + boost::lexical_cast<std::string>(n);
-    string syscall = "cp -f " + file + " " + savefile;
+    string savefile = dir + "/" + file + "." + std::to_string(n);
+    string syscall  = "cp -f " + file + " " + savefile;
 
     ASSERTL0(system(syscall.c_str()) == 0, syscall.c_str());
 }
@@ -1142,9 +1141,8 @@ void VortexWaveInteraction::MoveFile(string file, string dir, int n)
         opendir[dir] = 1;
     }
 
-    string savefile =
-        dir + "/" + file + "." + boost::lexical_cast<std::string>(n);
-    string syscall = "mv -f " + file + " " + savefile;
+    string savefile = dir + "/" + file + "." + std::to_string(n);
+    string syscall  = "mv -f " + file + " " + savefile;
 
     ASSERTL0(system(syscall.c_str()) == 0, syscall.c_str());
 }

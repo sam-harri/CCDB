@@ -285,8 +285,7 @@ void FilterReynoldsStresses::v_PrepareOutput(
 
     size_t dim = pFields.size() - 1;
 
-    m_fieldMetaData["NumberOfFieldDumps"] =
-        boost::lexical_cast<std::string>(m_numSamples);
+    m_fieldMetaData["NumberOfFieldDumps"] = std::to_string(m_numSamples);
 
     // Set wavespace to false, as calculations were performed in physical space
     bool waveSpace = pFields[0]->GetWaveSpace();

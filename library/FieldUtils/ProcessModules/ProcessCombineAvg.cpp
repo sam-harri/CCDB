@@ -186,10 +186,9 @@ void ProcessCombineAvg::v_Process(po::variables_map &vm)
     }
 
     // Update metadata
-    m_f->m_fieldMetaDataMap["NumberOfFieldDumps"] =
-        boost::lexical_cast<std::string>(na + nb);
-    NekDouble t0      = -1;
-    NekDouble finTime = -1;
+    m_f->m_fieldMetaDataMap["NumberOfFieldDumps"] = std::to_string(na + nb);
+    NekDouble t0                                  = -1;
+    NekDouble finTime                             = -1;
     if (m_f->m_fieldMetaDataMap.count("InitialTime"))
     {
         string s_t  = m_f->m_fieldMetaDataMap["InitialTime"];
