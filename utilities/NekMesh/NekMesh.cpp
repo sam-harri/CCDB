@@ -51,11 +51,12 @@ namespace ip = boost::asio::ip;
 int main(int argc, char *argv[])
 {
     po::options_description desc("Available options");
+    po::options_description dep("Deprecated options");
 
     // clang-format off
     desc.add_options()
         ("help,h",         "Produce this help message.")
-        ("forceoutput,f",  "Force the output to be written without any checks")
+        ("force-output,f", "Force the output to be written without any checks")
         ("modules-list,l", "Print the list of available modules.")
         ("modules-opt,p",  po::value<string>(),
              "Print options for a module.")
@@ -71,8 +72,19 @@ int main(int argc, char *argv[])
         ("input-file",   po::value<vector<string> >(), "Input filename");
     // clang-format on
 
+    // Deprecated options: introduced in 5.4.0 to homogenise command-line
+    // options to use '-' instead of camelCase or no spaces.
+    std::map<std::string, std::string> deprecated = {
+        {"forceoutput", "force-output"}};
+
+    for (auto &d : deprecated)
+    {
+        std::string description = "Deprecated: use --" + d.second;
+        dep.add_options()(d.first.c_str(), description.c_str());
+    }
+
     po::options_description cmdline_options;
-    cmdline_options.add(hidden).add(desc);
+    cmdline_options.add(hidden).add(desc).add(dep);
 
     po::positional_options_description p;
     p.add("input-file", -1);
@@ -96,15 +108,26 @@ int main(int argc, char *argv[])
     }
 
     // If NEKTAR_DISABLE_BACKUPS environment variable is set, enable the
-    // forceoutput option.
+    // force-output option.
     if (std::getenv("NEKTAR_DISABLE_BACKUPS") != nullptr)
     {
-        vm.insert(std::make_pair("forceoutput", po::variable_value()));
+        vm.insert(std::make_pair("force-output", po::variable_value()));
     }
 
     // Create a logger.
     auto logOutput = std::make_shared<StreamOutput>(std::cout);
     Logger log(logOutput, vm.count("verbose") ? VERBOSE : INFO);
+
+    // Deal with deprecated options.
+    for (auto &d : deprecated)
+    {
+        if (vm.count(d.first))
+        {
+            log(WARNING) << "--" << d.first << " deprecated: use --" << d.second
+                         << std::endl;
+            vm.emplace(d.second, po::variable_value(vm[d.first]));
+        }
+    }
 
     // Print available modules.
     if (vm.count("modules-list"))
@@ -201,7 +224,7 @@ int main(int argc, char *argv[])
         modcmds = vm["module"].as<vector<string>>();
     }
 
-    bool forceOutput = vm.count("forceoutput");
+    bool forceOutput = vm.count("force-output");
 
     // Add input and output modules to beginning and end of this vector.
     modcmds.insert(modcmds.begin(), inout[0]);

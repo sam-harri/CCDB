@@ -283,12 +283,13 @@ void SessionReader::InitSession(const std::vector<std::string> &filenames)
     std::string optfile;
     int exists;
 
-    if (DefinesCmdLineArgument("useoptfile"))
+    if (DefinesCmdLineArgument("use-opt-file"))
     {
-        optfile = m_cmdLineOptions.find("useoptfile")->second.as<std::string>();
-        exists  = (bool)boost::filesystem::exists(optfile.c_str());
+        optfile =
+            m_cmdLineOptions.find("use-opt-file")->second.as<std::string>();
+        exists = (bool)boost::filesystem::exists(optfile.c_str());
         ASSERTL0(exists, "A valid .opt file was not specified "
-                         "with the --useoptfile command line option");
+                         "with the --use-opt-file command line option");
 
         m_filenames.push_back(optfile);
 
@@ -296,7 +297,7 @@ void SessionReader::InitSession(const std::vector<std::string> &filenames)
         std::rotate(m_filenames.rbegin(), m_filenames.rbegin() + 1,
                     m_filenames.rend());
     }
-    else // check for writeoptfile
+    else // check for write-opt-file
     {
         // check for opt file
         optfile = m_sessionName.substr(0, m_sessionName.find("_xml/")) + ".opt";
@@ -440,36 +441,37 @@ std::vector<std::string> SessionReader::ParseCommandLineArguments(int argc,
 {
     // List the publically visible options (listed using --help).
     po::options_description desc("Allowed options");
+    po::options_description dep("Deprecated options");
 
     // clang-format off
-            desc.add_options()
-                ("verbose,v",    "be verbose")
-                ("version,V",    "print version information")
-                ("help,h",       "print this help message")
-                ("solverinfo,I", po::value<vector<std::string>>(),
-                                 "override a SOLVERINFO property")
-                ("parameter,P",  po::value<vector<std::string>>(),
-                                 "override a parameter")
-                ("npx",          po::value<int>(),
-                                 "number of procs in X-dir")
-                ("npy",          po::value<int>(),
-                                 "number of procs in Y-dir")
-                ("npz",          po::value<int>(),
-                                 "number of procs in Z-dir")
-                ("nsz",          po::value<int>(),
-                                 "number of slices in Z-dir")
-                ("npt",          po::value<int>(),
-                                 "number of procs in T-dir (parareal)")
-                ("part-only",    po::value<int>(),
-                                 "only partition mesh into N partitions.")
-                ("part-only-overlapping",    po::value<int>(),
-                                 "only partition mesh into N overlapping partitions.")
-                ("part-info",    "output partition information")
-                ("forceoutput,f",  "disables backups files and forces output to be "
-                                 "written without any checks")
-                ("writeoptfile", "write an optimisation file")
-                ("useoptfile",   po::value<std::string>(),
-                                 "use an optimisation file");
+    desc.add_options()
+        ("verbose,v",    "be verbose")
+        ("version,V",    "print version information")
+        ("help,h",       "print this help message")
+        ("solverinfo,I", po::value<vector<std::string>>(),
+                         "override a SOLVERINFO property")
+        ("parameter,P",  po::value<vector<std::string>>(),
+                         "override a parameter")
+        ("npx",          po::value<int>(),
+                         "number of procs in X-dir")
+        ("npy",          po::value<int>(),
+                         "number of procs in Y-dir")
+        ("npz",          po::value<int>(),
+                         "number of procs in Z-dir")
+        ("nsz",          po::value<int>(),
+                         "number of slices in Z-dir")
+        ("npt",          po::value<int>(),
+                         "number of procs in T-dir (parareal)")
+        ("part-only",    po::value<int>(),
+                         "only partition mesh into N partitions.")
+        ("part-only-overlapping",    po::value<int>(),
+                         "only partition mesh into N overlapping partitions.")
+        ("part-info",    "output partition information")
+        ("force-output,f","disables backups files and forces output to be "
+                          "written without any checks")
+        ("write-opt-file","write an optimisation file")
+        ("use-opt-file", po::value<std::string>(),
+                         "use an optimisation file");
     // clang-format on
 
 #ifdef NEKTAR_USE_CWIPI
@@ -494,6 +496,19 @@ std::vector<std::string> SessionReader::ParseCommandLineArguments(int argc,
         }
     }
 
+    // Deprecated options: introduced in 5.4.0 to homogenise command-line
+    // options to use '-' instead of camelCase or no spaces.
+    std::map<std::string, std::string> deprecated = {
+        {"forceoutput", "force-output"},
+        {"writeoptfile", "write-opt-file"},
+        {"useoptfile", "use-opt-file"}};
+
+    for (auto &d : deprecated)
+    {
+        std::string description = "Deprecated: use --" + d.second;
+        dep.add_options()(d.first.c_str(), description.c_str());
+    }
+
     // List hidden options (e.g. session file arguments are not actually
     // specified using the input-file option by the user).
     po::options_description hidden("Hidden options");
@@ -503,7 +518,7 @@ std::vector<std::string> SessionReader::ParseCommandLineArguments(int argc,
 
     // Combine all options for the parser
     po::options_description all("All options");
-    all.add(desc).add(hidden);
+    all.add(desc).add(dep).add(hidden);
 
     // Session file is a positional option
     po::positional_options_description p;
@@ -556,6 +571,18 @@ std::vector<std::string> SessionReader::ParseCommandLineArguments(int argc,
         exit(0);
     }
 
+    // Deal with deprecated options.
+    for (auto &d : deprecated)
+    {
+        if (m_cmdLineOptions.count(d.first))
+        {
+            std::cerr << "Warning: --" << d.first << " deprecated: use --"
+                      << d.second << std::endl;
+            m_cmdLineOptions.emplace(
+                d.second, po::variable_value(m_cmdLineOptions[d.first]));
+        }
+    }
+
     // Enable verbose mode
     if (m_cmdLineOptions.count("verbose"))
     {
@@ -567,7 +594,7 @@ std::vector<std::string> SessionReader::ParseCommandLineArguments(int argc,
     }
 
     // Disable backups
-    if (m_cmdLineOptions.count("forceoutput"))
+    if (m_cmdLineOptions.count("force-output"))
     {
         m_backups = false;
     }
@@ -577,7 +604,7 @@ std::vector<std::string> SessionReader::ParseCommandLineArguments(int argc,
     }
 
     // Enable update optimisation file
-    if (m_cmdLineOptions.count("writeoptfile"))
+    if (m_cmdLineOptions.count("write-opt-file"))
     {
         m_updateOptFile = true;
     }

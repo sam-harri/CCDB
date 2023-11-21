@@ -2,7 +2,7 @@
 import sys
 from NekPy.FieldUtils import *
 
-field = Field(sys.argv, forceoutput=True, error=True, output_points=10)
+field = Field(sys.argv, force_output=True, error=True, output_points=10)
 
 print("hello pytest")
 InputModule.Create("xml",  field, "chan3D.xml").Run()

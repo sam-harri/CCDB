@@ -15,7 +15,7 @@
         this test is designed to test the case when the input is a .csv file.
 
         The file flat-plane.csv contains the x,y,z coordinates at the Gauss points defined in
-        the flat-plane.xml file (exported with the "noequispaced" flag). The .csv file also 
+        the flat-plane.xml file (exported with the "no-equispaced" flag). The .csv file also 
         contains one additional field, defined as u = x + y. I.e., u is a linear function.
 
         The flat-plane.fld also contains the field u.

@@ -5478,7 +5478,7 @@ void ExpList::CreateCollections(Collections::ImplementationType ImpType)
     bool autotuning = colOpt.IsUsingAutotuning();
     if ((autotuning == false) && (ImpType == Collections::eNoImpType))
     {
-        // turn on autotuning if writeoptfile specified
+        // turn on autotuning if write-opt-file specified
         // if m_graph available
         if (m_session->GetUpdateOptFile() && m_graph)
         {
@@ -5612,7 +5612,7 @@ void ExpList::CreateCollections(Collections::ImplementationType ImpType)
     if ((m_session->GetUpdateOptFile()) && (ImpType == Collections::eNoImpType))
     {
         colOpt.UpdateOptFile(m_session->GetSessionName(), m_comm);
-        // turn off writeoptfile option so only first
+        // turn off write-opt-file option so only first
         // instance is timed
         m_session->SetUpdateOptFile(false);
     }

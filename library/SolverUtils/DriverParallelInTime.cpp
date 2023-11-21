@@ -163,9 +163,9 @@ void DriverParallelInTime::SetParallelInTimeEquationSystem(
     std::string nsz_string = std::to_string(nsz);
     std::string npt_string = std::to_string(npt);
 
-    // useoptfile
-    bool useoptfile         = m_session->DefinesCmdLineArgument("useoptfile");
-    std::string optfilename = useoptfile ? m_session->GetFilenames()[0] : "";
+    // use-opt-file
+    bool useOptFile         = m_session->DefinesCmdLineArgument("use-opt-file");
+    std::string optfilename = useOptFile ? m_session->GetFilenames()[0] : "";
 
     char *argv[] = {const_cast<char *>("Solver"), // this is just a place holder
                     const_cast<char *>("--npx"),
@@ -178,11 +178,11 @@ void DriverParallelInTime::SetParallelInTimeEquationSystem(
                     const_cast<char *>(nsz_string.c_str()),
                     const_cast<char *>("--npt"),
                     const_cast<char *>(npt_string.c_str()),
-                    const_cast<char *>("--useoptfile"),
+                    const_cast<char *>("--use-opt-file"),
                     const_cast<char *>(optfilename.c_str()),
                     nullptr};
 
-    size_t argc = useoptfile ? 13 : 11;
+    size_t argc = useOptFile ? 13 : 11;
 
     // Get list of session file names.
     std::vector<std::string> sessionFileNames;

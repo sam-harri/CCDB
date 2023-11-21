@@ -420,7 +420,7 @@ int main(int argc, char *argv[])
                 command += PortablePath(execPath);
                 if (HaveOptFile)
                 {
-                    command += " --useoptfile test.opt ";
+                    command += " --use-opt-file test.opt ";
                 }
 
                 command += " ";

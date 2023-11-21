@@ -2,7 +2,7 @@
 import sys
 from NekPy.FieldUtils import *
 
-field = Field(sys.argv, nparts=2, forceoutput=True, error=True)
+field = Field(sys.argv, nparts=2, force_output=True, error=True)
 
 inputxml   = InputModule.Create("xml", field, "Tet_channel_m3_xml")
 inputfld   = InputModule.Create("fld", field, "Tet_channel_m3.fld")
