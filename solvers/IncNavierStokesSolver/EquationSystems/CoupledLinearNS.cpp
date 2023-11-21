@@ -2469,12 +2469,12 @@ void CoupledLinearNS::v_Output(void)
         {
             fs::create_directory(newdir);
         }
-        WriteFld(newdir + "/" + m_sessionName + "_" +
-                     boost::lexical_cast<std::string>(
-                         m_windowPIT * m_comm->GetTimeComm()->GetSize() +
-                         m_comm->GetTimeComm()->GetRank() + 1) +
-                     ".fld",
-                 m_fields[0], fieldcoeffs, variables);
+        WriteFld(
+            newdir + "/" + m_sessionName + "_" +
+                std::to_string(m_windowPIT * m_comm->GetTimeComm()->GetSize() +
+                               m_comm->GetTimeComm()->GetRank() + 1) +
+                ".fld",
+            m_fields[0], fieldcoeffs, variables);
     }
 }
 

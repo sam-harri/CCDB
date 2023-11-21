@@ -2567,8 +2567,7 @@ void MMFMaxwell::Checkpoint_TotalFieldOutput(
     int nq      = m_fields[0]->GetTotPoints();
     int ncoeffs = m_fields[0]->GetNcoeffs();
 
-    std::string outname =
-        m_sessionName + "Tot_" + boost::lexical_cast<std::string>(n) + ".chk";
+    std::string outname = m_sessionName + "Tot_" + std::to_string(n) + ".chk";
 
     std::vector<std::string> variables(nvar);
     std::vector<Array<OneD, NekDouble>> fieldcoeffs(nvar);
@@ -2599,8 +2598,7 @@ void MMFMaxwell::Checkpoint_PlotOutput(
     int nq      = m_fields[0]->GetTotPoints();
     int ncoeffs = m_fields[0]->GetNcoeffs();
 
-    std::string outname =
-        m_sessionName + "Plot_" + boost::lexical_cast<std::string>(n) + ".chk";
+    std::string outname = m_sessionName + "Plot_" + std::to_string(n) + ".chk";
 
     std::vector<std::string> variables(nvar);
     variables[0] = "Fx";
@@ -2635,8 +2633,8 @@ void MMFMaxwell::Checkpoint_TotPlotOutput(
     int nq      = m_fields[0]->GetTotPoints();
     int ncoeffs = m_fields[0]->GetNcoeffs();
 
-    std::string outname = m_sessionName + "TotPlot_" +
-                          boost::lexical_cast<std::string>(n) + ".chk";
+    std::string outname =
+        m_sessionName + "TotPlot_" + std::to_string(n) + ".chk";
 
     std::vector<std::string> variables(nvar);
     variables[0] = "Frx";
@@ -2691,8 +2689,8 @@ void MMFMaxwell::Checkpoint_EDFluxOutput(
     int nq      = m_fields[0]->GetTotPoints();
     int ncoeffs = m_fields[0]->GetNcoeffs();
 
-    std::string outname = m_sessionName + "EDFlux_" +
-                          boost::lexical_cast<std::string>(n) + ".chk";
+    std::string outname =
+        m_sessionName + "EDFlux_" + std::to_string(n) + ".chk";
 
     std::vector<std::string> variables(nvar);
     variables[0] = "EDFx";
@@ -2743,8 +2741,8 @@ void MMFMaxwell::Checkpoint_EnergyOutput(
     int nq      = m_fields[0]->GetTotPoints();
     int ncoeffs = m_fields[0]->GetNcoeffs();
 
-    std::string outname = m_sessionName + "Energy_" +
-                          boost::lexical_cast<std::string>(n) + ".chk";
+    std::string outname =
+        m_sessionName + "Energy_" + std::to_string(n) + ".chk";
 
     std::vector<std::string> variables(nvar);
     variables[0] = "Energy";

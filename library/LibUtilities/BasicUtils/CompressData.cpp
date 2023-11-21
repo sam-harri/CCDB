@@ -103,7 +103,7 @@ std::string GetCompressString(void)
 
 std::string GetBitSizeStr(void)
 {
-    return boost::lexical_cast<std::string>(sizeof(void *) * 8);
+    return std::to_string(sizeof(void *) * 8);
 }
 
 /**

@@ -2325,14 +2325,12 @@ void SessionReader::ReadFunctions(TiXmlElement *conditions)
                     // Check it has not already been defined
                     pair<std::string, int> key(variableList[i], domainList[j]);
                     auto fcnsIter = functionVarMap.find(key);
-                    ASSERTL0(
-                        fcnsIter == functionVarMap.end(),
-                        "Error setting expression '" + variableList[i] +
-                            " in domain " +
-                            boost::lexical_cast<std::string>(domainList[j]) +
-                            "' in function '" + functionStr +
-                            "'. "
-                            "Expression has already been defined.");
+                    ASSERTL0(fcnsIter == functionVarMap.end(),
+                             "Error setting expression '" + variableList[i] +
+                                 " in domain " + std::to_string(domainList[j]) +
+                                 "' in function '" + functionStr +
+                                 "'. "
+                                 "Expression has already been defined.");
 
                     if (varSplit.size() > 0)
                     {

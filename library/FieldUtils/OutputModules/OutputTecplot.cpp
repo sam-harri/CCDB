@@ -366,7 +366,7 @@ fs::path OutputTecplot::v_GetPath(std::string &filename, po::variables_map &vm)
         int rank      = m_f->m_comm->GetSpaceComm()->GetRank();
         int dot       = filename.find_last_of('.');
         string ext    = filename.substr(dot, filename.length() - dot);
-        string procId = "_P" + boost::lexical_cast<std::string>(rank);
+        string procId = "_P" + std::to_string(rank);
         string start  = filename.substr(0, dot);
         returnstr     = start + procId + ext;
     }

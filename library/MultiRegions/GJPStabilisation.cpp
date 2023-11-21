@@ -115,9 +115,8 @@ GJPStabilisation::GJPStabilisation(ExpListSharedPtr pField)
             NekDouble jumpScal;
             elmt->TraceNormLen(n, h, p);
             ASSERTL0(boost::math::isnan(h) == false,
-                     "h has a nan value when e = " +
-                         boost::lexical_cast<std::string>(e) +
-                         " n =" + boost::lexical_cast<std::string>(n));
+                     "h has a nan value when e = " + std::to_string(e) +
+                         " n =" + std::to_string(n));
 
             if (p == 1)
             {

@@ -122,9 +122,9 @@ EquationSystem::EquationSystem(
     for (int i = 0; i < filenames.size(); ++i)
     {
         string sessionname = "SessionName";
-        sessionname += boost::lexical_cast<std::string>(i);
+        sessionname += std::to_string(i);
         m_fieldMetaDataMap[sessionname]  = filenames[i];
-        m_fieldMetaDataMap["ChkFileNum"] = boost::lexical_cast<std::string>(0);
+        m_fieldMetaDataMap["ChkFileNum"] = std::to_string(0);
     }
 }
 
@@ -1144,9 +1144,8 @@ void EquationSystem::v_Output(void)
             fs::create_directory(newdir);
         }
         WriteFld(newdir + "/" + m_sessionName + "_" +
-                 boost::lexical_cast<std::string>(
-                     m_windowPIT * m_comm->GetTimeComm()->GetSize() +
-                     m_comm->GetTimeComm()->GetRank() + 1) +
+                 std::to_string(m_windowPIT * m_comm->GetTimeComm()->GetSize() +
+                                m_comm->GetTimeComm()->GetRank() + 1) +
                  ".fld");
     }
 }
@@ -1184,22 +1183,20 @@ void EquationSystem::Checkpoint_Output(const int n)
     if (!m_comm->IsParallelInTime())
     {
         // Serial-in-time
-        std::string outname =
-            m_sessionName + "_" + boost::lexical_cast<std::string>(n);
+        std::string outname = m_sessionName + "_" + std::to_string(n);
         WriteFld(outname + ".chk");
     }
     else
     {
         // Parallel-in-time
-        std::string paradir = m_sessionName + "_" +
-                              boost::lexical_cast<std::string>(m_iterPIT) +
-                              ".pit";
+        std::string paradir =
+            m_sessionName + "_" + std::to_string(m_iterPIT) + ".pit";
         if (!fs::is_directory(paradir))
         {
             fs::create_directory(paradir);
         }
-        std::string outname = paradir + "/" + m_sessionName + "_" +
-                              boost::lexical_cast<std::string>(n);
+        std::string outname =
+            paradir + "/" + m_sessionName + "_" + std::to_string(n);
         WriteFld(outname + ".chk");
     }
 }
@@ -1216,22 +1213,20 @@ void EquationSystem::Checkpoint_Output(
     if (!m_comm->IsParallelInTime())
     {
         // Serial-in-time
-        std::string outname =
-            m_sessionName + "_" + boost::lexical_cast<std::string>(n);
+        std::string outname = m_sessionName + "_" + std::to_string(n);
         WriteFld(outname, field, fieldcoeffs, variables);
     }
     else
     {
         // Parallel-in-time
-        std::string paradir = m_sessionName + "_" +
-                              boost::lexical_cast<std::string>(m_iterPIT) +
-                              ".pit";
+        std::string paradir =
+            m_sessionName + "_" + std::to_string(m_iterPIT) + ".pit";
         if (!fs::is_directory(paradir))
         {
             fs::create_directory(paradir);
         }
-        std::string outname = paradir + "/" + m_sessionName + "_" +
-                              boost::lexical_cast<std::string>(n);
+        std::string outname =
+            paradir + "/" + m_sessionName + "_" + std::to_string(n);
         WriteFld(outname, field, fieldcoeffs, variables);
     }
 }
@@ -1242,8 +1237,7 @@ void EquationSystem::Checkpoint_Output(
  */
 void EquationSystem::Checkpoint_BaseFlow(const int n)
 {
-    std::string outname =
-        m_sessionName + "_BaseFlow_" + boost::lexical_cast<std::string>(n);
+    std::string outname = m_sessionName + "_BaseFlow_" + std::to_string(n);
 
     WriteFld(outname + ".chk");
 }
@@ -1313,8 +1307,7 @@ void EquationSystem::WriteFld(const std::string &outname,
     // Update step in field info if required
     if (m_fieldMetaDataMap.find("ChkFileNum") != m_fieldMetaDataMap.end())
     {
-        m_fieldMetaDataMap["ChkFileNum"] =
-            boost::lexical_cast<std::string>(m_nchk);
+        m_fieldMetaDataMap["ChkFileNum"] = std::to_string(m_nchk);
     }
 
     // If necessary, add mapping information to metadata

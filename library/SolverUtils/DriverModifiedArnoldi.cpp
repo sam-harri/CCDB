@@ -561,7 +561,7 @@ void DriverModifiedArnoldi::EV_post(Array<OneD, Array<OneD, NekDouble>> &Tseq,
         for (int j = 0; j < icon; ++j)
         {
             std::string file = m_session->GetSessionName() + "_eig_" +
-                               boost::lexical_cast<std::string>(j) + ".fld";
+                               std::to_string(j) + ".fld";
 
             if (m_comm->GetRank() == 0)
             {
@@ -570,9 +570,9 @@ void DriverModifiedArnoldi::EV_post(Array<OneD, Array<OneD, NekDouble>> &Tseq,
             WriteFld(file, Kseq[j]);
             if (m_useMask)
             {
-                std::string fileunmask =
-                    m_session->GetSessionName() + "_eig_masked_" +
-                    boost::lexical_cast<std::string>(j) + ".fld";
+                std::string fileunmask = m_session->GetSessionName() +
+                                         "_eig_masked_" + std::to_string(j) +
+                                         ".fld";
                 WriteFld(fileunmask, Tseq[j]);
             }
         }

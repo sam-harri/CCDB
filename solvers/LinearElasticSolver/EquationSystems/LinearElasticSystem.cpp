@@ -830,8 +830,7 @@ void LinearElasticSystem::v_ExtraFldOutput(
         Array<OneD, NekDouble> tFwd(nCoeffs);
         m_fields[i]->FwdTrans(m_temperature[i], tFwd);
         fieldcoeffs.push_back(tFwd);
-        variables.push_back("ThermStressDiv" +
-                            boost::lexical_cast<std::string>(i));
+        variables.push_back("ThermStressDiv" + std::to_string(i));
     }
 
     if (m_stress.size() == 0)
@@ -846,9 +845,8 @@ void LinearElasticSystem::v_ExtraFldOutput(
             Array<OneD, NekDouble> tFwd(nCoeffs);
             m_fields[i]->FwdTrans(m_stress[i][j], tFwd);
             fieldcoeffs.push_back(tFwd);
-            variables.push_back("ThermStress" +
-                                boost::lexical_cast<std::string>(i) +
-                                boost::lexical_cast<std::string>(j));
+            variables.push_back("ThermStress" + std::to_string(i) +
+                                std::to_string(j));
         }
     }
 }
