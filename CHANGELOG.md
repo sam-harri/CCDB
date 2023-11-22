@@ -19,6 +19,7 @@ v5.5.0
 - Fix Explist::v_GetNormals and GetElmtNormalLength (!1625)
 - Replace `boost::random` with `std::random` (!1673)
 - Add Robin BC to xxt full solver (!1679)
+- Update Parareal file output and tidy-up Parareal/PFASST interpolation (!1678)
 
 **ADRSolver**
 - Add support for spatially-constant, but variable direction, diffusion to

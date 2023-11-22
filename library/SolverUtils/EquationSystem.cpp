@@ -1189,14 +1189,17 @@ void EquationSystem::Checkpoint_Output(const int n)
     else
     {
         // Parallel-in-time
+        auto loc         = m_sessionName.find("_xml/");
+        auto sessionName = m_sessionName.substr(0, loc);
         std::string paradir =
-            m_sessionName + "_" + std::to_string(m_iterPIT) + ".pit";
+            sessionName + "_" + std::to_string(m_iterPIT) + ".pit";
         if (!fs::is_directory(paradir))
         {
             fs::create_directory(paradir);
         }
-        std::string outname =
-            paradir + "/" + m_sessionName + "_" + std::to_string(n);
+        std::string outname = paradir + "/" + sessionName + "_timeLevel" +
+                              std::to_string(m_session->GetTimeLevel()) + "_" +
+                              std::to_string(n);
         WriteFld(outname + ".chk");
     }
 }
@@ -1218,16 +1221,7 @@ void EquationSystem::Checkpoint_Output(
     }
     else
     {
-        // Parallel-in-time
-        std::string paradir =
-            m_sessionName + "_" + std::to_string(m_iterPIT) + ".pit";
-        if (!fs::is_directory(paradir))
-        {
-            fs::create_directory(paradir);
-        }
-        std::string outname =
-            paradir + "/" + m_sessionName + "_" + std::to_string(n);
-        WriteFld(outname, field, fieldcoeffs, variables);
+        ASSERTL0(false, "Not Implemented for Parallel-in-Time");
     }
 }
 

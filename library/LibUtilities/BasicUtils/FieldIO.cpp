@@ -531,7 +531,8 @@ std::string FieldIO::SetUpOutput(const std::string outname, bool perRank,
 
     if (root)
     {
-        std::cout << "Writing: " << specPath;
+        std::cout << "Writing: \"" + specPath.string() +
+                         (m_comm->IsParallelInTime() ? "\"\n" : "\"");
     }
 
     // serial processing just add ending.

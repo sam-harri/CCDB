@@ -88,8 +88,7 @@ private:
     void UpdateSolverInitialCondition(const size_t timeLevel);
 
     void UpdateSolution(const size_t timeLevel, const NekDouble time,
-                        const size_t nstep, const size_t wd = 0,
-                        const size_t iter = 0);
+                        const size_t nstep, const size_t wd, const size_t iter);
 
     void CorrectionWithOldCoarseSolution(void);
 

@@ -106,6 +106,8 @@ private:
 
     void IntegratedResidualEval(const size_t timeLevel);
 
+    using DriverParallelInTime::Interpolate;
+
     void Interpolate(const size_t coarseLevel, const SDCarray &in,
                      const size_t fineLevel, SDCarray &out, bool forced);
 

@@ -78,8 +78,12 @@ protected:
     void RecvFromPreviousProc(Array<OneD, Array<OneD, NekDouble>> &array,
                               int &convergence);
 
+    void RecvFromPreviousProc(Array<OneD, NekDouble> &array);
+
     void SendToNextProc(Array<OneD, Array<OneD, NekDouble>> &array,
                         int &convergence);
+
+    void SendToNextProc(Array<OneD, NekDouble> &array);
 
     void CopySolutionVector(const Array<OneD, const Array<OneD, NekDouble>> &in,
                             Array<OneD, Array<OneD, NekDouble>> &out);
@@ -105,16 +109,17 @@ protected:
 
     void PrintErrorNorm(const size_t timeLevel, const bool normalized);
 
-    void Interpolator(const size_t inLevel,
-                      const Array<OneD, const Array<OneD, NekDouble>> &inarray,
-                      const size_t outLevel,
-                      Array<OneD, Array<OneD, NekDouble>> &outarray);
-
     NekDouble vL2ErrorMax(void);
 
     NekDouble EstimateCommunicationTime(
         Array<OneD, Array<OneD, NekDouble>> &buffer1,
         Array<OneD, Array<OneD, NekDouble>> &buffer2);
+
+    void Interpolate(
+        const Array<OneD, MultiRegions::ExpListSharedPtr> &infield,
+        const Array<OneD, MultiRegions::ExpListSharedPtr> &outfield,
+        const Array<OneD, Array<OneD, NekDouble>> &inarray,
+        Array<OneD, Array<OneD, NekDouble>> &outarray);
 
     /// Timer.
     Nektar::LibUtilities::Timer m_timer;
@@ -130,12 +135,6 @@ protected:
 
     /// Local time.
     NekDouble m_time;
-
-    /// Number of steps for info I/O.
-    size_t m_infoSteps;
-
-    /// Number of steps for checkpoint.
-    size_t m_checkSteps;
 
     /// Number of time chunks.
     size_t m_numChunks;
@@ -178,13 +177,6 @@ protected:
     Array<OneD, NekDouble> m_vLinfErrors;
     Array<OneD, Array<OneD, NekDouble>> m_exactsoln;
 };
-
-/// Interpolate from an expansion to an expansion.
-void InterpExp1ToExp2(
-    const Array<OneD, MultiRegions::ExpListSharedPtr> &infield,
-    const Array<OneD, MultiRegions::ExpListSharedPtr> &outfield,
-    const Array<OneD, Array<OneD, NekDouble>> &inarray,
-    Array<OneD, Array<OneD, NekDouble>> &outarray);
 
 } // namespace Nektar::SolverUtils
 
