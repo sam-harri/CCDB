@@ -37,8 +37,6 @@
 #include <iomanip>
 #include <iostream>
 
-#include <boost/core/ignore_unused.hpp>
-
 using namespace std;
 
 namespace Nektar
@@ -163,10 +161,9 @@ void UnsteadyDiffusion::v_GenerateSummary(SummaryList &s)
  */
 void UnsteadyDiffusion::DoOdeRhs(
     const Array<OneD, const Array<OneD, NekDouble>> &inarray,
-    Array<OneD, Array<OneD, NekDouble>> &outarray, const NekDouble time)
+    Array<OneD, Array<OneD, NekDouble>> &outarray,
+    [[maybe_unused]] const NekDouble time)
 {
-    boost::ignore_unused(time);
-
     // Number of fields (variables of the problem)
     int nVariables = inarray.size();
 
@@ -230,11 +227,9 @@ void UnsteadyDiffusion::DoOdeProjection(
  */
 void UnsteadyDiffusion::DoImplicitSolve(
     const Array<OneD, const Array<OneD, NekDouble>> &inarray,
-    Array<OneD, Array<OneD, NekDouble>> &outarray, const NekDouble time,
-    const NekDouble lambda)
+    Array<OneD, Array<OneD, NekDouble>> &outarray,
+    [[maybe_unused]] const NekDouble time, const NekDouble lambda)
 {
-    boost::ignore_unused(time);
-
     StdRegions::ConstFactorMap factors;
 
     int nvariables                     = inarray.size();
@@ -272,12 +267,10 @@ void UnsteadyDiffusion::DoImplicitSolve(
  * @brief Return the flux vector for the unsteady diffusion problem.
  */
 void UnsteadyDiffusion::GetFluxVector(
-    const Array<OneD, Array<OneD, NekDouble>> &inarray,
+    [[maybe_unused]] const Array<OneD, Array<OneD, NekDouble>> &inarray,
     const Array<OneD, Array<OneD, Array<OneD, NekDouble>>> &qfield,
     Array<OneD, Array<OneD, Array<OneD, NekDouble>>> &viscousTensor)
 {
-    boost::ignore_unused(inarray);
-
     unsigned int nDim              = qfield.size();
     unsigned int nConvectiveFields = qfield[0].size();
     unsigned int nPts              = qfield[0][0].size();

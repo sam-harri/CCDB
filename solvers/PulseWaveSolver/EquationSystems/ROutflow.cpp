@@ -58,11 +58,9 @@ void ROutflow::v_DoBoundary(
     const Array<OneD, const Array<OneD, NekDouble>> &inarray,
     Array<OneD, Array<OneD, NekDouble>> &A_0,
     Array<OneD, Array<OneD, NekDouble>> &beta,
-    Array<OneD, Array<OneD, NekDouble>> &alpha, const NekDouble time, int omega,
-    int offset, int n)
+    Array<OneD, Array<OneD, NekDouble>> &alpha,
+    [[maybe_unused]] const NekDouble time, int omega, int offset, int n)
 {
-    boost::ignore_unused(time);
-
     NekDouble A_r  = 0.0;
     NekDouble u_r  = 0.0;
     NekDouble A_u  = 0.0;

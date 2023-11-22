@@ -909,10 +909,8 @@ void IncNavierStokes::SetMovingReferenceFrameBCs(const NekDouble &time)
 /**
  * Set Wall boundary conditions for moving frame of reference
  */
-void IncNavierStokes::SetMRFWallBCs(const NekDouble &time)
+void IncNavierStokes::SetMRFWallBCs([[maybe_unused]] const NekDouble &time)
 {
-    boost::ignore_unused(time);
-
     // for the wall we need to calculate:
     // [V_wall]_xyz = [V_frame]_xyz + [Omega X r]_xyz
     // Note all vectors must be in moving frame coordinates xyz
@@ -1134,9 +1132,8 @@ void IncNavierStokes::AddForcing(const SolverUtils::ForcingSharedPtr &pForce)
  *
  */
 Array<OneD, NekDouble> IncNavierStokes::v_GetMaxStdVelocity(
-    const NekDouble SpeedSoundFactor)
+    [[maybe_unused]] const NekDouble SpeedSoundFactor)
 {
-    boost::ignore_unused(SpeedSoundFactor);
     size_t nvel  = m_velocity.size();
     size_t nelmt = m_fields[0]->GetExpSize();
 

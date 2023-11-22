@@ -62,26 +62,24 @@ NoAdvection::~NoAdvection()
  *
  */
 void NoAdvection::v_InitObject(
-    LibUtilities::SessionReaderSharedPtr pSession,
-    Array<OneD, MultiRegions::ExpListSharedPtr> pFields)
+    [[maybe_unused]] LibUtilities::SessionReaderSharedPtr pSession,
+    [[maybe_unused]] Array<OneD, MultiRegions::ExpListSharedPtr> pFields)
 {
-    boost::ignore_unused(pSession, pFields);
 }
 
 /**
  *
  */
 void NoAdvection::v_Advect(
-    const int nConvectiveFields,
+    [[maybe_unused]] const int nConvectiveFields,
     const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
-    const Array<OneD, Array<OneD, NekDouble>> &advVel,
+    [[maybe_unused]] const Array<OneD, Array<OneD, NekDouble>> &advVel,
     const Array<OneD, Array<OneD, NekDouble>> &inarray,
-    Array<OneD, Array<OneD, NekDouble>> &outarray, const NekDouble &time,
-    const Array<OneD, Array<OneD, NekDouble>> &pFwd,
-    const Array<OneD, Array<OneD, NekDouble>> &pBwd)
+    Array<OneD, Array<OneD, NekDouble>> &outarray,
+    [[maybe_unused]] const NekDouble &time,
+    [[maybe_unused]] const Array<OneD, Array<OneD, NekDouble>> &pFwd,
+    [[maybe_unused]] const Array<OneD, Array<OneD, NekDouble>> &pBwd)
 {
-    boost::ignore_unused(nConvectiveFields, advVel, time, pFwd, pBwd);
-
     size_t nPointsTot = fields[0]->GetNpoints();
     for (size_t i = 0; i < inarray.size(); ++i)
     {

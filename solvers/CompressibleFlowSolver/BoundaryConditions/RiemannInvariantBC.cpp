@@ -32,8 +32,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include "RiemannInvariantBC.h"
 
 using namespace std;
@@ -66,12 +64,11 @@ RiemannInvariantBC::RiemannInvariantBC(
     }
 }
 
-void RiemannInvariantBC::v_Apply(Array<OneD, Array<OneD, NekDouble>> &Fwd,
-                                 Array<OneD, Array<OneD, NekDouble>> &physarray,
-                                 const NekDouble &time)
+void RiemannInvariantBC::v_Apply(
+    Array<OneD, Array<OneD, NekDouble>> &Fwd,
+    [[maybe_unused]] Array<OneD, Array<OneD, NekDouble>> &physarray,
+    [[maybe_unused]] const NekDouble &time)
 {
-    boost::ignore_unused(physarray, time);
-
     int i, j;
     int nTracePts   = m_fields[0]->GetTrace()->GetNpoints();
     int nDimensions = m_spacedim;

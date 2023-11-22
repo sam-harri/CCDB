@@ -37,7 +37,6 @@
 #include <iostream>
 
 #include <boost/algorithm/string.hpp>
-#include <boost/core/ignore_unused.hpp>
 
 #include <MultiRegions/AssemblyMap/AssemblyMapDG.h>
 #include <ShallowWaterSolver/EquationSystems/NonlinearPeregrine.h>
@@ -626,10 +625,8 @@ void NonlinearPeregrine::WallBoundary(
 
 void NonlinearPeregrine::WallBoundary2D(
     int bcRegion, int cnt, Array<OneD, Array<OneD, NekDouble>> &Fwd,
-    Array<OneD, Array<OneD, NekDouble>> &physarray)
+    [[maybe_unused]] Array<OneD, Array<OneD, NekDouble>> &physarray)
 {
-    boost::ignore_unused(physarray);
-
     int i;
     int nvariables = 3;
 
@@ -942,10 +939,9 @@ void NonlinearPeregrine::NumericalFluxForcing(
 }
 
 void NonlinearPeregrine::SetBoundaryConditionsForcing(
-    Array<OneD, Array<OneD, NekDouble>> &inarray, NekDouble time)
+    Array<OneD, Array<OneD, NekDouble>> &inarray,
+    [[maybe_unused]] NekDouble time)
 {
-    boost::ignore_unused(time);
-
     int cnt = 0;
 
     // loop over Boundary Regions
@@ -1052,10 +1048,8 @@ void NonlinearPeregrine::WallBoundaryForcing(
 }
 
 void NonlinearPeregrine::SetBoundaryConditionsContVariables(
-    Array<OneD, NekDouble> &inarray, NekDouble time)
+    Array<OneD, NekDouble> &inarray, [[maybe_unused]] NekDouble time)
 {
-    boost::ignore_unused(time);
-
     int cnt = 0;
 
     // loop over Boundary Regions
@@ -1189,12 +1183,10 @@ void NonlinearPeregrine::LaitoneSolitaryWave(NekDouble amp, NekDouble d,
 /**
  * @brief Set the initial conditions.
  */
-void NonlinearPeregrine::v_SetInitialConditions(NekDouble initialtime,
-                                                bool dumpInitialConditions,
-                                                const int domain)
+void NonlinearPeregrine::v_SetInitialConditions(
+    NekDouble initialtime, bool dumpInitialConditions,
+    [[maybe_unused]] const int domain)
 {
-    boost::ignore_unused(domain);
-
     switch (m_problemType)
     {
         case eSolitaryWave:

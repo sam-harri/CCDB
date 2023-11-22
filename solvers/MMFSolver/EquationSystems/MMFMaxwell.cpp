@@ -36,7 +36,6 @@
 
 #include <boost/algorithm/string.hpp>
 #include <boost/algorithm/string/predicate.hpp>
-#include <boost/core/ignore_unused.hpp>
 #include <iomanip>
 #include <iostream>
 
@@ -1319,10 +1318,9 @@ void MMFMaxwell::WeakDGMaxwellDirDeriv(
  */
 void MMFMaxwell::DoOdeProjection(
     const Array<OneD, const Array<OneD, NekDouble>> &inarray,
-    Array<OneD, Array<OneD, NekDouble>> &outarray, const NekDouble time)
+    Array<OneD, Array<OneD, NekDouble>> &outarray,
+    [[maybe_unused]] const NekDouble time)
 {
-    boost::ignore_unused(time);
-
     int var = inarray.size();
 
     if (inarray != outarray)
@@ -1337,10 +1335,8 @@ void MMFMaxwell::DoOdeProjection(
 
 void MMFMaxwell::v_SetInitialConditions(const NekDouble initialtime,
                                         bool dumpInitialConditions,
-                                        const int domain)
+                                        [[maybe_unused]] const int domain)
 {
-    boost::ignore_unused(domain);
-
     int nq   = GetTotPoints();
     int nvar = m_fields.size();
 
@@ -2298,10 +2294,9 @@ void MMFMaxwell::ComputeMaterialVector(
 void MMFMaxwell::ComputeMaterialOpticalCloak(
     const Array<OneD, const NekDouble> &radvec,
     Array<OneD, Array<OneD, NekDouble>> &epsvec,
-    Array<OneD, Array<OneD, NekDouble>> &muvec, const bool Dispersion)
+    [[maybe_unused]] Array<OneD, Array<OneD, NekDouble>> &muvec,
+    [[maybe_unused]] const bool Dispersion)
 {
-    boost::ignore_unused(muvec, Dispersion);
-
     int nq = GetNpoints();
 
     // Cloaking metamaterial
@@ -2680,11 +2675,9 @@ void MMFMaxwell::Checkpoint_TotPlotOutput(
 }
 
 void MMFMaxwell::Checkpoint_EDFluxOutput(
-    const int n, const NekDouble time,
+    const int n, [[maybe_unused]] const NekDouble time,
     const Array<OneD, const Array<OneD, NekDouble>> &fieldphys)
 {
-    boost::ignore_unused(time);
-
     int nvar    = m_fields.size();
     int nq      = m_fields[0]->GetTotPoints();
     int ncoeffs = m_fields[0]->GetNcoeffs();
@@ -2732,11 +2725,9 @@ void MMFMaxwell::Checkpoint_EDFluxOutput(
 }
 
 void MMFMaxwell::Checkpoint_EnergyOutput(
-    const int n, const NekDouble time,
+    const int n, [[maybe_unused]] const NekDouble time,
     const Array<OneD, const Array<OneD, NekDouble>> &fieldphys)
 {
-    boost::ignore_unused(time);
-
     int nvar    = m_fields.size();
     int nq      = m_fields[0]->GetTotPoints();
     int ncoeffs = m_fields[0]->GetNcoeffs();

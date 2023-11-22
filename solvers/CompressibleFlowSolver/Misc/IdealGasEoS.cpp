@@ -32,8 +32,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include "IdealGasEoS.h"
 
 using namespace std;
@@ -50,16 +48,15 @@ IdealGasEoS::IdealGasEoS(const LibUtilities::SessionReaderSharedPtr &pSession)
 {
 }
 
-NekDouble IdealGasEoS::v_GetTemperature(const NekDouble &rho,
+NekDouble IdealGasEoS::v_GetTemperature([[maybe_unused]] const NekDouble &rho,
                                         const NekDouble &e)
 {
-    boost::ignore_unused(rho);
     return GetTemperatureKernel(e);
 }
 
-vec_t IdealGasEoS::v_GetTemperature(const vec_t &rho, const vec_t &e)
+vec_t IdealGasEoS::v_GetTemperature([[maybe_unused]] const vec_t &rho,
+                                    const vec_t &e)
 {
-    boost::ignore_unused(rho);
     return GetTemperatureKernel(e);
 }
 
@@ -85,15 +82,15 @@ NekDouble IdealGasEoS::v_GetEntropy(const NekDouble &rho, const NekDouble &e)
     return m_gasConstant / (m_gamma - 1) * log(T) - m_gasConstant * log(rho);
 }
 
-NekDouble IdealGasEoS::v_GetDPDrho_e(const NekDouble &rho, const NekDouble &e)
+NekDouble IdealGasEoS::v_GetDPDrho_e([[maybe_unused]] const NekDouble &rho,
+                                     const NekDouble &e)
 {
-    boost::ignore_unused(rho);
     return e * (m_gamma - 1);
 }
 
-NekDouble IdealGasEoS::v_GetDPDe_rho(const NekDouble &rho, const NekDouble &e)
+NekDouble IdealGasEoS::v_GetDPDe_rho(const NekDouble &rho,
+                                     [[maybe_unused]] const NekDouble &e)
 {
-    boost::ignore_unused(e);
     return rho * (m_gamma - 1);
 }
 

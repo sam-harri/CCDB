@@ -58,14 +58,13 @@ TimeDependentInflow::~TimeDependentInflow()
 }
 
 void TimeDependentInflow::v_DoBoundary(
-    const Array<OneD, const Array<OneD, NekDouble>> &inarray,
-    Array<OneD, Array<OneD, NekDouble>> &A_0,
-    Array<OneD, Array<OneD, NekDouble>> &beta,
-    Array<OneD, Array<OneD, NekDouble>> &alpha, const NekDouble time, int omega,
-    int offset, int n)
+    [[maybe_unused]] const Array<OneD, const Array<OneD, NekDouble>> &inarray,
+    [[maybe_unused]] Array<OneD, Array<OneD, NekDouble>> &A_0,
+    [[maybe_unused]] Array<OneD, Array<OneD, NekDouble>> &beta,
+    [[maybe_unused]] Array<OneD, Array<OneD, NekDouble>> &alpha,
+    const NekDouble time, int omega, [[maybe_unused]] int offset,
+    [[maybe_unused]] int n)
 {
-    boost::ignore_unused(inarray, A_0, beta, alpha, offset, n);
-
     Array<OneD, MultiRegions::ExpListSharedPtr> vessel(2);
 
     // Pointers to the domains

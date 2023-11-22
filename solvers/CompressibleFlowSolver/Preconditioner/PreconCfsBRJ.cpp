@@ -86,10 +86,8 @@ void PreconCfsBRJ::v_InitObject()
 void PreconCfsBRJ::v_DoPreconCfs(
     const Array<OneD, MultiRegions::ExpListSharedPtr> &pFields,
     const Array<OneD, NekDouble> &inarray, Array<OneD, NekDouble> &outarray,
-    const bool &flag)
+    [[maybe_unused]] const bool &flag)
 {
-    boost::ignore_unused(flag);
-
     size_t nBRJIterTot = m_PreconItsStep;
     if (0 == nBRJIterTot)
     {
@@ -152,8 +150,6 @@ void PreconCfsBRJ::v_DoPreconCfs(
             BwdFluxDeriv[j] = Array<OneD, NekDouble>(nTracePts);
         }
 
-        bool flagUpdateDervFlux = false;
-
         const size_t nwspTraceDataType = nvariables + 1;
         Array<OneD, Array<OneD, NekSingle>> wspTraceDataType(nwspTraceDataType);
         for (size_t m = 0; m < nwspTraceDataType; m++)
@@ -172,11 +168,8 @@ void PreconCfsBRJ::v_DoPreconCfs(
             Vmath::Smul(ntotpnt, OmBRJParam, outarray, 1, outN, 1);
 
             timer.Start();
-            MinusOffDiag2Rhs(
-                pFields, nvariables, npoints, rhs2d, out_2d, flagUpdateDervFlux,
-                FwdFluxDeriv, BwdFluxDeriv, qfield, tmpTrace, wspTraceDataType,
-                m_TraceJacArraySingle, m_TraceJacDerivArraySingle,
-                m_TraceJacDerivSignSingle, m_TraceIPSymJacArraySingle);
+            MinusOffDiag2Rhs(pFields, nvariables, npoints, rhs2d, out_2d,
+                             tmpTrace, wspTraceDataType, m_TraceJacArraySingle);
             timer.Stop();
             timer.AccumulateRegion("PreconCfsBRJ::MinusOffDiag2Rhs", 2);
 
@@ -194,12 +187,10 @@ void PreconCfsBRJ::v_DoPreconCfs(
  *
  */
 void PreconCfsBRJ::v_BuildPreconCfs(
-    const Array<OneD, MultiRegions::ExpListSharedPtr> &pFields,
+    [[maybe_unused]] const Array<OneD, MultiRegions::ExpListSharedPtr> &pFields,
     const Array<OneD, const Array<OneD, NekDouble>> &intmp,
     const NekDouble time, const NekDouble lambda)
 {
-    boost::ignore_unused(pFields);
-
     if (0 < m_PreconItsStep)
     {
         SNekBlkMatSharedPtr PreconMatSingle;
@@ -285,10 +276,9 @@ void PreconCfsBRJ::v_BuildPreconCfs(
  *
  */
 bool PreconCfsBRJ::v_UpdatePreconMatCheck(
-    const Array<OneD, const NekDouble> &res, const NekDouble dtLambda)
+    [[maybe_unused]] const Array<OneD, const NekDouble> &res,
+    const NekDouble dtLambda)
 {
-    boost::ignore_unused(res);
-
     bool flag = false;
 
     if (m_CalcPreconMatFlag || (m_DtLambdaPreconMat != dtLambda))
@@ -310,9 +300,8 @@ bool PreconCfsBRJ::v_UpdatePreconMatCheck(
  */
 void PreconCfsBRJ::DoNullPrecon(const Array<OneD, NekDouble> &pInput,
                                 Array<OneD, NekDouble> &pOutput,
-                                const bool &flag)
+                                [[maybe_unused]] const bool &flag)
 {
-    boost::ignore_unused(flag);
     Vmath::Vcopy(pInput.size(), pInput, 1, pOutput, 1);
 }
 
@@ -403,20 +392,11 @@ void PreconCfsBRJ::MinusOffDiag2Rhs(
     const Array<OneD, MultiRegions::ExpListSharedPtr> &pFields,
     const size_t nvariables, const size_t nCoeffs,
     const Array<OneD, const Array<OneD, NekDouble>> &inarray,
-    Array<OneD, Array<OneD, NekDouble>> &outarray, bool flagUpdateDervFlux,
-    Array<OneD, Array<OneD, NekDouble>> &FwdFluxDeriv,
-    Array<OneD, Array<OneD, NekDouble>> &BwdFluxDeriv,
-    TensorOfArray3D<NekDouble> &qfield, TensorOfArray3D<NekDouble> &wspTrace,
+    Array<OneD, Array<OneD, NekDouble>> &outarray,
+    TensorOfArray3D<NekDouble> &wspTrace,
     Array<OneD, Array<OneD, DataType>> &wspTraceDataType,
-    const TensorOfArray4D<DataType> &TraceJacArray,
-    const TensorOfArray4D<DataType> &TraceJacDerivArray,
-    const Array<OneD, const Array<OneD, DataType>> &TraceJacDerivSign,
-    const TensorOfArray5D<DataType> &TraceIPSymJacArray)
+    const TensorOfArray4D<DataType> &TraceJacArray)
 {
-    boost::ignore_unused(flagUpdateDervFlux, qfield, TraceJacDerivArray,
-                         TraceJacDerivSign, FwdFluxDeriv, BwdFluxDeriv,
-                         TraceIPSymJacArray);
-
     size_t nTracePts = pFields[0]->GetTrace()->GetNpoints();
     size_t npoints   = pFields[0]->GetNpoints();
     size_t nDim      = m_spacedim;

@@ -60,12 +60,11 @@ RoeSolverSIMD::RoeSolverSIMD() : CompressibleSolver()
  *
  */
 void RoeSolverSIMD::v_Solve(
-    const int nDim, const Array<OneD, const Array<OneD, NekDouble>> &fwd,
+    [[maybe_unused]] const int nDim,
+    const Array<OneD, const Array<OneD, NekDouble>> &fwd,
     const Array<OneD, const Array<OneD, NekDouble>> &bwd,
     Array<OneD, Array<OneD, NekDouble>> &flux)
 {
-    boost::ignore_unused(nDim);
-
     static auto gamma      = m_params["gamma"]();
     static size_t nVars    = fwd.size();
     static size_t spaceDim = nVars - 2;

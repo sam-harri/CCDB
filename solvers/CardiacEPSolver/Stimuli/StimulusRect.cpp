@@ -169,8 +169,8 @@ void StimulusRect::v_Update(Array<OneD, Array<OneD, NekDouble>> &outarray,
 /**
  *
  */
-void StimulusRect::v_GenerateSummary(SolverUtils::SummaryList &s)
+void StimulusRect::v_GenerateSummary(
+    [[maybe_unused]] SolverUtils::SummaryList &s)
 {
-    boost::ignore_unused(s);
 }
 } // namespace Nektar

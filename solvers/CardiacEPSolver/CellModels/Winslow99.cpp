@@ -87,10 +87,9 @@ Winslow99::Winslow99(const LibUtilities::SessionReaderSharedPtr &pSession,
 
 void Winslow99::v_Update(
     const Array<OneD, const Array<OneD, NekDouble>> &inarray,
-    Array<OneD, Array<OneD, NekDouble>> &outarray, const NekDouble time)
+    Array<OneD, Array<OneD, NekDouble>> &outarray,
+    [[maybe_unused]] const NekDouble time)
 {
-    boost::ignore_unused(time);
-
     for (size_t i = 0; i < m_nq; ++i)
     {
 

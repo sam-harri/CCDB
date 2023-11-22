@@ -56,10 +56,9 @@ ProtocolFactory &GetProtocolFactory()
  * Protocol base class constructor.
  */
 Protocol::Protocol(const LibUtilities::SessionReaderSharedPtr &pSession,
-                   const TiXmlElement *pXml)
+                   [[maybe_unused]] const TiXmlElement *pXml)
     : m_session(pSession)
 {
-    boost::ignore_unused(pXml);
 }
 
 /**

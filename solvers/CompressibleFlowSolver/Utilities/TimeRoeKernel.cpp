@@ -180,9 +180,8 @@ int main(int argc, char const *argv[])
     constexpr short CPU_CLK_UNHALTED_REF_id = 2;
     int nevents{20};
     std::vector<double> events(nevents);
-    double time;
-    int count;
-    boost::ignore_unused(time, count);
+    [[maybe_unused]] double time;
+    [[maybe_unused]] int count;
 
     LIKWID_MARKER_GET("scalar", &nevents, events.data(), &time, &count);
     // print out CPE

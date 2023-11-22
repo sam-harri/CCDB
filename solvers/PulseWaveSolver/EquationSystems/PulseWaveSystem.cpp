@@ -1213,10 +1213,9 @@ void PulseWaveSystem::SetUpDomainInterfaceBCs(
  *  all subdomains and fills the domain-linking boundary
  *  conditions with the initial values of their domain.
  */
-void PulseWaveSystem::v_DoInitialise(bool dumpInitialConditions)
+void PulseWaveSystem::v_DoInitialise(
+    [[maybe_unused]] bool dumpInitialConditions)
 {
-    boost::ignore_unused(dumpInitialConditions);
-
     if (m_session->GetComm()->GetRank() == 0)
     {
         cout << "Initial Conditions: " << endl;
@@ -1944,12 +1943,10 @@ void PulseWaveSystem::WriteVessels(const std::string &outname)
  * @param   Normalised      Normalise L2-error.
  * @returns                 Error in the L2-norm.
  */
-NekDouble PulseWaveSystem::v_L2Error(unsigned int field,
-                                     const Array<OneD, NekDouble> &exact,
-                                     bool Normalised)
+NekDouble PulseWaveSystem::v_L2Error(
+    unsigned int field, [[maybe_unused]] const Array<OneD, NekDouble> &exact,
+    bool Normalised)
 {
-    boost::ignore_unused(exact);
-
     NekDouble L2error = 0.0;
     NekDouble L2error_dom;
     NekDouble Vol = 0.0;
@@ -2043,11 +2040,9 @@ NekDouble PulseWaveSystem::v_L2Error(unsigned int field,
  * @param   exactsoln       The exact solution to compare with.
  * @returns                 Error in the L_inft-norm.
  */
-NekDouble PulseWaveSystem::v_LinfError(unsigned int field,
-                                       const Array<OneD, NekDouble> &exact)
+NekDouble PulseWaveSystem::v_LinfError(
+    unsigned int field, [[maybe_unused]] const Array<OneD, NekDouble> &exact)
 {
-    boost::ignore_unused(exact);
-
     NekDouble LinferrorDom, Linferror = -1.0;
 
     for (size_t omega = 0; omega < m_nDomains; ++omega)

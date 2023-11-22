@@ -69,12 +69,12 @@ protected:
 
     void v_InitObject(bool DeclareFields = true) override;
 
-    void v_DoDiffusion(const Array<OneD, Array<OneD, NekDouble>> &inarray,
-                       Array<OneD, Array<OneD, NekDouble>> &outarray,
-                       const Array<OneD, Array<OneD, NekDouble>> &pFwd,
-                       const Array<OneD, Array<OneD, NekDouble>> &pBwd) final
+    void v_DoDiffusion(
+        [[maybe_unused]] const Array<OneD, Array<OneD, NekDouble>> &inarray,
+        [[maybe_unused]] Array<OneD, Array<OneD, NekDouble>> &outarray,
+        [[maybe_unused]] const Array<OneD, Array<OneD, NekDouble>> &pFwd,
+        [[maybe_unused]] const Array<OneD, Array<OneD, NekDouble>> &pBwd) final
     {
-        boost::ignore_unused(inarray, outarray, pFwd, pBwd);
         NEKERROR(ErrorUtil::efatal,
                  "v_DoDiffusion is not implemented for implicit solvers");
     }

@@ -36,7 +36,6 @@
 #include <iostream>
 
 #include <boost/algorithm/string/predicate.hpp>
-#include <boost/core/ignore_unused.hpp>
 
 #include <LibUtilities/BasicUtils/Timer.h>
 #include <LibUtilities/TimeIntegration/TimeIntegrationScheme.h>
@@ -425,10 +424,8 @@ void MMFSWE::v_DoSolve()
 
 void MMFSWE::DoOdeRhs(const Array<OneD, const Array<OneD, NekDouble>> &inarray,
                       Array<OneD, Array<OneD, NekDouble>> &outarray,
-                      const NekDouble time)
+                      [[maybe_unused]] const NekDouble time)
 {
-    boost::ignore_unused(time);
-
     int i;
     int nvariables = inarray.size();
     int ncoeffs    = GetNcoeffs();
@@ -845,13 +842,12 @@ void MMFSWE::NumericalSWEFlux(Array<OneD, Array<OneD, NekDouble>> &physfield,
     }
 }
 
-void MMFSWE::RiemannSolverHLLC(const int index, NekDouble hL, NekDouble uL,
-                               NekDouble vL, NekDouble hR, NekDouble uR,
-                               NekDouble vR, Array<OneD, NekDouble> &numfluxF,
+void MMFSWE::RiemannSolverHLLC([[maybe_unused]] const int index, NekDouble hL,
+                               NekDouble uL, NekDouble vL, NekDouble hR,
+                               NekDouble uR, NekDouble vR,
+                               Array<OneD, NekDouble> &numfluxF,
                                Array<OneD, NekDouble> &numfluxB)
 {
-    boost::ignore_unused(index);
-
     NekDouble g = m_g;
 
     NekDouble cL = sqrt(g * hL);
@@ -1801,10 +1797,8 @@ void MMFSWE::EvaluateStandardCoriolis(Array<OneD, NekDouble> &outarray)
 
 void MMFSWE::v_SetInitialConditions(const NekDouble initialtime,
                                     bool dumpInitialConditions,
-                                    const int domain)
+                                    [[maybe_unused]] const int domain)
 {
-    boost::ignore_unused(domain);
-
     int nq = GetTotPoints();
 
     switch (m_TestType)
@@ -1998,11 +1992,10 @@ void MMFSWE::v_SetInitialConditions(const NekDouble initialtime,
     }
 }
 
-void MMFSWE::TestSWE2Dproblem(const NekDouble time, unsigned int field,
+void MMFSWE::TestSWE2Dproblem([[maybe_unused]] const NekDouble time,
+                              unsigned int field,
                               Array<OneD, NekDouble> &outfield)
 {
-    boost::ignore_unused(time);
-
     int nq = m_fields[0]->GetNpoints();
 
     Array<OneD, NekDouble> x0(nq);
@@ -2406,11 +2399,10 @@ void MMFSWE::UnsteadyZonalFlow(unsigned int field, const NekDouble time,
     }
 }
 
-void MMFSWE::IsolatedMountainFlow(unsigned int field, const NekDouble time,
+void MMFSWE::IsolatedMountainFlow(unsigned int field,
+                                  [[maybe_unused]] const NekDouble time,
                                   Array<OneD, NekDouble> &outfield)
 {
-    boost::ignore_unused(time);
-
     int nq = GetTotPoints();
 
     NekDouble uhat, vhat;
@@ -2495,11 +2487,10 @@ void MMFSWE::IsolatedMountainFlow(unsigned int field, const NekDouble time,
     }
 }
 
-void MMFSWE::UnstableJetFlow(unsigned int field, const NekDouble time,
+void MMFSWE::UnstableJetFlow(unsigned int field,
+                             [[maybe_unused]] const NekDouble time,
                              Array<OneD, NekDouble> &outfield)
 {
-    boost::ignore_unused(time);
-
     int nq = GetTotPoints();
 
     NekDouble uhat, vhat;
@@ -3037,13 +3028,6 @@ void MMFSWE::TestVorticityComputation(void)
     std::cout << "chi migi1" << std::endl;
 
     ComputeVorticity(u, v, vorticitycompt);
-    /*for (int k=0; k < nq; k++)
-    {
-
-        std::cout << "vorticitycompt[ " << k << "]"<< "\t"<<vorticitycompt[k]<<
-    std::endl;
-
-    }*/
 
     Vmath::Vsub(nq, vorticityexact, 1, vorticitycompt, 1, vorticitycompt, 1);
 
@@ -3052,12 +3036,10 @@ void MMFSWE::TestVorticityComputation(void)
               << std::endl;
 }
 
-NekDouble MMFSWE::v_L2Error(unsigned int field,
-                            const Array<OneD, NekDouble> &exactsoln,
-                            bool Normalised)
+NekDouble MMFSWE::v_L2Error(
+    unsigned int field,
+    [[maybe_unused]] const Array<OneD, NekDouble> &exactsoln, bool Normalised)
 {
-    boost::ignore_unused(exactsoln);
-
     int nq            = m_fields[field]->GetNpoints();
     NekDouble L2error = -1.0;
 
@@ -3150,11 +3132,10 @@ NekDouble MMFSWE::v_L2Error(unsigned int field,
     return L2error;
 }
 
-NekDouble MMFSWE::v_LinfError(unsigned int field,
-                              const Array<OneD, NekDouble> &exactsoln)
+NekDouble MMFSWE::v_LinfError(
+    unsigned int field,
+    [[maybe_unused]] const Array<OneD, NekDouble> &exactsoln)
 {
-    boost::ignore_unused(exactsoln);
-
     NekDouble LinfError = -1.0;
 
     if (m_fields[field]->GetPhysState() == false)

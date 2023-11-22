@@ -35,8 +35,6 @@
 #include <iomanip>
 #include <iostream>
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <ADRSolver/EquationSystems/UnsteadyReactionDiffusion.h>
 #include <LibUtilities/TimeIntegration/TimeIntegrationScheme.h>
 
@@ -144,11 +142,9 @@ void UnsteadyReactionDiffusion::DoOdeProjection(
  */
 void UnsteadyReactionDiffusion::DoImplicitSolve(
     const Array<OneD, const Array<OneD, NekDouble>> &inarray,
-    Array<OneD, Array<OneD, NekDouble>> &outarray, const NekDouble time,
-    const NekDouble lambda)
+    Array<OneD, Array<OneD, NekDouble>> &outarray,
+    [[maybe_unused]] const NekDouble time, const NekDouble lambda)
 {
-    boost::ignore_unused(time);
-
     StdRegions::ConstFactorMap factors;
 
     int nvariables                     = inarray.size();

@@ -65,6 +65,7 @@ v5.5.0
 - Remove deprecated fs::copy_directory function call (!1662)
 - Added a sample python script for wallnormaldata module (!1663)
 - Replace boost::lexical_cast with std::to_string for integer variable (!1677)
+- Use `[[maybe_unused]]` attribute in solvers (!1683)
 
 v5.4.0
 ------

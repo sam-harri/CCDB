@@ -32,8 +32,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <ImageWarpingSolver/EquationSystems/ImageWarpingSystem.h>
 #include <MultiRegions/ContField.h>
 
@@ -130,10 +128,9 @@ ImageWarpingSystem::~ImageWarpingSystem()
  */
 void ImageWarpingSystem::DoOdeRhs(
     const Array<OneD, const Array<OneD, NekDouble>> &inarray,
-    Array<OneD, Array<OneD, NekDouble>> &outarray, const NekDouble time)
+    Array<OneD, Array<OneD, NekDouble>> &outarray,
+    [[maybe_unused]] const NekDouble time)
 {
-    boost::ignore_unused(time);
-
     int npoints = GetNpoints();
     int ncoeffs = inarray[0].size();
     StdRegions::ConstFactorMap factors;

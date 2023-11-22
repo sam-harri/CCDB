@@ -32,8 +32,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <ShallowWaterSolver/RiemannSolvers/NonlinearSWESolver.h>
 
 namespace Nektar
@@ -46,12 +44,11 @@ NonlinearSWESolver::NonlinearSWESolver(
 }
 
 void NonlinearSWESolver::v_Solve(
-    const int nDim, const Array<OneD, const Array<OneD, NekDouble>> &Fwd,
+    [[maybe_unused]] const int nDim,
+    const Array<OneD, const Array<OneD, NekDouble>> &Fwd,
     const Array<OneD, const Array<OneD, NekDouble>> &Bwd,
     Array<OneD, Array<OneD, NekDouble>> &flux)
 {
-    boost::ignore_unused(nDim);
-
     if (m_pointSolve)
     {
         int expDim = Fwd.size() - 1;

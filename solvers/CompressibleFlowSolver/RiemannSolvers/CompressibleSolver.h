@@ -35,8 +35,6 @@
 #ifndef NEKTAR_SOLVERS_COMPRESSIBLEFLOWSOLVER_RIEMANNSOLVER_COMPRESSIBLESOLVER
 #define NEKTAR_SOLVERS_COMPRESSIBLEFLOWSOLVER_RIEMANNSOLVER_COMPRESSIBLESOLVER
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <CompressibleFlowSolver/Misc/EquationOfState.h>
 #include <SolverUtils/RiemannSolvers/RiemannSolver.h>
 
@@ -63,21 +61,25 @@ protected:
                  const Array<OneD, const Array<OneD, ND>> &Bwd,
                  Array<OneD, Array<OneD, ND>> &flux) override;
 
-    virtual void v_ArraySolve(const Array<OneD, const Array<OneD, ND>> &Fwd,
-                              const Array<OneD, const Array<OneD, ND>> &Bwd,
-                              Array<OneD, Array<OneD, ND>> &flux)
+    virtual void v_ArraySolve(
+        [[maybe_unused]] const Array<OneD, const Array<OneD, ND>> &Fwd,
+        [[maybe_unused]] const Array<OneD, const Array<OneD, ND>> &Bwd,
+        [[maybe_unused]] Array<OneD, Array<OneD, ND>> &flux)
     {
-        boost::ignore_unused(Fwd, Bwd, flux);
         NEKERROR(ErrorUtil::efatal,
                  "This function should be defined by subclasses.");
     }
 
-    virtual void v_PointSolve(ND rhoL, ND rhouL, ND rhovL, ND rhowL, ND EL,
-                              ND rhoR, ND rhouR, ND rhovR, ND rhowR, ND ER,
-                              ND &rhof, ND &rhouf, ND &rhovf, ND &rhowf, ND &Ef)
+    virtual void v_PointSolve(
+        [[maybe_unused]] ND rhoL, [[maybe_unused]] ND rhouL,
+        [[maybe_unused]] ND rhovL, [[maybe_unused]] ND rhowL,
+        [[maybe_unused]] ND EL, [[maybe_unused]] ND rhoR,
+        [[maybe_unused]] ND rhouR, [[maybe_unused]] ND rhovR,
+        [[maybe_unused]] ND rhowR, [[maybe_unused]] ND ER,
+        [[maybe_unused]] ND &rhof, [[maybe_unused]] ND &rhouf,
+        [[maybe_unused]] ND &rhovf, [[maybe_unused]] ND &rhowf,
+        [[maybe_unused]] ND &Ef)
     {
-        boost::ignore_unused(rhoL, rhouL, rhovL, rhowL, EL, rhoR, rhouR, rhovR,
-                             rhowR, ER, rhof, rhouf, rhovf, rhowf, Ef);
         NEKERROR(ErrorUtil::efatal,
                  "This function should be defined by subclasses.");
     }

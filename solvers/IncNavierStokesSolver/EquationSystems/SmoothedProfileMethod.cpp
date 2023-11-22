@@ -299,11 +299,9 @@ void SmoothedProfileMethod::v_SolveUnsteadyStokesSystem(
  * @param Forcing
  */
 void SmoothedProfileMethod::SetUpCorrectionPressure(
-    const Array<OneD, const Array<OneD, NekDouble>> &fields,
+    [[maybe_unused]] const Array<OneD, const Array<OneD, NekDouble>> &fields,
     Array<OneD, Array<OneD, NekDouble>> &Forcing)
 {
-    boost::ignore_unused(fields);
-
     size_t physTot = m_fs[0]->GetNpoints();
     size_t nvel    = m_velocity.size();
 

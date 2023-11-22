@@ -32,8 +32,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include "WallBC.h"
 
 using namespace std;
@@ -55,10 +53,8 @@ WallBC::WallBC(const LibUtilities::SessionReaderSharedPtr &pSession,
 
 void WallBC::v_Apply(Array<OneD, Array<OneD, NekDouble>> &Fwd,
                      Array<OneD, Array<OneD, NekDouble>> &physarray,
-                     const NekDouble &time)
+                     [[maybe_unused]] const NekDouble &time)
 {
-    boost::ignore_unused(time);
-
     int i;
     int nVariables = physarray.size();
 

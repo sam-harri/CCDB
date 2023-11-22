@@ -1527,11 +1527,9 @@ void CoupledLinearNS::EvaluateAdvection(
 
 void CoupledLinearNS::SolveUnsteadyStokesSystem(
     const Array<OneD, const Array<OneD, NekDouble>> &inarray,
-    Array<OneD, Array<OneD, NekDouble>> &outarray, const NekDouble time,
-    const NekDouble aii_Dt)
+    Array<OneD, Array<OneD, NekDouble>> &outarray,
+    [[maybe_unused]] const NekDouble time, const NekDouble aii_Dt)
 {
-    boost::ignore_unused(time);
-
     size_t i;
     Array<OneD, Array<OneD, NekDouble>> F(m_nConvectiveFields);
     NekDouble lambda = 1.0 / aii_Dt;

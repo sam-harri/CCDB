@@ -40,8 +40,6 @@
 #include <iostream>
 #include <string>
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <MultiRegions/AssemblyMap/AssemblyMapDG.h>
 #include <MultiRegions/ContField.h>
 #include <MultiRegions/DisContField.h>
@@ -131,10 +129,8 @@ void COMPBL(Array<OneD, NekDouble> v, Array<OneD, NekDouble> dv)
  * Perform the RK4 integration
  */
 void RK4(Array<OneD, NekDouble> y, Array<OneD, NekDouble> dydx, int n,
-         NekDouble x, NekDouble h, Array<OneD, NekDouble> yout)
+         [[maybe_unused]] NekDouble x, NekDouble h, Array<OneD, NekDouble> yout)
 {
-    boost::ignore_unused(x);
-
     int nmax = 5;
 
     Array<OneD, NekDouble> yt(nmax, 0.0);

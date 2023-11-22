@@ -181,11 +181,10 @@ FileSolution::~FileSolution()
 }
 
 void FileSolution::DoImplicitSolve(
-    const Array<OneD, const Array<OneD, NekDouble>> &inarray,
-    Array<OneD, Array<OneD, NekDouble>> &outarray, NekDouble time,
-    NekDouble lambda)
+    [[maybe_unused]] const Array<OneD, const Array<OneD, NekDouble>> &inarray,
+    [[maybe_unused]] Array<OneD, Array<OneD, NekDouble>> &outarray,
+    [[maybe_unused]] NekDouble time, [[maybe_unused]] NekDouble lambda)
 {
-    boost::ignore_unused(inarray, outarray, time, lambda);
 }
 
 /**
@@ -196,10 +195,10 @@ void FileSolution::DoImplicitSolve(
  * @param time       Time.
  */
 void FileSolution::DoOdeRhs(
-    const Array<OneD, const Array<OneD, NekDouble>> &inarray,
-    Array<OneD, Array<OneD, NekDouble>> &outarray, const NekDouble time)
+    [[maybe_unused]] const Array<OneD, const Array<OneD, NekDouble>> &inarray,
+    Array<OneD, Array<OneD, NekDouble>> &outarray,
+    [[maybe_unused]] const NekDouble time)
 {
-    boost::ignore_unused(inarray, time);
     int nSolutionPts = GetNpoints();
     for (size_t i = 0; i < outarray.size(); ++i)
     {
@@ -215,15 +214,14 @@ void FileSolution::DoOdeRhs(
  * @param time       Time.
  */
 void FileSolution::DoOdeProjection(
-    const Array<OneD, const Array<OneD, NekDouble>> &inarray,
-    Array<OneD, Array<OneD, NekDouble>> &outarray, const NekDouble time)
+    [[maybe_unused]] const Array<OneD, const Array<OneD, NekDouble>> &inarray,
+    [[maybe_unused]] Array<OneD, Array<OneD, NekDouble>> &outarray,
+    [[maybe_unused]] const NekDouble time)
 {
-    boost::ignore_unused(inarray, outarray, time);
 }
 
-bool FileSolution::v_PostIntegrate(int step)
+bool FileSolution::v_PostIntegrate([[maybe_unused]] int step)
 {
-    boost::ignore_unused(step);
     UpdateField(m_time);
     return false;
 }
@@ -278,10 +276,9 @@ bool FileSolution::v_RequireFwdTrans()
 }
 
 void FileSolution::v_GetPressure(
-    const Array<OneD, const Array<OneD, NekDouble>> &physfield,
-    Array<OneD, NekDouble> &pressure)
+    [[maybe_unused]] const Array<OneD, const Array<OneD, NekDouble>> &physfield,
+    [[maybe_unused]] Array<OneD, NekDouble> &pressure)
 {
-    boost::ignore_unused(physfield, pressure);
 }
 
 void FileSolution::v_GetDensity(

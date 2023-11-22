@@ -54,21 +54,22 @@ protected:
                  Array<OneD, Array<OneD, NekDouble>> &flux) override;
 
     virtual void v_ArraySolve(
-        const Array<OneD, const Array<OneD, NekDouble>> &Fwd,
-        const Array<OneD, const Array<OneD, NekDouble>> &Bwd,
-        Array<OneD, Array<OneD, NekDouble>> &flux)
+        [[maybe_unused]] const Array<OneD, const Array<OneD, NekDouble>> &Fwd,
+        [[maybe_unused]] const Array<OneD, const Array<OneD, NekDouble>> &Bwd,
+        [[maybe_unused]] Array<OneD, Array<OneD, NekDouble>> &flux)
     {
-        boost::ignore_unused(Fwd, Bwd, flux);
         NEKERROR(ErrorUtil::efatal,
                  "This function should be defined by subclasses.");
     }
 
-    virtual void v_PointSolve(NekDouble etaL, NekDouble uL, NekDouble vL,
-                              NekDouble dL, NekDouble etaR, NekDouble uR,
-                              NekDouble vR, NekDouble dR, NekDouble &etaf,
-                              NekDouble &uf, NekDouble &vf)
+    virtual void v_PointSolve(
+        [[maybe_unused]] NekDouble etaL, [[maybe_unused]] NekDouble uL,
+        [[maybe_unused]] NekDouble vL, [[maybe_unused]] NekDouble dL,
+        [[maybe_unused]] NekDouble etaR, [[maybe_unused]] NekDouble uR,
+        [[maybe_unused]] NekDouble vR, [[maybe_unused]] NekDouble dR,
+        [[maybe_unused]] NekDouble &etaf, [[maybe_unused]] NekDouble &uf,
+        [[maybe_unused]] NekDouble &vf)
     {
-        boost::ignore_unused(etaL, uL, vL, dL, etaR, uR, vR, dR, etaf, uf, vf);
         NEKERROR(ErrorUtil::efatal,
                  "This function should be defined by subclasses.");
     }

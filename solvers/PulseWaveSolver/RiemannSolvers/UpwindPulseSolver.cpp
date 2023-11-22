@@ -54,12 +54,11 @@ UpwindPulseSolver::UpwindPulseSolver(
  *  \right]_{x_e^l}^{x_eû} \f$
  */
 void UpwindPulseSolver::v_Solve(
-    const int nDim, const Array<OneD, const Array<OneD, NekDouble>> &Fwd,
+    [[maybe_unused]] const int nDim,
+    const Array<OneD, const Array<OneD, NekDouble>> &Fwd,
     const Array<OneD, const Array<OneD, NekDouble>> &Bwd,
     Array<OneD, Array<OneD, NekDouble>> &flux)
 {
-    boost::ignore_unused(nDim);
-
     int i;
     int nTracePts = Fwd[0].size();
 

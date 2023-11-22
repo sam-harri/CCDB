@@ -192,16 +192,16 @@ void Extrapolate::v_CalcNeumannPressureBCs(
 }
 
 // do nothing unless otherwise defined.
-void Extrapolate::v_CorrectPressureBCs(const Array<OneD, NekDouble> &pressure)
+void Extrapolate::v_CorrectPressureBCs(
+    [[maybe_unused]] const Array<OneD, NekDouble> &pressure)
 {
-    boost::ignore_unused(pressure);
 }
 
 // do nothing unless otherwise defined.
-void Extrapolate::v_AddNormVelOnOBC(const int nbcoeffs, const int nreg,
-                                    Array<OneD, Array<OneD, NekDouble>> &u)
+void Extrapolate::v_AddNormVelOnOBC(
+    [[maybe_unused]] const int nbcoeffs, [[maybe_unused]] const int nreg,
+    [[maybe_unused]] Array<OneD, Array<OneD, NekDouble>> &u)
 {
-    boost::ignore_unused(nbcoeffs, nreg, u);
 }
 
 void Extrapolate::CalcOutflowBCs(

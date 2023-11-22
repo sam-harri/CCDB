@@ -120,16 +120,10 @@ private:
         const Array<OneD, MultiRegions::ExpListSharedPtr> &pFields,
         const size_t nvariables, const size_t nCoeffs,
         const Array<OneD, const Array<OneD, NekDouble>> &inarray,
-        Array<OneD, Array<OneD, NekDouble>> &outarray, bool flagUpdateDervFlux,
-        Array<OneD, Array<OneD, NekDouble>> &FwdFluxDeriv,
-        Array<OneD, Array<OneD, NekDouble>> &BwdFluxDeriv,
-        TensorOfArray3D<NekDouble> &qfield,
+        Array<OneD, Array<OneD, NekDouble>> &outarray,
         TensorOfArray3D<NekDouble> &wspTrace,
         Array<OneD, Array<OneD, DataType>> &wspTraceDataType,
-        const TensorOfArray4D<DataType> &TraceJacArray,
-        const TensorOfArray4D<DataType> &TraceJacDerivArray,
-        const Array<OneD, const Array<OneD, DataType>> &TraceJacDerivSign,
-        const TensorOfArray5D<DataType> &TraceIPSymJacArray);
+        const TensorOfArray4D<DataType> &TraceJacArray);
 
     template <typename TypeNekBlkMatSharedPtr>
     void AllocatePreconBlkDiagCoeff(

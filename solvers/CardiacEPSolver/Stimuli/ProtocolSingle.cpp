@@ -101,9 +101,9 @@ NekDouble ProtocolSingle::v_GetAmplitude(const NekDouble time)
 /**
  *
  */
-void ProtocolSingle::v_GenerateSummary(SolverUtils::SummaryList &s)
+void ProtocolSingle::v_GenerateSummary(
+    [[maybe_unused]] SolverUtils::SummaryList &s)
 {
-    boost::ignore_unused(s);
 }
 
 /**

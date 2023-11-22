@@ -60,10 +60,9 @@ void AdjointAdvection::v_Advect(
     const Array<OneD, Array<OneD, NekDouble>> &advVel,
     const Array<OneD, Array<OneD, NekDouble>> &inarray,
     Array<OneD, Array<OneD, NekDouble>> &outarray, const NekDouble &time,
-    const Array<OneD, Array<OneD, NekDouble>> &pFwd,
-    const Array<OneD, Array<OneD, NekDouble>> &pBwd)
+    [[maybe_unused]] const Array<OneD, Array<OneD, NekDouble>> &pFwd,
+    [[maybe_unused]] const Array<OneD, Array<OneD, NekDouble>> &pBwd)
 {
-    boost::ignore_unused(pFwd, pBwd);
     ASSERTL1(nConvectiveFields == inarray.size(),
              "Number of convective fields and Inarray are not compatible");
 
