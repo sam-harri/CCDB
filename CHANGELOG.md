@@ -18,6 +18,7 @@ v5.5.0
 - Fix a minor bug in ProcessWallNormalData (!1663)
 - Fix Explist::v_GetNormals and GetElmtNormalLength (!1625)
 - Replace `boost::random` with `std::random` (!1673)
+- Use `[[deprecated]]` attribute (!1682)
 
 **ADRSolver**
 - Add support for spatially-constant, but variable direction, diffusion to

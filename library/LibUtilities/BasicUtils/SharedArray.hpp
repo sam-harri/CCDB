@@ -36,7 +36,6 @@
 #define NEKTAR_LIB_UTILITIES_BASIC_UTILS_SHARED_ARRAY_HPP
 
 #include <LibUtilities/BasicUtils/ArrayPolicies.hpp>
-#include <LibUtilities/BasicUtils/Deprecated.hpp>
 #include <LibUtilities/BasicUtils/ErrorUtil.hpp>
 #include <LibUtilities/BasicUtils/RealComparison.hpp>
 #include <LibUtilities/LinearAlgebra/NekMatrixFwd.hpp>
@@ -335,7 +334,8 @@ public:
 
     /// \brief Returns the array's size.
     /// Deprecated
-    DEPRECATED(5.1.0, size) size_type num_elements() const
+    [[deprecated("since 5.1.0, use size() instead")]] size_type num_elements()
+        const
     {
         WARNINGL1(false, "member function num_elements() is deprecated, "
                          "use size() instead.");
@@ -539,7 +539,8 @@ public:
         return m_data->num_elements();
     }
     // deprecated interface
-    DEPRECATED(5.1.0, size) size_type num_elements() const
+    [[deprecated("since 5.1.0, use size() instead")]] size_type num_elements()
+        const
     {
         WARNINGL1(false, "member function num_elements() is deprecated, "
                          "use size() instead.");
