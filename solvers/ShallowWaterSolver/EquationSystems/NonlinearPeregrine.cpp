@@ -280,9 +280,8 @@ void NonlinearPeregrine::DoOdeRhs(
 
             //-------------------------------------------------------
             // inarray in physical space
-
-            Array<OneD, Array<OneD, NekDouble>> modarray(nvariables);
-            for (i = 0; i < nvariables; ++i)
+            Array<OneD, Array<OneD, NekDouble>> modarray(2);
+            for (i = 0; i < 2; ++i)
             {
                 modarray[i] = Array<OneD, NekDouble>(ncoeffs, 0.0);
             }
@@ -292,10 +291,9 @@ void NonlinearPeregrine::DoOdeRhs(
             // Compute the DG advection including the numerical flux
             // by using SolverUtils/Advection
             // Input and output in physical space
-            Array<OneD, Array<OneD, NekDouble>> advVel;
-
-            m_advection->Advect(nvariables - 1, m_fields, advVel, inarray,
-                                outarray, time);
+            m_advection->Advect(nvariables - 1, m_fields,
+                                NullNekDoubleArrayOfArray, inarray, outarray,
+                                time);
             //-------------------------------------------------------
 
             //-------------------------------------------------------
@@ -334,19 +332,19 @@ void NonlinearPeregrine::DoOdeRhs(
 
             //-------------------------------------------------
             // go to modal space
-            m_fields[0]->IProductWRTBase(outarray[1], modarray[1]);
-            m_fields[0]->IProductWRTBase(outarray[2], modarray[2]);
+            m_fields[0]->IProductWRTBase(outarray[1], modarray[0]);
+            m_fields[0]->IProductWRTBase(outarray[2], modarray[1]);
 
             // store f1 and f2 for later use (modal space)
             Array<OneD, NekDouble> f1(ncoeffs);
             Array<OneD, NekDouble> f2(ncoeffs);
 
-            Vmath::Vcopy(ncoeffs, modarray[1], 1, f1, 1); // f1
-            Vmath::Vcopy(ncoeffs, modarray[2], 1, f2, 1); // f2
+            Vmath::Vcopy(ncoeffs, modarray[0], 1, f1, 1); // f1
+            Vmath::Vcopy(ncoeffs, modarray[1], 1, f2, 1); // f2
 
             // Solve the remaining block-diagonal systems
+            m_fields[0]->MultiplyByElmtInvMass(modarray[0], modarray[0]);
             m_fields[0]->MultiplyByElmtInvMass(modarray[1], modarray[1]);
-            m_fields[0]->MultiplyByElmtInvMass(modarray[2], modarray[2]);
             //---------------------------------------------
 
             //---------------------------------------------
@@ -445,7 +443,7 @@ void NonlinearPeregrine::DoOdeRhs(
             SetBoundaryConditionsContVariables(physfield[0], time);
 
             m_fields[0]->IProductWRTDerivBase(0, physfield[0], coeffsfield[0]);
-            m_fields[1]->IProductWRTDerivBase(1, physfield[0], coeffsfield[1]);
+            m_fields[0]->IProductWRTDerivBase(1, physfield[0], coeffsfield[1]);
 
             Vmath::Neg(ncoeffs, coeffsfield[0], 1);
             Vmath::Neg(ncoeffs, coeffsfield[1], 1);
@@ -463,14 +461,14 @@ void NonlinearPeregrine::DoOdeRhs(
                 m_fields[0]->AddTraceIntegral(normflux, coeffsfield[1]);
             }
 
-            Vmath::Vadd(ncoeffs, f1, 1, coeffsfield[0], 1, modarray[1], 1);
-            Vmath::Vadd(ncoeffs, f2, 1, coeffsfield[1], 1, modarray[2], 1);
+            Vmath::Vadd(ncoeffs, f1, 1, coeffsfield[0], 1, modarray[0], 1);
+            Vmath::Vadd(ncoeffs, f2, 1, coeffsfield[1], 1, modarray[1], 1);
 
-            m_fields[1]->MultiplyByElmtInvMass(modarray[1], modarray[1]);
-            m_fields[2]->MultiplyByElmtInvMass(modarray[2], modarray[2]);
+            m_fields[1]->MultiplyByElmtInvMass(modarray[0], modarray[0]);
+            m_fields[2]->MultiplyByElmtInvMass(modarray[1], modarray[1]);
 
-            m_fields[1]->BwdTrans(modarray[1], outarray[1]);
-            m_fields[2]->BwdTrans(modarray[2], outarray[2]);
+            m_fields[1]->BwdTrans(modarray[0], outarray[1]);
+            m_fields[2]->BwdTrans(modarray[1], outarray[2]);
 
             // ok: returned to conservative variables... done!
             //---------------------
@@ -544,8 +542,8 @@ void NonlinearPeregrine::SetBoundaryConditions(
 
     // Extract trace for boundaries. Needs to be done on all processors to avoid
     // deadlock.
-    Array<OneD, Array<OneD, NekDouble>> Fwd(nvariables);
-    for (int i = 0; i < nvariables; ++i)
+    Array<OneD, Array<OneD, NekDouble>> Fwd(nvariables - 1);
+    for (int i = 0; i < nvariables - 1; ++i)
     {
         Fwd[i] = Array<OneD, NekDouble>(nTracePts);
         m_fields[i]->ExtractTracePhys(inarray[i], Fwd[i]);
