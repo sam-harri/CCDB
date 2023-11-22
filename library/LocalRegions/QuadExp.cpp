@@ -997,15 +997,11 @@ void QuadExp::v_ComputeTraceNormal(const int edge)
     const Array<TwoD, const NekDouble> &df =
         geomFactors->GetDerivFactors(ptsKeys);
     const Array<OneD, const NekDouble> &jac = geomFactors->GetJac(ptsKeys);
-    int nqe;
-    if (edge == 0 || edge == 2)
-    {
-        nqe = m_base[0]->GetNumPoints();
-    }
-    else
-    {
-        nqe = m_base[1]->GetNumPoints();
-    }
+
+    // The points of normals should follow trace basis, not local basis.
+    LibUtilities::BasisKey tobasis = GetTraceBasisKey(edge);
+
+    int nqe       = tobasis.GetNumPoints();
     int vCoordDim = GetCoordim();
 
     m_traceNormals[edge] = Array<OneD, Array<OneD, NekDouble>>(vCoordDim);
@@ -1219,14 +1215,14 @@ void QuadExp::v_ComputeTraceNormal(const int edge)
         Array<OneD, NekDouble> work(nqe, 0.0);
 
         // interpolate Jacobian and invert
-        LibUtilities::Interp1D(from_key, jac, m_base[0]->GetPointsKey(), work);
+        LibUtilities::Interp1D(from_key, jac, tobasis.GetPointsKey(), work);
         Vmath::Sdiv(nqe, 1.0, &work[0], 1, &work[0], 1);
 
         // interpolate
         for (i = 0; i < GetCoordim(); ++i)
         {
             LibUtilities::Interp1D(from_key, &normals[i * nq],
-                                   m_base[0]->GetPointsKey(), &normal[i][0]);
+                                   tobasis.GetPointsKey(), &normal[i][0]);
             Vmath::Vmul(nqe, work, 1, normal[i], 1, normal[i], 1);
         }
 
