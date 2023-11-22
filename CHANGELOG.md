@@ -22,6 +22,7 @@ v5.5.0
 - Update Parareal file output and tidy-up Parareal/PFASST interpolation (!1678)
 - Move from `boost::filesystem` to `std::filesystem` (!1674)
 - Use `[[deprecated]]` attribute (!1682)
+- Fix QuadExp::v_ComputeTraceNormals(!1685)
 
 **ADRSolver**
 - Add support for spatially-constant, but variable direction, diffusion to

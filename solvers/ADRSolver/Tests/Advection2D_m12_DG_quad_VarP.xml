@@ -164,16 +164,16 @@
 
     <COLLECTIONS>
         <OPERATOR TYPE="BwdTrans">
-            <ELEMENT TYPE="H" ORDER="2-15" IMPTYPE="SumFac" />
+            <ELEMENT TYPE="Q" ORDER="2-15" IMPTYPE="SumFac" />
         </OPERATOR>
         <OPERATOR TYPE="IProductWRTBase">
-            <ELEMENT TYPE="H" ORDER="2-15" IMPTYPE="SumFac" />
+            <ELEMENT TYPE="Q" ORDER="2-15" IMPTYPE="SumFac" />
         </OPERATOR>
         <OPERATOR TYPE="PhysDeriv">
-            <ELEMENT TYPE="H" ORDER="2-15" IMPTYPE="SumFac" />
+            <ELEMENT TYPE="Q" ORDER="2-15" IMPTYPE="SumFac" />
         </OPERATOR>
         <OPERATOR TYPE="IProductWRTDerivBase">
-            <ELEMENT TYPE="H" ORDER="2-15" IMPTYPE="SumFac" />
+            <ELEMENT TYPE="Q" ORDER="2-15" IMPTYPE="SumFac" />
         </OPERATOR>
     </COLLECTIONS>
 </NEKTAR>
