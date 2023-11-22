@@ -37,6 +37,9 @@ v5.5.0
 **CompressibleFlowSolver**
 - Add three subsonic inflow boundary conditions: EnforceEntropyPresure, EnforceEntropyVelocity, and EnforceEntropyTotalEnthalpy (!1398)
 
+**ShallowWaterSolver**
+- Reduce memory footprint of the Peregrine solver(!1680)
+
 **FieldConvert**
 - Fix typo in user-guide and fix but for parallel-in-time FieldConvert (!1645)
 - Fixed FieldConvert -m addfld (!1500)
