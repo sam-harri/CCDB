@@ -35,8 +35,6 @@
 #ifndef NEKTAR_SOLVERS_SHALLOWWATERSOLVER_RIEMANNSOLVER_NONLINEARSWESOLVER
 #define NEKTAR_SOLVERS_SHALLOWWATERSOLVER_RIEMANNSOLVER_NONLINEARSWESOLVER
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <SolverUtils/RiemannSolvers/RiemannSolver.h>
 
 using namespace Nektar::SolverUtils;
@@ -56,20 +54,21 @@ protected:
                  Array<OneD, Array<OneD, NekDouble>> &flux) override;
 
     virtual void v_ArraySolve(
-        const Array<OneD, const Array<OneD, NekDouble>> &Fwd,
-        const Array<OneD, const Array<OneD, NekDouble>> &Bwd,
-        Array<OneD, Array<OneD, NekDouble>> &flux)
+        [[maybe_unused]] const Array<OneD, const Array<OneD, NekDouble>> &Fwd,
+        [[maybe_unused]] const Array<OneD, const Array<OneD, NekDouble>> &Bwd,
+        [[maybe_unused]] Array<OneD, Array<OneD, NekDouble>> &flux)
     {
-        boost::ignore_unused(Fwd, Bwd, flux);
         NEKERROR(ErrorUtil::efatal,
                  "This function should be defined by subclasses.");
     }
 
-    virtual void v_PointSolve(NekDouble hL, NekDouble huL, NekDouble hvL,
-                              NekDouble hR, NekDouble huR, NekDouble hvR,
-                              NekDouble &hf, NekDouble &huf, NekDouble &hvf)
+    virtual void v_PointSolve(
+        [[maybe_unused]] NekDouble hL, [[maybe_unused]] NekDouble huL,
+        [[maybe_unused]] NekDouble hvL, [[maybe_unused]] NekDouble hR,
+        [[maybe_unused]] NekDouble huR, [[maybe_unused]] NekDouble hvR,
+        [[maybe_unused]] NekDouble &hf, [[maybe_unused]] NekDouble &huf,
+        [[maybe_unused]] NekDouble &hvf)
     {
-        boost::ignore_unused(hL, huL, hvL, hR, huR, hvR, hf, huf, hvf);
         NEKERROR(ErrorUtil::efatal,
                  "This function should be defined by subclasses.");
     }

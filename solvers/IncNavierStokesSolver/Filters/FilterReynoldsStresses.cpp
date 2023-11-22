@@ -203,10 +203,9 @@ void FilterReynoldsStresses::v_FillVariablesName(
 
 void FilterReynoldsStresses::v_ProcessSample(
     const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
-    std::vector<Array<OneD, NekDouble>> &fieldcoeffs, const NekDouble &time)
+    [[maybe_unused]] std::vector<Array<OneD, NekDouble>> &fieldcoeffs,
+    [[maybe_unused]] const NekDouble &time)
 {
-    boost::ignore_unused(fieldcoeffs, time);
-
     size_t i, j, n;
     size_t nq          = pFields[0]->GetTotPoints();
     size_t dim         = pFields.size() - 1;
@@ -279,10 +278,8 @@ void FilterReynoldsStresses::v_ProcessSample(
 
 void FilterReynoldsStresses::v_PrepareOutput(
     const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
-    const NekDouble &time)
+    [[maybe_unused]] const NekDouble &time)
 {
-    boost::ignore_unused(time);
-
     size_t dim = pFields.size() - 1;
 
     m_fieldMetaData["NumberOfFieldDumps"] = std::to_string(m_numSamples);

@@ -34,8 +34,6 @@
 
 #include <iostream>
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <ADRSolver/EquationSystems/UnsteadyViscousBurgers.h>
 
 using namespace std;
@@ -406,12 +404,10 @@ void UnsteadyViscousBurgers::GetFluxVectorAdv(
  * @param flux        Resulting flux.
  */
 void UnsteadyViscousBurgers::GetFluxVectorDiff(
-    const Array<OneD, Array<OneD, NekDouble>> &inarray,
+    [[maybe_unused]] const Array<OneD, Array<OneD, NekDouble>> &inarray,
     const Array<OneD, Array<OneD, Array<OneD, NekDouble>>> &qfield,
     Array<OneD, Array<OneD, Array<OneD, NekDouble>>> &viscousTensor)
 {
-    boost::ignore_unused(inarray);
-
     unsigned int nDim              = qfield.size();
     unsigned int nConvectiveFields = qfield[0].size();
     unsigned int nPts              = qfield[0][0].size();

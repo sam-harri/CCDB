@@ -32,8 +32,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include "PressureOutflowNonReflectiveBC.h"
 
 using namespace std;
@@ -66,10 +64,9 @@ PressureOutflowNonReflectiveBC::PressureOutflowNonReflectiveBC(
 
 void PressureOutflowNonReflectiveBC::v_Apply(
     Array<OneD, Array<OneD, NekDouble>> &Fwd,
-    Array<OneD, Array<OneD, NekDouble>> &physarray, const NekDouble &time)
+    Array<OneD, Array<OneD, NekDouble>> &physarray,
+    [[maybe_unused]] const NekDouble &time)
 {
-    boost::ignore_unused(time);
-
     int i, j;
     int nTracePts   = m_fields[0]->GetTrace()->GetNpoints();
     int nVariables  = physarray.size();

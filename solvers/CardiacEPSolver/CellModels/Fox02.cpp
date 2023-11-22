@@ -70,10 +70,8 @@ Fox02::Fox02(const LibUtilities::SessionReaderSharedPtr &pSession,
 
 void Fox02::v_Update(const Array<OneD, const Array<OneD, NekDouble>> &inarray,
                      Array<OneD, Array<OneD, NekDouble>> &outarray,
-                     const NekDouble time)
+                     [[maybe_unused]] const NekDouble time)
 {
-    boost::ignore_unused(time);
-
     for (size_t i = 0; i < m_nq; ++i)
     {
 

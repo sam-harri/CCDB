@@ -321,11 +321,9 @@ BidomainRoth::~BidomainRoth()
  */
 void BidomainRoth::DoImplicitSolve(
     const Array<OneD, const Array<OneD, NekDouble>> &inarray,
-    Array<OneD, Array<OneD, NekDouble>> &outarray, const NekDouble time,
-    const NekDouble lambda)
+    Array<OneD, Array<OneD, NekDouble>> &outarray,
+    [[maybe_unused]] const NekDouble time, const NekDouble lambda)
 {
-    boost::ignore_unused(time);
-
     int nq = m_fields[0]->GetNpoints();
 
     StdRegions::ConstFactorMap factorsHelmholtz;

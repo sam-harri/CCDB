@@ -60,29 +60,25 @@ void BetaPressureArea::v_GetPressure(NekDouble &P, const NekDouble &beta,
                                      const NekDouble &A, const NekDouble &A0,
                                      const NekDouble &dAUdx,
                                      const NekDouble &gamma,
-                                     const NekDouble &alpha)
+                                     [[maybe_unused]] const NekDouble &alpha)
 {
-    boost::ignore_unused(alpha);
-
     P = m_PExt + beta * (sqrt(A) - sqrt(A0)) -
         gamma * dAUdx / sqrt(A); // Viscoelasticity
 }
 
 void BetaPressureArea::v_GetC(NekDouble &c, const NekDouble &beta,
-                              const NekDouble &A, const NekDouble &A0,
-                              const NekDouble &alpha)
+                              const NekDouble &A,
+                              [[maybe_unused]] const NekDouble &A0,
+                              [[maybe_unused]] const NekDouble &alpha)
 {
-    boost::ignore_unused(A0, alpha);
-
     c = sqrt(beta / (2 * m_rho)) * sqrt(sqrt(A)); // Elastic
 }
 
 void BetaPressureArea::v_GetW1(NekDouble &W1, const NekDouble &u,
                                const NekDouble &beta, const NekDouble &A,
-                               const NekDouble &A0, const NekDouble &alpha)
+                               const NekDouble &A0,
+                               [[maybe_unused]] const NekDouble &alpha)
 {
-    boost::ignore_unused(alpha);
-
     NekDouble I = 0.0;
     GetCharIntegral(I, beta, A, A0);
 
@@ -91,10 +87,9 @@ void BetaPressureArea::v_GetW1(NekDouble &W1, const NekDouble &u,
 
 void BetaPressureArea::v_GetW2(NekDouble &W2, const NekDouble &u,
                                const NekDouble &beta, const NekDouble &A,
-                               const NekDouble &A0, const NekDouble &alpha)
+                               const NekDouble &A0,
+                               [[maybe_unused]] const NekDouble &alpha)
 {
-    boost::ignore_unused(alpha);
-
     NekDouble I = 0.0;
     GetCharIntegral(I, beta, A, A0);
 
@@ -105,10 +100,8 @@ void BetaPressureArea::v_GetAFromChars(NekDouble &A, const NekDouble &W1,
                                        const NekDouble &W2,
                                        const NekDouble &beta,
                                        const NekDouble &A0,
-                                       const NekDouble &alpha)
+                                       [[maybe_unused]] const NekDouble &alpha)
 {
-    boost::ignore_unused(alpha);
-
     A = pow((W1 - W2) * sqrt(2 * m_rho / beta) / 8 + sqrt(sqrt(A0)), 4);
 }
 
@@ -118,13 +111,10 @@ void BetaPressureArea::v_GetUFromChars(NekDouble &u, const NekDouble &W1,
     u = (W1 + W2) / 2; // Necessarily the case for all tube laws
 }
 
-void BetaPressureArea::v_GetCharIntegral(NekDouble &I, const NekDouble &beta,
-                                         const NekDouble &A,
-                                         const NekDouble &A0,
-                                         const NekDouble &alpha)
+void BetaPressureArea::v_GetCharIntegral(
+    NekDouble &I, const NekDouble &beta, const NekDouble &A,
+    const NekDouble &A0, [[maybe_unused]] const NekDouble &alpha)
 {
-    boost::ignore_unused(alpha);
-
     NekDouble c  = 0.0;
     NekDouble c0 = 0.0;
 

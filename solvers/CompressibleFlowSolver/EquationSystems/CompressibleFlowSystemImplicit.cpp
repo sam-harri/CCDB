@@ -32,8 +32,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <CompressibleFlowSolver/EquationSystems/CompressibleFlowSystemImplicit.h>
 #include <SolverUtils/Advection/AdvectionWeakDG.h>
 
@@ -194,10 +192,10 @@ void CFSImplicit::NonlinSysEvaluatorCoeff1D(
 
 void CFSImplicit::NonlinSysEvaluatorCoeff(
     const Array<OneD, const NekDouble> &inarray, Array<OneD, NekDouble> &out,
-    const bool &flag, const Array<OneD, const NekDouble> &source)
+    [[maybe_unused]] const bool &flag,
+    const Array<OneD, const NekDouble> &source)
 {
     LibUtilities::Timer timer;
-    boost::ignore_unused(flag);
     unsigned int nvariables = m_fields.size();
     unsigned int npoints    = m_fields[0]->GetNcoeffs();
     Array<OneD, Array<OneD, NekDouble>> in2D(nvariables);
@@ -394,12 +392,10 @@ void CFSImplicit::DoImplicitSolve(
 }
 
 void CFSImplicit::DoImplicitSolveCoeff(
-    const Array<OneD, const Array<OneD, NekDouble>> &inpnts,
+    [[maybe_unused]] const Array<OneD, const Array<OneD, NekDouble>> &inpnts,
     const Array<OneD, const NekDouble> &inarray, Array<OneD, NekDouble> &out,
     const NekDouble time, const NekDouble lambda)
 {
-    boost::ignore_unused(inpnts);
-
     m_TimeIntegLambda   = lambda;
     m_bndEvaluateTime   = time;
     m_solutionPhys      = inpnts;
@@ -1018,10 +1014,9 @@ void CFSImplicit::AddMatNSBlkDiagBnd(
 template <typename DataType, typename TypeNekBlkMatSharedPtr>
 void CFSImplicit::ElmtVarInvMtrx(
     Array<OneD, Array<OneD, TypeNekBlkMatSharedPtr>> &gmtxarray,
-    TypeNekBlkMatSharedPtr &gmtVar, const DataType &tmpDataType)
+    TypeNekBlkMatSharedPtr &gmtVar,
+    [[maybe_unused]] const DataType &tmpDataType)
 {
-    boost::ignore_unused(tmpDataType);
-
     int n1d               = gmtxarray.size();
     int n2d               = gmtxarray[0].size();
     int nConvectiveFields = n1d;
@@ -1111,12 +1106,10 @@ void CFSImplicit::GetTraceJac(
     const Array<OneD, const Array<OneD, NekDouble>> &inarray,
     TensorOfArray3D<NekDouble> &qfield,
     Array<OneD, TypeNekBlkMatSharedPtr> &TraceJac,
-    Array<OneD, TypeNekBlkMatSharedPtr> &TraceJacDeriv,
-    Array<OneD, Array<OneD, DataType>> &TraceJacDerivSign,
+    [[maybe_unused]] Array<OneD, TypeNekBlkMatSharedPtr> &TraceJacDeriv,
+    [[maybe_unused]] Array<OneD, Array<OneD, DataType>> &TraceJacDerivSign,
     TensorOfArray5D<DataType> &TraceIPSymJacArray)
 {
-    boost::ignore_unused(TraceJacDeriv, TraceJacDerivSign);
-
     int nvariables = inarray.size();
     int nTracePts  = GetTraceTotPoints();
 
@@ -1175,10 +1168,8 @@ void CFSImplicit::NumCalcRiemFluxJac(
     const Array<OneD, const Array<OneD, NekDouble>> &Fwd,
     const Array<OneD, const Array<OneD, NekDouble>> &Bwd,
     TypeNekBlkMatSharedPtr &FJac, TypeNekBlkMatSharedPtr &BJac,
-    TensorOfArray5D<DataType> &TraceIPSymJacArray)
+    [[maybe_unused]] TensorOfArray5D<DataType> &TraceIPSymJacArray)
 {
-    boost::ignore_unused(TraceIPSymJacArray);
-
     const NekDouble PenaltyFactor2 = 0.0;
     int nvariables                 = nConvectiveFields;
     int npoints                    = GetNpoints();
@@ -1361,22 +1352,21 @@ void CFSImplicit::NumCalcRiemFluxJac(
 }
 
 void CFSImplicit::CalcTraceNumericalFlux(
-    const int nConvectiveFields, const int nDim, const int nPts,
-    const int nTracePts, const NekDouble PenaltyFactor2,
+    const int nConvectiveFields, [[maybe_unused]] const int nDim,
+    [[maybe_unused]] const int nPts, const int nTracePts,
+    [[maybe_unused]] const NekDouble PenaltyFactor2,
     const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
     const Array<OneD, const Array<OneD, NekDouble>> &AdvVel,
     const Array<OneD, const Array<OneD, NekDouble>> &inarray,
-    const NekDouble time, TensorOfArray3D<NekDouble> &qfield,
+    [[maybe_unused]] const NekDouble time, TensorOfArray3D<NekDouble> &qfield,
     const Array<OneD, const Array<OneD, NekDouble>> &vFwd,
     const Array<OneD, const Array<OneD, NekDouble>> &vBwd,
-    const Array<OneD, const TensorOfArray2D<NekDouble>> &qFwd,
-    const Array<OneD, const TensorOfArray2D<NekDouble>> &qBwd,
-    const Array<OneD, NekDouble> &MuVarTrace, Array<OneD, int> &nonZeroIndex,
+    [[maybe_unused]] const Array<OneD, const TensorOfArray2D<NekDouble>> &qFwd,
+    [[maybe_unused]] const Array<OneD, const TensorOfArray2D<NekDouble>> &qBwd,
+    [[maybe_unused]] const Array<OneD, NekDouble> &MuVarTrace,
+    Array<OneD, int> &nonZeroIndex,
     Array<OneD, Array<OneD, NekDouble>> &traceflux)
 {
-    boost::ignore_unused(nDim, nPts, PenaltyFactor2, time, qFwd, qBwd,
-                         MuVarTrace);
-
     if (m_advectionJacFlag)
     {
         auto advWeakDGObject =
@@ -1443,7 +1433,7 @@ void CFSImplicit::CalcPreconMatBRJCoeff(
     Array<OneD, SNekBlkMatSharedPtr> &TraceJacDeriv,
     Array<OneD, Array<OneD, NekSingle>> &TraceJacDerivSign,
     TensorOfArray4D<NekSingle> &TraceJacArray,
-    TensorOfArray4D<NekSingle> &TraceJacDerivArray,
+    [[maybe_unused]] TensorOfArray4D<NekSingle> &TraceJacDerivArray,
     TensorOfArray5D<NekSingle> &TraceIPSymJacArray)
 {
     TensorOfArray3D<NekDouble> qfield;
@@ -1469,37 +1459,35 @@ void CFSImplicit::CalcPreconMatBRJCoeff(
     timer.Stop();
     timer.AccumulateRegion("CFSImplicit::AddMatNSBlkDiagBnd", 2);
 
-    MultiplyElmtInvMassPlusSource(gmtxarray, m_TimeIntegLambda, zero);
+    MultiplyElmtInvMassPlusSource<NekSingle>(gmtxarray, m_TimeIntegLambda);
 
     timer.Start();
     ElmtVarInvMtrx(gmtxarray, gmtVar, zero);
     timer.Stop();
     timer.AccumulateRegion("CFSImplicit::ElmtVarInvMtrx", 2);
 
-    TransTraceJacMatToArray(TraceJac, TraceJacDeriv, TraceJacArray,
-                            TraceJacDerivArray);
+    TransTraceJacMatToArray(TraceJac, TraceJacArray);
 }
 
 void CFSImplicit::v_MinusDiffusionFluxJacPoint(
-    const int nConvectiveFields, const int nElmtPnt,
-    const Array<OneD, const Array<OneD, NekDouble>> &locVars,
-    const TensorOfArray3D<NekDouble> &locDerv,
-    const Array<OneD, NekDouble> &locmu, const Array<OneD, NekDouble> &locDmuDT,
-    const Array<OneD, NekDouble> &normals, DNekMatSharedPtr &wspMat,
-    Array<OneD, Array<OneD, NekDouble>> &PntJacArray)
+    [[maybe_unused]] const int nConvectiveFields,
+    [[maybe_unused]] const int nElmtPnt,
+    [[maybe_unused]] const Array<OneD, const Array<OneD, NekDouble>> &locVars,
+    [[maybe_unused]] const TensorOfArray3D<NekDouble> &locDerv,
+    [[maybe_unused]] const Array<OneD, NekDouble> &locmu,
+    [[maybe_unused]] const Array<OneD, NekDouble> &locDmuDT,
+    [[maybe_unused]] const Array<OneD, NekDouble> &normals,
+    [[maybe_unused]] DNekMatSharedPtr &wspMat,
+    [[maybe_unused]] Array<OneD, Array<OneD, NekDouble>> &PntJacArray)
 {
-    boost::ignore_unused(nConvectiveFields, nElmtPnt, locVars, locDerv, locmu,
-                         locDmuDT, normals, wspMat, PntJacArray);
     // Do nothing by default
 }
 
 template <typename DataType, typename TypeNekBlkMatSharedPtr>
 void CFSImplicit::MultiplyElmtInvMassPlusSource(
     Array<OneD, Array<OneD, TypeNekBlkMatSharedPtr>> &gmtxarray,
-    const NekDouble dtlamda, const DataType tmpDataType)
+    const NekDouble dtlamda)
 {
-    boost::ignore_unused(tmpDataType);
-
     MultiRegions::ExpListSharedPtr explist              = m_fields[0];
     std::shared_ptr<LocalRegions::ExpansionVector> pexp = explist->GetExp();
     int nTotElmt                                        = (*pexp).size();
@@ -1586,12 +1574,8 @@ void CFSImplicit::MultiplyElmtInvMassPlusSource(
 template <typename DataType, typename TypeNekBlkMatSharedPtr>
 void CFSImplicit::TransTraceJacMatToArray(
     const Array<OneD, TypeNekBlkMatSharedPtr> &TraceJac,
-    const Array<OneD, TypeNekBlkMatSharedPtr> &TraceJacDeriv,
-    TensorOfArray4D<DataType> &TraceJacArray,
-    TensorOfArray4D<DataType> &TraceJacDerivArray)
+    TensorOfArray4D<DataType> &TraceJacArray)
 {
-    boost::ignore_unused(TraceJacArray, TraceJacDeriv, TraceJacDerivArray);
-
     int nFwdBwd, nDiagBlks, nvar0Jac, nvar1Jac;
 
     Array<OneD, unsigned int> rowSizes;
@@ -1631,37 +1615,35 @@ void CFSImplicit::TransTraceJacMatToArray(
 }
 
 void CFSImplicit::v_GetFluxDerivJacDirctn(
-    const MultiRegions::ExpListSharedPtr &explist,
-    const Array<OneD, const Array<OneD, NekDouble>> &normals,
-    const int nDervDir,
-    const Array<OneD, const Array<OneD, NekDouble>> &inarray,
-    TensorOfArray5D<NekDouble> &ElmtJacArray, const int nFluxDir)
+    [[maybe_unused]] const MultiRegions::ExpListSharedPtr &explist,
+    [[maybe_unused]] const Array<OneD, const Array<OneD, NekDouble>> &normals,
+    [[maybe_unused]] const int nDervDir,
+    [[maybe_unused]] const Array<OneD, const Array<OneD, NekDouble>> &inarray,
+    [[maybe_unused]] TensorOfArray5D<NekDouble> &ElmtJacArray,
+    [[maybe_unused]] const int nFluxDir)
 {
-    boost::ignore_unused(explist, normals, nDervDir, inarray, ElmtJacArray,
-                         nFluxDir);
     NEKERROR(ErrorUtil::efatal, "v_GetFluxDerivJacDirctn not coded");
 }
 
 void CFSImplicit::v_GetFluxDerivJacDirctnElmt(
-    const int nConvectiveFields, const int nElmtPnt, const int nDervDir,
-    const Array<OneD, const Array<OneD, NekDouble>> &locVars,
-    const Array<OneD, NekDouble> &locmu,
-    const Array<OneD, const Array<OneD, NekDouble>> &locnormal,
-    DNekMatSharedPtr &wspMat, Array<OneD, Array<OneD, NekDouble>> &PntJacArray)
+    [[maybe_unused]] const int nConvectiveFields,
+    [[maybe_unused]] const int nElmtPnt, [[maybe_unused]] const int nDervDir,
+    [[maybe_unused]] const Array<OneD, const Array<OneD, NekDouble>> &locVars,
+    [[maybe_unused]] const Array<OneD, NekDouble> &locmu,
+    [[maybe_unused]] const Array<OneD, const Array<OneD, NekDouble>> &locnormal,
+    [[maybe_unused]] DNekMatSharedPtr &wspMat,
+    [[maybe_unused]] Array<OneD, Array<OneD, NekDouble>> &PntJacArray)
 {
-    boost::ignore_unused(nConvectiveFields, nElmtPnt, nDervDir, locVars, locmu,
-                         locnormal, wspMat, PntJacArray);
     NEKERROR(ErrorUtil::efatal, "v_GetFluxDerivJacDirctn not coded");
 }
 
 void CFSImplicit::v_GetFluxDerivJacDirctn(
-    const MultiRegions::ExpListSharedPtr &explist,
-    const Array<OneD, const Array<OneD, NekDouble>> &normals,
-    const int nDervDir,
-    const Array<OneD, const Array<OneD, NekDouble>> &inarray,
-    TensorOfArray2D<DNekMatSharedPtr> &ElmtJac)
+    [[maybe_unused]] const MultiRegions::ExpListSharedPtr &explist,
+    [[maybe_unused]] const Array<OneD, const Array<OneD, NekDouble>> &normals,
+    [[maybe_unused]] const int nDervDir,
+    [[maybe_unused]] const Array<OneD, const Array<OneD, NekDouble>> &inarray,
+    [[maybe_unused]] TensorOfArray2D<DNekMatSharedPtr> &ElmtJac)
 {
-    boost::ignore_unused(explist, normals, nDervDir, inarray, ElmtJac);
 }
 
 void CFSImplicit::GetFluxVectorJacDirElmt(
@@ -1773,9 +1755,8 @@ void CFSImplicit::DoDiffusionCoeff(
 
 void CFSImplicit::MatrixMultiplyMatrixFreeCoeff(
     const Array<OneD, const NekDouble> &inarray, Array<OneD, NekDouble> &out,
-    const bool &flag)
+    [[maybe_unused]] const bool &flag)
 {
-    boost::ignore_unused(flag);
     const Array<OneD, const NekDouble> refsol = m_nonlinsol->GetRefSolution();
     const Array<OneD, const NekDouble> refres = m_nonlinsol->GetRefResidual();
     const Array<OneD, const NekDouble> refsource =

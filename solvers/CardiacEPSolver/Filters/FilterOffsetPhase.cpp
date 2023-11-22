@@ -81,10 +81,8 @@ FilterOffsetPhase::~FilterOffsetPhase()
 
 void FilterOffsetPhase::v_Initialise(
     const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
-    const NekDouble &time)
+    [[maybe_unused]] const NekDouble &time)
 {
-    boost::ignore_unused(time);
-
     m_index       = 0;
     m_outputIndex = 0;
 
@@ -145,10 +143,10 @@ void FilterOffsetPhase::v_Update(
 }
 
 void FilterOffsetPhase::v_Finalise(
-    const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
-    const NekDouble &time)
+    [[maybe_unused]] const Array<OneD, const MultiRegions::ExpListSharedPtr>
+        &pFields,
+    [[maybe_unused]] const NekDouble &time)
 {
-    boost::ignore_unused(pFields, time);
 }
 
 bool FilterOffsetPhase::v_IsTimeDependent()

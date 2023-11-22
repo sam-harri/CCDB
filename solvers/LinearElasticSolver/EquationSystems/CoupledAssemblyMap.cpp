@@ -34,8 +34,6 @@
 
 #include <iomanip>
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/BasicUtils/HashUtils.hpp>
 #include <LinearElasticSolver/EquationSystems/CoupledAssemblyMap.h>
 #include <LocalRegions/Expansion1D.h>
@@ -65,14 +63,13 @@ using SpatialDomains::BoundaryConditionShPtr;
 
 CoupledAssemblyMap::CoupledAssemblyMap(
     const LibUtilities::SessionReaderSharedPtr &pSession,
-    const SpatialDomains::MeshGraphSharedPtr &graph,
+    [[maybe_unused]] const SpatialDomains::MeshGraphSharedPtr &graph,
     const MultiRegions::AssemblyMapCGSharedPtr &cgMap,
-    const Array<OneD, const BoundaryCondShPtr> &boundaryConditions,
+    [[maybe_unused]] const Array<OneD, const BoundaryCondShPtr>
+        &boundaryConditions,
     const Array<OneD, MultiRegions::ExpListSharedPtr> &fields)
     : AssemblyMapCG(pSession, fields[0]->GetComm())
 {
-    boost::ignore_unused(graph, boundaryConditions);
-
     int nVel = fields[0]->GetCoordim(0);
 
     // Multi-level static condensation doesn't work yet.

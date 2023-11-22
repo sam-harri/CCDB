@@ -35,8 +35,6 @@
 #ifndef NEKTAR_SOLVERS_COMPRESSIBLEFLOWSOLVER_EQUATIONSYSTEMS_NSCFEAXISYM_H
 #define NEKTAR_SOLVERS_COMPRESSIBLEFLOWSOLVER_EQUATIONSYSTEMS_NSCFEAXISYM_H
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <CompressibleFlowSolver/EquationSystems/NavierStokesCFE.h>
 
 namespace Nektar
@@ -86,11 +84,11 @@ protected:
         TensorOfArray3D<NekDouble> &viscousTensor) override;
 
     void v_GetViscousFluxVectorDeAlias(
-        const Array<OneD, const Array<OneD, NekDouble>> &physfield,
-        TensorOfArray3D<NekDouble> &derivatives,
-        TensorOfArray3D<NekDouble> &viscousTensor) override
+        [[maybe_unused]] const Array<OneD, const Array<OneD, NekDouble>>
+            &physfield,
+        [[maybe_unused]] TensorOfArray3D<NekDouble> &derivatives,
+        [[maybe_unused]] TensorOfArray3D<NekDouble> &viscousTensor) override
     {
-        boost::ignore_unused(physfield, derivatives, viscousTensor);
         NEKERROR(ErrorUtil::efatal,
                  "Dealiased flux not implemented for axisymmetric case");
     }

@@ -77,10 +77,10 @@ public:
         const NekDouble &time) override;
 
     void v_Update(
-        const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
-        const NekDouble &time) override
+        [[maybe_unused]] const Array<OneD, const MultiRegions::ExpListSharedPtr>
+            &pFields,
+        [[maybe_unused]] const NekDouble &time) override
     {
-        boost::ignore_unused(pFields, time);
     }
 
     void UpdateForce(

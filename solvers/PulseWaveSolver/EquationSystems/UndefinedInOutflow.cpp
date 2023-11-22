@@ -57,13 +57,13 @@ UndefinedInOutflow::~UndefinedInOutflow()
 }
 
 void UndefinedInOutflow::v_DoBoundary(
-    const Array<OneD, const Array<OneD, NekDouble>> &inarray,
-    Array<OneD, Array<OneD, NekDouble>> &A_0,
-    Array<OneD, Array<OneD, NekDouble>> &beta,
-    Array<OneD, Array<OneD, NekDouble>> &alpha, const NekDouble time, int omega,
-    int offset, int n)
+    [[maybe_unused]] const Array<OneD, const Array<OneD, NekDouble>> &inarray,
+    [[maybe_unused]] Array<OneD, Array<OneD, NekDouble>> &A_0,
+    [[maybe_unused]] Array<OneD, Array<OneD, NekDouble>> &beta,
+    [[maybe_unused]] Array<OneD, Array<OneD, NekDouble>> &alpha,
+    [[maybe_unused]] const NekDouble time, [[maybe_unused]] int omega,
+    [[maybe_unused]] int offset, [[maybe_unused]] int n)
 {
-    boost::ignore_unused(inarray, A_0, beta, alpha, time, omega, offset, n);
 }
 
 } // namespace Nektar

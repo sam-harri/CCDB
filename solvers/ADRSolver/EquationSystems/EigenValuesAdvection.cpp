@@ -142,9 +142,9 @@ Array<OneD, NekDouble> &EigenValuesAdvection::GetNormalVelocity()
     return m_traceVn;
 }
 
-void EigenValuesAdvection::v_DoInitialise(bool dumpInitialConditions)
+void EigenValuesAdvection::v_DoInitialise(
+    [[maybe_unused]] bool dumpInitialConditions)
 {
-    boost::ignore_unused(dumpInitialConditions);
 }
 
 EigenValuesAdvection::~EigenValuesAdvection()

@@ -32,8 +32,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <CompressibleFlowSolver/EquationSystems/CompressibleFlowSystem.h>
 
 #include <LibUtilities/BasicUtils/Timer.h>
@@ -558,11 +556,9 @@ void CompressibleFlowSystem::GetFluxVectorDeAlias(
  *        subject to CFL restrictions.
  */
 void CompressibleFlowSystem::GetElmtTimeStep(
-    const Array<OneD, const Array<OneD, NekDouble>> &inarray,
+    [[maybe_unused]] const Array<OneD, const Array<OneD, NekDouble>> &inarray,
     Array<OneD, NekDouble> &tstep)
 {
-    boost::ignore_unused(inarray);
-
     size_t nElements = m_fields[0]->GetExpSize();
 
     // Change value of m_timestep (in case it is set to zero)
@@ -628,12 +624,10 @@ void CompressibleFlowSystem::v_GenerateSummary(SolverUtils::SummaryList &s)
 /**
  * @brief Set up logic for residual calculation.
  */
-void CompressibleFlowSystem::v_SetInitialConditions(NekDouble initialtime,
-                                                    bool dumpInitialConditions,
-                                                    const int domain)
+void CompressibleFlowSystem::v_SetInitialConditions(
+    NekDouble initialtime, bool dumpInitialConditions,
+    [[maybe_unused]] const int domain)
 {
-    boost::ignore_unused(domain);
-
     if (m_session->DefinesSolverInfo("ICTYPE") &&
         boost::iequals(m_session->GetSolverInfo("ICTYPE"), "IsentropicVortex"))
     {
@@ -1009,10 +1003,9 @@ void CompressibleFlowSystem::v_GetVelocity(
     m_varConv->GetVelocityVector(physfield, velocity);
 }
 
-void CompressibleFlowSystem::v_SteadyStateResidual(int step,
+void CompressibleFlowSystem::v_SteadyStateResidual([[maybe_unused]] int step,
                                                    Array<OneD, NekDouble> &L2)
 {
-    boost::ignore_unused(step);
     const size_t nPoints = GetTotPoints();
     const size_t nFields = m_fields.size();
     Array<OneD, Array<OneD, NekDouble>> rhs(nFields);
@@ -1073,7 +1066,6 @@ void CompressibleFlowSystem::EvaluateIsentropicVortex(
     m_session->LoadParameter("IsentropicV0", v0, 0.5);
     m_session->LoadParameter("IsentropicX0", x0, 5.0);
     m_session->LoadParameter("IsentropicY0", y0, 0.0);
-    boost::ignore_unused(z);
 
     int nq = x.size();
 

@@ -124,10 +124,9 @@ EnforceEntropyVelocity::EnforceEntropyVelocity(
 
 void EnforceEntropyVelocity::v_Apply(
     Array<OneD, Array<OneD, NekDouble>> &Fwd,
-    Array<OneD, Array<OneD, NekDouble>> &physarray, const NekDouble &time)
+    [[maybe_unused]] Array<OneD, Array<OneD, NekDouble>> &physarray,
+    [[maybe_unused]] const NekDouble &time)
 {
-    boost::ignore_unused(physarray, time);
-
     int i, j;
     int nDimensions = m_spacedim;
 

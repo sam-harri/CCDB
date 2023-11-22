@@ -37,7 +37,6 @@
 #define NEKTAR_SOLVERS_COMPRESSIBLEFLOWSOLVER_COMPRESSIBLEFLOWSYSTEMIMPLICIT_H
 
 #include <CompressibleFlowSolver/EquationSystems/CompressibleFlowSystem.h>
-#include <boost/core/ignore_unused.hpp>
 
 namespace Nektar
 {
@@ -200,8 +199,6 @@ protected:
     template <typename DataType, typename TypeNekBlkMatSharedPtr>
     void TransTraceJacMatToArray(
         const Array<OneD, TypeNekBlkMatSharedPtr> &TraceJac,
-        const Array<OneD, TypeNekBlkMatSharedPtr> &TraceJacDeriv,
-        TensorOfArray4D<DataType> &TraceJacArray,
         TensorOfArray4D<DataType> &TraceJacDerivArray);
 
     template <typename DataType, typename TypeNekBlkMatSharedPtr>
@@ -244,7 +241,7 @@ protected:
     template <typename DataType, typename TypeNekBlkMatSharedPtr>
     void MultiplyElmtInvMassPlusSource(
         Array<OneD, Array<OneD, TypeNekBlkMatSharedPtr>> &gmtxarray,
-        const NekDouble dtlamda, const DataType tmpDataType);
+        const NekDouble dtlamda);
 
     void GetFluxVectorJacDirElmt(
         const int nConvectiveFields, const int nElmtPnt,
@@ -342,26 +339,27 @@ protected:
     }
 
     virtual void v_DoDiffusionCoeff(
-        const Array<OneD, const Array<OneD, NekDouble>> &inarray,
-        Array<OneD, Array<OneD, NekDouble>> &outarray,
-        const Array<OneD, const Array<OneD, NekDouble>> &pFwd,
-        const Array<OneD, const Array<OneD, NekDouble>> &pBwd)
+        [[maybe_unused]] const Array<OneD, const Array<OneD, NekDouble>>
+            &inarray,
+        [[maybe_unused]] Array<OneD, Array<OneD, NekDouble>> &outarray,
+        [[maybe_unused]] const Array<OneD, const Array<OneD, NekDouble>> &pFwd,
+        [[maybe_unused]] const Array<OneD, const Array<OneD, NekDouble>> &pBwd)
     {
-        boost::ignore_unused(inarray, outarray, pFwd, pBwd);
     }
 
     virtual void v_CalcMuDmuDT(
-        const Array<OneD, const Array<OneD, NekDouble>> &inarray,
-        Array<OneD, NekDouble> &mu, Array<OneD, NekDouble> &DmuDT)
+        [[maybe_unused]] const Array<OneD, const Array<OneD, NekDouble>>
+            &inarray,
+        [[maybe_unused]] Array<OneD, NekDouble> &mu,
+        [[maybe_unused]] Array<OneD, NekDouble> &DmuDT)
     {
-        boost::ignore_unused(inarray, mu, DmuDT);
     }
 
     virtual void v_CalcPhysDeriv(
-        const Array<OneD, const Array<OneD, NekDouble>> &inarray,
-        TensorOfArray3D<NekDouble> &qfield)
+        [[maybe_unused]] const Array<OneD, const Array<OneD, NekDouble>>
+            &inarray,
+        [[maybe_unused]] TensorOfArray3D<NekDouble> &qfield)
     {
-        boost::ignore_unused(inarray, qfield);
     }
 
     virtual void v_MinusDiffusionFluxJacPoint(

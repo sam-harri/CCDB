@@ -33,7 +33,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "StagnationInflowBC.h"
-#include <boost/core/ignore_unused.hpp>
 
 using namespace std;
 
@@ -103,10 +102,8 @@ StagnationInflowBC::StagnationInflowBC(
 
 void StagnationInflowBC::v_Apply(Array<OneD, Array<OneD, NekDouble>> &Fwd,
                                  Array<OneD, Array<OneD, NekDouble>> &physarray,
-                                 const NekDouble &time)
+                                 [[maybe_unused]] const NekDouble &time)
 {
-    boost::ignore_unused(time);
-
     const size_t nTracePts  = Fwd[0].size();
     const size_t nVariables = physarray.size();
 

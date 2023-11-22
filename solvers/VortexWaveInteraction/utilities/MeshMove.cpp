@@ -38,8 +38,6 @@
 #include <iomanip>
 #include <iostream>
 
-#include <boost/core/ignore_unused.hpp>
-
 //#include <sstream>
 #include <LibUtilities/BasicConst/NektarUnivTypeDefs.hpp>
 #include <LibUtilities/LinearAlgebra/Lapack.hpp>
@@ -2101,16 +2099,17 @@ void OrderVertices(int nedges, SpatialDomains::MeshGraphSharedPtr graphShPt,
     }
 }
 
-void Computestreakpositions(
-    int npoints, MultiRegions::ExpListSharedPtr streak,
-    Array<OneD, NekDouble> xold_up, Array<OneD, NekDouble> yold_up,
-    Array<OneD, NekDouble> xold_low, Array<OneD, NekDouble> yold_low,
-    Array<OneD, NekDouble> xold_c, Array<OneD, NekDouble> yold_c,
-    Array<OneD, NekDouble> &xc, Array<OneD, NekDouble> &yc, NekDouble cr,
-    bool verts)
+void Computestreakpositions(int npoints, MultiRegions::ExpListSharedPtr streak,
+                            [[maybe_unused]] Array<OneD, NekDouble> xold_up,
+                            Array<OneD, NekDouble> yold_up,
+                            [[maybe_unused]] Array<OneD, NekDouble> xold_low,
+                            Array<OneD, NekDouble> yold_low,
+                            Array<OneD, NekDouble> xold_c,
+                            Array<OneD, NekDouble> yold_c,
+                            Array<OneD, NekDouble> &xc,
+                            Array<OneD, NekDouble> &yc, NekDouble cr,
+                            bool verts)
 {
-    boost::ignore_unused(xold_up, xold_low);
-
     cout << "Computestreakpositions" << endl;
     int nq = streak->GetTotPoints();
     Array<OneD, NekDouble> coord(2);
@@ -2380,8 +2379,9 @@ void GenerateMapEidsv1v2(MultiRegions::ExpListSharedPtr field,
     }
 }
 
-void MappingEVids(Array<OneD, NekDouble> xoldup, Array<OneD, NekDouble> yoldup,
-                  Array<OneD, NekDouble> xolddown,
+void MappingEVids([[maybe_unused]] Array<OneD, NekDouble> xoldup,
+                  Array<OneD, NekDouble> yoldup,
+                  [[maybe_unused]] Array<OneD, NekDouble> xolddown,
                   Array<OneD, NekDouble> yolddown, Array<OneD, NekDouble> xcold,
                   Array<OneD, NekDouble> ycold, Array<OneD, int> Vids_c,
                   SpatialDomains::MeshGraphSharedPtr mesh,
@@ -2390,8 +2390,6 @@ void MappingEVids(Array<OneD, NekDouble> xoldup, Array<OneD, NekDouble> yoldup,
                   Array<OneD, Array<OneD, int>> &Eids_lay,
                   Array<OneD, Array<OneD, int>> &Vids_lay)
 {
-    boost::ignore_unused(xoldup, xolddown);
-
     int nlay_Eids = xcold.size() - 1;
     int nlay_Vids = xcold.size();
 
@@ -3372,13 +3370,13 @@ void MoveLayerNnormpos(int nvertl, int npedge, Array<OneD, NekDouble> xcPhys,
 void MoveOutsidePointsfixedxpos(
     int npedge, SpatialDomains::MeshGraphSharedPtr mesh,
     Array<OneD, NekDouble> xcold, Array<OneD, NekDouble> ycold,
-    Array<OneD, NekDouble> xolddown, Array<OneD, NekDouble> yolddown,
-    Array<OneD, NekDouble> xoldup, Array<OneD, NekDouble> yoldup,
-    Array<OneD, NekDouble> ylaydown, Array<OneD, NekDouble> ylayup,
-    Array<OneD, NekDouble> &xnew, Array<OneD, NekDouble> &ynew)
+    [[maybe_unused]] Array<OneD, NekDouble> xolddown,
+    Array<OneD, NekDouble> yolddown,
+    [[maybe_unused]] Array<OneD, NekDouble> xoldup,
+    Array<OneD, NekDouble> yoldup, Array<OneD, NekDouble> ylaydown,
+    Array<OneD, NekDouble> ylayup, Array<OneD, NekDouble> &xnew,
+    Array<OneD, NekDouble> &ynew)
 {
-    boost::ignore_unused(xolddown, xoldup);
-
     // update vertices coords outside layers region
     int nvertl   = ycold.size();
     int nVertTot = mesh->GetNvertices();
@@ -3436,7 +3434,8 @@ void MoveOutsidePointsfixedxpos(
 
 void MoveOutsidePointsNnormpos(
     int npedge, SpatialDomains::MeshGraphSharedPtr mesh,
-    Array<OneD, NekDouble> xcold, Array<OneD, NekDouble> ycold,
+    [[maybe_unused]] Array<OneD, NekDouble> xcold,
+    [[maybe_unused]] Array<OneD, NekDouble> ycold,
     Array<OneD, NekDouble> xolddown, Array<OneD, NekDouble> yolddown,
     Array<OneD, NekDouble> xoldup, Array<OneD, NekDouble> yoldup,
     Array<OneD, NekDouble> xlaydown, Array<OneD, NekDouble> ylaydown,
@@ -3444,21 +3443,6 @@ void MoveOutsidePointsNnormpos(
     Array<OneD, NekDouble> nxPhys, Array<OneD, NekDouble> nyPhys,
     Array<OneD, NekDouble> &xnew, Array<OneD, NekDouble> &ynew)
 {
-    boost::ignore_unused(xcold, ycold);
-    /*
-         int nq1D =bndfieldup->GetTotPoints();
-         Array<OneD, NekDouble> xlayoldup(nq1D);
-         Array<OneD, NekDouble> xlayolddown(nq1D);
-         Array<OneD, NekDouble> ylayoldup(nq1D);
-         Array<OneD, NekDouble> ylayolddown(nq1D);
-         Array<OneD, NekDouble> zlayoldup(nq1D);
-         Array<OneD, NekDouble> zlayolddown(nq1D);
-         bndfielddown->GetCoords( xlayolddown,  ylayolddown,zlayolddown);
-         bndfieldup->GetCoords( xlayoldup,  ylayoldup,zlayoldup);
-
-         NekDouble xmax = Vmath::Vmax(nq1D, xlayoldup,1);
-         NekDouble xmin = Vmath::Vmin(nq1D, xlayoldup,1);
-    */
     // determine the new verts up/down pos:
     int nvertl = xoldup.size();
     int nedges = nvertl - 1;

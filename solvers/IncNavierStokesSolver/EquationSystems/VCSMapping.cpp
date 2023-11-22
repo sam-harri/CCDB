@@ -557,11 +557,9 @@ void VCSMapping::v_SolvePressure(const Array<OneD, NekDouble> &Forcing)
  */
 void VCSMapping::v_SolveViscous(
     const Array<OneD, const Array<OneD, NekDouble>> &Forcing,
-    const Array<OneD, const Array<OneD, NekDouble>> &inarray,
+    [[maybe_unused]] const Array<OneD, const Array<OneD, NekDouble>> &inarray,
     Array<OneD, Array<OneD, NekDouble>> &outarray, const NekDouble aii_Dt)
 {
-    boost::ignore_unused(inarray);
-
     if (!m_implicitViscous)
     {
         VelocityCorrectionScheme::v_SolveViscous(Forcing, inarray, outarray,

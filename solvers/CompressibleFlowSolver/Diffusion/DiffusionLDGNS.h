@@ -35,8 +35,6 @@
 #ifndef NEKTAR_SOLVERS_COMPRESSIBLEFLOWSOLVER_DIFFUSIONLDGNS
 #define NEKTAR_SOLVERS_COMPRESSIBLEFLOWSOLVER_DIFFUSIONLDGNS
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <CompressibleFlowSolver/Misc/EquationOfState.h>
 #include <LocalRegions/Expansion2D.h>
 #include <LocalRegions/Expansion3D.h>
@@ -49,9 +47,8 @@ namespace Nektar
 class DiffusionLDGNS : public Diffusion
 {
 public:
-    static DiffusionSharedPtr create(std::string diffType)
+    static DiffusionSharedPtr create([[maybe_unused]] std::string diffType)
     {
-        boost::ignore_unused(diffType);
         return DiffusionSharedPtr(new DiffusionLDGNS());
     }
 

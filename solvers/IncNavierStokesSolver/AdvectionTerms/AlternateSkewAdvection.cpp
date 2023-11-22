@@ -60,10 +60,8 @@ AlternateSkewAdvection::~AlternateSkewAdvection()
 
 void AlternateSkewAdvection::v_InitObject(
     LibUtilities::SessionReaderSharedPtr pSession,
-    Array<OneD, MultiRegions::ExpListSharedPtr> fields)
+    [[maybe_unused]] Array<OneD, MultiRegions::ExpListSharedPtr> fields)
 {
-    boost::ignore_unused(fields);
-
     pSession->MatchSolverInfo("ModeType", "SingleMode", m_SingleMode, false);
     pSession->MatchSolverInfo("ModeType", "HalfMode", m_HalfMode, false);
 }
@@ -73,12 +71,11 @@ void AlternateSkewAdvection::v_Advect(
     const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
     const Array<OneD, Array<OneD, NekDouble>> &advVel,
     const Array<OneD, Array<OneD, NekDouble>> &inarray,
-    Array<OneD, Array<OneD, NekDouble>> &outarray, const NekDouble &time,
-    const Array<OneD, Array<OneD, NekDouble>> &pFwd,
-    const Array<OneD, Array<OneD, NekDouble>> &pBwd)
+    Array<OneD, Array<OneD, NekDouble>> &outarray,
+    [[maybe_unused]] const NekDouble &time,
+    [[maybe_unused]] const Array<OneD, Array<OneD, NekDouble>> &pFwd,
+    [[maybe_unused]] const Array<OneD, Array<OneD, NekDouble>> &pBwd)
 {
-    boost::ignore_unused(time, pFwd, pBwd);
-
     // use dimension of Velocity vector to dictate dimension of operation
     int ndim       = advVel.size();
     int nPointsTot = fields[0]->GetNpoints();

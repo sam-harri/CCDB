@@ -34,8 +34,6 @@
 
 #include <iostream>
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <ADRSolver/EquationSystems/UnsteadyAdvectionDiffusion.h>
 #include <LibUtilities/TimeIntegration/TimeIntegrationScheme.h>
 
@@ -442,12 +440,10 @@ void UnsteadyAdvectionDiffusion::GetFluxVectorAdv(
  * @param flux        Resulting flux.
  */
 void UnsteadyAdvectionDiffusion::GetFluxVectorDiff(
-    const Array<OneD, Array<OneD, NekDouble>> &inarray,
+    [[maybe_unused]] const Array<OneD, Array<OneD, NekDouble>> &inarray,
     const Array<OneD, Array<OneD, Array<OneD, NekDouble>>> &qfield,
     Array<OneD, Array<OneD, Array<OneD, NekDouble>>> &viscousTensor)
 {
-    boost::ignore_unused(inarray);
-
     unsigned int nDim              = qfield.size();
     unsigned int nConvectiveFields = qfield[0].size();
     unsigned int nPts              = qfield[0][0].size();
@@ -663,10 +659,9 @@ void UnsteadyAdvectionDiffusion::SubStepAdvection(
  */
 void UnsteadyAdvectionDiffusion::SubStepProjection(
     const Array<OneD, const Array<OneD, NekDouble>> &inarray,
-    Array<OneD, Array<OneD, NekDouble>> &outarray, const NekDouble time)
+    Array<OneD, Array<OneD, NekDouble>> &outarray,
+    [[maybe_unused]] const NekDouble time)
 {
-    boost::ignore_unused(time);
-
     ASSERTL1(inarray.size() == outarray.size(),
              "Inarray and outarray of different sizes ");
 

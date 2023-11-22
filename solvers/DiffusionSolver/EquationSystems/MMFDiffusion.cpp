@@ -36,7 +36,6 @@
 #include <iostream>
 
 #include <boost/algorithm/string.hpp>
-#include <boost/core/ignore_unused.hpp>
 
 #include <DiffusionSolver/EquationSystems/MMFDiffusion.h>
 #include <LibUtilities/BasicUtils/SessionReader.h>
@@ -435,10 +434,8 @@ void MMFDiffusion::DoOdeRhs(
  */
 void MMFDiffusion::v_SetInitialConditions(NekDouble initialtime,
                                           bool dumpInitialConditions,
-                                          const int domain)
+                                          [[maybe_unused]] const int domain)
 {
-    boost::ignore_unused(domain);
-
     int nq = GetTotPoints();
 
     switch (m_TestType)

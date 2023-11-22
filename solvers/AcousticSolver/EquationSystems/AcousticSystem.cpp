@@ -41,7 +41,6 @@
 #define BOOST_ALLOW_DEPRECATED_HEADERS
 #endif
 
-#include <boost/core/ignore_unused.hpp>
 #include <boost/random/normal_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
 
@@ -364,12 +363,11 @@ void AcousticSystem::WallBC(int bcRegion, int cnt,
  * @brief Wall boundary conditions for the AcousticSystem equations.
  */
 void AcousticSystem::WhiteNoiseBC(
-    int bcRegion, int cnt, Array<OneD, Array<OneD, NekDouble>> &Fwd,
+    int bcRegion, int cnt,
+    [[maybe_unused]] Array<OneD, Array<OneD, NekDouble>> &Fwd,
     Array<OneD, Array<OneD, NekDouble>> &BfFwd,
     Array<OneD, Array<OneD, NekDouble>> &physarray)
 {
-    boost::ignore_unused(Fwd);
-
     int id1, id2, nBCEdgePts;
     int nVariables = physarray.size();
 
@@ -473,9 +471,8 @@ void AcousticSystem::WhiteNoiseBC(
  * @return       Standard velocity field.
  */
 Array<OneD, NekDouble> AcousticSystem::v_GetMaxStdVelocity(
-    const NekDouble SpeedSoundFactor)
+    [[maybe_unused]] const NekDouble SpeedSoundFactor)
 {
-    boost::ignore_unused(SpeedSoundFactor);
     int nElm = m_fields[0]->GetExpSize();
 
     Array<OneD, NekDouble> stdV(nElm, 0.0);

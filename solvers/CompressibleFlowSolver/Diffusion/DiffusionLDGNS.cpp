@@ -37,7 +37,6 @@
 #include <iostream>
 
 #include <boost/algorithm/string/predicate.hpp>
-#include <boost/core/ignore_unused.hpp>
 
 #include <LocalRegions/Expansion2D.h>
 
@@ -355,25 +354,24 @@ void DiffusionLDGNS::v_DiffuseCalcDerivative(
 }
 
 void DiffusionLDGNS::v_DiffuseVolumeFlux(
-    const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
+    [[maybe_unused]] const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
     const Array<OneD, Array<OneD, NekDouble>> &inarray,
     TensorOfArray3D<NekDouble> &qfields, TensorOfArray3D<NekDouble> &VolumeFlux,
-    Array<OneD, int> &nonZeroIndex)
+    [[maybe_unused]] Array<OneD, int> &nonZeroIndex)
 {
-    boost::ignore_unused(fields, nonZeroIndex);
     m_fluxVectorNS(inarray, qfields, VolumeFlux);
 }
 
 void DiffusionLDGNS::v_DiffuseTraceFlux(
     const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
-    const Array<OneD, Array<OneD, NekDouble>> &inarray,
-    TensorOfArray3D<NekDouble> &qfields, TensorOfArray3D<NekDouble> &VolumeFlux,
+    [[maybe_unused]] const Array<OneD, Array<OneD, NekDouble>> &inarray,
+    TensorOfArray3D<NekDouble> &qfields,
+    [[maybe_unused]] TensorOfArray3D<NekDouble> &VolumeFlux,
     Array<OneD, Array<OneD, NekDouble>> &TraceFlux,
     const Array<OneD, Array<OneD, NekDouble>> &pFwd,
     const Array<OneD, Array<OneD, NekDouble>> &pBwd,
-    Array<OneD, int> &nonZeroIndex)
+    [[maybe_unused]] Array<OneD, int> &nonZeroIndex)
 {
-    boost::ignore_unused(inarray, VolumeFlux, nonZeroIndex);
     NumericalFluxO2(fields, qfields, TraceFlux, pFwd, pBwd);
 }
 
@@ -423,11 +421,9 @@ void DiffusionLDGNS::ApplyBCsO1(
     const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
     const Array<OneD, Array<OneD, NekDouble>> &inarray,
     const Array<OneD, Array<OneD, NekDouble>> &pFwd,
-    const Array<OneD, Array<OneD, NekDouble>> &pBwd,
+    [[maybe_unused]] const Array<OneD, Array<OneD, NekDouble>> &pBwd,
     Array<OneD, Array<OneD, NekDouble>> &fluxO1)
 {
-    boost::ignore_unused(pBwd);
-
     std::size_t nTracePts = fields[0]->GetTrace()->GetTotPoints();
     std::size_t nScalars  = inarray.size();
 
@@ -732,13 +728,11 @@ void DiffusionLDGNS::NumericalFluxO2(
 void DiffusionLDGNS::ApplyBCsO2(
     const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
     const std::size_t var, const std::size_t dir,
-    const Array<OneD, const NekDouble> &qfield,
+    [[maybe_unused]] const Array<OneD, const NekDouble> &qfield,
     const Array<OneD, const NekDouble> &qFwd,
-    const Array<OneD, const NekDouble> &qBwd,
+    [[maybe_unused]] const Array<OneD, const NekDouble> &qBwd,
     Array<OneD, NekDouble> &penaltyflux)
 {
-    boost::ignore_unused(qfield, qBwd);
-
     std::size_t cnt         = 0;
     std::size_t nBndRegions = fields[var]->GetBndCondExpansions().size();
     // Loop on the boundary regions to apply appropriate bcs

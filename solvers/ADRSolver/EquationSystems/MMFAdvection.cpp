@@ -36,7 +36,6 @@
 #include <iostream>
 
 #include <boost/algorithm/string.hpp>
-#include <boost/core/ignore_unused.hpp>
 
 #include <ADRSolver/EquationSystems/MMFAdvection.h>
 #include <LibUtilities/BasicUtils/Timer.h>
@@ -392,10 +391,9 @@ Array<OneD, NekDouble> &MMFAdvection::GetNormalVelocity()
  */
 void MMFAdvection::DoOdeRhs(
     const Array<OneD, const Array<OneD, NekDouble>> &inarray,
-    Array<OneD, Array<OneD, NekDouble>> &outarray, const NekDouble time)
+    Array<OneD, Array<OneD, NekDouble>> &outarray,
+    [[maybe_unused]] const NekDouble time)
 {
-    boost::ignore_unused(time);
-
     int i;
     int nvariables = inarray.size();
     int npoints    = GetNpoints();
@@ -821,10 +819,8 @@ NekDouble MMFAdvection::ComputeCirculatingArclength(const NekDouble zlevel,
 
 void MMFAdvection::v_SetInitialConditions(const NekDouble initialtime,
                                           bool dumpInitialConditions,
-                                          const int domain)
+                                          [[maybe_unused]] const int domain)
 {
-    boost::ignore_unused(domain);
-
     int nq = m_fields[0]->GetNpoints();
 
     Array<OneD, NekDouble> u(nq);
@@ -1122,12 +1118,10 @@ void MMFAdvection::ComputeveldotMF(
     }
 }
 
-void MMFAdvection::v_EvaluateExactSolution(unsigned int field,
+void MMFAdvection::v_EvaluateExactSolution([[maybe_unused]] unsigned int field,
                                            Array<OneD, NekDouble> &outfield,
                                            const NekDouble time)
 {
-    boost::ignore_unused(field);
-
     switch (m_TestType)
     {
         case eAdvectionBell:

@@ -42,7 +42,6 @@
 #define BOOST_ALLOW_DEPRECATED_HEADERS
 #endif
 
-#include <boost/core/ignore_unused.hpp>
 #include <boost/random/mersenne_twister.hpp>
 
 #include <SolverUtils/Advection/Advection.h>
@@ -94,10 +93,10 @@ protected:
         Array<OneD, Array<OneD, NekDouble>> &outarray, const NekDouble time);
 
     virtual void v_AddLinTerm(
-        const Array<OneD, const Array<OneD, NekDouble>> &inarray,
-        Array<OneD, Array<OneD, NekDouble>> &outarray)
+        [[maybe_unused]] const Array<OneD, const Array<OneD, NekDouble>>
+            &inarray,
+        [[maybe_unused]] Array<OneD, Array<OneD, NekDouble>> &outarray)
     {
-        boost::ignore_unused(inarray, outarray);
     }
 
     virtual void v_GetFluxVector(
