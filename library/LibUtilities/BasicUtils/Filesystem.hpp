@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 //
-// File: FileSystem.h
+// File: Filesystem.hpp
 //
 // For more information, please see: http://www.nektar.info
 //
@@ -28,22 +28,62 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 //
-// Description:
+// Description: Header file to simplify use of <filesystem>
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef NEKTAR_LIB_UTILITIES_FILESYSTEM_HPP
-#define NEKTAR_LIB_UTILITIES_FILESYSTEM_HPP
+#ifndef NEKTAR_LIBUTILITIES_FILESYSTEM_HPP
+#define NEKTAR_LIBUTILITIES_FILESYSTEM_HPP
 
-#include <LibUtilities/LibUtilitiesDeclspec.h>
-#include <boost/filesystem.hpp>
-#include <string>
+#ifdef NEKTAR_USE_GNU_FS_EXPERIMENTAL
+#include <experimental/filesystem>
+namespace fs = std::experimental::filesystem;
+#else
+#include <filesystem>
+namespace fs = std::filesystem;
+#endif
 
-namespace fs = boost::filesystem;
+#include <algorithm>
+#include <chrono>
+#include <random>
 
 namespace Nektar::LibUtilities
 {
-LIB_UTILITIES_EXPORT std::string PortablePath(
-    const boost::filesystem::path &path);
+
+/**
+ * \brief create portable path on different platforms for std::filesystem path.
+ */
+static inline std::string PortablePath(const fs::path &path)
+{
+    return fs::path(path).make_preferred().string();
+}
+
+/**
+ * @brief Create a unique (random) path, based on an input stem string. The
+ * returned string is a filename or directory that does not exist.
+ *
+ * Given @p specFileStem as a parameter, this returns a string in the form
+ * `tmp_<stem>_abcdef` where the final 6 characters are random characters
+ * and digits.
+ */
+static inline fs::path UniquePath(std::string specFileStem)
+{
+    std::random_device rd;
+    std::mt19937 generator(rd());
+    fs::path tmp;
+
+    do
+    {
+        std::string chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                            "abcdefghijklmnopqrstuvwxyz";
+
+        std::shuffle(chars.begin(), chars.end(), generator);
+        tmp = fs::path("tmp_" + specFileStem + "_" + chars.substr(0, 6));
+    } while (fs::exists(tmp));
+
+    return tmp;
+}
+
 } // namespace Nektar::LibUtilities
+
 #endif

@@ -36,7 +36,7 @@
 #define NEKTAR_LIB_UTILITIES_BASIC_UTILS_FIELDIOHDF5_H
 
 #include <LibUtilities/BasicUtils/FieldIO.h>
-#include <LibUtilities/BasicUtils/FileSystem.h>
+#include <LibUtilities/BasicUtils/Filesystem.hpp>
 #include <LibUtilities/BasicUtils/H5.h>
 
 namespace Nektar::LibUtilities

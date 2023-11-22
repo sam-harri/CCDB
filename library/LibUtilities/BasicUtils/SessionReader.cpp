@@ -53,7 +53,7 @@
 #include <LibUtilities/BasicUtils/CheckedCast.hpp>
 #include <LibUtilities/BasicUtils/Equation.h>
 #include <LibUtilities/BasicUtils/ErrorUtil.hpp>
-#include <LibUtilities/BasicUtils/FileSystem.h>
+#include <LibUtilities/BasicUtils/Filesystem.hpp>
 #include <LibUtilities/BasicUtils/ParseUtils.h>
 #include <LibUtilities/Interpreter/Interpreter.h>
 #include <LibUtilities/Memory/NekMemoryManager.hpp>
@@ -287,7 +287,7 @@ void SessionReader::InitSession(const std::vector<std::string> &filenames)
     {
         optfile =
             m_cmdLineOptions.find("use-opt-file")->second.as<std::string>();
-        exists = (bool)boost::filesystem::exists(optfile.c_str());
+        exists = fs::exists(optfile.c_str());
         ASSERTL0(exists, "A valid .opt file was not specified "
                          "with the --use-opt-file command line option");
 
@@ -301,7 +301,7 @@ void SessionReader::InitSession(const std::vector<std::string> &filenames)
     {
         // check for opt file
         optfile = m_sessionName.substr(0, m_sessionName.find("_xml/")) + ".opt";
-        exists  = (bool)boost::filesystem::exists(optfile.c_str());
+        exists  = fs::exists(optfile.c_str());
 
         // For Paralell-in-Time
         if (exists && m_comm->IsParallelInTime())
@@ -410,7 +410,7 @@ void SessionReader::TestSharedFilesystem()
         }
         m_comm->Block();
 
-        int exists = (bool)boost::filesystem::exists("shared-fs-testfile");
+        int exists = fs::exists("shared-fs-testfile");
         m_comm->AllReduce(exists, LibUtilities::ReduceSum);
 
         m_sharedFilesystem = (exists == m_comm->GetSize());

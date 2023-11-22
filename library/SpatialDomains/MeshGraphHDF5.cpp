@@ -34,10 +34,10 @@
 
 #include <boost/algorithm/string.hpp>
 #include <boost/core/ignore_unused.hpp>
-#include <boost/filesystem.hpp>
 #include <tinyxml.h>
 #include <type_traits>
 
+#include <LibUtilities/BasicUtils/Filesystem.hpp>
 #include <LibUtilities/BasicUtils/ParseUtils.h>
 #include <LibUtilities/BasicUtils/Timer.h>
 #include <SpatialDomains/MeshGraphHDF5.h>
@@ -1606,7 +1606,7 @@ void MeshGraphHDF5::v_WriteGeometry(
     TiXmlElement *root;
     TiXmlElement *geomTag;
 
-    if (boost::filesystem::exists(filenameXml.c_str()))
+    if (fs::exists(filenameXml.c_str()))
     {
         ifstream file(filenameXml.c_str());
         file >> (*doc);

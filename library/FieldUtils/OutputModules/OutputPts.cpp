@@ -40,7 +40,7 @@ using namespace std;
 #include <boost/core/ignore_unused.hpp>
 
 #include <LibUtilities/BasicUtils/CsvIO.h>
-#include <LibUtilities/BasicUtils/FileSystem.h>
+#include <LibUtilities/BasicUtils/Filesystem.hpp>
 #include <LibUtilities/BasicUtils/PtsIO.h>
 
 #include "OutputPts.h"
@@ -72,7 +72,7 @@ void OutputPts::v_OutputFromPts(po::variables_map &vm)
     // Extract the output filename and extension
     string filename = m_config["outfile"].as<string>();
 
-    if (boost::filesystem::path(filename).extension() == ".csv")
+    if (fs::path(filename).extension() == ".csv")
     {
         LibUtilities::CsvIO csvIO(m_f->m_comm);
         csvIO.Write(filename, m_f->m_fieldPts);

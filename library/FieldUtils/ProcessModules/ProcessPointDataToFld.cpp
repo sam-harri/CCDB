@@ -94,11 +94,11 @@ void ProcessPointDataToFld::v_Process(po::variables_map &vm)
         LibUtilities::GetCommFactory().CreateInstance("Serial", 0, 0);
 
     // Determine file format from file extension
-    if (boost::filesystem::path(inFile).extension() == ".pts")
+    if (fs::path(inFile).extension() == ".pts")
     {
         LibUtilities::PtsIO(c).Import(inFile, fieldPts);
     }
-    else if (boost::filesystem::path(inFile).extension() == ".csv")
+    else if (fs::path(inFile).extension() == ".csv")
     {
         LibUtilities::CsvIO(c).Import(inFile, fieldPts);
     }

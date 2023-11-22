@@ -35,7 +35,6 @@
 #ifndef NEKTAR_TESTER_TESTDATA
 #define NEKTAR_TESTER_TESTDATA
 
-#include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
 
 #include <string>
@@ -43,7 +42,8 @@
 
 #include <tinyxml.h>
 
-namespace fs = boost::filesystem;
+#include <LibUtilities/BasicUtils/Filesystem.hpp>
+
 namespace po = boost::program_options;
 
 namespace Nektar

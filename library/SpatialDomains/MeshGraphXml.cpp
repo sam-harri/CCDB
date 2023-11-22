@@ -40,7 +40,7 @@
 #include <SpatialDomains/Movement/Movement.h>
 
 #include <LibUtilities/BasicUtils/FieldIOXml.h>
-#include <LibUtilities/BasicUtils/FileSystem.h>
+#include <LibUtilities/BasicUtils/Filesystem.hpp>
 #include <LibUtilities/BasicUtils/ParseUtils.h>
 #include <LibUtilities/Interpreter/Interpreter.h>
 
@@ -2816,11 +2816,11 @@ void MeshGraphXml::WriteXMLGeometry(std::string outname,
     // this is xml so we are going to write a directory with lots of
     // xml files
     string dirname = outname + "_xml";
-    boost::filesystem::path pdirname(dirname);
+    fs::path pdirname(dirname);
 
-    if (!boost::filesystem::is_directory(dirname))
+    if (!fs::is_directory(dirname))
     {
-        boost::filesystem::create_directory(dirname);
+        fs::create_directory(dirname);
     }
 
     ASSERTL0(elements.size() == partitions.size(),
@@ -3249,9 +3249,9 @@ void MeshGraphXml::WriteXMLGeometry(std::string outname,
 
         boost::format pad("P%1$07d.xml");
         pad % partitions[i];
-        boost::filesystem::path pFilename(pad.str());
+        fs::path pFilename(pad.str());
 
-        boost::filesystem::path fullpath = pdirname / pFilename;
+        fs::path fullpath = pdirname / pFilename;
         doc.SaveFile(LibUtilities::PortablePath(fullpath));
     }
 }

@@ -57,6 +57,8 @@
 #include <Metric.h>
 #include <TestData.h>
 
+#include <LibUtilities/BasicUtils/Filesystem.hpp>
+
 #include <boost/program_options.hpp>
 #include <boost/thread.hpp>
 
@@ -67,13 +69,6 @@ using namespace Nektar;
 
 // Define some namespace aliases
 namespace po = boost::program_options;
-
-std::string PortablePath(const boost::filesystem::path &path)
-{
-    boost::filesystem::path temp = path;
-    temp.make_preferred();
-    return temp.string();
-}
 
 int main(int argc, char *argv[])
 {
@@ -154,8 +149,7 @@ int main(int argc, char *argv[])
     // Temporary master directory to create which holds master output and error
     // files, and the working directories for each run
     const fs::path masterDir =
-        fs::current_path() / fs::path("tmp_" + specFileStem + "_" +
-                                      fs::unique_path("%%%%%%").string());
+        fs::current_path() / LibUtilities::UniquePath(specFileStem);
 
     // The current directory
     const fs::path startDir = fs::current_path();
@@ -417,7 +411,7 @@ int main(int argc, char *argv[])
                     command += "@PYTHON_EXECUTABLE@ ";
                 }
 
-                command += PortablePath(execPath);
+                command += LibUtilities::PortablePath(execPath);
                 if (HaveOptFile)
                 {
                     command += " --use-opt-file test.opt ";

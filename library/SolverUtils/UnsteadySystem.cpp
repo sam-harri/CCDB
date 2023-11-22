@@ -39,6 +39,7 @@ using namespace std;
 #include <boost/core/ignore_unused.hpp>
 #include <boost/format.hpp>
 
+#include <LibUtilities/BasicUtils/Filesystem.hpp>
 #include <LibUtilities/BasicUtils/Timer.h>
 #include <MultiRegions/AssemblyMap/AssemblyMapDG.h>
 #include <SolverUtils/UnsteadySystem.h>
@@ -406,9 +407,9 @@ void UnsteadySystem::v_DoSolve()
             // if it exists. Communicates the abort.
             if (m_session->GetComm()->GetSpaceComm()->GetRank() == 0)
             {
-                if (boost::filesystem::exists(abortFile))
+                if (fs::exists(abortFile))
                 {
-                    boost::filesystem::remove(abortFile);
+                    fs::remove(abortFile);
                     abortFlags[1] = 1;
                 }
             }

@@ -36,7 +36,7 @@
 #include "MeshGraphXmlCompressed.h"
 
 #include <LibUtilities/BasicUtils/CompressData.h>
-#include <LibUtilities/BasicUtils/FileSystem.h>
+#include <LibUtilities/BasicUtils/Filesystem.hpp>
 #include <LibUtilities/BasicUtils/ParseUtils.h>
 
 #include <LibUtilities/Interpreter/Interpreter.h>

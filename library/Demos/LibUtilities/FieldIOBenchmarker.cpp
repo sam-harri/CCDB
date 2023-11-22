@@ -34,11 +34,12 @@
 
 #include <LibUtilities/BasicUtils/FieldIO.h>
 #include <LibUtilities/BasicUtils/FieldIOXml.h>
-#include <LibUtilities/BasicUtils/FileSystem.h>
+#include <LibUtilities/BasicUtils/Filesystem.hpp>
 #include <LibUtilities/Communication/CommMpi.h>
 #include <boost/algorithm/string.hpp>
 #include <boost/program_options.hpp>
 #include <string>
+#include <system_error>
 #include <unordered_set>
 
 typedef std::unordered_set<int> IntSet;
@@ -46,8 +47,7 @@ typedef std::unordered_set<int> IntSet;
 using namespace Nektar;
 using namespace LibUtilities;
 
-namespace po    = boost::program_options;
-namespace berrc = boost::system::errc;
+namespace po = boost::program_options;
 
 typedef std::vector<FieldDefinitionsSharedPtr> DefVec;
 typedef std::vector<std::vector<NekDouble>> DatVec;
@@ -517,7 +517,7 @@ Results TestWrite(Experiment &exp)
         }
         catch (fs::filesystem_error &e)
         {
-            ASSERTL0(e.code().value() == berrc::no_such_file_or_directory,
+            ASSERTL0(e.code() == std::errc::no_such_file_or_directory,
                      "Filesystem error: " + std::string(e.what()));
         }
 

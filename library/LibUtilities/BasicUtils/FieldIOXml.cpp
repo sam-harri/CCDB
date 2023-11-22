@@ -42,8 +42,6 @@
 #include <mpi.h>
 #endif
 
-namespace berrc = boost::system::errc;
-
 namespace Nektar::LibUtilities
 {
 

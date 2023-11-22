@@ -12,8 +12,8 @@ PROJECT(ExampleSolver C CXX)
 # Finds Nektar++. This may introduce other dependencies, such as Boost.
 FIND_PACKAGE(Nektar++ REQUIRED)
 
-# Require C++11
-SET(CMAKE_CXX_STANDARD 11)
+# Require C++17
+SET(CMAKE_CXX_STANDARD 17)
 SET(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Add various definitions from Nektar++ CMake file.

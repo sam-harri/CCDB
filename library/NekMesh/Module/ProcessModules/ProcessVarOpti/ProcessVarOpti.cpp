@@ -51,7 +51,6 @@
 #include <LibUtilities/Foundations/NodalUtil.h>
 
 #include <boost/algorithm/string.hpp>
-#include <boost/filesystem.hpp>
 
 // Including Timer.h includes Windows.h, which causes GetJob to be set as a
 // macro for some reason.

@@ -38,7 +38,7 @@
 
 #include <LibUtilities/BasicConst/GitRevision.h>
 #include <LibUtilities/BasicUtils/FieldIO.h>
-#include <LibUtilities/BasicUtils/FileSystem.h>
+#include <LibUtilities/BasicUtils/Filesystem.hpp>
 
 #include <chrono>
 #include <ctime>
@@ -46,6 +46,7 @@
 #include <iomanip>
 #include <ios>
 #include <set>
+#include <system_error>
 
 #ifdef NEKTAR_USE_MPI
 #include <mpi.h>
@@ -55,8 +56,7 @@
 #define NEKTAR_VERSION "Unknown"
 #endif
 
-namespace berrc = boost::system::errc;
-namespace ip    = boost::asio::ip;
+namespace ip = boost::asio::ip;
 
 namespace Nektar::LibUtilities
 {
@@ -450,7 +450,7 @@ std::string FieldIO::SetUpOutput(const std::string outname, bool perRank,
         }
         catch (fs::filesystem_error &e)
         {
-            ASSERTL0(e.code().value() == berrc::no_such_file_or_directory,
+            ASSERTL0(e.code() == std::errc::no_such_file_or_directory,
                      "Filesystem error: " + std::string(e.what()));
         }
     }
@@ -497,7 +497,7 @@ std::string FieldIO::SetUpOutput(const std::string outname, bool perRank,
             }
             catch (fs::filesystem_error &e)
             {
-                ASSERTL0(e.code().value() == berrc::no_such_file_or_directory,
+                ASSERTL0(e.code() == std::errc::no_such_file_or_directory,
                          "Filesystem error: " + std::string(e.what()));
             }
         }
@@ -513,7 +513,7 @@ std::string FieldIO::SetUpOutput(const std::string outname, bool perRank,
             }
             catch (fs::filesystem_error &e)
             {
-                ASSERTL0(e.code().value() == berrc::no_such_file_or_directory,
+                ASSERTL0(e.code() == std::errc::no_such_file_or_directory,
                          "Filesystem error: " + std::string(e.what()));
             }
         }
