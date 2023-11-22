@@ -21,6 +21,7 @@ v5.5.0
 - Add Robin BC to xxt full solver (!1679)
 - Update Parareal file output and tidy-up Parareal/PFASST interpolation (!1678)
 - Move from `boost::filesystem` to `std::filesystem` (!1674)
+- Use `[[deprecated]]` attribute (!1682)
 
 **ADRSolver**
 - Add support for spatially-constant, but variable direction, diffusion to
