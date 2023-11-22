@@ -44,7 +44,7 @@
 #include <mpi.h>
 #endif
 
-#include <LibUtilities/BasicUtils/FileSystem.h>
+#include <LibUtilities/BasicUtils/Filesystem.hpp>
 #include <LibUtilities/BasicUtils/ParseUtils.h>
 
 using namespace std;

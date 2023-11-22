@@ -50,7 +50,7 @@
 #include <tinyxml.h>
 
 #include <LibUtilities/BasicUtils/FieldIO.h>
-#include <LibUtilities/BasicUtils/FileSystem.h>
+#include <LibUtilities/BasicUtils/Filesystem.hpp>
 #include <LibUtilities/BasicUtils/ParseUtils.h>
 #include <LibUtilities/BasicUtils/ShapeType.hpp>
 

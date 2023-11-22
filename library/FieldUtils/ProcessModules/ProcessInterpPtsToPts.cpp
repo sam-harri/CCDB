@@ -139,7 +139,7 @@ void ProcessInterpPtsToPts::CreateFieldPts(po::variables_map &vm)
     {
         string inFile = m_config["topts"].as<string>();
 
-        if (boost::filesystem::path(inFile).extension() == ".pts")
+        if (fs::path(inFile).extension() == ".pts")
         {
             LibUtilities::PtsIOSharedPtr ptsIO =
                 MemoryManager<LibUtilities::PtsIO>::AllocateSharedPtr(
@@ -147,7 +147,7 @@ void ProcessInterpPtsToPts::CreateFieldPts(po::variables_map &vm)
 
             ptsIO->Import(inFile, m_f->m_fieldPts);
         }
-        else if (boost::filesystem::path(inFile).extension() == ".csv")
+        else if (fs::path(inFile).extension() == ".csv")
         {
             LibUtilities::CsvIOSharedPtr csvIO =
                 MemoryManager<LibUtilities::CsvIO>::AllocateSharedPtr(

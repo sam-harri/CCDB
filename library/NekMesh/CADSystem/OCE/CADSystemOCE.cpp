@@ -32,6 +32,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
+#include <LibUtilities/BasicUtils/Filesystem.hpp>
 #include <LibUtilities/BasicUtils/ParseUtils.h>
 
 #include <NekMesh/CADSystem/CADSurf.h>
@@ -44,7 +45,6 @@
 #include <NekMesh/CADSystem/OCE/TransfiniteSurface.h>
 
 #include <boost/algorithm/string.hpp>
-#include <boost/filesystem.hpp>
 
 #include <ElCLib.hxx>
 #include <gce_MakeCirc.hxx>
@@ -183,7 +183,7 @@ bool CADSystemOCE::LoadCAD()
     {
         // not a naca profile behave normally
         // could be a geo
-        if (boost::filesystem::path(m_name).extension() == ".geo")
+        if (fs::path(m_name).extension() == ".geo")
         {
             m_shape = BuildGeo(m_name);
         }

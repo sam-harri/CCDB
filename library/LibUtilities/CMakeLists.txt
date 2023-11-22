@@ -14,7 +14,7 @@ SET(BasicUtilsHeaders
     ./BasicUtils/Equation.h
     ./BasicUtils/FieldIO.h
     ./BasicUtils/FieldIOXml.h
-    ./BasicUtils/FileSystem.h
+    ./BasicUtils/Filesystem.hpp
     ./BasicUtils/ErrorUtil.hpp
     ./BasicUtils/Interpolator.h
     ./BasicUtils/HashUtils.hpp
@@ -49,7 +49,6 @@ SET(BasicUtilsSources
 ./BasicUtils/ErrorUtil.cpp
 ./BasicUtils/FieldIO.cpp
 ./BasicUtils/FieldIOXml.cpp
-./BasicUtils/FileSystem.cpp
 ./BasicUtils/Interpolator.cpp
 ./BasicUtils/ParseUtils.cpp
 ./BasicUtils/PtsField.cpp
@@ -396,6 +395,11 @@ TARGET_INCLUDE_DIRECTORIES(tinysimd INTERFACE SimdLib)
 
 ADD_DEPENDENCIES(LibUtilities boost tinyxml-2.6.2 zlib-1.2.9 tinysimd)
 
+# Older gcc versions (6 <= version < 9) require libstdc++fs.
+IF (DEFINED NEKTAR_FILESYSTEM_LIBRARY)
+    TARGET_LINK_LIBRARIES(LibUtilities LINK_PRIVATE ${NEKTAR_FILESYSTEM_LIBRARY})
+ENDIF()
+
 ### Libraries needed specifically by LibUtilities ###
 
 # CWIPI
@@ -423,10 +427,9 @@ TARGET_LINK_LIBRARIES(LibUtilities LINK_PUBLIC
   ${Boost_THREAD_LIBRARY}
   ${Boost_IOSTREAMS_LIBRARY}
   ${Boost_PROGRAM_OPTIONS_LIBRARY}
-  ${Boost_FILESYSTEM_LIBRARY}
   ${Boost_SYSTEM_LIBRARY}
   ${Boost_REGEX_LIBRARY}
-    optimized ${ZLIB_LIBRARIES} debug ${ZLIB_LIBRARIES_DEBUG}
+  optimized ${ZLIB_LIBRARIES} debug ${ZLIB_LIBRARIES_DEBUG}
 )
 
 # TinyXML

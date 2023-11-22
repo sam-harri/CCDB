@@ -32,7 +32,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <boost/filesystem.hpp>
+#include <LibUtilities/BasicUtils/Filesystem.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
 
 #include "Module.h"
@@ -80,7 +80,7 @@ void InputModule::OpenStream()
     string filename = m_config["infile"].as<string>();
 
     // Check to see if filename exists.
-    if (!boost::filesystem::exists(filename))
+    if (!fs::exists(filename))
     {
         m_log(FATAL) << "Unable to read file: '" << filename << "'"
                      << std::endl;
@@ -151,7 +151,7 @@ bool OutputModule::CheckOverwrite(const std::string &filename)
         return true;
     }
 
-    if (!boost::filesystem::exists(filename))
+    if (!fs::exists(filename))
     {
         return true;
     }

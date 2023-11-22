@@ -38,8 +38,6 @@
 #include <functional>
 #include <unordered_set>
 
-namespace berrc = boost::system::errc;
-
 namespace Nektar::LibUtilities
 {
 namespace H5

@@ -50,7 +50,7 @@
 #include <LocalRegions/Expansion3D.h>
 #include <SolverUtils/Filters/Filter.h>
 
-#include <LibUtilities/BasicUtils/FileSystem.h>
+#include <LibUtilities/BasicUtils/Filesystem.hpp>
 #include <LibUtilities/BasicUtils/PtsIO.h>
 #include <LibUtilities/Polylib/Polylib.h>
 

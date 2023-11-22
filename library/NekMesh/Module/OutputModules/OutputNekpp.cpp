@@ -40,13 +40,13 @@ using namespace std;
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/core/ignore_unused.hpp>
-#include <boost/filesystem.hpp>
 #include <boost/iostreams/copy.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
 #include <boost/iostreams/filtering_streambuf.hpp>
 #include <boost/thread.hpp>
 namespace io = boost::iostreams;
 
+#include <LibUtilities/BasicUtils/Filesystem.hpp>
 #include <NekMesh/MeshElements/Element.h>
 #include <SpatialDomains/MeshGraph.h>
 #include <SpatialDomains/PointGeom.h>
@@ -200,12 +200,12 @@ void OutputNekpp::Process()
     std::string type = "XmlCompressed";
 
     // Compress output and append .gz extension
-    if (boost::filesystem::path(filename).extension() == ".xml" &&
+    if (fs::path(filename).extension() == ".xml" &&
         m_config["uncompress"].beenSet)
     {
         type = "Xml";
     }
-    else if (boost::filesystem::path(filename).extension() == ".nekg")
+    else if (fs::path(filename).extension() == ".nekg")
     {
         type = "HDF5";
     }

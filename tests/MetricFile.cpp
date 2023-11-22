@@ -39,6 +39,8 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/core/ignore_unused.hpp>
 
+#include <LibUtilities/BasicUtils/Filesystem.hpp>
+
 #include <MetricFile.h>
 #include <sha1.h>
 
@@ -104,7 +106,7 @@ std::string MetricFile::CalculateHash(std::string pfilename)
             // load all them into the
             for (int i = 0; i < dirfiles.size(); ++i)
             {
-                std::string infile = PortablePath(dirfiles[i]);
+                std::string infile = LibUtilities::PortablePath(dirfiles[i]);
                 std::ifstream file(infile.c_str());
                 ASSERTL0(file.good(), "Unable to open file: " + infile);
                 file >> (*xmlFldFile);

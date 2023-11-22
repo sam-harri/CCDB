@@ -31,11 +31,12 @@
 // Description: Unit test for varcoeff hashing
 //
 ///////////////////////////////////////////////////////////////////////////////
+
+#include <LibUtilities/BasicUtils/Filesystem.hpp>
+
 #include <MultiRegions/ContField.h>
 #include <MultiRegions/MultiRegions.hpp>
 
-#include <boost/filesystem.hpp>
-#include <boost/filesystem/fstream.hpp>
 #include <boost/test/unit_test.hpp>
 
 namespace Nektar::VarcoeffHashingTest
@@ -43,7 +44,7 @@ namespace Nektar::VarcoeffHashingTest
 using namespace MultiRegions;
 
 // Forward declare global variables for all tests
-boost::filesystem::path pathGlobal;
+fs::path pathGlobal;
 LibUtilities::SessionReaderSharedPtr lsession;
 MultiRegions::ContFieldSharedPtr contfield, forcefield;
 
@@ -163,16 +164,15 @@ static const std::string sessionfile =
  * Create the session file at working directory
  * TODO Use session-free approach to save effort on this test
  */
-void createSessionFile(boost::filesystem::path &ph)
+void createSessionFile(fs::path &ph)
 {
     // Create temporary directory
-    using namespace boost::filesystem;
-    ph = temp_directory_path() / unique_path();
-    create_directories(ph);
+    ph = fs::temp_directory_path() / LibUtilities::UniquePath("varctest");
+    fs::create_directories(ph);
 
     // Create file in working directory
     ph /= "TestVarcoeffHashing.xml"; // append filename
-    boost::filesystem::ofstream sfile(ph);
+    std::ofstream sfile(ph);
     sfile << sessionfile;
     sfile.close();
 }
@@ -182,7 +182,7 @@ void createSessionFile(boost::filesystem::path &ph)
  * Read session file, setup contfield and
  * auxilliary functions for forcing and varcoeffs
  */
-void setupContFieldSolve(boost::filesystem::path &ph,
+void setupContFieldSolve(fs::path &ph,
                          LibUtilities::SessionReaderSharedPtr &Session,
                          MultiRegions::ContFieldSharedPtr &Exp,
                          MultiRegions::ContFieldSharedPtr &Fce)

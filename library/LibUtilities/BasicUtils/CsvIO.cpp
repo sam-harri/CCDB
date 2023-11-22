@@ -48,7 +48,7 @@
 #endif
 
 #include "ErrorUtil.hpp"
-#include <LibUtilities/BasicUtils/FileSystem.h>
+#include <LibUtilities/BasicUtils/Filesystem.hpp>
 #include <LibUtilities/BasicUtils/ParseUtils.h>
 
 namespace Nektar::LibUtilities

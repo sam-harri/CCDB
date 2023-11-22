@@ -11,7 +11,7 @@ MESSAGE(STATUS "Searching for Boost:")
 
 # Minimum version and boost libraries required
 SET(MIN_VER "1.60.0")
-SET(NEEDED_BOOST_LIBS thread iostreams filesystem system program_options regex)
+SET(NEEDED_BOOST_LIBS thread iostreams system program_options regex)
 
 SET(Boost_NO_BOOST_CMAKE ON)
 IF( BOOST_ROOT )

@@ -32,11 +32,12 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-#include "ProcessLoadCAD.h"
+#include <LibUtilities/BasicUtils/Filesystem.hpp>
 #include <NekMesh/CADSystem/CADSystem.h>
 
 #include <boost/algorithm/string.hpp>
-#include <boost/filesystem.hpp>
+
+#include "ProcessLoadCAD.h"
 
 using namespace std;
 namespace Nektar::NekMesh
@@ -70,7 +71,7 @@ void ProcessLoadCAD::Process()
 
     m_log(VERBOSE) << "Loading CAD for: '" << name << "'" << endl;
 
-    if (boost::filesystem::path(name).extension() == ".fbm")
+    if (fs::path(name).extension() == ".fbm")
     {
         m_mesh->m_cad = GetEngineFactory().CreateInstance("cfi", name);
 

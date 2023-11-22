@@ -40,6 +40,17 @@ ENDIF()
 # Helps organize projects in IDEs.
 SET_PROPERTY(GLOBAL PROPERTY USE_FOLDERS ON)
 
+# Determine support for std::filesystem: older gcc versions support this
+# when using experimental and linking against libstdc++fs library.
+IF (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    IF(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 5.99 AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.0)
+        SET(NEKTAR_FILESYSTEM_LIBRARY "stdc++fs")
+        IF(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 8.0)
+            ADD_DEFINITIONS(-DNEKTAR_USE_GNU_FS_EXPERIMENTAL)
+        ENDIF()
+    ENDIF()
+ENDIF()
+
 # Extract the version number from the VERSION file and set in CMake
 # The format of this file must be X.X.X
 FILE(STRINGS "VERSION" NEKVER)

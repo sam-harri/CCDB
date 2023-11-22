@@ -37,7 +37,7 @@
 using namespace std;
 
 #include "OutputFileBase.h"
-#include <LibUtilities/BasicUtils/FileSystem.h>
+#include <LibUtilities/BasicUtils/Filesystem.hpp>
 #include <boost/format.hpp>
 #include <iomanip>
 

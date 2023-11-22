@@ -38,7 +38,7 @@
 #include <boost/algorithm/string/predicate.hpp>
 
 #include <LibUtilities/BasicUtils/FieldIO.h>
-#include <LibUtilities/BasicUtils/FileSystem.h>
+#include <LibUtilities/BasicUtils/Filesystem.hpp>
 
 namespace Nektar::LibUtilities
 {

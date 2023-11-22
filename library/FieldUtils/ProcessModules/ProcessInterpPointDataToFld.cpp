@@ -96,14 +96,14 @@ void ProcessInterpPointDataToFld::v_Process(po::variables_map &vm)
     }
     m_f->m_exp[0]->GetCoords(intFields[0], intFields[1], intFields[2]);
 
-    if (boost::filesystem::path(inFile).extension() == ".pts")
+    if (fs::path(inFile).extension() == ".pts")
     {
         LibUtilities::PtsIOSharedPtr ptsIO =
             MemoryManager<LibUtilities::PtsIO>::AllocateSharedPtr(m_f->m_comm);
 
         ptsIO->Import(inFile, fieldPts);
     }
-    else if (boost::filesystem::path(inFile).extension() == ".csv")
+    else if (fs::path(inFile).extension() == ".csv")
     {
         LibUtilities::CsvIOSharedPtr csvIO =
             MemoryManager<LibUtilities::CsvIO>::AllocateSharedPtr(m_f->m_comm);
