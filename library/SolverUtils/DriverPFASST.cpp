@@ -166,16 +166,16 @@ void DriverPFASST::v_Execute(std::ostream &out)
                  timeLevel--)
             {
                 // Correct solution and residual.
-                SendToNextProc(m_SDCSolver[timeLevel - 1]
+                /*SendToNextProc(m_SDCSolver[timeLevel - 1]
                                    ->UpdateLastQuadratureSolutionVector(),
-                               convergenceCurr);
+                               convergenceCurr);*/
                 CorrectSolution(timeLevel - 1);
                 CorrectResidual(timeLevel - 1);
-                RecvFromPreviousProc(
+                /*RecvFromPreviousProc(
                     m_SDCSolver[timeLevel - 1]
                         ->UpdateFirstQuadratureSolutionVector(),
                     convergencePrev[timeLevel - 1]);
-                CorrectInitialSolution(timeLevel - 1);
+                CorrectInitialSolution(timeLevel - 1);*/
                 if (timeLevel - 1 != 0)
                 {
                     RunSweep(m_time, timeLevel - 1, true);
@@ -224,16 +224,16 @@ void DriverPFASST::AssertParameters(void)
     }
 
     // Assert I/O parameters.
-    if (m_checkSteps)
+    if (m_EqSys[0]->GetCheckpointSteps())
     {
-        ASSERTL0(m_nsteps[0] % m_checkSteps == 0,
+        ASSERTL0(m_nsteps[0] % m_EqSys[0]->GetCheckpointSteps() == 0,
                  "number of IO_CheckSteps should divide number of steps "
                  "per time chunk");
     }
 
-    if (m_infoSteps)
+    if (m_EqSys[0]->GetInfoSteps())
     {
-        ASSERTL0(m_nsteps[0] % m_infoSteps == 0,
+        ASSERTL0(m_nsteps[0] % m_EqSys[0]->GetInfoSteps() == 0,
                  "number of IO_InfoSteps should divide number of steps "
                  "per time chunk");
     }
@@ -483,7 +483,9 @@ void DriverPFASST::Interpolate(const size_t coarseLevel, const SDCarray &in,
     // Interpolate solution in space.
     for (size_t n = 0; n < m_QuadPts[coarseLevel]; ++n)
     {
-        Interpolator(coarseLevel, in[n], fineLevel, m_storage[fineLevel][n]);
+        Interpolate(m_EqSys[coarseLevel]->UpdateFields(),
+                    m_EqSys[fineLevel]->UpdateFields(), in[n],
+                    m_storage[fineLevel][n]);
     }
 
     // Interpolate solution in time.
@@ -560,7 +562,9 @@ void DriverPFASST::Restrict(const size_t fineLevel, const SDCarray &in,
     // Restrict fine solution in space.
     for (size_t n = 0; n < m_QuadPts[coarseLevel]; ++n)
     {
-        Interpolator(fineLevel, m_storage[fineLevel][n], coarseLevel, out[n]);
+        Interpolate(m_EqSys[fineLevel]->UpdateFields(),
+                    m_EqSys[coarseLevel]->UpdateFields(),
+                    m_storage[fineLevel][n], out[n]);
     }
 }
 
@@ -668,7 +672,9 @@ void DriverPFASST::Correct(const size_t coarseLevel,
     {
         // Compute difference between coarse solution and restricted
         // solution.
-        Interpolator(fineLevel, out, coarseLevel, m_correction[fineLevel][0]);
+        Interpolate(m_EqSys[fineLevel]->UpdateFields(),
+                    m_EqSys[coarseLevel]->UpdateFields(), out,
+                    m_correction[fineLevel][0]);
         for (size_t i = 0; i < m_nVar; ++i)
         {
             Vmath::Vsub(m_npts[coarseLevel], in[i], 1,
@@ -677,8 +683,9 @@ void DriverPFASST::Correct(const size_t coarseLevel,
         }
 
         // Add correction to fine solution.
-        Interpolator(coarseLevel, m_correction[fineLevel][0], fineLevel,
-                     m_storage[fineLevel][0]);
+        Interpolate(m_EqSys[coarseLevel]->UpdateFields(),
+                    m_EqSys[fineLevel]->UpdateFields(),
+                    m_correction[fineLevel][0], m_storage[fineLevel][0]);
         for (size_t i = 0; i < m_nVar; ++i)
         {
             Vmath::Vadd(m_npts[fineLevel], m_storage[fineLevel][0][i], 1,
@@ -745,8 +752,9 @@ void DriverPFASST::Correct(const size_t coarseLevel, const SDCarray &rest,
     // Interpolate coarse solution delta in space.
     for (size_t n = 0; n < m_QuadPts[coarseLevel]; ++n)
     {
-        Interpolator(coarseLevel, m_correction[fineLevel][n], fineLevel,
-                     m_storage[fineLevel][n]);
+        Interpolate(m_EqSys[coarseLevel]->UpdateFields(),
+                    m_EqSys[fineLevel]->UpdateFields(),
+                    m_correction[fineLevel][n], m_storage[fineLevel][n]);
     }
 
     // Interpolate coarse solution delta in time and correct fine solution.
@@ -818,10 +826,10 @@ void DriverPFASST::ApplyWindowing(void)
         UpdateFirstQuadrature(0);
         for (size_t timeLevel = 0; timeLevel < m_nTimeLevel - 1; timeLevel++)
         {
-            Interpolator(timeLevel,
-                         m_SDCSolver[timeLevel]->GetSolutionVector()[0],
-                         timeLevel + 1,
-                         m_SDCSolver[timeLevel + 1]->UpdateSolutionVector()[0]);
+            Interpolate(m_EqSys[timeLevel]->UpdateFields(),
+                        m_EqSys[timeLevel + 1]->UpdateFields(),
+                        m_SDCSolver[timeLevel]->GetSolutionVector()[0],
+                        m_SDCSolver[timeLevel + 1]->UpdateSolutionVector()[0]);
         }
     }
 
@@ -864,8 +872,10 @@ void DriverPFASST::EvaluateSDCResidualNorm(const size_t timeLevel)
  */
 void DriverPFASST::WriteOutput(const size_t step, const NekDouble time)
 {
-    size_t timeLevel        = 0;
-    static size_t IOChkStep = m_checkSteps ? m_checkSteps : m_nsteps[timeLevel];
+    size_t timeLevel           = 0;
+    static size_t IOChkStep    = m_EqSys[0]->GetCheckpointSteps()
+                                     ? m_EqSys[0]->GetCheckpointSteps()
+                                     : m_nsteps[timeLevel];
     static std::string dirname = m_session->GetSessionName() + ".pit";
 
     if ((step + 1) % IOChkStep == 0)

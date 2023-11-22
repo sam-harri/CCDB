@@ -35,6 +35,13 @@
 #include <iomanip>
 
 #include <LibUtilities/BasicUtils/Timer.h>
+#include <LocalRegions/HexExp.h>
+#include <LocalRegions/PrismExp.h>
+#include <LocalRegions/PyrExp.h>
+#include <LocalRegions/QuadExp.h>
+#include <LocalRegions/SegExp.h>
+#include <LocalRegions/TetExp.h>
+#include <LocalRegions/TriExp.h>
 #include <SolverUtils/DriverParallelInTime.h>
 #include <boost/format.hpp>
 
@@ -178,11 +185,12 @@ void DriverParallelInTime::SetParallelInTimeEquationSystem(
                     const_cast<char *>(nsz_string.c_str()),
                     const_cast<char *>("--npt"),
                     const_cast<char *>(npt_string.c_str()),
+                    const_cast<char *>("-f"),
                     const_cast<char *>("--use-opt-file"),
                     const_cast<char *>(optfilename.c_str()),
                     nullptr};
 
-    size_t argc = useOptFile ? 13 : 11;
+    size_t argc = useOptFile ? 14 : 12;
 
     // Get list of session file names.
     std::vector<std::string> sessionFileNames;
@@ -250,14 +258,6 @@ void DriverParallelInTime::GetParametersFromSession(void)
                           ? m_session->GetParameter("NumWindows")
                           : 1;
 
-    // I/O parameters.
-    m_infoSteps  = m_session->DefinesParameter("IO_InfoSteps")
-                       ? m_session->GetParameter("IO_InfoSteps")
-                       : 0;
-    m_checkSteps = m_session->DefinesParameter("IO_CheckSteps")
-                       ? m_session->GetParameter("IO_CheckSteps")
-                       : 0;
-
     // Other parameters.
     m_exactSolution = m_session->DefinesParameter("ExactSolution")
                           ? m_session->GetParameter("ExactSolution")
@@ -274,16 +274,17 @@ void DriverParallelInTime::InitialiseEqSystem(bool turnoff_output)
     // Initialize fine solver.
     if (turnoff_output)
     {
-        m_EqSys[0]->SetInfoSteps(0);
-        m_EqSys[0]->SetCheckpointSteps(0);
+        for (size_t timeLevel = 0; timeLevel < m_nTimeLevel; timeLevel++)
+        {
+            m_EqSys[timeLevel]->SetInfoSteps(0);
+            m_EqSys[timeLevel]->SetCheckpointSteps(0);
+        }
     }
     m_EqSys[0]->DoInitialise(true);
 
     // Initialize coarse solver(s).
     for (size_t timeLevel = 1; timeLevel < m_nTimeLevel; timeLevel++)
     {
-        m_EqSys[timeLevel]->SetInfoSteps(0);
-        m_EqSys[timeLevel]->SetCheckpointSteps(0);
         m_EqSys[timeLevel]->DoInitialise(false);
     }
 
@@ -384,6 +385,17 @@ void DriverParallelInTime::RecvFromPreviousProc(
 /**
  *
  */
+void DriverParallelInTime::RecvFromPreviousProc(Array<OneD, NekDouble> &array)
+{
+    if (m_chunkRank > 0)
+    {
+        m_comm->GetTimeComm()->Recv(m_chunkRank - 1, array);
+    }
+}
+
+/**
+ *
+ */
 void DriverParallelInTime::SendToNextProc(
     Array<OneD, Array<OneD, NekDouble>> &array, int &convergence)
 {
@@ -394,6 +406,17 @@ void DriverParallelInTime::SendToNextProc(
         {
             m_comm->GetTimeComm()->Send(m_chunkRank + 1, array[i]);
         }
+    }
+}
+
+/**
+ *
+ */
+void DriverParallelInTime::SendToNextProc(Array<OneD, NekDouble> &array)
+{
+    if (m_chunkRank < m_numChunks - 1)
+    {
+        m_comm->GetTimeComm()->Send(m_chunkRank + 1, array);
     }
 }
 
@@ -557,18 +580,6 @@ NekDouble DriverParallelInTime::vL2ErrorMax(void)
 /**
  *
  */
-void DriverParallelInTime::Interpolator(
-    const size_t inLevel,
-    const Array<OneD, const Array<OneD, NekDouble>> &inarray,
-    const size_t outLevel, Array<OneD, Array<OneD, NekDouble>> &outarray)
-{
-    InterpExp1ToExp2(m_EqSys[inLevel]->UpdateFields(),
-                     m_EqSys[outLevel]->UpdateFields(), inarray, outarray);
-}
-
-/**
- *
- */
 NekDouble DriverParallelInTime::EstimateCommunicationTime(
     Array<OneD, Array<OneD, NekDouble>> &buffer1,
     Array<OneD, Array<OneD, NekDouble>> &buffer2)
@@ -613,7 +624,7 @@ NekDouble DriverParallelInTime::EstimateCommunicationTime(
 /**
  *
  */
-void InterpExp1ToExp2(
+void DriverParallelInTime::Interpolate(
     const Array<OneD, MultiRegions::ExpListSharedPtr> &infield,
     const Array<OneD, MultiRegions::ExpListSharedPtr> &outfield,
     const Array<OneD, Array<OneD, NekDouble>> &inarray,
@@ -660,28 +671,145 @@ void InterpExp1ToExp2(
             for (size_t i = 0; i < infield[n]->GetExpSize(); ++i)
             {
                 // Get the elements.
-                auto elmt1 = infield[n]->GetExp(i);
-                auto elmt2 = outfield[n]->GetExp(i);
+                auto inElmt  = infield[n]->GetExp(i);
+                auto outElmt = outfield[n]->GetExp(i);
 
                 // Get the offset of elements in the storage arrays.
-                size_t offset1 = infield[n]->GetCoeff_Offset(i);
-                size_t offset2 = outfield[n]->GetCoeff_Offset(i);
-
-                // Get type and number of modes.
-                std::vector<unsigned int> inbnum(elmt1->GetNumBases());
-                std::vector<LibUtilities::BasisType> inbtype(
-                    elmt1->GetNumBases());
-                for (size_t j = 0; j < inbnum.size(); ++j)
-                {
-                    inbnum[j]  = elmt1->GetBasisNumModes(j);
-                    inbtype[j] = elmt1->GetBasisType(j);
-                }
+                size_t inoffset  = infield[n]->GetCoeff_Offset(i);
+                size_t outoffset = outfield[n]->GetCoeff_Offset(i);
 
                 // Extract data from infield -> outfield.
-                elmt2->ExtractDataToCoeffs(&incoeff[offset1], inbnum, 0,
-                                           &outcoeff[offset2], inbtype);
+                Array<OneD, const NekDouble> indata(inElmt->GetNcoeffs(),
+                                                    &incoeff[inoffset]);
+                Array<OneD, NekDouble> bwd(outElmt->GetTotPoints());
+                Array<OneD, NekDouble> outdata(outElmt->GetNcoeffs());
+                StdRegions::StdExpansionSharedPtr inExp;
+                StdRegions::StdExpansionSharedPtr outExp;
+                if (inElmt->DetShapeType() == LibUtilities::Seg)
+                {
+                    inExp = std::make_shared<StdRegions::StdSegExp>(
+                        LibUtilities::BasisKey(
+                            inElmt->GetBasis(0)->GetBasisType(),
+                            inElmt->GetBasis(0)->GetNumModes(),
+                            outElmt->GetBasis(0)->GetPointsKey()));
+                    outExp = std::make_shared<StdRegions::StdSegExp>(
+                        outElmt->GetBasis(0)->GetBasisKey());
+                }
+                else if (inElmt->DetShapeType() == LibUtilities::Quad)
+                {
+                    inExp = std::make_shared<StdRegions::StdQuadExp>(
+                        LibUtilities::BasisKey(
+                            inElmt->GetBasis(0)->GetBasisType(),
+                            inElmt->GetBasis(0)->GetNumModes(),
+                            outElmt->GetBasis(0)->GetPointsKey()),
+                        LibUtilities::BasisKey(
+                            inElmt->GetBasis(1)->GetBasisType(),
+                            inElmt->GetBasis(1)->GetNumModes(),
+                            outElmt->GetBasis(1)->GetPointsKey()));
+                    outExp = std::make_shared<StdRegions::StdQuadExp>(
+                        outElmt->GetBasis(0)->GetBasisKey(),
+                        outElmt->GetBasis(1)->GetBasisKey());
+                }
+                else if (inElmt->DetShapeType() == LibUtilities::Tri)
+                {
+                    inExp = std::make_shared<StdRegions::StdTriExp>(
+                        LibUtilities::BasisKey(
+                            inElmt->GetBasis(0)->GetBasisType(),
+                            inElmt->GetBasis(0)->GetNumModes(),
+                            outElmt->GetBasis(0)->GetPointsKey()),
+                        LibUtilities::BasisKey(
+                            inElmt->GetBasis(1)->GetBasisType(),
+                            inElmt->GetBasis(1)->GetNumModes(),
+                            outElmt->GetBasis(1)->GetPointsKey()));
+                    outExp = std::make_shared<StdRegions::StdTriExp>(
+                        outElmt->GetBasis(0)->GetBasisKey(),
+                        outElmt->GetBasis(1)->GetBasisKey());
+                }
+                else if (inElmt->DetShapeType() == LibUtilities::Hex)
+                {
+                    inExp = std::make_shared<StdRegions::StdHexExp>(
+                        LibUtilities::BasisKey(
+                            inElmt->GetBasis(0)->GetBasisType(),
+                            inElmt->GetBasis(0)->GetNumModes(),
+                            outElmt->GetBasis(0)->GetPointsKey()),
+                        LibUtilities::BasisKey(
+                            inElmt->GetBasis(1)->GetBasisType(),
+                            inElmt->GetBasis(1)->GetNumModes(),
+                            outElmt->GetBasis(1)->GetPointsKey()),
+                        LibUtilities::BasisKey(
+                            inElmt->GetBasis(2)->GetBasisType(),
+                            inElmt->GetBasis(2)->GetNumModes(),
+                            outElmt->GetBasis(2)->GetPointsKey()));
+                    outExp = std::make_shared<StdRegions::StdHexExp>(
+                        outElmt->GetBasis(0)->GetBasisKey(),
+                        outElmt->GetBasis(1)->GetBasisKey(),
+                        outElmt->GetBasis(2)->GetBasisKey());
+                }
+                else if (inElmt->DetShapeType() == LibUtilities::Prism)
+                {
+                    inExp = std::make_shared<StdRegions::StdPrismExp>(
+                        LibUtilities::BasisKey(
+                            inElmt->GetBasis(0)->GetBasisType(),
+                            inElmt->GetBasis(0)->GetNumModes(),
+                            outElmt->GetBasis(0)->GetPointsKey()),
+                        LibUtilities::BasisKey(
+                            inElmt->GetBasis(1)->GetBasisType(),
+                            inElmt->GetBasis(1)->GetNumModes(),
+                            outElmt->GetBasis(1)->GetPointsKey()),
+                        LibUtilities::BasisKey(
+                            inElmt->GetBasis(2)->GetBasisType(),
+                            inElmt->GetBasis(2)->GetNumModes(),
+                            outElmt->GetBasis(2)->GetPointsKey()));
+                    outExp = std::make_shared<StdRegions::StdPrismExp>(
+                        outElmt->GetBasis(0)->GetBasisKey(),
+                        outElmt->GetBasis(1)->GetBasisKey(),
+                        outElmt->GetBasis(2)->GetBasisKey());
+                }
+                else if (inElmt->DetShapeType() == LibUtilities::Pyr)
+                {
+                    inExp = std::make_shared<StdRegions::StdPyrExp>(
+                        LibUtilities::BasisKey(
+                            inElmt->GetBasis(0)->GetBasisType(),
+                            inElmt->GetBasis(0)->GetNumModes(),
+                            outElmt->GetBasis(0)->GetPointsKey()),
+                        LibUtilities::BasisKey(
+                            inElmt->GetBasis(1)->GetBasisType(),
+                            inElmt->GetBasis(1)->GetNumModes(),
+                            outElmt->GetBasis(1)->GetPointsKey()),
+                        LibUtilities::BasisKey(
+                            inElmt->GetBasis(2)->GetBasisType(),
+                            inElmt->GetBasis(2)->GetNumModes(),
+                            outElmt->GetBasis(2)->GetPointsKey()));
+                    outExp = std::make_shared<StdRegions::StdPyrExp>(
+                        outElmt->GetBasis(0)->GetBasisKey(),
+                        outElmt->GetBasis(1)->GetBasisKey(),
+                        outElmt->GetBasis(2)->GetBasisKey());
+                }
+                else if (inElmt->DetShapeType() == LibUtilities::Tet)
+                {
+                    inExp = std::make_shared<StdRegions::StdTetExp>(
+                        LibUtilities::BasisKey(
+                            inElmt->GetBasis(0)->GetBasisType(),
+                            inElmt->GetBasis(0)->GetNumModes(),
+                            outElmt->GetBasis(0)->GetPointsKey()),
+                        LibUtilities::BasisKey(
+                            inElmt->GetBasis(1)->GetBasisType(),
+                            inElmt->GetBasis(1)->GetNumModes(),
+                            outElmt->GetBasis(1)->GetPointsKey()),
+                        LibUtilities::BasisKey(
+                            inElmt->GetBasis(2)->GetBasisType(),
+                            inElmt->GetBasis(2)->GetNumModes(),
+                            outElmt->GetBasis(2)->GetPointsKey()));
+                    outExp = std::make_shared<StdRegions::StdTetExp>(
+                        outElmt->GetBasis(0)->GetBasisKey(),
+                        outElmt->GetBasis(1)->GetBasisKey(),
+                        outElmt->GetBasis(2)->GetBasisKey());
+                }
+                inExp->BwdTrans(indata, bwd);
+                outExp->FwdTrans(bwd, outdata);
+                Vmath::Vcopy(outElmt->GetNcoeffs(), outdata.get(), 1,
+                             &outcoeff[outoffset], 1);
             }
-
             // Transform solution back to physical space.
             outfield[n]->BwdTrans(outcoeff, outphys);
         }
