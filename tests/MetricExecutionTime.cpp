@@ -160,7 +160,7 @@ bool MetricExecutionTime::v_Test(istream &pStdout, istream &pStderr)
     // Select istream to use.
     istream &is = m_useStderr ? pStderr : pStdout;
 
-    boost::cmatch matches;
+    std::smatch matches;
     string line;
     // Vector of execution times found in the output.
     vector<double> times;
@@ -170,7 +170,7 @@ bool MetricExecutionTime::v_Test(istream &pStdout, istream &pStderr)
     while (getline(is, line))
     {
         // Test to see if we have a match on this line.
-        if (boost::regex_match(line.c_str(), matches, m_regex))
+        if (std::regex_match(line, matches, m_regex))
         {
             // If no matches are found then throw an error.
             if (matches.size() == 1)
@@ -271,7 +271,7 @@ void MetricExecutionTime::v_Generate(istream &pStdout, istream &pStderr)
     // Select istream to use
     istream &is = m_useStderr ? pStderr : pStdout;
 
-    boost::cmatch matches;
+    std::smatch matches;
 
     string line;
     // Vector of execution times found in the output
@@ -282,7 +282,7 @@ void MetricExecutionTime::v_Generate(istream &pStdout, istream &pStderr)
     while (getline(is, line))
     {
         // Test to see if we have a match on this line
-        if (boost::regex_match(line.c_str(), matches, m_regex))
+        if (std::regex_match(line, matches, m_regex))
         {
             // If no fields in regex then throw an error
             ASSERTL0(matches.size() != 1, "No test sections in regex!");

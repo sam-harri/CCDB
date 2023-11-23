@@ -34,7 +34,6 @@
 
 #include <boost/asio/ip/host_name.hpp>
 #include <boost/format.hpp>
-#include <boost/regex.hpp>
 
 #include <LibUtilities/BasicConst/GitRevision.h>
 #include <LibUtilities/BasicUtils/FieldIO.h>
@@ -45,6 +44,7 @@
 #include <fstream>
 #include <iomanip>
 #include <ios>
+#include <regex>
 #include <set>
 #include <system_error>
 
@@ -108,14 +108,14 @@ const std::string FieldIO::GetFileType(const std::string &filename,
         {
             fs::path fullpath = filename;
             fs::path d        = fullpath;
-            boost::regex expr("P\\d{7}.fld");
-            boost::smatch what;
+            std::regex expr("P\\d{7}.fld");
+            std::smatch what;
 
             bool found = false;
             for (auto &f : fs::directory_iterator(d))
             {
-                if (boost::regex_match(f.path().filename().string(), what,
-                                       expr))
+                std::string filename = f.path().filename().string();
+                if (std::regex_match(filename, what, expr))
                 {
                     found    = true;
                     fullpath = f.path();

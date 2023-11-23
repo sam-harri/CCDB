@@ -37,7 +37,8 @@
 #define NEKTAR_TESTS_METRICEXECUTIONTIME_H
 
 #include <Metric.h>
-#include <boost/regex.hpp>
+
+#include <regex>
 #include <vector>
 
 namespace Nektar
@@ -83,7 +84,7 @@ public:
 
 protected:
     /// Regex used to match an execution time in a test output.
-    boost::regex m_regex;
+    std::regex m_regex;
     /// Stores each execution time found in the test output.
     MetricExecutionTimeFieldValue m_match;
     /// If true, use stderr for testing/generation instead of stdout.

@@ -61,7 +61,7 @@ MetricRegex::MetricRegex(TiXmlElement *metric, bool generate)
     TiXmlElement *regex = metric->FirstChildElement("regex");
     ASSERTL0(regex, "No Regex defined.");
     ASSERTL0(regex->GetText(), "Failed to get text");
-    m_regex = regex->GetText();
+    m_regex = std::regex(regex->GetText(), std::regex::ECMAScript);
 
     // Parse matching values if not generating.
     if (m_generate)
@@ -125,7 +125,7 @@ bool MetricRegex::v_Test(std::istream &pStdout, std::istream &pStderr)
     int nMatch                                   = m_matches.size();
     bool success                                 = true;
     bool matchedTol                              = false;
-    boost::cmatch matches;
+    std::smatch matches;
 
     // Process output file line by line searching for regex matches
     std::string line;
@@ -134,7 +134,7 @@ bool MetricRegex::v_Test(std::istream &pStdout, std::istream &pStderr)
         matchedTol = true;
 
         // Test to see if we have a match on this line.
-        if (boost::regex_match(line.c_str(), matches, m_regex))
+        if (std::regex_match(line, matches, m_regex))
         {
             // Error if no fields in regex then throw an error.
             if (matches.size() == 1)
@@ -272,14 +272,14 @@ void MetricRegex::v_Generate(std::istream &pStdout, std::istream &pStderr)
     // Select istream to use.
     std::istream &is = m_useStderr ? pStderr : pStdout;
 
-    boost::cmatch matches;
+    std::smatch matches;
 
     // Process output file line by line searching for regex matches
     std::string line;
     while (getline(is, line))
     {
         // Test to see if we have a match on this line.
-        if (boost::regex_match(line.c_str(), matches, m_regex))
+        if (std::regex_match(line, matches, m_regex))
         {
             // Error if no fields in regex then throw an error.
             ASSERTL0(matches.size() != 1, "No test sections in regex!");
