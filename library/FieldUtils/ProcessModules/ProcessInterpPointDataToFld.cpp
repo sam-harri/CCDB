@@ -37,7 +37,6 @@
 
 #include <boost/core/ignore_unused.hpp>
 #include <boost/geometry.hpp>
-#include <boost/math/special_functions/fpclassify.hpp>
 
 #include <FieldUtils/Interpolator.h>
 #include <LibUtilities/BasicUtils/CsvIO.h>

@@ -23,6 +23,8 @@ v5.5.0
 - Move from `boost::filesystem` to `std::filesystem` (!1674)
 - Use `[[deprecated]]` attribute (!1682)
 - Fix QuadExp::v_ComputeTraceNormals(!1685)
+- Replace `boost::math::tgamma` by `std::tgamma`(!1686)
+- Remove `#include <boost/math/special_functions/fpclassify.hpp>` header (!1686)
 
 **ADRSolver**
 - Add support for spatially-constant, but variable direction, diffusion to

@@ -45,7 +45,6 @@
 #include <LibUtilities/BasicUtils/Progressbar.hpp>
 #include <LibUtilities/BasicUtils/SharedArray.hpp>
 #include <LibUtilities/BasicUtils/Timer.h>
-#include <boost/math/special_functions/fpclassify.hpp>
 
 namespace bg  = boost::geometry;
 namespace bgi = boost::geometry::index;
