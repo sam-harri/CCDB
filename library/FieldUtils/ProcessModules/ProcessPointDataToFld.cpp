@@ -37,7 +37,6 @@
 using namespace std;
 
 #include <boost/core/ignore_unused.hpp>
-#include <boost/math/special_functions/fpclassify.hpp>
 
 #include <LibUtilities/BasicUtils/SharedArray.hpp>
 

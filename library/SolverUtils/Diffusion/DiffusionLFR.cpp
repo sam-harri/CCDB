@@ -38,7 +38,6 @@
 #include <MultiRegions/DisContField.h>
 #include <SolverUtils/Diffusion/DiffusionLFR.h>
 #include <boost/core/ignore_unused.hpp>
-#include <boost/math/special_functions/gamma.hpp>
 #include <iomanip>
 #include <iostream>
 
@@ -375,9 +374,9 @@ void DiffusionLFR::SetupCFunctions(
                 NekDouble sign0 = pow(-1.0, p0);
 
                 // Factorial factor to build the scheme
-                NekDouble ap0 = boost::math::tgamma(2 * p0 + 1) /
-                                (pow(2.0, p0) * boost::math::tgamma(p0 + 1) *
-                                 boost::math::tgamma(p0 + 1));
+                NekDouble ap0 =
+                    std::tgamma(2 * p0 + 1) /
+                    (pow(2.0, p0) * std::tgamma(p0 + 1) * std::tgamma(p0 + 1));
 
                 // Scalar parameter which recovers the FR schemes
                 if (m_diffType == "LFRDG")
@@ -388,21 +387,20 @@ void DiffusionLFR::SetupCFunctions(
                 {
                     c0 = 2.0 * p0 /
                          ((2.0 * p0 + 1.0) * (p0 + 1.0) *
-                          (ap0 * boost::math::tgamma(p0 + 1)) *
-                          (ap0 * boost::math::tgamma(p0 + 1)));
+                          (ap0 * std::tgamma(p0 + 1)) *
+                          (ap0 * std::tgamma(p0 + 1)));
                 }
                 else if (m_diffType == "LFRHU")
                 {
                     c0 = 2.0 * (p0 + 1.0) /
-                         ((2.0 * p0 + 1.0) * p0 *
-                          (ap0 * boost::math::tgamma(p0 + 1)) *
-                          (ap0 * boost::math::tgamma(p0 + 1)));
+                         ((2.0 * p0 + 1.0) * p0 * (ap0 * std::tgamma(p0 + 1)) *
+                          (ap0 * std::tgamma(p0 + 1)));
                 }
                 else if (m_diffType == "LFRcmin")
                 {
-                    c0 = -2.0 / ((2.0 * p0 + 1.0) *
-                                 (ap0 * boost::math::tgamma(p0 + 1)) *
-                                 (ap0 * boost::math::tgamma(p0 + 1)));
+                    c0 =
+                        -2.0 / ((2.0 * p0 + 1.0) * (ap0 * std::tgamma(p0 + 1)) *
+                                (ap0 * std::tgamma(p0 + 1)));
                 }
                 else if (m_diffType == "LFRinf")
                 {
@@ -410,8 +408,8 @@ void DiffusionLFR::SetupCFunctions(
                 }
 
                 NekDouble etap0 = 0.5 * c0 * (2.0 * p0 + 1.0) *
-                                  (ap0 * boost::math::tgamma(p0 + 1)) *
-                                  (ap0 * boost::math::tgamma(p0 + 1));
+                                  (ap0 * std::tgamma(p0 + 1)) *
+                                  (ap0 * std::tgamma(p0 + 1));
 
                 NekDouble overeta0 = 1.0 / (1.0 + etap0);
 
@@ -498,13 +496,13 @@ void DiffusionLFR::SetupCFunctions(
                 NekDouble sign1 = pow(-1.0, p1);
 
                 // Factorial factor to build the scheme
-                NekDouble ap0 = boost::math::tgamma(2 * p0 + 1) /
-                                (pow(2.0, p0) * boost::math::tgamma(p0 + 1) *
-                                 boost::math::tgamma(p0 + 1));
+                NekDouble ap0 =
+                    std::tgamma(2 * p0 + 1) /
+                    (pow(2.0, p0) * std::tgamma(p0 + 1) * std::tgamma(p0 + 1));
 
-                NekDouble ap1 = boost::math::tgamma(2 * p1 + 1) /
-                                (pow(2.0, p1) * boost::math::tgamma(p1 + 1) *
-                                 boost::math::tgamma(p1 + 1));
+                NekDouble ap1 =
+                    std::tgamma(2 * p1 + 1) /
+                    (pow(2.0, p1) * std::tgamma(p1 + 1) * std::tgamma(p1 + 1));
 
                 // Scalar parameter which recovers the FR schemes
                 if (m_diffType == "LFRDG")
@@ -516,35 +514,33 @@ void DiffusionLFR::SetupCFunctions(
                 {
                     c0 = 2.0 * p0 /
                          ((2.0 * p0 + 1.0) * (p0 + 1.0) *
-                          (ap0 * boost::math::tgamma(p0 + 1)) *
-                          (ap0 * boost::math::tgamma(p0 + 1)));
+                          (ap0 * std::tgamma(p0 + 1)) *
+                          (ap0 * std::tgamma(p0 + 1)));
 
                     c1 = 2.0 * p1 /
                          ((2.0 * p1 + 1.0) * (p1 + 1.0) *
-                          (ap1 * boost::math::tgamma(p1 + 1)) *
-                          (ap1 * boost::math::tgamma(p1 + 1)));
+                          (ap1 * std::tgamma(p1 + 1)) *
+                          (ap1 * std::tgamma(p1 + 1)));
                 }
                 else if (m_diffType == "LFRHU")
                 {
                     c0 = 2.0 * (p0 + 1.0) /
-                         ((2.0 * p0 + 1.0) * p0 *
-                          (ap0 * boost::math::tgamma(p0 + 1)) *
-                          (ap0 * boost::math::tgamma(p0 + 1)));
+                         ((2.0 * p0 + 1.0) * p0 * (ap0 * std::tgamma(p0 + 1)) *
+                          (ap0 * std::tgamma(p0 + 1)));
 
                     c1 = 2.0 * (p1 + 1.0) /
-                         ((2.0 * p1 + 1.0) * p1 *
-                          (ap1 * boost::math::tgamma(p1 + 1)) *
-                          (ap1 * boost::math::tgamma(p1 + 1)));
+                         ((2.0 * p1 + 1.0) * p1 * (ap1 * std::tgamma(p1 + 1)) *
+                          (ap1 * std::tgamma(p1 + 1)));
                 }
                 else if (m_diffType == "LFRcmin")
                 {
-                    c0 = -2.0 / ((2.0 * p0 + 1.0) *
-                                 (ap0 * boost::math::tgamma(p0 + 1)) *
-                                 (ap0 * boost::math::tgamma(p0 + 1)));
+                    c0 =
+                        -2.0 / ((2.0 * p0 + 1.0) * (ap0 * std::tgamma(p0 + 1)) *
+                                (ap0 * std::tgamma(p0 + 1)));
 
-                    c1 = -2.0 / ((2.0 * p1 + 1.0) *
-                                 (ap1 * boost::math::tgamma(p1 + 1)) *
-                                 (ap1 * boost::math::tgamma(p1 + 1)));
+                    c1 =
+                        -2.0 / ((2.0 * p1 + 1.0) * (ap1 * std::tgamma(p1 + 1)) *
+                                (ap1 * std::tgamma(p1 + 1)));
                 }
                 else if (m_diffType == "LFRinf")
                 {
@@ -553,12 +549,12 @@ void DiffusionLFR::SetupCFunctions(
                 }
 
                 NekDouble etap0 = 0.5 * c0 * (2.0 * p0 + 1.0) *
-                                  (ap0 * boost::math::tgamma(p0 + 1)) *
-                                  (ap0 * boost::math::tgamma(p0 + 1));
+                                  (ap0 * std::tgamma(p0 + 1)) *
+                                  (ap0 * std::tgamma(p0 + 1));
 
                 NekDouble etap1 = 0.5 * c1 * (2.0 * p1 + 1.0) *
-                                  (ap1 * boost::math::tgamma(p1 + 1)) *
-                                  (ap1 * boost::math::tgamma(p1 + 1));
+                                  (ap1 * std::tgamma(p1 + 1)) *
+                                  (ap1 * std::tgamma(p1 + 1));
 
                 NekDouble overeta0 = 1.0 / (1.0 + etap0);
                 NekDouble overeta1 = 1.0 / (1.0 + etap1);
@@ -681,19 +677,19 @@ void DiffusionLFR::SetupCFunctions(
                 NekDouble sign2 = pow(-1.0, p2);
 
                 // Factorial factor to build the scheme
-                NekDouble ap0 = boost::math::tgamma(2 * p0 + 1) /
-                                (pow(2.0, p0) * boost::math::tgamma(p0 + 1) *
-                                 boost::math::tgamma(p0 + 1));
+                NekDouble ap0 =
+                    std::tgamma(2 * p0 + 1) /
+                    (pow(2.0, p0) * std::tgamma(p0 + 1) * std::tgamma(p0 + 1));
 
                 // Factorial factor to build the scheme
-                NekDouble ap1 = boost::math::tgamma(2 * p1 + 1) /
-                                (pow(2.0, p1) * boost::math::tgamma(p1 + 1) *
-                                 boost::math::tgamma(p1 + 1));
+                NekDouble ap1 =
+                    std::tgamma(2 * p1 + 1) /
+                    (pow(2.0, p1) * std::tgamma(p1 + 1) * std::tgamma(p1 + 1));
 
                 // Factorial factor to build the scheme
-                NekDouble ap2 = boost::math::tgamma(2 * p2 + 1) /
-                                (pow(2.0, p2) * boost::math::tgamma(p2 + 1) *
-                                 boost::math::tgamma(p2 + 1));
+                NekDouble ap2 =
+                    std::tgamma(2 * p2 + 1) /
+                    (pow(2.0, p2) * std::tgamma(p2 + 1) * std::tgamma(p2 + 1));
 
                 // Scalar parameter which recovers the FR schemes
                 if (m_diffType == "LFRDG")
@@ -706,49 +702,46 @@ void DiffusionLFR::SetupCFunctions(
                 {
                     c0 = 2.0 * p0 /
                          ((2.0 * p0 + 1.0) * (p0 + 1.0) *
-                          (ap0 * boost::math::tgamma(p0 + 1)) *
-                          (ap0 * boost::math::tgamma(p0 + 1)));
+                          (ap0 * std::tgamma(p0 + 1)) *
+                          (ap0 * std::tgamma(p0 + 1)));
 
                     c1 = 2.0 * p1 /
                          ((2.0 * p1 + 1.0) * (p1 + 1.0) *
-                          (ap1 * boost::math::tgamma(p1 + 1)) *
-                          (ap1 * boost::math::tgamma(p1 + 1)));
+                          (ap1 * std::tgamma(p1 + 1)) *
+                          (ap1 * std::tgamma(p1 + 1)));
 
                     c2 = 2.0 * p2 /
                          ((2.0 * p2 + 1.0) * (p2 + 1.0) *
-                          (ap2 * boost::math::tgamma(p2 + 1)) *
-                          (ap2 * boost::math::tgamma(p2 + 1)));
+                          (ap2 * std::tgamma(p2 + 1)) *
+                          (ap2 * std::tgamma(p2 + 1)));
                 }
                 else if (m_diffType == "LFRHU")
                 {
                     c0 = 2.0 * (p0 + 1.0) /
-                         ((2.0 * p0 + 1.0) * p0 *
-                          (ap0 * boost::math::tgamma(p0 + 1)) *
-                          (ap0 * boost::math::tgamma(p0 + 1)));
+                         ((2.0 * p0 + 1.0) * p0 * (ap0 * std::tgamma(p0 + 1)) *
+                          (ap0 * std::tgamma(p0 + 1)));
 
                     c1 = 2.0 * (p1 + 1.0) /
-                         ((2.0 * p1 + 1.0) * p1 *
-                          (ap1 * boost::math::tgamma(p1 + 1)) *
-                          (ap1 * boost::math::tgamma(p1 + 1)));
+                         ((2.0 * p1 + 1.0) * p1 * (ap1 * std::tgamma(p1 + 1)) *
+                          (ap1 * std::tgamma(p1 + 1)));
 
                     c2 = 2.0 * (p2 + 1.0) /
-                         ((2.0 * p2 + 1.0) * p2 *
-                          (ap2 * boost::math::tgamma(p2 + 1)) *
-                          (ap2 * boost::math::tgamma(p2 + 1)));
+                         ((2.0 * p2 + 1.0) * p2 * (ap2 * std::tgamma(p2 + 1)) *
+                          (ap2 * std::tgamma(p2 + 1)));
                 }
                 else if (m_diffType == "LFRcmin")
                 {
-                    c0 = -2.0 / ((2.0 * p0 + 1.0) *
-                                 (ap0 * boost::math::tgamma(p0 + 1)) *
-                                 (ap0 * boost::math::tgamma(p0 + 1)));
+                    c0 =
+                        -2.0 / ((2.0 * p0 + 1.0) * (ap0 * std::tgamma(p0 + 1)) *
+                                (ap0 * std::tgamma(p0 + 1)));
 
-                    c1 = -2.0 / ((2.0 * p1 + 1.0) *
-                                 (ap1 * boost::math::tgamma(p1 + 1)) *
-                                 (ap1 * boost::math::tgamma(p1 + 1)));
+                    c1 =
+                        -2.0 / ((2.0 * p1 + 1.0) * (ap1 * std::tgamma(p1 + 1)) *
+                                (ap1 * std::tgamma(p1 + 1)));
 
-                    c2 = -2.0 / ((2.0 * p2 + 1.0) *
-                                 (ap2 * boost::math::tgamma(p2 + 1)) *
-                                 (ap2 * boost::math::tgamma(p2 + 1)));
+                    c2 =
+                        -2.0 / ((2.0 * p2 + 1.0) * (ap2 * std::tgamma(p2 + 1)) *
+                                (ap2 * std::tgamma(p2 + 1)));
                 }
                 else if (m_diffType == "LFRinf")
                 {
@@ -758,16 +751,16 @@ void DiffusionLFR::SetupCFunctions(
                 }
 
                 NekDouble etap0 = 0.5 * c0 * (2.0 * p0 + 1.0) *
-                                  (ap0 * boost::math::tgamma(p0 + 1)) *
-                                  (ap0 * boost::math::tgamma(p0 + 1));
+                                  (ap0 * std::tgamma(p0 + 1)) *
+                                  (ap0 * std::tgamma(p0 + 1));
 
                 NekDouble etap1 = 0.5 * c1 * (2.0 * p1 + 1.0) *
-                                  (ap1 * boost::math::tgamma(p1 + 1)) *
-                                  (ap1 * boost::math::tgamma(p1 + 1));
+                                  (ap1 * std::tgamma(p1 + 1)) *
+                                  (ap1 * std::tgamma(p1 + 1));
 
                 NekDouble etap2 = 0.5 * c2 * (2.0 * p2 + 1.0) *
-                                  (ap2 * boost::math::tgamma(p2 + 1)) *
-                                  (ap2 * boost::math::tgamma(p2 + 1));
+                                  (ap2 * std::tgamma(p2 + 1)) *
+                                  (ap2 * std::tgamma(p2 + 1));
 
                 NekDouble overeta0 = 1.0 / (1.0 + etap0);
                 NekDouble overeta1 = 1.0 / (1.0 + etap1);

@@ -1567,7 +1567,7 @@ void OneDFDESolver::EvaluateFDETerm(
 
         for (int j = 0; j < m_nPoints; j++)
         {
-            outarray[i][j] = w * tgamma(m_alpha + 1.0);
+            outarray[i][j] = w * std::tgamma(m_alpha + 1.0);
         }
     }
 }

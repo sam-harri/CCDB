@@ -171,7 +171,7 @@ void FractionalInTimeIntegrationScheme::v_InitializeScheme(
     // J
     m_J = SingleArray(m_order, 0.0);
 
-    m_J[0] = pow(m_deltaT, m_alpha) / tgamma(m_alpha + 1.);
+    m_J[0] = pow(m_deltaT, m_alpha) / std::tgamma(m_alpha + 1.);
 
     for (size_t m = 1, m_1 = 0; m < m_order; ++m, ++m_1)
     {
