@@ -25,6 +25,7 @@ v5.5.0
 - Fix QuadExp::v_ComputeTraceNormals(!1685)
 - Replace `boost::math::tgamma` by `std::tgamma`(!1686)
 - Remove `#include <boost/math/special_functions/fpclassify.hpp>` header (!1686)
+- Replace `boost::regex` with `std::regex` (!1676)
 
 **ADRSolver**
 - Add support for spatially-constant, but variable direction, diffusion to

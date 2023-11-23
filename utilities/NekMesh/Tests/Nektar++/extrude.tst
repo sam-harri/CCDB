@@ -33,8 +33,8 @@
             </matches>
         </metric>
         <metric type="regex" id="4">
-            <regex>^.*Lower mesh extent\s*:\s*(-?\d+\.?\d?+)\s*(-?\d+\.?\d?+)\s*
-                (-?\d+\.?\d?+)</regex>
+            <regex>^.*Lower mesh extent\s*:\s*(-?\d+\.?\d*)\s*(-?\d+\.?\d*)\s*
+                (-?\d+\.?\d*)</regex>
             <matches>
                 <match>
                     <field id="0">0</field>
@@ -44,8 +44,8 @@
             </matches>
         </metric>
         <metric type="regex" id="5">
-            <regex>^.*Upper mesh extent\s*:\s*(-?\d+\.?\d?+)\s*(-?\d+\.?\d?+)\s*
-                (-?\d+\.?\d?+)</regex>
+            <regex>^.*Upper mesh extent\s*:\s*(-?\d+\.?\d*)\s*(-?\d+\.?\d*)\s*
+                (-?\d+\.?\d*)</regex>
             <matches>
                 <match>
                     <field id="0">1</field>
