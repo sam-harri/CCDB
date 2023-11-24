@@ -65,10 +65,6 @@ StdPyrExp::StdPyrExp(const LibUtilities::BasisKey &Ba,
              "OrthoPyr_C");
 }
 
-StdPyrExp::StdPyrExp(const StdPyrExp &T) : StdExpansion(T), StdExpansion3D(T)
-{
-}
-
 //---------------------------------------
 // Differentiation/integration Methods
 //---------------------------------------

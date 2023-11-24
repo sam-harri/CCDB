@@ -52,10 +52,7 @@ class Expansion0D : virtual public Expansion,
 {
 public:
     LOCAL_REGIONS_EXPORT Expansion0D(SpatialDomains::Geometry0DSharedPtr pGeom);
-
-    LOCAL_REGIONS_EXPORT ~Expansion0D() override
-    {
-    }
+    LOCAL_REGIONS_EXPORT ~Expansion0D() override = default;
 
     inline SpatialDomains::Geometry0DSharedPtr GetGeom0D() const;
 

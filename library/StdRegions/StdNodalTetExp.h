@@ -43,13 +43,12 @@ namespace Nektar::StdRegions
 class StdNodalTetExp : virtual public StdTetExp
 {
 public:
-    STD_REGIONS_EXPORT StdNodalTetExp();
     STD_REGIONS_EXPORT StdNodalTetExp(const LibUtilities::BasisKey &Ba,
                                       const LibUtilities::BasisKey &Bb,
                                       const LibUtilities::BasisKey &Bc,
                                       const LibUtilities::PointsType Ntype);
-    STD_REGIONS_EXPORT StdNodalTetExp(const StdNodalTetExp &T);
-    STD_REGIONS_EXPORT ~StdNodalTetExp() override;
+    StdNodalTetExp(const StdNodalTetExp &T) = default;
+    ~StdNodalTetExp() override              = default;
 
     //-------------------------------
     // Nodal basis specific routines

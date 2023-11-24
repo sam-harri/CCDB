@@ -113,6 +113,7 @@ v5.4.0
 - Added a local space version of GMRES and ConjugateGradient (!1575)
 - Added a jacobi preconditioner building on diagonal impelemtation (!1575)
 - Add a priori convergence and null-input check to GMRES (!1590)
+- Some tidy-up in StdRegions (!1595)
 - Tidy-up/removed unused Lapack function definition (!1573)
 - Some Tidy-up in MatrixFreeOps (!1599)
 - Accelerate interpolation for regular and straight-edge elements (!1283)

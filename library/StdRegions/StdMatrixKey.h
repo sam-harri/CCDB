@@ -61,9 +61,7 @@ public:
 
     STD_REGIONS_EXPORT StdMatrixKey(const StdMatrixKey &rhs);
 
-    virtual ~StdMatrixKey()
-    {
-    }
+    virtual ~StdMatrixKey() = default;
 
     /// Used to lookup the create function in NekManager.
     struct opLess

@@ -44,22 +44,11 @@
 
 namespace Nektar::StdRegions
 {
-StdExpansion3D::StdExpansion3D()
-{
-}
 
 StdExpansion3D::StdExpansion3D(int numcoeffs, const LibUtilities::BasisKey &Ba,
                                const LibUtilities::BasisKey &Bb,
                                const LibUtilities::BasisKey &Bc)
     : StdExpansion(numcoeffs, 3, Ba, Bb, Bc)
-{
-}
-
-StdExpansion3D::StdExpansion3D(const StdExpansion3D &T) : StdExpansion(T)
-{
-}
-
-StdExpansion3D::~StdExpansion3D()
 {
 }
 
@@ -217,7 +206,7 @@ NekDouble StdExpansion3D::v_PhysEvaluate(
     WARNINGL2(coords[2] >= -1 - NekConstants::kNekZeroTol, "coord[2] < -1");
     WARNINGL2(coords[2] <= 1 + NekConstants::kNekZeroTol, "coord[2] >  1");
 
-    // Obtain local collapsed corodinate from Cartesian coordinate.
+    // Obtain local collapsed coordinate from Cartesian coordinate.
     LocCoordToLocCollapsed(coords, eta);
 
     const int nq0 = m_base[0]->GetNumPoints();
@@ -532,9 +521,6 @@ LibUtilities::BasisKey EvaluateTriFaceBasisKey(
                 }
                 case 1:
                 {
-                    //   const LibUtilities::PointsKey pkey(
-                    //   numpoints+1,
-                    //   LibUtilities::eGaussLobattoLegendre);
                     const LibUtilities::PointsKey pkey(
                         numpoints, LibUtilities::eGaussRadauMAlpha1Beta0);
                     return LibUtilities::BasisKey(LibUtilities::eModified_B,

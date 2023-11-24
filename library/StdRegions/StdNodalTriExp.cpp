@@ -57,12 +57,6 @@ StdNodalTriExp::StdNodalTriExp(const LibUtilities::BasisKey &Ba,
              "and b directions");
 }
 
-StdNodalTriExp::StdNodalTriExp(const StdNodalTriExp &T)
-    : StdExpansion(T), StdExpansion2D(T), StdTriExp(T),
-      m_nodalPointsKey(T.m_nodalPointsKey)
-{
-}
-
 bool StdNodalTriExp::v_IsNodalNonTensorialExp()
 {
     return true;

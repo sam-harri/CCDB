@@ -32,21 +32,13 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
-#include <LibUtilities/Foundations/InterpCoeff.h>
-#include <StdRegions/StdNodalTriExp.h>
-#include <StdRegions/StdSegExp.h> // for StdSegExp, etc
 #include <StdRegions/StdTriExp.h>
+#include <boost/core/ignore_unused.hpp>
 
 using namespace std;
 
 namespace Nektar::StdRegions
 {
-StdTriExp::StdTriExp()
-{
-}
-
 StdTriExp::StdTriExp(const LibUtilities::BasisKey &Ba,
                      const LibUtilities::BasisKey &Bb)
     : StdExpansion(LibUtilities::StdTriData::getNumberOfCoefficients(
@@ -59,15 +51,6 @@ StdTriExp::StdTriExp(const LibUtilities::BasisKey &Ba,
     ASSERTL0(Ba.GetNumModes() <= Bb.GetNumModes(),
              "order in 'a' direction is higher than order "
              "in 'b' direction");
-}
-
-StdTriExp::StdTriExp(const StdTriExp &T) : StdExpansion(T), StdExpansion2D(T)
-{
-}
-
-// Destructor
-StdTriExp::~StdTriExp()
-{
 }
 
 //-------------------------------

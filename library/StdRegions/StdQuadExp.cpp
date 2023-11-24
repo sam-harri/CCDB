@@ -37,16 +37,11 @@
 #include <LibUtilities/Foundations/InterpCoeff.h>
 #include <LibUtilities/Foundations/ManagerAccess.h>
 #include <StdRegions/StdQuadExp.h>
-#include <StdRegions/StdSegExp.h>
 
 using namespace std;
 
 namespace Nektar::StdRegions
 {
-
-StdQuadExp::StdQuadExp()
-{
-}
 
 /** \brief Constructor using BasisKey class for quadrature
  *  points and order definition
@@ -55,16 +50,6 @@ StdQuadExp::StdQuadExp(const LibUtilities::BasisKey &Ba,
                        const LibUtilities::BasisKey &Bb)
     : StdExpansion(Ba.GetNumModes() * Bb.GetNumModes(), 2, Ba, Bb),
       StdExpansion2D(Ba.GetNumModes() * Bb.GetNumModes(), Ba, Bb)
-{
-}
-
-/** \brief Copy Constructor */
-StdQuadExp::StdQuadExp(const StdQuadExp &T) : StdExpansion(T), StdExpansion2D(T)
-{
-}
-
-/** \brief Destructor */
-StdQuadExp::~StdQuadExp()
 {
 }
 
@@ -129,7 +114,6 @@ void StdQuadExp::v_StdPhysDeriv(const Array<OneD, const NekDouble> &inarray,
                                 Array<OneD, NekDouble> &out_d2)
 {
     boost::ignore_unused(out_d2);
-    // PhysTensorDeriv(inarray, out_d0, out_d1);
     StdQuadExp::v_PhysDeriv(inarray, out_d0, out_d1);
 }
 
@@ -137,7 +121,6 @@ void StdQuadExp::v_StdPhysDeriv(const int dir,
                                 const Array<OneD, const NekDouble> &inarray,
                                 Array<OneD, NekDouble> &outarray)
 {
-    // PhysTensorDeriv(inarray, outarray);
     StdQuadExp::v_PhysDeriv(dir, inarray, outarray);
 }
 

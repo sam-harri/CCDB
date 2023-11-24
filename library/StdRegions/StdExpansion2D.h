@@ -38,20 +38,18 @@
 #define STDEXP2D_H
 
 #include <StdRegions/StdExpansion.h>
-#include <StdRegions/StdRegionsDeclspec.h>
 
 namespace Nektar::StdRegions
 {
-
 class StdExpansion2D : virtual public StdExpansion
 {
 public:
-    STD_REGIONS_EXPORT StdExpansion2D();
     STD_REGIONS_EXPORT StdExpansion2D(int numcoeffs,
                                       const LibUtilities::BasisKey &Ba,
                                       const LibUtilities::BasisKey &Bb);
-    STD_REGIONS_EXPORT StdExpansion2D(const StdExpansion2D &T);
-    STD_REGIONS_EXPORT ~StdExpansion2D() override;
+    STD_REGIONS_EXPORT StdExpansion2D()                        = default;
+    STD_REGIONS_EXPORT StdExpansion2D(const StdExpansion2D &T) = default;
+    STD_REGIONS_EXPORT ~StdExpansion2D() override              = default;
 
     // Generic operations in different element
 

@@ -36,21 +36,18 @@
 #define NEKTAR_LIB_STDREGIONS_STDTRIEXP_H
 
 #include <StdRegions/StdExpansion2D.h>
-#include <StdRegions/StdRegions.hpp>
-#include <StdRegions/StdRegionsDeclspec.h>
+#include <StdRegions/StdSegExp.h> // for StdSegExp, etc
 
 namespace Nektar::StdRegions
 {
-class StdMatrixKey;
-
 class StdTriExp : virtual public StdExpansion2D
 {
 public:
-    STD_REGIONS_EXPORT StdTriExp();
     STD_REGIONS_EXPORT StdTriExp(const LibUtilities::BasisKey &Ba,
                                  const LibUtilities::BasisKey &Bb);
-    STD_REGIONS_EXPORT StdTriExp(const StdTriExp &T);
-    STD_REGIONS_EXPORT ~StdTriExp() override;
+    STD_REGIONS_EXPORT StdTriExp()                   = default;
+    STD_REGIONS_EXPORT StdTriExp(const StdTriExp &T) = default;
+    STD_REGIONS_EXPORT ~StdTriExp() override         = default;
 
 protected:
     //-------------------------------
@@ -168,14 +165,11 @@ protected:
         int localVertexId, bool useCoeffPacking = false) override;
     STD_REGIONS_EXPORT void v_GetInteriorMap(
         Array<OneD, unsigned int> &outarray) override;
-
     STD_REGIONS_EXPORT void v_GetBoundaryMap(
         Array<OneD, unsigned int> &outarray) override;
-
     STD_REGIONS_EXPORT void v_GetTraceCoeffMap(
         const unsigned int traceid,
         Array<OneD, unsigned int> &maparray) override;
-
     STD_REGIONS_EXPORT void v_GetTraceInteriorToElementMap(
         const int eid, Array<OneD, unsigned int> &maparray,
         Array<OneD, int> &signarray,

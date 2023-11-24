@@ -37,25 +37,17 @@
 #define NEKTAR_LIB_STDREGIONS_STDQUADEXP_H
 
 #include <StdRegions/StdExpansion2D.h>
-#include <StdRegions/StdRegions.hpp>
-#include <StdRegions/StdRegionsDeclspec.h>
+#include <StdRegions/StdSegExp.h>
 
 namespace Nektar::StdRegions
 {
-
-class StdExpansion1D;
-
 class StdQuadExp : virtual public StdExpansion2D
 {
-
-    typedef std::shared_ptr<StdExpansion1D> StdExpansion1DSharedPtr;
-
 public:
-    STD_REGIONS_EXPORT StdQuadExp();
     STD_REGIONS_EXPORT StdQuadExp(const LibUtilities::BasisKey &Ba,
                                   const LibUtilities::BasisKey &Bb);
-    STD_REGIONS_EXPORT StdQuadExp(const StdQuadExp &T);
-    STD_REGIONS_EXPORT ~StdQuadExp() override;
+    STD_REGIONS_EXPORT StdQuadExp(const StdQuadExp &T) = default;
+    STD_REGIONS_EXPORT ~StdQuadExp() override          = default;
 
 protected:
     //-------------------------------
@@ -88,9 +80,6 @@ protected:
     STD_REGIONS_EXPORT void v_BwdTrans(
         const Array<OneD, const NekDouble> &inarray,
         Array<OneD, NekDouble> &outarray) override;
-    STD_REGIONS_EXPORT void v_FwdTransBndConstrained(
-        const Array<OneD, const NekDouble> &inarray,
-        Array<OneD, NekDouble> &outarray) override;
     STD_REGIONS_EXPORT void v_BwdTrans_SumFac(
         const Array<OneD, const NekDouble> &inarray,
         Array<OneD, NekDouble> &outarray) override;
@@ -101,6 +90,9 @@ protected:
         Array<OneD, NekDouble> &outarray, Array<OneD, NekDouble> &wsp,
         bool doCheckCollDir0, bool doCheckCollDir1) override;
     STD_REGIONS_EXPORT void v_FwdTrans(
+        const Array<OneD, const NekDouble> &inarray,
+        Array<OneD, NekDouble> &outarray) override;
+    STD_REGIONS_EXPORT void v_FwdTransBndConstrained(
         const Array<OneD, const NekDouble> &inarray,
         Array<OneD, NekDouble> &outarray) override;
 
@@ -136,7 +128,6 @@ protected:
     STD_REGIONS_EXPORT void v_LocCollapsedToLocCoord(
         const Array<OneD, const NekDouble> &eta,
         Array<OneD, NekDouble> &xi) override;
-
     STD_REGIONS_EXPORT void v_FillMode(const int mode,
                                        Array<OneD, NekDouble> &array) override;
 
@@ -150,7 +141,6 @@ protected:
     STD_REGIONS_EXPORT int v_GetTraceNumPoints(const int i) const final;
     STD_REGIONS_EXPORT int v_NumBndryCoeffs() const final;
     STD_REGIONS_EXPORT int v_NumDGBndryCoeffs() const final;
-
     STD_REGIONS_EXPORT int v_CalcNumberOfCoefficients(
         const std::vector<unsigned int> &nummodes, int &modes_offset) override;
     STD_REGIONS_EXPORT const LibUtilities::BasisKey v_GetTraceBasisKey(
@@ -179,11 +169,9 @@ protected:
         Array<OneD, unsigned int> &outarray) override;
     STD_REGIONS_EXPORT int v_GetVertexMap(
         int localVertexId, bool useCoeffPacking = false) override;
-
     STD_REGIONS_EXPORT void v_GetTraceCoeffMap(
         const unsigned int traceid,
         Array<OneD, unsigned int> &maparray) override;
-
     STD_REGIONS_EXPORT void v_GetTraceInteriorToElementMap(
         const int eid, Array<OneD, unsigned int> &maparray,
         Array<OneD, int> &signarray,
