@@ -71,6 +71,7 @@ void CFSImplicit::v_InitObject(bool DeclareFields)
 
     // initialise implicit functors
     m_ode.DefineImplicitSolve(&CFSImplicit::DoImplicitSolve, this);
+    m_ode.DefineOdeImplicitRhs(&CFSImplicit::DoOdeImplicitRhs, this);
 
     InitialiseNonlinSysSolver();
 }
@@ -257,6 +258,27 @@ void CFSImplicit::NonlinSysEvaluatorCoeff(
         }
     }
     return;
+}
+
+void CFSImplicit::DoOdeImplicitRhs(
+    const Array<OneD, const Array<OneD, NekDouble>> &inarray,
+    Array<OneD, Array<OneD, NekDouble>> &outarray, const NekDouble time)
+{
+    int nvariables = inarray.size();
+    int ncoeffs    = m_fields[0]->GetNcoeffs();
+
+    Array<OneD, Array<OneD, NekDouble>> tmpOut(nvariables);
+    for (int i = 0; i < nvariables; ++i)
+    {
+        tmpOut[i] = Array<OneD, NekDouble>(ncoeffs);
+    }
+
+    DoOdeRhsCoeff(inarray, tmpOut, time);
+
+    for (int i = 0; i < nvariables; ++i)
+    {
+        m_fields[i]->BwdTrans(tmpOut[i], outarray[i]);
+    }
 }
 
 /**

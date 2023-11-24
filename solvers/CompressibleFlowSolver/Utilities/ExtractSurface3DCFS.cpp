@@ -51,7 +51,6 @@
 #include <LibUtilities/BasicUtils/NekFactory.hpp>
 #include <LibUtilities/BasicUtils/SessionReader.h>
 #include <LibUtilities/BasicUtils/SharedArray.hpp>
-#include <LibUtilities/Communication/Comm.h>
 
 #include <LibUtilities/Memory/NekMemoryManager.hpp>
 #include <MultiRegions/ContField.h>

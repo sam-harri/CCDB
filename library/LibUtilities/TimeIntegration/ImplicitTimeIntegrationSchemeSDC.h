@@ -120,9 +120,11 @@ void ImplicitTimeIntegrationSchemeSDC::v_InitializeScheme(
 void ImplicitTimeIntegrationSchemeSDC::v_ResidualEval(const NekDouble &delta_t,
                                                       const size_t n)
 {
-    boost::ignore_unused(delta_t, n);
+    // Apply time-dependent boundary condition
+    m_op.DoProjection(m_Y[n], m_tmp, m_time + delta_t * m_tau[n]);
 
-    ASSERTL0(false, "v_ResidualEval not implemented for implicit SDC");
+    // Compute residual
+    m_op.DoOdeImplicitRhs(m_tmp, m_F[n], m_time + delta_t * m_tau[n]);
 }
 
 void ImplicitTimeIntegrationSchemeSDC::v_ResidualEval(const NekDouble &delta_t)

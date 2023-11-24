@@ -26,6 +26,7 @@ v5.5.0
 - Replace `boost::math::tgamma` by `std::tgamma`(!1686)
 - Remove `#include <boost/math/special_functions/fpclassify.hpp>` header (!1686)
 - Replace `boost::regex` with `std::regex` (!1676)
+- Update SDC scheme for implicit PFASST (!1659)
 
 **ADRSolver**
 - Add support for spatially-constant, but variable direction, diffusion to
@@ -43,6 +44,7 @@ v5.5.0
 
 **CompressibleFlowSolver**
 - Add three subsonic inflow boundary conditions: EnforceEntropyPresure, EnforceEntropyVelocity, and EnforceEntropyTotalEnthalpy (!1398)
+- Update implicit solver for implicit PFASST (!1659)
 
 **ShallowWaterSolver**
 - Reduce memory footprint of the Peregrine solver(!1680)
