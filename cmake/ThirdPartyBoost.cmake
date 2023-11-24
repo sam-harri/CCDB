@@ -11,7 +11,7 @@ MESSAGE(STATUS "Searching for Boost:")
 
 # Minimum version and boost libraries required
 SET(MIN_VER "1.60.0")
-SET(NEEDED_BOOST_LIBS thread iostreams system program_options)
+SET(NEEDED_BOOST_LIBS iostreams system program_options)
 
 SET(Boost_NO_BOOST_CMAKE ON)
 IF( BOOST_ROOT )
@@ -224,9 +224,6 @@ IF (THIRDPARTY_BUILD_BOOST)
     MESSAGE(STATUS "Build boost libs: ${NEEDED_BOOST_LIBS_STRING}")
 ELSE (THIRDPARTY_BUILD_BOOST)
     ADD_CUSTOM_TARGET(boost ALL)
-    IF (BOOST_THREAD_LIBRARY)
-        MARK_AS_ADVANCED(BOOST_THREAD_LIBRARY)
-    ENDIF (BOOST_THREAD_LIBRARY)
     SET(Boost_CONFIG_INCLUDE_DIR ${Boost_INCLUDE_DIRS})
     SET(Boost_CONFIG_LIBRARY_DIR ${Boost_LIBRARY_DIRS})
 ENDIF (THIRDPARTY_BUILD_BOOST)

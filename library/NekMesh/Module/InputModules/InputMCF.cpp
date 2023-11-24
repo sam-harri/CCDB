@@ -32,11 +32,12 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
+#include <thread>
+
 #include <LibUtilities/BasicUtils/SessionReader.h>
 #include <NekMesh/CADSystem/CADCurve.h>
 
 #include <boost/algorithm/string.hpp>
-#include <boost/thread.hpp>
 
 #include <tinyxml.h>
 
@@ -660,7 +661,7 @@ void InputMCF::Process()
     ////*** VARIATIONAL OPTIMISATION ****////
     if (m_varopti)
     {
-        unsigned int np = boost::thread::physical_concurrency();
+        unsigned int np = std::thread::hardware_concurrency();
 
         m_log(VERBOSE) << "Detecting " << np << " cores, will attempt to run "
                        << "in parallel" << endl;

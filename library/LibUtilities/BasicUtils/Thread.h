@@ -35,12 +35,11 @@
 #ifndef NEKTAR_LIB_UTILITIES_THREAD_H_
 #define NEKTAR_LIB_UTILITIES_THREAD_H_
 
-#include <boost/thread/condition_variable.hpp>
-#include <boost/thread/locks.hpp>
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/thread.hpp>
 #include <memory>
+#include <mutex>
 #include <queue>
+#include <shared_mutex>
+#include <thread>
 #include <vector>
 
 #include <LibUtilities/BasicUtils/NekFactory.hpp>
@@ -374,8 +373,8 @@ protected:
     LIB_UTILITIES_EXPORT virtual bool v_IsInitialised();
 };
 
-typedef boost::unique_lock<boost::shared_mutex> WriteLock;
-typedef boost::shared_lock<boost::shared_mutex> ReadLock;
+typedef std::unique_lock<std::shared_mutex> WriteLock;
+typedef std::shared_lock<std::shared_mutex> ReadLock;
 
 /**
  * A class to manage multiple ThreadManagers.  It also acts as a cut-out during
@@ -398,7 +397,7 @@ class ThreadMaster
 {
 private:
     std::vector<ThreadManagerSharedPtr> m_threadManagers;
-    boost::shared_mutex m_mutex;
+    std::shared_mutex m_mutex;
     std::string m_threadingType;
 
 public:
