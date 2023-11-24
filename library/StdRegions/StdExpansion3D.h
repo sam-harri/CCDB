@@ -38,11 +38,9 @@
 #define STDEXP3D_H
 
 #include <StdRegions/StdExpansion.h>
-#include <StdRegions/StdRegionsDeclspec.h>
 
 namespace Nektar::StdRegions
 {
-
 class StdExpansion3D;
 typedef std::shared_ptr<StdExpansion3D> StdExpansion3DSharedPtr;
 
@@ -50,13 +48,13 @@ class StdExpansion3D : virtual public StdExpansion
 {
 
 public:
-    STD_REGIONS_EXPORT StdExpansion3D();
     STD_REGIONS_EXPORT StdExpansion3D(int numcoeffs,
                                       const LibUtilities::BasisKey &Ba,
                                       const LibUtilities::BasisKey &Bb,
                                       const LibUtilities::BasisKey &Bc);
-    STD_REGIONS_EXPORT StdExpansion3D(const StdExpansion3D &T);
-    STD_REGIONS_EXPORT ~StdExpansion3D() override;
+    STD_REGIONS_EXPORT StdExpansion3D()                        = default;
+    STD_REGIONS_EXPORT StdExpansion3D(const StdExpansion3D &T) = default;
+    STD_REGIONS_EXPORT ~StdExpansion3D() override              = default;
 
     // Differentiation
 

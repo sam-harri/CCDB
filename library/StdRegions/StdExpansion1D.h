@@ -38,20 +38,17 @@
 #define STDEXP1D_H
 
 #include <StdRegions/StdExpansion.h>
-#include <StdRegions/StdRegionsDeclspec.h>
 
 namespace Nektar::StdRegions
 {
-
 class StdExpansion1D : virtual public StdExpansion
 {
-
 public:
-    STD_REGIONS_EXPORT StdExpansion1D();
     STD_REGIONS_EXPORT StdExpansion1D(int numcoeffs,
                                       const LibUtilities::BasisKey &Ba);
-    STD_REGIONS_EXPORT StdExpansion1D(const StdExpansion1D &T);
-    STD_REGIONS_EXPORT ~StdExpansion1D() override;
+    STD_REGIONS_EXPORT StdExpansion1D()                        = default;
+    STD_REGIONS_EXPORT StdExpansion1D(const StdExpansion1D &T) = default;
+    STD_REGIONS_EXPORT ~StdExpansion1D() override              = default;
 
     /** \brief Evaluate the derivative \f$ d/d{\xi_1} \f$ at the
      *  physical quadrature points given by \a inarray and return in
@@ -105,8 +102,6 @@ protected:
                    std::array<NekDouble, 6> &secondOrderDerivs) override;
 
 private:
-    // Virtual Functions ----------------------------------------
-
     int v_GetShapeDimension() const final
     {
         return 1;

@@ -32,19 +32,14 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/BasicUtils/ShapeType.hpp>
 #include <StdRegions/StdPrismExp.h>
+#include <boost/core/ignore_unused.hpp>
 
 using namespace std;
 
 namespace Nektar::StdRegions
 {
-
-StdPrismExp::StdPrismExp()
-{
-}
 
 StdPrismExp::StdPrismExp(const LibUtilities::BasisKey &Ba,
                          const LibUtilities::BasisKey &Bb,
@@ -58,16 +53,6 @@ StdPrismExp::StdPrismExp(const LibUtilities::BasisKey &Ba,
 {
     ASSERTL0(Ba.GetNumModes() <= Bc.GetNumModes(),
              "order in 'a' direction is higher than order in 'c' direction");
-}
-
-StdPrismExp::StdPrismExp(const StdPrismExp &T)
-    : StdExpansion(T), StdExpansion3D(T)
-{
-}
-
-// Destructor
-StdPrismExp::~StdPrismExp()
-{
 }
 
 //---------------------------------------

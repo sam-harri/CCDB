@@ -42,10 +42,6 @@ using namespace std;
 
 namespace Nektar::StdRegions
 {
-StdHexExp::StdHexExp()
-{
-}
-
 StdHexExp::StdHexExp(const LibUtilities::BasisKey &Ba,
                      const LibUtilities::BasisKey &Bb,
                      const LibUtilities::BasisKey &Bc)
@@ -53,14 +49,6 @@ StdHexExp::StdHexExp(const LibUtilities::BasisKey &Ba,
                    Ba, Bb, Bc),
       StdExpansion3D(Ba.GetNumModes() * Bb.GetNumModes() * Bc.GetNumModes(), Ba,
                      Bb, Bc)
-{
-}
-
-StdHexExp::StdHexExp(const StdHexExp &T) : StdExpansion(T), StdExpansion3D(T)
-{
-}
-
-StdHexExp::~StdHexExp()
 {
 }
 

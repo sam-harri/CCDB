@@ -37,18 +37,12 @@
 #define NEKTAR_LIB_STDREGIONS_STDTETEXP_H
 
 #include <StdRegions/StdExpansion3D.h>
-#include <StdRegions/StdRegions.hpp>
-#include <StdRegions/StdRegionsDeclspec.h>
 
 namespace Nektar::StdRegions
 {
-class StdMatrixKey;
-
 class StdTetExp : virtual public StdExpansion3D
 {
-
 public:
-    STD_REGIONS_EXPORT StdTetExp();
     STD_REGIONS_EXPORT StdTetExp(const LibUtilities::BasisKey &Ba,
                                  const LibUtilities::BasisKey &Bb,
                                  const LibUtilities::BasisKey &Bc);
@@ -56,8 +50,8 @@ public:
                                  const LibUtilities::BasisKey &Bb,
                                  const LibUtilities::BasisKey &Bc,
                                  NekDouble *coeffs, NekDouble *phys);
-    STD_REGIONS_EXPORT StdTetExp(const StdTetExp &T);
-    STD_REGIONS_EXPORT ~StdTetExp() override;
+    STD_REGIONS_EXPORT StdTetExp(const StdTetExp &T) = default;
+    STD_REGIONS_EXPORT ~StdTetExp() override         = default;
 
     LibUtilities::ShapeType DetShapeType() const
     {
@@ -148,7 +142,6 @@ protected:
         Array<OneD, NekDouble> &coords_z) override;
     STD_REGIONS_EXPORT void v_FillMode(
         const int mode, Array<OneD, NekDouble> &outarray) override;
-
     STD_REGIONS_EXPORT NekDouble v_PhysEvaluateBasis(
         const Array<OneD, const NekDouble> &coords, int mode) final;
 
@@ -156,7 +149,6 @@ protected:
     v_PhysEvaluate(const Array<OneD, NekDouble> &coord,
                    const Array<OneD, const NekDouble> &inarray,
                    std::array<NekDouble, 3> &firstOrderDerivs) override;
-
     STD_REGIONS_EXPORT void v_GetTraceNumModes(
         const int fid, int &numModes0, int &numModes1,
         Orientation traceOrient = eDir1FwdDir1_Dir2FwdDir2) override;
@@ -193,17 +185,14 @@ protected:
         Array<OneD, unsigned int> &outarray) override;
     STD_REGIONS_EXPORT void v_GetTraceCoeffMap(
         const unsigned int fid, Array<OneD, unsigned int> &maparray) override;
-
     STD_REGIONS_EXPORT void v_GetElmtTraceToTraceMap(
         const unsigned int tid, Array<OneD, unsigned int> &maparray,
         Array<OneD, int> &signarray, Orientation traceOrient = eForwards,
         int P = -1, int Q = -1) override;
-
     STD_REGIONS_EXPORT void v_GetEdgeInteriorToElementMap(
         const int tid, Array<OneD, unsigned int> &maparray,
         Array<OneD, int> &signarray,
         const Orientation traceOrient = eDir1FwdDir1_Dir2FwdDir2) override;
-
     STD_REGIONS_EXPORT void v_GetTraceInteriorToElementMap(
         const int tid, Array<OneD, unsigned int> &maparray,
         Array<OneD, int> &signarray,
@@ -216,11 +205,9 @@ protected:
     v_GenMatrix(const StdMatrixKey &mkey) override;
     STD_REGIONS_EXPORT DNekMatSharedPtr
     v_CreateStdMatrix(const StdMatrixKey &mkey) override;
-
     STD_REGIONS_EXPORT void v_MultiplyByStdQuadratureMetric(
         const Array<OneD, const NekDouble> &inarray,
         Array<OneD, NekDouble> &outarray) override;
-
     STD_REGIONS_EXPORT void v_SVVLaplacianFilter(
         Array<OneD, NekDouble> &array, const StdMatrixKey &mkey) override;
 
@@ -233,8 +220,6 @@ protected:
 
     //---------------------------------------
     // Output interpolation functions
-    //---------------------------------------
-
     STD_REGIONS_EXPORT void v_GetSimplexEquiSpacedConnectivity(
         Array<OneD, int> &conn, bool standard = true) override;
 

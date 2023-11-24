@@ -38,17 +38,16 @@
 #include <boost/core/ignore_unused.hpp>
 
 #include <StdRegions/StdExpansion0D.h>
-#include <StdRegions/StdRegionsDeclspec.h>
 
 namespace Nektar::StdRegions
 {
 class StdPointExp : virtual public StdExpansion0D
 {
 public:
-    STD_REGIONS_EXPORT StdPointExp();
     STD_REGIONS_EXPORT StdPointExp(const LibUtilities::BasisKey &Ba);
-    STD_REGIONS_EXPORT StdPointExp(const StdPointExp &T);
-    STD_REGIONS_EXPORT ~StdPointExp() override;
+    STD_REGIONS_EXPORT StdPointExp()                     = default;
+    STD_REGIONS_EXPORT StdPointExp(const StdPointExp &T) = default;
+    STD_REGIONS_EXPORT ~StdPointExp() override           = default;
 
 protected:
     //----------------------------

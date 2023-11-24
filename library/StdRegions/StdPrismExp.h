@@ -37,30 +37,22 @@
 #define NEKTAR_LIB_STDREGIONS_STDPRISMEXP_H
 
 #include <StdRegions/StdExpansion3D.h>
-#include <StdRegions/StdRegionsDeclspec.h>
 
 namespace Nektar::StdRegions
 {
-
 /// Class representing a prismatic element in reference space.
 class StdPrismExp : virtual public StdExpansion3D
 {
-
 public:
-    STD_REGIONS_EXPORT StdPrismExp();
-
     STD_REGIONS_EXPORT StdPrismExp(const LibUtilities::BasisKey &Ba,
                                    const LibUtilities::BasisKey &Bb,
                                    const LibUtilities::BasisKey &Bc);
-
     STD_REGIONS_EXPORT StdPrismExp(const LibUtilities::BasisKey &Ba,
                                    const LibUtilities::BasisKey &Bb,
                                    const LibUtilities::BasisKey &Bc,
                                    NekDouble *coeffs, NekDouble *phys);
-
-    STD_REGIONS_EXPORT StdPrismExp(const StdPrismExp &T);
-
-    STD_REGIONS_EXPORT ~StdPrismExp() override;
+    STD_REGIONS_EXPORT StdPrismExp(const StdPrismExp &T) = default;
+    STD_REGIONS_EXPORT ~StdPrismExp() override           = default;
 
 protected:
     //---------------------------------------
@@ -163,14 +155,11 @@ protected:
     STD_REGIONS_EXPORT int v_GetTraceNcoeffs(const int i) const override;
     STD_REGIONS_EXPORT int v_GetTraceIntNcoeffs(const int i) const override;
     STD_REGIONS_EXPORT int v_GetTraceNumPoints(const int i) const override;
-
     STD_REGIONS_EXPORT int v_GetEdgeNcoeffs(const int i) const override;
-
     STD_REGIONS_EXPORT const LibUtilities::BasisKey v_GetTraceBasisKey(
         const int i, const int k) const override;
     STD_REGIONS_EXPORT LibUtilities::PointsKey v_GetTracePointsKey(
         const int i, const int j) const override;
-
     STD_REGIONS_EXPORT int v_CalcNumberOfCoefficients(
         const std::vector<unsigned int> &nummodes, int &modes_offset) override;
     STD_REGIONS_EXPORT bool v_IsBoundaryInteriorExpansion() const override;
@@ -194,7 +183,6 @@ protected:
         const int tid, Array<OneD, unsigned int> &maparray,
         Array<OneD, int> &signarray,
         const Orientation traceOrient = eDir1FwdDir1_Dir2FwdDir2) override;
-
     STD_REGIONS_EXPORT void v_GetTraceInteriorToElementMap(
         const int tid, Array<OneD, unsigned int> &maparray,
         Array<OneD, int> &signarray,
@@ -207,11 +195,9 @@ protected:
     v_GenMatrix(const StdMatrixKey &mkey) override;
     STD_REGIONS_EXPORT DNekMatSharedPtr
     v_CreateStdMatrix(const StdMatrixKey &mkey) override;
-
     STD_REGIONS_EXPORT void v_MultiplyByStdQuadratureMetric(
         const Array<OneD, const NekDouble> &inarray,
         Array<OneD, NekDouble> &outarray) override;
-
     STD_REGIONS_EXPORT void v_SVVLaplacianFilter(
         Array<OneD, NekDouble> &array, const StdMatrixKey &mkey) override;
 

@@ -41,10 +41,6 @@ using namespace std;
 
 namespace Nektar::StdRegions
 {
-StdTetExp::StdTetExp()
-{
-}
-
 StdTetExp::StdTetExp(const LibUtilities::BasisKey &Ba,
                      const LibUtilities::BasisKey &Bb,
                      const LibUtilities::BasisKey &Bc)
@@ -64,14 +60,6 @@ StdTetExp::StdTetExp(const LibUtilities::BasisKey &Ba,
     ASSERTL0(Bb.GetNumModes() <= Bc.GetNumModes(),
              "order in 'b' direction is higher than order "
              "in 'c' direction");
-}
-
-StdTetExp::StdTetExp(const StdTetExp &T) : StdExpansion(T), StdExpansion3D(T)
-{
-}
-
-StdTetExp::~StdTetExp()
-{
 }
 
 //----------------------------
@@ -986,7 +974,7 @@ int StdTetExp::v_GetNtraces() const
 
 LibUtilities::ShapeType StdTetExp::v_DetShapeType() const
 {
-    return DetShapeType();
+    return LibUtilities::eTetrahedron;
 }
 
 int StdTetExp::v_NumBndryCoeffs() const

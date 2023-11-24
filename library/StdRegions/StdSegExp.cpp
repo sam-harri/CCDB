@@ -41,11 +41,6 @@ using namespace std;
 
 namespace Nektar::StdRegions
 {
-/** \brief defult constructor */
-StdSegExp::StdSegExp()
-{
-}
-
 /** \brief Constructor using BasisKey class for quadrature points and
  *  order definition
  *
@@ -55,16 +50,6 @@ StdSegExp::StdSegExp()
 StdSegExp::StdSegExp(const LibUtilities::BasisKey &Ba)
     : StdExpansion(Ba.GetNumModes(), 1, Ba),
       StdExpansion1D(Ba.GetNumModes(), Ba)
-{
-}
-
-/** \brief Copy Constructor */
-StdSegExp::StdSegExp(const StdSegExp &T) : StdExpansion(T), StdExpansion1D(T)
-{
-}
-
-/** \brief Destructor */
-StdSegExp::~StdSegExp()
 {
 }
 
@@ -161,7 +146,6 @@ void StdSegExp::v_StdPhysDeriv(const Array<OneD, const NekDouble> &inarray,
 {
     boost::ignore_unused(out_d1, out_d2);
     PhysTensorDeriv(inarray, out_d0);
-    // PhysDeriv(inarray, out_d0);
 }
 
 void StdSegExp::v_StdPhysDeriv(const int dir,
@@ -171,7 +155,6 @@ void StdSegExp::v_StdPhysDeriv(const int dir,
     boost::ignore_unused(dir);
     ASSERTL1(dir == 0, "input dir is out of range");
     PhysTensorDeriv(inarray, outarray);
-    // PhysDeriv(inarray, outarray);
 }
 
 //---------------------------------------------------------------------
@@ -208,7 +191,6 @@ void StdSegExp::v_BwdTrans(const Array<OneD, const NekDouble> &inarray,
     }
     else
     {
-
         Blas::Dgemv('N', nquad, m_base[0]->GetNumModes(), 1.0,
                     (m_base[0]->GetBdata()).get(), nquad, &inarray[0], 1, 0.0,
                     &outarray[0], 1);

@@ -41,24 +41,9 @@ using namespace std;
 namespace Nektar::StdRegions
 {
 
-StdPointExp::StdPointExp()
-{
-}
-
 StdPointExp::StdPointExp(const LibUtilities::BasisKey &Ba)
     : StdExpansion(Ba.GetNumModes(), 1, Ba),
       StdExpansion0D(Ba.GetNumModes(), Ba)
-{
-}
-
-/** \brief Copy Constructor */
-
-StdPointExp::StdPointExp(const StdPointExp &T)
-    : StdExpansion(T), StdExpansion0D(T)
-{
-}
-
-StdPointExp::~StdPointExp()
 {
 }
 

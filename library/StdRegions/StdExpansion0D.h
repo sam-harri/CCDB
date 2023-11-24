@@ -38,34 +38,26 @@
 #define STDEXP0D_H
 
 #include <StdRegions/StdExpansion.h>
-#include <StdRegions/StdRegionsDeclspec.h>
 
 namespace Nektar::StdRegions
 {
-
 class StdExpansion0D : virtual public StdExpansion
 {
-
 public:
-    STD_REGIONS_EXPORT StdExpansion0D();
-
     STD_REGIONS_EXPORT StdExpansion0D(int numcoeffs,
                                       const LibUtilities::BasisKey &Ba);
-    STD_REGIONS_EXPORT StdExpansion0D(const StdExpansion0D &T);
-    STD_REGIONS_EXPORT ~StdExpansion0D() override;
+    STD_REGIONS_EXPORT StdExpansion0D()                        = default;
+    STD_REGIONS_EXPORT StdExpansion0D(const StdExpansion0D &T) = default;
+    STD_REGIONS_EXPORT ~StdExpansion0D() override              = default;
 
     STD_REGIONS_EXPORT void PhysTensorDeriv(
         const Array<OneD, const NekDouble> &inarray,
         Array<OneD, NekDouble> &outarray);
 
-    // Virtual Functions ----------------------------------------
 protected:
     STD_REGIONS_EXPORT NekDouble
     v_PhysEvaluate(const Array<OneD, const NekDouble> &coords,
                    const Array<OneD, const NekDouble> &physvals) override;
-    //    STD_REGIONS_EXPORT virtual NekDouble v_PhysEvaluate(
-    //        const Array<OneD, DNekMatSharedPtr> &I,
-    //        const Array<OneD, const NekDouble> &physvals) override;
 
     int v_GetShapeDimension() const final
     {

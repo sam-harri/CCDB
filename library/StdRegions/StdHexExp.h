@@ -35,9 +35,7 @@
 #ifndef NEKTAR_LIBRARY_STDREGIONS_STDHEXEXP_H
 #define NEKTAR_LIBRARY_STDREGIONS_STDHEXEXP_H
 
-//#include <StdRegions/StdRegions.hpp>
 #include <StdRegions/StdExpansion3D.h>
-#include <StdRegions/StdRegionsDeclspec.h>
 
 namespace Nektar::StdRegions
 {
@@ -46,12 +44,11 @@ class StdHexExp : virtual public StdExpansion3D
 {
 
 public:
-    STD_REGIONS_EXPORT StdHexExp();
     STD_REGIONS_EXPORT StdHexExp(const LibUtilities::BasisKey &Ba,
                                  const LibUtilities::BasisKey &Bb,
                                  const LibUtilities::BasisKey &Bc);
-    STD_REGIONS_EXPORT StdHexExp(const StdHexExp &T);
-    STD_REGIONS_EXPORT ~StdHexExp() override;
+    STD_REGIONS_EXPORT StdHexExp(const StdHexExp &T) = default;
+    STD_REGIONS_EXPORT ~StdHexExp() override         = default;
 
 protected:
     //----------------------------
@@ -78,11 +75,9 @@ protected:
     STD_REGIONS_EXPORT void v_BwdTrans(
         const Array<OneD, const NekDouble> &inarray,
         Array<OneD, NekDouble> &outarray) override;
-
     STD_REGIONS_EXPORT void v_BwdTrans_SumFac(
         const Array<OneD, const NekDouble> &inarray,
         Array<OneD, NekDouble> &outarray) override;
-
     STD_REGIONS_EXPORT void v_BwdTrans_SumFacKernel(
         const Array<OneD, const NekDouble> &base0,
         const Array<OneD, const NekDouble> &base1,
@@ -91,7 +86,6 @@ protected:
         Array<OneD, NekDouble> &outarray, Array<OneD, NekDouble> &wsp,
         bool doCheckCollDir0, bool doCheckCollDir1,
         bool doCheckCollDir2) override;
-
     STD_REGIONS_EXPORT void v_FwdTrans(
         const Array<OneD, const NekDouble> &inarray,
         Array<OneD, NekDouble> &outarray) override;
@@ -102,11 +96,9 @@ protected:
     STD_REGIONS_EXPORT void v_IProductWRTBase(
         const Array<OneD, const NekDouble> &inarray,
         Array<OneD, NekDouble> &outarray) override;
-
     STD_REGIONS_EXPORT void v_IProductWRTBase_SumFac(
         const Array<OneD, const NekDouble> &inarray,
         Array<OneD, NekDouble> &outarray, bool multbyweights = true) override;
-
     STD_REGIONS_EXPORT void v_IProductWRTBase_SumFacKernel(
         const Array<OneD, const NekDouble> &base0,
         const Array<OneD, const NekDouble> &base1,
@@ -115,11 +107,9 @@ protected:
         Array<OneD, NekDouble> &outarray, Array<OneD, NekDouble> &wsp,
         bool doCheckCollDir0, bool doCheckCollDir1,
         bool doCheckCollDir2) override;
-
     STD_REGIONS_EXPORT void v_IProductWRTDerivBase(
         const int dir, const Array<OneD, const NekDouble> &inarray,
         Array<OneD, NekDouble> &outarray) override;
-
     STD_REGIONS_EXPORT void v_IProductWRTDerivBase_SumFac(
         const int dir, const Array<OneD, const NekDouble> &inarray,
         Array<OneD, NekDouble> &outarray) override;
@@ -154,7 +144,6 @@ protected:
     STD_REGIONS_EXPORT int v_GetTraceNcoeffs(const int i) const override;
     STD_REGIONS_EXPORT int v_GetTraceIntNcoeffs(const int i) const override;
     STD_REGIONS_EXPORT int v_GetTraceNumPoints(const int i) const override;
-
     STD_REGIONS_EXPORT LibUtilities::PointsKey v_GetTracePointsKey(
         const int i, const int j) const override;
     STD_REGIONS_EXPORT int v_CalcNumberOfCoefficients(
@@ -168,7 +157,6 @@ protected:
     STD_REGIONS_EXPORT void v_GetTraceNumModes(
         const int fid, int &numModes0, int &numModes1,
         Orientation faceOrient = eDir1FwdDir1_Dir2FwdDir2) override;
-
     STD_REGIONS_EXPORT int v_GetEdgeNcoeffs(const int i) const override;
 
     //--------------------------
@@ -190,7 +178,6 @@ protected:
         const int tid, Array<OneD, unsigned int> &maparray,
         Array<OneD, int> &signarray,
         const Orientation traceOrient = eDir1FwdDir1_Dir2FwdDir2) override;
-
     STD_REGIONS_EXPORT void v_GetTraceInteriorToElementMap(
         const int tid, Array<OneD, unsigned int> &maparray,
         Array<OneD, int> &signarray,
@@ -216,30 +203,23 @@ protected:
     STD_REGIONS_EXPORT void v_MassMatrixOp(
         const Array<OneD, const NekDouble> &inarray,
         Array<OneD, NekDouble> &outarray, const StdMatrixKey &mkey) override;
-
     STD_REGIONS_EXPORT void v_LaplacianMatrixOp(
         const Array<OneD, const NekDouble> &inarray,
         Array<OneD, NekDouble> &outarray, const StdMatrixKey &mkey) override;
-
     STD_REGIONS_EXPORT void v_LaplacianMatrixOp(
         const int k1, const int k2, const Array<OneD, const NekDouble> &inarray,
         Array<OneD, NekDouble> &outarray, const StdMatrixKey &mkey) override;
-
     STD_REGIONS_EXPORT void v_WeakDerivMatrixOp(
         const int i, const Array<OneD, const NekDouble> &inarray,
         Array<OneD, NekDouble> &outarray, const StdMatrixKey &mkey) override;
-
     STD_REGIONS_EXPORT void v_HelmholtzMatrixOp(
         const Array<OneD, const NekDouble> &inarray,
         Array<OneD, NekDouble> &outarray, const StdMatrixKey &mkey) override;
-
     STD_REGIONS_EXPORT void v_MultiplyByStdQuadratureMetric(
         const Array<OneD, const NekDouble> &inarray,
         Array<OneD, NekDouble> &outarray) override;
-
     STD_REGIONS_EXPORT void v_SVVLaplacianFilter(
         Array<OneD, NekDouble> &array, const StdMatrixKey &mkey) override;
-
     STD_REGIONS_EXPORT void v_ExponentialFilter(
         Array<OneD, NekDouble> &array, const NekDouble alpha,
         const NekDouble exponent, const NekDouble cutoff) override;

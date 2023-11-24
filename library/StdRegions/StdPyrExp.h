@@ -37,61 +37,22 @@
 #define NEKTAR_LIBS_STDREGIONS_STDPYREXP_H
 
 #include <StdRegions/StdExpansion3D.h>
-#include <StdRegions/StdRegionsDeclspec.h>
-#include <tuple>
 
 namespace Nektar::StdRegions
 {
-typedef std::tuple<unsigned int, unsigned int, unsigned int, unsigned int> Mode;
-
-struct cmpop
-{
-    bool operator()(Mode const &a, Mode const &b) const
-    {
-        if (std::get<0>(a) < std::get<0>(b))
-        {
-            return true;
-        }
-        if (std::get<0>(a) > std::get<0>(b))
-        {
-            return false;
-        }
-
-        if (std::get<1>(a) < std::get<1>(b))
-        {
-            return true;
-        }
-        if (std::get<1>(a) > std::get<1>(b))
-        {
-            return false;
-        }
-
-        if (std::get<2>(a) < std::get<2>(b))
-        {
-            return true;
-        }
-
-        return false;
-    }
-};
-
 class StdPyrExp : virtual public StdExpansion3D
 {
 public:
-    STD_REGIONS_EXPORT StdPyrExp() = default;
-
     STD_REGIONS_EXPORT StdPyrExp(const LibUtilities::BasisKey &Ba,
                                  const LibUtilities::BasisKey &Bb,
                                  const LibUtilities::BasisKey &Bc);
-
     STD_REGIONS_EXPORT StdPyrExp(const LibUtilities::BasisKey &Ba,
                                  const LibUtilities::BasisKey &Bb,
                                  const LibUtilities::BasisKey &Bc,
                                  NekDouble *coeffs, NekDouble *phys);
-
-    STD_REGIONS_EXPORT StdPyrExp(const StdPyrExp &T);
-
-    STD_REGIONS_EXPORT ~StdPyrExp() override = default;
+    StdPyrExp()                   = default;
+    StdPyrExp(const StdPyrExp &T) = default;
+    ~StdPyrExp() override         = default;
 
 protected:
     //---------------------------------------
@@ -178,7 +139,6 @@ protected:
     STD_REGIONS_EXPORT void v_GetTraceNumModes(
         const int fid, int &numModes0, int &numModes1,
         Orientation faceOrient = eDir1FwdDir1_Dir2FwdDir2) override;
-
     STD_REGIONS_EXPORT NekDouble v_PhysEvaluateBasis(
         const Array<OneD, const NekDouble> &coords, int mode) final;
     STD_REGIONS_EXPORT NekDouble
@@ -198,7 +158,6 @@ protected:
     STD_REGIONS_EXPORT int v_GetTraceNcoeffs(const int i) const override;
     STD_REGIONS_EXPORT int v_GetTraceIntNcoeffs(const int i) const override;
     STD_REGIONS_EXPORT int v_GetTraceNumPoints(const int i) const override;
-
     STD_REGIONS_EXPORT int v_GetEdgeNcoeffs(const int i) const override;
     STD_REGIONS_EXPORT int v_CalcNumberOfCoefficients(
         const std::vector<unsigned int> &nummodes, int &modes_offset) override;
@@ -236,7 +195,6 @@ protected:
     v_GenMatrix(const StdMatrixKey &mkey) override;
     STD_REGIONS_EXPORT DNekMatSharedPtr
     v_CreateStdMatrix(const StdMatrixKey &mkey) override;
-
     STD_REGIONS_EXPORT void v_SVVLaplacianFilter(
         Array<OneD, NekDouble> &array, const StdMatrixKey &mkey) override;
 
