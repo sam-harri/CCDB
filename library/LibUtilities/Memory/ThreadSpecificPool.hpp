@@ -44,7 +44,7 @@
 #include <memory>
 
 #ifdef NEKTAR_USE_THREAD_SAFETY
-#include <boost/thread/mutex.hpp>
+#include <mutex>
 #endif
 
 #ifdef NEKTAR_USE_ALIGNED_MEM
@@ -104,7 +104,7 @@ public:
     void *Allocate()
     {
 #ifdef NEKTAR_USE_THREAD_SAFETY
-        boost::mutex::scoped_lock l(m_mutex);
+        std::scoped_lock l(m_mutex);
 #endif
         void *result = m_pool->malloc();
 
@@ -122,7 +122,7 @@ public:
     void Deallocate(const void *p)
     {
 #ifdef NEKTAR_USE_THREAD_SAFETY
-        boost::mutex::scoped_lock l(m_mutex);
+        std::scoped_lock l(m_mutex);
 #endif
 #if defined(NEKTAR_DEBUG) || defined(NEKTAR_FULLDEBUG)
         // The idea here is to fill the returned memory with some known
@@ -142,7 +142,7 @@ private:
     boost::pool<> *m_pool;
     size_t m_blockSize;
 #ifdef NEKTAR_USE_THREAD_SAFETY
-    boost::mutex m_mutex;
+    std::mutex m_mutex;
 #endif
 };
 } // namespace detail

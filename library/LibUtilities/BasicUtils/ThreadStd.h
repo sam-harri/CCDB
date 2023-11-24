@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 //
-// File: ThreadBoost.h
+// File: ThreadStd.h
 //
 // For more information, please see: http://www.nektar.info
 //
@@ -28,48 +28,82 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 //
-// Description:
+// Description: Thread manager implementation using std::thread.
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef NEKTAR_LIBUTILITIES_THREADBOOST_H_
-#define NEKTAR_LIBUTILITIES_THREADBOOST_H_
+#ifndef NEKTAR_LIBUTILITIES_THREADSTD_H_
+#define NEKTAR_LIBUTILITIES_THREADSTD_H_
 
-#include "LibUtilities/BasicUtils/Thread.h"
-#include <boost/thread/barrier.hpp>
+#include <condition_variable>
 #include <map>
+#include <mutex>
 #include <queue>
 #include <vector>
 
-#include "LibUtilities/Memory/NekMemoryManager.hpp"
+#include <LibUtilities/BasicUtils/Thread.h>
+#include <LibUtilities/Memory/NekMemoryManager.hpp>
 
 namespace Nektar::Thread
 {
 
-typedef boost::unique_lock<boost::mutex> Lock;
+typedef std::unique_lock<std::mutex> Lock;
 
-class ThreadWorkerBoost;
+class ThreadWorkerStd;
 
 /**
- * @brief Implementation of ThreadManager using Boost threads.
+ * @brief Implementation of ThreadManager using std::thread.
  */
-class ThreadManagerBoost : public ThreadManager
+class ThreadManagerStd : public ThreadManager
 {
+    /// Lightweight barrier class
+    class Barrier
+    {
+    public:
+        explicit Barrier(std::size_t iCount)
+            : mThreshold(iCount), mCount(iCount), mGeneration(0)
+        {
+        }
+
+        void Wait()
+        {
+            std::unique_lock<std::mutex> lLock{mMutex};
+            auto lGen = mGeneration;
+            if (!--mCount)
+            {
+                mGeneration++;
+                mCount = mThreshold;
+                mCond.notify_all();
+            }
+            else
+            {
+                mCond.wait(lLock, [this, lGen] { return lGen != mGeneration; });
+            }
+        }
+
+    private:
+        std::mutex mMutex;
+        std::condition_variable mCond;
+        std::size_t mThreshold;
+        std::size_t mCount;
+        std::size_t mGeneration;
+    };
+
     /**
      * So the workers can access the master queue and locks.
      */
-    friend class ThreadWorkerBoost;
+    friend class ThreadWorkerStd;
 
 public:
-    /// Constructs a ThreadManagerBoost.
-    ThreadManagerBoost(unsigned int numWorkers);
+    /// Constructs a ThreadManagerStd.
+    ThreadManagerStd(unsigned int numWorkers);
     /// Shuts down threading.
-    ~ThreadManagerBoost() override;
+    ~ThreadManagerStd() override;
 
     /// Called by the factory method.
     static ThreadManagerSharedPtr Create(unsigned int numT)
     {
-        return std::shared_ptr<ThreadManager>(new ThreadManagerBoost(numT));
+        return std::shared_ptr<ThreadManager>(new ThreadManagerStd(numT));
     }
 
 protected:
@@ -88,8 +122,8 @@ protected:
     const std::string &v_GetType() const override;
 
 private:
-    ThreadManagerBoost();
-    ThreadManagerBoost(const ThreadManagerBoost &);
+    ThreadManagerStd();
+    ThreadManagerStd(const ThreadManagerStd &);
     bool IsWorking();
     void SetNumWorkersImpl(const unsigned int num);
 
@@ -97,40 +131,38 @@ private:
     const unsigned int m_numThreads;
     unsigned int m_numWorkers;
     std::queue<ThreadJob *> m_masterQueue;
-    boost::mutex m_masterQueueMutex;
-    boost::mutex m_masterActiveMutex;
-    boost::condition_variable m_masterQueueCondVar;
-    boost::condition_variable m_masterActiveCondVar;
-    ThreadWorkerBoost **m_threadList;
-    boost::thread **m_threadThreadList;
-    boost::thread::id m_masterThreadId;
+    std::mutex m_masterQueueMutex;
+    std::mutex m_masterActiveMutex;
+    std::condition_variable m_masterQueueCondVar;
+    std::condition_variable m_masterActiveCondVar;
+    ThreadWorkerStd **m_threadList;
+    std::thread **m_threadThreadList;
+    std::thread::id m_masterThreadId;
     bool *m_threadBusyList;
     bool *m_threadActiveList;
     unsigned int m_chunkSize;
     SchedType m_schedType;
-    boost::barrier *m_barrier;
-    std::map<boost::thread::id, unsigned int> m_threadMap;
+    Barrier *m_barrier;
+    std::map<std::thread::id, unsigned int> m_threadMap;
     static std::string className;
     std::string m_type;
 };
 
 /**
- * @brief Implementation class for ThreadManagerBoost.
+ * @brief Implementation class for ThreadManagerStd.
  *
  * Each instance of this class corresponds to a worker thread.
  * Instances manage their own queue of jobs to run, grabbing new
  * jobs from the master queue when it is exhausted.
  */
-class ThreadWorkerBoost
+class ThreadWorkerStd
 {
 public:
     /// Constructor
-    ThreadWorkerBoost(ThreadManagerBoost *threadManager,
-                      unsigned int workerNum);
+    ThreadWorkerStd(ThreadManagerStd *threadManager, unsigned int workerNum);
     /// Destructor.
-    ~ThreadWorkerBoost();
-    /// This provides the interface that boost::thread uses to start the
-    /// worker.
+    ~ThreadWorkerStd();
+    /// This provides the interface that std::thread uses to start the worker.
     void operator()()
     {
         MainLoop();
@@ -148,7 +180,7 @@ public:
      * @brief A signal to shut down.
      *
      * If this method is called the worker will shut down.  Used by the
-     * ThreadManagerBoost to stop threading.
+     * ThreadManagerStd to stop threading.
      */
     void Stop()
     {
@@ -156,8 +188,8 @@ public:
     };
 
 private:
-    ThreadWorkerBoost();
-    ThreadWorkerBoost(const ThreadWorkerBoost &);
+    ThreadWorkerStd();
+    ThreadWorkerStd(const ThreadWorkerStd &);
     void MainLoop();
     void LoadJobs();
     unsigned int GetNumToLoad();
@@ -165,11 +197,12 @@ private:
     void RunJobs();
 
     // Member variables
-    ThreadManagerBoost *m_threadManager;
+    ThreadManagerStd *m_threadManager;
     std::queue<ThreadJob *> m_workerQueue;
     bool m_keepgoing;
     unsigned int m_threadNum;
 };
 
 } // namespace Nektar::Thread
-#endif /* THREADBOOST_H_ */
+
+#endif

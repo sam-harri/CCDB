@@ -32,7 +32,7 @@ SET(BasicUtilsHeaders
     ./BasicUtils/SharedArray.hpp
     ./BasicUtils/Smath.hpp
     ./BasicUtils/Thread.h
-    ./BasicUtils/ThreadBoost.h
+    ./BasicUtils/ThreadStd.h
     ./BasicUtils/Vmath.hpp
     ./BasicUtils/VmathSIMD.hpp
     ./BasicUtils/VmathArray.hpp
@@ -55,7 +55,7 @@ SET(BasicUtilsSources
 ./BasicUtils/PtsIO.cpp
 ./BasicUtils/SessionReader.cpp
 ./BasicUtils/Thread.cpp
-./BasicUtils/ThreadBoost.cpp
+./BasicUtils/ThreadStd.cpp
 ./BasicUtils/Timer.cpp
 ./BasicUtils/Vmath.cpp
 )
@@ -424,10 +424,9 @@ ENDIF( NEKTAR_USE_ARPACK )
 
 # Boost
 TARGET_LINK_LIBRARIES(LibUtilities LINK_PUBLIC
-  ${Boost_THREAD_LIBRARY}
   ${Boost_IOSTREAMS_LIBRARY}
-  ${Boost_PROGRAM_OPTIONS_LIBRARY}
   ${Boost_SYSTEM_LIBRARY}
+  ${Boost_PROGRAM_OPTIONS_LIBRARY}
   optimized ${ZLIB_LIBRARIES} debug ${ZLIB_LIBRARIES_DEBUG}
 )
 

@@ -41,8 +41,8 @@
 #include <sstream>
 
 #ifdef NEKTAR_USE_THREAD_SAFETY
-#include <boost/thread/locks.hpp>
-#include <boost/thread/shared_mutex.hpp>
+#include <shared_mutex>
+#include <thread>
 #endif
 
 #include <LibUtilities/BasicUtils/ErrorUtil.hpp>
@@ -50,8 +50,8 @@
 namespace Nektar::LibUtilities
 {
 #ifdef NEKTAR_USE_THREAD_SAFETY
-typedef boost::unique_lock<boost::shared_mutex> WriteLock;
-typedef boost::shared_lock<boost::shared_mutex> ReadLock;
+typedef std::unique_lock<std::shared_mutex> WriteLock;
+typedef std::shared_lock<std::shared_mutex> ReadLock;
 #endif
 
 template <typename KeyType> struct defOpLessCreator
@@ -317,7 +317,7 @@ private:
     CreateFuncType m_globalCreateFunc;
     CreateFuncContainer m_keySpecificCreateFuncs;
 #ifdef NEKTAR_USE_THREAD_SAFETY
-    static boost::shared_mutex m_mutex;
+    static std::shared_mutex m_mutex;
 #endif
 };
 
@@ -330,8 +330,7 @@ typename NekManager<KeyType, ValueT, opLessCreator>::FlagContainerPool
                opLessCreator>::m_managementEnabledContainerPool;
 #ifdef NEKTAR_USE_THREAD_SAFETY
 template <typename KeyType, typename ValueT, typename opLessCreator>
-typename boost::shared_mutex
-    NekManager<KeyType, ValueT, opLessCreator>::m_mutex;
+typename std::shared_mutex NekManager<KeyType, ValueT, opLessCreator>::m_mutex;
 #endif
 } // namespace Nektar::LibUtilities
 

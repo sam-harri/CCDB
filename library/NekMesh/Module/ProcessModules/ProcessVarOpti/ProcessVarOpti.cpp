@@ -307,7 +307,7 @@ void ProcessVarOpti::Process()
 
     int ctr = 0;
     Thread::ThreadMaster tms;
-    tms.SetThreadingType("ThreadManagerBoost");
+    tms.SetThreadingType("ThreadManagerStd");
     Thread::ThreadManagerSharedPtr tm =
         tms.CreateInstance(Thread::ThreadMaster::SessionJob, nThreads);
 

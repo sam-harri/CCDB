@@ -36,7 +36,6 @@
 #include <LibUtilities/BasicUtils/Timer.h>
 #include <LibUtilities/Interpreter/Interpreter.h>
 
-#define BOOST_SPIRIT_THREADSAFE
 #include <boost/spirit/include/classic_assign_actor.hpp>
 #include <boost/spirit/include/classic_ast.hpp>
 #include <boost/spirit/include/classic_core.hpp>

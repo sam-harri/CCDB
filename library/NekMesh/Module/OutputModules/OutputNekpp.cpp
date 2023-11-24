@@ -34,6 +34,8 @@
 
 #include <set>
 #include <string>
+#include <thread>
+
 using namespace std;
 
 #include <boost/algorithm/string/classification.hpp>
@@ -43,7 +45,7 @@ using namespace std;
 #include <boost/iostreams/copy.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
 #include <boost/iostreams/filtering_streambuf.hpp>
-#include <boost/thread.hpp>
+
 namespace io = boost::iostreams;
 
 #include <LibUtilities/BasicUtils/Filesystem.hpp>
@@ -169,7 +171,7 @@ void OutputNekpp::Process()
     // Useful when doing r-adaptation
     if (m_config["varopti"].beenSet)
     {
-        unsigned int np        = boost::thread::physical_concurrency();
+        unsigned int np        = std::thread::hardware_concurrency();
         ModuleSharedPtr module = GetModuleFactory().CreateInstance(
             ModuleKey(eProcessModule, "varopti"), m_mesh);
         module->RegisterConfig("hyperelastic", "");

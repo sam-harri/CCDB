@@ -144,7 +144,7 @@ template <class T> T ran2(long *idum)
 #undef RNMX
 
 #ifdef NEKTAR_USE_THREAD_SAFETY
-static boost::mutex mutex;
+static std::mutex mutex;
 #endif
 template LIB_UTILITIES_EXPORT Nektar::NekDouble ran2(long *idum);
 template LIB_UTILITIES_EXPORT Nektar::NekSingle ran2(long *idum);
@@ -155,7 +155,7 @@ void FillWhiteNoise(int n, const T eps, T *x, const int incx, int outseed)
 {
 #ifdef NEKTAR_USE_THREAD_SAFETY
     // Protect the static vars here and in ran2
-    boost::mutex::scoped_lock l(mutex);
+    std::scoped_lock l(mutex);
 #endif
 
     // Define static variables for generating random numbers

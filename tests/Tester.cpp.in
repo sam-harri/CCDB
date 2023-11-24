@@ -49,9 +49,11 @@
  * @see Metric#Test:
  */
 
+#include <chrono>
 #include <fstream>
 #include <iostream>
 #include <string>
+#include <thread>
 #include <vector>
 
 #include <Metric.h>
@@ -60,7 +62,6 @@
 #include <LibUtilities/BasicUtils/Filesystem.hpp>
 
 #include <boost/program_options.hpp>
-#include <boost/thread.hpp>
 
 #cmakedefine NEKTAR_TEST_FORCEMPIEXEC 1
 
@@ -581,8 +582,8 @@ int main(int argc, char *argv[])
             }
             catch (const fs::filesystem_error &e)
             {
-                // usleep(1000);
-                boost::this_thread::sleep(boost::posix_time::milliseconds(1));
+                using namespace std::chrono_literals;
+                std::this_thread::sleep_for(1ms);
                 i--;
                 if (i > 0)
                 {
