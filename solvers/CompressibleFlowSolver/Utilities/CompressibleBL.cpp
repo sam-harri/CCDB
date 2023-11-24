@@ -43,12 +43,10 @@
 #include <MultiRegions/AssemblyMap/AssemblyMapDG.h>
 #include <MultiRegions/ContField.h>
 #include <MultiRegions/DisContField.h>
-#include <MultiRegions/ExpList.h>
 #include <MultiRegions/ExpList2DHomogeneous1D.h>
 #include <MultiRegions/ExpList3DHomogeneous1D.h>
 #include <MultiRegions/ExpList3DHomogeneous2D.h>
 
-#include <LocalRegions/Expansion.h>
 #include <LocalRegions/Expansion2D.h>
 #include <LocalRegions/Expansion3D.h>
 #include <LocalRegions/MatrixKey.h>
@@ -57,7 +55,6 @@
 #include <LibUtilities/BasicUtils/NekFactory.hpp>
 #include <LibUtilities/BasicUtils/SessionReader.h>
 #include <LibUtilities/BasicUtils/SharedArray.hpp>
-#include <LibUtilities/Communication/Comm.h>
 #include <LibUtilities/Memory/NekMemoryManager.hpp>
 
 #include <SpatialDomains/MeshGraph.h>
