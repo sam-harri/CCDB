@@ -111,6 +111,27 @@ protected:
     int m_nElmt;
 };
 
+// Base class for PhysInterp1DScaled operator.
+class PhysInterp1DScaled : virtual public Operator
+{
+public:
+    PhysInterp1DScaled(std::vector<LibUtilities::BasisSharedPtr> basis,
+                       int nElmt)
+        : m_basis(basis), m_nElmt(nElmt)
+    {
+    }
+
+    ~PhysInterp1DScaled() override = default;
+
+    MATRIXFREE_EXPORT virtual void operator()(
+        const Array<OneD, const NekDouble> &input,
+        Array<OneD, NekDouble> &output) = 0; // Abstract Method
+
+protected:
+    std::vector<LibUtilities::BasisSharedPtr> m_basis;
+    int m_nElmt;
+};
+
 // Base class for product operator.
 class IProduct : virtual public Operator
 {

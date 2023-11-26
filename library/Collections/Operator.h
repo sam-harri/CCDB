@@ -35,8 +35,6 @@
 #ifndef NEKTAR_LIBRARY_COLLECTIONS_OPERATOR_H
 #define NEKTAR_LIBRARY_COLLECTIONS_OPERATOR_H
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <Collections/CollectionsDeclspec.h>
 #include <LibUtilities/BasicUtils/NekFactory.hpp>
 #include <SpatialDomains/Geometry.h>
@@ -68,15 +66,17 @@ enum OperatorType
     eIProductWRTBase,
     eIProductWRTDerivBase,
     ePhysDeriv,
+    ePhysInterp1DScaled,
     SIZE_OperatorType
 };
 
-const char *const OperatorTypeMap[] = {"BwdTrans", "Helmholtz",
-                                       "IProductWRTBase",
-                                       "IProductWRTDerivBase", "PhysDeriv"};
+const char *const OperatorTypeMap[] = {
+    "BwdTrans",  "Helmholtz",         "IProductWRTBase", "IProductWRTDerivBase",
+    "PhysDeriv", "PhysInterp1DScaled"};
 
-const char *const OperatorTypeMap1[] = {"BwdTrans", "Helmholtz", "IPWrtBase",
-                                        "IPWrtDBase", "PhysDeriv "};
+const char *const OperatorTypeMap1[] = {"BwdTrans",  "Helmholtz",
+                                        "IPWrtBase", "IPWrtDBase",
+                                        "PhysDeriv", "PhysInterp1DScaled"};
 
 enum ImplementationType
 {
@@ -173,12 +173,54 @@ public:
         return m_stdExp;
     }
 
+    inline unsigned int GetInputSize()
+    {
+        return m_inputSize;
+    }
+
+    inline unsigned int GetOutputSize()
+    {
+        return m_outputSize;
+    }
+
 protected:
     bool m_isDeformed;
     StdRegions::StdExpansionSharedPtr m_stdExp;
+    /// number of elements that the operator is applied on
     unsigned int m_numElmt;
     unsigned int m_nqe;
     unsigned int m_wspSize;
+    /// number of modes or quadrature points that are passed as input to an
+    /// operator
+    unsigned int m_inputSize;
+    /// number of modes or quadrature points  that are taken as output from an
+    /// operator
+    unsigned int m_outputSize;
+
+    /// @brief This purely virtual function needs to be set-up for every
+    /// operator inside Collections. It is responsible for returning the size of
+    /// input collection, that the operator is applied on either in physical or
+    /// coefficient space.
+    /// @return Returns 0. The actual implementation is inside the specific
+    /// operator class.
+    virtual int v_GetInputSize()
+    {
+        NEKERROR(ErrorUtil::efatal,
+                 "This method is not defined or valid for this class type");
+        return 0;
+    }
+    /// @brief This purely virtual function needs to be set-up for every
+    /// operator inside Collections. It is responsible for returning the output
+    /// size either in physical or coefficient space of an operator inside
+    /// Collections.
+    /// @return Returns 0. The actual implementation is inside the specific
+    /// operator class.
+    virtual int v_GetOutputSize()
+    {
+        NEKERROR(ErrorUtil::efatal,
+                 "This method is not defined or valid for this class type");
+        return 0;
+    }
 };
 
 /// Shared pointer to an Operator object

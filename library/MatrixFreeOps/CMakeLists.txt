@@ -11,7 +11,7 @@ SET(MATRIXFREEOPS_SOURCES
 # so to reduce compile time timeout failures due to the large number
 # of template impementations.
 
-SET(OPERATORS BwdTrans PhysDeriv Helmholtz IProduct IProductWRTDerivBase )
+SET(OPERATORS BwdTrans PhysDeriv Helmholtz IProduct IProductWRTDerivBase PhysInterp1DScaled)
 SET(SHAPES Seg Tri Quad Hex Tet Prism Pyr )
 SET(DIMENSIONS 1 2 2 3 3 3 3 )
 
@@ -41,6 +41,15 @@ foreach(OPERATOR IN LISTS OPERATORS)
         # INST sets the macro used in NektarExpMacros.h
         # The BwdTrans only has regular elements.
         IF( "${OPERATOR}" STREQUAL "BwdTrans" )
+            SET(INST 1)
+        # All other operators have regular and deformed elements.
+        ELSE()
+            SET(INST 2)
+        ENDIF()
+
+        # INST sets the macro used in NektarExpMacros.h
+        # The PhysInterp1DScaled only has regular elements.
+        IF( "${OPERATOR}" STREQUAL "PhysInterp1DScaled" )
             SET(INST 1)
         # All other operators have regular and deformed elements.
         ELSE()

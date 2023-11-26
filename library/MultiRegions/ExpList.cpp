@@ -32,15 +32,14 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <iomanip>
-
-#include <boost/core/ignore_unused.hpp>
-
+#include <Collections/CollectionOptimisation.h>
+#include <Collections/Operator.h>
+#include <LibUtilities/BasicUtils/Timer.h>
 #include <LibUtilities/Communication/Comm.h>
-#include <MultiRegions/ExpList.h>
-#include <MultiRegions/GlobalLinSys.h>
-
 #include <LibUtilities/Foundations/Interp.h>
+#include <LibUtilities/Foundations/ManagerAccess.h> // for PointsManager, etc
+#include <LibUtilities/Foundations/PhysGalerkinProject.h>
+#include <LibUtilities/Polylib/Polylib.h>
 #include <LocalRegions/Expansion3D.h>
 #include <LocalRegions/HexExp.h>
 #include <LocalRegions/MatrixKey.h> // for MatrixKey
@@ -52,26 +51,20 @@
 #include <LocalRegions/SegExp.h>
 #include <LocalRegions/TetExp.h>
 #include <LocalRegions/TriExp.h>
-
 #include <MultiRegions/AssemblyMap/AssemblyMapCG.h> // for AssemblyMapCG, etc
 #include <MultiRegions/AssemblyMap/AssemblyMapDG.h> // for AssemblyMapCG, etc
-#include <MultiRegions/GlobalLinSysKey.h>           // for GlobalLinSysKey
-#include <MultiRegions/GlobalMatrix.h>              // for GlobalMatrix, etc
-#include <MultiRegions/GlobalMatrixKey.h>           // for GlobalMatrixKey
+#include <MultiRegions/ExpList.h>
+#include <MultiRegions/GlobalLinSys.h>
+#include <MultiRegions/GlobalLinSysKey.h> // for GlobalLinSysKey
+#include <MultiRegions/GlobalMatrix.h>    // for GlobalMatrix, etc
+#include <MultiRegions/GlobalMatrixKey.h> // for GlobalMatrixKey
 
-#include <LibUtilities/Foundations/Interp.h>
-#include <LibUtilities/Foundations/ManagerAccess.h> // for PointsManager, etc
-#include <LibUtilities/Foundations/PhysGalerkinProject.h>
+#include <LibUtilities/BasicUtils/Likwid.hpp>
 #include <LibUtilities/LinearAlgebra/NekMatrix.hpp>
 #include <LibUtilities/LinearAlgebra/NekTypeDefs.hpp>
 #include <LibUtilities/LinearAlgebra/SparseMatrixFwd.hpp>
-#include <LibUtilities/Polylib/Polylib.h>
-
-#include <Collections/CollectionOptimisation.h>
-#include <Collections/Operator.h>
-
-#include <LibUtilities/BasicUtils/Likwid.hpp>
-#include <LibUtilities/BasicUtils/Timer.h>
+#include <boost/core/ignore_unused.hpp>
+#include <iomanip>
 
 using namespace std;
 
@@ -126,7 +119,6 @@ ExpList::ExpList(const ExpList &in, const bool DeclareCoeffPhysArrays)
       m_blockMat(in.m_blockMat), m_WaveSpace(false),
       m_elmtToExpId(in.m_elmtToExpId)
 {
-
     // Set up m_coeffs, m_phys and offset arrays.
     // use this to keep memory declaration in one place
     SetupCoeffPhys(DeclareCoeffPhysArrays, false);
@@ -228,7 +220,6 @@ ExpList::ExpList(const LibUtilities::SessionReaderSharedPtr &pSession,
       m_blockMat(MemoryManager<BlockMatrixMap>::AllocateSharedPtr()),
       m_WaveSpace(false)
 {
-
     // Initialise expansion vector
     InitialiseExpVector(expansions);
 
@@ -686,7 +677,6 @@ ExpList::ExpList(
         {
             if ((exp2D = locexp[i]->as<LocalRegions::Expansion2D>()))
             {
-
                 int nedges = locexp[i]->GetNtraces();
 
                 for (j = 0; j < nedges; ++j, ++cntr)
@@ -1087,7 +1077,6 @@ ExpList::ExpList(const LibUtilities::SessionReaderSharedPtr &pSession,
                 else if ((TriGeom = std::dynamic_pointer_cast<
                               SpatialDomains::TriGeom>(FaceGeom)))
                 {
-
                     LibUtilities::BasisKey nface_dir0(face0_dir0.GetBasisType(),
                                                       face_dir0.GetNumModes(),
                                                       face_dir0.GetPointsKey());
@@ -1245,7 +1234,6 @@ ExpList::ExpList(const LibUtilities::SessionReaderSharedPtr &pSession,
                 }
                 else
                 {
-
                     exp =
                         MemoryManager<LocalRegions::SegExp>::AllocateSharedPtr(
                             bkey, SegGeom);
@@ -1461,7 +1449,6 @@ void ExpList::SetupCoeffPhys(bool DeclareCoeffPhysArrays, bool SetupOffsets)
 void ExpList::InitialiseExpVector(
     const SpatialDomains::ExpansionInfoMap &expmap)
 {
-
     SpatialDomains::SegGeomSharedPtr SegmentGeom;
     SpatialDomains::TriGeomSharedPtr TriangleGeom;
     SpatialDomains::QuadGeomSharedPtr QuadrilateralGeom;
@@ -1518,7 +1505,6 @@ void ExpList::InitialiseExpVector(
                          std::dynamic_pointer_cast<SpatialDomains ::TriGeom>(
                              expInfo->m_geomShPtr)))
                 {
-
                     // This is not elegantly implemented needs re-thinking.
                     if (Ba.GetBasisType() == LibUtilities::eGLL_Lagrange)
                     {
@@ -1565,7 +1551,6 @@ void ExpList::InitialiseExpVector(
                          std::dynamic_pointer_cast<SpatialDomains::TetGeom>(
                              expInfo->m_geomShPtr)))
                 {
-
                     if (Ba.GetBasisType() == LibUtilities::eGLL_Lagrange ||
                         Ba.GetBasisType() == LibUtilities::eGauss_Lagrange)
                     {
@@ -1591,7 +1576,6 @@ void ExpList::InitialiseExpVector(
                 else if ((PyrGeom = std::dynamic_pointer_cast<
                               SpatialDomains::PyrGeom>(expInfo->m_geomShPtr)))
                 {
-
                     exp =
                         MemoryManager<LocalRegions::PyrExp>::AllocateSharedPtr(
                             Ba, Bb, Bc, PyrGeom);
@@ -1714,7 +1698,6 @@ void ExpList::v_IProductWRTDerivBase(
     int i;
 
     Array<OneD, NekDouble> e_outarray;
-
     for (i = 0; i < (*m_exp).size(); ++i)
     {
         (*m_exp)[i]->IProductWRTDerivBase(dir, inarray + m_phys_offset[i],
@@ -1790,7 +1773,8 @@ void ExpList::v_IProductWRTDerivBase(
     }
 
     LibUtilities::Timer timer;
-
+    int input_offset{0};
+    int output_offset{0};
     LIKWID_MARKER_START("IProductWRTDerivBase_coll");
     timer.Start();
 
@@ -1801,8 +1785,11 @@ void ExpList::v_IProductWRTDerivBase(
             {
                 m_collections[i].ApplyOperator(
                     Collections::eIProductWRTDerivBase,
-                    inarray[0] + m_coll_phys_offset[i],
-                    tmp0 = outarray + m_coll_coeff_offset[i]);
+                    inarray[0] + input_offset, tmp0 = outarray + output_offset);
+                input_offset += m_collections[i].GetInputSize(
+                    Collections::eIProductWRTDerivBase);
+                output_offset += m_collections[i].GetOutputSize(
+                    Collections::eIProductWRTDerivBase);
             }
             break;
         case 2:
@@ -1810,9 +1797,12 @@ void ExpList::v_IProductWRTDerivBase(
             {
                 m_collections[i].ApplyOperator(
                     Collections::eIProductWRTDerivBase,
-                    inarray[0] + m_coll_phys_offset[i],
-                    tmp0 = inarray[1] + m_coll_phys_offset[i],
-                    tmp1 = outarray + m_coll_coeff_offset[i]);
+                    inarray[0] + input_offset, tmp0 = inarray[1] + input_offset,
+                    tmp1 = outarray + output_offset);
+                input_offset += m_collections[i].GetInputSize(
+                    Collections::eIProductWRTDerivBase);
+                output_offset += m_collections[i].GetOutputSize(
+                    Collections::eIProductWRTDerivBase);
             }
             break;
         case 3:
@@ -1820,10 +1810,13 @@ void ExpList::v_IProductWRTDerivBase(
             {
                 m_collections[i].ApplyOperator(
                     Collections::eIProductWRTDerivBase,
-                    inarray[0] + m_coll_phys_offset[i],
-                    tmp0 = inarray[1] + m_coll_phys_offset[i],
-                    tmp1 = inarray[2] + m_coll_phys_offset[i],
-                    tmp2 = outarray + m_coll_coeff_offset[i]);
+                    inarray[0] + input_offset, tmp0 = inarray[1] + input_offset,
+                    tmp1 = inarray[2] + input_offset,
+                    tmp2 = outarray + output_offset);
+                input_offset += m_collections[i].GetInputSize(
+                    Collections::eIProductWRTDerivBase);
+                output_offset += m_collections[i].GetOutputSize(
+                    Collections::eIProductWRTDerivBase);
             }
             break;
         default:
@@ -1879,7 +1872,6 @@ void ExpList::v_PhysDeriv(const Array<OneD, const NekDouble> &inarray,
     Array<OneD, NekDouble> e_out_d0;
     Array<OneD, NekDouble> e_out_d1;
     Array<OneD, NekDouble> e_out_d2;
-    int offset;
 
     // initialise if required
     if (m_collectionsDoInit[Collections::ePhysDeriv])
@@ -1891,18 +1883,18 @@ void ExpList::v_PhysDeriv(const Array<OneD, const NekDouble> &inarray,
         m_collectionsDoInit[Collections::ePhysDeriv] = false;
     }
 
+    int offset{0};
     LibUtilities::Timer timer;
     timer.Start();
     for (int i = 0; i < m_collections.size(); ++i)
     {
-        offset   = m_coll_phys_offset[i];
         e_out_d0 = out_d0 + offset;
         e_out_d1 = out_d1 + offset;
         e_out_d2 = out_d2 + offset;
-
         m_collections[i].ApplyOperator(Collections::ePhysDeriv,
                                        inarray + offset, e_out_d0, e_out_d1,
                                        e_out_d2);
+        offset += m_collections[i].GetInputSize(Collections::ePhysDeriv);
     }
     timer.Stop();
     // Elapsed time
@@ -1942,7 +1934,6 @@ void ExpList::v_PhysDeriv(Direction edir,
     }
     else
     {
-
         // initialise if required
         if (m_collectionsDoInit[Collections::ePhysDeriv])
         {
@@ -1956,14 +1947,13 @@ void ExpList::v_PhysDeriv(Direction edir,
         // convert enum into int
         int intdir = (int)edir;
         Array<OneD, NekDouble> e_out_d;
-        int offset;
+        int offset{0};
         for (int i = 0; i < m_collections.size(); ++i)
         {
-            offset  = m_coll_phys_offset[i];
             e_out_d = out_d + offset;
-
             m_collections[i].ApplyOperator(Collections::ePhysDeriv, intdir,
                                            inarray + offset, e_out_d);
+            offset += m_collections[i].GetInputSize(Collections::ePhysDeriv);
         }
     }
 }
@@ -2459,11 +2449,19 @@ void ExpList::GeneralMatrixOp(const GlobalMatrixKey &gkey,
         }
 
         Array<OneD, NekDouble> tmp;
+        int input_offset{0};
+        int output_offset{0};
         for (int i = 0; i < m_collections.size(); ++i)
         {
-            m_collections[i].ApplyOperator(
-                Collections::eHelmholtz, inarray + m_coll_coeff_offset[i],
-                tmp = outarray + m_coll_coeff_offset[i]);
+            // the input_offset is equal to the output_offset - this is
+            // happenning inside the Helmholtz_Helper class
+            m_collections[i].ApplyOperator(Collections::eHelmholtz,
+                                           inarray + input_offset,
+                                           tmp = outarray + output_offset);
+            input_offset +=
+                m_collections[i].GetInputSize(Collections::eHelmholtz);
+            output_offset +=
+                m_collections[i].GetOutputSize(Collections::eHelmholtz);
         }
     }
     else
@@ -2864,17 +2862,22 @@ void ExpList::v_BwdTrans(const Array<OneD, const NekDouble> &inarray,
         timer.Start();
 
         Array<OneD, NekDouble> tmp;
+        int input_offset{0};
+        int output_offset{0};
         for (int i = 0; i < m_collections.size(); ++i)
         {
-            m_collections[i].ApplyOperator(
-                Collections::eBwdTrans, inarray + m_coll_coeff_offset[i],
-                tmp = outarray + m_coll_phys_offset[i]);
+            m_collections[i].ApplyOperator(Collections::eBwdTrans,
+                                           inarray + input_offset,
+                                           tmp = outarray + output_offset);
+            input_offset +=
+                m_collections[i].GetInputSize(Collections::eBwdTrans);
+            output_offset +=
+                m_collections[i].GetOutputSize(Collections::eBwdTrans);
         }
 
         timer.Stop();
         LIKWID_MARKER_STOP("v_BwdTrans");
     }
-
     // Elapsed time
     timer.AccumulateRegion("Collections:BwdTrans", 10);
 }
@@ -5086,12 +5089,17 @@ void ExpList::v_IProductWRTBase(const Array<OneD, const NekDouble> &inarray,
     }
 
     Array<OneD, NekDouble> tmp;
+    int input_offset{0};
+    int output_offset{0};
     for (int i = 0; i < m_collections.size(); ++i)
     {
-
         m_collections[i].ApplyOperator(Collections::eIProductWRTBase,
-                                       inarray + m_coll_phys_offset[i],
-                                       tmp = outarray + m_coll_coeff_offset[i]);
+                                       inarray + input_offset,
+                                       tmp = outarray + output_offset);
+        input_offset +=
+            m_collections[i].GetInputSize(Collections::eIProductWRTBase);
+        output_offset +=
+            m_collections[i].GetOutputSize(Collections::eIProductWRTBase);
     }
 }
 
@@ -5459,10 +5467,6 @@ ExpListSharedPtr &ExpList::v_GetPlane(int n)
  */
 void ExpList::CreateCollections(Collections::ImplementationType ImpType)
 {
-    map<LibUtilities::ShapeType,
-        vector<std::pair<LocalRegions::ExpansionSharedPtr, int>>>
-        collections;
-
     // Set up initialisation flags
     m_collectionsDoInit =
         std::vector<bool>(Collections::SIZE_OperatorType, true);
@@ -5493,11 +5497,6 @@ void ExpList::CreateCollections(Collections::ImplementationType ImpType)
     }
     bool verbose = (m_session->DefinesCmdLineArgument("verbose")) &&
                    (m_session->GetComm()->GetRank() == 0);
-    // the maximum size is either explicitly specified, or set to very large
-    // value which will not affect the actual collection size
-    int collmax =
-        (colOpt.GetMaxCollectionSize() > 0 ? colOpt.GetMaxCollectionSize()
-                                           : 2 * m_exp->size());
 
     // clear vectors in case previously called
     m_collections.clear();
@@ -5509,23 +5508,44 @@ void ExpList::CreateCollections(Collections::ImplementationType ImpType)
       Use 3 basiskey + deformed flag to determine if two exp belong to the same
       collection or not.
     -------------------------------------------------------------------------*/
+    // the maximum size is either explicitly specified, or set to very large
+    // value which will not affect the actual collection size
+    int collmax =
+        (colOpt.GetMaxCollectionSize() > 0 ? colOpt.GetMaxCollectionSize()
+                                           : 2 * m_exp->size());
+
     vector<StdRegions::StdExpansionSharedPtr> collExp;
+    LocalRegions::ExpansionSharedPtr exp = (*m_exp)[0];
+    Collections::OperatorImpMap impTypes = colOpt.GetOperatorImpMap(exp);
+    // storing the offset for the modes and quadrature points for the 1st
+    // element in the collection
+    m_coll_coeff_offset.push_back(m_coeff_offset[0]);
+    m_coll_phys_offset.push_back(m_phys_offset[0]);
+
+    // add the first element to the collection - initialization
+    collExp.push_back(exp);
+    // collcnt is the number of elements in current collection
+    int collcnt = 1;
     // initialize the basisKeys to NullBasisKey
-    std::vector<LibUtilities::BasisKey> prevbasisKeys(
-        3, LibUtilities::NullBasisKey);
     std::vector<LibUtilities::BasisKey> thisbasisKeys(
         3, LibUtilities::NullBasisKey);
-    // initialize the deformed flag to false
-    bool prevDef = false;
-    // collcnt is the number of elements in current collection
-    int collcnt = 0;
+    std::vector<LibUtilities::BasisKey> prevbasisKeys(
+        3, LibUtilities::NullBasisKey);
+    // fetch basiskeys of the first element
+    for (int d = 0; d < exp->GetNumBases(); d++)
+    {
+        prevbasisKeys[d] = exp->GetBasis(d)->GetBasisKey();
+    }
+
+    // initialize the deformed flag based on the first element
+    bool prevDef =
+        exp->GetMetricInfo()->GetGtype() == SpatialDomains::eDeformed;
     // collsize is the maximum size among all collections
     int collsize = 0;
 
-    for (int i = 0; i < (*m_exp).size(); i++)
+    for (int i = 1; i < (*m_exp).size(); i++)
     {
-        LocalRegions::ExpansionSharedPtr exp = (*m_exp)[i];
-        Collections::OperatorImpMap impTypes = colOpt.GetOperatorImpMap(exp);
+        exp = (*m_exp)[i];
 
         // fetch basiskeys of current element
         for (int d = 0; d < exp->GetNumBases(); d++)
@@ -5541,62 +5561,13 @@ void ExpList::CreateCollections(Collections::ImplementationType ImpType)
         if (thisbasisKeys != prevbasisKeys || prevDef != Deformed ||
             collcnt >= collmax)
         {
-            // if previous one is not empty (i==0), create new collection
-            // according to the previous collExp and push it back.
-            if (i > 0)
-            {
-                Collections::Collection tmp(collExp, impTypes);
-                m_collections.push_back(tmp);
-
-                // if no Imp Type provided and No
-                // setting in xml file. reset
-                // impTypes using timings
-                if (autotuning)
-                {
-                    // if current collection is larger than previous one
-                    // update impTypes; otherwise, use previous impTypes
-                    if (collExp.size() > collsize)
-                    {
-                        impTypes =
-                            colOpt.SetWithTimings(collExp, impTypes, verbose);
-                        collsize = collExp.size();
-                    }
-                }
-
-                // start new geom list
-                collExp.clear();
-            }
-
-            // set up initial offset of this collection
-            m_coll_coeff_offset.push_back(m_coeff_offset[i]);
-            m_coll_phys_offset.push_back(m_phys_offset[i]);
-            // insert exp and reset count to 1
-            collExp.push_back(exp);
-            collcnt = 1;
-            // update previous info
-            prevbasisKeys = thisbasisKeys;
-            prevDef       = Deformed;
-        }
-        else // The current exp is the same as the previous one
-        {
-            // insert exp and increment count
-            collExp.push_back(exp);
-            collcnt++;
-            // No need to update previous info
-        }
-
-        // check if we have reached the end of m_exp
-        if (i == (*m_exp).size() - 1)
-        {
-            // Then create and push back the last collection
-            Collections::Collection tmp(collExp, impTypes);
-            m_collections.push_back(tmp);
-
             // if no Imp Type provided and No
             // setting in xml file. reset
             // impTypes using timings
             if (autotuning)
             {
+                // if current collection is larger than previous one
+                // update impTypes; otherwise, use previous impTypes
                 if (collExp.size() > collsize)
                 {
                     impTypes =
@@ -5604,9 +5575,49 @@ void ExpList::CreateCollections(Collections::ImplementationType ImpType)
                     collsize = collExp.size();
                 }
             }
+            Collections::OperatorImpMap impTypes =
+                colOpt.GetOperatorImpMap(exp);
+
+            Collections::Collection tmp(collExp, impTypes);
+            m_collections.push_back(tmp);
+            // store the offsets of the current element
+            m_coll_coeff_offset.push_back(m_coeff_offset[i]);
+            m_coll_phys_offset.push_back(m_phys_offset[i]);
+
+            // for the new collection calling the optimization routine based on
+            // its first element
+            impTypes = colOpt.GetOperatorImpMap((*m_exp)[i]);
+
+            // clean-up current element list - temporary collection
             collExp.clear();
+            collcnt  = 0;
+            collsize = 0;
+        }
+
+        // insert exp and increment count
+        collExp.push_back(exp);
+        collcnt++;
+        // update previous info
+        prevbasisKeys = thisbasisKeys;
+        prevDef       = Deformed;
+    }
+
+    // execute autotuning for the last collection
+    if (autotuning)
+    {
+        if (collExp.size() > collsize)
+        {
+            impTypes = colOpt.SetWithTimings(collExp, impTypes, verbose);
+            collsize = collExp.size();
         }
     }
+    Collections::Collection tmp(collExp, impTypes);
+    m_collections.push_back(tmp);
+
+    // clean-up current element list - temporary collection
+    collExp.clear();
+    collcnt  = 0;
+    collsize = 0;
 
     // update optimisation file
     if ((m_session->GetUpdateOptFile()) && (ImpType == Collections::eNoImpType))
@@ -5648,78 +5659,52 @@ void ExpList::v_PhysInterp1DScaled(const NekDouble scale,
                                    const Array<OneD, NekDouble> &inarray,
                                    Array<OneD, NekDouble> &outarray)
 {
-    int cnt, cnt1;
+    boost::ignore_unused(scale);
+    // the scaling factor for the PhysInterp1DScaled is given as NekDouble
+    // however inside Collections it is treated as a FactorMap
+    // defining needed FactorMap to pass the scaling factor as an input to
+    // Collections
+    StdRegions::ConstFactorMap factors;
+    // Updating the FactorMap according to the scale input
+    factors[StdRegions::eFactorConst] = scale;
+    LibUtilities::Timer timer;
 
-    cnt = cnt1 = 0;
-
-    switch (m_expType)
+    // initialise if required
+    if (m_collections.size() &&
+        m_collectionsDoInit[Collections::ePhysInterp1DScaled])
     {
-        case e2D:
+        for (int i = 0; i < m_collections.size(); ++i)
         {
-            for (int i = 0; i < GetExpSize(); ++i)
-            {
-                // get new points key
-                int pt0  = (*m_exp)[i]->GetNumPoints(0);
-                int pt1  = (*m_exp)[i]->GetNumPoints(1);
-                int npt0 = (int)pt0 * scale;
-                int npt1 = (int)pt1 * scale;
-
-                LibUtilities::PointsKey newPointsKey0(
-                    npt0, (*m_exp)[i]->GetPointsType(0));
-                LibUtilities::PointsKey newPointsKey1(
-                    npt1, (*m_exp)[i]->GetPointsType(1));
-
-                // Interpolate points;
-                LibUtilities::Interp2D((*m_exp)[i]->GetBasis(0)->GetPointsKey(),
-                                       (*m_exp)[i]->GetBasis(1)->GetPointsKey(),
-                                       &inarray[cnt], newPointsKey0,
-                                       newPointsKey1, &outarray[cnt1]);
-
-                cnt += pt0 * pt1;
-                cnt1 += npt0 * npt1;
-            }
+            m_collections[i].Initialise(Collections::ePhysInterp1DScaled);
+            m_collectionsDoInit[Collections::ePhysInterp1DScaled] = false;
         }
-        break;
-        case e3D:
-        {
-            for (int i = 0; i < GetExpSize(); ++i)
-            {
-                // get new points key
-                int pt0  = (*m_exp)[i]->GetNumPoints(0);
-                int pt1  = (*m_exp)[i]->GetNumPoints(1);
-                int pt2  = (*m_exp)[i]->GetNumPoints(2);
-                int npt0 = (int)pt0 * scale;
-                int npt1 = (int)pt1 * scale;
-                int npt2 = (int)pt2 * scale;
-
-                LibUtilities::PointsKey newPointsKey0(
-                    npt0, (*m_exp)[i]->GetPointsType(0));
-                LibUtilities::PointsKey newPointsKey1(
-                    npt1, (*m_exp)[i]->GetPointsType(1));
-                LibUtilities::PointsKey newPointsKey2(
-                    npt2, (*m_exp)[i]->GetPointsType(2));
-
-                // Interpolate points;
-                LibUtilities::Interp3D((*m_exp)[i]->GetBasis(0)->GetPointsKey(),
-                                       (*m_exp)[i]->GetBasis(1)->GetPointsKey(),
-                                       (*m_exp)[i]->GetBasis(2)->GetPointsKey(),
-                                       &inarray[cnt], newPointsKey0,
-                                       newPointsKey1, newPointsKey2,
-                                       &outarray[cnt1]);
-
-                cnt += pt0 * pt1 * pt2;
-                cnt1 += npt0 * npt1 * npt2;
-            }
-        }
-        break;
-        default:
-        {
-            NEKERROR(ErrorUtil::efatal, "This expansion is not set");
-        }
-        break;
     }
-}
+    // once the collections are initialized, check for the scaling factor
+    for (int i = 0; i < m_collections.size(); ++i)
 
+    {
+        m_collections[i].CheckFactors(Collections::ePhysInterp1DScaled, factors,
+                                      m_coll_phys_offset[i]);
+    }
+    LIKWID_MARKER_START("v_PhysInterp1DScaled");
+    timer.Start();
+    Array<OneD, NekDouble> tmp;
+    int input_offset{0};
+    int output_offset{0};
+    for (int i = 0; i < m_collections.size(); ++i)
+    {
+        m_collections[i].ApplyOperator(Collections::ePhysInterp1DScaled,
+                                       inarray + input_offset,
+                                       tmp = outarray + output_offset);
+        input_offset +=
+            m_collections[i].GetInputSize(Collections::ePhysInterp1DScaled);
+        output_offset +=
+            m_collections[i].GetOutputSize(Collections::ePhysInterp1DScaled);
+    }
+    timer.Stop();
+    LIKWID_MARKER_STOP("v_PhysInterp1DScaled");
+    timer.AccumulateRegion("Collections:PhysInterp1DScaled", 10);
+}
 void ExpList::v_AddTraceIntegralToOffDiag(
     const Array<OneD, const NekDouble> &FwdFlux,
     const Array<OneD, const NekDouble> &BwdFlux,
@@ -5932,8 +5917,8 @@ void ExpList::GetDiagMatIpwrtBase(
 
 /**
  * @brief inverse process of v_GetFwdBwdTracePhys. Given Trace integration of
- * Fwd and Bwd Jacobian, with dimension NtotalTrace*TraceCoef*TracePhys. return
- * Elemental Jacobian matrix with dimension
+ * Fwd and Bwd Jacobian, with dimension NtotalTrace*TraceCoef*TracePhys.
+ * return Elemental Jacobian matrix with dimension
  * NtotalElement*ElementCoef*ElementPhys.
  *
  *
