@@ -96,6 +96,16 @@ public:
         return m_geomData;
     }
 
+    inline int GetInputSize(const OperatorType &op)
+    {
+        return m_ops[op]->GetInputSize();
+    }
+
+    inline int GetOutputSize(const OperatorType &op)
+    {
+        return m_ops[op]->GetOutputSize();
+    }
+
 protected:
     std::unordered_map<OperatorType, OperatorSharedPtr, EnumHash> m_ops;
     CoalescedGeomDataSharedPtr m_geomData;

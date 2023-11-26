@@ -9,6 +9,7 @@ SET(COLLECTIONS_SOURCES
   IProductWRTDerivBase.cpp
   IProduct.cpp
   PhysDeriv.cpp
+  PhysInterp1DScaled.cpp
   )
 
 SET(COLLECTIONS_HEADERS

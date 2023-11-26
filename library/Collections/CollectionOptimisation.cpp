@@ -59,7 +59,7 @@ CollectionOptimisation::CollectionOptimisation(
     : m_shapeDim(shapedim)
 {
     map<ElmtOrder, ImplementationType> defaults, defaultsPhysDeriv,
-        defaultsHelmholtz;
+        defaultsHelmholtz, defaultsPhysInterp1DScaled;
     bool verbose = (pSession.get()) &&
                    (pSession->DefinesCmdLineArgument("verbose")) &&
                    (pSession->GetComm()->GetRank() == 0);
@@ -81,9 +81,10 @@ CollectionOptimisation::CollectionOptimisation(
     // Set defaults for all element types.
     for (auto &it2 : elTypes)
     {
-        defaults[ElmtOrder(it2.second, -1)]          = m_defaultType;
-        defaultsPhysDeriv[ElmtOrder(it2.second, -1)] = m_defaultType;
-        defaultsHelmholtz[ElmtOrder(it2.second, -1)] = m_defaultType;
+        defaults[ElmtOrder(it2.second, -1)]                   = m_defaultType;
+        defaultsPhysDeriv[ElmtOrder(it2.second, -1)]          = m_defaultType;
+        defaultsHelmholtz[ElmtOrder(it2.second, -1)]          = m_defaultType;
+        defaultsPhysInterp1DScaled[ElmtOrder(it2.second, -1)] = m_defaultType;
     }
 
     if (defaultType == eNoImpType)
@@ -95,6 +96,10 @@ CollectionOptimisation::CollectionOptimisation(
 
             // Use IterPerExp
             defaultsHelmholtz[ElmtOrder(it2.second, -1)] = eMatrixFree;
+
+            // Use NoCollection for PhysInterp1DScaled
+            defaultsPhysInterp1DScaled[ElmtOrder(it2.second, -1)] =
+                eNoCollection;
         }
     }
 
@@ -109,6 +114,9 @@ CollectionOptimisation::CollectionOptimisation(
                 break;
             case ePhysDeriv:
                 m_global[(OperatorType)i] = defaultsPhysDeriv;
+                break;
+            case ePhysInterp1DScaled:
+                m_global[(OperatorType)i] = defaultsPhysInterp1DScaled;
                 break;
             default:
                 m_global[(OperatorType)i] = defaults;
@@ -402,13 +410,6 @@ OperatorImpMap CollectionOptimisation::SetWithTimings(
         return ret;
     }
 
-    int maxsize =
-        pCollExp.size() * max(pExp->GetNcoeffs(), pExp->GetTotPoints());
-    Array<OneD, NekDouble> inarray(maxsize, 1.0);
-    Array<OneD, NekDouble> outarray1(maxsize);
-    Array<OneD, NekDouble> outarray2(maxsize);
-    Array<OneD, NekDouble> outarray3(maxsize);
-
     LibUtilities::Timer t;
 
     if (verbose)
@@ -427,6 +428,28 @@ OperatorImpMap CollectionOptimisation::SetWithTimings(
 
     StdRegions::ConstFactorMap factors; // required for helmholtz operator
     factors[StdRegions::eFactorLambda] = 1.5;
+
+    // do we need to dynamically update the value of this eFactorconst based on
+    // the solver that is called?
+    factors[StdRegions::eFactorConst] = 1.5;
+    int qpInsideElmt_idir; // declaration for the total number of points towards
+                           // the i-th direction
+    int newQpInsideElmt_idir;  // declaration for the scaled total number of
+                               // points towards the i-th direction
+    int newTotQpInsideElmt{1}; // initialization for the total number of scaled
+                               // quadrature points inside an element
+    for (int i = 0; i < pExp->GetShapeDimension(); ++i)
+    {
+        qpInsideElmt_idir = pExp->GetNumPoints(i);
+        newQpInsideElmt_idir =
+            (int)qpInsideElmt_idir * factors[StdRegions::eFactorConst];
+        newTotQpInsideElmt *= newQpInsideElmt_idir;
+    }
+    int maxsize = pCollExp.size() * max(pExp->GetNcoeffs(), newTotQpInsideElmt);
+    Array<OneD, NekDouble> inarray(maxsize, 1.0);
+    Array<OneD, NekDouble> outarray1(maxsize);
+    Array<OneD, NekDouble> outarray2(maxsize);
+    Array<OneD, NekDouble> outarray3(maxsize);
 
     for (int imp = 1; imp < SIZE_ImplementationType; ++imp)
     {

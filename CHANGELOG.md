@@ -129,6 +129,8 @@ v5.4.0
 - Rename communicator in LinearAlgebra (!1612)
 - Add IProductWRTDerivBase operator for 3DH1D problems (!1483)
 - Full support of mixed-order elements in DG (!1606)
+- Refactoring collections for allowing variable output size inside the collections' operators, introduced PhysInterp1DScaled in Collections (!1620)
+
 - Use default keyword for destructor in Driver (!1624)
 - Add additional test for SDC time-integration(!1621)
 - Fix to compiler flags for MSVC (!1604)

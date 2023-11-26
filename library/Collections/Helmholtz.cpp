@@ -54,9 +54,29 @@ using LibUtilities::eTetrahedron;
 using LibUtilities::eTriangle;
 
 /**
+ * @brief Helmholtz help class to calculate the size of the collection
+ * that is given as an input and as an output to the Helmholtz Operator. The
+ * size evaluation takes into account that the evaluation of the Helmholtz
+ * operator takes input from the coeff space and gives the output in the coeff
+ * space too.
+ */
+class Helmholtz_Helper : virtual public Operator
+{
+protected:
+    Helmholtz_Helper()
+    {
+        // expect input to be number of elements by the number of coefficients
+        m_inputSize = m_numElmt * m_stdExp->GetNcoeffs();
+        // expect output to be number of elements by the number of coefficients
+        // computation is from coeff space to coeff space
+        m_outputSize = m_inputSize;
+    }
+};
+
+/**
  * @brief Helmholtz operator using LocalRegions implementation.
  */
-class Helmholtz_NoCollection final : public Operator
+class Helmholtz_NoCollection final : virtual public Operator, Helmholtz_Helper
 {
 public:
     OPERATOR_CREATE(Helmholtz_NoCollection)
@@ -109,7 +129,7 @@ private:
     Helmholtz_NoCollection(vector<StdRegions::StdExpansionSharedPtr> pCollExp,
                            CoalescedGeomDataSharedPtr pGeomData,
                            StdRegions::FactorMap factors)
-        : Operator(pCollExp, pGeomData, factors)
+        : Operator(pCollExp, pGeomData, factors), Helmholtz_Helper()
     {
         m_expList = pCollExp;
         m_dim     = pCollExp[0]->GetNumBases();
@@ -155,7 +175,7 @@ OperatorKey Helmholtz_NoCollection::m_typeArr[] = {
 /**
  * @brief Helmholtz operator using LocalRegions implementation.
  */
-class Helmholtz_IterPerExp final : public Operator
+class Helmholtz_IterPerExp final : virtual public Operator, Helmholtz_Helper
 {
 public:
     OPERATOR_CREATE(Helmholtz_IterPerExp)
@@ -486,7 +506,7 @@ private:
     Helmholtz_IterPerExp(vector<StdRegions::StdExpansionSharedPtr> pCollExp,
                          CoalescedGeomDataSharedPtr pGeomData,
                          StdRegions::FactorMap factors)
-        : Operator(pCollExp, pGeomData, factors)
+        : Operator(pCollExp, pGeomData, factors), Helmholtz_Helper()
     {
         m_dim     = pCollExp[0]->GetShapeDimension();
         m_coordim = pCollExp[0]->GetCoordim();
@@ -539,7 +559,9 @@ OperatorKey Helmholtz_IterPerExp::m_typeArr[] = {
 /**
  * @brief Helmholtz operator using matrix free operators.
  */
-class Helmholtz_MatrixFree final : public Operator, MatrixFreeOneInOneOut
+class Helmholtz_MatrixFree final : virtual public Operator,
+                                   MatrixFreeOneInOneOut,
+                                   Helmholtz_Helper
 {
 public:
     OPERATOR_CREATE(Helmholtz_MatrixFree)
@@ -670,7 +692,8 @@ private:
         : Operator(pCollExp, pGeomData, factors),
           MatrixFreeOneInOneOut(pCollExp[0]->GetStdExp()->GetNcoeffs(),
                                 pCollExp[0]->GetStdExp()->GetNcoeffs(),
-                                pCollExp.size())
+                                pCollExp.size()),
+          Helmholtz_Helper()
     {
 
         m_nmtot = m_numElmt * pCollExp[0]->GetStdExp()->GetNcoeffs();

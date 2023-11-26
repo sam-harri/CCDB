@@ -32,14 +32,13 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
-#include <MatrixFreeOps/Operator.hpp>
-
 #include <Collections/Collection.h>
 #include <Collections/IProduct.h>
 #include <Collections/MatrixFreeBase.h>
 #include <Collections/Operator.h>
+
+#include <MatrixFreeOps/Operator.hpp>
+#include <boost/core/ignore_unused.hpp>
 
 using namespace std;
 
@@ -55,9 +54,28 @@ using LibUtilities::eTetrahedron;
 using LibUtilities::eTriangle;
 
 /**
+ * @brief Inner product help class to calculate the size of the collection
+ * that is given as an input and as an output to the IProductWRTBase Operator.
+ * The size evaluation takes into account the conversion from the physical space
+ * to the coefficient space.
+ */
+class IProductWRTBase_Helper : virtual public Operator
+{
+protected:
+    IProductWRTBase_Helper()
+    {
+        // expect input to be number of elements by the number of quad points
+        m_inputSize = m_numElmt * m_stdExp->GetTotPoints();
+        // expect input to be number of elements by the number of coefficients
+        m_outputSize = m_numElmt * m_stdExp->GetNcoeffs();
+    }
+};
+
+/**
  * @brief Inner product operator using standard matrix approach
  */
-class IProductWRTBase_StdMat final : public Operator
+class IProductWRTBase_StdMat final : virtual public Operator,
+                                     virtual public IProductWRTBase_Helper
 {
 public:
     OPERATOR_CREATE(IProductWRTBase_StdMat)
@@ -117,7 +135,7 @@ private:
     IProductWRTBase_StdMat(vector<StdRegions::StdExpansionSharedPtr> pCollExp,
                            CoalescedGeomDataSharedPtr pGeomData,
                            StdRegions::FactorMap factors)
-        : Operator(pCollExp, pGeomData, factors)
+        : Operator(pCollExp, pGeomData, factors), IProductWRTBase_Helper()
     {
         m_jac = pGeomData->GetJac(pCollExp);
         StdRegions::StdMatrixKey key(StdRegions::eIProductWRTBase,
@@ -167,7 +185,9 @@ OperatorKey IProductWRTBase_StdMat::m_typeArr[] = {
 /**
  * @brief Inner product operator using operator using matrix free operators.
  */
-class IProductWRTBase_MatrixFree final : public Operator, MatrixFreeOneInOneOut
+class IProductWRTBase_MatrixFree final : virtual public Operator,
+                                         MatrixFreeOneInOneOut,
+                                         virtual public IProductWRTBase_Helper
 {
 public:
     OPERATOR_CREATE(IProductWRTBase_MatrixFree)
@@ -218,12 +238,11 @@ private:
     IProductWRTBase_MatrixFree(
         vector<StdRegions::StdExpansionSharedPtr> pCollExp,
         CoalescedGeomDataSharedPtr pGeomData, StdRegions::FactorMap factors)
-        : Operator(pCollExp, pGeomData, factors),
+        : Operator(pCollExp, pGeomData, factors), IProductWRTBase_Helper(),
           MatrixFreeOneInOneOut(pCollExp[0]->GetStdExp()->GetTotPoints(),
                                 pCollExp[0]->GetStdExp()->GetNcoeffs(),
                                 pCollExp.size())
     {
-
         // Basis vector
         const auto dim = pCollExp[0]->GetStdExp()->GetShapeDimension();
         std::vector<LibUtilities::BasisSharedPtr> basis(dim);
@@ -276,7 +295,8 @@ OperatorKey IProductWRTBase_MatrixFree::m_typeArr[] = {
 /**
  * @brief Inner product operator using element-wise operation
  */
-class IProductWRTBase_IterPerExp final : public Operator
+class IProductWRTBase_IterPerExp final : virtual public Operator,
+                                         virtual public IProductWRTBase_Helper
 {
 public:
     OPERATOR_CREATE(IProductWRTBase_IterPerExp)
@@ -328,7 +348,7 @@ private:
     IProductWRTBase_IterPerExp(
         vector<StdRegions::StdExpansionSharedPtr> pCollExp,
         CoalescedGeomDataSharedPtr pGeomData, StdRegions::FactorMap factors)
-        : Operator(pCollExp, pGeomData, factors)
+        : Operator(pCollExp, pGeomData, factors), IProductWRTBase_Helper()
     {
         int nqtot = pCollExp[0]->GetTotPoints();
 
@@ -378,7 +398,8 @@ OperatorKey IProductWRTBase_IterPerExp::m_typeArr[] = {
 /**
  * @brief Inner product operator using original MultiRegions implementation.
  */
-class IProductWRTBase_NoCollection final : public Operator
+class IProductWRTBase_NoCollection final : virtual public Operator,
+                                           virtual public IProductWRTBase_Helper
 {
 public:
     OPERATOR_CREATE(IProductWRTBase_NoCollection)
@@ -426,7 +447,7 @@ private:
     IProductWRTBase_NoCollection(
         vector<StdRegions::StdExpansionSharedPtr> pCollExp,
         CoalescedGeomDataSharedPtr pGeomData, StdRegions::FactorMap factors)
-        : Operator(pCollExp, pGeomData, factors)
+        : Operator(pCollExp, pGeomData, factors), IProductWRTBase_Helper()
     {
         m_expList = pCollExp;
     }
@@ -479,7 +500,8 @@ OperatorKey IProductWRTBase_NoCollection::m_typeArr[] = {
 /**
  * @brief Inner product operator using sum-factorisation (Segment)
  */
-class IProductWRTBase_SumFac_Seg final : public Operator
+class IProductWRTBase_SumFac_Seg final : virtual public Operator,
+                                         virtual public IProductWRTBase_Helper
 {
 public:
     OPERATOR_CREATE(IProductWRTBase_SumFac_Seg)
@@ -536,7 +558,7 @@ private:
     IProductWRTBase_SumFac_Seg(
         vector<StdRegions::StdExpansionSharedPtr> pCollExp,
         CoalescedGeomDataSharedPtr pGeomData, StdRegions::FactorMap factors)
-        : Operator(pCollExp, pGeomData, factors),
+        : Operator(pCollExp, pGeomData, factors), IProductWRTBase_Helper(),
           m_nquad0(m_stdExp->GetNumPoints(0)),
           m_nmodes0(m_stdExp->GetBasisNumModes(0)),
           m_colldir0(m_stdExp->GetBasis(0)->Collocation()),
@@ -556,7 +578,8 @@ OperatorKey IProductWRTBase_SumFac_Seg::m_type =
 /**
  * @brief Inner product operator using sum-factorisation (Quad)
  */
-class IProductWRTBase_SumFac_Quad final : public Operator
+class IProductWRTBase_SumFac_Quad final : virtual public Operator,
+                                          virtual public IProductWRTBase_Helper
 {
 public:
     OPERATOR_CREATE(IProductWRTBase_SumFac_Quad)
@@ -608,7 +631,7 @@ private:
     IProductWRTBase_SumFac_Quad(
         vector<StdRegions::StdExpansionSharedPtr> pCollExp,
         CoalescedGeomDataSharedPtr pGeomData, StdRegions::FactorMap factors)
-        : Operator(pCollExp, pGeomData, factors),
+        : Operator(pCollExp, pGeomData, factors), IProductWRTBase_Helper(),
           m_nquad0(m_stdExp->GetNumPoints(0)),
           m_nquad1(m_stdExp->GetNumPoints(1)),
           m_nmodes0(m_stdExp->GetBasisNumModes(0)),
@@ -633,7 +656,8 @@ OperatorKey IProductWRTBase_SumFac_Quad::m_type =
 /**
  * @brief Inner product operator using sum-factorisation (Tri)
  */
-class IProductWRTBase_SumFac_Tri final : public Operator
+class IProductWRTBase_SumFac_Tri final : virtual public Operator,
+                                         virtual public IProductWRTBase_Helper
 {
 public:
     OPERATOR_CREATE(IProductWRTBase_SumFac_Tri)
@@ -684,7 +708,7 @@ private:
     IProductWRTBase_SumFac_Tri(
         vector<StdRegions::StdExpansionSharedPtr> pCollExp,
         CoalescedGeomDataSharedPtr pGeomData, StdRegions::FactorMap factors)
-        : Operator(pCollExp, pGeomData, factors),
+        : Operator(pCollExp, pGeomData, factors), IProductWRTBase_Helper(),
           m_nquad0(m_stdExp->GetNumPoints(0)),
           m_nquad1(m_stdExp->GetNumPoints(1)),
           m_nmodes0(m_stdExp->GetBasisNumModes(0)),
@@ -715,7 +739,8 @@ OperatorKey IProductWRTBase_SumFac_Tri::m_type =
 /**
  * @brief Inner Product operator using sum-factorisation (Hex)
  */
-class IProductWRTBase_SumFac_Hex final : public Operator
+class IProductWRTBase_SumFac_Hex final : virtual public Operator,
+                                         virtual public IProductWRTBase_Helper
 {
 public:
     OPERATOR_CREATE(IProductWRTBase_SumFac_Hex)
@@ -771,7 +796,7 @@ private:
     IProductWRTBase_SumFac_Hex(
         vector<StdRegions::StdExpansionSharedPtr> pCollExp,
         CoalescedGeomDataSharedPtr pGeomData, StdRegions::FactorMap factors)
-        : Operator(pCollExp, pGeomData, factors),
+        : Operator(pCollExp, pGeomData, factors), IProductWRTBase_Helper(),
           m_nquad0(m_stdExp->GetNumPoints(0)),
           m_nquad1(m_stdExp->GetNumPoints(1)),
           m_nquad2(m_stdExp->GetNumPoints(2)),
@@ -802,7 +827,8 @@ OperatorKey IProductWRTBase_SumFac_Hex::m_type =
 /**
  * @brief Inner product operator using sum-factorisation (Tet)
  */
-class IProductWRTBase_SumFac_Tet final : public Operator
+class IProductWRTBase_SumFac_Tet final : virtual public Operator,
+                                         virtual public IProductWRTBase_Helper
 {
 public:
     OPERATOR_CREATE(IProductWRTBase_SumFac_Tet)
@@ -856,7 +882,7 @@ private:
     IProductWRTBase_SumFac_Tet(
         vector<StdRegions::StdExpansionSharedPtr> pCollExp,
         CoalescedGeomDataSharedPtr pGeomData, StdRegions::FactorMap factors)
-        : Operator(pCollExp, pGeomData, factors),
+        : Operator(pCollExp, pGeomData, factors), IProductWRTBase_Helper(),
           m_nquad0(m_stdExp->GetNumPoints(0)),
           m_nquad1(m_stdExp->GetNumPoints(1)),
           m_nquad2(m_stdExp->GetNumPoints(2)),
@@ -894,7 +920,8 @@ OperatorKey IProductWRTBase_SumFac_Tet::m_type =
 /**
  * @brief Inner Product operator using sum-factorisation (Prism)
  */
-class IProductWRTBase_SumFac_Prism final : public Operator
+class IProductWRTBase_SumFac_Prism final : virtual public Operator,
+                                           IProductWRTBase_Helper
 {
 public:
     OPERATOR_CREATE(IProductWRTBase_SumFac_Prism)
@@ -948,7 +975,7 @@ private:
     IProductWRTBase_SumFac_Prism(
         vector<StdRegions::StdExpansionSharedPtr> pCollExp,
         CoalescedGeomDataSharedPtr pGeomData, StdRegions::FactorMap factors)
-        : Operator(pCollExp, pGeomData, factors),
+        : Operator(pCollExp, pGeomData, factors), IProductWRTBase_Helper(),
           m_nquad0(m_stdExp->GetNumPoints(0)),
           m_nquad1(m_stdExp->GetNumPoints(1)),
           m_nquad2(m_stdExp->GetNumPoints(2)),
@@ -986,7 +1013,8 @@ OperatorKey IProductWRTBase_SumFac_Prism::m_type =
 /**
  * @brief Inner Product operator using sum-factorisation (Pyr)
  */
-class IProductWRTBase_SumFac_Pyr final : public Operator
+class IProductWRTBase_SumFac_Pyr final : virtual public Operator,
+                                         IProductWRTBase_Helper
 {
 public:
     OPERATOR_CREATE(IProductWRTBase_SumFac_Pyr)
@@ -1040,7 +1068,7 @@ private:
     IProductWRTBase_SumFac_Pyr(
         vector<StdRegions::StdExpansionSharedPtr> pCollExp,
         CoalescedGeomDataSharedPtr pGeomData, StdRegions::FactorMap factors)
-        : Operator(pCollExp, pGeomData, factors),
+        : Operator(pCollExp, pGeomData, factors), IProductWRTBase_Helper(),
           m_nquad0(m_stdExp->GetNumPoints(0)),
           m_nquad1(m_stdExp->GetNumPoints(1)),
           m_nquad2(m_stdExp->GetNumPoints(2)),
