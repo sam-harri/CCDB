@@ -105,9 +105,7 @@ private:
 
     // Arnoldi process
     void DoArnoldi(const int starttem, const int endtem, const int nGlobal,
-                   const int nDir,
-                   // V_total(:,1:nd) total search directions
-                   Array<OneD, Array<OneD, NekDouble>> &V_local,
+                   const int nDir, Array<OneD, NekDouble> &w,
                    // V[nd] current search direction
                    Array<OneD, NekDouble> &Vsingle1,
                    // V[nd+1] new search direction
@@ -128,6 +126,13 @@ private:
                     Array<OneD, NekDouble> &y);
     static std::string lookupIds[];
     static std::string def;
+
+    // Hessenburg matrix
+    Array<OneD, Array<OneD, NekDouble>> m_hes;
+    // Hesseburg matrix after rotation
+    Array<OneD, Array<OneD, NekDouble>> m_Upper;
+    // Total search directions
+    Array<OneD, Array<OneD, NekDouble>> m_V_total;
 };
 } // namespace Nektar::LibUtilities
 

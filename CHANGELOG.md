@@ -28,6 +28,7 @@ v5.5.0
 - Remove `#include <boost/math/special_functions/fpclassify.hpp>` header (!1686)
 - Replace `boost::regex` with `std::regex` (!1676)
 - Update SDC scheme for implicit PFASST (!1659)
+- Pre-allocate memory for GMRES (!1668)
 
 **ADRSolver**
 - Add support for spatially-constant, but variable direction, diffusion to

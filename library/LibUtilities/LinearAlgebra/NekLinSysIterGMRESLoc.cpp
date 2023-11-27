@@ -104,6 +104,22 @@ NekLinSysIterGMRESLoc::NekLinSysIterGMRESLoc(
     }
 
     m_isLocal = true;
+
+    // Allocate array storage of coefficients
+    // Hessenburg matrix
+    m_hes = Array<OneD, Array<OneD, NekDouble>>(m_LinSysMaxStorage);
+    for (size_t nd = 0; nd < m_LinSysMaxStorage; nd++)
+    {
+        m_hes[nd] = Array<OneD, NekDouble>(m_LinSysMaxStorage + 1, 0.0);
+    }
+    // Hesseburg matrix after rotation
+    m_Upper = Array<OneD, Array<OneD, NekDouble>>(m_LinSysMaxStorage);
+    for (size_t nd = 0; nd < m_LinSysMaxStorage; nd++)
+    {
+        m_Upper[nd] = Array<OneD, NekDouble>(m_LinSysMaxStorage + 1, 0.0);
+    }
+    // Total search directions
+    m_V_total = Array<OneD, Array<OneD, NekDouble>>(m_LinSysMaxStorage + 1);
 }
 
 void NekLinSysIterGMRESLoc::v_InitObject()
@@ -230,12 +246,6 @@ NekDouble NekLinSysIterGMRESLoc::DoGmresRestart(
     const Array<OneD, const NekDouble> &pInput, Array<OneD, NekDouble> &pOutput)
 {
     // Allocate array storage of coefficients
-    // Hessenburg matrix
-    Array<OneD, Array<OneD, NekDouble>> hes(m_LinSysMaxStorage);
-    // Hesseburg matrix after rotation
-    Array<OneD, Array<OneD, NekDouble>> Upper(m_LinSysMaxStorage);
-    // Total search directions
-    Array<OneD, Array<OneD, NekDouble>> V_total(m_LinSysMaxStorage + 1);
     // Residual
     Array<OneD, NekDouble> eta(m_LinSysMaxStorage + 1, 0.0);
     // Givens rotation c
@@ -244,8 +254,6 @@ NekDouble NekLinSysIterGMRESLoc::DoGmresRestart(
     Array<OneD, NekDouble> sn(m_LinSysMaxStorage, 0.0);
     // Total coefficients, just for check
     Array<OneD, NekDouble> y_total(m_LinSysMaxStorage, 0.0);
-    // Residual
-    NekDouble eps;
     // Search direction order
     Array<OneD, int> id(m_LinSysMaxStorage, 0);
     Array<OneD, int> id_start(m_LinSysMaxStorage, 0);
@@ -255,9 +263,12 @@ NekDouble NekLinSysIterGMRESLoc::DoGmresRestart(
     int starttem;
     int endtem;
 
+    NekDouble eps;
     NekDouble beta, alpha;
     NekDouble vExchange = 0;
     // Temporary Array
+    Array<OneD, NekDouble> w(nLocal, 0.0);
+    Array<OneD, NekDouble> wk(nLocal, 0.0);
     Array<OneD, NekDouble> r0(nLocal, 0.0);
     Array<OneD, NekDouble> V1;
     Array<OneD, NekDouble> V2;
@@ -287,8 +298,6 @@ NekDouble NekLinSysIterGMRESLoc::DoGmresRestart(
 
     // Norm of (r0)
     // The m_map tells how to connect
-
-    Array<OneD, NekDouble> wk(nLocal);
     m_operator.DoAssembleLoc(r0, wk, true);
     vExchange = Vmath::Dot(nLocal, wk, r0);
     m_rowComm->AllReduce(vExchange, LibUtilities::ReduceSum);
@@ -336,9 +345,12 @@ NekDouble NekLinSysIterGMRESLoc::DoGmresRestart(
     }
 
     // Normlized by r0 norm V(:,1)=r0/norm(r0)
-    alpha      = 1.0 / eta[0];
-    V_total[0] = Array<OneD, NekDouble>(nLocal, 0.0);
-    Vmath::Smul(nLocal, alpha, r0, 1, V_total[0], 1);
+    alpha = 1.0 / eta[0];
+    if (m_V_total[0].size() == 0)
+    {
+        m_V_total[0] = Array<OneD, NekDouble>(nLocal, 0.0);
+    }
+    Vmath::Smul(nLocal, alpha, r0, 1, m_V_total[0], 1);
 
     // restarted Gmres(m) process
     int nswp = 0;
@@ -349,33 +361,36 @@ NekDouble NekLinSysIterGMRESLoc::DoGmresRestart(
 
     for (int nd = 0; nd < m_LinSysMaxStorage; ++nd)
     {
-        hes[nd]         = Array<OneD, NekDouble>(m_LinSysMaxStorage + 1, 0.0);
-        Upper[nd]       = Array<OneD, NekDouble>(m_LinSysMaxStorage + 1, 0.0);
-        V_total[nd + 1] = Array<OneD, NekDouble>(nLocal, 0.0);
-        V2              = V_total[nd + 1];
-        h1              = hes[nd];
+        if (m_V_total[nd + 1].size() == 0)
+        {
+            m_V_total[nd + 1] = Array<OneD, NekDouble>(nLocal, 0.0);
+        }
+        Vmath::Zero(nLocal, m_V_total[nd + 1], 1);
+        Vmath::Zero(m_LinSysMaxStorage + 1, m_hes[nd], 1);
+        V2 = m_V_total[nd + 1];
+        h1 = m_hes[nd];
 
         if (m_NekLinSysRightPrecon)
         {
-            m_operator.DoNekSysPrecon(V_total[nd], V1, true);
+            m_operator.DoNekSysPrecon(m_V_total[nd], V1, true);
         }
         else
         {
-            V1 = V_total[nd];
+            V1 = m_V_total[nd];
         }
         // w here is no need to add nDir due to temporary Array
         idtem    = id[nd];
         starttem = id_start[idtem];
         endtem   = id_end[idtem];
 
-        DoArnoldi(starttem, endtem, nLocal, V_total, V1, V2, h1);
+        DoArnoldi(starttem, endtem, nLocal, w, wk, V1, V2, h1);
 
         if (starttem > 0)
         {
             starttem = starttem - 1;
         }
 
-        h2 = Upper[nd];
+        h2 = m_Upper[nd];
         Vmath::Vcopy(m_LinSysMaxStorage + 1, &h1[0], 1, &h2[0], 1);
         DoGivensRotation(starttem, endtem, cs, sn, h2, eta);
 
@@ -408,13 +423,13 @@ NekDouble NekLinSysIterGMRESLoc::DoGmresRestart(
         }
     }
 
-    DoBackward(nswp, Upper, eta, y_total);
+    DoBackward(nswp, m_Upper, eta, y_total);
     // calculate output y_total*V_total
     Array<OneD, NekDouble> solution(nLocal, 0.0);
     for (int i = 0; i < nswp; ++i)
     {
         beta = y_total[i];
-        Vmath::Svtvp(nLocal, beta, V_total[i], 1, solution, 1, solution, 1);
+        Vmath::Svtvp(nLocal, beta, m_V_total[i], 1, solution, 1, solution, 1);
     }
 
     if (m_NekLinSysRightPrecon)
@@ -428,21 +443,15 @@ NekDouble NekLinSysIterGMRESLoc::DoGmresRestart(
 }
 
 // Arnoldi Subroutine
-void NekLinSysIterGMRESLoc::DoArnoldi(
-    const int starttem, const int endtem, const int nLocal,
-    Array<OneD, Array<OneD, NekDouble>> &V_local, Array<OneD, NekDouble> &V1,
-    Array<OneD, NekDouble> &V2, Array<OneD, NekDouble> &h)
+void NekLinSysIterGMRESLoc::DoArnoldi(const int starttem, const int endtem,
+                                      const int nLocal,
+                                      Array<OneD, NekDouble> &w,
+                                      Array<OneD, NekDouble> &wk,
+                                      Array<OneD, NekDouble> &V1,
+                                      Array<OneD, NekDouble> &V2,
+                                      Array<OneD, NekDouble> &h)
 {
-    // To notice, V_local's order not certainly equal to starttem:endtem
-    // starttem:endtem is the entry position in Hessenburg matrix
-    NekDouble alpha, beta;
-    int numbertem;
-    // Later for parallel
-    NekDouble vExchange = 0.0;
-    // w=AV(:,nd)
-    Array<OneD, NekDouble> w(nLocal, 0.0);
-    Array<OneD, NekDouble> wk(nLocal, 0.0);
-
+    NekDouble alpha, beta, vExchange = 0.0;
     LibUtilities::Timer timer;
     timer.Start();
     m_operator.DoNekSysLhsEval(V1, w, m_DifferenceFlag1);
@@ -457,23 +466,19 @@ void NekLinSysIterGMRESLoc::DoArnoldi(
     Vmath::Smul(nLocal, sqrt(m_prec_factor), w, 1, w, 1);
 
     // Modified Gram-Schmidt
-    // The pointer not certainly equal to starttem.
-    // Like initially, Gmres-deep need to use numbertem=0
-    numbertem = starttem;
     for (int i = starttem; i < endtem; ++i)
     {
         // Do inner product on equivalent of global values excluding
         // Diriclet conditions. To do this need to assmble (and
         // scatter back vector and then zero Dirichlet conditions.
-        m_operator.DoAssembleLoc(V_local[numbertem], wk, true);
+        m_operator.DoAssembleLoc(m_V_total[i], wk, true);
         vExchange = Vmath::Dot(nLocal, wk, w);
         m_rowComm->AllReduce(vExchange, LibUtilities::ReduceSum);
 
         h[i] = vExchange;
 
         beta = -1.0 * vExchange;
-        Vmath::Svtvp(nLocal, beta, V_local[numbertem], 1, w, 1, w, 1);
-        numbertem = numbertem + 1;
+        Vmath::Svtvp(nLocal, beta, m_V_total[i], 1, w, 1, w, 1);
     }
     // end of Modified Gram-Schmidt
 
@@ -557,7 +562,6 @@ void NekLinSysIterGMRESLoc::DoBackward(const int number,
     for (int i = maxid - 1; i > -1; --i)
     {
         sum = b[i];
-
         for (int j = i + 1; j < number; ++j)
         {
             // i and j changes due to use Array<OneD,Array<OneD,NekDouble>>
