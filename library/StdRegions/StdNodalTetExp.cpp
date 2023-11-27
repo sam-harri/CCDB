@@ -32,8 +32,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/Foundations/ManagerAccess.h> // for PointsManager, etc
 #include <StdRegions/StdNodalTetExp.h>
 
@@ -243,9 +241,8 @@ void StdNodalTetExp::v_FillMode(const int mode,
 //---------------------------------------
 
 int StdNodalTetExp::v_GetVertexMap(const int localVertexId,
-                                   bool useCoeffPacking)
+                                   [[maybe_unused]] bool useCoeffPacking)
 {
-    boost::ignore_unused(useCoeffPacking);
     ASSERTL0(localVertexId >= 0 && localVertexId <= 3,
              "Local Vertex ID must be between 0 and 3");
     return localVertexId;

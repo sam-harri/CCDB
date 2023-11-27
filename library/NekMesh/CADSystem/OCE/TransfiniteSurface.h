@@ -38,7 +38,6 @@
 #include <Standard_Version.hxx>
 #include <gp_GTrsf2d.hxx>
 
-#include <boost/core/ignore_unused.hpp>
 #include <vector>
 
 #include <NekMesh/Module/Log.hpp>
@@ -159,9 +158,9 @@ public:
      * @brief Returns the reversed parameter for this curve. Unimplemented in
      * this class.
      */
-    Standard_Real ReversedParameter(const Standard_Real U) const override
+    Standard_Real ReversedParameter(
+        [[maybe_unused]] const Standard_Real U) const override
     {
-        boost::ignore_unused(U);
         throw new NekMeshError("Unsupported function.");
         return 0.0;
     }
@@ -170,10 +169,10 @@ public:
      * @brief Returns the transformed parameter for this curve. Unimplemented in
      * this class.
      */
-    Standard_Real TransformedParameter(const Standard_Real U,
-                                       const gp_Trsf &T) const override
+    Standard_Real TransformedParameter(
+        [[maybe_unused]] const Standard_Real U,
+        [[maybe_unused]] const gp_Trsf &T) const override
     {
-        boost::ignore_unused(U, T);
         throw new NekMeshError("Unsupported function.");
         return 0.0;
     }
@@ -182,9 +181,9 @@ public:
      * @brief Returns a parametric transformation for this curve. Unimplemented
      * in this class.
      */
-    Standard_Real ParametricTransformation(const gp_Trsf &T) const override
+    Standard_Real ParametricTransformation(
+        [[maybe_unused]] const gp_Trsf &T) const override
     {
-        boost::ignore_unused(T);
         throw new NekMeshError("Unsupported function.");
         return 0.0;
     }
@@ -419,10 +418,10 @@ public:
      * Since we're lazy and D3 isn't called in the mesh generation pipeline,
      * this isn't implemented in this class (even though it is well-defined).
      */
-    void D3(const Standard_Real U, gp_Pnt &P, gp_Vec &V1, gp_Vec &V2,
-            gp_Vec &V3) const override
+    void D3([[maybe_unused]] const Standard_Real U, [[maybe_unused]] gp_Pnt &P,
+            [[maybe_unused]] gp_Vec &V1, [[maybe_unused]] gp_Vec &V2,
+            [[maybe_unused]] gp_Vec &V3) const override
     {
-        boost::ignore_unused(U, P, V1, V2, V3);
         throw new NekMeshError("Unsupported function.");
     }
 
@@ -433,9 +432,9 @@ public:
      * Since we're lazy and DN isn't called in the mesh generation pipeline,
      * this isn't implemented in this class (even though it is well-defined).
      */
-    gp_Vec DN(const Standard_Real U, const Standard_Integer N) const override
+    gp_Vec DN([[maybe_unused]] const Standard_Real U,
+              [[maybe_unused]] const Standard_Integer N) const override
     {
-        boost::ignore_unused(U, N);
         throw new NekMeshError("Unsupported function.");
         return gp_Vec();
     }
@@ -555,9 +554,9 @@ public:
         throw new NekMeshError("Unsupported function.");
     }
 
-    Standard_Real UReversedParameter(const Standard_Real U) const override
+    Standard_Real UReversedParameter(
+        [[maybe_unused]] const Standard_Real U) const override
     {
-        boost::ignore_unused(U);
         throw new NekMeshError("Unsupported function.");
         return 0.0;
     }
@@ -570,9 +569,9 @@ public:
         throw new NekMeshError("Unsupported function.");
     }
 
-    Standard_Real VReversedParameter(const Standard_Real V) const override
+    Standard_Real VReversedParameter(
+        [[maybe_unused]] const Standard_Real V) const override
     {
-        boost::ignore_unused(V);
         throw new NekMeshError("Unsupported function.");
         return 0.0;
     }
@@ -604,16 +603,16 @@ public:
         return tmp;
     }
 
-    void TransformParameters(Standard_Real &U, Standard_Real &V,
-                             const gp_Trsf &T) const override
+    void TransformParameters([[maybe_unused]] Standard_Real &U,
+                             [[maybe_unused]] Standard_Real &V,
+                             [[maybe_unused]] const gp_Trsf &T) const override
     {
-        boost::ignore_unused(U, V, T);
         throw new NekMeshError("Unsupported function.");
     }
 
-    gp_GTrsf2d ParametricTransformation(const gp_Trsf &T) const override
+    gp_GTrsf2d ParametricTransformation(
+        [[maybe_unused]] const gp_Trsf &T) const override
     {
-        boost::ignore_unused(T);
         throw new NekMeshError("Unsupported function.");
         return gp_GTrsf2d();
     }
@@ -1024,11 +1023,11 @@ public:
      * Since we're lazy and DN isn't called in the mesh generation pipeline,
      * this isn't implemented in this class (even though it is well-defined).
      */
-    gp_Vec DN(const Standard_Real U, const Standard_Real V,
-              const Standard_Integer Nu,
-              const Standard_Integer Nv) const override
+    gp_Vec DN([[maybe_unused]] const Standard_Real U,
+              [[maybe_unused]] const Standard_Real V,
+              [[maybe_unused]] const Standard_Integer Nu,
+              [[maybe_unused]] const Standard_Integer Nv) const override
     {
-        boost::ignore_unused(U, V, Nu, Nv);
         throw new NekMeshError("Unsupported function.");
         return gp_Vec();
     }

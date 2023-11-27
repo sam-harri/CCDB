@@ -99,9 +99,8 @@ void GlobalLinSysStaticCond::v_Solve(
     const Array<OneD, const NekDouble> &pLocInput,
     Array<OneD, NekDouble> &pLocOutput,
     const AssemblyMapSharedPtr &pLocToGloMap,
-    const Array<OneD, const NekDouble> &dirForcing)
+    [[maybe_unused]] const Array<OneD, const NekDouble> &dirForcing)
 {
-    boost::ignore_unused(dirForcing);
     ASSERTL1(dirForcing.size() == 0,
              "GlobalLinSysStaticCond: Not setup for dirForcing");
 

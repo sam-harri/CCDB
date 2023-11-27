@@ -55,15 +55,13 @@ void Diffusion::InitObject(const LibUtilities::SessionReaderSharedPtr pSession,
 }
 
 void Diffusion::v_DiffuseCoeffs(
-    const std::size_t nConvectiveFields,
-    const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
-    const Array<OneD, Array<OneD, NekDouble>> &inarray,
-    Array<OneD, Array<OneD, NekDouble>> &outarray,
-    const Array<OneD, Array<OneD, NekDouble>> &pFwd,
-    const Array<OneD, Array<OneD, NekDouble>> &pBwd)
+    [[maybe_unused]] const std::size_t nConvectiveFields,
+    [[maybe_unused]] const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
+    [[maybe_unused]] const Array<OneD, Array<OneD, NekDouble>> &inarray,
+    [[maybe_unused]] Array<OneD, Array<OneD, NekDouble>> &outarray,
+    [[maybe_unused]] const Array<OneD, Array<OneD, NekDouble>> &pFwd,
+    [[maybe_unused]] const Array<OneD, Array<OneD, NekDouble>> &pBwd)
 {
-    boost::ignore_unused(nConvectiveFields, fields, inarray, outarray, pFwd,
-                         pBwd);
     NEKERROR(ErrorUtil::efatal, "v_DiffuseCoeffs not defined");
 }
 
@@ -74,37 +72,35 @@ const Array<OneD, const Array<OneD, NekDouble>> &Diffusion::v_GetTraceNormal()
 }
 
 void Diffusion::v_DiffuseCalcDerivative(
-    const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
-    const Array<OneD, Array<OneD, NekDouble>> &inarray,
-    TensorOfArray3D<NekDouble> &qfields,
-    const Array<OneD, Array<OneD, NekDouble>> &pFwd,
-    const Array<OneD, Array<OneD, NekDouble>> &pBwd)
+    [[maybe_unused]] const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
+    [[maybe_unused]] const Array<OneD, Array<OneD, NekDouble>> &inarray,
+    [[maybe_unused]] TensorOfArray3D<NekDouble> &qfields,
+    [[maybe_unused]] const Array<OneD, Array<OneD, NekDouble>> &pFwd,
+    [[maybe_unused]] const Array<OneD, Array<OneD, NekDouble>> &pBwd)
 {
-    boost::ignore_unused(fields, inarray, qfields, pFwd, pBwd);
     NEKERROR(ErrorUtil::efatal, "Not defined for function DiffuseVolumeFLux.");
 }
 
 void Diffusion::v_DiffuseVolumeFlux(
-    const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
-    const Array<OneD, Array<OneD, NekDouble>> &inarray,
-    TensorOfArray3D<NekDouble> &qfields, TensorOfArray3D<NekDouble> &VolumeFlux,
-    Array<OneD, int> &nonZeroIndex)
+    [[maybe_unused]] const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
+    [[maybe_unused]] const Array<OneD, Array<OneD, NekDouble>> &inarray,
+    [[maybe_unused]] TensorOfArray3D<NekDouble> &qfields,
+    [[maybe_unused]] TensorOfArray3D<NekDouble> &VolumeFlux,
+    [[maybe_unused]] Array<OneD, int> &nonZeroIndex)
 {
-    boost::ignore_unused(fields, inarray, qfields, VolumeFlux, nonZeroIndex);
     NEKERROR(ErrorUtil::efatal, "Not defined for function DiffuseVolumeFLux.");
 }
 
 void Diffusion::v_DiffuseTraceFlux(
-    const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
-    const Array<OneD, Array<OneD, NekDouble>> &inarray,
-    TensorOfArray3D<NekDouble> &qfields, TensorOfArray3D<NekDouble> &VolumeFlux,
-    Array<OneD, Array<OneD, NekDouble>> &TraceFlux,
-    const Array<OneD, Array<OneD, NekDouble>> &pFwd,
-    const Array<OneD, Array<OneD, NekDouble>> &pBwd,
-    Array<OneD, int> &nonZeroIndex)
+    [[maybe_unused]] const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
+    [[maybe_unused]] const Array<OneD, Array<OneD, NekDouble>> &inarray,
+    [[maybe_unused]] TensorOfArray3D<NekDouble> &qfields,
+    [[maybe_unused]] TensorOfArray3D<NekDouble> &VolumeFlux,
+    [[maybe_unused]] Array<OneD, Array<OneD, NekDouble>> &TraceFlux,
+    [[maybe_unused]] const Array<OneD, Array<OneD, NekDouble>> &pFwd,
+    [[maybe_unused]] const Array<OneD, Array<OneD, NekDouble>> &pBwd,
+    [[maybe_unused]] Array<OneD, int> &nonZeroIndex)
 {
-    boost::ignore_unused(fields, inarray, qfields, VolumeFlux, TraceFlux, pFwd,
-                         pBwd, nonZeroIndex);
     NEKERROR(ErrorUtil::efatal, "Not defined function DiffuseTraceFLux.");
 }
 

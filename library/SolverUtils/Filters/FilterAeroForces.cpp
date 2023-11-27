@@ -42,7 +42,6 @@
 #include <SolverUtils/Filters/FilterAeroForces.h>
 #include <SolverUtils/Filters/FilterInterfaces.hpp>
 #include <boost/algorithm/string.hpp>
-#include <boost/core/ignore_unused.hpp>
 #include <iomanip>
 
 using namespace std;
@@ -643,10 +642,8 @@ void FilterAeroForces::v_Update(
  */
 void FilterAeroForces::v_Finalise(
     const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
-    const NekDouble &time)
+    [[maybe_unused]] const NekDouble &time)
 {
-    boost::ignore_unused(time);
-
     if (pFields[0]->GetComm()->GetRank() == 0)
     {
         m_outputStream.close();
@@ -1275,10 +1272,8 @@ void FilterAeroForces::CalculateForces(
  */
 void FilterAeroForces::CalculateForcesMapping(
     const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
-    const NekDouble &time)
+    [[maybe_unused]] const NekDouble &time)
 {
-    boost::ignore_unused(time);
-
     int cnt, elmtid, offset, boundary;
     // Get number of quadrature points and dimensions
     int physTot = pFields[0]->GetNpoints();

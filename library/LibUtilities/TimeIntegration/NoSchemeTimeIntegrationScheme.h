@@ -53,7 +53,6 @@ public:
                                       std::vector<NekDouble> freeParams)
         : TimeIntegrationScheme(variant, order, freeParams)
     {
-        boost::ignore_unused(variant, order, freeParams);
     }
     ~NoSchemeTimeIntegrationScheme() override
     {
@@ -89,10 +88,10 @@ public:
     }
 
     // Sets the solution Vector
-    inline void v_SetSolutionVector(const size_t Offset,
-                                    const DoubleArray &y) override
+    inline void v_SetSolutionVector(
+        [[maybe_unused]] const size_t Offset,
+        [[maybe_unused]] const DoubleArray &y) override
     {
-        boost::ignore_unused(Offset, y);
     }
 
     // The worker methods

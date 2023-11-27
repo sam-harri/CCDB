@@ -33,8 +33,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <MultiRegions/ExpList.h>
 #include <MultiRegions/ExpList3DHomogeneous2D.h>
 
@@ -52,11 +50,10 @@ ExpList3DHomogeneous2D::ExpList3DHomogeneous2D(
     const LibUtilities::BasisKey &HomoBasis_y,
     const LibUtilities::BasisKey &HomoBasis_z, const NekDouble lhom_y,
     const NekDouble lhom_z, const bool useFFT, const bool dealiasing,
-    const Collections::ImplementationType ImpType)
+    [[maybe_unused]] const Collections::ImplementationType ImpType)
     : ExpListHomogeneous2D(e3DH2D, pSession, HomoBasis_y, HomoBasis_z, lhom_y,
                            lhom_z, useFFT, dealiasing)
 {
-    boost::ignore_unused(ImpType);
 }
 
 // Constructor for ExpList3DHomogeneous2D to act as a Explist field

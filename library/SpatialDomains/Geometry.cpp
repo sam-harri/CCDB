@@ -34,8 +34,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <SpatialDomains/Geometry.h>
 #include <SpatialDomains/Geometry1D.h>
 #include <SpatialDomains/Geometry2D.h>
@@ -158,9 +156,8 @@ int Geometry::GetFid(int i) const
 /**
  * @copydoc Geometry::GetEdge()
  */
-Geometry1DSharedPtr Geometry::v_GetEdge(int i) const
+Geometry1DSharedPtr Geometry::v_GetEdge([[maybe_unused]] int i) const
 {
-    boost::ignore_unused(i);
     NEKERROR(ErrorUtil::efatal,
              "This function is only valid for shape type geometries");
     return Geometry1DSharedPtr();
@@ -169,9 +166,8 @@ Geometry1DSharedPtr Geometry::v_GetEdge(int i) const
 /**
  * @copydoc Geometry::GetFace()
  */
-Geometry2DSharedPtr Geometry::v_GetFace(int i) const
+Geometry2DSharedPtr Geometry::v_GetFace([[maybe_unused]] int i) const
 {
-    boost::ignore_unused(i);
     NEKERROR(ErrorUtil::efatal,
              "This function is only valid for shape type geometries");
     return Geometry2DSharedPtr();
@@ -190,9 +186,9 @@ int Geometry::v_GetNumVerts() const
 /**
  * @copydoc Geometry::GetEorient()
  */
-StdRegions::Orientation Geometry::v_GetEorient(const int i) const
+StdRegions::Orientation Geometry::v_GetEorient(
+    [[maybe_unused]] const int i) const
 {
-    boost::ignore_unused(i);
     NEKERROR(ErrorUtil::efatal,
              "This function is not valid for this geometry.");
     return StdRegions::eForwards;
@@ -201,9 +197,9 @@ StdRegions::Orientation Geometry::v_GetEorient(const int i) const
 /**
  * @copydoc Geometry::GetForient()
  */
-StdRegions::Orientation Geometry::v_GetForient(const int i) const
+StdRegions::Orientation Geometry::v_GetForient(
+    [[maybe_unused]] const int i) const
 {
-    boost::ignore_unused(i);
     NEKERROR(ErrorUtil::efatal,
              "This function is not valid for this geometry.");
     return StdRegions::eFwd;
@@ -235,9 +231,9 @@ int Geometry::v_GetShapeDim() const
     return 0;
 }
 
-int Geometry::v_AllLeftCheck(const Array<OneD, const NekDouble> &gloCoord)
+int Geometry::v_AllLeftCheck(
+    [[maybe_unused]] const Array<OneD, const NekDouble> &gloCoord)
 {
-    boost::ignore_unused(gloCoord);
     return 0;
 }
 
@@ -285,10 +281,10 @@ bool Geometry::v_ContainsPoint(const Array<OneD, const NekDouble> &gloCoord,
     }
 }
 
-NekDouble Geometry::v_FindDistance(const Array<OneD, const NekDouble> &xs,
-                                   Array<OneD, NekDouble> &xi)
+NekDouble Geometry::v_FindDistance(
+    [[maybe_unused]] const Array<OneD, const NekDouble> &xs,
+    [[maybe_unused]] Array<OneD, NekDouble> &xi)
 {
-    boost::ignore_unused(xs, xi);
     NEKERROR(ErrorUtil::efatal,
              "This function has not been defined for this geometry");
     return false;
@@ -297,9 +293,9 @@ NekDouble Geometry::v_FindDistance(const Array<OneD, const NekDouble> &xs,
 /**
  * @copydoc Geometry::GetVertexEdgeMap()
  */
-int Geometry::v_GetVertexEdgeMap(const int i, const int j) const
+int Geometry::v_GetVertexEdgeMap([[maybe_unused]] const int i,
+                                 [[maybe_unused]] const int j) const
 {
-    boost::ignore_unused(i, j);
     NEKERROR(ErrorUtil::efatal,
              "This function has not been defined for this geometry");
     return 0;
@@ -308,9 +304,9 @@ int Geometry::v_GetVertexEdgeMap(const int i, const int j) const
 /**
  * @copydoc Geometry::GetVertexFaceMap()
  */
-int Geometry::v_GetVertexFaceMap(const int i, const int j) const
+int Geometry::v_GetVertexFaceMap([[maybe_unused]] const int i,
+                                 [[maybe_unused]] const int j) const
 {
-    boost::ignore_unused(i, j);
     NEKERROR(ErrorUtil::efatal,
              "This function has not been defined for this geometry");
     return 0;
@@ -319,9 +315,9 @@ int Geometry::v_GetVertexFaceMap(const int i, const int j) const
 /**
  * @copydoc Geometry::GetEdgeFaceMap()
  */
-int Geometry::v_GetEdgeFaceMap(const int i, const int j) const
+int Geometry::v_GetEdgeFaceMap([[maybe_unused]] const int i,
+                               [[maybe_unused]] const int j) const
 {
-    boost::ignore_unused(i, j);
     NEKERROR(ErrorUtil::efatal,
              "This function has not been defined for this geometry");
     return 0;
@@ -330,9 +326,9 @@ int Geometry::v_GetEdgeFaceMap(const int i, const int j) const
 /**
  * @copydoc Geometry::GetEdgeNormalToFaceVert()
  */
-int Geometry::v_GetEdgeNormalToFaceVert(const int i, const int j) const
+int Geometry::v_GetEdgeNormalToFaceVert([[maybe_unused]] const int i,
+                                        [[maybe_unused]] const int j) const
 {
-    boost::ignore_unused(i, j);
     NEKERROR(ErrorUtil::efatal,
              "This function has not been defined for this geometry");
     return 0;
@@ -341,9 +337,9 @@ int Geometry::v_GetEdgeNormalToFaceVert(const int i, const int j) const
 /**
  * @copydoc Geometry::GetDir()
  */
-int Geometry::v_GetDir(const int i, const int j) const
+int Geometry::v_GetDir([[maybe_unused]] const int i,
+                       [[maybe_unused]] const int j) const
 {
-    boost::ignore_unused(i, j);
     NEKERROR(ErrorUtil::efatal,
              "This function has not been defined for this geometry");
     return 0;
@@ -352,10 +348,10 @@ int Geometry::v_GetDir(const int i, const int j) const
 /**
  * @copydoc Geometry::GetCoord()
  */
-NekDouble Geometry::v_GetCoord(const int i,
-                               const Array<OneD, const NekDouble> &Lcoord)
+NekDouble Geometry::v_GetCoord(
+    [[maybe_unused]] const int i,
+    [[maybe_unused]] const Array<OneD, const NekDouble> &Lcoord)
 {
-    boost::ignore_unused(i, Lcoord);
     NEKERROR(ErrorUtil::efatal,
              "This function is only valid for expansion type geometries");
     return 0.0;
@@ -364,10 +360,10 @@ NekDouble Geometry::v_GetCoord(const int i,
 /**
  * @copydoc Geometry::GetLocCoords()
  */
-NekDouble Geometry::v_GetLocCoords(const Array<OneD, const NekDouble> &coords,
-                                   Array<OneD, NekDouble> &Lcoords)
+NekDouble Geometry::v_GetLocCoords(
+    [[maybe_unused]] const Array<OneD, const NekDouble> &coords,
+    [[maybe_unused]] Array<OneD, NekDouble> &Lcoords)
 {
-    boost::ignore_unused(coords, Lcoords);
     NEKERROR(ErrorUtil::efatal,
              "This function is only valid for expansion type geometries");
     return 0.0;
@@ -385,9 +381,9 @@ void Geometry::v_FillGeom()
 /**
  * @copydoc Geometry::Reset()
  */
-void Geometry::v_Reset(CurveMap &curvedEdges, CurveMap &curvedFaces)
+void Geometry::v_Reset([[maybe_unused]] CurveMap &curvedEdges,
+                       [[maybe_unused]] CurveMap &curvedFaces)
 {
-    boost::ignore_unused(curvedEdges, curvedFaces);
 
     // Reset state
     m_state            = eNotFilled;

@@ -59,11 +59,11 @@ public:
     ~FauxComm() override
     {
     }
-    void v_SplitComm(int pRows, int pColumns, int pTime) override
+    void v_SplitComm(int pRows, int pColumns,
+                     [[maybe_unused]] int pTime) override
     {
         m_commRow    = std::shared_ptr<FauxComm>(new FauxComm(pColumns));
         m_commColumn = std::shared_ptr<FauxComm>(new FauxComm(pRows));
-        boost::ignore_unused(pTime);
     }
 };
 

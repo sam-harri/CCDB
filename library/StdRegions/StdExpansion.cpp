@@ -33,8 +33,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/Foundations/ManagerAccess.h> // for BasisManager, etc
 #include <StdRegions/StdExpansion.h>
 
@@ -869,10 +867,10 @@ void StdExpansion::WeakDirectionalDerivMatrixOp_MatFree(
 }
 
 void StdExpansion::MassLevelCurvatureMatrixOp_MatFree(
-    const Array<OneD, const NekDouble> &inarray,
-    Array<OneD, NekDouble> &outarray, const StdMatrixKey &mkey)
+    [[maybe_unused]] const Array<OneD, const NekDouble> &inarray,
+    [[maybe_unused]] Array<OneD, NekDouble> &outarray,
+    [[maybe_unused]] const StdMatrixKey &mkey)
 {
-    boost::ignore_unused(inarray, outarray, mkey);
 }
 
 void StdExpansion::LinearAdvectionMatrixOp_MatFree(
@@ -1011,111 +1009,105 @@ NekDouble StdExpansion::StdPhysEvaluate(
 }
 
 int StdExpansion::v_CalcNumberOfCoefficients(
-    const std::vector<unsigned int> &nummodes, int &modes_offset)
+    [[maybe_unused]] const std::vector<unsigned int> &nummodes,
+    [[maybe_unused]] int &modes_offset)
 {
-    boost::ignore_unused(nummodes, modes_offset);
     NEKERROR(ErrorUtil::efatal, "This function is not defined for this class");
     return 0;
 }
 
 void StdExpansion::v_NormVectorIProductWRTBase(
-    const Array<OneD, const NekDouble> &Fx, Array<OneD, NekDouble> &outarray)
+    [[maybe_unused]] const Array<OneD, const NekDouble> &Fx,
+    [[maybe_unused]] Array<OneD, NekDouble> &outarray)
 {
-    boost::ignore_unused(Fx, outarray);
     NEKERROR(ErrorUtil::efatal, "This function is not valid for this class");
 }
 
 void StdExpansion::v_NormVectorIProductWRTBase(
-    const Array<OneD, const NekDouble> &Fx,
-    const Array<OneD, const NekDouble> &Fy, Array<OneD, NekDouble> &outarray)
+    [[maybe_unused]] const Array<OneD, const NekDouble> &Fx,
+    [[maybe_unused]] const Array<OneD, const NekDouble> &Fy,
+    [[maybe_unused]] Array<OneD, NekDouble> &outarray)
 {
-    boost::ignore_unused(Fx, Fy, outarray);
     NEKERROR(ErrorUtil::efatal, "This function is not valid for this class");
 }
 
 void StdExpansion::v_NormVectorIProductWRTBase(
-    const Array<OneD, const NekDouble> &Fx,
-    const Array<OneD, const NekDouble> &Fy,
-    const Array<OneD, const NekDouble> &Fz, Array<OneD, NekDouble> &outarray)
+    [[maybe_unused]] const Array<OneD, const NekDouble> &Fx,
+    [[maybe_unused]] const Array<OneD, const NekDouble> &Fy,
+    [[maybe_unused]] const Array<OneD, const NekDouble> &Fz,
+    [[maybe_unused]] Array<OneD, NekDouble> &outarray)
 {
-    boost::ignore_unused(Fx, Fy, Fz, outarray);
     NEKERROR(ErrorUtil::efatal, "This function is not valid for this class");
 }
 
 void StdExpansion::v_NormVectorIProductWRTBase(
-    const Array<OneD, const Array<OneD, NekDouble>> &Fvec,
-    Array<OneD, NekDouble> &outarray)
+    [[maybe_unused]] const Array<OneD, const Array<OneD, NekDouble>> &Fvec,
+    [[maybe_unused]] Array<OneD, NekDouble> &outarray)
 {
-    boost::ignore_unused(Fvec, outarray);
     NEKERROR(ErrorUtil::efatal, "This function is not valid for this class");
 }
 
 DNekScalBlkMatSharedPtr StdExpansion::v_GetLocStaticCondMatrix(
-    const LocalRegions::MatrixKey &mkey)
+    [[maybe_unused]] const LocalRegions::MatrixKey &mkey)
 {
-    boost::ignore_unused(mkey);
     NEKERROR(ErrorUtil::efatal, "This function is only valid for LocalRegions");
     return NullDNekScalBlkMatSharedPtr;
 }
 
 void StdExpansion::v_DropLocStaticCondMatrix(
-    const LocalRegions::MatrixKey &mkey)
+    [[maybe_unused]] const LocalRegions::MatrixKey &mkey)
 {
-    boost::ignore_unused(mkey);
     NEKERROR(ErrorUtil::efatal, "This function is only valid for LocalRegions");
 }
 
 void StdExpansion::v_SetCoeffsToOrientation(
-    StdRegions::Orientation dir, Array<OneD, const NekDouble> &inarray,
-    Array<OneD, NekDouble> &outarray)
+    [[maybe_unused]] StdRegions::Orientation dir,
+    [[maybe_unused]] Array<OneD, const NekDouble> &inarray,
+    [[maybe_unused]] Array<OneD, NekDouble> &outarray)
 {
-    boost::ignore_unused(dir, inarray, outarray);
     NEKERROR(ErrorUtil::efatal, "This function is not defined for this shape");
 }
 
-void StdExpansion::v_SetCoeffsToOrientation(Array<OneD, NekDouble> &coeffs,
-                                            StdRegions::Orientation dir)
+void StdExpansion::v_SetCoeffsToOrientation(
+    [[maybe_unused]] Array<OneD, NekDouble> &coeffs,
+    [[maybe_unused]] StdRegions::Orientation dir)
 {
-    boost::ignore_unused(coeffs, dir);
     NEKERROR(ErrorUtil::efatal, "This function is not defined for this shape");
 }
 
 NekDouble StdExpansion::v_StdPhysEvaluate(
-    const Array<OneD, const NekDouble> &Lcoord,
-    const Array<OneD, const NekDouble> &physvals)
+    [[maybe_unused]] const Array<OneD, const NekDouble> &Lcoord,
+    [[maybe_unused]] const Array<OneD, const NekDouble> &physvals)
 
 {
-    boost::ignore_unused(Lcoord, physvals);
     NEKERROR(ErrorUtil::efatal, "This function is not defined for this shape");
     return 0;
 }
 
 void StdExpansion::v_LocCoordToLocCollapsed(
-    const Array<OneD, const NekDouble> &xi, Array<OneD, NekDouble> &eta)
+    [[maybe_unused]] const Array<OneD, const NekDouble> &xi,
+    [[maybe_unused]] Array<OneD, NekDouble> &eta)
 {
-    boost::ignore_unused(xi, eta);
     NEKERROR(ErrorUtil::efatal, "This function is not defined for this shape");
 }
 
 void StdExpansion::v_LocCollapsedToLocCoord(
-    const Array<OneD, const NekDouble> &eta, Array<OneD, NekDouble> &xi)
+    [[maybe_unused]] const Array<OneD, const NekDouble> &eta,
+    [[maybe_unused]] Array<OneD, NekDouble> &xi)
 {
-    boost::ignore_unused(eta, xi);
     NEKERROR(ErrorUtil::efatal, "This function is not defined for this shape");
 }
 
-const LibUtilities::BasisKey StdExpansion::v_GetTraceBasisKey(const int i,
-                                                              const int k) const
+const LibUtilities::BasisKey StdExpansion::v_GetTraceBasisKey(
+    [[maybe_unused]] const int i, [[maybe_unused]] const int k) const
 {
-    boost::ignore_unused(i, k);
     ASSERTL0(false, "This function is not valid or not defined");
     return LibUtilities::NullBasisKey;
 }
 
-LibUtilities::PointsKey StdExpansion::v_GetTracePointsKey(const int i,
-                                                          const int j) const
+LibUtilities::PointsKey StdExpansion::v_GetTracePointsKey(
+    [[maybe_unused]] const int i, [[maybe_unused]] const int j) const
 {
-    boost::ignore_unused(i, j);
     ASSERTL0(false, "This function is not valid or not defined");
     return LibUtilities::NullPointsKey;
 }
@@ -1153,10 +1145,10 @@ bool StdExpansion::v_IsNodalNonTensorialExp()
 }
 
 void StdExpansion::v_IProductWRTDerivBase(
-    const int dir, const Array<OneD, const NekDouble> &inarray,
-    Array<OneD, NekDouble> &outarray)
+    [[maybe_unused]] const int dir,
+    [[maybe_unused]] const Array<OneD, const NekDouble> &inarray,
+    [[maybe_unused]] Array<OneD, NekDouble> &outarray)
 {
-    boost::ignore_unused(dir, inarray, outarray);
     NEKERROR(ErrorUtil::efatal, "This method has not been defined");
 }
 
@@ -1164,11 +1156,10 @@ void StdExpansion::v_IProductWRTDerivBase(
  *
  */
 void StdExpansion::v_IProductWRTDirectionalDerivBase(
-    const Array<OneD, const NekDouble> &direction,
-    const Array<OneD, const NekDouble> &inarray,
-    Array<OneD, NekDouble> &outarray)
+    [[maybe_unused]] const Array<OneD, const NekDouble> &direction,
+    [[maybe_unused]] const Array<OneD, const NekDouble> &inarray,
+    [[maybe_unused]] Array<OneD, NekDouble> &outarray)
 {
-    boost::ignore_unused(direction, inarray, outarray);
     NEKERROR(ErrorUtil::efatal, "This method has not been defined");
 }
 
@@ -1176,10 +1167,9 @@ void StdExpansion::v_IProductWRTDirectionalDerivBase(
  *
  */
 void StdExpansion::v_FwdTransBndConstrained(
-    const Array<OneD, const NekDouble> &inarray,
-    Array<OneD, NekDouble> &outarray)
+    [[maybe_unused]] const Array<OneD, const NekDouble> &inarray,
+    [[maybe_unused]] Array<OneD, NekDouble> &outarray)
 {
-    boost::ignore_unused(inarray, outarray);
     NEKERROR(ErrorUtil::efatal, "This method has not been defined");
 }
 
@@ -1187,9 +1177,9 @@ void StdExpansion::v_FwdTransBndConstrained(
  * @brief Integrates the specified function over the domain.
  * @see StdRegions#StdExpansion#Integral.
  */
-NekDouble StdExpansion::v_Integral(const Array<OneD, const NekDouble> &inarray)
+NekDouble StdExpansion::v_Integral(
+    [[maybe_unused]] const Array<OneD, const NekDouble> &inarray)
 {
-    boost::ignore_unused(inarray);
     NEKERROR(ErrorUtil::efatal, "This function is only valid for "
                                 "local expansions");
     return 0;
@@ -1199,27 +1189,27 @@ NekDouble StdExpansion::v_Integral(const Array<OneD, const NekDouble> &inarray)
  * @brief Calculate the derivative of the physical points
  * @see StdRegions#StdExpansion#PhysDeriv
  */
-void StdExpansion::v_PhysDeriv(const Array<OneD, const NekDouble> &inarray,
-                               Array<OneD, NekDouble> &out_d1,
-                               Array<OneD, NekDouble> &out_d2,
-                               Array<OneD, NekDouble> &out_d3)
+void StdExpansion::v_PhysDeriv(
+    [[maybe_unused]] const Array<OneD, const NekDouble> &inarray,
+    [[maybe_unused]] Array<OneD, NekDouble> &out_d1,
+    [[maybe_unused]] Array<OneD, NekDouble> &out_d2,
+    [[maybe_unused]] Array<OneD, NekDouble> &out_d3)
 {
-    boost::ignore_unused(inarray, out_d1, out_d2, out_d3);
     NEKERROR(ErrorUtil::efatal, "This function is only valid for "
                                 "local expansions");
 }
 
-void StdExpansion::v_PhysDeriv_s(const Array<OneD, const NekDouble> &inarray,
-                                 Array<OneD, NekDouble> &out_ds)
+void StdExpansion::v_PhysDeriv_s(
+    [[maybe_unused]] const Array<OneD, const NekDouble> &inarray,
+    [[maybe_unused]] Array<OneD, NekDouble> &out_ds)
 {
-    boost::ignore_unused(inarray, out_ds);
     NEKERROR(ErrorUtil::efatal, "This function is only valid for "
                                 "local expansions");
 }
-void StdExpansion::v_PhysDeriv_n(const Array<OneD, const NekDouble> &inarray,
-                                 Array<OneD, NekDouble> &out_dn)
+void StdExpansion::v_PhysDeriv_n(
+    [[maybe_unused]] const Array<OneD, const NekDouble> &inarray,
+    [[maybe_unused]] Array<OneD, NekDouble> &out_dn)
 {
-    boost::ignore_unused(inarray, out_dn);
     NEKERROR(ErrorUtil::efatal, "This function is only valid for "
                                 "local expansions");
 }
@@ -1229,12 +1219,12 @@ void StdExpansion::v_PhysDeriv_n(const Array<OneD, const NekDouble> &inarray,
  * given direction
  * @see StdRegions#StdExpansion#PhysDeriv
  */
-void StdExpansion::v_PhysDeriv(const int dir,
-                               const Array<OneD, const NekDouble> &inarray,
-                               Array<OneD, NekDouble> &out_d0)
+void StdExpansion::v_PhysDeriv(
+    [[maybe_unused]] const int dir,
+    [[maybe_unused]] const Array<OneD, const NekDouble> &inarray,
+    [[maybe_unused]] Array<OneD, NekDouble> &out_d0)
 
 {
-    boost::ignore_unused(dir, inarray, out_d0);
     NEKERROR(ErrorUtil::efatal, "This function is only valid for "
                                 "specific element types");
 }
@@ -1244,64 +1234,60 @@ void StdExpansion::v_PhysDeriv(const int dir,
  * @see StdRegions#StdExpansion#PhysDirectionalDeriv
  */
 void StdExpansion::v_PhysDirectionalDeriv(
-    const Array<OneD, const NekDouble> &inarray,
-    const Array<OneD, const NekDouble> &direction,
-    Array<OneD, NekDouble> &outarray)
+    [[maybe_unused]] const Array<OneD, const NekDouble> &inarray,
+    [[maybe_unused]] const Array<OneD, const NekDouble> &direction,
+    [[maybe_unused]] Array<OneD, NekDouble> &outarray)
 {
-    boost::ignore_unused(inarray, direction, outarray);
     NEKERROR(ErrorUtil::efatal, "This function is only valid for "
                                 "specific element types");
 }
 
-void StdExpansion::v_StdPhysDeriv(const Array<OneD, const NekDouble> &inarray,
-                                  Array<OneD, NekDouble> &out_d1,
-                                  Array<OneD, NekDouble> &out_d2,
-                                  Array<OneD, NekDouble> &out_d3)
+void StdExpansion::v_StdPhysDeriv(
+    [[maybe_unused]] const Array<OneD, const NekDouble> &inarray,
+    [[maybe_unused]] Array<OneD, NekDouble> &out_d1,
+    [[maybe_unused]] Array<OneD, NekDouble> &out_d2,
+    [[maybe_unused]] Array<OneD, NekDouble> &out_d3)
 {
-    boost::ignore_unused(inarray, out_d1, out_d2, out_d3);
     NEKERROR(ErrorUtil::efatal, "Method does not exist for this shape");
 }
 
-void StdExpansion::v_StdPhysDeriv(const int dir,
-                                  const Array<OneD, const NekDouble> &inarray,
-                                  Array<OneD, NekDouble> &outarray)
+void StdExpansion::v_StdPhysDeriv(
+    [[maybe_unused]] const int dir,
+    [[maybe_unused]] const Array<OneD, const NekDouble> &inarray,
+    [[maybe_unused]] Array<OneD, NekDouble> &outarray)
 {
-    boost::ignore_unused(dir, inarray, outarray);
     NEKERROR(ErrorUtil::efatal, "Method does not exist for this shape");
 }
 
 NekDouble StdExpansion::v_PhysEvaluate(
-    const Array<OneD, const NekDouble> &coords,
-    const Array<OneD, const NekDouble> &physvals)
+    [[maybe_unused]] const Array<OneD, const NekDouble> &coords,
+    [[maybe_unused]] const Array<OneD, const NekDouble> &physvals)
 {
-    boost::ignore_unused(coords, physvals);
     NEKERROR(ErrorUtil::efatal, "Method does not exist for this shape");
     return 0;
 }
 
 NekDouble StdExpansion::v_PhysEvaluate(
-    const Array<OneD, DNekMatSharedPtr> &I,
-    const Array<OneD, const NekDouble> &physvals)
+    [[maybe_unused]] const Array<OneD, DNekMatSharedPtr> &I,
+    [[maybe_unused]] const Array<OneD, const NekDouble> &physvals)
 {
-    boost::ignore_unused(I, physvals);
     NEKERROR(ErrorUtil::efatal, "Method does not exist for this shape");
     return 0;
 }
 
 NekDouble StdExpansion::v_PhysEvaluateBasis(
-    const Array<OneD, const NekDouble> &coords, int mode)
+    [[maybe_unused]] const Array<OneD, const NekDouble> &coords,
+    [[maybe_unused]] int mode)
 {
-    boost::ignore_unused(coords, mode);
     NEKERROR(ErrorUtil::efatal, "Method does not exist for this shape");
     return 0;
 }
 
 NekDouble StdExpansion::v_PhysEvaluate(
-    const Array<OneD, NekDouble> &coord,
-    const Array<OneD, const NekDouble> &inarray,
-    std::array<NekDouble, 3> &firstOrderDerivs)
+    [[maybe_unused]] const Array<OneD, NekDouble> &coord,
+    [[maybe_unused]] const Array<OneD, const NekDouble> &inarray,
+    [[maybe_unused]] std::array<NekDouble, 3> &firstOrderDerivs)
 {
-    boost::ignore_unused(coord, inarray, firstOrderDerivs);
     NEKERROR(ErrorUtil::efatal,
              "PhysEvaluate first order derivative method does not exist"
              " for this shape type: " +
@@ -1311,12 +1297,11 @@ NekDouble StdExpansion::v_PhysEvaluate(
 }
 
 NekDouble StdExpansion::v_PhysEvaluate(
-    const Array<OneD, NekDouble> &coord,
-    const Array<OneD, const NekDouble> &inarray,
-    std::array<NekDouble, 3> &firstOrderDerivs,
-    std::array<NekDouble, 6> &secondOrderDerivs)
+    [[maybe_unused]] const Array<OneD, NekDouble> &coord,
+    [[maybe_unused]] const Array<OneD, const NekDouble> &inarray,
+    [[maybe_unused]] std::array<NekDouble, 3> &firstOrderDerivs,
+    [[maybe_unused]] std::array<NekDouble, 6> &secondOrderDerivs)
 {
-    boost::ignore_unused(coord, inarray, firstOrderDerivs, secondOrderDerivs);
     NEKERROR(ErrorUtil::efatal,
              "PhysEvaluate second order derivative method does not exist"
              " for this shape type: " +
@@ -1325,43 +1310,43 @@ NekDouble StdExpansion::v_PhysEvaluate(
     return 0;
 }
 
-void StdExpansion::v_FillMode(const int mode, Array<OneD, NekDouble> &outarray)
+void StdExpansion::v_FillMode([[maybe_unused]] const int mode,
+                              [[maybe_unused]] Array<OneD, NekDouble> &outarray)
 {
-    boost::ignore_unused(mode, outarray);
     NEKERROR(ErrorUtil::efatal, "This function has not "
                                 "been defined for this shape");
 }
 
-DNekMatSharedPtr StdExpansion::v_GenMatrix(const StdMatrixKey &mkey)
+DNekMatSharedPtr StdExpansion::v_GenMatrix(
+    [[maybe_unused]] const StdMatrixKey &mkey)
 {
-    boost::ignore_unused(mkey);
     NEKERROR(ErrorUtil::efatal, "This function has not "
                                 "been defined for this element");
     DNekMatSharedPtr returnval;
     return returnval;
 }
 
-DNekMatSharedPtr StdExpansion::v_CreateStdMatrix(const StdMatrixKey &mkey)
+DNekMatSharedPtr StdExpansion::v_CreateStdMatrix(
+    [[maybe_unused]] const StdMatrixKey &mkey)
 {
-    boost::ignore_unused(mkey);
     NEKERROR(ErrorUtil::efatal, "This function has not "
                                 "been defined for this element");
     DNekMatSharedPtr returnval;
     return returnval;
 }
 
-void StdExpansion::v_GetCoords(Array<OneD, NekDouble> &coords_0,
-                               Array<OneD, NekDouble> &coords_1,
-                               Array<OneD, NekDouble> &coords_2)
+void StdExpansion::v_GetCoords(
+    [[maybe_unused]] Array<OneD, NekDouble> &coords_0,
+    [[maybe_unused]] Array<OneD, NekDouble> &coords_1,
+    [[maybe_unused]] Array<OneD, NekDouble> &coords_2)
 {
-    boost::ignore_unused(coords_0, coords_1, coords_2);
     NEKERROR(ErrorUtil::efatal, "Write coordinate definition method");
 }
 
-void StdExpansion::v_GetCoord(const Array<OneD, const NekDouble> &Lcoord,
-                              Array<OneD, NekDouble> &coord)
+void StdExpansion::v_GetCoord(
+    [[maybe_unused]] const Array<OneD, const NekDouble> &Lcoord,
+    [[maybe_unused]] Array<OneD, NekDouble> &coord)
 {
-    boost::ignore_unused(Lcoord, coord);
     NEKERROR(ErrorUtil::efatal, "Write coordinate definition method");
 }
 
@@ -1370,71 +1355,74 @@ int StdExpansion::v_GetCoordim() const
     return GetShapeDimension();
 }
 
-void StdExpansion::v_GetBoundaryMap(Array<OneD, unsigned int> &outarray)
+void StdExpansion::v_GetBoundaryMap(
+    [[maybe_unused]] Array<OneD, unsigned int> &outarray)
 {
-    boost::ignore_unused(outarray);
     NEKERROR(ErrorUtil::efatal, "Method does not exist for this shape");
 }
 
-void StdExpansion::v_GetInteriorMap(Array<OneD, unsigned int> &outarray)
+void StdExpansion::v_GetInteriorMap(
+    [[maybe_unused]] Array<OneD, unsigned int> &outarray)
 {
-    boost::ignore_unused(outarray);
     NEKERROR(ErrorUtil::efatal, "Method does not exist for this shape");
 }
 
-int StdExpansion::v_GetVertexMap(const int localVertexId, bool useCoeffPacking)
+int StdExpansion::v_GetVertexMap([[maybe_unused]] const int localVertexId,
+                                 [[maybe_unused]] bool useCoeffPacking)
 {
-    boost::ignore_unused(localVertexId, useCoeffPacking);
     NEKERROR(ErrorUtil::efatal, "Method does not exist for this shape");
     return 0;
 }
 
-void StdExpansion::v_GetTraceToElementMap(const int tid,
-                                          Array<OneD, unsigned int> &maparray,
-                                          Array<OneD, int> &signarray,
-                                          Orientation traceOrient, int P, int Q)
+void StdExpansion::v_GetTraceToElementMap(
+    [[maybe_unused]] const int tid,
+    [[maybe_unused]] Array<OneD, unsigned int> &maparray,
+    [[maybe_unused]] Array<OneD, int> &signarray,
+    [[maybe_unused]] Orientation traceOrient, [[maybe_unused]] int P,
+    [[maybe_unused]] int Q)
 {
-    boost::ignore_unused(tid, maparray, signarray, traceOrient, P, Q);
     NEKERROR(ErrorUtil::efatal, "Method does not exist for this shape");
 }
 
-void StdExpansion::v_GetTraceCoeffMap(const unsigned int traceid,
-                                      Array<OneD, unsigned int> &maparray)
+void StdExpansion::v_GetTraceCoeffMap(
+    [[maybe_unused]] const unsigned int traceid,
+    [[maybe_unused]] Array<OneD, unsigned int> &maparray)
 {
-    boost::ignore_unused(traceid, maparray);
     NEKERROR(ErrorUtil::efatal, "Method does not exist for this shape");
 }
 
-void StdExpansion::v_GetElmtTraceToTraceMap(const unsigned int tid,
-                                            Array<OneD, unsigned int> &maparray,
-                                            Array<OneD, int> &signarray,
-                                            Orientation traceOrient, int P,
-                                            int Q)
+void StdExpansion::v_GetElmtTraceToTraceMap(
+    [[maybe_unused]] const unsigned int tid,
+    [[maybe_unused]] Array<OneD, unsigned int> &maparray,
+    [[maybe_unused]] Array<OneD, int> &signarray,
+    [[maybe_unused]] Orientation traceOrient, [[maybe_unused]] int P,
+    [[maybe_unused]] int Q)
 {
-    boost::ignore_unused(tid, maparray, signarray, traceOrient, P, Q);
     NEKERROR(ErrorUtil::efatal, "Method does not exist for this shape");
 }
 
 void StdExpansion::v_GetTraceInteriorToElementMap(
-    const int tid, Array<OneD, unsigned int> &maparray,
-    Array<OneD, int> &signarray, const Orientation traceOrient)
+    [[maybe_unused]] const int tid,
+    [[maybe_unused]] Array<OneD, unsigned int> &maparray,
+    [[maybe_unused]] Array<OneD, int> &signarray,
+    [[maybe_unused]] const Orientation traceOrient)
 {
-    boost::ignore_unused(tid, maparray, signarray, traceOrient);
     NEKERROR(ErrorUtil::efatal, "Method does not exist for this shape");
 }
 
-void StdExpansion::v_GetTraceNumModes(const int tid, int &numModes0,
-                                      int &numModes1, Orientation traceOrient)
+void StdExpansion::v_GetTraceNumModes([[maybe_unused]] const int tid,
+                                      [[maybe_unused]] int &numModes0,
+                                      [[maybe_unused]] int &numModes1,
+                                      [[maybe_unused]] Orientation traceOrient)
 {
-    boost::ignore_unused(tid, traceOrient, numModes0, numModes1);
     NEKERROR(ErrorUtil::efatal, "Method does not exist for this shape");
 }
 
 void StdExpansion::v_GetVertexPhysVals(
-    const int vertex, const Array<OneD, const NekDouble> &inarray,
-    NekDouble &outarray)
+    [[maybe_unused]] const int vertex,
+    [[maybe_unused]] const Array<OneD, const NekDouble> &inarray,
+    [[maybe_unused]] NekDouble &outarray)
 {
-    boost::ignore_unused(vertex, inarray, outarray);
     NEKERROR(ErrorUtil::efatal, "Method does not exist for "
                                 "this shape or library");
 }
@@ -1447,27 +1435,25 @@ void StdExpansion::v_MultiplyByQuadratureMetric(
 }
 
 void StdExpansion::v_MultiplyByStdQuadratureMetric(
-    const Array<OneD, const NekDouble> &inarray,
-    Array<OneD, NekDouble> &outarray)
+    [[maybe_unused]] const Array<OneD, const NekDouble> &inarray,
+    [[maybe_unused]] Array<OneD, NekDouble> &outarray)
 {
-    boost::ignore_unused(inarray, outarray);
     NEKERROR(ErrorUtil::efatal,
              "Method does not exist for this shape or library");
 }
 
 void StdExpansion::v_BwdTrans_SumFac(
-    const Array<OneD, const NekDouble> &inarray,
-    Array<OneD, NekDouble> &outarray)
+    [[maybe_unused]] const Array<OneD, const NekDouble> &inarray,
+    [[maybe_unused]] Array<OneD, NekDouble> &outarray)
 {
-    boost::ignore_unused(inarray, outarray);
     NEKERROR(ErrorUtil::efatal, "Method does not exist for this shape");
 }
 
 void StdExpansion::v_IProductWRTBase_SumFac(
-    const Array<OneD, const NekDouble> &inarray,
-    Array<OneD, NekDouble> &outarray, bool multiplybyweights)
+    [[maybe_unused]] const Array<OneD, const NekDouble> &inarray,
+    [[maybe_unused]] Array<OneD, NekDouble> &outarray,
+    [[maybe_unused]] bool multiplybyweights)
 {
-    boost::ignore_unused(inarray, outarray, multiplybyweights);
     NEKERROR(ErrorUtil::efatal, "Method does not exist for this shape");
 }
 
@@ -1475,19 +1461,18 @@ void StdExpansion::v_IProductWRTBase_SumFac(
  *
  */
 void StdExpansion::v_IProductWRTDirectionalDerivBase_SumFac(
-    const Array<OneD, const NekDouble> &direction,
-    const Array<OneD, const NekDouble> &inarray,
-    Array<OneD, NekDouble> &outarray)
+    [[maybe_unused]] const Array<OneD, const NekDouble> &direction,
+    [[maybe_unused]] const Array<OneD, const NekDouble> &inarray,
+    [[maybe_unused]] Array<OneD, NekDouble> &outarray)
 {
-    boost::ignore_unused(direction, inarray, outarray);
     NEKERROR(ErrorUtil::efatal, "Method does not exist for this shape");
 }
 
 void StdExpansion::v_IProductWRTDerivBase_SumFac(
-    const int dir, const Array<OneD, const NekDouble> &inarray,
-    Array<OneD, NekDouble> &outarray)
+    [[maybe_unused]] const int dir,
+    [[maybe_unused]] const Array<OneD, const NekDouble> &inarray,
+    [[maybe_unused]] Array<OneD, NekDouble> &outarray)
 {
-    boost::ignore_unused(dir, inarray, outarray);
     NEKERROR(ErrorUtil::efatal, "Method does not exist for this shape");
 }
 
@@ -1509,27 +1494,27 @@ void StdExpansion::v_LaplacianMatrixOp(
     LaplacianMatrixOp_MatFree(inarray, outarray, mkey);
 }
 
-void StdExpansion::v_SVVLaplacianFilter(Array<OneD, NekDouble> &array,
-                                        const StdMatrixKey &mkey)
+void StdExpansion::v_SVVLaplacianFilter(
+    [[maybe_unused]] Array<OneD, NekDouble> &array,
+    [[maybe_unused]] const StdMatrixKey &mkey)
 {
-    boost::ignore_unused(array, mkey);
     ASSERTL0(false, "This function is not defined in StdExpansion.");
 }
 
-void StdExpansion::v_ExponentialFilter(Array<OneD, NekDouble> &array,
-                                       const NekDouble alpha,
-                                       const NekDouble exponent,
-                                       const NekDouble cutoff)
+void StdExpansion::v_ExponentialFilter(
+    [[maybe_unused]] Array<OneD, NekDouble> &array,
+    [[maybe_unused]] const NekDouble alpha,
+    [[maybe_unused]] const NekDouble exponent,
+    [[maybe_unused]] const NekDouble cutoff)
 {
-    boost::ignore_unused(array, alpha, exponent, cutoff);
     ASSERTL0(false, "This function is not defined in StdExpansion.");
 }
 
 void StdExpansion::v_ReduceOrderCoeffs(
-    int numMin, const Array<OneD, const NekDouble> &inarray,
-    Array<OneD, NekDouble> &outarray)
+    [[maybe_unused]] int numMin,
+    [[maybe_unused]] const Array<OneD, const NekDouble> &inarray,
+    [[maybe_unused]] Array<OneD, NekDouble> &outarray)
 {
-    boost::ignore_unused(numMin, inarray, outarray);
     ASSERTL0(false, "This function is not defined in StdExpansion.");
 }
 
@@ -1608,10 +1593,10 @@ void StdExpansion::v_LaplacianMatrixOp_MatFree(
 }
 
 void StdExpansion::v_LaplacianMatrixOp_MatFree_Kernel(
-    const Array<OneD, const NekDouble> &inarray,
-    Array<OneD, NekDouble> &outarray, Array<OneD, NekDouble> &wsp)
+    [[maybe_unused]] const Array<OneD, const NekDouble> &inarray,
+    [[maybe_unused]] Array<OneD, NekDouble> &outarray,
+    [[maybe_unused]] Array<OneD, NekDouble> &wsp)
 {
-    boost::ignore_unused(inarray, outarray, wsp);
     ASSERTL0(false, "Not implemented.");
 }
 
@@ -1625,9 +1610,8 @@ void StdExpansion::v_HelmholtzMatrixOp_MatFree(
 }
 
 DNekMatSharedPtr StdExpansion::v_BuildInverseTransformationMatrix(
-    const DNekScalMatSharedPtr &m_transformationmatrix)
+    [[maybe_unused]] const DNekScalMatSharedPtr &m_transformationmatrix)
 {
-    boost::ignore_unused(m_transformationmatrix);
     NEKERROR(ErrorUtil::efatal, "This function is only valid for LocalRegions");
     return NullDNekMatSharedPtr;
 }
@@ -1670,10 +1654,9 @@ void StdExpansion::PhysInterpToSimplexEquiSpaced(
     out = (*intmat) * in;
 }
 
-void StdExpansion::v_GetSimplexEquiSpacedConnectivity(Array<OneD, int> &conn,
-                                                      bool standard)
+void StdExpansion::v_GetSimplexEquiSpacedConnectivity(
+    [[maybe_unused]] Array<OneD, int> &conn, [[maybe_unused]] bool standard)
 {
-    boost::ignore_unused(conn, standard);
     NEKERROR(ErrorUtil::efatal,
              "GetSimplexEquiSpacedConnectivity not"
              " implemented for " +

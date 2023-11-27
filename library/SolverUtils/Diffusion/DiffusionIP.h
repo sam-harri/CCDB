@@ -43,9 +43,8 @@ namespace Nektar::SolverUtils
 class DiffusionIP : public Diffusion
 {
 public:
-    static DiffusionSharedPtr create(std::string diffType)
+    static DiffusionSharedPtr create([[maybe_unused]] std::string diffType)
     {
-        boost::ignore_unused(diffType);
         return DiffusionSharedPtr(new DiffusionIP());
     }
 

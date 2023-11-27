@@ -33,7 +33,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <boost/algorithm/string.hpp>
-#include <boost/core/ignore_unused.hpp>
 #include <tinyxml.h>
 #include <type_traits>
 
@@ -109,36 +108,36 @@ std::pair<size_t, size_t> SplitWork(size_t vecsize, int rank, int nprocs)
 }
 
 template <class T, typename std::enable_if<T::kDim == 0, int>::type = 0>
-inline int GetGeomDataDim(std::map<int, std::shared_ptr<T>> &geomMap)
+inline int GetGeomDataDim(
+    [[maybe_unused]] std::map<int, std::shared_ptr<T>> &geomMap)
 {
-    boost::ignore_unused(geomMap);
     return 3;
 }
 
 template <class T, typename std::enable_if<T::kDim == 1, int>::type = 0>
-inline int GetGeomDataDim(std::map<int, std::shared_ptr<T>> &geomMap)
+inline int GetGeomDataDim(
+    [[maybe_unused]] std::map<int, std::shared_ptr<T>> &geomMap)
 {
-    boost::ignore_unused(geomMap);
     return T::kNverts;
 }
 
 template <class T, typename std::enable_if<T::kDim == 2, int>::type = 0>
-inline int GetGeomDataDim(std::map<int, std::shared_ptr<T>> &geomMap)
+inline int GetGeomDataDim(
+    [[maybe_unused]] std::map<int, std::shared_ptr<T>> &geomMap)
 {
-    boost::ignore_unused(geomMap);
     return T::kNedges;
 }
 
 template <class T, typename std::enable_if<T::kDim == 3, int>::type = 0>
-inline int GetGeomDataDim(std::map<int, std::shared_ptr<T>> &geomMap)
+inline int GetGeomDataDim(
+    [[maybe_unused]] std::map<int, std::shared_ptr<T>> &geomMap)
 {
-    boost::ignore_unused(geomMap);
     return T::kNfaces;
 }
 
-template <class... T> inline void UniqueValues(std::unordered_set<int> &unique)
+template <class... T>
+inline void UniqueValues([[maybe_unused]] std::unordered_set<int> &unique)
 {
-    boost::ignore_unused(unique);
 }
 
 template <class... T>
@@ -764,18 +763,17 @@ void MeshGraphHDF5::v_PartitionMesh(
 
 template <class T, typename DataType>
 void MeshGraphHDF5::ConstructGeomObject(
-    std::map<int, std::shared_ptr<T>> &geomMap, int id, DataType *data,
-    CurveSharedPtr curve)
+    [[maybe_unused]] std::map<int, std::shared_ptr<T>> &geomMap,
+    [[maybe_unused]] int id, [[maybe_unused]] DataType *data,
+    [[maybe_unused]] CurveSharedPtr curve)
 {
-    boost::ignore_unused(geomMap, id, data, curve);
 }
 
 template <>
 void MeshGraphHDF5::ConstructGeomObject(
     std::map<int, std::shared_ptr<PointGeom>> &geomMap, int id, NekDouble *data,
-    CurveSharedPtr curve)
+    [[maybe_unused]] CurveSharedPtr curve)
 {
-    boost::ignore_unused(curve);
     geomMap[id] = MemoryManager<PointGeom>::AllocateSharedPtr(
         m_spaceDimension, id, data[0], data[1], data[2]);
 }
@@ -813,9 +811,8 @@ void MeshGraphHDF5::ConstructGeomObject(
 template <>
 void MeshGraphHDF5::ConstructGeomObject(
     std::map<int, std::shared_ptr<TetGeom>> &geomMap, int id, int *data,
-    CurveSharedPtr curve)
+    [[maybe_unused]] CurveSharedPtr curve)
 {
-    boost::ignore_unused(curve);
     TriGeomSharedPtr faces[4] = {
         std::static_pointer_cast<TriGeom>(GetGeometry2D(data[0])),
         std::static_pointer_cast<TriGeom>(GetGeometry2D(data[1])),
@@ -830,9 +827,8 @@ void MeshGraphHDF5::ConstructGeomObject(
 template <>
 void MeshGraphHDF5::ConstructGeomObject(
     std::map<int, std::shared_ptr<PyrGeom>> &geomMap, int id, int *data,
-    CurveSharedPtr curve)
+    [[maybe_unused]] CurveSharedPtr curve)
 {
-    boost::ignore_unused(curve);
     Geometry2DSharedPtr faces[5] = {
         GetGeometry2D(data[0]), GetGeometry2D(data[1]), GetGeometry2D(data[2]),
         GetGeometry2D(data[3]), GetGeometry2D(data[4])};
@@ -845,9 +841,8 @@ void MeshGraphHDF5::ConstructGeomObject(
 template <>
 void MeshGraphHDF5::ConstructGeomObject(
     std::map<int, std::shared_ptr<PrismGeom>> &geomMap, int id, int *data,
-    CurveSharedPtr curve)
+    [[maybe_unused]] CurveSharedPtr curve)
 {
-    boost::ignore_unused(curve);
     Geometry2DSharedPtr faces[5] = {
         GetGeometry2D(data[0]), GetGeometry2D(data[1]), GetGeometry2D(data[2]),
         GetGeometry2D(data[3]), GetGeometry2D(data[4])};
@@ -860,9 +855,8 @@ void MeshGraphHDF5::ConstructGeomObject(
 template <>
 void MeshGraphHDF5::ConstructGeomObject(
     std::map<int, std::shared_ptr<HexGeom>> &geomMap, int id, int *data,
-    CurveSharedPtr curve)
+    [[maybe_unused]] CurveSharedPtr curve)
 {
-    boost::ignore_unused(curve);
     QuadGeomSharedPtr faces[6] = {
         std::static_pointer_cast<QuadGeom>(GetGeometry2D(data[0])),
         std::static_pointer_cast<QuadGeom>(GetGeometry2D(data[1])),
@@ -1586,10 +1580,8 @@ void MeshGraphHDF5::WriteDomain(std::map<int, CompositeMap> &domain)
 
 void MeshGraphHDF5::v_WriteGeometry(
     const std::string &outfilename, bool defaultExp,
-    const LibUtilities::FieldMetaDataMap &metadata)
+    [[maybe_unused]] const LibUtilities::FieldMetaDataMap &metadata)
 {
-    boost::ignore_unused(metadata);
-
     vector<string> tmp;
     boost::split(tmp, outfilename, boost::is_any_of("."));
     string filenameXml  = tmp[0] + ".xml";

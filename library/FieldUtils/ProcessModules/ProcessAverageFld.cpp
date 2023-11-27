@@ -37,7 +37,6 @@
 using namespace std;
 #include <LibUtilities/BasicUtils/ParseUtils.h>
 #include <LibUtilities/BasicUtils/SharedArray.hpp>
-#include <boost/core/ignore_unused.hpp>
 #include <boost/format.hpp>
 
 #include "ProcessAverageFld.h"

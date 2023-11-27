@@ -40,7 +40,6 @@
 
 #include <LibUtilities/BasicConst/NektarUnivTypeDefs.hpp>
 #include <LibUtilities/Memory/NekMemoryManager.hpp>
-#include <boost/core/ignore_unused.hpp>
 #include <boost/multi_array.hpp>
 
 namespace Nektar
@@ -56,9 +55,9 @@ class ArrayInitializationPolicy<
     typename std::enable_if<std::is_fundamental<ObjectType>::value>::type>
 {
 public:
-    static void Initialize(ObjectType *data, size_t itemsToCreate)
+    static void Initialize([[maybe_unused]] ObjectType *data,
+                           [[maybe_unused]] size_t itemsToCreate)
     {
-        boost::ignore_unused(data, itemsToCreate);
     }
 
     static void Initialize(ObjectType *data, size_t itemsToCreate,
@@ -156,9 +155,9 @@ class ArrayDestructionPolicy<
     typename std::enable_if<std::is_fundamental<ObjectType>::value>::type>
 {
 public:
-    static void Destroy(ObjectType *data, size_t itemsToDestroy)
+    static void Destroy([[maybe_unused]] ObjectType *data,
+                        [[maybe_unused]] size_t itemsToDestroy)
     {
-        boost::ignore_unused(data, itemsToDestroy);
     }
 };
 
@@ -187,8 +186,8 @@ std::shared_ptr<boost::multi_array_ref<DataType, Dim::Value>> CreateStorage(
                                   std::multiplies<size_t>());
     DataType *storage = MemoryManager<DataType>::RawAllocate(size);
     return MemoryManager<ArrayType>::AllocateSharedPtrD(
-        [=](boost::multi_array_ref<DataType, Dim::Value> *ptr) {
-            boost::ignore_unused(ptr);
+        [=]([[maybe_unused]] boost::multi_array_ref<DataType, Dim::Value>
+                *ptr) {
             ArrayDestructionPolicy<DataType>::Destroy(storage, size);
             MemoryManager<DataType>::RawDeallocate(storage, size);
         },

@@ -1992,10 +1992,9 @@ void PreconditionerLowEnergy::ReSetTetMaxRMat(
     std::map<ShapeType, DNekScalMatSharedPtr> &maxRmat,
     std::map<ShapeType, Array<OneD, unsigned int>> &vertMapMaxR,
     std::map<ShapeType, Array<OneD, Array<OneD, unsigned int>>> &edgeMapMaxR,
-    std::map<ShapeType, Array<OneD, Array<OneD, unsigned int>>> &faceMapMaxR)
+    [[maybe_unused]] std::map<ShapeType, Array<OneD, Array<OneD, unsigned int>>>
+        &faceMapMaxR)
 {
-    boost::ignore_unused(faceMapMaxR);
-
     int nRows = TetExp->NumBndryCoeffs();
     NekDouble val;
     NekDouble zero = 0.0;

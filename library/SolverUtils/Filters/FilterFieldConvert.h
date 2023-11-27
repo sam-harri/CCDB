@@ -36,8 +36,6 @@
 #ifndef NEKTAR_SOLVERUTILS_FILTERS_FILTERFIELDCONVERT_H
 #define NEKTAR_SOLVERUTILS_FILTERS_FILTERFIELDCONVERT_H
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <FieldUtils/Module.h>
 #include <SolverUtils/Filters/Filter.h>
 
@@ -88,11 +86,10 @@ protected:
         std::vector<Array<OneD, NekDouble>> &fieldcoeffs,
         const NekDouble &time);
     SOLVER_UTILS_EXPORT virtual void v_PrepareOutput(
-        const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
-        const NekDouble &time)
+        [[maybe_unused]] const Array<OneD, const MultiRegions::ExpListSharedPtr>
+            &pFields,
+        [[maybe_unused]] const NekDouble &time)
     {
-        boost::ignore_unused(pFields, time);
-        // Do nothing by default
     }
     SOLVER_UTILS_EXPORT virtual NekDouble v_GetScale()
     {

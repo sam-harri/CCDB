@@ -32,8 +32,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/BasicUtils/Vmath.hpp>
 #include <LibUtilities/BasicUtils/VmathArray.hpp>
 #include <LibUtilities/Foundations/Interp.h>
@@ -1620,9 +1618,8 @@ void QuadExp::v_SVVLaplacianFilter(Array<OneD, NekDouble> &array,
 void QuadExp::v_NormalTraceDerivFactors(
     Array<OneD, Array<OneD, NekDouble>> &d0factors,
     Array<OneD, Array<OneD, NekDouble>> &d1factors,
-    Array<OneD, Array<OneD, NekDouble>> &d2factors)
+    [[maybe_unused]] Array<OneD, Array<OneD, NekDouble>> &d2factors)
 {
-    boost::ignore_unused(d2factors); // for 3D shapes
     int nquad0 = GetNumPoints(0);
     int nquad1 = GetNumPoints(1);
 

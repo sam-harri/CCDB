@@ -37,7 +37,6 @@
 #include <LocalRegions/Expansion2D.h>
 #include <SolverUtils/Diffusion/DiffusionLFRNS.h>
 #include <boost/algorithm/string/predicate.hpp>
-#include <boost/core/ignore_unused.hpp>
 #include <iomanip>
 #include <iostream>
 
@@ -207,11 +206,9 @@ void DiffusionLFRNS::v_InitObject(
  * \todo Add the metric terms for 3D Hexahedra.
  */
 void DiffusionLFRNS::SetupMetrics(
-    LibUtilities::SessionReaderSharedPtr pSession,
+    [[maybe_unused]] LibUtilities::SessionReaderSharedPtr pSession,
     Array<OneD, MultiRegions::ExpListSharedPtr> pFields)
 {
-    boost::ignore_unused(pSession);
-
     int i, n;
     int nquad0, nquad1;
     int phys_offset;
@@ -370,11 +367,9 @@ void DiffusionLFRNS::SetupMetrics(
  * @param pFields   Pointer to fields.
  */
 void DiffusionLFRNS::SetupCFunctions(
-    LibUtilities::SessionReaderSharedPtr pSession,
+    [[maybe_unused]] LibUtilities::SessionReaderSharedPtr pSession,
     Array<OneD, MultiRegions::ExpListSharedPtr> pFields)
 {
-    boost::ignore_unused(pSession);
-
     int i, n;
     NekDouble c0 = 0.0;
     NekDouble c1 = 0.0;
@@ -916,11 +911,9 @@ void DiffusionLFRNS::v_Diffuse(
     const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
     const Array<OneD, Array<OneD, NekDouble>> &inarray,
     Array<OneD, Array<OneD, NekDouble>> &outarray,
-    const Array<OneD, Array<OneD, NekDouble>> &pFwd,
-    const Array<OneD, Array<OneD, NekDouble>> &pBwd)
+    [[maybe_unused]] const Array<OneD, Array<OneD, NekDouble>> &pFwd,
+    [[maybe_unused]] const Array<OneD, Array<OneD, NekDouble>> &pBwd)
 {
-    boost::ignore_unused(pFwd, pBwd);
-
     int i, j, n;
     int phys_offset;
 
@@ -1655,13 +1648,11 @@ void DiffusionLFRNS::WeakPenaltyO2(
  *
  */
 void DiffusionLFRNS::DerCFlux_1D(
-    const int nConvectiveFields,
+    [[maybe_unused]] const int nConvectiveFields,
     const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
     const Array<OneD, const NekDouble> &flux,
     const Array<OneD, const NekDouble> &iFlux, Array<OneD, NekDouble> &derCFlux)
 {
-    boost::ignore_unused(nConvectiveFields);
-
     int n;
     int nLocalSolutionPts, phys_offset;
 
@@ -1751,13 +1742,11 @@ void DiffusionLFRNS::DerCFlux_1D(
  * \todo: Switch on shapes eventually here.
  */
 void DiffusionLFRNS::DerCFlux_2D(
-    const int nConvectiveFields, const int direction,
+    [[maybe_unused]] const int nConvectiveFields, const int direction,
     const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
     const Array<OneD, const NekDouble> &flux,
     const Array<OneD, NekDouble> &iFlux, Array<OneD, NekDouble> &derCFlux)
 {
-    boost::ignore_unused(nConvectiveFields);
-
     int n, e, i, j, cnt;
 
     Array<OneD, const NekDouble> jac;
@@ -1949,15 +1938,13 @@ void DiffusionLFRNS::DerCFlux_2D(
  * \todo: Switch on shapes eventually here.
  */
 void DiffusionLFRNS::DivCFlux_2D(
-    const int nConvectiveFields,
+    [[maybe_unused]] const int nConvectiveFields,
     const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
     const Array<OneD, const NekDouble> &fluxX1,
     const Array<OneD, const NekDouble> &fluxX2,
     const Array<OneD, const NekDouble> &numericalFlux,
     Array<OneD, NekDouble> &divCFlux)
 {
-    boost::ignore_unused(nConvectiveFields);
-
     int n, e, i, j, cnt;
 
     int nElements = fields[0]->GetExpSize();
@@ -2139,15 +2126,13 @@ void DiffusionLFRNS::DivCFlux_2D(
  */
 
 void DiffusionLFRNS::DivCFlux_2D_Gauss(
-    const int nConvectiveFields,
+    [[maybe_unused]] const int nConvectiveFields,
     const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
     const Array<OneD, const NekDouble> &fluxX1,
     const Array<OneD, const NekDouble> &fluxX2,
     const Array<OneD, const NekDouble> &numericalFlux,
     Array<OneD, NekDouble> &divCFlux)
 {
-    boost::ignore_unused(nConvectiveFields);
-
     int n, e, i, j, cnt;
 
     int nElements = fields[0]->GetExpSize();

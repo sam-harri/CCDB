@@ -36,8 +36,6 @@
 #include <string>
 using namespace std;
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/BasicUtils/SharedArray.hpp>
 
 #include "ProcessAddFld.h"
@@ -71,10 +69,8 @@ ProcessAddFld::~ProcessAddFld()
 {
 }
 
-void ProcessAddFld::v_Process(po::variables_map &vm)
+void ProcessAddFld::v_Process([[maybe_unused]] po::variables_map &vm)
 {
-    boost::ignore_unused(vm);
-
     string scalestr = m_config["scale"].as<string>();
     NekDouble scale = boost::lexical_cast<NekDouble>(scalestr);
 

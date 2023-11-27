@@ -34,8 +34,6 @@
 
 #include <iomanip>
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/Memory/NekMemoryManager.hpp>
 #include <SolverUtils/Filters/FilterModalEnergy.h>
 
@@ -326,10 +324,8 @@ void FilterModalEnergy::v_Update(
  */
 void FilterModalEnergy::v_Finalise(
     const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
-    const NekDouble &time)
+    [[maybe_unused]] const NekDouble &time)
 {
-    boost::ignore_unused(time);
-
     if (pFields[0]->GetComm()->GetRank() == 0)
     {
         m_outputStream.close();
@@ -342,10 +338,8 @@ void FilterModalEnergy::v_Finalise(
  */
 NekDouble FilterModalEnergy::L2Error(
     const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
-    unsigned int field, const NekDouble &time)
+    unsigned int field, [[maybe_unused]] const NekDouble &time)
 {
-    boost::ignore_unused(time);
-
     NekDouble L2error                 = -1.0;
     LibUtilities::CommSharedPtr vComm = pFields[0]->GetComm();
 

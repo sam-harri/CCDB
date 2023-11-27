@@ -38,8 +38,6 @@
 #include <functional>
 #include <string>
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/BasicUtils/NekFactory.hpp>
 #include <LibUtilities/BasicUtils/SharedArray.hpp>
 #include <MultiRegions/AssemblyMap/AssemblyMapDG.h>
@@ -401,9 +399,9 @@ protected:
         const Array<OneD, Array<OneD, NekDouble>> &pBwd,
         Array<OneD, int> &nonZeroIndex);
 
-    virtual void v_SetHomoDerivs(Array<OneD, Array<OneD, NekDouble>> &deriv)
+    virtual void v_SetHomoDerivs(
+        [[maybe_unused]] Array<OneD, Array<OneD, NekDouble>> &deriv)
     {
-        boost::ignore_unused(deriv);
     }
 
     virtual TensorOfArray3D<NekDouble> &v_GetFluxTensor()

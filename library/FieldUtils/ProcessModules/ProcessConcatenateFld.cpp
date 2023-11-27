@@ -36,8 +36,6 @@
 #include <string>
 using namespace std;
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/BasicUtils/SharedArray.hpp>
 
 #include "ProcessConcatenateFld.h"
@@ -59,10 +57,8 @@ ProcessConcatenateFld::~ProcessConcatenateFld()
 {
 }
 
-void ProcessConcatenateFld::v_Process(po::variables_map &vm)
+void ProcessConcatenateFld::v_Process([[maybe_unused]] po::variables_map &vm)
 {
-    boost::ignore_unused(vm);
-
     if (m_f->m_comm->TreatAsRankZero())
     {
         cout << "Concatenate module is not needed. Instead, use " << endl

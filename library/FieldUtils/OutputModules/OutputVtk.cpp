@@ -32,7 +32,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
 #include <boost/format.hpp>
 
 #include "OutputVtk.h"
@@ -826,7 +825,7 @@ std::vector<long long> lowOrderMapping(int nDim, Array<OneD, int> nquad)
     return p;
 }
 
-int GetHighOrderVtkCellType(int sType)
+int GetHighOrderVtkCellType([[maybe_unused]] int sType)
 {
 #if VTK_MAJOR_VERSION >= 8
     // For deformed elements this is a map of shape type to VTK type
@@ -841,7 +840,6 @@ int GetHighOrderVtkCellType(int sType)
 
     return vtkCellType.at(sType);
 #else
-    boost::ignore_unused(sType);
     NEKERROR(
         ErrorUtil::efatal,
         "High-order VTK output requires minimum VTK library version of 8.0")
@@ -1591,9 +1589,8 @@ void OutputVtk::WritePVtu(po::variables_map &vm)
     cout << "Written file: " << filename << endl;
 }
 
-void OutputVtk::v_OutputFromData(po::variables_map &vm)
+void OutputVtk::v_OutputFromData([[maybe_unused]] po::variables_map &vm)
 {
-    boost::ignore_unused(vm);
     NEKERROR(ErrorUtil::efatal,
              "OutputVtk can't write using only FieldData. You may need "
              "to add a mesh XML file to your input files.");

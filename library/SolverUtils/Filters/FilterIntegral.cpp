@@ -39,7 +39,6 @@
 #include <SolverUtils/Filters/FilterIntegral.h>
 
 #include <boost/algorithm/string.hpp>
-#include <boost/core/ignore_unused.hpp>
 
 namespace Nektar::SolverUtils
 {
@@ -354,11 +353,10 @@ void FilterIntegral::v_Update(
  * @brief Finalise the filter.
  */
 void FilterIntegral::v_Finalise(
-    const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
-    const NekDouble &time)
+    [[maybe_unused]] const Array<OneD, const MultiRegions::ExpListSharedPtr>
+        &pFields,
+    [[maybe_unused]] const NekDouble &time)
 {
-    boost::ignore_unused(pFields, time);
-
     if (m_comm->GetRank() == 0)
     {
         m_outFile.close();

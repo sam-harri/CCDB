@@ -32,15 +32,12 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/Communication/Comm.h>
 
 namespace Nektar::LibUtilities
 {
-Comm::Comm(int narg, char *arg[])
+Comm::Comm([[maybe_unused]] int narg, [[maybe_unused]] char *arg[])
 {
-    boost::ignore_unused(narg, arg);
 }
 
 /**

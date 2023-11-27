@@ -33,7 +33,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include <StdRegions/StdTriExp.h>
-#include <boost/core/ignore_unused.hpp>
 
 using namespace std;
 
@@ -107,10 +106,8 @@ NekDouble StdTriExp::v_Integral(const Array<OneD, const NekDouble> &inarray)
 void StdTriExp::v_PhysDeriv(const Array<OneD, const NekDouble> &inarray,
                             Array<OneD, NekDouble> &out_d0,
                             Array<OneD, NekDouble> &out_d1,
-                            Array<OneD, NekDouble> &out_d2)
+                            [[maybe_unused]] Array<OneD, NekDouble> &out_d2)
 {
-    boost::ignore_unused(out_d2);
-
     int i;
     int nquad0 = m_base[0]->GetNumPoints();
     int nquad1 = m_base[1]->GetNumPoints();
@@ -196,9 +193,8 @@ void StdTriExp::v_PhysDeriv(const int dir,
 void StdTriExp::v_StdPhysDeriv(const Array<OneD, const NekDouble> &inarray,
                                Array<OneD, NekDouble> &out_d0,
                                Array<OneD, NekDouble> &out_d1,
-                               Array<OneD, NekDouble> &out_d2)
+                               [[maybe_unused]] Array<OneD, NekDouble> &out_d2)
 {
-    boost::ignore_unused(out_d2);
     StdTriExp::v_PhysDeriv(inarray, out_d0, out_d1);
 }
 
@@ -239,10 +235,9 @@ void StdTriExp::v_BwdTrans_SumFacKernel(
     const Array<OneD, const NekDouble> &base1,
     const Array<OneD, const NekDouble> &inarray,
     Array<OneD, NekDouble> &outarray, Array<OneD, NekDouble> &wsp,
-    bool doCheckCollDir0, bool doCheckCollDir1)
+    [[maybe_unused]] bool doCheckCollDir0,
+    [[maybe_unused]] bool doCheckCollDir1)
 {
-    boost::ignore_unused(doCheckCollDir0, doCheckCollDir1);
-
     int i;
     int mode;
     int nquad0  = m_base[0]->GetNumPoints();
@@ -460,10 +455,9 @@ void StdTriExp::v_IProductWRTBase_SumFacKernel(
     const Array<OneD, const NekDouble> &base1,
     const Array<OneD, const NekDouble> &inarray,
     Array<OneD, NekDouble> &outarray, Array<OneD, NekDouble> &wsp,
-    bool doCheckCollDir0, bool doCheckCollDir1)
+    [[maybe_unused]] bool doCheckCollDir0,
+    [[maybe_unused]] bool doCheckCollDir1)
 {
-    boost::ignore_unused(doCheckCollDir0, doCheckCollDir1);
-
     int i;
     int mode;
     int nquad0  = m_base[0]->GetNumPoints();
@@ -809,10 +803,8 @@ int StdTriExp::v_CalcNumberOfCoefficients(
 
 void StdTriExp::v_GetCoords(Array<OneD, NekDouble> &coords_0,
                             Array<OneD, NekDouble> &coords_1,
-                            Array<OneD, NekDouble> &coords_2)
+                            [[maybe_unused]] Array<OneD, NekDouble> &coords_2)
 {
-    boost::ignore_unused(coords_2);
-
     Array<OneD, const NekDouble> z0 = m_base[0]->GetZ();
     Array<OneD, const NekDouble> z1 = m_base[1]->GetZ();
     int nq0                         = GetNumPoints(0);
@@ -835,10 +827,9 @@ bool StdTriExp::v_IsBoundaryInteriorExpansion() const
            m_base[1]->GetBasisType() == LibUtilities::eModified_B;
 }
 
-const LibUtilities::BasisKey StdTriExp::v_GetTraceBasisKey(const int i,
-                                                           const int j) const
+const LibUtilities::BasisKey StdTriExp::v_GetTraceBasisKey(
+    const int i, [[maybe_unused]] const int j) const
 {
-    boost::ignore_unused(j);
     ASSERTL2(i >= 0 && i <= 2, "edge id is out of range");
 
     // Get basiskey (0 or 1) according to edge id i
@@ -1547,11 +1538,9 @@ void StdTriExp::v_MultiplyByStdQuadratureMetric(
     }
 }
 
-void StdTriExp::v_GetSimplexEquiSpacedConnectivity(Array<OneD, int> &conn,
-                                                   bool standard)
+void StdTriExp::v_GetSimplexEquiSpacedConnectivity(
+    Array<OneD, int> &conn, [[maybe_unused]] bool standard)
 {
-    boost::ignore_unused(standard);
-
     int np1 = m_base[0]->GetNumPoints();
     int np2 = m_base[1]->GetNumPoints();
     int np  = max(np1, np2);

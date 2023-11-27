@@ -32,8 +32,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/Foundations/NodalTetEvenlySpaced.h>
 #include <vector>
 
@@ -56,9 +54,9 @@ bool isVertex(size_t x, size_t y, size_t z, size_t npts)
            (x == 0 && y == 0 && z == (npts - 1));
 }
 
-bool isEdge_01(size_t x, size_t y, size_t z, size_t npts)
+bool isEdge_01([[maybe_unused]] size_t x, size_t y, size_t z,
+               [[maybe_unused]] size_t npts)
 { // edge 0
-    boost::ignore_unused(x, npts);
     return y == 0 && z == 0;
 }
 
@@ -67,15 +65,15 @@ bool isEdge_12(size_t x, size_t y, size_t z, size_t npts)
     return z == 0 && x + y == npts - 1;
 }
 
-bool isEdge_20(size_t x, size_t y, size_t z, size_t npts)
+bool isEdge_20(size_t x, [[maybe_unused]] size_t y, size_t z,
+               [[maybe_unused]] size_t npts)
 { // edge 2
-    boost::ignore_unused(y, npts);
     return x == 0 && z == 0;
 }
 
-bool isEdge_03(size_t x, size_t y, size_t z, size_t npts)
+bool isEdge_03(size_t x, size_t y, [[maybe_unused]] size_t z,
+               [[maybe_unused]] size_t npts)
 { // edge 3
-    boost::ignore_unused(z, npts);
     return x == 0 && y == 0;
 }
 
@@ -96,15 +94,15 @@ bool isEdge(size_t x, size_t y, size_t z, size_t npts)
            isEdge_13(x, y, z, npts) || isEdge_23(x, y, z, npts);
 }
 
-bool isFace_012(size_t x, size_t y, size_t z, size_t npts)
+bool isFace_012([[maybe_unused]] size_t x, [[maybe_unused]] size_t y, size_t z,
+                [[maybe_unused]] size_t npts)
 { // bottom face (face 0)
-    boost::ignore_unused(x, y, npts);
     return z == 0;
 }
 
-bool isFace_013(size_t x, size_t y, size_t z, size_t npts)
+bool isFace_013([[maybe_unused]] size_t x, size_t y, [[maybe_unused]] size_t z,
+                [[maybe_unused]] size_t npts)
 { // face 1
-    boost::ignore_unused(x, z, npts);
     return y == 0;
 }
 
@@ -113,9 +111,9 @@ bool isFace_123(size_t x, size_t y, size_t z, size_t npts)
     return x + y + z == npts - 1;
 }
 
-bool isFace_203(size_t x, size_t y, size_t z, size_t npts)
+bool isFace_203(size_t x, [[maybe_unused]] size_t y, [[maybe_unused]] size_t z,
+                [[maybe_unused]] size_t npts)
 { // face 3
-    boost::ignore_unused(y, z, npts);
     return x == 0;
 }
 

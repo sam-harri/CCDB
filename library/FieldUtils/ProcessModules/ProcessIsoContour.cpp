@@ -34,7 +34,6 @@
 #include <iostream>
 #include <string>
 
-#include <boost/core/ignore_unused.hpp>
 #include <boost/geometry.hpp>
 #include <boost/geometry/geometries/box.hpp>
 #include <boost/geometry/geometries/point.hpp>

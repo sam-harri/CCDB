@@ -116,9 +116,8 @@ void DriverParallelInTime::v_InitObject(std::ostream &out)
 /**
  *
  */
-void DriverParallelInTime::v_Execute(std::ostream &out)
+void DriverParallelInTime::v_Execute([[maybe_unused]] std::ostream &out)
 {
-    boost::ignore_unused(out);
 }
 
 /**

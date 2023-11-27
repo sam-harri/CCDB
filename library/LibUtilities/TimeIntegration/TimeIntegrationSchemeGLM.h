@@ -106,7 +106,6 @@ protected:
                                  std::vector<NekDouble> freeParams)
         : TimeIntegrationScheme(variant, order, freeParams)
     {
-        boost::ignore_unused(variant, order, freeParams);
     }
 
     ~TimeIntegrationSchemeGLM() override

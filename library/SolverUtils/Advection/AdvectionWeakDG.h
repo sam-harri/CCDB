@@ -35,8 +35,6 @@
 #ifndef NEKTAR_SOLVERUTILS_ADVECTIONWEAKDG
 #define NEKTAR_SOLVERUTILS_ADVECTIONWEAKDG
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <SolverUtils/Advection/Advection.h>
 
 namespace Nektar::SolverUtils
@@ -44,9 +42,8 @@ namespace Nektar::SolverUtils
 class AdvectionWeakDG : public Advection
 {
 public:
-    static AdvectionSharedPtr create(std::string advType)
+    static AdvectionSharedPtr create([[maybe_unused]] std::string advType)
     {
-        boost::ignore_unused(advType);
         return AdvectionSharedPtr(new AdvectionWeakDG());
     }
 

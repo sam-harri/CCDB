@@ -35,8 +35,6 @@
 #ifndef NEKMESH_MESHELEMENTS_FACE
 #define NEKMESH_MESHELEMENTS_FACE
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/BasicUtils/HashUtils.hpp>
 #include <SpatialDomains/QuadGeom.h>
 #include <SpatialDomains/TriGeom.h>

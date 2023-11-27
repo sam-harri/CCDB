@@ -41,8 +41,6 @@
 // Rotation in 3 directions are allowed for 3D.
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/BasicUtils/Vmath.hpp>
 #include <MultiRegions/ExpList.h>
 #include <SolverUtils/Filters/FilterInterfaces.hpp>
@@ -78,9 +76,9 @@ ForcingMovingReferenceFrame::ForcingMovingReferenceFrame(
  */
 void ForcingMovingReferenceFrame::v_InitObject(
     const Array<OneD, MultiRegions::ExpListSharedPtr> &pFields,
-    const unsigned int &pNumForcingFields, const TiXmlElement *pForce)
+    [[maybe_unused]] const unsigned int &pNumForcingFields,
+    const TiXmlElement *pForce)
 {
-    boost::ignore_unused(pNumForcingFields);
     m_session->MatchSolverInfo("Homogeneous", "1D", m_isH1d, false);
     m_session->MatchSolverInfo("Homogeneous", "2D", m_isH2d, false);
     bool singleMode, halfMode;
@@ -411,9 +409,9 @@ void ForcingMovingReferenceFrame::UpdateTheta(const NekDouble &time)
 void ForcingMovingReferenceFrame::v_Apply(
     const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
     const Array<OneD, Array<OneD, NekDouble>> &inarray,
-    Array<OneD, Array<OneD, NekDouble>> &outarray, const NekDouble &time)
+    Array<OneD, Array<OneD, NekDouble>> &outarray,
+    [[maybe_unused]] const NekDouble &time)
 {
-    boost::ignore_unused(time);
     // If there is no rotation, body force is zero,
     // nothing needs to be done here.
     if (!m_hasRotation)
@@ -422,7 +420,6 @@ void ForcingMovingReferenceFrame::v_Apply(
     }
     // frame velocities are already updated in pre_Apply
     int npoints = fields[0]->GetNpoints();
-    boost::ignore_unused(npoints);
     addRotation(npoints, outarray, -1., inarray, outarray);
 }
 

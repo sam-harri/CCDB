@@ -35,8 +35,6 @@
 
 #include <iomanip>
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <SolverUtils/DriverModifiedArnoldi.h>
 
 using namespace std;
@@ -591,11 +589,9 @@ void DriverModifiedArnoldi::EV_big(Array<OneD, Array<OneD, NekDouble>> &bvecs,
                                    Array<OneD, Array<OneD, NekDouble>> &evecs,
                                    const int ntot, const int kdim,
                                    const int nvec, Array<OneD, NekDouble> &zvec,
-                                   Array<OneD, NekDouble> &wr,
+                                   [[maybe_unused]] Array<OneD, NekDouble> &wr,
                                    Array<OneD, NekDouble> &wi)
 {
-    boost::ignore_unused(wr);
-
     NekDouble wgt, norm;
     Array<OneD, Array<OneD, NekDouble>> btmp(nvec);
     Array<OneD, Array<OneD, NekDouble>> etmp(nvec);

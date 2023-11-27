@@ -509,24 +509,20 @@ NEK_FORCE_INLINE static void PhysInterp1DScaledPyrKernel(
 #if defined(SHAPE_DIMENSION_1D)
 
 template <LibUtilities::ShapeType SHAPE_TYPE>
-NEK_FORCE_INLINE static void PhysInterp1DScaled1DWorkspace(const size_t nm0,
-                                                           const size_t nq0)
+NEK_FORCE_INLINE static void PhysInterp1DScaled1DWorkspace(
+    [[maybe_unused]] const size_t nm0, [[maybe_unused]] const size_t nq0)
 
 {
-    boost::ignore_unused(SHAPE_TYPE, nm0, nq0);
 }
 
 #elif defined(SHAPE_DIMENSION_2D)
 
 template <LibUtilities::ShapeType SHAPE_TYPE>
-NEK_FORCE_INLINE static void PhysInterp1DScaled2DWorkspace(const size_t nm0,
-                                                           const size_t nm1,
-                                                           const size_t nq0,
-                                                           const size_t nq1,
-                                                           size_t &wsp0Size)
+NEK_FORCE_INLINE static void PhysInterp1DScaled2DWorkspace(
+    [[maybe_unused]] const size_t nm0, [[maybe_unused]] const size_t nm1,
+    [[maybe_unused]] const size_t nq0, [[maybe_unused]] const size_t nq1,
+    size_t &wsp0Size)
 {
-    boost::ignore_unused(SHAPE_TYPE, nm0, nm1, nq0, nq1);
-
     // Check preconditions
     ASSERTL1((SHAPE_TYPE == LibUtilities::ShapeType::Tri && nm0 == nm1 &&
               nq0 == nq1 + 1) ||
@@ -545,11 +541,11 @@ NEK_FORCE_INLINE static void PhysInterp1DScaled2DWorkspace(const size_t nm0,
 
 template <LibUtilities::ShapeType SHAPE_TYPE>
 NEK_FORCE_INLINE static void PhysInterp1DScaled3DWorkspace(
-    const size_t nm0, const size_t nm1, const size_t nm2, const size_t nq0,
-    const size_t nq1, const size_t nq2, size_t &wsp0Size, size_t &wsp1Size)
+    [[maybe_unused]] const size_t nm0, [[maybe_unused]] const size_t nm1,
+    [[maybe_unused]] const size_t nm2, [[maybe_unused]] const size_t nq0,
+    [[maybe_unused]] const size_t nq1, [[maybe_unused]] const size_t nq2,
+    size_t &wsp0Size, size_t &wsp1Size)
 {
-    boost::ignore_unused(SHAPE_TYPE, nm0, nm1, nm2, nq0, nq1, nq2);
-
     // Check preconditions
     ASSERTL1((SHAPE_TYPE == LibUtilities::ShapeType::Hex && nm0 == nm1 &&
               nm0 == nm2 && nq0 == nq1 && nq0 == nq2) ||
@@ -593,7 +589,8 @@ NEK_FORCE_INLINE static void PhysInterp1DScaled1DKernel(
 template <LibUtilities::ShapeType SHAPE_TYPE>
 NEK_FORCE_INLINE static void PhysInterp1DScaled2DKernel(
     const size_t nm0, const size_t nm1, const size_t nq0, const size_t nq1,
-    const bool correct, const std::vector<vec_t, allocator<vec_t>> &in,
+    [[maybe_unused]] const bool correct,
+    const std::vector<vec_t, allocator<vec_t>> &in,
     const std::vector<vec_t, allocator<vec_t>> &basis0,
     const std::vector<vec_t, allocator<vec_t>> &basis1,
     std::vector<vec_t, allocator<vec_t>> &wsp0,
@@ -604,7 +601,6 @@ NEK_FORCE_INLINE static void PhysInterp1DScaled2DKernel(
                                 wsp0, out);
 
 #elif defined(SHAPE_TYPE_QUAD)
-    boost::ignore_unused(correct);
     PhysInterp1DScaledQuadKernel(nm0, nm1, nq0, nq1, in, basis0, basis1, wsp0,
                                  out);
 #endif
@@ -615,7 +611,7 @@ NEK_FORCE_INLINE static void PhysInterp1DScaled2DKernel(
 template <LibUtilities::ShapeType SHAPE_TYPE>
 NEK_FORCE_INLINE static void PhysInterp1DScaled3DKernel(
     const size_t nm0, const size_t nm1, const size_t nm2, const size_t nq0,
-    const size_t nq1, const size_t nq2, const bool correct,
+    const size_t nq1, const size_t nq2, [[maybe_unused]] const bool correct,
     const std::vector<vec_t, allocator<vec_t>> &in,
     const std::vector<vec_t, allocator<vec_t>> &basis0,
     const std::vector<vec_t, allocator<vec_t>> &basis1,
@@ -625,7 +621,6 @@ NEK_FORCE_INLINE static void PhysInterp1DScaled3DKernel(
     std::vector<vec_t, allocator<vec_t>> &out)
 {
 #if defined(SHAPE_TYPE_HEX)
-    boost::ignore_unused(correct);
     PhysInterp1DScaledHexKernel(nm0, nm1, nm2, nq0, nq1, nq2, in, basis0,
                                 basis1, basis2, wsp0, wsp1, out);
 #elif defined(SHAPE_TYPE_TET)

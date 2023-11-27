@@ -276,9 +276,8 @@ bool ZoneTranslate::v_Move(NekDouble timeStep)
     return true;
 }
 
-bool ZoneFixed::v_Move(NekDouble time)
+bool ZoneFixed::v_Move([[maybe_unused]] NekDouble time)
 {
-    boost::ignore_unused(time);
     return false;
 }
 

@@ -117,8 +117,8 @@ void ImplicitTimeIntegrationSchemeSDC::v_InitializeScheme(
 /**
  * @brief Worker method to compute the residual.
  */
-void ImplicitTimeIntegrationSchemeSDC::v_ResidualEval(const NekDouble &delta_t,
-                                                      const size_t n)
+void ImplicitTimeIntegrationSchemeSDC::v_ResidualEval(
+    [[maybe_unused]] const NekDouble &delta_t, [[maybe_unused]] const size_t n)
 {
     // Apply time-dependent boundary condition
     m_op.DoProjection(m_Y[n], m_tmp, m_time + delta_t * m_tau[n]);

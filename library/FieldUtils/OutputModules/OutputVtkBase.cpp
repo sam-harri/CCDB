@@ -37,7 +37,6 @@
 #include <string>
 using namespace std;
 
-#include <boost/core/ignore_unused.hpp>
 #include <boost/format.hpp>
 
 #include <LibUtilities/BasicUtils/Filesystem.hpp>
@@ -278,18 +277,16 @@ void OutputVtkBase::v_OutputFromExp(po::variables_map &vm)
     }
 }
 
-void OutputVtkBase::v_OutputFromData(po::variables_map &vm)
+void OutputVtkBase::v_OutputFromData([[maybe_unused]] po::variables_map &vm)
 {
-    boost::ignore_unused(vm);
     NEKERROR(ErrorUtil::efatal,
              "OutputVtk can't write using only FieldData. You may need "
              "to add a mesh XML file to your input files.");
 }
 
-fs::path OutputVtkBase::v_GetPath(std::string &filename, po::variables_map &vm)
+fs::path OutputVtkBase::v_GetPath(std::string &filename,
+                                  [[maybe_unused]] po::variables_map &vm)
 {
-    boost::ignore_unused(vm);
-
     int nprocs = m_f->m_comm->GetSpaceComm()->GetSize();
     fs::path specPath;
     if (nprocs == 1)

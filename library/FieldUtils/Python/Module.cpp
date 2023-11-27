@@ -59,9 +59,8 @@ struct ModuleWrap : public MODTYPE, public py::wrapper<MODTYPE>
     /**
      * @brief Concrete implementation of the Module::Process function.
      */
-    void v_Process(po::variables_map &vm) override
+    void v_Process([[maybe_unused]] po::variables_map &vm) override
     {
-        boost::ignore_unused(vm);
         this->get_override("Process")();
     }
 

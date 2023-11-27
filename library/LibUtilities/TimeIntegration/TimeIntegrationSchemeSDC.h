@@ -337,32 +337,31 @@ protected:
     LUE ConstDoubleArray &v_TimeIntegrate(const size_t timestep,
                                           const NekDouble delta_t) override;
 
-    LUE virtual void v_ResidualEval(const NekDouble &delta_t, const size_t n)
+    LUE virtual void v_ResidualEval([[maybe_unused]] const NekDouble &delta_t,
+                                    [[maybe_unused]] const size_t n)
     {
         ASSERTL0(false, "Specific version of spectral deferred correction "
                         "not implemented");
-        boost::ignore_unused(delta_t, n);
     }
 
-    LUE virtual void v_ResidualEval(const NekDouble &delta_t)
+    LUE virtual void v_ResidualEval([[maybe_unused]] const NekDouble &delta_t)
     {
         ASSERTL0(false, "Specific version of spectral deferred correction "
                         "not implemented");
-        boost::ignore_unused(delta_t);
     }
 
-    LUE virtual void v_ComputeInitialGuess(const NekDouble &delta_t)
+    LUE virtual void v_ComputeInitialGuess(
+        [[maybe_unused]] const NekDouble &delta_t)
     {
         ASSERTL0(false, "Specific version of spectral deferred correction "
                         "not implemented");
-        boost::ignore_unused(delta_t);
     }
 
-    LUE virtual void v_SDCIterationLoop(const NekDouble &delta_t)
+    LUE virtual void v_SDCIterationLoop(
+        [[maybe_unused]] const NekDouble &delta_t)
     {
         ASSERTL0(false, "Specific version of spectral deferred correction "
                         "not implemented");
-        boost::ignore_unused(delta_t);
     }
 
     LUE void v_print(std::ostream &os) const override;

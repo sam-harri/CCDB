@@ -32,8 +32,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <SolverUtils/Filters/FilterThresholdMax.h>
 
 using namespace std;
@@ -102,10 +100,8 @@ FilterThresholdMax::~FilterThresholdMax()
 
 void FilterThresholdMax::v_Initialise(
     const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
-    const NekDouble &time)
+    [[maybe_unused]] const NekDouble &time)
 {
-    boost::ignore_unused(time);
-
     m_threshold = Array<OneD, NekDouble>(pFields[m_thresholdVar]->GetNpoints(),
                                          m_initialValue);
 }
@@ -135,10 +131,8 @@ void FilterThresholdMax::v_Update(
 
 void FilterThresholdMax::v_Finalise(
     const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
-    const NekDouble &time)
+    [[maybe_unused]] const NekDouble &time)
 {
-    boost::ignore_unused(time);
-
     std::vector<LibUtilities::FieldDefinitionsSharedPtr> FieldDef =
         pFields[m_thresholdVar]->GetFieldDefinitions();
     std::vector<std::vector<NekDouble>> FieldData(FieldDef.size());

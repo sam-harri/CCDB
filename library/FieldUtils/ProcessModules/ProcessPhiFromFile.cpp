@@ -35,7 +35,6 @@
 #include "ProcessPhiFromFile.h"
 #include <LibUtilities/BasicUtils/SessionReader.h>
 #include <LibUtilities/BasicUtils/SharedArray.hpp>
-#include <boost/core/ignore_unused.hpp>
 
 using namespace Nektar;
 using namespace std;
@@ -70,11 +69,8 @@ ProcessPhiFromFile::~ProcessPhiFromFile()
 /**
  *
  */
-void ProcessPhiFromFile::v_Process(po::variables_map &vm)
+void ProcessPhiFromFile::v_Process([[maybe_unused]] po::variables_map &vm)
 {
-    // Ignore warnings due to 'vm'
-    boost::ignore_unused(vm);
-
     // Do not run in parallel
     ASSERTL0(m_f->m_session->GetComm()->GetSpaceComm()->IsSerial(),
              "Parallel execution is "

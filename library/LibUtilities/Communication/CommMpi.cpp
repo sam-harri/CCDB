@@ -349,12 +349,11 @@ void CommMpi::v_Scatter(void *sendbuf, int sendcount, CommDataType sendtype,
 /**
  *
  */
-void CommMpi::v_DistGraphCreateAdjacent(int indegree, const int sources[],
-                                        const int sourceweights[], int reorder)
+void CommMpi::v_DistGraphCreateAdjacent(
+    [[maybe_unused]] int indegree, [[maybe_unused]] const int sources[],
+    [[maybe_unused]] const int sourceweights[], [[maybe_unused]] int reorder)
 {
 #if MPI_VERSION < 3
-    boost::ignore_unused(indegree, sources, sourceweights, reorder);
-
     ASSERTL0(false, "MPI_Dist_graph_create_adjacent is not supported in your "
                     "installed MPI version.");
 #else
@@ -370,14 +369,13 @@ void CommMpi::v_DistGraphCreateAdjacent(int indegree, const int sources[],
 /**
  *
  */
-void CommMpi::v_NeighborAlltoAllv(void *sendbuf, int sendcounts[],
-                                  int sdispls[], CommDataType sendtype,
-                                  void *recvbuf, int recvcounts[],
-                                  int rdispls[], CommDataType recvtype)
+void CommMpi::v_NeighborAlltoAllv(
+    [[maybe_unused]] void *sendbuf, [[maybe_unused]] int sendcounts[],
+    [[maybe_unused]] int sdispls[], [[maybe_unused]] CommDataType sendtype,
+    [[maybe_unused]] void *recvbuf, [[maybe_unused]] int recvcounts[],
+    [[maybe_unused]] int rdispls[], [[maybe_unused]] CommDataType recvtype)
 {
 #if MPI_VERSION < 3
-    boost::ignore_unused(sendbuf, sendcounts, sdispls, sendtype, recvbuf,
-                         recvcounts, rdispls, recvtype);
     ASSERTL0(false, "MPI_Neighbor_alltoallv is not supported in your "
                     "installed MPI version.");
 #else

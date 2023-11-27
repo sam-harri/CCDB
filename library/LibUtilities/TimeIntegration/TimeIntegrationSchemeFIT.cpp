@@ -281,10 +281,8 @@ void FractionalInTimeIntegrationScheme::v_InitializeScheme(
  * @brief Worker method that performs the time integration.
  */
 ConstDoubleArray &FractionalInTimeIntegrationScheme::v_TimeIntegrate(
-    const size_t timestep, const NekDouble delta_t)
+    const size_t timestep, [[maybe_unused]] const NekDouble delta_t)
 {
-    boost::ignore_unused(delta_t);
-
     ASSERTL1(delta_t == m_deltaT,
              "Delta T has changed which is not permitted.");
 

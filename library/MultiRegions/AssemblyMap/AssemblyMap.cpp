@@ -33,7 +33,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include <boost/algorithm/string.hpp>
-#include <boost/core/ignore_unused.hpp>
 
 #include <MultiRegions/AssemblyMap/AssemblyMap.h>
 
@@ -548,23 +547,21 @@ void AssemblyMap::CalculateBndSystemBandWidth()
     m_bndSystemBandWidth = bwidth;
 }
 
-int AssemblyMap::v_GetLocalToGlobalMap(const int i) const
+int AssemblyMap::v_GetLocalToGlobalMap([[maybe_unused]] const int i) const
 {
-    boost::ignore_unused(i);
     NEKERROR(ErrorUtil::efatal, "Not defined for this type of mapping.");
     return 0;
 }
 
-int AssemblyMap::v_GetGlobalToUniversalMap(const int i) const
+int AssemblyMap::v_GetGlobalToUniversalMap([[maybe_unused]] const int i) const
 {
-    boost::ignore_unused(i);
     NEKERROR(ErrorUtil::efatal, "Not defined for this type of mapping.");
     return 0;
 }
 
-int AssemblyMap::v_GetGlobalToUniversalMapUnique(const int i) const
+int AssemblyMap::v_GetGlobalToUniversalMapUnique(
+    [[maybe_unused]] const int i) const
 {
-    boost::ignore_unused(i);
     NEKERROR(ErrorUtil::efatal, "Not defined for this type of mapping.");
     return 0;
 }
@@ -590,9 +587,9 @@ const Array<OneD, const int> &AssemblyMap::v_GetGlobalToUniversalMapUnique()
     return result;
 }
 
-NekDouble AssemblyMap::v_GetLocalToGlobalSign(const int i) const
+NekDouble AssemblyMap::v_GetLocalToGlobalSign(
+    [[maybe_unused]] const int i) const
 {
-    boost::ignore_unused(i);
     NEKERROR(ErrorUtil::efatal, "Not defined for this type of mapping.");
     return 0.0;
 }
@@ -604,68 +601,68 @@ const Array<OneD, NekDouble> &AssemblyMap::v_GetLocalToGlobalSign() const
     return result;
 }
 
-void AssemblyMap::v_LocalToGlobal(const Array<OneD, const NekDouble> &loc,
-                                  Array<OneD, NekDouble> &global,
-                                  bool useComm) const
+void AssemblyMap::v_LocalToGlobal(
+    [[maybe_unused]] const Array<OneD, const NekDouble> &loc,
+    [[maybe_unused]] Array<OneD, NekDouble> &global,
+    [[maybe_unused]] bool useComm) const
 {
-    boost::ignore_unused(loc, global, useComm);
     NEKERROR(ErrorUtil::efatal, "Not defined for this type of mapping.");
 }
 
-void AssemblyMap::v_LocalToGlobal(const NekVector<NekDouble> &loc,
-                                  NekVector<NekDouble> &global,
-                                  bool useComm) const
+void AssemblyMap::v_LocalToGlobal(
+    [[maybe_unused]] const NekVector<NekDouble> &loc,
+    [[maybe_unused]] NekVector<NekDouble> &global,
+    [[maybe_unused]] bool useComm) const
 {
-    boost::ignore_unused(loc, global, useComm);
     NEKERROR(ErrorUtil::efatal, "Not defined for this type of mapping.");
 }
 
-void AssemblyMap::v_GlobalToLocal(const Array<OneD, const NekDouble> &global,
-                                  Array<OneD, NekDouble> &loc) const
+void AssemblyMap::v_GlobalToLocal(
+    [[maybe_unused]] const Array<OneD, const NekDouble> &global,
+    [[maybe_unused]] Array<OneD, NekDouble> &loc) const
 {
-    boost::ignore_unused(loc, global);
     NEKERROR(ErrorUtil::efatal, "Not defined for this type of mapping.");
 }
 
-void AssemblyMap::v_GlobalToLocal(const NekVector<NekDouble> &global,
-                                  NekVector<NekDouble> &loc) const
+void AssemblyMap::v_GlobalToLocal(
+    [[maybe_unused]] const NekVector<NekDouble> &global,
+    [[maybe_unused]] NekVector<NekDouble> &loc) const
 {
-    boost::ignore_unused(loc, global);
     NEKERROR(ErrorUtil::efatal, "Not defined for this type of mapping.");
 }
 
-void AssemblyMap::v_Assemble(const Array<OneD, const NekDouble> &loc,
-                             Array<OneD, NekDouble> &global) const
+void AssemblyMap::v_Assemble(
+    [[maybe_unused]] const Array<OneD, const NekDouble> &loc,
+    [[maybe_unused]] Array<OneD, NekDouble> &global) const
 {
-    boost::ignore_unused(loc, global);
     NEKERROR(ErrorUtil::efatal, "Not defined for this type of mapping.");
 }
 
-void AssemblyMap::v_Assemble(const NekVector<NekDouble> &loc,
-                             NekVector<NekDouble> &global) const
+void AssemblyMap::v_Assemble(
+    [[maybe_unused]] const NekVector<NekDouble> &loc,
+    [[maybe_unused]] NekVector<NekDouble> &global) const
 {
-    boost::ignore_unused(loc, global);
     NEKERROR(ErrorUtil::efatal, "Not defined for this type of mapping.");
 }
 
-void AssemblyMap::v_UniversalAssemble(Array<OneD, NekDouble> &pGlobal) const
+void AssemblyMap::v_UniversalAssemble(
+    [[maybe_unused]] Array<OneD, NekDouble> &pGlobal) const
 {
-    boost::ignore_unused(pGlobal);
     // Do nothing here since multi-level static condensation uses a
     // AssemblyMap and thus will call this routine in serial.
 }
 
-void AssemblyMap::v_UniversalAssemble(NekVector<NekDouble> &pGlobal) const
+void AssemblyMap::v_UniversalAssemble(
+    [[maybe_unused]] NekVector<NekDouble> &pGlobal) const
 {
-    boost::ignore_unused(pGlobal);
     // Do nothing here since multi-level static condensation uses a
     // AssemblyMap and thus will call this routine in serial.
 }
 
-void AssemblyMap::v_UniversalAssemble(Array<OneD, NekDouble> &pGlobal,
-                                      int offset) const
+void AssemblyMap::v_UniversalAssemble(
+    [[maybe_unused]] Array<OneD, NekDouble> &pGlobal,
+    [[maybe_unused]] int offset) const
 {
-    boost::ignore_unused(pGlobal, offset);
     // Do nothing here since multi-level static condensation uses a
     // AssemblyMap and thus will call this routine in serial.
 }
@@ -726,9 +723,9 @@ const Array<OneD, const int> &AssemblyMap::v_GetExtraDirEdges()
 }
 
 std::shared_ptr<AssemblyMap> AssemblyMap::v_LinearSpaceMap(
-    const ExpList &locexp, GlobalSysSolnType solnType)
+    [[maybe_unused]] const ExpList &locexp,
+    [[maybe_unused]] GlobalSysSolnType solnType)
 {
-    boost::ignore_unused(locexp, solnType);
     NEKERROR(ErrorUtil::efatal, "Not defined for this type of mapping.");
     static std::shared_ptr<AssemblyMap> result;
     return result;

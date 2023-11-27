@@ -36,7 +36,6 @@
 #include <string>
 using namespace std;
 
-#include <boost/core/ignore_unused.hpp>
 #include <boost/lexical_cast.hpp>
 
 #include <FieldUtils/Interpolator.h>
@@ -127,10 +126,9 @@ void ProcessInterpPtsToPts::v_Process(po::variables_map &vm)
     }
 }
 
-void ProcessInterpPtsToPts::CreateFieldPts(po::variables_map &vm)
+void ProcessInterpPtsToPts::CreateFieldPts(
+    [[maybe_unused]] po::variables_map &vm)
 {
-    boost::ignore_unused(vm);
-
     int rank   = m_f->m_comm->GetSpaceComm()->GetRank();
     int nprocs = m_f->m_comm->GetSpaceComm()->GetSize();
     // Check for command line point specification
@@ -355,10 +353,8 @@ void ProcessInterpPtsToPts::CreateFieldPts(po::variables_map &vm)
 void ProcessInterpPtsToPts::InterpolatePtsToPts(
     LibUtilities::PtsFieldSharedPtr &fromPts,
     LibUtilities::PtsFieldSharedPtr &toPts, NekDouble clamp_low,
-    NekDouble clamp_up, NekDouble def_value)
+    NekDouble clamp_up, [[maybe_unused]] NekDouble def_value)
 {
-    boost::ignore_unused(def_value);
-
     ASSERTL0(toPts->GetNFields() >= fromPts->GetNFields(),
              "ptField has too few fields");
 

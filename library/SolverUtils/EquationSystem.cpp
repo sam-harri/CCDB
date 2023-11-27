@@ -32,8 +32,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <FieldUtils/Interpolator.h>
 #include <SolverUtils/EquationSystem.h>
 
@@ -985,12 +983,10 @@ Array<OneD, NekDouble> EquationSystem::ErrorExtraPoints(unsigned int field)
  * @param  initialtime           Time at which to evaluate the function.
  * @param  dumpInitialConditions Write the initial condition to file?
  */
-void EquationSystem::v_SetInitialConditions(NekDouble initialtime,
-                                            bool dumpInitialConditions,
-                                            const int domain)
+void EquationSystem::v_SetInitialConditions(
+    [[maybe_unused]] NekDouble initialtime, bool dumpInitialConditions,
+    const int domain)
 {
-    boost::ignore_unused(initialtime);
-
     if (m_session->GetComm()->GetRank() == 0)
     {
         cout << "Initial Conditions:" << endl;
@@ -1082,9 +1078,8 @@ void EquationSystem::v_EvaluateExactSolution(unsigned int field,
 /**
  * By default, nothing needs initialising at the EquationSystem level.
  */
-void EquationSystem::v_DoInitialise(bool dumpInitialConditions)
+void EquationSystem::v_DoInitialise([[maybe_unused]] bool dumpInitialConditions)
 {
-    boost::ignore_unused(dumpInitialConditions);
 }
 
 /**
@@ -1600,10 +1595,9 @@ MultiRegions::ExpListSharedPtr EquationSystem::v_GetPressure()
  *
  */
 void EquationSystem::v_ExtraFldOutput(
-    std::vector<Array<OneD, NekDouble>> &fieldcoeffs,
-    std::vector<std::string> &variables)
+    [[maybe_unused]] std::vector<Array<OneD, NekDouble>> &fieldcoeffs,
+    [[maybe_unused]] std::vector<std::string> &variables)
 {
-    boost::ignore_unused(fieldcoeffs, variables);
 }
 
 } // namespace Nektar::SolverUtils

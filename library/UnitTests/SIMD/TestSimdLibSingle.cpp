@@ -35,7 +35,6 @@
 #include <LibUtilities/SimdLib/io.hpp>
 #include <LibUtilities/SimdLib/tinysimd.hpp>
 
-#include <boost/core/ignore_unused.hpp>
 #include <boost/test/unit_test.hpp>
 
 #include <array>
@@ -146,25 +145,22 @@ BOOST_AUTO_TEST_CASE(SimdLibFloat_mem_size)
 
 BOOST_AUTO_TEST_CASE(SimdLibFloat_ctors)
 {
-    vec_t avec1;
+    [[maybe_unused]] vec_t avec1;
 
     vec_t::scalarType ascalar = 0;
     vec_t avec2(ascalar);
-    vec_t avec3{ascalar};
+    [[maybe_unused]] vec_t avec3{ascalar};
     vec_t avec4 = ascalar;
 
-    vec_t avec5(avec2);
-    vec_t avec6{avec4};
+    [[maybe_unused]] vec_t avec5(avec2);
+    [[maybe_unused]] vec_t avec6{avec4};
 
-    vec_t avec7(avec2._data);
-    vec_t avec8{avec2._data};
+    [[maybe_unused]] vec_t avec7(avec2._data);
+    [[maybe_unused]] vec_t avec8{avec2._data};
 
     vec_t::vectorType anative;
-    vec_t avec9(anative);
-    vec_t avec10{anative};
-
-    boost::ignore_unused(avec1, avec3, avec5, avec6, avec7, avec8, avec9,
-                         avec10);
+    [[maybe_unused]] vec_t avec9(anative);
+    [[maybe_unused]] vec_t avec10{anative};
 }
 
 BOOST_AUTO_TEST_CASE(SimdLibFloat_load)

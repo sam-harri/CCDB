@@ -36,7 +36,6 @@
 #include <iostream>
 using namespace std;
 
-#include <boost/core/ignore_unused.hpp>
 #include <boost/format.hpp>
 
 #include <LibUtilities/BasicUtils/Filesystem.hpp>
@@ -726,9 +725,8 @@ void UnsteadySystem::CheckForRestartTime(NekDouble &time, int &nchk)
  * @see UnsteadySystem::GetTimeStep
  */
 NekDouble UnsteadySystem::v_GetTimeStep(
-    const Array<OneD, const Array<OneD, NekDouble>> &inarray)
+    [[maybe_unused]] const Array<OneD, const Array<OneD, NekDouble>> &inarray)
 {
-    boost::ignore_unused(inarray);
     NEKERROR(ErrorUtil::efatal, "Not defined for this class");
     return 0.0;
 }
@@ -736,18 +734,16 @@ NekDouble UnsteadySystem::v_GetTimeStep(
 /**
  *
  */
-bool UnsteadySystem::v_PreIntegrate(int step)
+bool UnsteadySystem::v_PreIntegrate([[maybe_unused]] int step)
 {
-    boost::ignore_unused(step);
     return false;
 }
 
 /**
  *
  */
-bool UnsteadySystem::v_PostIntegrate(int step)
+bool UnsteadySystem::v_PostIntegrate([[maybe_unused]] int step)
 {
-    boost::ignore_unused(step);
     return false;
 }
 
@@ -910,9 +906,9 @@ bool UnsteadySystem::CheckSteadyState(int step, const NekDouble &totCPUTime)
 /**
  *
  */
-void UnsteadySystem::v_SteadyStateResidual(int step, Array<OneD, NekDouble> &L2)
+void UnsteadySystem::v_SteadyStateResidual([[maybe_unused]] int step,
+                                           Array<OneD, NekDouble> &L2)
 {
-    boost::ignore_unused(step);
     const int nPoints = GetTotPoints();
     const int nFields = m_fields.size();
 
@@ -951,9 +947,9 @@ void UnsteadySystem::v_SteadyStateResidual(int step, Array<OneD, NekDouble> &L2)
  */
 void UnsteadySystem::DoDummyProjection(
     const Array<OneD, const Array<OneD, NekDouble>> &inarray,
-    Array<OneD, Array<OneD, NekDouble>> &outarray, const NekDouble time)
+    Array<OneD, Array<OneD, NekDouble>> &outarray,
+    [[maybe_unused]] const NekDouble time)
 {
-    boost::ignore_unused(time);
 
     if (&inarray != &outarray)
     {

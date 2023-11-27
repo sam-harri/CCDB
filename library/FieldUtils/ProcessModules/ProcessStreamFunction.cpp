@@ -32,8 +32,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include "ProcessStreamFunction.h"
 
 using namespace std;

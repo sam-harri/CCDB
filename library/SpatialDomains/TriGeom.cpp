@@ -514,10 +514,8 @@ void TriGeom::v_FillGeom()
     m_state = ePtsFilled;
 }
 
-int TriGeom::v_GetDir(const int i, const int j) const
+int TriGeom::v_GetDir(const int i, [[maybe_unused]] const int j) const
 {
-    boost::ignore_unused(j); // required in 3D shapes
-
     return i == 0 ? 0 : 1;
 }
 

@@ -120,10 +120,8 @@ void DriverArnoldi::v_InitObject(ostream &out)
 /**
  *
  */
-void DriverArnoldi::v_Execute(std::ostream &out)
+void DriverArnoldi::v_Execute([[maybe_unused]] std::ostream &out)
 {
-    boost::ignore_unused(out);
-
     ASSERTL0(false, "Specific version of Arnoldi driver not implemented");
 }
 

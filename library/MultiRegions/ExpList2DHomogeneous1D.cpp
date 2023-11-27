@@ -341,10 +341,9 @@ void ExpList2DHomogeneous1D::v_WriteTecplotZone(std::ostream &outfile,
 }
 
 void ExpList2DHomogeneous1D::v_WriteVtkPieceHeader(std::ostream &outfile,
-                                                   int expansion, int istrip)
+                                                   int expansion,
+                                                   [[maybe_unused]] int istrip)
 {
-    boost::ignore_unused(istrip);
-
     // If there is only one plane (e.g. HalfMode), we write a 2D plane.
     if (m_planes.size() == 1)
     {

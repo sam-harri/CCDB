@@ -40,8 +40,6 @@
 
 #include <string>
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/BasicConst/NektarUnivTypeDefs.hpp>
 #include <LibUtilities/BasicUtils/ErrorUtil.hpp>
 #include <LibUtilities/BasicUtils/NekFactory.hpp>
@@ -207,16 +205,10 @@ protected:
 
     // These methods should never be used directly, only used by child classes.
     LUE TimeIntegrationScheme(std::string variant, size_t order,
-                              std::vector<NekDouble> freeParams)
-    {
-        boost::ignore_unused(variant, order, freeParams);
-    }
+                              std::vector<NekDouble> freeParams);
 
     LUE TimeIntegrationScheme(const TimeIntegrationScheme &in) = delete;
-
-    virtual ~TimeIntegrationScheme()
-    {
-    }
+    virtual ~TimeIntegrationScheme()                           = default;
 
 }; // end class TimeIntegrationScheme
 

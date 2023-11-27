@@ -32,8 +32,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/BasicUtils/SessionReader.h>
 #include <LocalRegions/Expansion.h>
 #include <LocalRegions/MatrixKey.h>
@@ -192,15 +190,14 @@ GlobalLinSysFactory &GetGlobalLinSysFactory()
  * @param   pkey        Associated linear system key.
  * @param   locToGloMap Local to global mapping.
  */
-GlobalLinSys::GlobalLinSys(const GlobalLinSysKey &pKey,
-                           const std::weak_ptr<ExpList> &pExpList,
-                           const std::shared_ptr<AssemblyMap> &pLocToGloMap)
+GlobalLinSys::GlobalLinSys(
+    const GlobalLinSysKey &pKey, const std::weak_ptr<ExpList> &pExpList,
+    [[maybe_unused]] const std::shared_ptr<AssemblyMap> &pLocToGloMap)
     : m_linSysKey(pKey), m_expList(pExpList),
       m_robinBCInfo(m_expList.lock()->GetRobinBCInfo()),
       m_verbose(
           m_expList.lock()->GetSession()->DefinesCmdLineArgument("verbose"))
 {
-    boost::ignore_unused(pLocToGloMap);
 }
 
 /**
@@ -420,9 +417,8 @@ void GlobalLinSys::v_InitObject()
 }
 
 void GlobalLinSys::v_Initialise(
-    const std::shared_ptr<AssemblyMap> &pLocToGloMap)
+    [[maybe_unused]] const std::shared_ptr<AssemblyMap> &pLocToGloMap)
 {
-    boost::ignore_unused(pLocToGloMap);
     NEKERROR(ErrorUtil::efatal, "Method does not exist");
 }
 } // namespace Nektar::MultiRegions

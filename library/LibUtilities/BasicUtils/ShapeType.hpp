@@ -38,8 +38,6 @@
 #include <algorithm>
 #include <vector>
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/BasicUtils/ErrorUtil.hpp>
 
 #ifdef min
@@ -99,9 +97,8 @@ inline int getNumberOfCoefficients(int Na)
     return Na;
 }
 
-inline int getNumberOfBndCoefficients(int Na)
+inline int getNumberOfBndCoefficients([[maybe_unused]] int Na)
 {
-    boost::ignore_unused(Na);
     return 2;
 }
 } // namespace StdSegData

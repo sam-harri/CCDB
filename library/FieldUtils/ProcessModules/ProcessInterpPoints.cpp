@@ -35,7 +35,6 @@
 #include <iostream>
 #include <string>
 
-#include <boost/core/ignore_unused.hpp>
 #include <boost/geometry.hpp>
 #include <boost/lexical_cast.hpp>
 
@@ -269,10 +268,8 @@ void ProcessInterpPoints::v_Process(po::variables_map &vm)
     }
 }
 
-void ProcessInterpPoints::CreateFieldPts(po::variables_map &vm)
+void ProcessInterpPoints::CreateFieldPts([[maybe_unused]] po::variables_map &vm)
 {
-    boost::ignore_unused(vm);
-
     int rank   = m_f->m_comm->GetSpaceComm()->GetRank();
     int nprocs = m_f->m_comm->GetSpaceComm()->GetSize();
     // Check for command line point specification
@@ -497,10 +494,8 @@ void ProcessInterpPoints::CreateFieldPts(po::variables_map &vm)
 void ProcessInterpPoints::InterpolateFieldToPts(
     vector<MultiRegions::ExpListSharedPtr> &field0,
     LibUtilities::PtsFieldSharedPtr &pts, NekDouble clamp_low,
-    NekDouble clamp_up, NekDouble def_value)
+    NekDouble clamp_up, [[maybe_unused]] NekDouble def_value)
 {
-    boost::ignore_unused(def_value);
-
     ASSERTL0(pts->GetNFields() == field0.size(), "ptField has too few fields");
 
     int nfields = field0.size();

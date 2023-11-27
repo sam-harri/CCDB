@@ -320,11 +320,9 @@ void DiffusionIP::v_DiffuseCalcDerivative(
     const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
     const Array<OneD, Array<OneD, NekDouble>> &inarray,
     TensorOfArray3D<NekDouble> &qfield,
-    const Array<OneD, Array<OneD, NekDouble>> &pFwd,
-    const Array<OneD, Array<OneD, NekDouble>> &pBwd)
+    [[maybe_unused]] const Array<OneD, Array<OneD, NekDouble>> &pFwd,
+    [[maybe_unused]] const Array<OneD, Array<OneD, NekDouble>> &pBwd)
 {
-    boost::ignore_unused(pFwd, pBwd);
-
     Array<OneD, Array<OneD, NekDouble>> qtmp{3};
     size_t nDim = fields[0]->GetCoordim(0);
     for (int nd = 0; nd < 3; ++nd)
@@ -364,14 +362,13 @@ void DiffusionIP::v_DiffuseVolumeFlux(
 void DiffusionIP::v_DiffuseTraceFlux(
     const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
     const Array<OneD, Array<OneD, NekDouble>> &inarray,
-    TensorOfArray3D<NekDouble> &qfield, TensorOfArray3D<NekDouble> &VolumeFlux,
+    TensorOfArray3D<NekDouble> &qfield,
+    [[maybe_unused]] TensorOfArray3D<NekDouble> &VolumeFlux,
     Array<OneD, Array<OneD, NekDouble>> &TraceFlux,
     const Array<OneD, Array<OneD, NekDouble>> &pFwd,
     const Array<OneD, Array<OneD, NekDouble>> &pBwd,
     Array<OneD, int> &nonZeroIndex)
 {
-    boost::ignore_unused(VolumeFlux);
-
     TensorOfArray3D<NekDouble> traceflux3D(1);
     traceflux3D[0] = TraceFlux;
 
@@ -458,14 +455,14 @@ void DiffusionIP::AddDiffusionSymmFluxToPhys(
 void DiffusionIP::DiffuseTraceSymmFlux(
     const std::size_t nConvectiveFields,
     const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
-    const Array<OneD, Array<OneD, NekDouble>> &inarray,
-    TensorOfArray3D<NekDouble> &qfield, TensorOfArray3D<NekDouble> &VolumeFlux,
+    [[maybe_unused]] const Array<OneD, Array<OneD, NekDouble>> &inarray,
+    [[maybe_unused]] TensorOfArray3D<NekDouble> &qfield,
+    [[maybe_unused]] TensorOfArray3D<NekDouble> &VolumeFlux,
     TensorOfArray3D<NekDouble> &SymmFlux,
-    const Array<OneD, Array<OneD, NekDouble>> &pFwd,
-    const Array<OneD, Array<OneD, NekDouble>> &pBwd,
+    [[maybe_unused]] const Array<OneD, Array<OneD, NekDouble>> &pFwd,
+    [[maybe_unused]] const Array<OneD, Array<OneD, NekDouble>> &pBwd,
     Array<OneD, int> &nonZeroIndex)
 {
-    boost::ignore_unused(inarray, qfield, VolumeFlux, pFwd, pBwd);
     size_t nDim = fields[0]->GetCoordim(0);
 
     CalcTraceSymFlux(nConvectiveFields, nDim, m_traceAver, m_traceJump,
@@ -497,14 +494,12 @@ void DiffusionIP::CalcTraceSymFlux(
 
 void DiffusionIP::AddSymmFluxIntegralToCoeff(
     const std::size_t nConvectiveFields, const size_t nDim, const size_t nPts,
-    const size_t nTracePts,
+    [[maybe_unused]] const size_t nTracePts,
     const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
     const Array<OneD, const int> &nonZeroIndex,
     TensorOfArray3D<NekDouble> &tracflux,
     Array<OneD, Array<OneD, NekDouble>> &outarray)
 {
-    boost::ignore_unused(nTracePts);
-
     size_t nCoeffs = outarray[nConvectiveFields - 1].size();
     Array<OneD, NekDouble> tmpCoeff{nCoeffs, 0.0};
     Array<OneD, Array<OneD, NekDouble>> tmpfield(nDim);
@@ -535,14 +530,12 @@ void DiffusionIP::AddSymmFluxIntegralToCoeff(
 
 void DiffusionIP::AddSymmFluxIntegralToPhys(
     const std::size_t nConvectiveFields, const size_t nDim, const size_t nPts,
-    const size_t nTracePts,
+    [[maybe_unused]] const size_t nTracePts,
     const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
     const Array<OneD, const int> &nonZeroIndex,
     TensorOfArray3D<NekDouble> &tracflux,
     Array<OneD, Array<OneD, NekDouble>> &outarray)
 {
-    boost::ignore_unused(nTracePts);
-
     size_t nCoeffs = outarray[nConvectiveFields - 1].size();
     Array<OneD, NekDouble> tmpCoeff{nCoeffs, 0.0};
     Array<OneD, NekDouble> tmpPhysi{nPts, 0.0};
@@ -678,7 +671,7 @@ void DiffusionIP::ConsVarAveJump(
 void DiffusionIP::CalcTraceNumFlux(
     const NekDouble PenaltyFactor2,
     const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
-    const Array<OneD, Array<OneD, NekDouble>> &inarray,
+    [[maybe_unused]] const Array<OneD, Array<OneD, NekDouble>> &inarray,
     const TensorOfArray3D<NekDouble> &qfield,
     const Array<OneD, Array<OneD, NekDouble>> &vFwd,
     const Array<OneD, Array<OneD, NekDouble>> &vBwd,
@@ -691,7 +684,6 @@ void DiffusionIP::CalcTraceNumFlux(
     size_t nTracePts         = fields[0]->GetTrace()->GetTotPoints();
     size_t nConvectiveFields = fields.size();
 
-    boost::ignore_unused(inarray);
     const MultiRegions::AssemblyMapDGSharedPtr TraceMap =
         fields[0]->GetTraceMap();
 

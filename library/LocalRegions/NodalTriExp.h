@@ -35,8 +35,6 @@
 #ifndef NODALTRIEXP_H
 #define NODALTRIEXP_H
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <SpatialDomains/TriGeom.h>
 #include <StdRegions/StdNodalTriExp.h>
 
@@ -238,12 +236,12 @@ private:
         StdTriExp::v_PhysDeriv(inarray, out_d0, out_d1, out_d2);
     }
 
-    void v_PhysDeriv(
-        const Array<OneD, const NekDouble> &inarray,
-        Array<OneD, NekDouble> &out_d0, Array<OneD, NekDouble> &out_d1,
-        Array<OneD, NekDouble> &out_d2 = NullNekDouble1DArray) override
+    void v_PhysDeriv(const Array<OneD, const NekDouble> &inarray,
+                     Array<OneD, NekDouble> &out_d0,
+                     Array<OneD, NekDouble> &out_d1,
+                     [[maybe_unused]] Array<OneD, NekDouble> &out_d2 =
+                         NullNekDouble1DArray) override
     {
-        boost::ignore_unused(out_d2);
         PhysDeriv(inarray, out_d0, out_d1);
     }
 
@@ -314,11 +312,11 @@ private:
         StdNodalTriExp::v_BwdTrans_SumFac(inarray, outarray);
     }
 
-    void v_IProductWRTBase_SumFac(const Array<OneD, const NekDouble> &inarray,
-                                  Array<OneD, NekDouble> &outarray,
-                                  bool multiplybyweights = true) override
+    void v_IProductWRTBase_SumFac(
+        const Array<OneD, const NekDouble> &inarray,
+        Array<OneD, NekDouble> &outarray,
+        [[maybe_unused]] bool multiplybyweights = true) override
     {
-        boost::ignore_unused(multiplybyweights);
         IProductWRTBase_SumFac(inarray, outarray);
     }
 

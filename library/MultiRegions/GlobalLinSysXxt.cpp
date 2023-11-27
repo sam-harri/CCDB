@@ -32,8 +32,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/Communication/Xxt.hpp>
 #include <MultiRegions/GlobalLinSysXxt.h>
 

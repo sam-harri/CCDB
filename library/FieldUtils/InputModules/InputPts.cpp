@@ -36,8 +36,6 @@
 #include <string>
 using namespace std;
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/BasicUtils/CsvIO.h>
 #include <LibUtilities/BasicUtils/PtsField.h>
 #include <LibUtilities/BasicUtils/PtsIO.h>
@@ -80,10 +78,8 @@ InputPts::~InputPts()
 /**
  *
  */
-void InputPts::v_Process(po::variables_map &vm)
+void InputPts::v_Process([[maybe_unused]] po::variables_map &vm)
 {
-    boost::ignore_unused(vm);
-
     string inFile = m_config["infile"].as<string>();
 
     // Determine appropriate field input

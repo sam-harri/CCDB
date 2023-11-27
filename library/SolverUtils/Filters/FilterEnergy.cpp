@@ -34,8 +34,6 @@
 
 #include <iomanip>
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <SolverUtils/Filters/FilterEnergy.h>
 #include <SolverUtils/Filters/FilterInterfaces.hpp>
 
@@ -261,10 +259,10 @@ void FilterEnergy::v_Update(
 }
 
 void FilterEnergy::v_Finalise(
-    const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
-    const NekDouble &time)
+    [[maybe_unused]] const Array<OneD, const MultiRegions::ExpListSharedPtr>
+        &pFields,
+    [[maybe_unused]] const NekDouble &time)
 {
-    boost::ignore_unused(pFields, time);
     m_outFile.close();
 }
 

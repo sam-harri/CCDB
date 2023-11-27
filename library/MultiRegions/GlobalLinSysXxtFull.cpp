@@ -244,12 +244,11 @@ void GlobalLinSysXxtFull::v_Solve(
 
 /// Solve the linear system for given input and output vectors.
 void GlobalLinSysXxtFull::v_SolveLinearSystem(
-    const int pNumRows, const Array<OneD, const NekDouble> &pInput,
-    Array<OneD, NekDouble> &pOutput, const AssemblyMapSharedPtr &pLocToGloMap,
-    const int pNumDir)
+    [[maybe_unused]] const int pNumRows,
+    const Array<OneD, const NekDouble> &pInput, Array<OneD, NekDouble> &pOutput,
+    const AssemblyMapSharedPtr &pLocToGloMap,
+    [[maybe_unused]] const int pNumDir)
 {
-    boost::ignore_unused(pNumDir);
-
     int nLocal = pNumRows;
 
     Vmath::Zero(nLocal, pOutput, 1);

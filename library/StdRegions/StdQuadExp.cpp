@@ -32,8 +32,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/Foundations/InterpCoeff.h>
 #include <LibUtilities/Foundations/ManagerAccess.h>
 #include <StdRegions/StdQuadExp.h>
@@ -78,9 +76,8 @@ NekDouble StdQuadExp::v_Integral(const Array<OneD, const NekDouble> &inarray)
 void StdQuadExp::v_PhysDeriv(const Array<OneD, const NekDouble> &inarray,
                              Array<OneD, NekDouble> &out_d0,
                              Array<OneD, NekDouble> &out_d1,
-                             Array<OneD, NekDouble> &out_d2)
+                             [[maybe_unused]] Array<OneD, NekDouble> &out_d2)
 {
-    boost::ignore_unused(out_d2);
     PhysTensorDeriv(inarray, out_d0, out_d1);
 }
 
@@ -111,9 +108,8 @@ void StdQuadExp::v_PhysDeriv(const int dir,
 void StdQuadExp::v_StdPhysDeriv(const Array<OneD, const NekDouble> &inarray,
                                 Array<OneD, NekDouble> &out_d0,
                                 Array<OneD, NekDouble> &out_d1,
-                                Array<OneD, NekDouble> &out_d2)
+                                [[maybe_unused]] Array<OneD, NekDouble> &out_d2)
 {
-    boost::ignore_unused(out_d2);
     StdQuadExp::v_PhysDeriv(inarray, out_d0, out_d1);
 }
 
@@ -607,10 +603,9 @@ int StdQuadExp::v_GetTraceNumPoints(const int i) const
     }
 }
 
-const LibUtilities::BasisKey StdQuadExp::v_GetTraceBasisKey(const int i,
-                                                            const int j) const
+const LibUtilities::BasisKey StdQuadExp::v_GetTraceBasisKey(
+    const int i, [[maybe_unused]] const int j) const
 {
-    boost::ignore_unused(j);
     ASSERTL2((i >= 0) && (i <= 3), "edge id is out of range");
 
     if ((i == 0) || (i == 2))
@@ -684,9 +679,8 @@ bool StdQuadExp::v_IsBoundaryInteriorExpansion() const
 
 void StdQuadExp::v_GetCoords(Array<OneD, NekDouble> &coords_0,
                              Array<OneD, NekDouble> &coords_1,
-                             Array<OneD, NekDouble> &coords_2)
+                             [[maybe_unused]] Array<OneD, NekDouble> &coords_2)
 {
-    boost::ignore_unused(coords_2);
     Array<OneD, const NekDouble> z0 = m_base[0]->GetZ();
     Array<OneD, const NekDouble> z1 = m_base[1]->GetZ();
     int nq0                         = GetNumPoints(0);
@@ -1594,11 +1588,9 @@ void StdQuadExp::v_MultiplyByStdQuadratureMetric(
     }
 }
 
-void StdQuadExp::v_GetSimplexEquiSpacedConnectivity(Array<OneD, int> &conn,
-                                                    bool standard)
+void StdQuadExp::v_GetSimplexEquiSpacedConnectivity(
+    Array<OneD, int> &conn, [[maybe_unused]] bool standard)
 {
-    boost::ignore_unused(standard);
-
     int np1 = m_base[0]->GetNumPoints();
     int np2 = m_base[1]->GetNumPoints();
     int np  = max(np1, np2);

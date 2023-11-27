@@ -42,7 +42,6 @@
 
 #include <MultiRegions/ContField.h>
 
-#include <boost/core/ignore_unused.hpp>
 #include <boost/format.hpp>
 #include <boost/functional/hash.hpp>
 
@@ -58,29 +57,24 @@ std::string CouplingCwipi::className =
                                                  "Cwipi Coupling");
 
 void CouplingCwipi::InterpCallback(
-    const int entities_dim, const int n_local_vertex, const int n_local_element,
-    const int n_local_polyhedra, const int n_distant_point,
-    const double local_coordinates[], const int local_connectivity_index[],
-    const int local_connectivity[], const int local_polyhedra_face_index[],
-    const int local_polyhedra_cell_to_face_connectivity[],
-    const int local_polyhedra_face_connectivity_index[],
-    const int local_polyhedra_face_connectivity[],
+    const int entities_dim, const int n_local_vertex,
+    [[maybe_unused]] const int n_local_element,
+    [[maybe_unused]] const int n_local_polyhedra, const int n_distant_point,
+    [[maybe_unused]] const double local_coordinates[],
+    [[maybe_unused]] const int local_connectivity_index[],
+    [[maybe_unused]] const int local_connectivity[],
+    [[maybe_unused]] const int local_polyhedra_face_index[],
+    [[maybe_unused]] const int local_polyhedra_cell_to_face_connectivity[],
+    [[maybe_unused]] const int local_polyhedra_face_connectivity_index[],
+    [[maybe_unused]] const int local_polyhedra_face_connectivity[],
     const double distant_points_coordinates[],
-    const int distant_points_location[], const float distant_points_distance[],
-    const int distant_points_barycentric_coordinates_index[],
-    const double distant_points_barycentric_coordinates[], const int stride,
-    const cwipi_solver_type_t solver_type, const void *local_field,
-    void *distant_field)
+    [[maybe_unused]] const int distant_points_location[],
+    [[maybe_unused]] const float distant_points_distance[],
+    [[maybe_unused]] const int distant_points_barycentric_coordinates_index[],
+    [[maybe_unused]] const double distant_points_barycentric_coordinates[],
+    const int stride, [[maybe_unused]] const cwipi_solver_type_t solver_type,
+    [[maybe_unused]] const void *local_field, void *distant_field)
 {
-    boost::ignore_unused(
-        n_local_element, n_local_polyhedra, local_coordinates,
-        local_connectivity_index, local_connectivity,
-        local_polyhedra_face_index, local_polyhedra_cell_to_face_connectivity,
-        local_polyhedra_face_connectivity_index,
-        local_polyhedra_face_connectivity, distant_points_location,
-        distant_points_distance, distant_points_barycentric_coordinates_index,
-        distant_points_barycentric_coordinates, solver_type, local_field);
-
     Array<OneD, Array<OneD, NekDouble>> interpField(stride);
 
     Array<OneD, Array<OneD, NekDouble>> distCoords(n_distant_point);

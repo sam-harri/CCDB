@@ -104,9 +104,8 @@ public:
 
 private:
     /// Function which tests the the value of uv used is within the surface
-    void Test(Array<OneD, NekDouble> uv)
+    void Test([[maybe_unused]] Array<OneD, NekDouble> uv)
     {
-        boost::ignore_unused(uv);
     }
     /// CFI object for surface.
     cfi::Face *m_cfiSurface;

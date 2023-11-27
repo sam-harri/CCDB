@@ -37,8 +37,6 @@
 #include <string>
 using namespace std;
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/BasicUtils/PtsField.h>
 #include <LibUtilities/BasicUtils/PtsIO.h>
 
@@ -345,18 +343,15 @@ void OutputTecplot::v_OutputFromExp(po::variables_map &vm)
     WriteTecplotFile(vm);
 }
 
-void OutputTecplot::v_OutputFromData(po::variables_map &vm)
+void OutputTecplot::v_OutputFromData([[maybe_unused]] po::variables_map &vm)
 {
-    boost::ignore_unused(vm);
-
     NEKERROR(ErrorUtil::efatal,
              "OutputTecplot can't write using only FieldData.");
 }
 
-fs::path OutputTecplot::v_GetPath(std::string &filename, po::variables_map &vm)
+fs::path OutputTecplot::v_GetPath(std::string &filename,
+                                  [[maybe_unused]] po::variables_map &vm)
 {
-    boost::ignore_unused(vm);
-
     int nprocs = m_f->m_comm->GetSpaceComm()->GetSize();
     string returnstr(filename);
 

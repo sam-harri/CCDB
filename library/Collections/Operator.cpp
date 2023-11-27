@@ -65,12 +65,11 @@ OperatorImpMap SetFixedImpType(ImplementationType defaultType)
  */
 Operator::Operator(std::vector<StdRegions::StdExpansionSharedPtr> pCollExp,
                    std::shared_ptr<CoalescedGeomData> GeomData,
-                   StdRegions::FactorMap factors)
+                   [[maybe_unused]] StdRegions::FactorMap factors)
     : m_isDeformed(GeomData->IsDeformed(pCollExp)),
       m_stdExp(pCollExp[0]->GetStdExp()), m_numElmt(pCollExp.size()),
       m_nqe(pCollExp[0]->GetTotPoints()), m_wspSize(0)
 {
-    boost::ignore_unused(factors);
 }
 
 /**

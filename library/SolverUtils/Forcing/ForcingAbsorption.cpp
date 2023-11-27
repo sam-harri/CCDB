@@ -33,8 +33,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <SolverUtils/Forcing/ForcingAbsorption.h>
 
 #include <LibUtilities/BasicUtils/ParseUtils.h>
@@ -280,10 +278,9 @@ void ForcingAbsorption::v_ApplyCoeff(
 }
 
 void ForcingAbsorption::CalculateForcing(
-    const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
+    [[maybe_unused]] const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
     const Array<OneD, Array<OneD, NekDouble>> &inarray, const NekDouble &time)
 {
-    boost::ignore_unused(fields);
     int nq = m_Forcing[0].size();
 
     std::string s_FieldStr;

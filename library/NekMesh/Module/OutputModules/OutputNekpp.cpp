@@ -41,7 +41,6 @@ using namespace std;
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/algorithm/string/split.hpp>
-#include <boost/core/ignore_unused.hpp>
 #include <boost/iostreams/copy.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
 #include <boost/iostreams/filtering_streambuf.hpp>
@@ -90,11 +89,9 @@ OutputNekpp::~OutputNekpp()
 
 template <typename T>
 void TestElmts(const std::map<int, std::shared_ptr<T>> &geomMap,
-               SpatialDomains::MeshGraphSharedPtr &graph,
+               [[maybe_unused]] SpatialDomains::MeshGraphSharedPtr &graph,
                LibUtilities::Interpreter &strEval, int exprId, Logger &log)
 {
-    boost::ignore_unused(graph);
-
     for (auto &geomIt : geomMap)
     {
         SpatialDomains::GeometrySharedPtr geom = geomIt.second;

@@ -74,10 +74,8 @@ NekNonlinSysNewton::~NekNonlinSysNewton()
 int NekNonlinSysNewton::v_SolveSystem(
     const int nGlobal, const Array<OneD, const NekDouble> &pInput,
     Array<OneD, NekDouble> &pOutput, const int nDir, const NekDouble tol,
-    const NekDouble factor)
+    [[maybe_unused]] const NekDouble factor)
 {
-    boost::ignore_unused(factor);
-
     v_SetupNekNonlinSystem(nGlobal, pInput, pInput, nDir);
 
     m_Solution = pOutput;
@@ -173,11 +171,10 @@ NekDouble NekNonlinSysNewton::CalcInexactNewtonForcing(
 }
 
 void NekNonlinSysNewton::v_SetupNekNonlinSystem(
-    const int nGlobal, const Array<OneD, const NekDouble> &pInput,
+    const int nGlobal,
+    [[maybe_unused]] const Array<OneD, const NekDouble> &pInput,
     const Array<OneD, const NekDouble> &pSource, const int nDir)
 {
-    boost::ignore_unused(pInput);
-
     ASSERTL0(0 == nDir, "0 != nDir not tested");
     ASSERTL0(m_SysDimen == nGlobal, "m_SysDimen!=nGlobal");
 

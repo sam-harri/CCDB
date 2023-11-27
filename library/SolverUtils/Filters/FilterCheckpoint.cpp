@@ -32,8 +32,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <SolverUtils/Filters/FilterCheckpoint.h>
 
 namespace Nektar::SolverUtils
@@ -126,10 +124,10 @@ void FilterCheckpoint::v_Update(
 }
 
 void FilterCheckpoint::v_Finalise(
-    const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
-    const NekDouble &time)
+    [[maybe_unused]] const Array<OneD, const MultiRegions::ExpListSharedPtr>
+        &pFields,
+    [[maybe_unused]] const NekDouble &time)
 {
-    boost::ignore_unused(pFields, time);
 }
 
 bool FilterCheckpoint::v_IsTimeDependent()

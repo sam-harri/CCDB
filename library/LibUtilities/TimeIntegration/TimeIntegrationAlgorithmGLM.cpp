@@ -40,8 +40,6 @@
 
 #include <iostream>
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <cmath>
 
 namespace Nektar::LibUtilities
@@ -896,13 +894,11 @@ void TimeIntegrationAlgorithmGLM::VerifyIntegrationSchemeType()
 }
 
 bool TimeIntegrationAlgorithmGLM::CheckTimeIntegrateArguments(
-    ConstTripleArray &y_old, ConstSingleArray &t_old, TripleArray &y_new,
-    SingleArray &t_new) const
+    [[maybe_unused]] ConstTripleArray &y_old,
+    [[maybe_unused]] ConstSingleArray &t_old,
+    [[maybe_unused]] TripleArray &y_new,
+    [[maybe_unused]] SingleArray &t_new) const
 {
-#ifndef NEKTAR_DEBUG
-    boost::ignore_unused(y_old, t_old, y_new, t_new);
-#endif
-
     // Check if arrays are all of consistent size
 
     ASSERTL1(y_old.size() == m_numsteps, "Non-matching number of steps.");

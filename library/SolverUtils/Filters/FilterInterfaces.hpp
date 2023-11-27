@@ -102,34 +102,29 @@ protected:
         const Array<OneD, const Array<OneD, NekDouble>> &physfield,
         Array<OneD, NekDouble> &pressure) = 0;
     SOLVER_UTILS_EXPORT virtual void v_SetMovingFrameVelocities(
-        const Array<OneD, NekDouble> &vFrameVels)
+        [[maybe_unused]] const Array<OneD, NekDouble> &vFrameVels)
     {
-        boost::ignore_unused(vFrameVels);
     }
     SOLVER_UTILS_EXPORT virtual void v_GetMovingFrameVelocities(
-        Array<OneD, NekDouble> &vFrameVels)
+        [[maybe_unused]] Array<OneD, NekDouble> &vFrameVels)
     {
-        boost::ignore_unused(vFrameVels);
     }
     SOLVER_UTILS_EXPORT virtual void v_SetMovingFrameProjectionMat(
-        const boost::numeric::ublas::matrix<NekDouble> &vProjMat)
+        [[maybe_unused]] const boost::numeric::ublas::matrix<NekDouble>
+            &vProjMat)
     {
-        boost::ignore_unused(vProjMat);
     }
     SOLVER_UTILS_EXPORT virtual void v_GetMovingFrameProjectionMat(
-        boost::numeric::ublas::matrix<NekDouble> &vProjMat)
+        [[maybe_unused]] boost::numeric::ublas::matrix<NekDouble> &vProjMat)
     {
-        boost::ignore_unused(vProjMat);
     }
     SOLVER_UTILS_EXPORT virtual void v_SetMovingFrameAngles(
-        const Array<OneD, NekDouble> &vFrameTheta)
+        [[maybe_unused]] const Array<OneD, NekDouble> &vFrameTheta)
     {
-        boost::ignore_unused(vFrameTheta);
     }
     SOLVER_UTILS_EXPORT virtual void v_GetMovingFrameAngles(
-        Array<OneD, NekDouble> &vFrameTheta)
+        [[maybe_unused]] Array<OneD, NekDouble> &vFrameTheta)
     {
-        boost::ignore_unused(vFrameTheta);
     }
 };
 

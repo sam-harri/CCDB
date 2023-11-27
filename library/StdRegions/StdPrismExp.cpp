@@ -34,7 +34,6 @@
 
 #include <LibUtilities/BasicUtils/ShapeType.hpp>
 #include <StdRegions/StdPrismExp.h>
-#include <boost/core/ignore_unused.hpp>
 
 using namespace std;
 
@@ -264,10 +263,10 @@ void StdPrismExp::v_BwdTrans_SumFacKernel(
     const Array<OneD, const NekDouble> &base2,
     const Array<OneD, const NekDouble> &inarray,
     Array<OneD, NekDouble> &outarray, Array<OneD, NekDouble> &wsp,
-    bool doCheckCollDir0, bool doCheckCollDir1, bool doCheckCollDir2)
+    [[maybe_unused]] bool doCheckCollDir0,
+    [[maybe_unused]] bool doCheckCollDir1,
+    [[maybe_unused]] bool doCheckCollDir2)
 {
-    boost::ignore_unused(doCheckCollDir0, doCheckCollDir1, doCheckCollDir2);
-
     int i, mode;
     int nquad0                  = m_base[0]->GetNumPoints();
     int nquad1                  = m_base[1]->GetNumPoints();
@@ -421,10 +420,10 @@ void StdPrismExp::v_IProductWRTBase_SumFacKernel(
     const Array<OneD, const NekDouble> &base2,
     const Array<OneD, const NekDouble> &inarray,
     Array<OneD, NekDouble> &outarray, Array<OneD, NekDouble> &wsp,
-    bool doCheckCollDir0, bool doCheckCollDir1, bool doCheckCollDir2)
+    [[maybe_unused]] bool doCheckCollDir0,
+    [[maybe_unused]] bool doCheckCollDir1,
+    [[maybe_unused]] bool doCheckCollDir2)
 {
-    boost::ignore_unused(doCheckCollDir0, doCheckCollDir1, doCheckCollDir2);
-
     // Interior prism implementation based on Spen's book page
     // 119. and 608.
     const int nquad0 = m_base[0]->GetNumPoints();

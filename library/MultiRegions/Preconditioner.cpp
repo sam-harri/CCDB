@@ -32,8 +32,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LocalRegions/MatrixKey.h>
 #include <MultiRegions/GlobalMatrixKey.h>
 #include <MultiRegions/Preconditioner.h>
@@ -77,11 +75,11 @@ void Preconditioner::v_InitObject()
 /**
  * \brief Apply a preconditioner to the conjugate gradient method
  */
-void Preconditioner::v_DoPreconditioner(const Array<OneD, NekDouble> &pInput,
-                                        Array<OneD, NekDouble> &pOutput,
-                                        const bool &IsLocal)
+void Preconditioner::v_DoPreconditioner(
+    [[maybe_unused]] const Array<OneD, NekDouble> &pInput,
+    [[maybe_unused]] Array<OneD, NekDouble> &pOutput,
+    [[maybe_unused]] const bool &IsLocal)
 {
-    boost::ignore_unused(pInput, pOutput, IsLocal);
     NEKERROR(ErrorUtil::efatal, "Method does not exist");
 }
 
@@ -122,11 +120,11 @@ void Preconditioner::DoAssembleLoc(const Array<OneD, NekDouble> &pInput,
  * an output for non-vertex degrees of freedom.
  */
 void Preconditioner::v_DoPreconditionerWithNonVertOutput(
-    const Array<OneD, NekDouble> &pInput, Array<OneD, NekDouble> &pOutput,
-    const Array<OneD, NekDouble> &pNonVertOutput,
-    Array<OneD, NekDouble> &pVertForce)
+    [[maybe_unused]] const Array<OneD, NekDouble> &pInput,
+    [[maybe_unused]] Array<OneD, NekDouble> &pOutput,
+    [[maybe_unused]] const Array<OneD, NekDouble> &pNonVertOutput,
+    [[maybe_unused]] Array<OneD, NekDouble> &pVertForce)
 {
-    boost::ignore_unused(pInput, pOutput, pNonVertOutput, pVertForce);
     NEKERROR(ErrorUtil::efatal, "Method does not exist");
 }
 
@@ -134,36 +132,34 @@ void Preconditioner::v_DoPreconditionerWithNonVertOutput(
  * \brief Transform from original basis to low energy basis
  */
 void Preconditioner::v_DoTransformBasisToLowEnergy(
-    Array<OneD, NekDouble> &pInOut)
+    [[maybe_unused]] Array<OneD, NekDouble> &pInOut)
 {
-    boost::ignore_unused(pInOut);
 }
 
 /**
  * \brief Transform from low energy coeffs to orignal basis
  */
 void Preconditioner::v_DoTransformCoeffsFromLowEnergy(
-    Array<OneD, NekDouble> &pInOut)
+    [[maybe_unused]] Array<OneD, NekDouble> &pInOut)
 {
-    boost::ignore_unused(pInOut);
 }
 
 /**
  * \brief Multiply by the block inverse transformation matrix
  */
 void Preconditioner::v_DoTransformCoeffsToLowEnergy(
-    const Array<OneD, NekDouble> &pInput, Array<OneD, NekDouble> &pOutput)
+    [[maybe_unused]] const Array<OneD, NekDouble> &pInput,
+    [[maybe_unused]] Array<OneD, NekDouble> &pOutput)
 {
-    boost::ignore_unused(pInput, pOutput);
 }
 
 /**
  * \brief Multiply by the block transposed inverse transformation matrix
  */
 void Preconditioner::v_DoTransformBasisFromLowEnergy(
-    const Array<OneD, NekDouble> &pInput, Array<OneD, NekDouble> &pOutput)
+    [[maybe_unused]] const Array<OneD, NekDouble> &pInput,
+    [[maybe_unused]] Array<OneD, NekDouble> &pOutput)
 {
-    boost::ignore_unused(pInput, pOutput);
     NEKERROR(ErrorUtil::efatal, "Method does not exist");
 }
 
@@ -176,9 +172,9 @@ void Preconditioner::v_BuildPreconditioner()
  * \f$\mathbf{R}^{T}\f$
  */
 DNekScalMatSharedPtr Preconditioner::v_TransformedSchurCompl(
-    int offset, int bnd_offset, const std::shared_ptr<DNekScalMat> &loc_mat)
+    [[maybe_unused]] int offset, [[maybe_unused]] int bnd_offset,
+    const std::shared_ptr<DNekScalMat> &loc_mat)
 {
-    boost::ignore_unused(offset, bnd_offset);
     return loc_mat;
 }
 
