@@ -36,7 +36,6 @@
 #include <string>
 using namespace std;
 
-#include <boost/core/ignore_unused.hpp>
 #include <boost/format.hpp>
 
 #include <LibUtilities/BasicUtils/FieldIOXml.h>
@@ -62,10 +61,8 @@ OutputInfo::~OutputInfo()
 {
 }
 
-void OutputInfo::v_Process(po::variables_map &vm)
+void OutputInfo::v_Process([[maybe_unused]] po::variables_map &vm)
 {
-    boost::ignore_unused(vm);
-
     // Extract the output filename and extension
     string filename = m_config["outfile"].as<string>();
 

@@ -172,9 +172,8 @@ void PtsIO::Write(const string &outFile,
  */
 void PtsIO::v_ImportPtsFieldData(const string inFile,
                                  PtsFieldSharedPtr &ptsField,
-                                 DomainRangeShPtr &Range)
+                                 [[maybe_unused]] DomainRangeShPtr &Range)
 {
-    boost::ignore_unused(Range);
     TiXmlDocument docInput(inFile);
     bool loadOkay1 = docInput.LoadFile();
 

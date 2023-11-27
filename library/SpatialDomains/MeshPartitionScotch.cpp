@@ -32,8 +32,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <SpatialDomains/MeshPartitionScotch.h>
 
 namespace Nektar::SpatialDomains
@@ -61,15 +59,14 @@ MeshPartitionScotch::~MeshPartitionScotch()
 }
 
 void MeshPartitionScotch::v_PartitionGraphImpl(
-    int &nVerts, int &nVertConds, Nektar::Array<Nektar::OneD, int> &xadj,
+    int &nVerts, [[maybe_unused]] int &nVertConds,
+    Nektar::Array<Nektar::OneD, int> &xadj,
     Nektar::Array<Nektar::OneD, int> &adjcy,
     Nektar::Array<Nektar::OneD, int> &vertWgt,
     Nektar::Array<Nektar::OneD, int> &vertSize,
-    Nektar::Array<Nektar::OneD, int> &edgeWgt, int &nparts, int &volume,
-    Nektar::Array<Nektar::OneD, int> &part)
+    [[maybe_unused]] Nektar::Array<Nektar::OneD, int> &edgeWgt, int &nparts,
+    int &volume, Nektar::Array<Nektar::OneD, int> &part)
 {
-    boost::ignore_unused(nVertConds, edgeWgt);
-
     int wgtflag = 0;
     int *vwgt   = nullptr;
     int *vsize  = nullptr;

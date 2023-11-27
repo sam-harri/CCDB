@@ -32,8 +32,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/FFT/NektarFFT.h>
 
 namespace Nektar::LibUtilities
@@ -88,16 +86,14 @@ void NektarFFT::FFTBwdTrans(Array<OneD, NekDouble> &coef,
     v_FFTBwdTrans(coef, phys);
 }
 
-void NektarFFT::v_FFTFwdTrans(Array<OneD, NekDouble> &phys,
-                              Array<OneD, NekDouble> &coef)
+void NektarFFT::v_FFTFwdTrans([[maybe_unused]] Array<OneD, NekDouble> &phys,
+                              [[maybe_unused]] Array<OneD, NekDouble> &coef)
 {
-    boost::ignore_unused(phys, coef);
 }
 
-void NektarFFT::v_FFTBwdTrans(Array<OneD, NekDouble> &coef,
-                              Array<OneD, NekDouble> &phys)
+void NektarFFT::v_FFTBwdTrans([[maybe_unused]] Array<OneD, NekDouble> &coef,
+                              [[maybe_unused]] Array<OneD, NekDouble> &phys)
 {
-    boost::ignore_unused(coef, phys);
 }
 
 } // namespace Nektar::LibUtilities

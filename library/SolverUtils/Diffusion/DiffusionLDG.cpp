@@ -200,25 +200,24 @@ void DiffusionLDG::v_DiffuseCalcDerivative(
 }
 
 void DiffusionLDG::v_DiffuseVolumeFlux(
-    const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
+    [[maybe_unused]] const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
     const Array<OneD, Array<OneD, NekDouble>> &inarray,
     TensorOfArray3D<NekDouble> &qfield, TensorOfArray3D<NekDouble> &viscTensor,
-    Array<OneD, int> &nonZeroIndex)
+    [[maybe_unused]] Array<OneD, int> &nonZeroIndex)
 {
-    boost::ignore_unused(fields, nonZeroIndex);
     m_fluxVector(inarray, qfield, viscTensor);
 }
 
 void DiffusionLDG::v_DiffuseTraceFlux(
     const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
     const Array<OneD, Array<OneD, NekDouble>> &inarray,
-    TensorOfArray3D<NekDouble> &qfield, TensorOfArray3D<NekDouble> &viscTensor,
+    [[maybe_unused]] TensorOfArray3D<NekDouble> &qfield,
+    TensorOfArray3D<NekDouble> &viscTensor,
     Array<OneD, Array<OneD, NekDouble>> &TraceFlux,
-    const Array<OneD, Array<OneD, NekDouble>> &pFwd,
-    const Array<OneD, Array<OneD, NekDouble>> &pBwd,
-    Array<OneD, int> &nonZeroIndex)
+    [[maybe_unused]] const Array<OneD, Array<OneD, NekDouble>> &pFwd,
+    [[maybe_unused]] const Array<OneD, Array<OneD, NekDouble>> &pBwd,
+    [[maybe_unused]] Array<OneD, int> &nonZeroIndex)
 {
-    boost::ignore_unused(qfield, pFwd, pBwd, nonZeroIndex);
     NumFluxforVector(fields, inarray, viscTensor, TraceFlux);
 }
 
@@ -273,12 +272,12 @@ void DiffusionLDG::NumFluxforScalar(
 
 void DiffusionLDG::ApplyScalarBCs(
     const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
-    const std::size_t var, const Array<OneD, const NekDouble> &ufield,
+    const std::size_t var,
+    [[maybe_unused]] const Array<OneD, const NekDouble> &ufield,
     const Array<OneD, const NekDouble> &Fwd,
-    const Array<OneD, const NekDouble> &Bwd,
+    [[maybe_unused]] const Array<OneD, const NekDouble> &Bwd,
     Array<OneD, NekDouble> &penaltyflux)
 {
-    boost::ignore_unused(ufield, Bwd);
     // Number of boundary regions
     std::size_t nBndRegions = fields[var]->GetBndCondExpansions().size();
     std::size_t cnt         = 0;
@@ -414,13 +413,11 @@ void DiffusionLDG::NumFluxforVector(
 void DiffusionLDG::ApplyVectorBCs(
     const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
     const std::size_t var, const std::size_t dir,
-    const Array<OneD, const NekDouble> &qfield,
+    [[maybe_unused]] const Array<OneD, const NekDouble> &qfield,
     const Array<OneD, const NekDouble> &qFwd,
-    const Array<OneD, const NekDouble> &qBwd,
+    [[maybe_unused]] const Array<OneD, const NekDouble> &qBwd,
     Array<OneD, NekDouble> &penaltyflux)
 {
-    boost::ignore_unused(qfield, qBwd);
-
     std::size_t nBndRegions = fields[var]->GetBndCondExpansions().size();
     std::size_t cnt         = 0;
 

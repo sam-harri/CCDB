@@ -35,8 +35,6 @@
 #ifndef NEKTAR_LIB_UTILITIES_FOUNDATIONS_POINTS_H
 #define NEKTAR_LIB_UTILITIES_FOUNDATIONS_POINTS_H
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/BasicConst/NektarUnivTypeDefs.hpp>
 #include <LibUtilities/BasicUtils/ErrorUtil.hpp>
 #include <LibUtilities/BasicUtils/SharedArray.hpp>
@@ -440,9 +438,9 @@ protected:
     {
     }
 
-    virtual const MatrixSharedPtrType v_GetI(const PointsKey &key)
+    virtual const MatrixSharedPtrType v_GetI(
+        [[maybe_unused]] const PointsKey &key)
     {
-        boost::ignore_unused(key);
         NEKERROR(ErrorUtil::efatal, "Method not implemented ");
         std::shared_ptr<NekMatrix<NekDouble>> returnval(
             MemoryManager<NekMatrix<NekDouble>>::AllocateSharedPtr());
@@ -450,9 +448,8 @@ protected:
     }
 
     virtual const MatrixSharedPtrType v_GetI(
-        const Array<OneD, const DataType> &x)
+        [[maybe_unused]] const Array<OneD, const DataType> &x)
     {
-        boost::ignore_unused(x);
         NEKERROR(ErrorUtil::efatal, "Method not implemented");
         std::shared_ptr<NekMatrix<NekDouble>> returnval(
             MemoryManager<NekMatrix<NekDouble>>::AllocateSharedPtr());
@@ -460,9 +457,8 @@ protected:
     }
 
     virtual const MatrixSharedPtrType v_GetI(
-        size_t, const Array<OneD, const DataType> &x)
+        size_t, [[maybe_unused]] const Array<OneD, const DataType> &x)
     {
-        boost::ignore_unused(x);
         NEKERROR(ErrorUtil::efatal, "Method not implemented");
         std::shared_ptr<NekMatrix<NekDouble>> returnval(
             MemoryManager<NekMatrix<NekDouble>>::AllocateSharedPtr());
@@ -470,10 +466,9 @@ protected:
     }
 
     virtual const MatrixSharedPtrType v_GetI(
-        const Array<OneD, const DataType> &x,
-        const Array<OneD, const DataType> &y)
+        [[maybe_unused]] const Array<OneD, const DataType> &x,
+        [[maybe_unused]] const Array<OneD, const DataType> &y)
     {
-        boost::ignore_unused(x, y);
         NEKERROR(ErrorUtil::efatal, "Method not implemented");
         std::shared_ptr<NekMatrix<NekDouble>> returnval(
             MemoryManager<NekMatrix<NekDouble>>::AllocateSharedPtr());
@@ -481,11 +476,10 @@ protected:
     }
 
     virtual const MatrixSharedPtrType v_GetI(
-        const Array<OneD, const DataType> &x,
-        const Array<OneD, const DataType> &y,
-        const Array<OneD, const DataType> &z)
+        [[maybe_unused]] const Array<OneD, const DataType> &x,
+        [[maybe_unused]] const Array<OneD, const DataType> &y,
+        [[maybe_unused]] const Array<OneD, const DataType> &z)
     {
-        boost::ignore_unused(x, y, z);
         NEKERROR(ErrorUtil::efatal, "Method not implemented");
         std::shared_ptr<NekMatrix<NekDouble>> returnval(
             MemoryManager<NekMatrix<NekDouble>>::AllocateSharedPtr());
@@ -493,9 +487,8 @@ protected:
     }
 
     virtual const MatrixSharedPtrType v_GetGalerkinProjection(
-        const PointsKey &pkey)
+        [[maybe_unused]] const PointsKey &pkey)
     {
-        boost::ignore_unused(pkey);
         NEKERROR(ErrorUtil::efatal, "Method not implemented ");
         std::shared_ptr<NekMatrix<NekDouble>> returnval(
             MemoryManager<NekMatrix<NekDouble>>::AllocateSharedPtr());

@@ -32,8 +32,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/Foundations/ManagerAccess.h> // for PointsManager, etc
 #include <StdRegions/StdNodalTriExp.h>
 
@@ -243,9 +241,8 @@ int StdNodalTriExp::v_NumBndryCoeffs() const
 //--------------------------
 
 int StdNodalTriExp::v_GetVertexMap(const int localVertexId,
-                                   bool useCoeffPacking)
+                                   [[maybe_unused]] bool useCoeffPacking)
 {
-    boost::ignore_unused(useCoeffPacking);
     ASSERTL0(localVertexId >= 0 && localVertexId <= 2,
              "Local Vertex ID must be between 0 and 2");
     return localVertexId;
@@ -255,10 +252,8 @@ void StdNodalTriExp::v_GetTraceToElementMap(const int eid,
                                             Array<OneD, unsigned int> &maparray,
                                             Array<OneD, int> &signarray,
                                             Orientation edgeOrient, int P,
-                                            int Q)
+                                            [[maybe_unused]] int Q)
 {
-    boost::ignore_unused(Q);
-
     ASSERTL0(eid >= 0 && eid <= 2, "Local Edge ID must be between 0 and 2");
 
     const int nEdgeCoeffs = GetTraceNcoeffs(eid);

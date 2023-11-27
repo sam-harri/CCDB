@@ -456,10 +456,8 @@ void QuadGeom::v_FillGeom()
     }
 }
 
-int QuadGeom::v_GetDir(const int i, const int j) const
+int QuadGeom::v_GetDir(const int i, [[maybe_unused]] const int j) const
 {
-    boost::ignore_unused(j); // required in 3D shapes
-
     return i % 2;
 }
 

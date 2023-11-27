@@ -314,12 +314,13 @@ protected:
     {
     }
 
-    virtual int v_SolveSystem(const int nGlobal,
-                              const Array<OneD, const NekDouble> &pInput,
-                              Array<OneD, NekDouble> &pOutput, const int nDir,
-                              const NekDouble tol, const NekDouble factor)
+    virtual int v_SolveSystem(
+        [[maybe_unused]] const int nGlobal,
+        [[maybe_unused]] const Array<OneD, const NekDouble> &pInput,
+        [[maybe_unused]] Array<OneD, NekDouble> &pOutput,
+        [[maybe_unused]] const int nDir, [[maybe_unused]] const NekDouble tol,
+        [[maybe_unused]] const NekDouble factor)
     {
-        boost::ignore_unused(nGlobal, pInput, pOutput, nDir, tol, factor);
         ASSERTL0(false, "LinSysIterSolver NOT CORRECT.");
         return 0;
     }

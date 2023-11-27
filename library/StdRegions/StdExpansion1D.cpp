@@ -80,21 +80,19 @@ NekDouble StdExpansion1D::v_PhysEvaluate(
 }
 
 NekDouble StdExpansion1D::v_PhysEvaluate(
-    const Array<OneD, NekDouble> &coord,
-    const Array<OneD, const NekDouble> &inarray,
-    std::array<NekDouble, 3> &firstOrderDerivs)
+    [[maybe_unused]] const Array<OneD, NekDouble> &coord,
+    [[maybe_unused]] const Array<OneD, const NekDouble> &inarray,
+    [[maybe_unused]] std::array<NekDouble, 3> &firstOrderDerivs)
 {
-    boost::ignore_unused(coord, inarray, firstOrderDerivs);
     return 0;
 }
 
 NekDouble StdExpansion1D::v_PhysEvaluate(
-    const Array<OneD, NekDouble> &coord,
-    const Array<OneD, const NekDouble> &inarray,
-    std::array<NekDouble, 3> &firstOrderDerivs,
-    std::array<NekDouble, 6> &secondOrderDerivs)
+    [[maybe_unused]] const Array<OneD, NekDouble> &coord,
+    [[maybe_unused]] const Array<OneD, const NekDouble> &inarray,
+    [[maybe_unused]] std::array<NekDouble, 3> &firstOrderDerivs,
+    [[maybe_unused]] std::array<NekDouble, 6> &secondOrderDerivs)
 {
-    boost::ignore_unused(coord, inarray, firstOrderDerivs, secondOrderDerivs);
     return 0;
 }
 

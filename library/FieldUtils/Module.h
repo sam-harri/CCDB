@@ -241,9 +241,8 @@ public:
 protected:
     Module(){};
 
-    virtual void v_Process(po::variables_map &vm)
+    virtual void v_Process([[maybe_unused]] po::variables_map &vm)
     {
-        boost::ignore_unused(vm);
         NEKERROR(ErrorUtil::efatal, "v_Process not coded");
     }
 

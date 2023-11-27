@@ -143,11 +143,9 @@ void IMEXTimeIntegrationSchemeSDC::v_InitializeScheme(
 /**
  * @brief Worker method to compute the residual.
  */
-void IMEXTimeIntegrationSchemeSDC::v_ResidualEval(const NekDouble &delta_t,
-                                                  const size_t n)
+void IMEXTimeIntegrationSchemeSDC::v_ResidualEval(
+    [[maybe_unused]] const NekDouble &delta_t, [[maybe_unused]] const size_t n)
 {
-    boost::ignore_unused(delta_t, n);
-
     ASSERTL0(false, "v_ResidualEval not implemented for IMEX SDC");
 }
 

@@ -32,8 +32,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/Foundations/Basis.h>
 #include <LibUtilities/Foundations/ManagerAccess.h>
 #include <LibUtilities/Foundations/Points.h>
@@ -109,10 +107,9 @@ void AdvectionFR::v_InitObject(
  * \todo Add the metric terms for 3D Hexahedra.
  */
 void AdvectionFR::SetupMetrics(
-    LibUtilities::SessionReaderSharedPtr pSession,
+    [[maybe_unused]] LibUtilities::SessionReaderSharedPtr pSession,
     Array<OneD, MultiRegions::ExpListSharedPtr> pFields)
 {
-    boost::ignore_unused(pSession);
     int i, n;
     int nquad0, nquad1;
     int phys_offset;
@@ -274,11 +271,9 @@ void AdvectionFR::SetupMetrics(
  * @param pFields   Pointer to fields.
  */
 void AdvectionFR::SetupCFunctions(
-    LibUtilities::SessionReaderSharedPtr pSession,
+    [[maybe_unused]] LibUtilities::SessionReaderSharedPtr pSession,
     Array<OneD, MultiRegions::ExpListSharedPtr> pFields)
 {
-    boost::ignore_unused(pSession);
-
     int i, n;
     NekDouble c0 = 0.0;
     NekDouble c1 = 0.0;
@@ -821,14 +816,13 @@ void AdvectionFR::SetupCFunctions(
 void AdvectionFR::v_Advect(
     const int nConvectiveFields,
     const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
-    const Array<OneD, Array<OneD, NekDouble>> &advVel,
+    [[maybe_unused]] const Array<OneD, Array<OneD, NekDouble>> &advVel,
     const Array<OneD, Array<OneD, NekDouble>> &inarray,
-    Array<OneD, Array<OneD, NekDouble>> &outarray, const NekDouble &time,
-    const Array<OneD, Array<OneD, NekDouble>> &pFwd,
-    const Array<OneD, Array<OneD, NekDouble>> &pBwd)
+    Array<OneD, Array<OneD, NekDouble>> &outarray,
+    [[maybe_unused]] const NekDouble &time,
+    [[maybe_unused]] const Array<OneD, Array<OneD, NekDouble>> &pFwd,
+    [[maybe_unused]] const Array<OneD, Array<OneD, NekDouble>> &pBwd)
 {
-    boost::ignore_unused(advVel, time, pFwd, pBwd);
-
     int i, j, n;
     int phys_offset;
 
@@ -1019,14 +1013,12 @@ void AdvectionFR::v_Advect(
  *
  */
 void AdvectionFR::DivCFlux_1D(
-    const int nConvectiveFields,
+    [[maybe_unused]] const int nConvectiveFields,
     const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
     const Array<OneD, const NekDouble> &fluxX1,
     const Array<OneD, const NekDouble> &numericalFlux,
     Array<OneD, NekDouble> &divCFlux)
 {
-    boost::ignore_unused(nConvectiveFields);
-
     int n;
     int nLocalSolutionPts, phys_offset, t_offset;
 
@@ -1124,15 +1116,13 @@ void AdvectionFR::DivCFlux_1D(
  * \todo: Switch on shapes eventually here.
  */
 void AdvectionFR::DivCFlux_2D(
-    const int nConvectiveFields,
+    [[maybe_unused]] const int nConvectiveFields,
     const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
     const Array<OneD, const NekDouble> &fluxX1,
     const Array<OneD, const NekDouble> &fluxX2,
     const Array<OneD, const NekDouble> &numericalFlux,
     Array<OneD, NekDouble> &divCFlux)
 {
-    boost::ignore_unused(nConvectiveFields);
-
     int n, e, i, j, cnt;
 
     int nElements = fields[0]->GetExpSize();
@@ -1308,15 +1298,13 @@ void AdvectionFR::DivCFlux_2D(
  */
 
 void AdvectionFR::DivCFlux_2D_Gauss(
-    const int nConvectiveFields,
+    [[maybe_unused]] const int nConvectiveFields,
     const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
     const Array<OneD, const NekDouble> &fluxX1,
     const Array<OneD, const NekDouble> &fluxX2,
     const Array<OneD, const NekDouble> &numericalFlux,
     Array<OneD, NekDouble> &divCFlux)
 {
-    boost::ignore_unused(nConvectiveFields);
-
     int n, e, i, j, cnt;
 
     int nElements = fields[0]->GetExpSize();
@@ -1640,16 +1628,14 @@ void AdvectionFR::DivCFlux_2D_Gauss(
  * \todo: To be implemented. Switch on shapes eventually here.
  */
 void AdvectionFR::DivCFlux_3D(
-    const int nConvectiveFields,
-    const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
-    const Array<OneD, const NekDouble> &fluxX1,
-    const Array<OneD, const NekDouble> &fluxX2,
-    const Array<OneD, const NekDouble> &fluxX3,
-    const Array<OneD, const NekDouble> &numericalFlux,
-    Array<OneD, NekDouble> &divCFlux)
+    [[maybe_unused]] const int nConvectiveFields,
+    [[maybe_unused]] const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
+    [[maybe_unused]] const Array<OneD, const NekDouble> &fluxX1,
+    [[maybe_unused]] const Array<OneD, const NekDouble> &fluxX2,
+    [[maybe_unused]] const Array<OneD, const NekDouble> &fluxX3,
+    [[maybe_unused]] const Array<OneD, const NekDouble> &numericalFlux,
+    [[maybe_unused]] Array<OneD, NekDouble> &divCFlux)
 {
-    boost::ignore_unused(nConvectiveFields, fields, fluxX1, fluxX2, fluxX3,
-                         numericalFlux, divCFlux);
 }
 
 } // namespace Nektar::SolverUtils

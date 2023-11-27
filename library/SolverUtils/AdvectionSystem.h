@@ -71,9 +71,8 @@ protected:
     SOLVER_UTILS_EXPORT bool v_PostIntegrate(int step) override;
 
     SOLVER_UTILS_EXPORT virtual Array<OneD, NekDouble> v_GetMaxStdVelocity(
-        const NekDouble SpeedSoundFactor = 1.0)
+        [[maybe_unused]] const NekDouble SpeedSoundFactor = 1.0)
     {
-        boost::ignore_unused(SpeedSoundFactor);
         ASSERTL0(false,
                  "v_GetMaxStdVelocity is not implemented by the base class.");
         Array<OneD, NekDouble> dummy(1);

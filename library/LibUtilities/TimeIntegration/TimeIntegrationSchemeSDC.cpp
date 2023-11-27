@@ -93,11 +93,9 @@ void TimeIntegrationSchemeSDC::v_SetSolutionVector(const size_t Offset,
  * @brief Worker method to initialize the integration scheme.
  */
 void TimeIntegrationSchemeSDC::v_InitializeScheme(
-    const NekDouble deltaT, ConstDoubleArray &y_0, const NekDouble time,
-    const TimeIntegrationSchemeOperators &op)
+    [[maybe_unused]] const NekDouble deltaT, ConstDoubleArray &y_0,
+    const NekDouble time, const TimeIntegrationSchemeOperators &op)
 {
-    boost::ignore_unused(deltaT);
-
     if (m_initialized)
     {
         m_time = time;
@@ -184,10 +182,8 @@ void TimeIntegrationSchemeSDC::v_InitializeScheme(
  * @brief Worker method that performs the time integration.
  */
 ConstDoubleArray &TimeIntegrationSchemeSDC::v_TimeIntegrate(
-    const size_t timestep, const NekDouble delta_t)
+    [[maybe_unused]] const size_t timestep, const NekDouble delta_t)
 {
-    boost::ignore_unused(timestep);
-
     for (size_t k = 0; k < m_order; ++k)
     {
         // Compute initial guess

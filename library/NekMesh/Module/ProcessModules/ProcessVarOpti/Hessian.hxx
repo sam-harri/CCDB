@@ -141,9 +141,8 @@ template <> int NodeOpti::IsIndefinite<3>()
  *
  * Specialised versions of this function exist only for 2x2 and 3x3 matrices.
  */
-template <int DIM> void NodeOpti::MinEigen(NekDouble &val)
+template <int DIM> void NodeOpti::MinEigen([[maybe_unused]] NekDouble &val)
 {
-    boost::ignore_unused(val);
     ASSERTL0(false, "DIM error");
 }
 
@@ -252,6 +251,6 @@ template <> void NodeOpti::MinEigen<3>(NekDouble &val)
     }
 }
 
-} // namespace Nektar
+} // namespace Nektar::NekMesh
 
 #endif

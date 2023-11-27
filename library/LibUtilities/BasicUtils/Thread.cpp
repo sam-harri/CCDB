@@ -34,8 +34,6 @@
 
 #include <iostream>
 
-#include <boost/core/ignore_unused.hpp>
-
 #include "LibUtilities/BasicUtils/Thread.h"
 
 namespace Nektar::Thread
@@ -207,9 +205,9 @@ ThreadStartupManager::~ThreadStartupManager()
 /**
  *
  */
-void ThreadStartupManager::v_QueueJobs(std::vector<ThreadJob *> &joblist)
+void ThreadStartupManager::v_QueueJobs(
+    [[maybe_unused]] std::vector<ThreadJob *> &joblist)
 {
-    boost::ignore_unused(joblist);
     NEKERROR(ErrorUtil::efatal,
              "Attempted to QueueJobs in ThreadDefaultManager");
 }
@@ -217,9 +215,8 @@ void ThreadStartupManager::v_QueueJobs(std::vector<ThreadJob *> &joblist)
 /**
  *
  */
-void ThreadStartupManager::v_QueueJob(ThreadJob *job)
+void ThreadStartupManager::v_QueueJob([[maybe_unused]] ThreadJob *job)
 {
-    boost::ignore_unused(job);
     NEKERROR(ErrorUtil::efatal,
              "Attempted to QueueJob in ThreadDefaultManager");
 }
@@ -276,9 +273,8 @@ void ThreadStartupManager::v_Wait()
 /**
  *
  */
-void ThreadStartupManager::v_SetChunkSize(unsigned int chnk)
+void ThreadStartupManager::v_SetChunkSize([[maybe_unused]] unsigned int chnk)
 {
-    boost::ignore_unused(chnk);
     NEKERROR(ErrorUtil::efatal,
              "Attempted to SetChunkSize in ThreadDefaultManager");
 }
@@ -286,9 +282,8 @@ void ThreadStartupManager::v_SetChunkSize(unsigned int chnk)
 /**
  *
  */
-void ThreadStartupManager::v_SetSchedType(SchedType s)
+void ThreadStartupManager::v_SetSchedType([[maybe_unused]] SchedType s)
 {
-    boost::ignore_unused(s);
     NEKERROR(ErrorUtil::efatal,
              "Attempted to SetSchedType in ThreadDefaultManager");
 }
@@ -329,9 +324,8 @@ const std::string &ThreadStartupManager::v_GetType() const
  * @brief ThreadDefaultManager copy constructor
  */
 ThreadStartupManager &ThreadStartupManager::operator=(
-    const ThreadStartupManager &src)
+    [[maybe_unused]] const ThreadStartupManager &src)
 {
-    boost::ignore_unused(src);
     return *this;
 }
 

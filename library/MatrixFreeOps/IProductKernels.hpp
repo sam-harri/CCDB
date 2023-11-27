@@ -815,27 +815,19 @@ NEK_FORCE_INLINE static void IProductPyrKernel(
 #if defined(SHAPE_DIMENSION_1D)
 
 template <LibUtilities::ShapeType SHAPE_TYPE>
-NEK_FORCE_INLINE static void IProduct1DWorkspace(const size_t nm0,
-                                                 const size_t nq0)
+NEK_FORCE_INLINE static void IProduct1DWorkspace(
+    [[maybe_unused]] const size_t nm0, [[maybe_unused]] const size_t nq0)
 
 {
-    boost::ignore_unused(SHAPE_TYPE, nm0, nq0);
-
-    // Check preconditions
-    // None
 }
 
 #elif defined(SHAPE_DIMENSION_2D)
 
 template <LibUtilities::ShapeType SHAPE_TYPE>
-NEK_FORCE_INLINE static void IProduct2DWorkspace(const size_t nm0,
-                                                 const size_t nm1,
-                                                 const size_t nq0,
-                                                 const size_t nq1,
-                                                 size_t &wsp0Size)
+NEK_FORCE_INLINE static void IProduct2DWorkspace(
+    [[maybe_unused]] const size_t nm0, [[maybe_unused]] const size_t nm1,
+    const size_t nq0, [[maybe_unused]] const size_t nq1, size_t &wsp0Size)
 {
-    boost::ignore_unused(SHAPE_TYPE, nm0, nm1, nq1);
-
     // Check preconditions
     ASSERTL1((SHAPE_TYPE == LibUtilities::ShapeType::Tri && nm0 == nm1 &&
               nq0 == nq1 + 1) ||
@@ -850,12 +842,11 @@ NEK_FORCE_INLINE static void IProduct2DWorkspace(const size_t nm0,
 
 template <LibUtilities::ShapeType SHAPE_TYPE>
 NEK_FORCE_INLINE static void IProduct3DWorkspace(
-    const size_t nm0, const size_t nm1, const size_t nm2, const size_t nq0,
+    [[maybe_unused]] const size_t nm0, [[maybe_unused]] const size_t nm1,
+    [[maybe_unused]] const size_t nm2, [[maybe_unused]] const size_t nq0,
     const size_t nq1, const size_t nq2, size_t &wsp0Size, size_t &wsp1Size,
-    size_t &wsp2Size)
+    [[maybe_unused]] size_t &wsp2Size)
 {
-    boost::ignore_unused(SHAPE_TYPE, nm0, nm1, nm2, nq0, wsp2Size);
-
     // Check preconditions
     ASSERTL1((SHAPE_TYPE == LibUtilities::ShapeType::Hex && nm0 == nm1 &&
               nm0 == nm2 && nq0 == nq1 && nq0 == nq2) ||
@@ -900,7 +891,8 @@ template <LibUtilities::ShapeType SHAPE_TYPE, bool SCALE, bool APPEND,
           bool DEFORMED>
 NEK_FORCE_INLINE static void IProduct2DKernel(
     const size_t nm0, const size_t nm1, const size_t nq0, const size_t nq1,
-    const bool correct, const std::vector<vec_t, allocator<vec_t>> &in,
+    [[maybe_unused]] const bool correct,
+    const std::vector<vec_t, allocator<vec_t>> &in,
     const std::vector<vec_t, allocator<vec_t>> &basis0,
     const std::vector<vec_t, allocator<vec_t>> &basis1,
     const std::vector<vec_t, allocator<vec_t>> &w0,
@@ -913,7 +905,6 @@ NEK_FORCE_INLINE static void IProduct2DKernel(
                                                basis0, basis1, w0, w1, jac,
                                                wsp0, out, scale);
 #elif defined(SHAPE_TYPE_QUAD)
-    boost::ignore_unused(correct);
     IProductQuadKernel<SCALE, APPEND, DEFORMED>(
         nm0, nm1, nq0, nq1, in, basis0, basis1, w0, w1, jac, wsp0, out, scale);
 #endif
@@ -925,7 +916,7 @@ template <LibUtilities::ShapeType SHAPE_TYPE, bool SCALE, bool APPEND,
           bool DEFORMED>
 NEK_FORCE_INLINE static void IProduct3DKernel(
     const size_t nm0, const size_t nm1, const size_t nm2, const size_t nq0,
-    const size_t nq1, const size_t nq2, const bool correct,
+    const size_t nq1, const size_t nq2, [[maybe_unused]] const bool correct,
     const std::vector<vec_t, allocator<vec_t>> &in,
     const std::vector<vec_t, allocator<vec_t>> &basis0,
     const std::vector<vec_t, allocator<vec_t>> &basis1,
@@ -935,16 +926,14 @@ NEK_FORCE_INLINE static void IProduct3DKernel(
     const std::vector<vec_t, allocator<vec_t>> &w2, const vec_t *jac,
     std::vector<vec_t, allocator<vec_t>> &wsp0,
     std::vector<vec_t, allocator<vec_t>> &wsp1,
-    std::vector<vec_t, allocator<vec_t>> &wsp2,
+    [[maybe_unused]] std::vector<vec_t, allocator<vec_t>> &wsp2,
     std::vector<vec_t, allocator<vec_t>> &out, NekDouble scale = 1.0)
 {
 #if defined(SHAPE_TYPE_HEX)
-    boost::ignore_unused(correct, wsp2);
     IProductHexKernel<SCALE, APPEND, DEFORMED>(nm0, nm1, nm2, nq0, nq1, nq2, in,
                                                basis0, basis1, basis2, w0, w1,
                                                w2, jac, wsp0, wsp1, out, scale);
 #elif defined(SHAPE_TYPE_TET)
-    boost::ignore_unused(wsp2);
     IProductTetKernel<SCALE, APPEND, DEFORMED>(
         nm0, nm1, nm2, nq0, nq1, nq2, correct, in, basis0, basis1, basis2, w0,
         w1, w2, jac, wsp0, wsp1, out, scale);
@@ -953,7 +942,6 @@ NEK_FORCE_INLINE static void IProduct3DKernel(
         nm0, nm1, nm2, nq0, nq1, nq2, correct, in, basis0, basis1, basis2, w0,
         w1, w2, jac, wsp0, wsp1, wsp2, out, scale);
 #elif defined(SHAPE_TYPE_PYR)
-    boost::ignore_unused(wsp2);
     IProductPyrKernel<SCALE, APPEND, DEFORMED>(
         nm0, nm1, nm2, nq0, nq1, nq2, correct, in, basis0, basis1, basis2, w0,
         w1, w2, jac, wsp0, wsp1, out, scale);

@@ -2527,11 +2527,9 @@ void StdHexExp::v_ExponentialFilter(Array<OneD, NekDouble> &array,
     OrthoExp.BwdTrans(orthocoeffs, array);
 }
 
-void StdHexExp::v_GetSimplexEquiSpacedConnectivity(Array<OneD, int> &conn,
-                                                   bool standard)
+void StdHexExp::v_GetSimplexEquiSpacedConnectivity(
+    Array<OneD, int> &conn, [[maybe_unused]] bool standard)
 {
-    boost::ignore_unused(standard);
-
     int np0 = m_base[0]->GetNumPoints();
     int np1 = m_base[1]->GetNumPoints();
     int np2 = m_base[2]->GetNumPoints();

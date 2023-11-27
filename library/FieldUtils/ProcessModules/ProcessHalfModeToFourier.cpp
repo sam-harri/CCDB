@@ -39,7 +39,6 @@ using namespace std;
 
 #include <LibUtilities/BasicUtils/ParseUtils.h>
 #include <LibUtilities/BasicUtils/SharedArray.hpp>
-#include <boost/core/ignore_unused.hpp>
 
 #include "ProcessHalfModeToFourier.h"
 
@@ -65,10 +64,8 @@ ProcessHalfModeToFourier::~ProcessHalfModeToFourier()
 {
 }
 
-void ProcessHalfModeToFourier::v_Process(po::variables_map &vm)
+void ProcessHalfModeToFourier::v_Process([[maybe_unused]] po::variables_map &vm)
 {
-    boost::ignore_unused(vm);
-
     set<int> sinmode;
     if (m_config["realmodetoimag"].as<string>().compare("NotSet"))
     {

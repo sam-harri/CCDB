@@ -35,8 +35,6 @@
 #ifndef NEKTAR_LIBS_MULTIREGIONS_EXPLIST_H
 #define NEKTAR_LIBS_MULTIREGIONS_EXPLIST_H
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <Collections/Collection.h>
 #include <LibUtilities/BasicUtils/SessionReader.h>
 #include <LibUtilities/Communication/Comm.h>
@@ -1471,9 +1469,9 @@ protected:
     }
 
     // wrapper function to set viscosity for Homo1D expansion
-    virtual void v_SetHomo1DSpecVanVisc(Array<OneD, NekDouble> visc)
+    virtual void v_SetHomo1DSpecVanVisc(
+        [[maybe_unused]] Array<OneD, NekDouble> visc)
     {
-        boost::ignore_unused(visc);
         NEKERROR(ErrorUtil::efatal,
                  "This method is not defined or valid for this class type");
     }

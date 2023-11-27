@@ -32,8 +32,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include "CADCurve.h"
 #include "CADSurf.h"
 
@@ -42,10 +40,9 @@ using namespace std;
 namespace Nektar::NekMesh
 {
 
-Array<OneD, NekDouble> CADCurve::NormalWRT(NekDouble t, int surf)
+Array<OneD, NekDouble> CADCurve::NormalWRT(NekDouble t,
+                                           [[maybe_unused]] int surf)
 {
-    boost::ignore_unused(surf);
-
     Array<OneD, NekDouble> p = P(t);
     pair<weak_ptr<CADSurf>, CADOrientation::Orientation> surface;
 

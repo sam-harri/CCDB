@@ -32,8 +32,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <CompressibleFlowSolver/Misc/VariableConverter.h>
 #include <SolverUtils/Filters/FilterMaxMinFields.h>
 
@@ -154,10 +152,9 @@ void FilterMaxMinFields::v_Initialise(
 
 void FilterMaxMinFields::v_ProcessSample(
     const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
-    std::vector<Array<OneD, NekDouble>> &fieldcoeffs, const NekDouble &time)
+    std::vector<Array<OneD, NekDouble>> &fieldcoeffs,
+    [[maybe_unused]] const NekDouble &time)
 {
-    boost::ignore_unused(time);
-
     for (int n = 0; n < m_variables.size(); ++n)
     {
         int nf = (n < pFields.size()) ? n : 0;
@@ -219,11 +216,10 @@ void FilterMaxMinFields::v_ProcessSample(
 }
 
 void FilterMaxMinFields::v_PrepareOutput(
-    const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
-    const NekDouble &time)
+    [[maybe_unused]] const Array<OneD, const MultiRegions::ExpListSharedPtr>
+        &pFields,
+    [[maybe_unused]] const NekDouble &time)
 {
-    boost::ignore_unused(pFields, time);
-
     m_fieldMetaData["NumberOfFieldDumps"] = std::to_string(m_numSamples);
 }
 

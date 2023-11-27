@@ -34,8 +34,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <CompressibleFlowSolver/Misc/VariableConverter.h>
 #include <SolverUtils/Filters/FilterBodyFittedVelocity.h>
 
@@ -339,10 +337,9 @@ void FilterBodyFittedVelocity::v_FillVariablesName(
 // contains noises for unknown reasons at the moment.
 void FilterBodyFittedVelocity::v_ProcessSample(
     const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
-    std::vector<Array<OneD, NekDouble>> &fieldcoeffs, const NekDouble &time)
+    std::vector<Array<OneD, NekDouble>> &fieldcoeffs,
+    [[maybe_unused]] const NekDouble &time)
 {
-    boost::ignore_unused(time);
-
     // Use shift_vel to get the current u,v,w in Cartesian coordinate
     // cfs_2D:
     // rho,rhou,rhov,E,u,v,p,T,s,a,Mach,Sensor,distanceToWall,u_bfc,v_bfc
@@ -487,11 +484,10 @@ void FilterBodyFittedVelocity::v_ProcessSample(
 }
 
 void FilterBodyFittedVelocity::v_PrepareOutput(
-    const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
-    const NekDouble &time)
+    [[maybe_unused]] const Array<OneD, const MultiRegions::ExpListSharedPtr>
+        &pFields,
+    [[maybe_unused]] const NekDouble &time)
 {
-    boost::ignore_unused(pFields, time);
-
     m_fieldMetaData["NumberOfFieldDumps"] = std::to_string(m_numSamples);
 }
 

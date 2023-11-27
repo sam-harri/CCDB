@@ -139,23 +139,17 @@ struct HelmholtzTemplate
 #if defined(SHAPE_DIMENSION_1D)
 
     // Non-size based operator.
-    void operator1D(const Array<OneD, const NekDouble> &input,
-                    Array<OneD, NekDouble> &output)
+    void operator1D([[maybe_unused]] const Array<OneD, const NekDouble> &input,
+                    [[maybe_unused]] Array<OneD, NekDouble> &output)
     {
-        boost::ignore_unused(input);
-        boost::ignore_unused(output);
-
         ASSERTL0(false, "HelmholtzTemplate::operator1D: Not Impelented.");
     }
 
     // Size based template version.
     template <int nm0, int nq0>
-    void operator1D(const Array<OneD, const NekDouble> &input,
-                    Array<OneD, NekDouble> &output)
+    void operator1D([[maybe_unused]] const Array<OneD, const NekDouble> &input,
+                    [[maybe_unused]] Array<OneD, NekDouble> &output)
     {
-        boost::ignore_unused(input);
-        boost::ignore_unused(output);
-
         ASSERTL0(false, "HelmholtzTemplate::operator1D: Not Impelented.");
     }
 

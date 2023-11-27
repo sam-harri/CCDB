@@ -38,8 +38,6 @@
 #include <complex>
 #include <cstdio>
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/BasicConst/NektarUnivTypeDefs.hpp>
 /// Maximum number of iterations in polynomial defalation routine Jacobz
 #define STOP 30
@@ -914,9 +912,9 @@ h_j(z) =  \left\{ \begin{array}{ll}
 */
 
 double hgj(const int i, const double z, const double *zgj, const int np,
-           const double alpha, const double beta)
+           [[maybe_unused]] const double alpha,
+           [[maybe_unused]] const double beta)
 {
-    boost::ignore_unused(alpha, beta);
     double zi, dz;
 
     zi = *(zgj + i);
@@ -951,10 +949,9 @@ P_{np-1}^{\alpha,\beta+1}(z_j) ) (z-z_j)} & \mbox{if $z \ne z_j$}\\
 */
 
 double hgrjm(const int i, const double z, const double *zgrj, const int np,
-             const double alpha, const double beta)
+             [[maybe_unused]] const double alpha,
+             [[maybe_unused]] const double beta)
 {
-    boost::ignore_unused(alpha, beta);
-
     double zi, dz;
 
     zi = *(zgrj + i);
@@ -989,9 +986,9 @@ P_{np-1}^{\alpha+1,\beta}(z_j) ) (z-z_j)} & \mbox{if $z \ne z_j$}\\
 */
 
 double hgrjp(const int i, const double z, const double *zgrj, const int np,
-             const double alpha, const double beta)
+             [[maybe_unused]] const double alpha,
+             [[maybe_unused]] const double beta)
 {
-    boost::ignore_unused(alpha, beta);
     double zi, dz;
 
     zi = *(zgrj + i);
@@ -1026,10 +1023,9 @@ h_j(z) = \left\{ \begin{array}{ll}
 */
 
 double hglj(const int i, const double z, const double *zglj, const int np,
-            const double alpha, const double beta)
+            [[maybe_unused]] const double alpha,
+            [[maybe_unused]] const double beta)
 {
-    boost::ignore_unused(alpha, beta);
-
     double zi, dz;
 
     zi = *(zglj + i);

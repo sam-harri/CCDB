@@ -32,8 +32,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <GlobalMapping/MappingXofZ.h>
 #include <MultiRegions/ExpList.h>
 
@@ -155,11 +153,9 @@ void MappingXofZ::v_GetJacobian(Array<OneD, NekDouble> &outarray)
 }
 
 void MappingXofZ::v_DotGradJacobian(
-    const Array<OneD, Array<OneD, NekDouble>> &inarray,
+    [[maybe_unused]] const Array<OneD, Array<OneD, NekDouble>> &inarray,
     Array<OneD, NekDouble> &outarray)
 {
-    boost::ignore_unused(inarray);
-
     int physTot = m_fields[0]->GetTotPoints();
 
     Vmath::Zero(physTot, outarray, 1);

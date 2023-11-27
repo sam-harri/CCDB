@@ -32,8 +32,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #ifdef NEKTAR_USING_PETSC
 #include "petscsys.h"
 #endif
@@ -116,109 +114,118 @@ NekDouble CommSerial::v_Wtime()
 /**
  *
  */
-void CommSerial::v_Send(void *buf, int count, CommDataType dt, int dest)
+void CommSerial::v_Send([[maybe_unused]] void *buf, [[maybe_unused]] int count,
+                        [[maybe_unused]] CommDataType dt,
+                        [[maybe_unused]] int dest)
 {
-    boost::ignore_unused(buf, count, dt, dest);
 }
 
 /**
  *
  */
-void CommSerial::v_Recv(void *buf, int count, CommDataType dt, int source)
+void CommSerial::v_Recv([[maybe_unused]] void *buf, [[maybe_unused]] int count,
+                        [[maybe_unused]] CommDataType dt,
+                        [[maybe_unused]] int source)
 {
-    boost::ignore_unused(buf, count, dt, source);
 }
 
 /**
  *
  */
-void CommSerial::v_SendRecv(void *sendbuf, int sendcount, CommDataType sendtype,
-                            int dest, void *recvbuf, int recvcount,
-                            CommDataType recvtype, int source)
+void CommSerial::v_SendRecv(
+    [[maybe_unused]] void *sendbuf, [[maybe_unused]] int sendcount,
+    [[maybe_unused]] CommDataType sendtype, [[maybe_unused]] int dest,
+    [[maybe_unused]] void *recvbuf, [[maybe_unused]] int recvcount,
+    [[maybe_unused]] CommDataType recvtype, [[maybe_unused]] int source)
 {
-    boost::ignore_unused(sendbuf, sendcount, sendtype, dest, recvbuf, recvcount,
-                         recvtype, source);
 }
 
 /**
  *
  */
-void CommSerial::v_AllReduce(void *buf, int count, CommDataType dt,
-                             enum ReduceOperator pOp)
+void CommSerial::v_AllReduce([[maybe_unused]] void *buf,
+                             [[maybe_unused]] int count,
+                             [[maybe_unused]] CommDataType dt,
+                             [[maybe_unused]] enum ReduceOperator pOp)
 {
-    boost::ignore_unused(buf, count, dt, pOp);
 }
 
 /**
  *
  */
-void CommSerial::v_AlltoAll(void *sendbuf, int sendcount, CommDataType sendtype,
-                            void *recvbuf, int recvcount, CommDataType recvtype)
+void CommSerial::v_AlltoAll([[maybe_unused]] void *sendbuf,
+                            [[maybe_unused]] int sendcount,
+                            [[maybe_unused]] CommDataType sendtype,
+                            [[maybe_unused]] void *recvbuf,
+                            [[maybe_unused]] int recvcount,
+                            [[maybe_unused]] CommDataType recvtype)
 {
-    boost::ignore_unused(sendbuf, sendcount, sendtype, recvbuf, recvcount,
-                         recvtype);
 }
 
 /**
  *
  */
-void CommSerial::v_AlltoAllv(void *sendbuf, int sendcounts[], int sdispls[],
-                             CommDataType sendtype, void *recvbuf,
-                             int recvcounts[], int rdispls[],
-                             CommDataType recvtype)
+void CommSerial::v_AlltoAllv(
+    [[maybe_unused]] void *sendbuf, [[maybe_unused]] int sendcounts[],
+    [[maybe_unused]] int sdispls[], [[maybe_unused]] CommDataType sendtype,
+    [[maybe_unused]] void *recvbuf, [[maybe_unused]] int recvcounts[],
+    [[maybe_unused]] int rdispls[], [[maybe_unused]] CommDataType recvtype)
 {
-    boost::ignore_unused(sendbuf, sendcounts, sdispls, sendtype, recvbuf,
-                         recvcounts, rdispls, recvtype);
 }
 
 /**
  *
  */
-void CommSerial::v_AllGather(void *sendbuf, int sendcount,
-                             CommDataType sendtype, void *recvbuf,
-                             int recvcount, CommDataType recvtype)
+void CommSerial::v_AllGather([[maybe_unused]] void *sendbuf,
+                             [[maybe_unused]] int sendcount,
+                             [[maybe_unused]] CommDataType sendtype,
+                             [[maybe_unused]] void *recvbuf,
+                             [[maybe_unused]] int recvcount,
+                             [[maybe_unused]] CommDataType recvtype)
 {
-    boost::ignore_unused(sendbuf, sendcount, sendtype, recvbuf, recvcount,
-                         recvtype);
 }
 
 /**
  *
  */
-void CommSerial::v_AllGatherv(void *sendbuf, int sendcount,
-                              CommDataType sendtype, void *recvbuf,
-                              int recvcounts[], int rdispls[],
-                              CommDataType recvtype)
+void CommSerial::v_AllGatherv([[maybe_unused]] void *sendbuf,
+                              [[maybe_unused]] int sendcount,
+                              [[maybe_unused]] CommDataType sendtype,
+                              [[maybe_unused]] void *recvbuf,
+                              [[maybe_unused]] int recvcounts[],
+                              [[maybe_unused]] int rdispls[],
+                              [[maybe_unused]] CommDataType recvtype)
 {
-    boost::ignore_unused(sendbuf, sendcount, sendtype, recvbuf, recvcounts,
-                         rdispls, recvtype);
 }
 
 /**
  *
  */
-void CommSerial::v_AllGatherv(void *recvbuf, int recvcounts[], int rdispls[],
-                              CommDataType recvtype)
+void CommSerial::v_AllGatherv([[maybe_unused]] void *recvbuf,
+                              [[maybe_unused]] int recvcounts[],
+                              [[maybe_unused]] int rdispls[],
+                              [[maybe_unused]] CommDataType recvtype)
 {
-    boost::ignore_unused(recvbuf, recvcounts, rdispls, recvtype);
 }
 
 /**
  *
  */
-void CommSerial::v_Bcast(void *buffer, int count, CommDataType dt, int root)
+void CommSerial::v_Bcast([[maybe_unused]] void *buffer,
+                         [[maybe_unused]] int count,
+                         [[maybe_unused]] CommDataType dt,
+                         [[maybe_unused]] int root)
 {
-    boost::ignore_unused(buffer, count, dt, root);
 }
 
 /**
  *
  */
 void CommSerial::v_Gather(void *sendbuf, int sendcount, CommDataType sendtype,
-                          void *recvbuf, int recvcount, CommDataType recvtype,
-                          int root)
+                          void *recvbuf, [[maybe_unused]] int recvcount,
+                          [[maybe_unused]] CommDataType recvtype,
+                          [[maybe_unused]] int root)
 {
-    boost::ignore_unused(recvcount, recvtype, root);
     std::memcpy(recvbuf, sendbuf, sendcount * CommDataTypeGetSize(sendtype));
 }
 
@@ -226,111 +233,120 @@ void CommSerial::v_Gather(void *sendbuf, int sendcount, CommDataType sendtype,
  *
  */
 void CommSerial::v_Scatter(void *sendbuf, int sendcount, CommDataType sendtype,
-                           void *recvbuf, int recvcount, CommDataType recvtype,
-                           int root)
+                           void *recvbuf, [[maybe_unused]] int recvcount,
+                           [[maybe_unused]] CommDataType recvtype,
+                           [[maybe_unused]] int root)
 {
-    boost::ignore_unused(recvcount, recvtype, root);
     std::memcpy(recvbuf, sendbuf, sendcount * CommDataTypeGetSize(sendtype));
 }
 
 /**
  *
  */
-void CommSerial::v_DistGraphCreateAdjacent(int indegree, const int sources[],
-                                           const int sourceweights[],
-                                           int reorder)
+void CommSerial::v_DistGraphCreateAdjacent(
+    [[maybe_unused]] int indegree, [[maybe_unused]] const int sources[],
+    [[maybe_unused]] const int sourceweights[], [[maybe_unused]] int reorder)
 {
-    boost::ignore_unused(indegree, sources, sourceweights, reorder);
 }
 
 /**
  *
  */
-void CommSerial::v_NeighborAlltoAllv(void *sendbuf, int sendcounts[],
-                                     int senddispls[], CommDataType sendtype,
-                                     void *recvbuf, int recvcounts[],
-                                     int rdispls[], CommDataType recvtype)
+void CommSerial::v_NeighborAlltoAllv(
+    [[maybe_unused]] void *sendbuf, [[maybe_unused]] int sendcounts[],
+    [[maybe_unused]] int senddispls[], [[maybe_unused]] CommDataType sendtype,
+    [[maybe_unused]] void *recvbuf, [[maybe_unused]] int recvcounts[],
+    [[maybe_unused]] int rdispls[], [[maybe_unused]] CommDataType recvtype)
 {
-    boost::ignore_unused(sendbuf, sendcounts, senddispls, sendtype, recvbuf,
-                         recvcounts, rdispls, recvtype);
 }
 
 /**
  *
  */
-void CommSerial::v_Irsend(void *buf, int count, CommDataType dt, int dest,
-                          CommRequestSharedPtr request, int loc)
+void CommSerial::v_Irsend([[maybe_unused]] void *buf,
+                          [[maybe_unused]] int count,
+                          [[maybe_unused]] CommDataType dt,
+                          [[maybe_unused]] int dest,
+                          [[maybe_unused]] CommRequestSharedPtr request,
+                          [[maybe_unused]] int loc)
 {
-    boost::ignore_unused(buf, count, dt, dest, request, loc);
 }
 
 /**
  *
  */
-void CommSerial::v_Isend(void *buf, int count, CommDataType dt, int dest,
-                         CommRequestSharedPtr request, int loc)
+void CommSerial::v_Isend([[maybe_unused]] void *buf, [[maybe_unused]] int count,
+                         [[maybe_unused]] CommDataType dt,
+                         [[maybe_unused]] int dest,
+                         [[maybe_unused]] CommRequestSharedPtr request,
+                         [[maybe_unused]] int loc)
 {
-    boost::ignore_unused(buf, count, dt, dest, request, loc);
 }
 
 /**
  *
  */
-void CommSerial::v_SendInit(void *buf, int count, CommDataType dt, int dest,
-                            CommRequestSharedPtr request, int loc)
+void CommSerial::v_SendInit([[maybe_unused]] void *buf,
+                            [[maybe_unused]] int count,
+                            [[maybe_unused]] CommDataType dt,
+                            [[maybe_unused]] int dest,
+                            [[maybe_unused]] CommRequestSharedPtr request,
+                            [[maybe_unused]] int loc)
 {
-    boost::ignore_unused(buf, count, dt, dest, request, loc);
 }
 
 /**
  *
  */
-void CommSerial::v_Irecv(void *buf, int count, CommDataType dt, int source,
-                         CommRequestSharedPtr request, int loc)
+void CommSerial::v_Irecv([[maybe_unused]] void *buf, [[maybe_unused]] int count,
+                         [[maybe_unused]] CommDataType dt,
+                         [[maybe_unused]] int source,
+                         [[maybe_unused]] CommRequestSharedPtr request,
+                         [[maybe_unused]] int loc)
 {
-    boost::ignore_unused(buf, count, dt, source, request, loc);
 }
 
 /**
  *
  */
-void CommSerial::v_RecvInit(void *buf, int count, CommDataType dt, int source,
-                            CommRequestSharedPtr request, int loc)
+void CommSerial::v_RecvInit([[maybe_unused]] void *buf,
+                            [[maybe_unused]] int count,
+                            [[maybe_unused]] CommDataType dt,
+                            [[maybe_unused]] int source,
+                            [[maybe_unused]] CommRequestSharedPtr request,
+                            [[maybe_unused]] int loc)
 {
-    boost::ignore_unused(buf, count, dt, source, request, loc);
 }
 
 /**
  *
  */
-void CommSerial::v_StartAll(CommRequestSharedPtr request)
+void CommSerial::v_StartAll([[maybe_unused]] CommRequestSharedPtr request)
 {
-    boost::ignore_unused(request);
 }
 
 /**
  *
  */
-void CommSerial::v_WaitAll(CommRequestSharedPtr request)
+void CommSerial::v_WaitAll([[maybe_unused]] CommRequestSharedPtr request)
 {
-    boost::ignore_unused(request);
 }
 
 /**
  *
  */
-CommRequestSharedPtr CommSerial::v_CreateRequest(int num)
+CommRequestSharedPtr CommSerial::v_CreateRequest([[maybe_unused]] int num)
 {
-    boost::ignore_unused(num);
     return std::shared_ptr<CommRequest>(new CommRequest);
 }
 
 /**
  *
  */
-void CommSerial::v_SplitComm(int pRows, int pColumns, int pTime)
+void CommSerial::v_SplitComm([[maybe_unused]] int pRows,
+                             [[maybe_unused]] int pColumns,
+                             [[maybe_unused]] int pTime)
 {
-    boost::ignore_unused(pRows, pColumns, pTime);
     ASSERTL0(false, "Cannot split a serial process.");
 }
 

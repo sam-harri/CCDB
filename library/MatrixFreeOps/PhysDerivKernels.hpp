@@ -209,10 +209,9 @@ NEK_FORCE_INLINE static void PhysDerivTensor3DKernel(
 #if defined(SHAPE_DIMENSION_1D)
 
 template <LibUtilities::ShapeType SHAPE_TYPE>
-NEK_FORCE_INLINE static void PhysDeriv1DWorkspace(const size_t nq0)
+NEK_FORCE_INLINE static void PhysDeriv1DWorkspace(
+    [[maybe_unused]] const size_t nq0)
 {
-    boost::ignore_unused(SHAPE_TYPE, nq0);
-
     // Check preconditions
     // None
 }
@@ -220,11 +219,9 @@ NEK_FORCE_INLINE static void PhysDeriv1DWorkspace(const size_t nq0)
 #elif defined(SHAPE_DIMENSION_2D)
 
 template <LibUtilities::ShapeType SHAPE_TYPE>
-NEK_FORCE_INLINE static void PhysDeriv2DWorkspace(const size_t nq0,
-                                                  const size_t nq1)
+NEK_FORCE_INLINE static void PhysDeriv2DWorkspace(
+    [[maybe_unused]] const size_t nq0, [[maybe_unused]] const size_t nq1)
 {
-    boost::ignore_unused(SHAPE_TYPE, nq0, nq1);
-
     // Check preconditions
     ASSERTL1((SHAPE_TYPE == LibUtilities::ShapeType::Tri && nq0 == nq1 + 1) ||
                  (SHAPE_TYPE == LibUtilities::ShapeType::Quad && nq0 == nq1),
@@ -234,14 +231,11 @@ NEK_FORCE_INLINE static void PhysDeriv2DWorkspace(const size_t nq0,
 #elif defined(SHAPE_DIMENSION_3D)
 
 template <LibUtilities::ShapeType SHAPE_TYPE>
-NEK_FORCE_INLINE static void PhysDeriv3DWorkspace(const size_t nq0,
-                                                  const size_t nq1,
-                                                  const size_t nq2,
-                                                  size_t &wsp1Size,
-                                                  size_t &wsp2Size)
+NEK_FORCE_INLINE static void PhysDeriv3DWorkspace(
+    [[maybe_unused]] const size_t nq0, [[maybe_unused]] const size_t nq1,
+    [[maybe_unused]] const size_t nq2, [[maybe_unused]] size_t &wsp1Size,
+    [[maybe_unused]] size_t &wsp2Size)
 {
-    boost::ignore_unused(SHAPE_TYPE, nq0, nq1, nq2, wsp1Size, wsp2Size);
-
     // Check preconditions
     ASSERTL1((SHAPE_TYPE == LibUtilities::ShapeType::Hex && nq0 == nq1 &&
               nq0 == nq2) ||

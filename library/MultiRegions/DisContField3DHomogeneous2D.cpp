@@ -33,8 +33,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <MultiRegions/DisContField.h>
 #include <MultiRegions/DisContField3DHomogeneous2D.h>
 #include <MultiRegions/ExpList2DHomogeneous2D.h>
@@ -327,10 +325,10 @@ std::map<int, RobinBCInfoSharedPtr> DisContField3DHomogeneous2D::
 }
 
 void DisContField3DHomogeneous2D::v_EvaluateBoundaryConditions(
-    const NekDouble time, const std::string varName, const NekDouble x2_in,
-    const NekDouble x3_in)
+    const NekDouble time, const std::string varName,
+    [[maybe_unused]] const NekDouble x2_in,
+    [[maybe_unused]] const NekDouble x3_in)
 {
-    boost::ignore_unused(x2_in, x3_in);
     int n, m;
     const Array<OneD, const NekDouble> y = m_homogeneousBasis_y->GetZ();
     const Array<OneD, const NekDouble> z = m_homogeneousBasis_z->GetZ();

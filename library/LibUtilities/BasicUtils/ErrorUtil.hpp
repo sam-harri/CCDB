@@ -38,8 +38,6 @@
 #include <stdexcept>
 #include <string>
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/LibUtilitiesDeclspec.h>
 
 #if defined(NEKTAR_USE_MPI)
@@ -85,12 +83,11 @@ public:
         return m_outStream != &std::cerr;
     }
 
-    inline static void Error(ErrType type, const char *routine, int lineNumber,
-                             const char *msg, unsigned int level,
-                             bool DoComm = false)
+    inline static void Error(ErrType type, [[maybe_unused]] const char *routine,
+                             [[maybe_unused]] int lineNumber, const char *msg,
+                             unsigned int level,
+                             [[maybe_unused]] bool DoComm = false)
     {
-        boost::ignore_unused(DoComm);
-
         // The user of outStream is primarily for the unit tests.  The unit
         // tests often generate errors on purpose to make sure invalid usage is
         // flagged appropriately.  Printing the error messages to cerr made the
@@ -101,8 +98,6 @@ public:
 #if defined(NEKTAR_DEBUG) || defined(NEKTAR_FULLDEBUG)
         baseMsg += "Where   : " + std::string(routine) + "[" +
                    std::to_string(lineNumber) + "]\nMessage : ";
-#else
-        boost::ignore_unused(routine, lineNumber);
 #endif
         baseMsg += std::string(msg);
 
@@ -119,8 +114,6 @@ public:
                 MPI_Comm_rank(MPI_COMM_WORLD, &rank);
             }
         }
-#else
-        boost::ignore_unused(DoComm);
 #endif
 
         std::string btMessage("");

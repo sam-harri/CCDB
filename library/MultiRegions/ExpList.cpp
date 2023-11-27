@@ -34,11 +34,14 @@
 
 #include <Collections/CollectionOptimisation.h>
 #include <Collections/Operator.h>
-#include <LibUtilities/BasicUtils/Timer.h>
+#include <LibUtilities/BasicUtils/Likwid.hpp>
 #include <LibUtilities/Communication/Comm.h>
 #include <LibUtilities/Foundations/Interp.h>
 #include <LibUtilities/Foundations/ManagerAccess.h> // for PointsManager, etc
 #include <LibUtilities/Foundations/PhysGalerkinProject.h>
+#include <LibUtilities/LinearAlgebra/NekMatrix.hpp>
+#include <LibUtilities/LinearAlgebra/NekTypeDefs.hpp>
+#include <LibUtilities/LinearAlgebra/SparseMatrixFwd.hpp>
 #include <LibUtilities/Polylib/Polylib.h>
 #include <LocalRegions/Expansion3D.h>
 #include <LocalRegions/HexExp.h>
@@ -58,12 +61,6 @@
 #include <MultiRegions/GlobalLinSysKey.h> // for GlobalLinSysKey
 #include <MultiRegions/GlobalMatrix.h>    // for GlobalMatrix, etc
 #include <MultiRegions/GlobalMatrixKey.h> // for GlobalMatrixKey
-
-#include <LibUtilities/BasicUtils/Likwid.hpp>
-#include <LibUtilities/LinearAlgebra/NekMatrix.hpp>
-#include <LibUtilities/LinearAlgebra/NekTypeDefs.hpp>
-#include <LibUtilities/LinearAlgebra/SparseMatrixFwd.hpp>
-#include <boost/core/ignore_unused.hpp>
 #include <iomanip>
 
 using namespace std;
@@ -272,13 +269,13 @@ ExpList::ExpList(
     const LocalRegions::ExpansionVector &locexp,
     const SpatialDomains::MeshGraphSharedPtr &graph,
     const LibUtilities::CommSharedPtr &comm, const bool DeclareCoeffPhysArrays,
-    const std::string variable, const Collections::ImplementationType ImpType)
+    [[maybe_unused]] const std::string variable,
+    [[maybe_unused]] const Collections::ImplementationType ImpType)
     : m_comm(comm), m_session(pSession), m_graph(graph), m_physState(false),
       m_exp(MemoryManager<LocalRegions::ExpansionVector>::AllocateSharedPtr()),
       m_blockMat(MemoryManager<BlockMatrixMap>::AllocateSharedPtr()),
       m_WaveSpace(false)
 {
-    boost::ignore_unused(variable, ImpType);
     int i, j, id, elmtid = 0;
     set<int> tracesDone;
 
@@ -966,15 +963,15 @@ ExpList::ExpList(
 ExpList::ExpList(const LibUtilities::SessionReaderSharedPtr &pSession,
                  const LocalRegions::ExpansionVector &locexp,
                  const SpatialDomains::MeshGraphSharedPtr &graph,
-                 const bool DeclareCoeffPhysArrays, const std::string variable,
-                 const Collections::ImplementationType ImpType)
+                 const bool DeclareCoeffPhysArrays,
+                 [[maybe_unused]] const std::string variable,
+                 [[maybe_unused]] const Collections::ImplementationType ImpType)
     : m_comm(pSession->GetComm()), m_session(pSession), m_graph(graph),
       m_physState(false),
       m_exp(MemoryManager<LocalRegions::ExpansionVector>::AllocateSharedPtr()),
       m_blockMat(MemoryManager<BlockMatrixMap>::AllocateSharedPtr()),
       m_WaveSpace(false)
 {
-    boost::ignore_unused(variable, ImpType);
     int i, j, elmtid = 0;
 
     SpatialDomains::PointGeomSharedPtr PointGeom;
@@ -2200,9 +2197,8 @@ void ExpList::v_FwdTransBndConstrained(
  * @param   field     An array containing the field in physical space
  *
  */
-void ExpList::v_SmoothField(Array<OneD, NekDouble> &field)
+void ExpList::v_SmoothField([[maybe_unused]] Array<OneD, NekDouble> &field)
 {
-    boost::ignore_unused(field);
     // Do nothing unless the method is implemented in the appropriate
     // class, i.e. ContField1D,ContField2D, etc.
 
@@ -3330,9 +3326,8 @@ void ExpList::WriteVtkFooter(std::ostream &outfile)
 }
 
 void ExpList::v_WriteVtkPieceHeader(std::ostream &outfile, int expansion,
-                                    int istrip)
+                                    [[maybe_unused]] int istrip)
 {
-    boost::ignore_unused(istrip);
     int i, j, k;
     int nbase = (*m_exp)[expansion]->GetNumBases();
     int ntot  = (*m_exp)[expansion]->GetTotPoints();
@@ -3463,9 +3458,9 @@ void ExpList::v_WriteVtkPieceHeader(std::ostream &outfile, int expansion,
     outfile << "      <PointData>" << endl;
 }
 
-void ExpList::WriteVtkPieceFooter(std::ostream &outfile, int expansion)
+void ExpList::WriteVtkPieceFooter(std::ostream &outfile,
+                                  [[maybe_unused]] int expansion)
 {
-    boost::ignore_unused(expansion);
     outfile << "      </PointData>" << endl;
     outfile << "    </Piece>" << endl;
 }
@@ -3651,9 +3646,8 @@ NekDouble ExpList::v_GetHomoLen(void)
     return len;
 }
 
-void ExpList::v_SetHomoLen(const NekDouble lhom)
+void ExpList::v_SetHomoLen([[maybe_unused]] const NekDouble lhom)
 {
-    boost::ignore_unused(lhom);
     NEKERROR(ErrorUtil::efatal,
              "This method is not defined or valid for this class type");
 }
@@ -3680,16 +3674,15 @@ void ExpList::v_ClearGlobalLinSysManager(void)
              "ClearGlobalLinSysManager not implemented for ExpList.");
 }
 
-int ExpList::v_GetPoolCount(std::string poolName)
+int ExpList::v_GetPoolCount([[maybe_unused]] std::string poolName)
 {
-    boost::ignore_unused(poolName);
     NEKERROR(ErrorUtil::efatal, "GetPoolCount not implemented for ExpList.");
     return -1;
 }
 
-void ExpList::v_UnsetGlobalLinSys(GlobalLinSysKey key, bool clearLocalMatrices)
+void ExpList::v_UnsetGlobalLinSys([[maybe_unused]] GlobalLinSysKey key,
+                                  [[maybe_unused]] bool clearLocalMatrices)
 {
-    boost::ignore_unused(key, clearLocalMatrices);
     NEKERROR(ErrorUtil::efatal,
              "UnsetGlobalLinSys not implemented for ExpList.");
 }
@@ -3961,9 +3954,9 @@ void ExpList::ExtractCoeffsToCoeffs(
 void ExpList::v_ExtractDataToCoeffs(
     LibUtilities::FieldDefinitionsSharedPtr &fielddef,
     std::vector<NekDouble> &fielddata, std::string &field,
-    Array<OneD, NekDouble> &coeffs, std::unordered_map<int, int> zIdToPlane)
+    Array<OneD, NekDouble> &coeffs,
+    [[maybe_unused]] std::unordered_map<int, int> zIdToPlane)
 {
-    boost::ignore_unused(zIdToPlane);
     int i, expId;
     int offset       = 0;
     int modes_offset = 0;
@@ -4170,9 +4163,9 @@ const Array<OneD, const std::shared_ptr<ExpList>>
     return result;
 }
 
-std::shared_ptr<ExpList> &ExpList::v_UpdateBndCondExpansion(int i)
+std::shared_ptr<ExpList> &ExpList::v_UpdateBndCondExpansion(
+    [[maybe_unused]] int i)
 {
-    boost::ignore_unused(i);
     NEKERROR(ErrorUtil::efatal,
              "This method is not defined or valid for this class type");
     static std::shared_ptr<ExpList> result;
@@ -4744,75 +4737,73 @@ void ExpList::GetElmtNormalLength(Array<OneD, NekDouble> &lengthsFwd,
     }
 }
 
-void ExpList::v_AddTraceIntegral(const Array<OneD, const NekDouble> &Fn,
-                                 Array<OneD, NekDouble> &outarray)
+void ExpList::v_AddTraceIntegral(
+    [[maybe_unused]] const Array<OneD, const NekDouble> &Fn,
+    [[maybe_unused]] Array<OneD, NekDouble> &outarray)
 {
-    boost::ignore_unused(Fn, outarray);
     NEKERROR(ErrorUtil::efatal,
              "This method is not defined or valid for this class type");
 }
 
-void ExpList::v_AddFwdBwdTraceIntegral(const Array<OneD, const NekDouble> &Fwd,
-                                       const Array<OneD, const NekDouble> &Bwd,
-                                       Array<OneD, NekDouble> &outarray)
+void ExpList::v_AddFwdBwdTraceIntegral(
+    [[maybe_unused]] const Array<OneD, const NekDouble> &Fwd,
+    [[maybe_unused]] const Array<OneD, const NekDouble> &Bwd,
+    [[maybe_unused]] Array<OneD, NekDouble> &outarray)
 {
-    boost::ignore_unused(Fwd, Bwd, outarray);
     NEKERROR(ErrorUtil::efatal,
              "This method is not defined or valid for this class type");
 }
 
-void ExpList::v_GetFwdBwdTracePhys(Array<OneD, NekDouble> &Fwd,
-                                   Array<OneD, NekDouble> &Bwd)
+void ExpList::v_GetFwdBwdTracePhys([[maybe_unused]] Array<OneD, NekDouble> &Fwd,
+                                   [[maybe_unused]] Array<OneD, NekDouble> &Bwd)
 {
-    boost::ignore_unused(Fwd, Bwd);
     NEKERROR(ErrorUtil::efatal,
              "This method is not defined or valid for this class type");
 }
 
-void ExpList::v_GetFwdBwdTracePhys(const Array<OneD, const NekDouble> &field,
-                                   Array<OneD, NekDouble> &Fwd,
-                                   Array<OneD, NekDouble> &Bwd, bool FillBnd,
-                                   bool PutFwdInBwdOnBCs, bool DoExchange)
+void ExpList::v_GetFwdBwdTracePhys(
+    [[maybe_unused]] const Array<OneD, const NekDouble> &field,
+    [[maybe_unused]] Array<OneD, NekDouble> &Fwd,
+    [[maybe_unused]] Array<OneD, NekDouble> &Bwd, [[maybe_unused]] bool FillBnd,
+    [[maybe_unused]] bool PutFwdInBwdOnBCs, [[maybe_unused]] bool DoExchange)
 {
-    boost::ignore_unused(field, Fwd, Bwd, FillBnd, PutFwdInBwdOnBCs,
-                         DoExchange);
     NEKERROR(ErrorUtil::efatal,
              "This method is not defined or valid for this class type");
 }
 
-void ExpList::v_FillBwdWithBoundCond(const Array<OneD, NekDouble> &Fwd,
-                                     Array<OneD, NekDouble> &Bwd,
-                                     bool PutFwdInBwdOnBCs)
+void ExpList::v_FillBwdWithBoundCond(
+    [[maybe_unused]] const Array<OneD, NekDouble> &Fwd,
+    [[maybe_unused]] Array<OneD, NekDouble> &Bwd,
+    [[maybe_unused]] bool PutFwdInBwdOnBCs)
 {
-    boost::ignore_unused(Fwd, Bwd, PutFwdInBwdOnBCs);
     NEKERROR(ErrorUtil::efatal,
              "This method is not defined or valid for this class type");
 }
 
-void ExpList::v_AddTraceQuadPhysToField(const Array<OneD, const NekDouble> &Fwd,
-                                        const Array<OneD, const NekDouble> &Bwd,
-                                        Array<OneD, NekDouble> &field)
+void ExpList::v_AddTraceQuadPhysToField(
+    [[maybe_unused]] const Array<OneD, const NekDouble> &Fwd,
+    [[maybe_unused]] const Array<OneD, const NekDouble> &Bwd,
+    [[maybe_unused]] Array<OneD, NekDouble> &field)
 {
-    boost::ignore_unused(field, Fwd, Bwd);
     NEKERROR(ErrorUtil::efatal,
              "v_AddTraceQuadPhysToField is not defined for this class type");
 }
 
 void ExpList::v_AddTraceQuadPhysToOffDiag(
-    const Array<OneD, const NekDouble> &Fwd,
-    const Array<OneD, const NekDouble> &Bwd, Array<OneD, NekDouble> &field)
+    [[maybe_unused]] const Array<OneD, const NekDouble> &Fwd,
+    [[maybe_unused]] const Array<OneD, const NekDouble> &Bwd,
+    [[maybe_unused]] Array<OneD, NekDouble> &field)
 {
-    boost::ignore_unused(field, Fwd, Bwd);
     NEKERROR(ErrorUtil::efatal,
              "v_AddTraceQuadPhysToOffDiag is not defined for this class");
 }
 
-void ExpList::v_GetLocTraceFromTracePts(const Array<OneD, const NekDouble> &Fwd,
-                                        const Array<OneD, const NekDouble> &Bwd,
-                                        Array<OneD, NekDouble> &locTraceFwd,
-                                        Array<OneD, NekDouble> &locTraceBwd)
+void ExpList::v_GetLocTraceFromTracePts(
+    [[maybe_unused]] const Array<OneD, const NekDouble> &Fwd,
+    [[maybe_unused]] const Array<OneD, const NekDouble> &Bwd,
+    [[maybe_unused]] Array<OneD, NekDouble> &locTraceFwd,
+    [[maybe_unused]] Array<OneD, NekDouble> &locTraceBwd)
 {
-    boost::ignore_unused(Fwd, Bwd, locTraceFwd, locTraceBwd);
     NEKERROR(ErrorUtil::efatal,
              "v_GetLocTraceFromTracePts is not defined for this class");
 }
@@ -4825,9 +4816,9 @@ const Array<OneD, const NekDouble> &ExpList::v_GetBndCondBwdWeight()
     return tmp;
 }
 
-void ExpList::v_SetBndCondBwdWeight(const int index, const NekDouble value)
+void ExpList::v_SetBndCondBwdWeight([[maybe_unused]] const int index,
+                                    [[maybe_unused]] const NekDouble value)
 {
-    boost::ignore_unused(index, value);
     NEKERROR(ErrorUtil::efatal,
              "v_setBndCondBwdWeight is not defined for this class type");
 }
@@ -4840,122 +4831,122 @@ const vector<bool> &ExpList::v_GetLeftAdjacentFaces(void) const
     return tmp;
 }
 
-void ExpList::v_ExtractTracePhys(Array<OneD, NekDouble> &outarray)
+void ExpList::v_ExtractTracePhys(
+    [[maybe_unused]] Array<OneD, NekDouble> &outarray)
 {
-    boost::ignore_unused(outarray);
     NEKERROR(ErrorUtil::efatal,
              "This method is not defined or valid for this class type");
 }
 
-void ExpList::v_ExtractTracePhys(const Array<OneD, const NekDouble> &inarray,
-                                 Array<OneD, NekDouble> &outarray)
+void ExpList::v_ExtractTracePhys(
+    [[maybe_unused]] const Array<OneD, const NekDouble> &inarray,
+    [[maybe_unused]] Array<OneD, NekDouble> &outarray)
 {
-    boost::ignore_unused(inarray, outarray);
     NEKERROR(ErrorUtil::efatal,
              "This method is not defined or valid for this class type");
 }
 
 void ExpList::v_MultiplyByInvMassMatrix(
-    const Array<OneD, const NekDouble> &inarray,
-    Array<OneD, NekDouble> &outarray)
+    [[maybe_unused]] const Array<OneD, const NekDouble> &inarray,
+    [[maybe_unused]] Array<OneD, NekDouble> &outarray)
 {
-    boost::ignore_unused(inarray, outarray);
     NEKERROR(ErrorUtil::efatal,
              "This method is not defined or valid for this class type");
 }
 
 GlobalLinSysKey ExpList::v_HelmSolve(
-    const Array<OneD, const NekDouble> &inarray,
-    Array<OneD, NekDouble> &outarray, const StdRegions::ConstFactorMap &factors,
-    const StdRegions::VarCoeffMap &varcoeff,
-    const MultiRegions::VarFactorsMap &varfactors,
-    const Array<OneD, const NekDouble> &dirForcing, const bool PhysSpaceForcing)
+    [[maybe_unused]] const Array<OneD, const NekDouble> &inarray,
+    [[maybe_unused]] Array<OneD, NekDouble> &outarray,
+    [[maybe_unused]] const StdRegions::ConstFactorMap &factors,
+    [[maybe_unused]] const StdRegions::VarCoeffMap &varcoeff,
+    [[maybe_unused]] const MultiRegions::VarFactorsMap &varfactors,
+    [[maybe_unused]] const Array<OneD, const NekDouble> &dirForcing,
+    [[maybe_unused]] const bool PhysSpaceForcing)
 {
-    boost::ignore_unused(inarray, outarray, factors, varcoeff, varfactors,
-                         dirForcing, PhysSpaceForcing);
     NEKERROR(ErrorUtil::efatal, "HelmSolve not implemented.");
     return NullGlobalLinSysKey;
 }
 
 GlobalLinSysKey ExpList::v_LinearAdvectionDiffusionReactionSolve(
-    const Array<OneD, const NekDouble> &inarray,
-    Array<OneD, NekDouble> &outarray, const StdRegions::ConstFactorMap &factors,
-    const StdRegions::VarCoeffMap &varcoeff,
-    const MultiRegions::VarFactorsMap &varfactors,
-    const Array<OneD, const NekDouble> &dirForcing, const bool PhysSpaceForcing)
+    [[maybe_unused]] const Array<OneD, const NekDouble> &inarray,
+    [[maybe_unused]] Array<OneD, NekDouble> &outarray,
+    [[maybe_unused]] const StdRegions::ConstFactorMap &factors,
+    [[maybe_unused]] const StdRegions::VarCoeffMap &varcoeff,
+    [[maybe_unused]] const MultiRegions::VarFactorsMap &varfactors,
+    [[maybe_unused]] const Array<OneD, const NekDouble> &dirForcing,
+    [[maybe_unused]] const bool PhysSpaceForcing)
 {
-    boost::ignore_unused(inarray, outarray, factors, varcoeff, varfactors,
-                         dirForcing, PhysSpaceForcing);
     NEKERROR(ErrorUtil::efatal,
              "LinearAdvectionDiffusionReactionSolve not implemented.");
     return NullGlobalLinSysKey;
 }
 
 void ExpList::v_LinearAdvectionReactionSolve(
-    const Array<OneD, Array<OneD, NekDouble>> &velocity,
-    const Array<OneD, const NekDouble> &inarray,
-    Array<OneD, NekDouble> &outarray, const NekDouble lambda,
-    const Array<OneD, const NekDouble> &dirForcing)
+    [[maybe_unused]] const Array<OneD, Array<OneD, NekDouble>> &velocity,
+    [[maybe_unused]] const Array<OneD, const NekDouble> &inarray,
+    [[maybe_unused]] Array<OneD, NekDouble> &outarray,
+    [[maybe_unused]] const NekDouble lambda,
+    [[maybe_unused]] const Array<OneD, const NekDouble> &dirForcing)
 {
-    boost::ignore_unused(velocity, inarray, outarray, lambda, dirForcing);
     NEKERROR(ErrorUtil::efatal,
              "This method is not defined or valid for this class type");
 }
 
-void ExpList::v_HomogeneousFwdTrans(const int npts,
-                                    const Array<OneD, const NekDouble> &inarray,
-                                    Array<OneD, NekDouble> &outarray,
-                                    bool Shuff, bool UnShuff)
+void ExpList::v_HomogeneousFwdTrans(
+    [[maybe_unused]] const int npts,
+    [[maybe_unused]] const Array<OneD, const NekDouble> &inarray,
+    [[maybe_unused]] Array<OneD, NekDouble> &outarray,
+    [[maybe_unused]] bool Shuff, [[maybe_unused]] bool UnShuff)
 {
-    boost::ignore_unused(npts, inarray, outarray, Shuff, UnShuff);
     NEKERROR(ErrorUtil::efatal,
              "This method is not defined or valid for this class type");
 }
 
-void ExpList::v_HomogeneousBwdTrans(const int npts,
-                                    const Array<OneD, const NekDouble> &inarray,
-                                    Array<OneD, NekDouble> &outarray,
-                                    bool Shuff, bool UnShuff)
+void ExpList::v_HomogeneousBwdTrans(
+    [[maybe_unused]] const int npts,
+    [[maybe_unused]] const Array<OneD, const NekDouble> &inarray,
+    [[maybe_unused]] Array<OneD, NekDouble> &outarray,
+    [[maybe_unused]] bool Shuff, [[maybe_unused]] bool UnShuff)
 {
-    boost::ignore_unused(npts, inarray, outarray, Shuff, UnShuff);
     NEKERROR(ErrorUtil::efatal,
              "This method is not defined or valid for this class type");
 }
 
-void ExpList::v_DealiasedProd(const int npts,
-                              const Array<OneD, NekDouble> &inarray1,
-                              const Array<OneD, NekDouble> &inarray2,
-                              Array<OneD, NekDouble> &outarray)
+void ExpList::v_DealiasedProd(
+    [[maybe_unused]] const int npts,
+    [[maybe_unused]] const Array<OneD, NekDouble> &inarray1,
+    [[maybe_unused]] const Array<OneD, NekDouble> &inarray2,
+    [[maybe_unused]] Array<OneD, NekDouble> &outarray)
 {
-    boost::ignore_unused(npts, inarray1, inarray2, outarray);
     NEKERROR(ErrorUtil::efatal,
              "This method is not defined or valid for this class type");
 }
 
 void ExpList::v_DealiasedDotProd(
-    const int npts, const Array<OneD, Array<OneD, NekDouble>> &inarray1,
-    const Array<OneD, Array<OneD, NekDouble>> &inarray2,
-    Array<OneD, Array<OneD, NekDouble>> &outarray)
+    [[maybe_unused]] const int npts,
+    [[maybe_unused]] const Array<OneD, Array<OneD, NekDouble>> &inarray1,
+    [[maybe_unused]] const Array<OneD, Array<OneD, NekDouble>> &inarray2,
+    [[maybe_unused]] Array<OneD, Array<OneD, NekDouble>> &outarray)
 {
-    boost::ignore_unused(npts, inarray1, inarray2, outarray);
     NEKERROR(ErrorUtil::efatal,
              "This method is not defined or valid for this class type");
 }
 
-void ExpList::v_GetBCValues(Array<OneD, NekDouble> &BndVals,
-                            const Array<OneD, NekDouble> &TotField, int BndID)
+void ExpList::v_GetBCValues(
+    [[maybe_unused]] Array<OneD, NekDouble> &BndVals,
+    [[maybe_unused]] const Array<OneD, NekDouble> &TotField,
+    [[maybe_unused]] int BndID)
 {
-    boost::ignore_unused(BndVals, TotField, BndID);
     NEKERROR(ErrorUtil::efatal,
              "This method is not defined or valid for this class type");
 }
 
-void ExpList::v_NormVectorIProductWRTBase(Array<OneD, const NekDouble> &V1,
-                                          Array<OneD, const NekDouble> &V2,
-                                          Array<OneD, NekDouble> &outarray,
-                                          int BndID)
+void ExpList::v_NormVectorIProductWRTBase(
+    [[maybe_unused]] Array<OneD, const NekDouble> &V1,
+    [[maybe_unused]] Array<OneD, const NekDouble> &V2,
+    [[maybe_unused]] Array<OneD, NekDouble> &outarray,
+    [[maybe_unused]] int BndID)
 {
-    boost::ignore_unused(V1, V2, outarray, BndID);
     NEKERROR(ErrorUtil::efatal,
              "This method is not defined or valid for this class type");
 }
@@ -5003,43 +4994,43 @@ void ExpList::v_NormVectorIProductWRTBase(
     }
 }
 
-void ExpList::v_ImposeDirichletConditions(Array<OneD, NekDouble> &outarray)
+void ExpList::v_ImposeDirichletConditions(
+    [[maybe_unused]] Array<OneD, NekDouble> &outarray)
 {
-    boost::ignore_unused(outarray);
     NEKERROR(ErrorUtil::efatal,
              "This method is not defined or valid for this class type");
 }
 
 /**
  */
-void ExpList::v_FillBndCondFromField(const Array<OneD, NekDouble> coeffs)
+void ExpList::v_FillBndCondFromField(
+    [[maybe_unused]] const Array<OneD, NekDouble> coeffs)
 {
-    boost::ignore_unused(coeffs);
     NEKERROR(ErrorUtil::efatal,
              "This method is not defined or valid for this class type");
 }
 
 /**
  */
-void ExpList::v_FillBndCondFromField(const int nreg,
-                                     const Array<OneD, NekDouble> coeffs)
+void ExpList::v_FillBndCondFromField(
+    [[maybe_unused]] const int nreg,
+    [[maybe_unused]] const Array<OneD, NekDouble> coeffs)
 {
-    boost::ignore_unused(nreg, coeffs);
     NEKERROR(ErrorUtil::efatal,
              "This method is not defined or valid for this class type");
 }
 
-void ExpList::v_LocalToGlobal(bool useComm)
+void ExpList::v_LocalToGlobal([[maybe_unused]] bool useComm)
 {
-    boost::ignore_unused(useComm);
     NEKERROR(ErrorUtil::efatal,
              "This method is not defined or valid for this class type");
 }
 
-void ExpList::v_LocalToGlobal(const Array<OneD, const NekDouble> &inarray,
-                              Array<OneD, NekDouble> &outarray, bool useComm)
+void ExpList::v_LocalToGlobal(
+    [[maybe_unused]] const Array<OneD, const NekDouble> &inarray,
+    [[maybe_unused]] Array<OneD, NekDouble> &outarray,
+    [[maybe_unused]] bool useComm)
 {
-    boost::ignore_unused(inarray, outarray, useComm);
     NEKERROR(ErrorUtil::efatal,
              "This method is not defined or valid for this class type");
 }
@@ -5050,10 +5041,10 @@ void ExpList::v_GlobalToLocal(void)
              "This method is not defined or valid for this class type");
 }
 
-void ExpList::v_GlobalToLocal(const Array<OneD, const NekDouble> &inarray,
-                              Array<OneD, NekDouble> &outarray)
+void ExpList::v_GlobalToLocal(
+    [[maybe_unused]] const Array<OneD, const NekDouble> &inarray,
+    [[maybe_unused]] Array<OneD, NekDouble> &outarray)
 {
-    boost::ignore_unused(inarray, outarray);
     NEKERROR(ErrorUtil::efatal,
              "This method is not defined or valid for this class type");
 }
@@ -5187,10 +5178,10 @@ void ExpList::v_SetUpPhysNormals()
 
 /**
  */
-void ExpList::v_GetBndElmtExpansion(int i, std::shared_ptr<ExpList> &result,
-                                    const bool DeclareCoeffPhysArrays)
+void ExpList::v_GetBndElmtExpansion(
+    [[maybe_unused]] int i, [[maybe_unused]] std::shared_ptr<ExpList> &result,
+    [[maybe_unused]] const bool DeclareCoeffPhysArrays)
 {
-    boost::ignore_unused(i, result, DeclareCoeffPhysArrays);
     NEKERROR(ErrorUtil::efatal,
              "This method is not defined or valid for this class type");
 }
@@ -5355,25 +5346,24 @@ void ExpList::v_GetBoundaryNormals(int i,
 
 /**
  */
-void ExpList::v_GetBoundaryToElmtMap(Array<OneD, int> &ElmtID,
-                                     Array<OneD, int> &EdgeID)
+void ExpList::v_GetBoundaryToElmtMap([[maybe_unused]] Array<OneD, int> &ElmtID,
+                                     [[maybe_unused]] Array<OneD, int> &EdgeID)
 {
-    boost::ignore_unused(ElmtID, EdgeID);
     NEKERROR(ErrorUtil::efatal,
              "This method is not defined or valid for this class type");
 }
 
-void ExpList::v_FillBwdWithBwdWeight(Array<OneD, NekDouble> &weightave,
-                                     Array<OneD, NekDouble> &weightjmp)
+void ExpList::v_FillBwdWithBwdWeight(
+    [[maybe_unused]] Array<OneD, NekDouble> &weightave,
+    [[maybe_unused]] Array<OneD, NekDouble> &weightjmp)
 {
-    boost::ignore_unused(weightave, weightjmp);
     NEKERROR(ErrorUtil::efatal, "v_FillBwdWithBwdWeight not defined");
 }
 
-void ExpList::v_PeriodicBwdCopy(const Array<OneD, const NekDouble> &Fwd,
-                                Array<OneD, NekDouble> &Bwd)
+void ExpList::v_PeriodicBwdCopy(
+    [[maybe_unused]] const Array<OneD, const NekDouble> &Fwd,
+    [[maybe_unused]] Array<OneD, NekDouble> &Bwd)
 {
-    boost::ignore_unused(Fwd, Bwd);
     NEKERROR(ErrorUtil::efatal, "v_PeriodicBwdCopy not defined");
 }
 
@@ -5401,12 +5391,12 @@ Array<OneD, SpatialDomains::BoundaryConditionShPtr>
 
 /**
  */
-void ExpList::v_EvaluateBoundaryConditions(const NekDouble time,
-                                           const std::string varName,
-                                           const NekDouble x2_in,
-                                           const NekDouble x3_in)
+void ExpList::v_EvaluateBoundaryConditions(
+    [[maybe_unused]] const NekDouble time,
+    [[maybe_unused]] const std::string varName,
+    [[maybe_unused]] const NekDouble x2_in,
+    [[maybe_unused]] const NekDouble x3_in)
 {
-    boost::ignore_unused(time, varName, x2_in, x3_in);
     NEKERROR(ErrorUtil::efatal,
              "This method is not defined or valid for this class type");
 }
@@ -5423,11 +5413,10 @@ map<int, RobinBCInfoSharedPtr> ExpList::v_GetRobinBCInfo(void)
 
 /**
  */
-void ExpList::v_GetPeriodicEntities(PeriodicMap &periodicVerts,
-                                    PeriodicMap &periodicEdges,
-                                    PeriodicMap &periodicFaces)
+void ExpList::v_GetPeriodicEntities([[maybe_unused]] PeriodicMap &periodicVerts,
+                                    [[maybe_unused]] PeriodicMap &periodicEdges,
+                                    [[maybe_unused]] PeriodicMap &periodicFaces)
 {
-    boost::ignore_unused(periodicVerts, periodicEdges, periodicFaces);
     NEKERROR(ErrorUtil::efatal,
              "This method is not defined or valid for this class type");
 }
@@ -5453,9 +5442,8 @@ SpatialDomains::BoundaryConditionShPtr ExpList::GetBoundaryCondition(
     return boundaryCondition;
 }
 
-ExpListSharedPtr &ExpList::v_GetPlane(int n)
+ExpListSharedPtr &ExpList::v_GetPlane([[maybe_unused]] int n)
 {
-    boost::ignore_unused(n);
     NEKERROR(ErrorUtil::efatal,
              "This method is not defined or valid for this class type");
     return NullExpListSharedPtr;
@@ -5655,11 +5643,10 @@ LibUtilities::NekManager<GlobalLinSysKey, GlobalLinSys>
     return v_GetGlobalLinSysManager();
 }
 
-void ExpList::v_PhysInterp1DScaled(const NekDouble scale,
+void ExpList::v_PhysInterp1DScaled([[maybe_unused]] const NekDouble scale,
                                    const Array<OneD, NekDouble> &inarray,
                                    Array<OneD, NekDouble> &outarray)
 {
-    boost::ignore_unused(scale);
     // the scaling factor for the PhysInterp1DScaled is given as NekDouble
     // however inside Collections it is treated as a FactorMap
     // defining needed FactorMap to pass the scaling factor as an input to
@@ -5706,11 +5693,10 @@ void ExpList::v_PhysInterp1DScaled(const NekDouble scale,
     timer.AccumulateRegion("Collections:PhysInterp1DScaled", 10);
 }
 void ExpList::v_AddTraceIntegralToOffDiag(
-    const Array<OneD, const NekDouble> &FwdFlux,
-    const Array<OneD, const NekDouble> &BwdFlux,
-    Array<OneD, NekDouble> &outarray)
+    [[maybe_unused]] const Array<OneD, const NekDouble> &FwdFlux,
+    [[maybe_unused]] const Array<OneD, const NekDouble> &BwdFlux,
+    [[maybe_unused]] Array<OneD, NekDouble> &outarray)
 {
-    boost::ignore_unused(FwdFlux, BwdFlux, outarray);
     NEKERROR(ErrorUtil::efatal, "AddTraceIntegralToOffDiag not defined");
 }
 

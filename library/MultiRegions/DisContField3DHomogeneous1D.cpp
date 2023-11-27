@@ -33,8 +33,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LocalRegions/Expansion1D.h>
 #include <MultiRegions/DisContField.h>
 #include <MultiRegions/DisContField3DHomogeneous1D.h>
@@ -600,10 +598,10 @@ std::map<int, RobinBCInfoSharedPtr> DisContField3DHomogeneous1D::
 }
 
 void DisContField3DHomogeneous1D::v_EvaluateBoundaryConditions(
-    const NekDouble time, const std::string varName, const NekDouble x2_in,
-    const NekDouble x3_in)
+    const NekDouble time, const std::string varName,
+    [[maybe_unused]] const NekDouble x2_in,
+    [[maybe_unused]] const NekDouble x3_in)
 {
-    boost::ignore_unused(x2_in, x3_in);
     int i;
     int npoints;
     int nbnd = m_bndCondExpansions.size();

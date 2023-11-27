@@ -71,10 +71,8 @@ void DriverParareal::v_InitObject(std::ostream &out)
 /**
  *
  */
-void DriverParareal::v_Execute(std::ostream &out)
+void DriverParareal::v_Execute([[maybe_unused]] std::ostream &out)
 {
-    boost::ignore_unused(out);
-
     // Get and assert parameters from session file.
     AssertParameters();
 

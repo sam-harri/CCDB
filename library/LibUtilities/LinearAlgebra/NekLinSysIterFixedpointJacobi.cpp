@@ -72,10 +72,9 @@ NekLinSysIterFixedpointJacobi::~NekLinSysIterFixedpointJacobi()
  */
 int NekLinSysIterFixedpointJacobi::v_SolveSystem(
     const int nGlobal, const Array<OneD, const NekDouble> &pRhs,
-    Array<OneD, NekDouble> &pSolution, const int nDir, const NekDouble tol,
-    const NekDouble factor)
+    Array<OneD, NekDouble> &pSolution, [[maybe_unused]] const int nDir,
+    const NekDouble tol, const NekDouble factor)
 {
-    boost::ignore_unused(nDir);
 
     int niterations = 0;
     m_tolerance     = max(tol, 1.0E-16);

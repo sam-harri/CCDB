@@ -36,8 +36,6 @@
 #ifndef EXPLIST3DHOMO1D_H
 #define EXPLIST3DHOMO1D_H
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <MultiRegions/ExpListHomogeneous1D.h>
 #include <MultiRegions/MultiRegionsDeclspec.h>
 #include <vector>
@@ -128,11 +126,10 @@ protected:
 
     Array<OneD, const NekDouble> v_HomogeneousEnergy(void) override;
 
-    void v_GetPeriodicEntities(PeriodicMap &periodicVerts,
-                               PeriodicMap &periodicEdges,
-                               PeriodicMap &periodicFaces) override
+    void v_GetPeriodicEntities(
+        PeriodicMap &periodicVerts, PeriodicMap &periodicEdges,
+        [[maybe_unused]] PeriodicMap &periodicFaces) override
     {
-        boost::ignore_unused(periodicFaces);
         m_planes[0]->GetPeriodicEntities(periodicVerts, periodicEdges);
     }
 

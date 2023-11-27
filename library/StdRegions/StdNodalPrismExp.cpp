@@ -32,8 +32,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/Foundations/ManagerAccess.h> // for PointsManager, etc
 #include <StdRegions/StdNodalPrismExp.h>
 
@@ -238,9 +236,8 @@ void StdNodalPrismExp::v_FillMode(const int mode,
 //---------------------------------------
 
 int StdNodalPrismExp::v_GetVertexMap(const int localVertexId,
-                                     bool useCoeffPacking)
+                                     [[maybe_unused]] bool useCoeffPacking)
 {
-    boost::ignore_unused(useCoeffPacking);
     ASSERTL0(false, "Needs setting up");
     return localVertexId;
 }

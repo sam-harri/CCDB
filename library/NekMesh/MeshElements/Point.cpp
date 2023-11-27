@@ -32,8 +32,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <NekMesh/MeshElements/Point.h>
 
 using namespace std;
@@ -61,9 +59,8 @@ Point::Point(ElmtConfig pConf, vector<NodeSharedPtr> pNodeList,
 /**
  * @brief Return the number of nodes defining a point (i.e. return 1).
  */
-unsigned int Point::GetNumNodes(ElmtConfig pConf)
+unsigned int Point::GetNumNodes([[maybe_unused]] ElmtConfig pConf)
 {
-    boost::ignore_unused(pConf);
     return 1;
 }
 } // namespace Nektar::NekMesh

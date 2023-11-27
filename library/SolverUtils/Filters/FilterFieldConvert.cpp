@@ -37,7 +37,6 @@
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/algorithm/string/split.hpp>
-#include <boost/core/ignore_unused.hpp>
 #include <boost/program_options.hpp>
 
 namespace Nektar::SolverUtils
@@ -516,11 +515,11 @@ void FilterFieldConvert::v_Finalise(
 }
 
 void FilterFieldConvert::v_ProcessSample(
-    const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
-    std::vector<Array<OneD, NekDouble>> &fieldcoeffs, const NekDouble &time)
+    [[maybe_unused]] const Array<OneD, const MultiRegions::ExpListSharedPtr>
+        &pFields,
+    std::vector<Array<OneD, NekDouble>> &fieldcoeffs,
+    [[maybe_unused]] const NekDouble &time)
 {
-    boost::ignore_unused(pFields, time);
-
     for (int n = 0; n < m_outFields.size(); ++n)
     {
         Vmath::Vcopy(m_outFields[n].size(), fieldcoeffs[n], 1, m_outFields[n],

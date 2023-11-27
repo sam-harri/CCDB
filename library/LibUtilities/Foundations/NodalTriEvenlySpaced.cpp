@@ -32,8 +32,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/Foundations/NodalTriEvenlySpaced.h>
 #include <vector>
 
@@ -58,9 +56,8 @@ bool isEdge(size_t i, size_t j, size_t npts)
     return i == 0 || j == 0 || i + j == npts - 1; // i+j=tot num of steps
 }
 
-bool isEdge_1(size_t i, size_t j, size_t npts)
+bool isEdge_1(size_t i, [[maybe_unused]] size_t j, [[maybe_unused]] size_t npts)
 {
-    boost::ignore_unused(j, npts);
     return i == 0;
 }
 

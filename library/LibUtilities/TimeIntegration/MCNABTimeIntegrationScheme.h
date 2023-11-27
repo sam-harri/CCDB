@@ -54,8 +54,7 @@ public:
                                std::vector<NekDouble> freeParams)
         : TimeIntegrationSchemeGLM("", 2, freeParams)
     {
-        boost::ignore_unused(variant);
-        boost::ignore_unused(order);
+        boost::ignore_unused(variant, order);
 
         m_integration_phases    = TimeIntegrationAlgorithmGLMVector(3);
         m_integration_phases[0] = TimeIntegrationAlgorithmGLMSharedPtr(
@@ -77,11 +76,9 @@ public:
     }
 
     static TimeIntegrationSchemeSharedPtr create(
-        std::string variant, size_t order, std::vector<NekDouble> freeParams)
+        [[maybe_unused]] std::string variant, [[maybe_unused]] size_t order,
+        std::vector<NekDouble> freeParams)
     {
-        boost::ignore_unused(variant);
-        boost::ignore_unused(order);
-
         TimeIntegrationSchemeSharedPtr p =
             MemoryManager<MCNABTimeIntegrationScheme>::AllocateSharedPtr(
                 "", 2, freeParams);

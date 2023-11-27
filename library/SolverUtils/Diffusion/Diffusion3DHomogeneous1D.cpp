@@ -36,8 +36,6 @@
 #include <iostream>
 using namespace std;
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <SolverUtils/Diffusion/Diffusion3DHomogeneous1D.h>
 
 namespace Nektar::SolverUtils
@@ -185,11 +183,9 @@ void Diffusion3DHomogeneous1D::v_Diffuse(
     const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
     const Array<OneD, Array<OneD, NekDouble>> &inarray,
     Array<OneD, Array<OneD, NekDouble>> &outarray,
-    const Array<OneD, Array<OneD, NekDouble>> &pFwd,
-    const Array<OneD, Array<OneD, NekDouble>> &pBwd)
+    [[maybe_unused]] const Array<OneD, Array<OneD, NekDouble>> &pFwd,
+    [[maybe_unused]] const Array<OneD, Array<OneD, NekDouble>> &pBwd)
 {
-    boost::ignore_unused(pFwd, pBwd);
-
     Array<OneD, NekDouble> tmp(m_numPoints), tmp2;
     Array<OneD, Array<OneD, NekDouble>> viscHComp;
     const int nPointsTot = fields[0]->GetNpoints();

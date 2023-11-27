@@ -32,8 +32,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/Foundations/Interp.h>
 #include <LibUtilities/Foundations/InterpCoeff.h>
 #include <LibUtilities/Foundations/ManagerAccess.h>
@@ -2254,10 +2252,8 @@ void Expansion2D::v_SetUpPhysNormals(const int edge)
 
 void Expansion2D::v_ReOrientTracePhysMap(const StdRegions::Orientation orient,
                                          Array<OneD, int> &idmap, const int nq0,
-                                         const int nq1)
+                                         [[maybe_unused]] const int nq1)
 {
-    boost::ignore_unused(nq1);
-
     if (idmap.size() != nq0)
     {
         idmap = Array<OneD, int>(nq0);

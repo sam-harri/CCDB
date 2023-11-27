@@ -32,8 +32,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/Foundations/Interp.h>
 #include <LibUtilities/Foundations/InterpCoeff.h>
 #include <LocalRegions/Expansion2D.h>
@@ -321,14 +319,11 @@ void Expansion3D::AddNormTraceInt(
 /**
  * For a given face add the \tilde{F}_1j contributions
  */
-void Expansion3D::AddFaceBoundaryInt(const int face,
-                                     ExpansionSharedPtr &FaceExp,
-                                     Array<OneD, NekDouble> &facePhys,
-                                     Array<OneD, NekDouble> &outarray,
-                                     const StdRegions::VarCoeffMap &varcoeffs)
+void Expansion3D::AddFaceBoundaryInt(
+    const int face, ExpansionSharedPtr &FaceExp,
+    Array<OneD, NekDouble> &facePhys, Array<OneD, NekDouble> &outarray,
+    [[maybe_unused]] const StdRegions::VarCoeffMap &varcoeffs)
 {
-    boost::ignore_unused(varcoeffs);
-
     int i;
     int order_f = FaceExp->GetNcoeffs();
     Array<OneD, NekDouble> coeff(order_f);
@@ -337,20 +332,6 @@ void Expansion3D::AddFaceBoundaryInt(const int face,
                      GetBasisNumModes(1), GetBasisNumModes(2), face,
                      GetTraceOrient(face));
     IndexMapValuesSharedPtr map = GetIndexMap(ikey);
-
-    //            StdRegions::VarCoeffType VarCoeff[3] =
-    //            {StdRegions::eVarCoeffD00,
-    //                                                    StdRegions::eVarCoeffD11,
-    //                                                    StdRegions::eVarCoeffD22};
-    //            StdRegions::VarCoeffMap::const_iterator x;
-    //            Array<OneD, NekDouble> varcoeff_work(nquad_e);
-    //
-    ///// @TODO Variable coeffs
-    //            if ((x = varcoeffs.find(VarCoeff[0])) != varcoeffs.end())
-    //            {
-    //                GetPhysEdgeVarCoeffsFromElement(edge,EdgeExp,x->second,varcoeff_work);
-    //                Vmath::Vmul(nquad_e,varcoeff_work,1,EdgeExp->GetPhys(),1,EdgeExp->UpdatePhys(),1);
-    //            }
 
     FaceExp->IProductWRTBase(facePhys, coeff);
 

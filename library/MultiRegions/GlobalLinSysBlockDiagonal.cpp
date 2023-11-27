@@ -32,8 +32,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <MultiRegions/GlobalVecLinSysBlockDiagonal.h>
 
 namespace Nektar
@@ -57,10 +55,9 @@ string GlobalVecLinSysDirectFull::className =
  */
 GlobalVecLinSys::GlobalVecLinSys(
     const GlobalLinSysKey &pKey, const std::weak_ptr<VecExpList> &pExpList,
-    const std::shared_ptr<AssemblyMap> &pLocToGloMap)
+    [[maybe_unused]] const std::shared_ptr<AssemblyMap> &pLocToGloMap)
     : m_linSysKey(pKey), m_expList(pExpList), m_verbose(true)
 {
-    boost::ignore_unused(pLocToGloMap);
 }
 
 /**

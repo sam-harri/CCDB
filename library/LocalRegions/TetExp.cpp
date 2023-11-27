@@ -32,8 +32,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/Foundations/Interp.h>
 #include <LibUtilities/Foundations/InterpCoeff.h>
 #include <LocalRegions/TetExp.h>
@@ -554,10 +552,8 @@ StdRegions::StdExpansionSharedPtr TetExp::v_GetLinStdExp(void) const
 void TetExp::v_ExtractDataToCoeffs(
     const NekDouble *data, const std::vector<unsigned int> &nummodes,
     const int mode_offset, NekDouble *coeffs,
-    std::vector<LibUtilities::BasisType> &fromType)
+    [[maybe_unused]] std::vector<LibUtilities::BasisType> &fromType)
 {
-    boost::ignore_unused(fromType);
-
     int data_order0 = nummodes[mode_offset];
     int fillorder0  = min(m_base[0]->GetNumModes(), data_order0);
     int data_order1 = nummodes[mode_offset + 1];

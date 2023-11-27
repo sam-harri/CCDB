@@ -282,9 +282,9 @@ public:
         }
     }
 
-    NEK_FORCE_INLINE void SetVarDiffusion(Array<OneD, NekDouble> diff)
+    NEK_FORCE_INLINE void SetVarDiffusion(
+        [[maybe_unused]] Array<OneD, NekDouble> diff)
     {
-        boost::ignore_unused(diff);
         m_isVarDiff      = true;
         m_isConstVarDiff = false;
 

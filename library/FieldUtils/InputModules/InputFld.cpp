@@ -36,8 +36,6 @@
 #include <string>
 using namespace std;
 
-#include <boost/core/ignore_unused.hpp>
-
 #include "InputFld.h"
 using namespace Nektar;
 
@@ -79,10 +77,8 @@ InputFld::~InputFld()
 /**
  *
  */
-void InputFld::v_Process(po::variables_map &vm)
+void InputFld::v_Process([[maybe_unused]] po::variables_map &vm)
 {
-    boost::ignore_unused(vm);
-
     int i;
     string fileName = m_config["infile"].as<string>();
 

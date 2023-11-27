@@ -36,7 +36,6 @@
 #include <string>
 using namespace std;
 
-#include <boost/core/ignore_unused.hpp>
 #include <boost/format.hpp>
 
 #include "OutputStdOut.h"
@@ -57,9 +56,8 @@ OutputStdOut::~OutputStdOut()
 {
 }
 
-void OutputStdOut::v_Process(po::variables_map &vm)
+void OutputStdOut::v_Process([[maybe_unused]] po::variables_map &vm)
 {
-    boost::ignore_unused(vm);
 }
 
 } // namespace Nektar::FieldUtils

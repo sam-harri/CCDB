@@ -81,10 +81,10 @@ size_t NoSchemeTimeIntegrationScheme::v_GetNumIntegrationPhases() const
  * @brief Worker method to initialize the integration scheme.
  */
 void NoSchemeTimeIntegrationScheme::v_InitializeScheme(
-    const NekDouble deltaT, ConstDoubleArray &y_0, const NekDouble time,
-    const TimeIntegrationSchemeOperators &op)
+    [[maybe_unused]] const NekDouble deltaT, ConstDoubleArray &y_0,
+    [[maybe_unused]] const NekDouble time,
+    [[maybe_unused]] const TimeIntegrationSchemeOperators &op)
 {
-    boost::ignore_unused(deltaT, time, op);
     m_doubleArray = y_0;
 }
 
@@ -92,9 +92,9 @@ void NoSchemeTimeIntegrationScheme::v_InitializeScheme(
  * @brief Worker method that actually does the time integration.
  */
 ConstDoubleArray &NoSchemeTimeIntegrationScheme::v_TimeIntegrate(
-    const size_t timestep, const NekDouble delta_t)
+    [[maybe_unused]] const size_t timestep,
+    [[maybe_unused]] const NekDouble delta_t)
 {
-    boost::ignore_unused(timestep, delta_t);
     return m_doubleArray;
 }
 

@@ -35,7 +35,6 @@
 #include <iostream>
 #include <string>
 
-#include <boost/core/ignore_unused.hpp>
 #include <boost/geometry.hpp>
 
 #include <FieldUtils/Interpolator.h>

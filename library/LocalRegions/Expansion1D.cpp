@@ -32,8 +32,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LocalRegions/Expansion1D.h>
 #include <LocalRegions/Expansion2D.h>
 
@@ -285,12 +283,10 @@ DNekMatSharedPtr Expansion1D::v_GenMatrix(const StdRegions::StdMatrixKey &mkey)
     return returnval;
 }
 
-void Expansion1D::AddNormTraceInt(const int dir,
+void Expansion1D::AddNormTraceInt([[maybe_unused]] const int dir,
                                   Array<OneD, const NekDouble> &inarray,
                                   Array<OneD, NekDouble> &outarray)
 {
-    boost::ignore_unused(dir);
-
     int k;
     int nbndry                                = NumBndryCoeffs();
     int nquad                                 = GetNumPoints(0);
@@ -459,10 +455,9 @@ NekDouble Expansion1D::v_VectorFlux(
 */
 void Expansion1D::v_NormalTraceDerivFactors(
     Array<OneD, Array<OneD, NekDouble>> &factors,
-    Array<OneD, Array<OneD, NekDouble>> &d0factors,
-    Array<OneD, Array<OneD, NekDouble>> &d1factors)
+    [[maybe_unused]] Array<OneD, Array<OneD, NekDouble>> &d0factors,
+    [[maybe_unused]] Array<OneD, Array<OneD, NekDouble>> &d1factors)
 {
-    boost::ignore_unused(d0factors, d1factors); // for 2D&3D shapes
     int nquad = GetNumPoints(0);
     Array<TwoD, const NekDouble> gmat =
         m_metricinfo->GetDerivFactors(GetPointsKeys());
@@ -504,12 +499,11 @@ void Expansion1D::v_NormalTraceDerivFactors(
     }
 }
 
-void Expansion1D::v_ReOrientTracePhysMap(const StdRegions::Orientation orient,
-                                         Array<OneD, int> &idmap, const int nq0,
-                                         const int nq1)
+void Expansion1D::v_ReOrientTracePhysMap(
+    [[maybe_unused]] const StdRegions::Orientation orient,
+    Array<OneD, int> &idmap, [[maybe_unused]] const int nq0,
+    [[maybe_unused]] const int nq1)
 {
-    boost::ignore_unused(orient, nq0, nq1);
-
     if (idmap.size() != 1)
     {
         idmap = Array<OneD, int>(1);
@@ -518,9 +512,9 @@ void Expansion1D::v_ReOrientTracePhysMap(const StdRegions::Orientation orient,
     idmap[0] = 0;
 }
 
-void Expansion1D::v_TraceNormLen(const int traceid, NekDouble &h, NekDouble &p)
+void Expansion1D::v_TraceNormLen([[maybe_unused]] const int traceid,
+                                 NekDouble &h, NekDouble &p)
 {
-    boost::ignore_unused(traceid);
     h = GetGeom()->GetVertex(1)->dist(*GetGeom()->GetVertex(0));
     p = m_ncoeffs - 1;
 }

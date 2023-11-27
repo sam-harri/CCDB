@@ -32,8 +32,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <SolverUtils/Forcing/ForcingProgrammatic.h>
 
 namespace Nektar::SolverUtils
@@ -57,10 +55,9 @@ Array<OneD, Array<OneD, NekDouble>> &ForcingProgrammatic::UpdateForces()
 
 void ForcingProgrammatic::v_InitObject(
     const Array<OneD, MultiRegions::ExpListSharedPtr> &pFields,
-    const unsigned int &pNumForcingFields, const TiXmlElement *pForce)
+    const unsigned int &pNumForcingFields,
+    [[maybe_unused]] const TiXmlElement *pForce)
 {
-    boost::ignore_unused(pForce);
-
     m_NumVariable = pNumForcingFields;
     int nq        = pFields[0]->GetTotPoints();
 
@@ -72,12 +69,11 @@ void ForcingProgrammatic::v_InitObject(
 }
 
 void ForcingProgrammatic::v_Apply(
-    const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
-    const Array<OneD, Array<OneD, NekDouble>> &inarray,
-    Array<OneD, Array<OneD, NekDouble>> &outarray, const NekDouble &time)
+    [[maybe_unused]] const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
+    [[maybe_unused]] const Array<OneD, Array<OneD, NekDouble>> &inarray,
+    Array<OneD, Array<OneD, NekDouble>> &outarray,
+    [[maybe_unused]] const NekDouble &time)
 {
-    boost::ignore_unused(fields, inarray, time);
-
     for (int i = 0; i < m_NumVariable; i++)
     {
         Vmath::Vadd(outarray[i].size(), outarray[i], 1, m_Forcing[i], 1,

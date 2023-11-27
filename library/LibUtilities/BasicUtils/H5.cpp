@@ -32,8 +32,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/BasicUtils/H5.h>
 #include <LibUtilities/Foundations/BasisType.h>
 
@@ -316,11 +314,10 @@ bool CanHaveGroupsDataSets::LinkIterator::operator==(
 {
     return (m_grp == other.m_grp && m_idx == other.m_idx);
 }
-herr_t CanHaveGroupsDataSets::LinkIterator::helper(hid_t g_id, const char *name,
-                                                   const H5L_info_t *info,
-                                                   void *op_data)
+herr_t CanHaveGroupsDataSets::LinkIterator::helper(
+    [[maybe_unused]] hid_t g_id, const char *name,
+    [[maybe_unused]] const H5L_info_t *info, void *op_data)
 {
-    boost::ignore_unused(g_id, info);
     CanHaveGroupsDataSets::LinkIterator *iter =
         static_cast<CanHaveGroupsDataSets::LinkIterator *>(op_data);
     iter->m_currentName = name;
@@ -388,11 +385,10 @@ bool CanHaveAttributes::AttrIterator::operator==(
     return m_obj == other.m_obj && m_idx == other.m_idx;
 }
 
-herr_t CanHaveAttributes::AttrIterator::helper(hid_t g_id, const char *name,
-                                               const H5A_info_t *info,
-                                               void *op_data)
+herr_t CanHaveAttributes::AttrIterator::helper(
+    [[maybe_unused]] hid_t g_id, const char *name,
+    [[maybe_unused]] const H5A_info_t *info, void *op_data)
 {
-    boost::ignore_unused(g_id, info);
     CanHaveAttributes::AttrIterator *iter =
         static_cast<CanHaveAttributes::AttrIterator *>(op_data);
     iter->m_currentName = name;

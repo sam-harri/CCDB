@@ -704,7 +704,8 @@ NEK_FORCE_INLINE static void DiffusionCoeffTetKernel(
     const size_t nq0, const size_t nq1, const size_t nq2,
     const bool isConstVarDiff, const Array<OneD, NekDouble> &constVarDiff,
     const bool isVarDiff, const Array<OneD, NekDouble> &varD00,
-    const Array<OneD, NekDouble> &varD01, const Array<OneD, NekDouble> &varD11,
+    const Array<OneD, NekDouble> &varD01,
+    [[maybe_unused]] const Array<OneD, NekDouble> &varD11,
     const Array<OneD, NekDouble> &varD02, const Array<OneD, NekDouble> &varD12,
     const Array<OneD, NekDouble> &varD22, const vec_t *df_ptr,
     const std::vector<vec_t, allocator<vec_t>> &m_h0,
@@ -715,8 +716,6 @@ NEK_FORCE_INLINE static void DiffusionCoeffTetKernel(
     std::vector<vec_t, allocator<vec_t>> &deriv1,
     std::vector<vec_t, allocator<vec_t>> &deriv2)
 {
-    boost::ignore_unused(varD11);
-
     constexpr auto ndf = 9;
 
     vec_t df0, df1, df2, df3, df4, df5, df6, df7, df8;
@@ -935,15 +934,13 @@ NEK_FORCE_INLINE static void DiffusionCoeffPrismKernel(
 
     vec_t df0, df1, df2, df3, df4, df5, df6, df7, df8;
     vec_t g0, g1, g2, g3, g4, g5; // metrics
-    vec_t d00 = {1.0};
-    vec_t d01 = {0.0};
-    vec_t d11 = {1.0};
-    vec_t d02 = {0.0};
-    vec_t d12 = {0.0};
-    vec_t d22 = {1.0};                                 // var diffusion terms
+    [[maybe_unused]] vec_t d00 = {1.0};
+    [[maybe_unused]] vec_t d01 = {0.0};
+    [[maybe_unused]] vec_t d11 = {1.0};
+    [[maybe_unused]] vec_t d02 = {0.0};
+    [[maybe_unused]] vec_t d12 = {0.0};
+    [[maybe_unused]] vec_t d22 = {1.0};                // var diffusion terms
     vec_t td0, td1, td2, td3, td4, td5, td6, td7, td8; // temp terms for vardiff
-    boost::ignore_unused(d00, d01, d11, d02, d12, d22, td0, td1, td2, td3, td4,
-                         td5, td6, td7, td8);
 
     if (isConstVarDiff)
     {
@@ -1342,8 +1339,6 @@ NEK_FORCE_INLINE static void GetHelmholtz2DHalfSpace(
     std::vector<vec_t, allocator<vec_t>> &h0,
     std::vector<vec_t, allocator<vec_t>> &h1)
 {
-    boost::ignore_unused(SHAPE_TYPE);
-
     h0.resize(nq0);
     h1.resize(nq1);
 
@@ -1362,17 +1357,15 @@ NEK_FORCE_INLINE static void GetHelmholtz2DHalfSpace(
     defined(SHAPE_TYPE_PYR)
 template <LibUtilities::ShapeType SHAPE_TYPE>
 NEK_FORCE_INLINE static void GetHelmholtz3DHalfSpace(
-    const size_t nq0, const size_t nq1, const size_t nq2,
+    const size_t nq0, [[maybe_unused]] const size_t nq1, const size_t nq2,
     const Array<OneD, const NekDouble> &z0,
-    const Array<OneD, const NekDouble> &z1,
+    [[maybe_unused]] const Array<OneD, const NekDouble> &z1,
     const Array<OneD, const NekDouble> &z2,
     std::vector<vec_t, allocator<vec_t>> &h0,
     std::vector<vec_t, allocator<vec_t>> &h1,
-    std::vector<vec_t, allocator<vec_t>> &h2,
-    std::vector<vec_t, allocator<vec_t>> &h3)
+    [[maybe_unused]] std::vector<vec_t, allocator<vec_t>> &h2,
+    [[maybe_unused]] std::vector<vec_t, allocator<vec_t>> &h3)
 {
-    boost::ignore_unused(SHAPE_TYPE, nq1, z1, h2, h3);
-
 #if defined(SHAPE_TYPE_TET)
     h0.resize(nq0);
     h1.resize(nq1);
@@ -1443,8 +1436,8 @@ NEK_FORCE_INLINE static void DiffusionCoeff2DKernel(
     const Array<OneD, NekDouble> &constVarDiff, const bool isVarDiff,
     const Array<OneD, NekDouble> &varD00, const Array<OneD, NekDouble> &varD01,
     const Array<OneD, NekDouble> &varD11, const vec_t *df_ptr,
-    const std::vector<vec_t, allocator<vec_t>> &h0,
-    const std::vector<vec_t, allocator<vec_t>> &h1,
+    [[maybe_unused]] const std::vector<vec_t, allocator<vec_t>> &h0,
+    [[maybe_unused]] const std::vector<vec_t, allocator<vec_t>> &h1,
     std::vector<vec_t, allocator<vec_t>> &bwd,
     std::vector<vec_t, allocator<vec_t>> &deriv0,
     std::vector<vec_t, allocator<vec_t>> &deriv1)
@@ -1454,7 +1447,6 @@ NEK_FORCE_INLINE static void DiffusionCoeff2DKernel(
                                       isVarDiff, varD00, varD01, varD11, df_ptr,
                                       h0, h1, bwd, deriv0, deriv1);
 #elif defined(SHAPE_TYPE_QUAD)
-    boost::ignore_unused(h0, h1);
     DiffusionCoeffQuadKernel<DEFORMED>(nq0, nq1, isConstVarDiff, constVarDiff,
                                        isVarDiff, varD00, varD01, varD11,
                                        df_ptr, bwd, deriv0, deriv1);
@@ -1471,16 +1463,15 @@ NEK_FORCE_INLINE static void DiffusionCoeff3DKernel(
     const Array<OneD, NekDouble> &varD01, const Array<OneD, NekDouble> &varD11,
     const Array<OneD, NekDouble> &varD02, const Array<OneD, NekDouble> &varD12,
     const Array<OneD, NekDouble> &varD22, const vec_t *df_ptr,
-    const std::vector<vec_t, allocator<vec_t>> &h0,
-    const std::vector<vec_t, allocator<vec_t>> &h1,
-    const std::vector<vec_t, allocator<vec_t>> &h2,
-    const std::vector<vec_t, allocator<vec_t>> &h3,
+    [[maybe_unused]] const std::vector<vec_t, allocator<vec_t>> &h0,
+    [[maybe_unused]] const std::vector<vec_t, allocator<vec_t>> &h1,
+    [[maybe_unused]] const std::vector<vec_t, allocator<vec_t>> &h2,
+    [[maybe_unused]] const std::vector<vec_t, allocator<vec_t>> &h3,
     std::vector<vec_t, allocator<vec_t>> &deriv0,
     std::vector<vec_t, allocator<vec_t>> &deriv1,
     std::vector<vec_t, allocator<vec_t>> &deriv2)
 {
 #if defined(SHAPE_TYPE_HEX)
-    boost::ignore_unused(h0, h1, h2, h3);
     DiffusionCoeffHexKernel<DEFORMED>(
         nq0, nq1, nq2, isConstVarDiff, constVarDiff, isVarDiff, varD00, varD01,
         varD11, varD02, varD12, varD22, df_ptr, deriv0, deriv1, deriv2);
@@ -1490,12 +1481,10 @@ NEK_FORCE_INLINE static void DiffusionCoeff3DKernel(
                                       varD11, varD02, varD12, varD22, df_ptr,
                                       h0, h1, h2, h3, deriv0, deriv1, deriv2);
 #elif defined(SHAPE_TYPE_PRISM)
-    boost::ignore_unused(h2, h3);
     DiffusionCoeffPrismKernel<DEFORMED>(
         nq0, nq1, nq2, isConstVarDiff, constVarDiff, isVarDiff, varD00, varD01,
         varD11, varD02, varD12, varD22, df_ptr, h0, h1, deriv0, deriv1, deriv2);
 #elif defined(SHAPE_TYPE_PYR)
-    boost::ignore_unused(h3);
     DiffusionCoeffPyrKernel<DEFORMED>(nq0, nq1, nq2, isConstVarDiff,
                                       constVarDiff, isVarDiff, varD00, varD01,
                                       varD11, varD02, varD12, varD22, df_ptr,

@@ -36,7 +36,6 @@
 #define NEKTAR_LIBRARY_COLLECTIONS_MATRIXFREEBASE_H
 
 #include <StdRegions/StdExpansion.h>
-#include <boost/core/ignore_unused.hpp>
 
 namespace Nektar::Collections
 {

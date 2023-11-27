@@ -38,8 +38,6 @@
 #include <map>
 #include <string>
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/BasicUtils/SharedArray.hpp>
 #include <LibUtilities/Interpreter/Interpreter.h>
 

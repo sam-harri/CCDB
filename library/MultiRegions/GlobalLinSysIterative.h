@@ -142,10 +142,8 @@ private:
 
     void DoMatrixMultiplyFlag(const Array<OneD, NekDouble> &pInput,
                               Array<OneD, NekDouble> &pOutput,
-                              const bool &controlFlag)
+                              [[maybe_unused]] const bool &controlFlag)
     {
-        boost::ignore_unused(controlFlag);
-
         v_DoMatrixMultiply(pInput, pOutput);
     }
 

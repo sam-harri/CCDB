@@ -520,13 +520,13 @@ void NekLinSysIterGMRES::DoArnoldi(const int starttem, const int endtem,
 
 // QR factorization through Givens rotation
 void NekLinSysIterGMRES::DoGivensRotation(const int starttem, const int endtem,
-                                          const int nGlobal, const int nDir,
+                                          [[maybe_unused]] const int nGlobal,
+                                          [[maybe_unused]] const int nDir,
                                           Array<OneD, NekDouble> &c,
                                           Array<OneD, NekDouble> &s,
                                           Array<OneD, NekDouble> &hsingle,
                                           Array<OneD, NekDouble> &eta)
 {
-    boost::ignore_unused(nGlobal, nDir);
     NekDouble temp_dbl;
     NekDouble dd;
     NekDouble hh;

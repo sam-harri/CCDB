@@ -32,8 +32,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <MultiRegions/ExpList.h>
 #include <SolverUtils/Forcing/ForcingNoise.h>
 
@@ -108,12 +106,11 @@ void ForcingNoise::v_InitObject(
 }
 
 void ForcingNoise::v_Apply(
-    const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
-    const Array<OneD, Array<OneD, NekDouble>> &inarray,
-    Array<OneD, Array<OneD, NekDouble>> &outarray, const NekDouble &time)
+    [[maybe_unused]] const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
+    [[maybe_unused]] const Array<OneD, Array<OneD, NekDouble>> &inarray,
+    Array<OneD, Array<OneD, NekDouble>> &outarray,
+    [[maybe_unused]] const NekDouble &time)
 {
-    boost::ignore_unused(fields, inarray, time);
-
     // Do not apply forcing if exceeded m_numSteps
     if (m_numSteps && (m_index >= m_numSteps))
     {

@@ -41,8 +41,6 @@
 #include <string>
 #include <vector>
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/BasicUtils/ErrorUtil.hpp>
 #include <LibUtilities/Communication/Comm.h>
 
@@ -395,9 +393,9 @@ class DataType : public Object
 {
 public:
     static DataTypeSharedPtr String(size_t len = 0);
-    template <class T> static DataTypeSharedPtr OfObject(const T &obj)
+    template <class T>
+    static DataTypeSharedPtr OfObject([[maybe_unused]] const T &obj)
     {
-        boost::ignore_unused(obj);
         return DataTypeTraits<T>::GetType();
     }
     DataTypeSharedPtr Copy() const;

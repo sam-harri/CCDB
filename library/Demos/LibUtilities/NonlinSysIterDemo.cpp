@@ -100,9 +100,8 @@ public:
     }
 
     void DoLhs(InArrayType &inarray, OutArrayType &outarray,
-               const bool &flag = false)
+               [[maybe_unused]] const bool &flag = false)
     {
-        boost::ignore_unused(flag);
         const Array<OneD, const NekDouble> refsol =
             m_nonlinsol->GetRefSolution();
 
@@ -117,9 +116,8 @@ public:
     }
 
     void DoRhs(InArrayType &inarray, OutArrayType &outarray,
-               const bool &flag = false)
+               [[maybe_unused]] const bool &flag = false)
     {
-        boost::ignore_unused(flag);
         ASSERTL1(m_matDim == inarray.size(),
                  "CoeffMat dim not equal to NekSys dim in DoRhs");
         NekDouble x  = inarray[0];

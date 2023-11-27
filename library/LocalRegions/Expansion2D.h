@@ -35,8 +35,6 @@
 #ifndef EXPANSION2D_H
 #define EXPANSION2D_H
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LocalRegions/Expansion1D.h>
 #include <LocalRegions/LocalRegionsDeclspec.h>
 #include <LocalRegions/MatrixKey.h>

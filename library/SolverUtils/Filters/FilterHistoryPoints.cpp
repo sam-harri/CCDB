@@ -39,7 +39,6 @@ using namespace std;
 #include <LibUtilities/Memory/NekMemoryManager.hpp>
 #include <MultiRegions/ExpList3DHomogeneous1D.h>
 #include <SolverUtils/Filters/FilterHistoryPoints.h>
-#include <boost/core/ignore_unused.hpp>
 #include <boost/format.hpp>
 
 namespace Nektar::SolverUtils
@@ -685,10 +684,8 @@ void FilterHistoryPoints::v_WriteData(const int &rank,
  */
 void FilterHistoryPoints::v_Finalise(
     const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
-    const NekDouble &time)
+    [[maybe_unused]] const NekDouble &time)
 {
-    boost::ignore_unused(time);
-
     if (pFields[0]->GetComm()->GetRank() == 0 && m_outputOneFile)
     {
         m_outputStream.close();

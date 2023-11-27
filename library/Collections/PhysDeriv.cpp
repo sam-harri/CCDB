@@ -35,9 +35,7 @@
 #include <Collections/Collection.h>
 #include <Collections/MatrixFreeBase.h>
 #include <Collections/Operator.h>
-
 #include <MatrixFreeOps/Operator.hpp>
-#include <boost/core/ignore_unused.hpp>
 
 using namespace std;
 
@@ -192,10 +190,9 @@ public:
         }
     }
 
-    void CheckFactors(StdRegions::FactorMap factors,
-                      int coll_phys_offset) override
+    void CheckFactors([[maybe_unused]] StdRegions::FactorMap factors,
+                      [[maybe_unused]] int coll_phys_offset) override
     {
-        boost::ignore_unused(factors, coll_phys_offset);
         ASSERTL0(false, "Not valid for this operator.");
     }
 
@@ -288,10 +285,8 @@ public:
                     Array<OneD, NekDouble> &output0,
                     Array<OneD, NekDouble> &output1,
                     Array<OneD, NekDouble> &output2,
-                    Array<OneD, NekDouble> &wsp) final
+                    [[maybe_unused]] Array<OneD, NekDouble> &wsp) final
     {
-        boost::ignore_unused(wsp);
-
         if (m_isPadded)
         {
             // copy into padded vector
@@ -328,9 +323,8 @@ public:
 
     void operator()(int dir, const Array<OneD, const NekDouble> &input,
                     Array<OneD, NekDouble> &output,
-                    Array<OneD, NekDouble> &wsp) final
+                    [[maybe_unused]] Array<OneD, NekDouble> &wsp) final
     {
-        boost::ignore_unused(wsp);
         if (m_isPadded)
         {
             // copy into padded vector
@@ -344,10 +338,9 @@ public:
         Vmath::Vcopy(m_nOut, m_output[dir], 1, output, 1);
     }
 
-    void CheckFactors(StdRegions::FactorMap factors,
-                      int coll_phys_offset) override
+    void CheckFactors([[maybe_unused]] StdRegions::FactorMap factors,
+                      [[maybe_unused]] int coll_phys_offset) override
     {
-        boost::ignore_unused(factors, coll_phys_offset);
         ASSERTL0(false, "Not valid for this operator.");
     }
 
@@ -553,10 +546,9 @@ public:
         }
     }
 
-    void CheckFactors(StdRegions::FactorMap factors,
-                      int coll_phys_offset) override
+    void CheckFactors([[maybe_unused]] StdRegions::FactorMap factors,
+                      [[maybe_unused]] int coll_phys_offset) override
     {
-        boost::ignore_unused(factors, coll_phys_offset);
         ASSERTL0(false, "Not valid for this operator.");
     }
 
@@ -628,10 +620,8 @@ public:
                     Array<OneD, NekDouble> &output0,
                     Array<OneD, NekDouble> &output1,
                     Array<OneD, NekDouble> &output2,
-                    Array<OneD, NekDouble> &wsp) final
+                    [[maybe_unused]] Array<OneD, NekDouble> &wsp) final
     {
-        boost::ignore_unused(wsp);
-
         const int nPhys = m_expList[0]->GetTotPoints();
         Array<OneD, NekDouble> tmp0, tmp1, tmp2;
 
@@ -674,10 +664,8 @@ public:
 
     void operator()(int dir, const Array<OneD, const NekDouble> &input,
                     Array<OneD, NekDouble> &output,
-                    Array<OneD, NekDouble> &wsp) final
+                    [[maybe_unused]] Array<OneD, NekDouble> &wsp) final
     {
-        boost::ignore_unused(wsp);
-
         const int nPhys = m_expList[0]->GetTotPoints();
         Array<OneD, NekDouble> tmp;
 
@@ -689,10 +677,9 @@ public:
         }
     }
 
-    void CheckFactors(StdRegions::FactorMap factors,
-                      int coll_phys_offset) override
+    void CheckFactors([[maybe_unused]] StdRegions::FactorMap factors,
+                      [[maybe_unused]] int coll_phys_offset) override
     {
-        boost::ignore_unused(factors, coll_phys_offset);
         ASSERTL0(false, "Not valid for this operator.");
     }
 
@@ -844,10 +831,9 @@ public:
         }
     }
 
-    void CheckFactors(StdRegions::FactorMap factors,
-                      int coll_phys_offset) override
+    void CheckFactors([[maybe_unused]] StdRegions::FactorMap factors,
+                      [[maybe_unused]] int coll_phys_offset) override
     {
-        boost::ignore_unused(factors, coll_phys_offset);
         ASSERTL0(false, "Not valid for this operator.");
     }
 
@@ -1010,10 +996,9 @@ public:
         }
     }
 
-    void CheckFactors(StdRegions::FactorMap factors,
-                      int coll_phys_offset) override
+    void CheckFactors([[maybe_unused]] StdRegions::FactorMap factors,
+                      [[maybe_unused]] int coll_phys_offset) override
     {
-        boost::ignore_unused(factors, coll_phys_offset);
         ASSERTL0(false, "Not valid for this operator.");
     }
 
@@ -1198,10 +1183,9 @@ public:
         }
     }
 
-    void CheckFactors(StdRegions::FactorMap factors,
-                      int coll_phys_offset) override
+    void CheckFactors([[maybe_unused]] StdRegions::FactorMap factors,
+                      [[maybe_unused]] int coll_phys_offset) override
     {
-        boost::ignore_unused(factors, coll_phys_offset);
         ASSERTL0(false, "Not valid for this operator.");
     }
 
@@ -1415,10 +1399,9 @@ public:
         }
     }
 
-    void CheckFactors(StdRegions::FactorMap factors,
-                      int coll_phys_offset) override
+    void CheckFactors([[maybe_unused]] StdRegions::FactorMap factors,
+                      [[maybe_unused]] int coll_phys_offset) override
     {
-        boost::ignore_unused(factors, coll_phys_offset);
         ASSERTL0(false, "Not valid for this operator.");
     }
 
@@ -1666,10 +1649,9 @@ public:
         }
     }
 
-    void CheckFactors(StdRegions::FactorMap factors,
-                      int coll_phys_offset) override
+    void CheckFactors([[maybe_unused]] StdRegions::FactorMap factors,
+                      [[maybe_unused]] int coll_phys_offset) override
     {
-        boost::ignore_unused(factors, coll_phys_offset);
         ASSERTL0(false, "Not valid for this operator.");
     }
 
@@ -1919,10 +1901,9 @@ public:
         }
     }
 
-    void CheckFactors(StdRegions::FactorMap factors,
-                      int coll_phys_offset) override
+    void CheckFactors([[maybe_unused]] StdRegions::FactorMap factors,
+                      [[maybe_unused]] int coll_phys_offset) override
     {
-        boost::ignore_unused(factors, coll_phys_offset);
         ASSERTL0(false, "Not valid for this operator.");
     }
 
@@ -2176,10 +2157,9 @@ public:
         }
     }
 
-    void CheckFactors(StdRegions::FactorMap factors,
-                      int coll_phys_offset) override
+    void CheckFactors([[maybe_unused]] StdRegions::FactorMap factors,
+                      [[maybe_unused]] int coll_phys_offset) override
     {
-        boost::ignore_unused(factors, coll_phys_offset);
         ASSERTL0(false, "Not valid for this operator.");
     }
 

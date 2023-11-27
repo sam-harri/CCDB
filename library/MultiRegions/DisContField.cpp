@@ -517,9 +517,8 @@ bool DisContField::IsLeftAdjacentTrace(const int n, const int e)
 SpatialDomains::BoundaryConditionsSharedPtr DisContField::GetDomainBCs(
     const SpatialDomains::CompositeMap &domain,
     const SpatialDomains::BoundaryConditions &Allbcs,
-    const std::string &variable)
+    [[maybe_unused]] const std::string &variable)
 {
-    boost::ignore_unused(variable);
     SpatialDomains::BoundaryConditionsSharedPtr returnval;
 
     returnval =
@@ -3393,10 +3392,10 @@ GlobalLinSysKey DisContField::v_HelmSolve(
     const Array<OneD, const NekDouble> &inarray,
     Array<OneD, NekDouble> &outarray, const StdRegions::ConstFactorMap &factors,
     const StdRegions::VarCoeffMap &varcoeff,
-    const MultiRegions::VarFactorsMap &varfactors,
-    const Array<OneD, const NekDouble> &dirForcing, const bool PhysSpaceForcing)
+    [[maybe_unused]] const MultiRegions::VarFactorsMap &varfactors,
+    [[maybe_unused]] const Array<OneD, const NekDouble> &dirForcing,
+    const bool PhysSpaceForcing)
 {
-    boost::ignore_unused(varfactors, dirForcing);
     int i, n, cnt, nbndry;
     int nexp = GetExpSize();
     Array<OneD, NekDouble> f(m_ncoeffs);

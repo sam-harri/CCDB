@@ -33,7 +33,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include <boost/algorithm/string/predicate.hpp>
-#include <boost/core/ignore_unused.hpp>
 
 #include <Collections/CollectionOptimisation.h>
 #include <LibUtilities/BasicUtils/ParseUtils.h>
@@ -393,10 +392,8 @@ OperatorImpMap CollectionOptimisation::GetOperatorImpMap(
 
 OperatorImpMap CollectionOptimisation::SetWithTimings(
     vector<StdRegions::StdExpansionSharedPtr> pCollExp,
-    OperatorImpMap &impTypes, bool verbose)
+    [[maybe_unused]] OperatorImpMap &impTypes, bool verbose)
 {
-    boost::ignore_unused(impTypes);
-
     OperatorImpMap ret;
 
     StdRegions::StdExpansionSharedPtr pExp = pCollExp[0];

@@ -552,16 +552,12 @@ struct PhysDerivTemplate
     NEK_FORCE_INLINE void PhysDeriv2DKernel(
         const int nq0, const int nq1, const size_t outdim,
         const std::vector<vec_t, allocator<vec_t>> &in,
-        const std::vector<vec_t, allocator<vec_t>> &Z0,
-        const std::vector<vec_t, allocator<vec_t>> &Z1,
+        [[maybe_unused]] const std::vector<vec_t, allocator<vec_t>> &Z0,
+        [[maybe_unused]] const std::vector<vec_t, allocator<vec_t>> &Z1,
         const std::vector<vec_t, allocator<vec_t>> &D0,
         const std::vector<vec_t, allocator<vec_t>> &D1, const vec_t *df_ptr,
         vec_t *df_tmp, std::vector<vec_t, allocator<vec_t>> *out)
     {
-#if defined(SHAPE_TYPE_QUAD)
-        boost::ignore_unused(Z0, Z1);
-#endif
-
         // Results written to out_d0, out_d1
         PhysDerivTensor2DKernel(nq0, nq1, in, D0, D1, out[0], out[1]);
 
@@ -651,21 +647,21 @@ struct PhysDerivTemplate
     NEK_FORCE_INLINE void PhysDeriv3DKernel(
         const int nq0, const int nq1, const int nq2,
         const std::vector<vec_t, allocator<vec_t>> &in,
-        const std::vector<vec_t, allocator<vec_t>> &Z0,
-        const std::vector<vec_t, allocator<vec_t>> &Z1,
-        const std::vector<vec_t, allocator<vec_t>> &Z2,
+        [[maybe_unused]] const std::vector<vec_t, allocator<vec_t>> &Z0,
+        [[maybe_unused]] const std::vector<vec_t, allocator<vec_t>> &Z1,
+        [[maybe_unused]] const std::vector<vec_t, allocator<vec_t>> &Z2,
         const std::vector<vec_t, allocator<vec_t>> &D0,
         const std::vector<vec_t, allocator<vec_t>> &D1,
         const std::vector<vec_t, allocator<vec_t>> &D2, const vec_t *df_ptr,
-        vec_t *df_tmp, std::vector<vec_t, allocator<vec_t>> &wsp0, // Tets only
-        std::vector<vec_t, allocator<vec_t>> &wsp1,                // Tets only
+        vec_t *df_tmp,
+        [[maybe_unused]] std::vector<vec_t, allocator<vec_t>>
+            &wsp0, // Tets only
+        [[maybe_unused]] std::vector<vec_t, allocator<vec_t>>
+            &wsp1, // Tets only
         std::vector<vec_t, allocator<vec_t>> &out_d0,
         std::vector<vec_t, allocator<vec_t>> &out_d1,
         std::vector<vec_t, allocator<vec_t>> &out_d2)
     {
-#ifndef SHAPE_TYPE_TET
-        boost::ignore_unused(Z0, Z1, Z2, wsp0, wsp1);
-#endif
         // Results written to out_d0, out_d1, out_d2
         PhysDerivTensor3DKernel(nq0, nq1, nq2, in, D0, D1, D2, out_d0, out_d1,
                                 out_d2);

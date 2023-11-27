@@ -32,8 +32,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/Foundations/InterpCoeff.h>
 #include <SolverUtils/Filters/FilterEnergy1D.h>
 
@@ -100,9 +98,8 @@ FilterEnergy1D::~FilterEnergy1D()
  */
 void FilterEnergy1D::v_Initialise(
     const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
-    const NekDouble &time)
+    [[maybe_unused]] const NekDouble &time)
 {
-    boost::ignore_unused(time);
     ASSERTL0(pFields[0]->GetExp(0)->GetNumBases() == 1,
              "The Energy 1D filter is only valid in 1D.");
 }
@@ -166,10 +163,10 @@ void FilterEnergy1D::v_Update(
 }
 
 void FilterEnergy1D::v_Finalise(
-    const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
-    const NekDouble &time)
+    [[maybe_unused]] const Array<OneD, const MultiRegions::ExpListSharedPtr>
+        &pFields,
+    [[maybe_unused]] const NekDouble &time)
 {
-    boost::ignore_unused(pFields, time);
     m_out.close();
 }
 

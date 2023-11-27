@@ -32,8 +32,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <Collections/Collection.h>
 #include <Collections/IProduct.h>
 #include <Collections/MatrixFreeBase.h>
@@ -85,12 +83,10 @@ public:
 
     void operator()(const Array<OneD, const NekDouble> &entry0,
                     Array<OneD, NekDouble> &entry1,
-                    Array<OneD, NekDouble> &entry2,
-                    Array<OneD, NekDouble> &entry3,
-                    Array<OneD, NekDouble> &wsp) final
+                    [[maybe_unused]] Array<OneD, NekDouble> &entry2,
+                    [[maybe_unused]] Array<OneD, NekDouble> &entry3,
+                    [[maybe_unused]] Array<OneD, NekDouble> &wsp) final
     {
-        boost::ignore_unused(entry2, entry3, wsp);
-
         unsigned int nmodes = m_expList[0]->GetNcoeffs();
         Array<OneD, NekDouble> tmp;
 
@@ -104,18 +100,17 @@ public:
         }
     }
 
-    void operator()(int dir, const Array<OneD, const NekDouble> &input,
-                    Array<OneD, NekDouble> &output,
-                    Array<OneD, NekDouble> &wsp) final
+    void operator()([[maybe_unused]] int dir,
+                    [[maybe_unused]] const Array<OneD, const NekDouble> &input,
+                    [[maybe_unused]] Array<OneD, NekDouble> &output,
+                    [[maybe_unused]] Array<OneD, NekDouble> &wsp) final
     {
-        boost::ignore_unused(dir, input, output, wsp);
         NEKERROR(ErrorUtil::efatal, "Not valid for this operator.");
     }
 
     void CheckFactors(StdRegions::FactorMap factors,
-                      int coll_phys_offset) override
+                      [[maybe_unused]] int coll_phys_offset) override
     {
-        boost::ignore_unused(coll_phys_offset);
         m_factors = factors;
     }
 
@@ -184,12 +179,10 @@ public:
 
     void operator()(const Array<OneD, const NekDouble> &input,
                     Array<OneD, NekDouble> &output,
-                    Array<OneD, NekDouble> &output1,
-                    Array<OneD, NekDouble> &output2,
+                    [[maybe_unused]] Array<OneD, NekDouble> &output1,
+                    [[maybe_unused]] Array<OneD, NekDouble> &output2,
                     Array<OneD, NekDouble> &wsp) final
     {
-        boost::ignore_unused(output1, output2);
-
         const int nCoeffs = m_stdExp->GetNcoeffs();
         const int nPhys   = m_stdExp->GetTotPoints();
 
@@ -411,11 +404,11 @@ public:
         }
     }
 
-    void operator()(int dir, const Array<OneD, const NekDouble> &input,
-                    Array<OneD, NekDouble> &output,
-                    Array<OneD, NekDouble> &wsp) final
+    void operator()([[maybe_unused]] int dir,
+                    [[maybe_unused]] const Array<OneD, const NekDouble> &input,
+                    [[maybe_unused]] Array<OneD, NekDouble> &output,
+                    [[maybe_unused]] Array<OneD, NekDouble> &wsp) final
     {
-        boost::ignore_unused(dir, input, output, wsp);
         NEKERROR(ErrorUtil::efatal, "Not valid for this operator.");
     }
 
@@ -426,10 +419,8 @@ public:
      * @param coll_phys_offset Unused
      */
     void CheckFactors(StdRegions::FactorMap factors,
-                      int coll_phys_offset) override
+                      [[maybe_unused]] int coll_phys_offset) override
     {
-        boost::ignore_unused(coll_phys_offset);
-
         // If match previous factors, nothing to do.
         if (m_factors == factors)
         {
@@ -570,12 +561,10 @@ public:
 
     void operator()(const Array<OneD, const NekDouble> &input,
                     Array<OneD, NekDouble> &output0,
-                    Array<OneD, NekDouble> &output1,
-                    Array<OneD, NekDouble> &output2,
-                    Array<OneD, NekDouble> &wsp) final
+                    [[maybe_unused]] Array<OneD, NekDouble> &output1,
+                    [[maybe_unused]] Array<OneD, NekDouble> &output2,
+                    [[maybe_unused]] Array<OneD, NekDouble> &wsp) final
     {
-        boost::ignore_unused(output1, output2, wsp);
-
         if (m_isPadded)
         {
             // copy into padded vector
@@ -589,11 +578,11 @@ public:
         }
     }
 
-    void operator()(int dir, const Array<OneD, const NekDouble> &input,
-                    Array<OneD, NekDouble> &output,
-                    Array<OneD, NekDouble> &wsp) final
+    void operator()([[maybe_unused]] int dir,
+                    [[maybe_unused]] const Array<OneD, const NekDouble> &input,
+                    [[maybe_unused]] Array<OneD, NekDouble> &output,
+                    [[maybe_unused]] Array<OneD, NekDouble> &wsp) final
     {
-        boost::ignore_unused(dir, input, output, wsp);
         NEKERROR(ErrorUtil::efatal, "Not valid for this operator.");
     }
 
@@ -601,10 +590,8 @@ public:
      *
      */
     void CheckFactors(StdRegions::FactorMap factors,
-                      int coll_phys_offset) override
+                      [[maybe_unused]] int coll_phys_offset) override
     {
-        boost::ignore_unused(coll_phys_offset);
-
         if (factors == m_factors)
         {
             return;

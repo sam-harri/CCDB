@@ -37,8 +37,6 @@
 
 #include <iostream>
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/BasicConst/NektarUnivTypeDefs.hpp>
 #include <LibUtilities/BasicUtils/SharedArray.hpp>
 #ifdef NEKTAR_USE_MPI
@@ -189,9 +187,10 @@ extern "C"
  *                      communication.
  * @return GSLib data structure containing mapping information.
  */
-static inline gs_data *Init(const Nektar::Array<OneD, long> pId,
-                            const LibUtilities::CommSharedPtr &pComm,
-                            bool verbose = true)
+static inline gs_data *Init(
+    [[maybe_unused]] const Nektar::Array<OneD, long> pId,
+    [[maybe_unused]] const LibUtilities::CommSharedPtr &pComm,
+    [[maybe_unused]] bool verbose = true)
 {
 #ifdef NEKTAR_USE_MPI
     if (pComm->IsSerial())
@@ -210,7 +209,6 @@ static inline gs_data *Init(const Nektar::Array<OneD, long> pId,
     MPI_Comm_free(&vComm.c);
     return result;
 #else
-    boost::ignore_unused(pId, pComm, verbose);
     return 0;
 #endif
 }
@@ -224,8 +222,9 @@ static inline gs_data *Init(const Nektar::Array<OneD, long> pId,
  * -distributed dot products, for which the contributions of each DOF must
  * be included only once.
  */
-static inline void Unique(const Nektar::Array<OneD, long> pId,
-                          const LibUtilities::CommSharedPtr &pComm)
+static inline void Unique(
+    [[maybe_unused]] const Nektar::Array<OneD, long> pId,
+    [[maybe_unused]] const LibUtilities::CommSharedPtr &pComm)
 {
 #ifdef NEKTAR_USE_MPI
     if (pComm->IsSerial())
@@ -240,15 +239,13 @@ static inline void Unique(const Nektar::Array<OneD, long> pId,
     vComm.id = vCommMpi->GetRank();
     vComm.np = vCommMpi->GetSize();
     nektar_gs_unique(pId.get(), pId.size(), &vComm);
-#else
-    boost::ignore_unused(pId, pComm);
 #endif
 }
 
 /**
  * @brief Deallocates the GSLib mapping data.
  */
-static inline void Finalise(gs_data *pGsh)
+static inline void Finalise([[maybe_unused]] gs_data *pGsh)
 {
 #ifdef NEKTAR_USE_MPI
     int finalized;
@@ -257,8 +254,6 @@ static inline void Finalise(gs_data *pGsh)
     {
         nektar_gs_free(pGsh);
     }
-#else
-    boost::ignore_unused(pGsh);
 #endif
 }
 
@@ -267,9 +262,11 @@ static inline void Finalise(gs_data *pGsh)
  *
  * The
  */
-static inline void Gather(
-    Nektar::Array<OneD, NekDouble> pU, gs_op pOp, gs_data *pGsh,
-    Nektar::Array<OneD, NekDouble> pBuffer = NullNekDouble1DArray)
+static inline void Gather([[maybe_unused]] Nektar::Array<OneD, NekDouble> pU,
+                          [[maybe_unused]] gs_op pOp,
+                          [[maybe_unused]] gs_data *pGsh,
+                          [[maybe_unused]] Nektar::Array<OneD, NekDouble>
+                              pBuffer = NullNekDouble1DArray)
 {
 #ifdef NEKTAR_USE_MPI
     if (!pGsh)
@@ -287,8 +284,6 @@ static inline void Gather(
         buf.n   = pBuffer.size();
         nektar_gs(pU.get(), gs_double, pOp, false, pGsh, &buf);
     }
-#else
-    boost::ignore_unused(pU, pOp, pGsh, pBuffer);
 #endif
 }
 } // namespace Gs

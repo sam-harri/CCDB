@@ -32,8 +32,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/BasicUtils/VmathArray.hpp>
 #include <SolverUtils/RiemannSolvers/RiemannSolver.h>
 
@@ -80,10 +78,9 @@ RiemannSolver::RiemannSolver() : m_requiresRotation(false), m_rotStorage(3)
 }
 
 RiemannSolver::RiemannSolver(
-    const LibUtilities::SessionReaderSharedPtr &pSession)
+    [[maybe_unused]] const LibUtilities::SessionReaderSharedPtr &pSession)
     : m_requiresRotation(false), m_rotStorage(3)
 {
-    boost::ignore_unused(pSession);
 }
 
 /**
@@ -542,12 +539,13 @@ void RiemannSolver::CalcFluxJacobian(
 }
 
 void RiemannSolver::v_CalcFluxJacobian(
-    const int nDim, const Array<OneD, const Array<OneD, NekDouble>> &Fwd,
-    const Array<OneD, const Array<OneD, NekDouble>> &Bwd,
-    const Array<OneD, const Array<OneD, NekDouble>> &normals,
-    DNekBlkMatSharedPtr &FJac, DNekBlkMatSharedPtr &BJac)
+    [[maybe_unused]] const int nDim,
+    [[maybe_unused]] const Array<OneD, const Array<OneD, NekDouble>> &Fwd,
+    [[maybe_unused]] const Array<OneD, const Array<OneD, NekDouble>> &Bwd,
+    [[maybe_unused]] const Array<OneD, const Array<OneD, NekDouble>> &normals,
+    [[maybe_unused]] DNekBlkMatSharedPtr &FJac,
+    [[maybe_unused]] DNekBlkMatSharedPtr &BJac)
 {
-    boost::ignore_unused(nDim, Fwd, Bwd, normals, FJac, BJac);
     NEKERROR(ErrorUtil::efatal, "v_CalcFluxJacobian not specified.");
 }
 

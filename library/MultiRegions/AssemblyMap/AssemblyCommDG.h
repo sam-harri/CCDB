@@ -83,10 +83,9 @@ public:
     MULTI_REGIONS_EXPORT Serial() = default;
 
     MULTI_REGIONS_EXPORT inline void PerformExchange(
-        const Array<OneD, NekDouble> &testFwd,
-        Array<OneD, NekDouble> &testBwd) final
+        [[maybe_unused]] const Array<OneD, NekDouble> &testFwd,
+        [[maybe_unused]] Array<OneD, NekDouble> &testBwd) final
     {
-        boost::ignore_unused(testFwd, testBwd);
     }
 };
 

@@ -71,10 +71,8 @@ void DriverPFASST::v_InitObject(std::ostream &out)
 /**
  *
  */
-void DriverPFASST::v_Execute(std::ostream &out)
+void DriverPFASST::v_Execute([[maybe_unused]] std::ostream &out)
 {
-    boost::ignore_unused(out);
-
     size_t step     = m_chunkRank;
     m_totalTime     = m_timestep[0] * m_nsteps[0];
     m_numWindowsPIT = m_nsteps[0] / m_numChunks;

@@ -32,8 +32,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <SolverUtils/Filters/FilterAverageFields.h>
 
 namespace Nektar::SolverUtils
@@ -65,11 +63,11 @@ FilterAverageFields::~FilterAverageFields()
 }
 
 void FilterAverageFields::v_ProcessSample(
-    const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
-    std::vector<Array<OneD, NekDouble>> &fieldcoeffs, const NekDouble &time)
+    [[maybe_unused]] const Array<OneD, const MultiRegions::ExpListSharedPtr>
+        &pFields,
+    std::vector<Array<OneD, NekDouble>> &fieldcoeffs,
+    [[maybe_unused]] const NekDouble &time)
 {
-    boost::ignore_unused(pFields, time);
-
     for (int n = 0; n < m_outFields.size(); ++n)
     {
         Vmath::Vadd(m_outFields[n].size(), fieldcoeffs[n], 1, m_outFields[n], 1,
@@ -78,11 +76,10 @@ void FilterAverageFields::v_ProcessSample(
 }
 
 void FilterAverageFields::v_PrepareOutput(
-    const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
-    const NekDouble &time)
+    [[maybe_unused]] const Array<OneD, const MultiRegions::ExpListSharedPtr>
+        &pFields,
+    [[maybe_unused]] const NekDouble &time)
 {
-    boost::ignore_unused(pFields, time);
-
     m_fieldMetaData["NumberOfFieldDumps"] = std::to_string(m_numSamples);
 }
 

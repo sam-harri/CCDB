@@ -197,9 +197,8 @@ DNekScalBlkMatSharedPtr GlobalLinSysIterativeStaticCond::v_GetStaticCondBlock(
  * @param   locToGloMap Local to global mapping information.
  */
 void GlobalLinSysIterativeStaticCond::v_AssembleSchurComplement(
-    const AssemblyMapSharedPtr pLocToGloMap)
+    [[maybe_unused]] const AssemblyMapSharedPtr pLocToGloMap)
 {
-    boost::ignore_unused(pLocToGloMap);
     // Set up unique map
     v_UniqueMap();
 

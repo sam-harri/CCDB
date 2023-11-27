@@ -35,8 +35,6 @@
 #ifndef NEKMESH_OCTREE_SOURCEPOINT_H
 #define NEKMESH_OCTREE_SOURCEPOINT_H
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/BasicUtils/SharedArray.hpp>
 #include <LibUtilities/Memory/NekMemoryManager.hpp>
 
@@ -89,14 +87,13 @@ public:
         return 0.0;
     }
 
-    virtual void SetDelta(NekDouble i)
+    virtual void SetDelta([[maybe_unused]] NekDouble i)
     {
-        boost::ignore_unused(i);
     }
 
-    virtual void GetCAD(int &surf, Array<OneD, NekDouble> &uv)
+    virtual void GetCAD([[maybe_unused]] int &surf,
+                        [[maybe_unused]] Array<OneD, NekDouble> &uv)
     {
-        boost::ignore_unused(surf, uv);
     }
 
     bool HasDelta()
@@ -261,9 +258,8 @@ public:
         return 0.0;
     }
 
-    void SetDelta(NekDouble i) override
+    void SetDelta([[maybe_unused]] NekDouble i) override
     {
-        boost::ignore_unused(i);
         NEKERROR(ErrorUtil::efatal,
                  "Cannot assign refinement delta to this type");
     }
@@ -275,9 +271,8 @@ public:
         return 0.0;
     }
 
-    void SetRDelta(NekDouble i)
+    void SetRDelta([[maybe_unused]] NekDouble i)
     {
-        boost::ignore_unused(i);
         NEKERROR(ErrorUtil::efatal, "Cannot assign delta to this type");
     }
 
@@ -327,15 +322,14 @@ public:
         return 0.0;
     }
 
-    void SetDelta(NekDouble i) override
+    void SetDelta([[maybe_unused]] NekDouble i) override
     {
-        boost::ignore_unused(i);
         NEKERROR(ErrorUtil::efatal, "Cannot assign delta to this type");
     }
 
-    void GetCAD(int &surf, Array<OneD, NekDouble> &uv) override
+    void GetCAD([[maybe_unused]] int &surf,
+                [[maybe_unused]] Array<OneD, NekDouble> &uv) override
     {
-        boost::ignore_unused(surf, uv);
         NEKERROR(ErrorUtil::efatal, "Cannot retrieve CAD from this type")
     }
 

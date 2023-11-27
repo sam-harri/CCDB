@@ -136,10 +136,9 @@ public:
     }
 
     void DoFixedPoint(InArrayType &rhs, InArrayType &inarray,
-                      OutArrayType &outarray, const bool &flag = false)
+                      OutArrayType &outarray,
+                      [[maybe_unused]] const bool &flag = false)
     {
-        boost::ignore_unused(flag);
-
         ASSERTL1(m_matDim == inarray.size(),
                  "CoeffMat dim not equal to NekSys dim in DoFixedPoint");
         NekVector<NekDouble> vecInn(m_matDim, inarray, eWrapper);
@@ -155,9 +154,8 @@ public:
     }
 
     void DoLhs(InArrayType &inarray, OutArrayType &outarray,
-               const bool &flag = false)
+               [[maybe_unused]] const bool &flag = false)
     {
-        boost::ignore_unused(flag);
         ASSERTL1(m_matDim == inarray.size(),
                  "CoeffMat dim not equal to NekSys dim in DoLhs");
         NekVector<NekDouble> vecInn(m_matDim, inarray, eWrapper);

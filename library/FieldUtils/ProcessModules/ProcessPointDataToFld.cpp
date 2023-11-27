@@ -36,13 +36,9 @@
 #include <string>
 using namespace std;
 
-#include <boost/core/ignore_unused.hpp>
-
-#include <LibUtilities/BasicUtils/SharedArray.hpp>
-
-#include <LibUtilities/BasicUtils/CsvIO.h>
-
 #include "ProcessPointDataToFld.h"
+#include <LibUtilities/BasicUtils/CsvIO.h>
+#include <LibUtilities/BasicUtils/SharedArray.hpp>
 
 namespace Nektar::FieldUtils
 {

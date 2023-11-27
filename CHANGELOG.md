@@ -72,6 +72,7 @@ v5.5.0
 - Added a sample python script for wallnormaldata module (!1663)
 - Replace boost::lexical_cast with std::to_string for integer variable (!1677)
 - Use `[[maybe_unused]]` attribute in solvers (!1683)
+- Use `[[maybe_unused]]` attribute in library (!1684)
 - Fix sse2 SIMD bug (!1559)
 
 v5.4.0

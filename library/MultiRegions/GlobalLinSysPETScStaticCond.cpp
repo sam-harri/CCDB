@@ -32,8 +32,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <MultiRegions/GlobalLinSysPETScStaticCond.h>
 
 #include <petscksp.h>
@@ -261,11 +259,9 @@ DNekScalBlkMatSharedPtr GlobalLinSysPETScStaticCond::v_GetStaticCondBlock(
     return schurComplBlock;
 }
 
-void GlobalLinSysPETScStaticCond::v_PreSolve(int scLevel,
-                                             Array<OneD, NekDouble> &F_bnd)
+void GlobalLinSysPETScStaticCond::v_PreSolve(
+    int scLevel, [[maybe_unused]] Array<OneD, NekDouble> &F_bnd)
 {
-    boost::ignore_unused(F_bnd);
-
     if (scLevel == 0)
     {
         // When matrices are supplied to the constructor at the top

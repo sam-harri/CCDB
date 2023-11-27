@@ -40,7 +40,6 @@
 #include <LibUtilities/Foundations/ManagerAccess.h>
 
 #include <boost/algorithm/string.hpp>
-#include <boost/core/ignore_unused.hpp>
 
 using namespace std;
 using namespace Nektar::NekMesh;
@@ -74,10 +73,8 @@ ProcessProjectCAD::~ProcessProjectCAD()
 
 bool ProcessProjectCAD::findAndProject(
     bgi::rtree<boxI, bgi::quadratic<16>> &rtree, Array<OneD, NekDouble> &in,
-    int &surf)
+    [[maybe_unused]] int &surf)
 {
-    boost::ignore_unused(surf);
-
     point q(in[0], in[1], in[2]);
     vector<boxI> result;
     rtree.query(bgi::intersects(q), back_inserter(result));

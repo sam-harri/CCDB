@@ -32,8 +32,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/LinearAlgebra/BlockMatrix.hpp>
 #include <LibUtilities/LinearAlgebra/ScaledMatrix.hpp>
 #include <LibUtilities/LinearAlgebra/StandardMatrix.hpp>
@@ -465,10 +463,10 @@ NekMatrix<NekMatrix<DataType, InnerMatrixType>, BlockMatrixTag>::CreateWrapper(
 
 template <typename DataType, typename InnerMatrixType>
 unsigned int NekMatrix<NekMatrix<DataType, InnerMatrixType>, BlockMatrixTag>::
-    GetNumberOfElementsInBlock(unsigned int block, unsigned int totalBlocks,
+    GetNumberOfElementsInBlock(unsigned int block,
+                               [[maybe_unused]] unsigned int totalBlocks,
                                const Array<OneD, unsigned int> &sizes)
 {
-    boost::ignore_unused(totalBlocks);
     ASSERTL2(block < totalBlocks,
              std::string("Block Element ") + std::to_string(block) +
                  std::string(" requested in a matrix with a maximum of ") +

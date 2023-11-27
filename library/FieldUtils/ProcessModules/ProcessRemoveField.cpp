@@ -35,8 +35,6 @@
 #include <string>
 using namespace std;
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/BasicUtils/ParseUtils.h>
 #include <LibUtilities/BasicUtils/SharedArray.hpp>
 
@@ -60,10 +58,8 @@ ProcessRemoveField::~ProcessRemoveField(void)
 {
 }
 
-void ProcessRemoveField::v_Process(po::variables_map &vm)
+void ProcessRemoveField::v_Process([[maybe_unused]] po::variables_map &vm)
 {
-    boost::ignore_unused(vm);
-
     // Obtain field names to be removed
     string fieldNames = m_config["fieldname"].as<string>();
     vector<string> fieldName;

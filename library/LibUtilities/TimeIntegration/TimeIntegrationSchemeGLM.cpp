@@ -105,10 +105,9 @@ ConstDoubleArray &TimeIntegrationSchemeGLM::v_TimeIntegrate(
 }
 
 void TimeIntegrationSchemeGLM::v_InitializeSecondaryData(
-    TimeIntegrationAlgorithmGLM *phase, NekDouble deltaT) const
+    [[maybe_unused]] TimeIntegrationAlgorithmGLM *phase,
+    [[maybe_unused]] NekDouble deltaT) const
 {
-    boost::ignore_unused(phase, deltaT);
-
     ASSERTL0(false,
              "No InitializeSecondaryData method for scheme " + GetFullName());
 }

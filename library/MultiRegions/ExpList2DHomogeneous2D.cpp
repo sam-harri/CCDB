@@ -33,8 +33,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <MultiRegions/ExpList2DHomogeneous2D.h>
 
 using namespace std;
@@ -127,13 +125,11 @@ void ExpList2DHomogeneous2D::SetCoeffPhys(void)
     }
 }
 
-void ExpList2DHomogeneous2D::v_GetCoords(const int eid,
+void ExpList2DHomogeneous2D::v_GetCoords([[maybe_unused]] const int eid,
                                          Array<OneD, NekDouble> &xc0,
                                          Array<OneD, NekDouble> &xc1,
                                          Array<OneD, NekDouble> &xc2)
 {
-    boost::ignore_unused(eid);
-
     int n, m, j;
     Array<OneD, NekDouble> tmp_xc;
     int nylines = m_homogeneousBasis_y->GetNumPoints();
@@ -310,10 +306,9 @@ void ExpList2DHomogeneous2D::v_WriteTecplotZone(std::ostream &outfile,
 }
 
 void ExpList2DHomogeneous2D::v_WriteVtkPieceHeader(std::ostream &outfile,
-                                                   int expansion, int istrip)
+                                                   int expansion,
+                                                   [[maybe_unused]] int istrip)
 {
-    boost::ignore_unused(istrip);
-
     int i, j;
 
     int nquad0 = 1;

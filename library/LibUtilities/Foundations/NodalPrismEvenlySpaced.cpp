@@ -32,8 +32,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/Foundations/NodalPrismEvenlySpaced.h>
 #include <vector>
 
@@ -55,33 +53,31 @@ bool isVertex(size_t x, size_t y, size_t z, size_t npts)
            (x == 0 && y == (npts - 1) && z == (npts - 1));
 }
 
-bool isEdge_01(size_t x, size_t y, size_t z, size_t npts)
+bool isEdge_01([[maybe_unused]] size_t x, size_t y, size_t z,
+               [[maybe_unused]] size_t npts)
 {
-    boost::ignore_unused(x, npts);
     return y == 0 && z == 0;
 }
 
-bool isEdge_12(size_t x, size_t y, size_t z, size_t npts)
+bool isEdge_12(size_t x, [[maybe_unused]] size_t y, size_t z, size_t npts)
 {
-    boost::ignore_unused(y);
     return x == (npts - 1) && z == 0;
 }
 
-bool isEdge_23(size_t x, size_t y, size_t z, size_t npts)
+bool isEdge_23([[maybe_unused]] size_t x, size_t y, size_t z, size_t npts)
 {
-    boost::ignore_unused(x);
     return y == (npts - 1) && z == 0;
 }
 
-bool isEdge_30(size_t x, size_t y, size_t z, size_t npts)
+bool isEdge_30(size_t x, [[maybe_unused]] size_t y, size_t z,
+               [[maybe_unused]] size_t npts)
 {
-    boost::ignore_unused(y, npts);
     return x == 0 && z == 0;
 }
 
-bool isEdge_04(size_t x, size_t y, size_t z, size_t npts)
+bool isEdge_04(size_t x, size_t y, [[maybe_unused]] size_t z,
+               [[maybe_unused]] size_t npts)
 {
-    boost::ignore_unused(z, npts);
     return x == 0 && y == 0;
 }
 
@@ -95,15 +91,13 @@ bool isEdge_25(size_t x, size_t y, size_t z, size_t npts)
     return x + z == (npts - 1) && y == (npts - 1);
 }
 
-bool isEdge_35(size_t x, size_t y, size_t z, size_t npts)
+bool isEdge_35(size_t x, size_t y, [[maybe_unused]] size_t z, size_t npts)
 {
-    boost::ignore_unused(z);
     return x == 0 && y == (npts - 1);
 }
 
-bool isEdge_45(size_t x, size_t y, size_t z, size_t npts)
+bool isEdge_45(size_t x, [[maybe_unused]] size_t y, size_t z, size_t npts)
 {
-    boost::ignore_unused(y);
     return x == 0 && z == (npts - 1);
 }
 
@@ -116,33 +110,32 @@ bool isEdge(size_t x, size_t y, size_t z, size_t npts)
            isEdge_45(x, y, z, npts);
 }
 
-bool isFace_0123(size_t x, size_t y, size_t z, size_t npts)
+bool isFace_0123([[maybe_unused]] size_t x, [[maybe_unused]] size_t y, size_t z,
+                 [[maybe_unused]] size_t npts)
 {
-    boost::ignore_unused(x, y, npts);
     return z == 0;
 }
 
-bool isFace_014(size_t x, size_t y, size_t z, size_t npts)
+bool isFace_014([[maybe_unused]] size_t x, size_t y, [[maybe_unused]] size_t z,
+                [[maybe_unused]] size_t npts)
 {
-    boost::ignore_unused(x, z, npts);
     return y == 0;
 }
 
-bool isFace_1254(size_t x, size_t y, size_t z, size_t npts)
+bool isFace_1254(size_t x, [[maybe_unused]] size_t y, size_t z, size_t npts)
 {
-    boost::ignore_unused(y);
     return x + z == npts - 1;
 }
 
-bool isFace_325(size_t x, size_t y, size_t z, size_t npts)
+bool isFace_325([[maybe_unused]] size_t x, size_t y, [[maybe_unused]] size_t z,
+                size_t npts)
 {
-    boost::ignore_unused(x, z);
     return y == (npts - 1);
 }
 
-bool isFace_0354(size_t x, size_t y, size_t z, size_t npts)
+bool isFace_0354(size_t x, [[maybe_unused]] size_t y, [[maybe_unused]] size_t z,
+                 [[maybe_unused]] size_t npts)
 {
-    boost::ignore_unused(y, z, npts);
     return x == 0;
 }
 

@@ -34,7 +34,6 @@
 
 #include <LibUtilities/Foundations/ManagerAccess.h>
 #include <boost/algorithm/string.hpp>
-#include <boost/core/ignore_unused.hpp>
 
 #include "InputStar.h"
 #include <NekMesh/MeshElements/Element.h>
@@ -481,11 +480,10 @@ static void PrismLineFaces(int prismid, map<int, int> &facelist,
     }
 }
 
-void InputStar::GenElement2D(vector<NodeSharedPtr> &VertNodes, int i,
-                             vector<int> &FaceNodes, int nComposite)
+void InputStar::GenElement2D(vector<NodeSharedPtr> &VertNodes,
+                             [[maybe_unused]] int i, vector<int> &FaceNodes,
+                             int nComposite)
 {
-    boost::ignore_unused(i);
-
     LibUtilities::ShapeType elType = LibUtilities::eTriangle;
 
     if (FaceNodes.size() == 4)
@@ -518,13 +516,11 @@ void InputStar::GenElement2D(vector<NodeSharedPtr> &VertNodes, int i,
     m_mesh->m_element[E->GetDim()].push_back(E);
 }
 
-void InputStar::GenElement3D(vector<NodeSharedPtr> &VertNodes, int i,
-                             vector<int> &ElementFaces,
+void InputStar::GenElement3D(vector<NodeSharedPtr> &VertNodes,
+                             [[maybe_unused]] int i, vector<int> &ElementFaces,
                              unordered_map<int, vector<int>> &FaceNodes,
                              int nComposite, bool DoOrient)
 {
-    boost::ignore_unused(i);
-
     LibUtilities::ShapeType elType = LibUtilities::eTetrahedron;
 
     // set up Node list
