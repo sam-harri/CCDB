@@ -21,5 +21,3 @@
         </metric>
     </metrics>
 </test>
-
-
