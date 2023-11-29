@@ -38,7 +38,6 @@
 #include <SolverUtils/AdvectionSystem.h>
 #include <SolverUtils/Diffusion/Diffusion.h>
 #include <SolverUtils/RiemannSolvers/RiemannSolver.h>
-#include <SolverUtils/UnsteadySystem.h>
 
 namespace Nektar
 {
@@ -54,10 +53,12 @@ public:
         const LibUtilities::SessionReaderSharedPtr &pSession,
         const SpatialDomains::MeshGraphSharedPtr &pGraph)
     {
-        return MemoryManager<ShallowWaterSystem>::AllocateSharedPtr(pSession,
-                                                                    pGraph);
+        SolverUtils::EquationSystemSharedPtr p =
+            MemoryManager<ShallowWaterSystem>::AllocateSharedPtr(pSession,
+                                                                 pGraph);
+        p->InitObject();
+        return p;
     }
-
     /// Name of class
     static std::string className;
 
@@ -66,7 +67,6 @@ public:
 
 protected:
     SolverUtils::RiemannSolverSharedPtr m_riemannSolver;
-    SolverUtils::RiemannSolverSharedPtr m_riemannSolverLDG;
     SolverUtils::AdvectionSharedPtr m_advection;
     SolverUtils::DiffusionSharedPtr m_diffusion;
 
@@ -84,14 +84,15 @@ protected:
     Array<OneD, NekDouble> m_coriolis;
     // Location of velocity vector.
     Array<OneD, Array<OneD, NekDouble>> m_vecLocs;
+
     /// Initialises UnsteadySystem class members.
     ShallowWaterSystem(const LibUtilities::SessionReaderSharedPtr &pSession,
                        const SpatialDomains::MeshGraphSharedPtr &pGraph);
 
-    void v_InitObject(bool DeclareFields = true) override;
-
     /// Print a summary of time stepping parameters.
     void v_GenerateSummary(SolverUtils::SummaryList &s) override;
+
+    void v_InitObject(bool DeclareFields = true) override;
 
     void PrimitiveToConservative()
     {

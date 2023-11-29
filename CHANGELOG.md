@@ -49,6 +49,7 @@ v5.5.0
 
 **ShallowWaterSolver**
 - Reduce memory footprint of the Peregrine solver(!1680)
+- Fix Peregrine solver for Parareal output(!1689)
 
 **FieldConvert**
 - Fix typo in user-guide and fix but for parallel-in-time FieldConvert (!1645)

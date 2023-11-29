@@ -224,7 +224,6 @@ void NonlinearPeregrine::AddVariableDepth(
     const Array<OneD, const Array<OneD, NekDouble>> &physarray,
     Array<OneD, Array<OneD, NekDouble>> &outarray)
 {
-
     int ncoeffs = GetNcoeffs();
     int nq      = GetTotPoints();
 
@@ -968,9 +967,6 @@ void NonlinearPeregrine::SetBoundaryConditionsForcing(
 void NonlinearPeregrine::WallBoundaryForcing(
     int bcRegion, int cnt, Array<OneD, Array<OneD, NekDouble>> &inarray)
 {
-
-    // std::cout << " WallBoundaryForcing" << std::endl;
-
     int nTraceNumPoints = GetTraceTotPoints();
     int nvariables      = 2;
 
@@ -1110,26 +1106,23 @@ void NonlinearPeregrine::NumericalFluxConsVariables(
 
     //-----------------------------------------------------
     // get temporary arrays
-    Array<OneD, Array<OneD, NekDouble>> Fwd(1);
-    Array<OneD, Array<OneD, NekDouble>> Bwd(1);
-
-    Fwd[0] = Array<OneD, NekDouble>(nTraceNumPoints);
-    Bwd[0] = Array<OneD, NekDouble>(nTraceNumPoints);
+    Array<OneD, NekDouble> Fwd(nTraceNumPoints);
+    Array<OneD, NekDouble> Bwd(nTraceNumPoints);
     //-----------------------------------------------------
 
     //-----------------------------------------------------
     // get the physical values at the trace
     // (we have put any time-dependent BC in field[1])
 
-    m_fields[1]->GetFwdBwdTracePhys(physfield, Fwd[0], Bwd[0]);
+    m_fields[1]->GetFwdBwdTracePhys(physfield, Fwd, Bwd);
     //-----------------------------------------------------
 
     //-----------------------------------------------------
     // use centred fluxes for the numerical flux
     for (i = 0; i < nTraceNumPoints; ++i)
     {
-        outX[i] = 0.5 * (Fwd[0][i] + Bwd[0][i]);
-        outY[i] = 0.5 * (Fwd[0][i] + Bwd[0][i]);
+        outX[i] = 0.5 * (Fwd[i] + Bwd[i]);
+        outY[i] = 0.5 * (Fwd[i] + Bwd[i]);
     }
     //-----------------------------------------------------
 }
@@ -1192,21 +1185,34 @@ void NonlinearPeregrine::v_SetInitialConditions(
         case eSolitaryWave:
         {
             LaitoneSolitaryWave(0.1, m_const_depth, 0.0, 0.0);
-            m_nchk++;
             break;
         }
         default:
         {
             EquationSystem::v_SetInitialConditions(initialtime, false);
+            m_nchk--; // Note: m_nchk has been incremented in EquationSystem.
             break;
         }
     }
 
-    if (dumpInitialConditions)
+    if (dumpInitialConditions && m_checksteps && m_nchk == 0 &&
+        !m_comm->IsParallelInTime())
     {
-        // Dump initial conditions to file
-        Checkpoint_Output(0);
+        Checkpoint_Output(m_nchk);
     }
+    else if (dumpInitialConditions && m_nchk == 0 && m_comm->IsParallelInTime())
+    {
+        std::string newdir = m_sessionName + ".pit";
+        if (!fs::is_directory(newdir))
+        {
+            fs::create_directory(newdir);
+        }
+        if (m_comm->GetTimeComm()->GetRank() == 0)
+        {
+            WriteFld(newdir + "/" + m_sessionName + "_0.fld");
+        }
+    }
+    m_nchk++;
 }
 
 } // namespace Nektar
