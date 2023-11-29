@@ -659,7 +659,6 @@ void NonlinearSWE::PrimitiveToConservative(
     const Array<OneD, const Array<OneD, NekDouble>> &physin,
     Array<OneD, Array<OneD, NekDouble>> &physout)
 {
-
     int nq = GetTotPoints();
 
     if (physin.get() == physout.get())

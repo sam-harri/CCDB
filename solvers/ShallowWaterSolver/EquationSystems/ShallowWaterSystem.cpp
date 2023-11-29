@@ -90,9 +90,6 @@ void ShallowWaterSystem::v_InitObject(bool DeclareFields)
         m_vecLocs[0][i] = 1 + i;
     }
 
-    // Load generic input parameters
-    m_session->LoadParameter("IO_InfoSteps", m_infosteps, 0);
-
     // Load acceleration of gravity
     m_session->LoadParameter("Gravity", m_g, 9.81);
 

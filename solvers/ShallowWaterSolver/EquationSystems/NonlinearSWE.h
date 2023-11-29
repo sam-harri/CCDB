@@ -44,7 +44,6 @@ namespace Nektar
  *
  *
  **/
-
 class NonlinearSWE : public ShallowWaterSystem
 {
 public:

@@ -76,20 +76,11 @@ public:
 
     ~NonlinearPeregrine() override;
 
-    ///< problem type selector
-    ProblemType m_problemType;
-
 protected:
-    StdRegions::ConstFactorMap m_factors;
-
     NonlinearPeregrine(const LibUtilities::SessionReaderSharedPtr &pSession,
                        const SpatialDomains::MeshGraphSharedPtr &pGraph);
 
     void v_InitObject(bool DeclareFields = true) override;
-
-    /// Still water depth traces
-    Array<OneD, NekDouble> m_dFwd;
-    Array<OneD, NekDouble> m_dBwd;
 
     void DoOdeRhs(const Array<OneD, const Array<OneD, NekDouble>> &inarray,
                   Array<OneD, Array<OneD, NekDouble>> &outarray,
@@ -123,8 +114,6 @@ protected:
     }
 
 private:
-    NekDouble m_const_depth;
-
     void NumericalFlux1D(Array<OneD, Array<OneD, NekDouble>> &physfield,
                          Array<OneD, Array<OneD, NekDouble>> &numfluxX);
 
@@ -186,6 +175,17 @@ private:
     void NumericalFluxConsVariables(Array<OneD, NekDouble> &physfield,
                                     Array<OneD, NekDouble> &outX,
                                     Array<OneD, NekDouble> &outY);
+
+    StdRegions::ConstFactorMap m_factors;
+
+    /// Still water depth traces
+    Array<OneD, NekDouble> m_dFwd;
+    Array<OneD, NekDouble> m_dBwd;
+
+    ///< problem type selector
+    ProblemType m_problemType;
+
+    NekDouble m_const_depth;
 };
 
 } // namespace Nektar
