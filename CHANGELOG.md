@@ -43,6 +43,7 @@ v5.5.0
 **IncNavierStokesSolver**
 - Save BndElmtExpansion and avoid re-building (!1648)
 - Add Simo-advection and a switch for Simo-/Dong-advection to VCSImplicit (!1630)
+- Add a new feature of elasticaly mounted object using the moving reference frame (!1495)
 
 **CompressibleFlowSolver**
 - Add three subsonic inflow boundary conditions: EnforceEntropyPresure, EnforceEntropyVelocity, and EnforceEntropyTotalEnthalpy (!1398)

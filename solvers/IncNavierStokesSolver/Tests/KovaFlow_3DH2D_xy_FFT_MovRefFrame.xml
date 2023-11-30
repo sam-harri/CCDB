@@ -79,7 +79,7 @@
 
     <FORCING>
         <FORCE TYPE="MovingReferenceFrame">
-            <LinearVelocity> MovingReferenceFrame </LinearVelocity>
+            <FRAMEVELOCITY> MovingReferenceFrame </FRAMEVELOCITY>
         </FORCE>
     </FORCING>
 

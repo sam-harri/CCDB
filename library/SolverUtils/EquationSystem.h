@@ -425,11 +425,14 @@ protected:
     LibUtilities::FieldMetaDataMap m_fieldMetaDataMap;
 
     /// Moving frame of reference velocities
+    /// (u, v, w, omega_x, omega_y, omega_z, a_x, a_y, a_z, domega_x, domega_y,
+    /// domega_z)
     Array<OneD, NekDouble> m_movingFrameVelsxyz;
 
     /// Moving frame of reference angles with respect to the
     // stationary inertial frame
-    Array<OneD, NekDouble> m_movingFrameTheta;
+    // (x, y, z, angle_x, angle_y, angle_y, pivot_x, pivot_y, pivot_z)
+    Array<OneD, NekDouble> m_movingFrameData;
 
     /// Projection matrix for transformation between inertial and moving
     // frame of reference

@@ -25,8 +25,7 @@
             <P> C             = 1.0               	   </P>
             <P> D0            = 1.0               	   </P>
             <P> Uinf          = 1.              	   </P>
-            <P> Vinf          = 0.0              	   </P>
-            <P> AoA           = 0*PI/180              	   </P>
+            <P> AoA           = 30*PI/180              	   </P>
             <P> Uinfx         = Uinf*cos(AoA)         	   </P>
             <P> Uinfy         = Uinf*sin(AoA)          	   </P>
             <P> Re            = 200.                        </P>
@@ -72,26 +71,27 @@
 
         </BOUNDARYCONDITIONS>
         <FUNCTION NAME="InitialConditions">
-            <F VAR="u,v,p" FILE="MovingRefFrame_Rot_SimpleDomain.rst" />
+            <E VAR="u" VALUE="Uinfx" />
+            <E VAR="v" VALUE="Uinfy" />
+            <E VAR="p" VALUE="0" />
         </FUNCTION>
 
         <FUNCTION NAME="VelMRF">
             <E VAR="u" VALUE="0.0" />
             <E VAR="v" VALUE="0" />
+            <E VAR="Omega_z" VALUE="amp*omega*cos(omega*(t-t0))"/>
         </FUNCTION>
 
-        <FUNCTION NAME="OmegaMRF">
-            <E VAR="Omega_z" VALUE="amp*omega*cos(omega*(t-t0))"/>
+        <FUNCTION NAME="ExactSolution">
+            <E VAR="u" VALUE=" Uinfx*cos(amp*sin(omega*(t-t0))) + Uinfy*sin(amp*sin(omega*(t-t0)))" />
+            <E VAR="v" VALUE="-Uinfx*sin(amp*sin(omega*(t-t0))) + Uinfy*cos(amp*sin(omega*(t-t0)))" />
+            <E VAR="p" VALUE="0"/>
         </FUNCTION>
 
     </CONDITIONS>
     <FORCING>
         <FORCE TYPE="MovingReferenceFrame">
-            <LinearVelocity> VelMRF </LinearVelocity>
-            <AngularVelocity> OmegaMRF </AngularVelocity>
-            <!--
-                <PivotPoint> 0.0 0.0 0.0 </PivotPoint>
-            -->
+            <FRAMEVELOCITY> VelMRF </FRAMEVELOCITY>
         </FORCE>
     </FORCING>
 
