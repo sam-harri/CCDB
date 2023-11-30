@@ -671,6 +671,10 @@ void FilterAeroForces::GetForces(
     {
         CalculateForces(pFields, time);
     }
+    if (Aeroforces == NullNekDouble1DArray || Aeroforces.size() == 0)
+    {
+        return;
+    }
     // Get information to write result
     Array<OneD, unsigned int> ZIDs = pFields[0]->GetZIDs();
     int local_planes               = ZIDs.size();
@@ -1175,6 +1179,23 @@ void FilterAeroForces::CalculateForces(
         rowComm->AllReduce(m_Mvplane[i], LibUtilities::ReduceSum);
         colComm->AllReduce(m_Mvplane[i], LibUtilities::ReduceSum);
     }
+
+    // Pass force (computatonal frame) to FluidInterface
+    Array<OneD, NekDouble> aeroforces(6, 0.);
+    for (size_t i = 0; i < m_Ft.size(); ++i)
+    {
+        aeroforces[i] = (Vmath::Vsum(m_nPlanes, m_Fpplane[i], 1) +
+                         Vmath::Vsum(m_nPlanes, m_Fvplane[i], 1)) /
+                        m_nPlanes;
+    }
+    for (size_t i = 0; i < m_Mt.size(); ++i)
+    {
+        int j             = m_Mt.size() - 1 - i;
+        aeroforces[5 - i] = (Vmath::Vsum(m_nPlanes, m_Mpplane[j], 1) +
+                             Vmath::Vsum(m_nPlanes, m_Mvplane[j], 1)) /
+                            m_nPlanes;
+    }
+    fluidEqu->SetAeroForce(aeroforces);
 
     // Project results to new directions
     for (int plane = 0; plane < m_nPlanes; plane++)

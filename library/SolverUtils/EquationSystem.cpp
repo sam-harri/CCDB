@@ -1309,16 +1309,16 @@ void EquationSystem::WriteFld(const std::string &outname,
     mapping->Output(fieldMetaDataMap, outname);
 
     // If necessary, add informaton for moving frame reference to metadata
-    if (m_fieldMetaDataMap.find("Theta_x") != m_fieldMetaDataMap.end())
+    // X, Y, Z translational displacements
+    // Theta_x, Theta_y, Theta_z angular displacements
+    // X0, Y0, Z0 pivot point
+    std::vector<std::string> strFrameData = {
+        "X", "Y", "Z", "Theta_x", "Theta_y", "Theta_z", "X0", "Y0", "Z0"};
+    for (size_t i = 0; i < strFrameData.size() && i < m_movingFrameData.size();
+         ++i)
     {
-        // if one theta exists, add all three thetas
-        std::vector<std::string> vSuffix = {"_x", "_y", "_z"};
-        for (int i = 0; i < 3; ++i)
-        {
-            std::string sTheta = "Theta" + vSuffix[i];
-            m_fieldMetaDataMap[sTheta] =
-                boost::lexical_cast<std::string>(m_movingFrameTheta[i]);
-        }
+        fieldMetaDataMap[strFrameData[i]] =
+            boost::lexical_cast<std::string>(m_movingFrameData[i]);
     }
 
     m_fld->Write(outname, FieldDef, FieldData, fieldMetaDataMap,

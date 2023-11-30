@@ -82,13 +82,19 @@ public:
     SOLVER_UTILS_EXPORT void GetMovingFrameProjectionMat(
         boost::numeric::ublas::matrix<NekDouble> &vProjMat);
 
-    // gave access and set the angle between moving frame and stationary
-    // inertial frame
-    SOLVER_UTILS_EXPORT void SetMovingFrameAngles(
-        const Array<OneD, NekDouble> &vFrameTheta);
+    // gave access and set the displacement and angles between moving frame and
+    // stationary one
+    SOLVER_UTILS_EXPORT void SetMovingFrameDisp(
+        const Array<OneD, NekDouble> &vFrameDisp);
 
-    SOLVER_UTILS_EXPORT void GetMovingFrameAngles(
-        Array<OneD, NekDouble> &vFrameTheta);
+    SOLVER_UTILS_EXPORT void GetMovingFrameDisp(
+        Array<OneD, NekDouble> &vFrameDisp);
+
+    /// Set aerodynamic force and moment
+    SOLVER_UTILS_EXPORT void SetAeroForce(Array<OneD, NekDouble> forces);
+
+    /// Get aerodynamic force and moment
+    SOLVER_UTILS_EXPORT void GetAeroForce(Array<OneD, NekDouble> forces);
 
 protected:
     SOLVER_UTILS_EXPORT virtual void v_GetVelocity(
@@ -118,12 +124,22 @@ protected:
         [[maybe_unused]] boost::numeric::ublas::matrix<NekDouble> &vProjMat)
     {
     }
-    SOLVER_UTILS_EXPORT virtual void v_SetMovingFrameAngles(
-        [[maybe_unused]] const Array<OneD, NekDouble> &vFrameTheta)
+    SOLVER_UTILS_EXPORT virtual void v_SetMovingFrameDisp(
+        [[maybe_unused]] const Array<OneD, NekDouble> &vFrameDisp)
     {
     }
-    SOLVER_UTILS_EXPORT virtual void v_GetMovingFrameAngles(
-        [[maybe_unused]] Array<OneD, NekDouble> &vFrameTheta)
+    SOLVER_UTILS_EXPORT virtual void v_GetMovingFrameDisp(
+        [[maybe_unused]] Array<OneD, NekDouble> &vFrameDisp)
+    {
+    }
+
+    SOLVER_UTILS_EXPORT virtual void v_SetAeroForce(
+        [[maybe_unused]] Array<OneD, NekDouble> forces)
+    {
+    }
+
+    SOLVER_UTILS_EXPORT virtual void v_GetAeroForce(
+        [[maybe_unused]] Array<OneD, NekDouble> forces)
     {
     }
 };
@@ -205,16 +221,26 @@ inline void FluidInterface::GetMovingFrameProjectionMat(
 /**
  *
  */
-inline void FluidInterface::SetMovingFrameAngles(
-    const Array<OneD, NekDouble> &vFrameTheta)
+inline void FluidInterface::SetMovingFrameDisp(
+    const Array<OneD, NekDouble> &vFrameDisp)
 {
-    v_SetMovingFrameAngles(vFrameTheta);
+    v_SetMovingFrameDisp(vFrameDisp);
 }
 
-inline void FluidInterface::GetMovingFrameAngles(
-    Array<OneD, NekDouble> &vFrameTheta)
+inline void FluidInterface::GetMovingFrameDisp(
+    Array<OneD, NekDouble> &vFrameDisp)
 {
-    v_GetMovingFrameAngles(vFrameTheta);
+    v_GetMovingFrameDisp(vFrameDisp);
+}
+
+inline void FluidInterface::SetAeroForce(Array<OneD, NekDouble> forces)
+{
+    v_SetAeroForce(forces);
+}
+
+inline void FluidInterface::GetAeroForce(Array<OneD, NekDouble> forces)
+{
+    v_GetAeroForce(forces);
 }
 
 } // namespace Nektar::SolverUtils

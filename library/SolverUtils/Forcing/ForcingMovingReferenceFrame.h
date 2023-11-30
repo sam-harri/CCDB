@@ -43,6 +43,7 @@
 #include <LibUtilities/BasicUtils/SharedArray.hpp>
 #include <MultiRegions/ExpList.h>
 #include <SolverUtils/EquationSystem.h>
+#include <SolverUtils/Filters/FilterAeroForces.h>
 #include <SolverUtils/Forcing/Forcing.h>
 #include <SolverUtils/SolverUtilsDeclspec.h>
 #include <boost/numeric/ublas/io.hpp>
@@ -54,6 +55,47 @@ namespace Nektar::SolverUtils
 {
 
 namespace bn = boost::numeric;
+
+/***
+ * Solve the body's motion using Newmark-Beta method
+ * M ddx + C dx + K x = F
+ * In discrete form
+ * CoeffMatrix dx = rhs
+ ***/
+class Newmark_BetaSolver
+{
+public:
+    Newmark_BetaSolver(){};
+    ~Newmark_BetaSolver(){};
+    void SetNewmarkBeta(NekDouble beta, NekDouble gamma, NekDouble dt,
+                        DNekMatSharedPtr M, DNekMatSharedPtr C,
+                        DNekMatSharedPtr K, std::set<int> DirDoFs);
+    void Solve(Array<OneD, Array<OneD, NekDouble>> u,
+               Array<OneD, NekDouble> force,
+               std::map<int, NekDouble> motionPrescribed);
+    int m_rows;
+    Array<OneD, NekDouble> m_coeffs;
+    DNekMatSharedPtr m_M;
+    DNekMatSharedPtr m_C;
+    DNekMatSharedPtr m_K;
+    DNekMatSharedPtr m_coeffMatrix;
+    DNekMatSharedPtr m_inverseMatrix;
+};
+
+class FrameTransform
+{
+public:
+    FrameTransform();
+    ~FrameTransform(){};
+    void SetAngle(const Array<OneD, NekDouble> theta);
+    void BodyToInerital(const int dim, const Array<OneD, NekDouble> &body,
+                        Array<OneD, NekDouble> &inertial);
+    void IneritalToBody(const int dim, Array<OneD, NekDouble> &body,
+                        const Array<OneD, NekDouble> &inertial);
+
+private:
+    Array<OneD, NekDouble> m_matrix;
+};
 
 class ForcingMovingReferenceFrame : public Forcing
 {
@@ -99,71 +141,94 @@ protected:
 private:
     // name of the function for linear and angular velocities in the session
     // file
-    std::string m_funcName;
-    std::string m_velFuncName;
-    std::string m_omegaFuncName;
+    // pivot point
+    Array<OneD, NekDouble> m_pivotPoint;
+    Array<OneD, NekDouble> m_travelWave;
+    FrameTransform m_frame;
 
     // prescribed functions in the session file
-    std::map<int, LibUtilities::EquationSharedPtr> m_frameFunction;
-    std::map<int, LibUtilities::EquationSharedPtr> m_velFunction;
-    std::map<int, LibUtilities::EquationSharedPtr> m_omegaFunction;
+    std::map<int, LibUtilities::EquationSharedPtr> m_frameVelFunction;
+    std::map<int, LibUtilities::EquationSharedPtr> m_extForceFunction;
+    std::ofstream m_outputStream;
+    int m_rank;
 
     // a boolean switch indicating for which direction the velocities are
     // available. The available velocites could be different from the
     // precscribed one because of the rotation which result in change of basis
     // vector of local frame to the inertial frame.
-    std::map<int, bool> m_hasVel;
-    std::map<int, bool> m_hasOmega;
+    Array<OneD, bool> m_hasVel;
+    Array<OneD, bool> m_hasOmega;
 
     // frame linear velocities in inertial frame
-    std::map<int, NekDouble> m_velXYZ;
+    Array<OneD, NekDouble> m_velXYZ;
 
     // frame linear velocities in local translating-rotating frame
-    std::map<int, NekDouble> m_velxyz;
+    Array<OneD, NekDouble> m_velxyz;
 
     // frame angular velocities in inertial frame
-    std::map<int, NekDouble> m_omegaXYZ;
+    Array<OneD, NekDouble> m_omegaXYZ;
 
     // frame angular velocities in local translating-rotating frame
-    std::map<int, NekDouble> m_omegaxyz;
+    Array<OneD, NekDouble> m_omegaxyz;
     // coordinate vector
     Array<OneD, Array<OneD, NekDouble>> m_coords;
-
-    // pivot point
-    Array<OneD, NekDouble> m_pivotPoint;
+    // externel force
+    Array<OneD, NekDouble> m_extForceXYZ;
 
     // rotation angel
-    Array<OneD, NekDouble> m_theta;
+    Array<OneD, NekDouble> m_disp;
 
     // Projection matrix for transformation of vectors between inertial and
     // moving reference frames
-    bn::ublas::matrix<NekDouble> m_ProjMatX;
-    bn::ublas::matrix<NekDouble> m_ProjMatY;
     bn::ublas::matrix<NekDouble> m_ProjMatZ;
+
+    NekDouble m_startTime;
+    NekDouble m_timestep;
 
     bool m_hasRotation;
     bool m_isH1d;
     bool m_hasPlane0;
     bool m_isH2d;
+    bool m_hasFreeMotion;
     NekInt m_spacedim;
+    NekInt m_expdim;
+    unsigned int m_index;
+    unsigned int m_outputFrequency;
+    Newmark_BetaSolver m_bodySolver;
+    Array<OneD, Array<OneD, NekDouble>> m_bodyVel;
+    std::set<int> m_DirDoFs;
+    FilterAeroForcesSharedPtr m_aeroforceFilter;
 
     ForcingMovingReferenceFrame(
         const LibUtilities::SessionReaderSharedPtr &pSession,
         const std::weak_ptr<EquationSystem> &pEquation);
 
-    ~ForcingMovingReferenceFrame(void) override{};
+    ~ForcingMovingReferenceFrame(void) override;
 
-    void Update(const NekDouble &time);
-    void UpdateTheta(const NekDouble &time);
-    void CheckForRestartTheta(
+    void Update(const Array<OneD, MultiRegions::ExpListSharedPtr> &pFields,
+                const NekDouble &time);
+    void UpdateRotMat();
+    void CheckForRestartTime(
         const Array<OneD, MultiRegions::ExpListSharedPtr> &pFields,
-        Array<OneD, NekDouble> &theta);
+        NekDouble &time);
 
     void addRotation(int npoints,
                      const Array<OneD, Array<OneD, NekDouble>> &inarray0,
                      NekDouble angVelScale,
                      const Array<OneD, Array<OneD, NekDouble>> &inarray1,
                      Array<OneD, Array<OneD, NekDouble>> &outarray);
+    void InitBodySolver(const TiXmlElement *pForce, const int dim,
+                        const int rank, const NekDouble time);
+    void SolveBodyMotion(Array<OneD, Array<OneD, NekDouble>> &bodyVel,
+                         const Array<OneD, NekDouble> &forcebody,
+                         std::map<int, NekDouble> &Dirs);
+    void LoadParameters(const TiXmlElement *pForce, const NekDouble time);
+    NekDouble EvaluateExpression(std::string expression);
+    void InitialiseFilter(
+        const LibUtilities::SessionReaderSharedPtr &pSession,
+        const Array<OneD, MultiRegions::ExpListSharedPtr> &pFields,
+        const TiXmlElement *pForce);
+    void UpdateBoundaryConditions(NekDouble time);
 };
 
 } // namespace Nektar::SolverUtils

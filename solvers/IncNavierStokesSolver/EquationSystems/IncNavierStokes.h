@@ -180,16 +180,17 @@ public:
         const Array<OneD, NekDouble> &vFrameVels) override;
     void v_GetMovingFrameVelocities(
         Array<OneD, NekDouble> &vFrameVels) override;
-    void v_SetMovingFrameAngles(
-        const Array<OneD, NekDouble> &vFrameTheta) override;
-    void v_GetMovingFrameAngles(Array<OneD, NekDouble> &vFrameTheta) override;
+    void v_SetMovingFrameDisp(
+        const Array<OneD, NekDouble> &vFrameDisp) override;
+    void v_GetMovingFrameDisp(Array<OneD, NekDouble> &vFrameDisp) override;
     void v_SetMovingFrameProjectionMat(
         const bnu::matrix<NekDouble> &vProjMat) override;
     void v_GetMovingFrameProjectionMat(
         bnu::matrix<NekDouble> &vProjMat) override;
+    void v_SetAeroForce(Array<OneD, NekDouble> forces) override;
+    void v_GetAeroForce(Array<OneD, NekDouble> forces) override;
 
     bool DefinedForcing(const std::string &sForce);
-    void GetPivotPoint(Array<OneD, NekDouble> &vPivotPoint);
 
 protected:
     // pointer to the extrapolation class for sub-stepping and HOPBS
@@ -236,6 +237,7 @@ protected:
     // pivot point for moving reference frame
     // TODO: relocate this variable
     Array<OneD, NekDouble> m_pivotPoint;
+    Array<OneD, NekDouble> m_aeroForces;
 
     /// Constructor.
     IncNavierStokes(const LibUtilities::SessionReaderSharedPtr &pSession,

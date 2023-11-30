@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <NEKTAR>
     <EXPANSIONS>
-        <E COMPOSITE="C[6,7]" NUMMODES="5" TYPE="MODIFIED" FIELDS="u,v" />
-        <E COMPOSITE="C[6,7]" NUMMODES="4" TYPE="MODIFIEDQUADPLUS1" FIELDS="p" />
+        <E COMPOSITE="C[6,7]" NUMMODES="3" TYPE="MODIFIED" FIELDS="u,v" />
+        <E COMPOSITE="C[6,7]" NUMMODES="2" TYPE="MODIFIEDQUADPLUS1" FIELDS="p" />
     </EXPANSIONS>
     <CONDITIONS>
         <SOLVERINFO>
@@ -12,38 +12,18 @@
             <I PROPERTY="AdvectionForm" VALUE="Convective"/>
             <I PROPERTY="Projection" VALUE="Galerkin" />
             <I PROPERTY="TimeIntegrationMethod" VALUE="IMEXOrder2" />
-            <I PROPERTY="DEALIASING" VALUE="True" />
-            <I PROPERTY="SPECTRALDEALIASING" VALUE="True" />
-            <I PROPERTY="SPECTRALHPDEALIASING" VALUE="True" />
             <I PROPERTY="SpectralVanishingViscosity" VALUE="DGKernel" />
         </SOLVERINFO>
         <PARAMETERS>
-            <P> TimeStep      = 1.0e-5                      </P>
-            <P> NumSteps      = 10               	   </P>
-            <P> IO_CheckSteps = 10               	   </P>
+            <P> TimeStep      = 2.0e-3                      </P>
+            <P> NumSteps      = 20               	   </P>
+            <P> IO_CheckSteps = 100               	   </P>
             <P> IO_InfoSteps  = 10              	   </P>
-            <P> IO_CFLSteps  =  10                         </P>
-            <P> C             = 1.0               	   </P>
-            <P> D0            = 1.0               	   </P>
-            <P> Uinf          = 1.              	   </P>
-            <P> Vinf          = 0.0              	   </P>
-            <P> AoA           = 0*PI/180              	   </P>
-            <P> Uinfx         = Uinf*cos(AoA)         	   </P>
-            <P> Uinfy         = Uinf*sin(AoA)          	   </P>
-            <P> Re            = 500.                        </P>
-            <P> Kinvis        = Uinf*C/Re          	   </P>
-            <P> t0            = 0.0                        </P>
-            <P> freq          = 2.                         </P>
+            <P> Re            = 100.                        </P>
+            <P> Kinvis        = 1/Re          	   </P>
+            <P> freq          = 1.                         </P>
             <P> amp           = 10.*PI/180.              </P>
             <P> omega         = 2.*PI*freq                 </P>
-            <!--
-                <P> HomModesZ     = 24               	   </P>
-                <P> LZ            = 0.5*1.77              	   </P>
-                <P> SVVDiffCoeff  = 0.75                       </P>
-                <P> SVVDiffCoeffHomo1D  = 0.1                       </P>
-                <P> SVVCutoffRatio  = 0.9                       </P>
-                <P> SVVCutoffRatioHomo1D  = 0.9                       </P>
-            -->
         </PARAMETERS>
         <VARIABLES>
             <V ID="0"> u </V>
@@ -59,59 +39,77 @@
         </BOUNDARYREGIONS>
         <BOUNDARYCONDITIONS>
             <REGION REF="0">
-                <D VAR="u" USERDEFINEDTYPE="MovingFrameWall" VALUE="Uinfx" />
-                <D VAR="v" USERDEFINEDTYPE="MovingFrameWall" VALUE="Uinfy" />
+                <D VAR="u" USERDEFINEDTYPE="MovingFrameWall" VALUE="0" />
+                <D VAR="v" USERDEFINEDTYPE="MovingFrameWall" VALUE="0" />
                 <N VAR="p" USERDEFINEDTYPE="H" VALUE="0" />
             </REGION>
-
             <REGION REF="1">
-                <D VAR="u" USERDEFINEDTYPE="MovingFrameDomainVel" VALUE="Uinfx" />
-                <D VAR="v" USERDEFINEDTYPE="MovingFrameDomainVel" VALUE="Uinfy" />
-                <N VAR="p" USERDEFINEDTYPE="H" VALUE="0" />
+                <D VAR="u" VALUE="0" />
+                <D VAR="v" VALUE="0" />
+                <D VAR="p" VALUE="0" />
             </REGION>
-
-            <REGION REF="2"> <!-- outflow -->
-                <N VAR="u" USERDEFINEDTYPE="HOutflow" VALUE="0" />
-                <N VAR="v" USERDEFINEDTYPE="HOutflow" VALUE="0" />
-                <D VAR="p" USERDEFINEDTYPE="HOutflow" VALUE="0" />
+            <REGION REF="2">
+                <D VAR="u" VALUE="0" />
+                <D VAR="v" VALUE="0" />
+                <D VAR="p" VALUE="0" />
             </REGION>
-
             <REGION REF="3">
-                <D VAR="u" USERDEFINEDTYPE="MovingFrameDomainVel" VALUE="Uinfx" />
-                <D VAR="v" USERDEFINEDTYPE="MovingFrameDomainVel" VALUE="Uinfy" />
-                <N VAR="p" USERDEFINEDTYPE="H" VALUE="0" />
+                <D VAR="u" VALUE="0" />
+                <D VAR="v" VALUE="0" />
+                <D VAR="p" VALUE="0" />
             </REGION>
             <REGION REF="4">
-                <D VAR="u" USERDEFINEDTYPE="MovingFrameDomainVel" VALUE="Uinfx" />
-                <D VAR="v" USERDEFINEDTYPE="MovingFrameDomainVel" VALUE="Uinfy" />
-                <N VAR="p" USERDEFINEDTYPE="H" VALUE="0" />
+                <D VAR="u" VALUE="0" />
+                <D VAR="v" VALUE="0" />
+                <D VAR="p" VALUE="0" />
             </REGION>
         </BOUNDARYCONDITIONS>
+
         <FUNCTION NAME="InitialConditions">
-            <F VAR="u,v,p" FILE="MovingRefFrame_Rot_naca0012.rst" />
+            <E VAR="u" VALUE="0" />
+            <E VAR="v" VALUE="0" />
+            <E VAR="p" VALUE="0" />
         </FUNCTION>
 
         <FUNCTION NAME="VelMRF">
             <E VAR="u" VALUE="0.0" />
             <E VAR="v" VALUE="0" />
-            <E VAR="Omega_z" VALUE="amp*omega*cos(omega*(t-t0))"/>
+            <E VAR="Omega_z" VALUE="amp*omega*cos(omega*t)"/>
         </FUNCTION>
 
+        <FUNCTION NAME="ExtForce">
+            <E VAR="u" VALUE="-1" />
+            <E VAR="v" VALUE="0" />
+            <E VAR="Omega_z" VALUE="0"/>
+        </FUNCTION>
+
+        <FUNCTION NAME="InitDisp">
+            <E VAR="u" VALUE="0" />
+            <E VAR="v" VALUE="0" />
+            <E VAR="Omega_z" VALUE="0"/>
+        </FUNCTION>
     </CONDITIONS>
 
     <FORCING>
         <FORCE TYPE="MovingReferenceFrame">
             <FRAMEVELOCITY> VelMRF </FRAMEVELOCITY>
-            <PIVOTPOINT> 0.25, 0.0, 0.0 </PIVOTPOINT>
+            <EXTERNALFORCE>  ExtForce </EXTERNALFORCE>
+            <INITIALDISPLACEMENT>  InitDisp </INITIALDISPLACEMENT>
+            <MASS>         1.0, 0., 0,  0,1,0,  0,0,1 </MASS>
+            <MOTIONPRESCRIBED>  0, 1 ,1 </MOTIONPRESCRIBED>
+            <PIVOTPOINT> 0. ,  0 ,0 </PIVOTPOINT>
+            <BOUNDARY> B[0] </BOUNDARY>
+            <OutputFile> bodyMotion.mrf </OutputFile>
+            <OutputFrequency> 2 </OutputFrequency>
         </FORCE>
     </FORCING>
 
     <FILTERS>
         <FILTER TYPE="AeroForces">
             <PARAM NAME="OutputFile">dragLift</PARAM>
-            <PARAM NAME="OutputFrequency">10</PARAM>
+            <PARAM NAME="OutputFrequency">1</PARAM>
             <PARAM NAME="Boundary"> B[0] </PARAM>
-            <PARAM NAME="MomentPoint">0.25 0.0 0. </PARAM>
+            <PARAM NAME="MomentPoint">0.0 0.0 0. </PARAM>
         </FILTER>
     </FILTERS>
 
