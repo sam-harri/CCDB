@@ -304,7 +304,7 @@ void GlobalLinSysIterative::UpdateKnownSolutions(
         Vmath::Dot2(nNonDir, newBasis, tmpAx_s + nDir, m_map + nDir);
     vComm->AllReduce(solNorm, Nektar::LibUtilities::ReduceSum);
 
-    if (solNorm < 22.2 * NekConstants::kNekSparseNonZeroTol)
+    if (solNorm < NekConstants::kNekSparseNonZeroTol)
     {
         return;
     }
