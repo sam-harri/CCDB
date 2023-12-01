@@ -34,7 +34,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include <IncNavierStokesSolver/EquationSystems/SubSteppingExtrapolateWeakPressure.h>
-#include <LibUtilities/Communication/Comm.h>
 
 using namespace std;
 

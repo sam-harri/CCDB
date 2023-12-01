@@ -1045,20 +1045,9 @@ void CoupledLocalToGlobalC0ContMap::FindEdgeIdToAddMeanPressure(
                                     if (HomGraphEdgeIdToEdgeId.count(
                                             GlobIdOffset1 + l) != 0)
                                     {
-                                        // June 2012: commenting this condition
-                                        // apparently solved the bug caused by
-                                        // the edge reordering procedure
-
-                                        // if(AddMeanPressureToEdgeId[elmtid] ==
-                                        // -1)
-                                        //{
-
-                                        // AddMeanPressureToEdgeId[elmtid] =
-                                        // HomGraphEdgeIdToEdgeId[GlobIdOffset1+l];
                                         AddMeanPressureToEdgeId[elmtid] =
                                             defedge;
 
-                                        //}
                                         SetEdge = true;
                                         break;
                                     }

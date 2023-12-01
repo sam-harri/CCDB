@@ -33,7 +33,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include <IncNavierStokesSolver/EquationSystems/MappingExtrapolate.h>
-#include <LibUtilities/Communication/Comm.h>
 
 namespace Nektar
 {

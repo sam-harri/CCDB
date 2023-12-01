@@ -34,8 +34,6 @@
 
 #include <IncNavierStokesSolver/EquationSystems/SubSteppingExtrapolate.h>
 
-#include <LibUtilities/Communication/Comm.h>
-
 namespace Nektar
 {
 using namespace LibUtilities;

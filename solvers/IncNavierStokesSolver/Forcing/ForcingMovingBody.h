@@ -149,9 +149,6 @@ private:
     Array<OneD, Array<OneD, NekDouble>> m_eta;
     ///
     unsigned int m_outputFrequency;
-    Array<OneD, std::ofstream> m_outputStream;
-    std::string m_outputFile_fce;
-    std::string m_outputFile_mot;
 };
 
 } // namespace Nektar
