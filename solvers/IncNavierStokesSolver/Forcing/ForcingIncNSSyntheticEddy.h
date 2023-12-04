@@ -119,7 +119,9 @@ protected:
     /// Calculate Forcing
     void CalculateForcing(
         const Array<OneD, MultiRegions::ExpListSharedPtr> &pFields);
-
+    /// Compute the initial location of the eddies for the test case
+    void ComputeInitialLocationTestCase();
+ 
     // Members
     // Expressions (functions) of the prescribed Reynolds stresses
     std::map<int, LibUtilities::EquationSharedPtr> m_R;
@@ -160,8 +162,8 @@ protected:
     NekDouble m_currTime;
     /// Keep applying force during GMRES iteration
     bool m_implicitForcing{false};
-    /// Homogeneous expansion in z-direction
-    bool m_isH1D{false};
+    /// Check for test case
+    bool m_tCase; 
 
 private:
     ForcingIncNSSyntheticEddy(

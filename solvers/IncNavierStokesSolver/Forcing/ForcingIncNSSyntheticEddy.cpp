@@ -199,6 +199,11 @@ void ForcingIncNSSyntheticEddy::v_InitObject(
     std::string bVelStr = elmtInfTurb->GetText();
     m_Ub                = boost::lexical_cast<NekDouble>(bVelStr);
 
+    // Read flag to check if the run is a test case
+    elmtInfTurb = pForce->FirstChildElement("TestCase");
+    const char *tcaseStr = elmtInfTurb->GetText();
+    m_tCase = (strcmp(tcaseStr, "ChanFlow3D") == 0) ? true : false; 
+
     // Set Cholesky decomposition of the Reynolds Stresses in the domain
     SetCholeskyReyStresses(pFields);
     // Compute reference lengths
@@ -209,8 +214,17 @@ void ForcingIncNSSyntheticEddy::v_InitObject(
     SetNumberOfEddies();
     // Set mask
     SetBoxOfEddiesMask(pFields);
-    // Compute initial location of the eddies in the box
-    ComputeInitialRandomLocationOfEddies();
+    //Check for test case
+    if (!m_tCase)
+    {
+        // Compute initial location of the eddies in the box
+        ComputeInitialRandomLocationOfEddies();
+    }
+    else
+    {
+        // Compute initial location of the eddies for the test case
+        ComputeInitialLocationTestCase();
+    }
 
     // Seed to generate random positions for the eddies
     srand(time(0));
@@ -883,6 +897,38 @@ void ForcingIncNSSyntheticEddy::SetNumberOfEddies()
 {
     m_N = int((m_lyz[0] * m_lyz[1]) /
               (4 * m_lref[m_spacedim - 2] * m_lref[m_spacedim - 1]));
+}
+
+/**
+ * @brief Place eddies in specific locations in the test case
+ *        geometry for consistency and comparison. 
+ * 
+ *        This function was design for a three-dimensional 
+ *        channel flow test case (ChanFlow3d_infTurb). 
+ *        It is only called for testing purposes (unit test).
+ */
+void ForcingIncNSSyntheticEddy::ComputeInitialLocationTestCase()
+{
+    m_N = 3; // Redefine number of eddies
+    m_eddyPos = Array<OneD, Array<OneD, NekDouble>>(m_N);
+
+    // First eddy (center)
+    m_eddyPos[0] = Array<OneD, NekDouble>(m_spacedim);
+    m_eddyPos[0][0] = (m_rc[0] - m_lref[0]) + 0.25 * 2 * m_lref[0];
+    m_eddyPos[0][1] = m_rc[1];
+    m_eddyPos[0][2] = m_rc[2];
+
+    // Second eddy (top)
+    m_eddyPos[1] = Array<OneD, NekDouble>(m_spacedim);
+    m_eddyPos[1][0] = (m_rc[0] - m_lref[0]) + 0.25 * 2 * m_lref[0];
+    m_eddyPos[1][1] = (m_rc[1] - 0.5 * m_lyz[0]) + 0.9 * m_lyz[0];
+    m_eddyPos[1][2] = m_rc[2];
+
+    // Third eddy (bottom)
+    m_eddyPos[2] = Array<OneD, NekDouble>(m_spacedim);
+    m_eddyPos[2][0] = (m_rc[0] - m_lref[0]) + 0.25 * 2 * m_lref[0];
+    m_eddyPos[2][1] = (m_rc[1] - 0.5 * m_lyz[0]) + 0.1 * m_lyz[0];
+    m_eddyPos[2][2] = m_rc[2];
 }
 
 } // namespace SolverUtils
