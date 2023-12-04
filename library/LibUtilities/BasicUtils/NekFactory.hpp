@@ -43,6 +43,7 @@
 #include <string>
 
 #ifdef NEKTAR_USE_THREAD_SAFETY
+#include <mutex>
 #include <shared_mutex>
 #include <thread>
 #endif
@@ -278,7 +279,7 @@ protected:
     }
 
 private:
-    NekFactory(const NekFactory &rhs) = delete;
+    NekFactory(const NekFactory &rhs)            = delete;
     NekFactory &operator=(const NekFactory &rhs) = delete;
 
     TMapFactory mMapFactory;
