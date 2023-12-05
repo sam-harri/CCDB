@@ -592,13 +592,22 @@ void ForcingIncNSSyntheticEddy::UpdateEddiesPositions()
         {
             // Generate a new one in the inlet plane
             m_eddyPos[n][0] = m_rc[0] - m_lref[0] + tol;
-            m_eddyPos[n][1] =
-                (m_rc[1] - 0.5 * m_lyz[0]) +
-                (NekSingle(std::rand()) / NekSingle(RAND_MAX)) * m_lyz[0];
-            m_eddyPos[n][2] =
-                (m_rc[2] - 0.5 * m_lyz[1]) +
-                (NekSingle(std::rand()) / NekSingle(RAND_MAX)) * m_lyz[1];
-
+            // Check if test case
+            if (!m_tCase)
+            {
+                m_eddyPos[n][1] =
+                    (m_rc[1] - 0.5 * m_lyz[0]) +
+                    (NekSingle(std::rand()) / NekSingle(RAND_MAX)) * m_lyz[0];
+                m_eddyPos[n][2] =
+                    (m_rc[2] - 0.5 * m_lyz[1]) +
+                    (NekSingle(std::rand()) / NekSingle(RAND_MAX)) * m_lyz[1];
+            }
+            else
+            {
+                // same place (center) for the test case
+                m_eddyPos[n][1] = m_rc[1];
+                m_eddyPos[n][2] = m_rc[2];
+            }
             m_eddiesIDForcing.push_back(n);
             m_calcForcing = true;
         }
@@ -696,9 +705,17 @@ Array<OneD, Array<OneD, int>> ForcingIncNSSyntheticEddy::
         for (auto &n : m_eddiesIDForcing)
         {
             // Convert to -1 or to 1
-            epsilonSign[j][n] =
-                ((NekSingle(std::rand()) / NekSingle(RAND_MAX)) <= 0.5) ? -1
-                                                                        : 1;
+            // Check if test case
+            if (!m_tCase)
+            {
+                epsilonSign[j][n] =
+                    ((NekSingle(std::rand()) / NekSingle(RAND_MAX)) <= 0.5) ? -1 : 1;
+            }
+            else
+            {
+                // Positive values only for the test case
+                epsilonSign[j][n] = 1; 
+            }
         }
     }
 
@@ -914,19 +931,19 @@ void ForcingIncNSSyntheticEddy::ComputeInitialLocationTestCase()
 
     // First eddy (center)
     m_eddyPos[0] = Array<OneD, NekDouble>(m_spacedim);
-    m_eddyPos[0][0] = (m_rc[0] - m_lref[0]) + 0.25 * 2 * m_lref[0];
+    m_eddyPos[0][0] = (m_rc[0] - m_lref[0]) + 0.2 * 2 * m_lref[0];
     m_eddyPos[0][1] = m_rc[1];
     m_eddyPos[0][2] = m_rc[2];
 
     // Second eddy (top)
     m_eddyPos[1] = Array<OneD, NekDouble>(m_spacedim);
-    m_eddyPos[1][0] = (m_rc[0] - m_lref[0]) + 0.25 * 2 * m_lref[0];
+    m_eddyPos[1][0] = (m_rc[0] - m_lref[0]) + 0.3 * 2 * m_lref[0];
     m_eddyPos[1][1] = (m_rc[1] - 0.5 * m_lyz[0]) + 0.9 * m_lyz[0];
     m_eddyPos[1][2] = m_rc[2];
 
     // Third eddy (bottom)
     m_eddyPos[2] = Array<OneD, NekDouble>(m_spacedim);
-    m_eddyPos[2][0] = (m_rc[0] - m_lref[0]) + 0.25 * 2 * m_lref[0];
+    m_eddyPos[2][0] = (m_rc[0] - m_lref[0]) + 0.4 * 2 * m_lref[0];
     m_eddyPos[2][1] = (m_rc[1] - 0.5 * m_lyz[0]) + 0.1 * m_lyz[0];
     m_eddyPos[2][2] = m_rc[2];
 }
