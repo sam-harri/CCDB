@@ -68,7 +68,7 @@ public:
     PreconCfsBRJ(const Array<OneD, MultiRegions::ExpListSharedPtr> &pFields,
                  const LibUtilities::SessionReaderSharedPtr &pSession,
                  const LibUtilities::CommSharedPtr &vComm);
-    ~PreconCfsBRJ() override{};
+    ~PreconCfsBRJ() override = default;
 
 protected:
     int m_PreconItsStep;
@@ -88,8 +88,6 @@ protected:
     TensorOfArray4D<NekSingle> m_TraceJacDerivArraySingle;
     Array<OneD, Array<OneD, NekSingle>> m_TraceJacDerivSignSingle;
     TensorOfArray5D<NekSingle> m_TraceIPSymJacArraySingle;
-
-    PrecType m_PreconMatStorage;
 
     void v_InitObject() override;
 
