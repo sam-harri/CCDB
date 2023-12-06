@@ -1137,7 +1137,7 @@
             <I PROPERTY="ICType"                VALUE="IsentropicVortex"    />
             <I PROPERTY="Projection"            VALUE="DisContinuous"       />
             <I PROPERTY="AdvectionType"         VALUE="WeakDG"              />
-            <I PROPERTY="TimeIntegrationMethod" VALUE="DIRKOrder3"          />
+            <I PROPERTY="TimeIntegrationMethod" VALUE="DIRKOrder4_ES6"      />
             <I PROPERTY="UpwindType"            VALUE="Roe"                 />
             <I PROPERTY="LinSysIterSolverTypeInNonlin" VALUE="GMRES"        />
         </SOLVERINFO>

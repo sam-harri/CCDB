@@ -692,7 +692,8 @@ void CompressibleFlowSystem::v_EvaluateExactSolution(
     unsigned int field, Array<OneD, NekDouble> &outfield, const NekDouble time)
 {
 
-    if (m_session->DefinesSolverInfo("ICTYPE"))
+    if (!m_session->DefinesFunction("ExactSolution") &&
+        m_session->DefinesSolverInfo("ICTYPE"))
     {
         if (boost::iequals(m_session->GetSolverInfo("ICTYPE"),
                            "IsentropicVortex"))

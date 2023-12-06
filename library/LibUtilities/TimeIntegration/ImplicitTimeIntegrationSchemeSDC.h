@@ -124,7 +124,7 @@ void ImplicitTimeIntegrationSchemeSDC::v_ResidualEval(
     m_op.DoProjection(m_Y[n], m_tmp, m_time + delta_t * m_tau[n]);
 
     // Compute residual
-    m_op.DoOdeImplicitRhs(m_tmp, m_F[n], m_time + delta_t * m_tau[n]);
+    m_op.DoOdeRhs(m_tmp, m_F[n], m_time + delta_t * m_tau[n]);
 }
 
 void ImplicitTimeIntegrationSchemeSDC::v_ResidualEval(const NekDouble &delta_t)

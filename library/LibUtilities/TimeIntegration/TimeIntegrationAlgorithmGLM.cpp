@@ -66,6 +66,13 @@ TimeIntegrationSolutionGLMSharedPtr TimeIntegrationAlgorithmGLM::InitializeData(
         // Ensure initial solution is in correct space.
         m_op.DoProjection(y_out->GetSolution(), y_out->UpdateSolution(), time);
     }
+    else if (m_schemeType == eDiagonallyImplicit &&
+             fabs(A(0, 0)) < NekConstants::kNekZeroTol)
+    {
+        // Explicit first-stage when first diagonal coefficient is equal to
+        // zero (EDIRK/ESDIRK schemes).
+        m_op.DoProjection(y_out->GetSolution(), y_out->UpdateSolution(), time);
+    }
 
     // Calculate the initial derivative, if is part of the solution vector of
     // the current scheme.

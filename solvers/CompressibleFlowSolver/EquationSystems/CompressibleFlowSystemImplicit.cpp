@@ -70,8 +70,8 @@ void CFSImplicit::v_InitObject(bool DeclareFields)
     m_viscousJacFlag = (0 == ntmp) ? false : true;
 
     // initialise implicit functors
+    m_ode.DefineOdeRhs(&CFSImplicit::DoOdeImplicitRhs, this);
     m_ode.DefineImplicitSolve(&CFSImplicit::DoImplicitSolve, this);
-    m_ode.DefineOdeImplicitRhs(&CFSImplicit::DoOdeImplicitRhs, this);
 
     InitialiseNonlinSysSolver();
 }
