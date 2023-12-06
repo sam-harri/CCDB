@@ -33,7 +33,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include <IncNavierStokesSolver/EquationSystems/WeakPressureExtrapolate.h>
-#include <LibUtilities/Communication/Comm.h>
 
 namespace Nektar
 {
