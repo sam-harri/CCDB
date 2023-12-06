@@ -68,7 +68,7 @@ public:
         const LibUtilities::SessionReaderSharedPtr &pSession,
         const LibUtilities::CommSharedPtr &vRowComm, const int nDimen,
         const NekSysKey &pKey);
-    LIB_UTILITIES_EXPORT ~NekLinSysIterFixedpointJacobi() override;
+    LIB_UTILITIES_EXPORT ~NekLinSysIterFixedpointJacobi() override = default;
 
 protected:
     void v_InitObject() override;

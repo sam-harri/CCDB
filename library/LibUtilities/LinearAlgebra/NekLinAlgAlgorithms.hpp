@@ -55,7 +55,6 @@ std::vector<NekVector<DataType>> GramSchmidtOrthogonalization(
     typedef NekVector<DataType> VectorType;
     typedef NekMatrix<DataType> MatrixType;
 
-    // typename dim = x[0].GetDimension();
     unsigned int dim = x[0].GetDimension();
     std::vector<VectorType> q(x.size(), VectorType());
 

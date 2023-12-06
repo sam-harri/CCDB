@@ -37,6 +37,7 @@
 #define NEKTAR_LIB_UTILITIES_LINEAR_ALGEBRA_NEK_LINSYS_ITERAT_CG_H
 
 #include <LibUtilities/LinearAlgebra/NekLinSysIter.h>
+
 namespace Nektar::LibUtilities
 {
 /// A global linear system.
@@ -67,7 +68,7 @@ public:
         const LibUtilities::SessionReaderSharedPtr &pSession,
         const LibUtilities::CommSharedPtr &vRowComm, const int nDimen,
         const NekSysKey &pKey);
-    LIB_UTILITIES_EXPORT ~NekLinSysIterCG() override;
+    LIB_UTILITIES_EXPORT ~NekLinSysIterCG() override = default;
 
 protected:
     void v_InitObject() override;

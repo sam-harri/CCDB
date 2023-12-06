@@ -71,7 +71,7 @@ public:
         const LibUtilities::SessionReaderSharedPtr &pSession,
         const LibUtilities::CommSharedPtr &vRowComm, const int nDimen,
         const NekSysKey &pKey);
-    LIB_UTILITIES_EXPORT ~NekLinSysIter() override;
+    LIB_UTILITIES_EXPORT ~NekLinSysIter() override = default;
 
     LIB_UTILITIES_EXPORT void SetUniversalUniqueMap(
         const Array<OneD, const int> &map);
@@ -106,9 +106,8 @@ protected:
     /// Dot product of rhs to normalise stopping criterion
     NekDouble m_rhs_magnitude = NekConstants::kNekUnsetDouble;
 
-    int m_totalIterations  = 0;
-    NekDouble m_rhs_mag_sm = 0.9;
-
+    int m_totalIterations   = 0;
+    NekDouble m_rhs_mag_sm  = 0.9;
     NekDouble m_prec_factor = 1.0;
 
     // This is the maximum number of solution vectors that can be stored

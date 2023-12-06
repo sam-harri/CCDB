@@ -37,6 +37,7 @@
 #define NEKTAR_LIB_UTILITIES_LINEAR_ALGEBRA_NEK_LINSYS_ITERAT_CG_H
 
 #include <LibUtilities/LinearAlgebra/NekLinSysIter.h>
+
 namespace Nektar::LibUtilities
 {
 /// A global linear system.
@@ -61,13 +62,15 @@ public:
         p->InitObject();
         return p;
     }
+
     static std::string className;
+
     /// Constructor for full direct matrix solve.
     LIB_UTILITIES_EXPORT NekLinSysIterCGLoc(
         const LibUtilities::SessionReaderSharedPtr &pSession,
         const LibUtilities::CommSharedPtr &vRowComm, const int nDimen,
         const NekSysKey &pKey);
-    LIB_UTILITIES_EXPORT ~NekLinSysIterCGLoc() override;
+    LIB_UTILITIES_EXPORT ~NekLinSysIterCGLoc() override = default;
 
 protected:
     void v_InitObject() override;

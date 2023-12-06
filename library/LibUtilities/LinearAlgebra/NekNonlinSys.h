@@ -58,7 +58,7 @@ public:
         const LibUtilities::SessionReaderSharedPtr &pSession,
         const LibUtilities::CommSharedPtr &vRowComm, const int nDimen,
         const NekSysKey &pKey);
-    LIB_UTILITIES_EXPORT ~NekNonlinSys() override;
+    LIB_UTILITIES_EXPORT ~NekNonlinSys() override = default;
 
     LIB_UTILITIES_EXPORT const Array<OneD, const NekDouble> &GetRefSolution()
         const
@@ -131,8 +131,6 @@ protected:
     Array<OneD, NekDouble> m_Residual;
     Array<OneD, NekDouble> m_DeltSltn;
     Array<OneD, NekDouble> m_SourceVec;
-
-    bool m_ResidualUpdated = false;
 
     void v_InitObject() override;
 

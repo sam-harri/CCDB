@@ -131,9 +131,6 @@ static SNekMatSharedPtr NullSNekMatSharedPtr;
 static SNekScalMatSharedPtr NullSNekScalMatSharedPtr;
 static SNekScalBlkMatSharedPtr NullSNekScalBlkMatSharedPtr;
 
-//     typedef LinearSystem                      DNekScalLinSys;
-//     typedef std::shared_ptr<DNekScalLinSys>   DNekScalLinSysSharedPtr;
-
 static Array<OneD, SNekBlkMatSharedPtr> NullArraySNekBlkMatSharedPtr;
 
 } // namespace Nektar

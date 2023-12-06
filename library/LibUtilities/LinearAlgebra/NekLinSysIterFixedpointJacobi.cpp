@@ -33,7 +33,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <LibUtilities/BasicUtils/Timer.h>
 #include <LibUtilities/LinearAlgebra/NekLinSysIterFixedpointJacobi.h>
 
 using namespace std;
@@ -58,13 +57,12 @@ NekLinSysIterFixedpointJacobi::NekLinSysIterFixedpointJacobi(
 {
 }
 
+/**
+ *
+ */
 void NekLinSysIterFixedpointJacobi::v_InitObject()
 {
     NekLinSysIter::v_InitObject();
-}
-
-NekLinSysIterFixedpointJacobi::~NekLinSysIterFixedpointJacobi()
-{
 }
 
 /**

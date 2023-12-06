@@ -33,7 +33,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <LibUtilities/BasicUtils/Timer.h>
 #include <LibUtilities/LinearAlgebra/NekLinSysIter.h>
 
 using namespace std;
@@ -57,9 +56,7 @@ NekLinSysIter::NekLinSysIter(
     const NekSysKey &pKey)
     : NekSys(pSession, vRowComm, nDimen, pKey)
 {
-    std::vector<std::string> variables(1);
-    variables[0]    = pSession->GetVariable(0);
-    string variable = variables[0];
+    string variable = pSession->GetVariable(0);
 
     if (pSession->DefinesGlobalSysSolnInfo(variable, "NekLinSysTolerance"))
     {
@@ -106,10 +103,6 @@ void NekLinSysIter::v_InitObject()
     SetUniversalUniqueMap();
 }
 
-NekLinSysIter::~NekLinSysIter()
-{
-}
-
 void NekLinSysIter::SetUniversalUniqueMap(const Array<OneD, const int> &map)
 {
     int nmap = map.size();
@@ -154,18 +147,17 @@ void NekLinSysIter::Set_Rhs_Magnitude(const NekVector<NekDouble> &pIn)
 
 void NekLinSysIter::Set_Rhs_Magnitude(const Array<OneD, NekDouble> &pIn)
 {
-    Array<OneD, NekDouble> vExchange(1, 0.0);
-
+    NekDouble vExchange(0.0);
     Array<OneD, NekDouble> wk(pIn.size());
     m_operator.DoAssembleLoc(pIn, wk);
-    vExchange[0] = Vmath::Dot(pIn.size(), wk, pIn);
+    vExchange = Vmath::Dot(pIn.size(), wk, pIn);
     m_rowComm->AllReduce(vExchange, LibUtilities::ReduceSum);
 
     // To ensure that very different rhs values are not being
     // used in subsequent solvers such as the velocit solve in
     // INC NS. If this works we then need to work out a better
     // way to control this.
-    NekDouble new_rhs_mag = (vExchange[0] > 1e-6) ? vExchange[0] : 1.0;
+    NekDouble new_rhs_mag = (vExchange > 1e-6) ? vExchange : 1.0;
 
     if (m_rhs_magnitude == NekConstants::kNekUnsetDouble)
     {

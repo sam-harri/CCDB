@@ -37,6 +37,7 @@
 #define NEKTAR_LIB_UTILITIES_LINEAR_ALGEBRA_NEK_LINSYS_ITERAT_GMRES_H
 
 #include <LibUtilities/LinearAlgebra/NekLinSysIter.h>
+
 namespace Nektar::LibUtilities
 {
 /// A global linear system.
@@ -59,13 +60,14 @@ public:
         p->InitObject();
         return p;
     }
+
     static std::string className;
 
     LIB_UTILITIES_EXPORT NekLinSysIterGMRES(
         const LibUtilities::SessionReaderSharedPtr &pSession,
         const LibUtilities::CommSharedPtr &vRowComm, const int nDimen,
         const NekSysKey &pKey = NekSysKey());
-    LIB_UTILITIES_EXPORT ~NekLinSysIterGMRES() override;
+    LIB_UTILITIES_EXPORT ~NekLinSysIterGMRES() override = default;
 
     LIB_UTILITIES_EXPORT int GetMaxLinIte()
     {

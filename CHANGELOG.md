@@ -30,6 +30,7 @@ v5.5.0
 - Update SDC scheme for implicit PFASST (!1659)
 - Pre-allocate memory for GMRES (!1668)
 - Remove arbitrary factor in  `GlobalLinSysIterative.cpp` (!1694)
+- Some tidy-up in LinearAlgebra (!1699)
 
 **ADRSolver**
 - Add support for spatially-constant, but variable direction, diffusion to

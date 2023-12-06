@@ -123,10 +123,6 @@ void NekLinSysIterGMRES::v_InitObject()
     NekLinSysIter::v_InitObject();
 }
 
-NekLinSysIterGMRES::~NekLinSysIterGMRES()
-{
-}
-
 /**
  *
  */
