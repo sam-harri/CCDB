@@ -37,18 +37,11 @@
 
 #include <CompressibleFlowSolver/Preconditioner/PreconCfsOp.h>
 #include <LibUtilities/BasicUtils/SessionReader.h>
-#include <LibUtilities/BasicUtils/SharedArray.hpp>
 #include <LibUtilities/Communication/Comm.h>
 #include <MultiRegions/ExpList.h>
 
 namespace Nektar
 {
-enum PrecType
-{
-    eNull, ///< No Solution type specified
-    eDiagonal,
-    eSparse,
-};
 
 //  Forward declaration
 class PreconCfs;
@@ -70,9 +63,7 @@ public:
               const LibUtilities::SessionReaderSharedPtr &pSession,
               const LibUtilities::CommSharedPtr &vComm);
 
-    virtual ~PreconCfs()
-    {
-    }
+    virtual ~PreconCfs() = default;
 
     inline void InitObject();
 
@@ -97,16 +88,11 @@ protected:
     LibUtilities::CommSharedPtr m_Comm;
     bool m_verbose;
     int m_spacedim;
-
     NekPreconCfsOperators m_operator;
-
     int m_PreconMatFreezNumb;
     int m_PreconTimesCounter;
-
     NekDouble m_DtLambdaPreconMat = -1.0;
-    NekDouble m_BndEvaluateTime;
-
-    bool m_CalcPreconMatFlag = false;
+    bool m_CalcPreconMatFlag      = false;
 
     virtual void v_InitObject() = 0;
 
@@ -166,6 +152,7 @@ inline bool PreconCfs::UpdatePreconMatCheck(
 {
     return v_UpdatePreconMatCheck(res, dtLambda);
 }
+
 } // namespace Nektar
 
 #endif

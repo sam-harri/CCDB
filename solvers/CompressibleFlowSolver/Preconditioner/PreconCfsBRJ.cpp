@@ -59,8 +59,7 @@ PreconCfsBRJ::PreconCfsBRJ(
     pSession->LoadParameter("PreconItsStep", m_PreconItsStep, 7);
     pSession->LoadParameter("BRJRelaxParam", m_BRJRelaxParam, 1.0);
 
-    size_t nvariables  = pFields.size();
-    m_PreconMatStorage = eDiagonal;
+    size_t nvariables = pFields.size();
 
     m_PreconMatVarsSingle =
         Array<OneD, Array<OneD, SNekBlkMatSharedPtr>>(nvariables);
@@ -89,7 +88,7 @@ void PreconCfsBRJ::v_DoPreconCfs(
     [[maybe_unused]] const bool &flag)
 {
     size_t nBRJIterTot = m_PreconItsStep;
-    if (0 == nBRJIterTot)
+    if (nBRJIterTot == 0)
     {
         DoNullPrecon(inarray, outarray, flag);
     }
@@ -189,7 +188,7 @@ void PreconCfsBRJ::v_DoPreconCfs(
 void PreconCfsBRJ::v_BuildPreconCfs(
     [[maybe_unused]] const Array<OneD, MultiRegions::ExpListSharedPtr> &pFields,
     const Array<OneD, const Array<OneD, NekDouble>> &intmp,
-    const NekDouble time, const NekDouble lambda)
+    [[maybe_unused]] const NekDouble time, const NekDouble lambda)
 {
     if (0 < m_PreconItsStep)
     {
@@ -265,9 +264,7 @@ void PreconCfsBRJ::v_BuildPreconCfs(
         }
     }
 
-    m_BndEvaluateTime   = time;
-    m_DtLambdaPreconMat = lambda;
-
+    m_DtLambdaPreconMat  = lambda;
     m_CalcPreconMatFlag  = false;
     m_PreconTimesCounter = 1;
 }
@@ -279,18 +276,8 @@ bool PreconCfsBRJ::v_UpdatePreconMatCheck(
     [[maybe_unused]] const Array<OneD, const NekDouble> &res,
     const NekDouble dtLambda)
 {
-    bool flag = false;
-
-    if (m_CalcPreconMatFlag || (m_DtLambdaPreconMat != dtLambda))
-    {
-        flag = true;
-    }
-
-    if (m_PreconMatFreezNumb < m_PreconTimesCounter)
-    {
-        flag = true;
-    }
-
+    bool flag = (m_CalcPreconMatFlag || m_DtLambdaPreconMat != dtLambda ||
+                 m_PreconMatFreezNumb < m_PreconTimesCounter);
     m_CalcPreconMatFlag = flag;
     return flag;
 }

@@ -50,6 +50,7 @@ v5.5.0
 **CompressibleFlowSolver**
 - Add three subsonic inflow boundary conditions: EnforceEntropyPresure, EnforceEntropyVelocity, and EnforceEntropyTotalEnthalpy (!1398)
 - Update implicit solver for implicit PFASST (!1659)
+- Some tidy-up in the compressible flow solver (!1698)
 
 **ShallowWaterSolver**
 - Reduce memory footprint of the Peregrine solver(!1680)

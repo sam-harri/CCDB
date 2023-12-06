@@ -472,6 +472,7 @@ void CFSImplicit::CalcRefValues(const Array<OneD, const NekDouble> &inarray)
     {
         m_magnitdEstimat[1] += m_magnitdEstimat[i];
     }
+
     for (int i = 2; i < nvariables - 1; ++i)
     {
         m_magnitdEstimat[i] = m_magnitdEstimat[1];
