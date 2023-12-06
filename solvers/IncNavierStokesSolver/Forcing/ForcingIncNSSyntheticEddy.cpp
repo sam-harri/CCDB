@@ -201,7 +201,7 @@ void ForcingIncNSSyntheticEddy::v_InitObject(
 
     // Read flag to check if the run is a test case
     elmtInfTurb = pForce->FirstChildElement("TestCase");
-    const char *tcaseStr = elmtInfTurb->GetText();
+    const char *tcaseStr = (elmtInfTurb) ? elmtInfTurb->GetText() : "NoName";
     m_tCase = (strcmp(tcaseStr, "ChanFlow3D") == 0) ? true : false; 
 
     // Set Cholesky decomposition of the Reynolds Stresses in the domain
