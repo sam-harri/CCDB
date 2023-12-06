@@ -55,9 +55,7 @@ NekNonlinSys::NekNonlinSys(const LibUtilities::SessionReaderSharedPtr &pSession,
                            const int nDimen, const NekSysKey &pKey)
     : NekSys(pSession, vRowComm, nDimen, pKey)
 {
-    std::vector<std::string> variables(1);
-    variables[0]    = pSession->GetVariable(0);
-    string variable = variables[0];
+    string variable = pSession->GetVariable(0);
 
     if (pSession->DefinesGlobalSysSolnInfo(variable, "NekNonlinSysTolerance"))
     {
@@ -113,7 +111,6 @@ NekNonlinSys::NekNonlinSys(const LibUtilities::SessionReaderSharedPtr &pSession,
                                 pKey.m_LinSysRelativeTolInNonlin);
     }
 
-    m_LinSysIterSolverType = pKey.m_LinSysIterSolverTypeInNonlin;
     if (pSession->DefinesGlobalSysSolnInfo(variable,
                                            "LinSysIterSolverTypeInNonlin"))
     {
@@ -122,11 +119,9 @@ NekNonlinSys::NekNonlinSys(const LibUtilities::SessionReaderSharedPtr &pSession,
     }
     else
     {
-        if (pSession->DefinesSolverInfo("LinSysIterSolverTypeInNonlin"))
-        {
-            m_LinSysIterSolverType =
-                pSession->GetSolverInfo("LinSysIterSolverTypeInNonlin");
-        }
+        pSession->LoadSolverInfo("LinSysIterSolverTypeInNonlin",
+                                 m_LinSysIterSolverType,
+                                 pKey.m_LinSysIterSolverTypeInNonlin);
     }
 
     ASSERTL0(LibUtilities::GetNekLinSysIterFactory().ModuleExists(
@@ -142,10 +137,6 @@ NekNonlinSys::NekNonlinSys(const LibUtilities::SessionReaderSharedPtr &pSession,
 void NekNonlinSys::v_InitObject()
 {
     NekSys::v_InitObject();
-}
-
-NekNonlinSys::~NekNonlinSys()
-{
 }
 
 } // namespace Nektar::LibUtilities

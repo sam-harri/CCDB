@@ -29,6 +29,7 @@ v5.5.0
 - Replace `boost::regex` with `std::regex` (!1676)
 - Update SDC scheme for implicit PFASST (!1659)
 - Pre-allocate memory for GMRES (!1668)
+- Some tidy-up in LinearAlgebra (!1699)
 
 **ADRSolver**
 - Add support for spatially-constant, but variable direction, diffusion to

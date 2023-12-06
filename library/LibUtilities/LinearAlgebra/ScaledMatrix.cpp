@@ -226,61 +226,6 @@ NekMatrix<DataType, ScaledMatrixTag> Transpose(
     return result;
 }
 
-//    template<typename DataType, typename InnerMatrixType>
-//    NekMatrix<NekMatrix< DataType, InnerMatrixType>,
-//    ScaledMatrixTag>::const_iterator::const_iterator(
-//            typename NekMatrix<NekMatrix< DataType, InnerMatrixType>,
-//            ScaledMatrixTag>::InnerType::const_iterator iter, const typename
-//            NekMatrix<NekMatrix< DataType, InnerMatrixType>,
-//            ScaledMatrixTag>::NumberType& scale) :
-//        m_iter(iter),
-//        m_scale(scale)
-//    {
-//    }
-
-//    template<typename DataType, typename InnerMatrixType>
-//    typename NekMatrix<NekMatrix< DataType, InnerMatrixType>,
-//    ScaledMatrixTag>::const_iterator NekMatrix<NekMatrix< DataType,
-//    InnerMatrixType>, ScaledMatrixTag>::const_iterator::operator++(int)
-//    {
-//        const_iterator out = *this;
-//        ++m_iter;
-//        return out;
-//    }
-
-//    template<typename DataType, typename InnerMatrixType>
-//    typename NekMatrix<NekMatrix< DataType, InnerMatrixType>,
-//    ScaledMatrixTag>::const_iterator& NekMatrix<NekMatrix< DataType,
-//    InnerMatrixType>, ScaledMatrixTag>::const_iterator::operator++()
-//    {
-//        ++m_iter;
-//        return *this;
-//    }
-
-//    template<typename DataType, typename InnerMatrixType>
-//    typename NekMatrix<NekMatrix< DataType, InnerMatrixType>,
-//    ScaledMatrixTag>::NumberType NekMatrix<NekMatrix< DataType,
-//    InnerMatrixType>, ScaledMatrixTag>::const_iterator::operator*()
-//    {
-//        return m_scale*(*m_iter);
-//    }
-
-//    template<typename DataType, typename InnerMatrixType>
-//    bool NekMatrix<NekMatrix< DataType, InnerMatrixType>,
-//    ScaledMatrixTag>::const_iterator::operator==(const NekMatrix<NekMatrix<
-//    DataType, InnerMatrixType>, ScaledMatrixTag>::const_iterator& rhs)
-//    {
-//        return m_iter == rhs.m_iter;
-//    }
-
-//    template<typename DataType, typename InnerMatrixType>
-//    bool NekMatrix<NekMatrix< DataType, InnerMatrixType>,
-//    ScaledMatrixTag>::const_iterator::operator!=(const NekMatrix<NekMatrix<
-//    DataType, InnerMatrixType>, ScaledMatrixTag>::const_iterator& rhs)
-//    {
-//        return !(*this == rhs);
-//    }
-
 template LIB_UTILITIES_EXPORT class NekMatrix<
     NekMatrix<NekDouble, StandardMatrixTag>, ScaledMatrixTag>;
 

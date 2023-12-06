@@ -65,7 +65,7 @@ public:
         const LibUtilities::SessionReaderSharedPtr &pSession,
         const LibUtilities::CommSharedPtr &vRowComm, const int nDimen,
         const NekSysKey &pKey = NekSysKey());
-    LIB_UTILITIES_EXPORT ~NekLinSysIterGMRESLoc() override;
+    LIB_UTILITIES_EXPORT ~NekLinSysIterGMRESLoc() override = default;
 
     LIB_UTILITIES_EXPORT int GetMaxLinIte()
     {

@@ -207,13 +207,8 @@ protected:
 class NekSysKey
 {
 public:
-    NekSysKey()
-    {
-    }
-
-    ~NekSysKey()
-    {
-    }
+    NekSysKey()  = default;
+    ~NekSysKey() = default;
 
     NekDouble m_Tolerance                      = NekConstants::kNekIterativeTol;
     int m_NekNonlinSysMaxIterations            = 100;
@@ -255,11 +250,11 @@ public:
         const LibUtilities::SessionReaderSharedPtr &pSession,
         const LibUtilities::CommSharedPtr &vRowComm, const int nDimen,
         const NekSysKey &pKey);
+    LIB_UTILITIES_EXPORT virtual ~NekSys() = default;
     LIB_UTILITIES_EXPORT void InitObject()
     {
         v_InitObject();
     }
-    LIB_UTILITIES_EXPORT virtual ~NekSys();
 
     LIB_UTILITIES_EXPORT inline void SetSysOperators(const NekSysOperators &in)
     {

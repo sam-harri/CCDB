@@ -45,7 +45,6 @@ extern "C"
     // ARPACK ROUTINES
 
     // Computation of eigenvalues
-
     void F77NAME(dsaupd)(int &ido, const char *bmat, const int &n,
                          const char *which, const int &nev, const double &tol,
                          double *resid, const int &ncv, double *v,
@@ -82,7 +81,6 @@ extern "C"
 
 /// Top level reverse communication interface to solve real double-precision
 /// symmetric problems
-
 static inline void Dsaupd(int &ido, const char *bmat, const int &n,
                           const char *which, const int &nev, const double &tol,
                           double *resid, const int &ncv, double *v,
@@ -127,7 +125,6 @@ static inline void Dnaupd(int &ido, const char *bmat, const int &n,
 
 /// Post-processing routine to computed eigenvector of computed eigenvalues in
 /// Dnaupd
-
 static inline void Dneupd(const int &rvec, const char *howmny,
                           const int *select, double *dr, double *di, double *z,
                           const int &ldz, const double &sigmar,

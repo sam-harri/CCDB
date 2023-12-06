@@ -62,11 +62,12 @@ public:
     }
 
     static std::string className;
+
     LIB_UTILITIES_EXPORT NekNonlinSysNewton(
         const LibUtilities::SessionReaderSharedPtr &pSession,
         const LibUtilities::CommSharedPtr &vRowComm, const int nscale,
         const NekSysKey &pKey);
-    LIB_UTILITIES_EXPORT ~NekNonlinSysNewton() override;
+    LIB_UTILITIES_EXPORT ~NekNonlinSysNewton() override = default;
 
 protected:
     NekDouble m_SysResNorm0;
@@ -74,7 +75,7 @@ protected:
 
     bool m_InexactNewtonForcing = 0;
     NekDouble m_forcingGamma    = 1.0;
-    NekDouble m_forcingAlpha    = 0.5 * (1.0 + sqrt(5));
+    NekDouble m_forcingAlpha    = 0.5 * (1.0 + sqrt(5.0));
 
     void v_InitObject() override;
 
@@ -97,6 +98,7 @@ private:
                                        const NekDouble &resnormOld,
                                        const NekDouble &resnorm);
 };
+
 } // namespace Nektar::LibUtilities
 
 #endif

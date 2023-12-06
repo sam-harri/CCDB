@@ -33,7 +33,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <LibUtilities/BasicUtils/Timer.h>
 #include <LibUtilities/LinearAlgebra/NekNonlinSysNewton.h>
 
 using namespace std;
@@ -64,10 +63,6 @@ void NekNonlinSysNewton::v_InitObject()
     m_DeltSltn = Array<OneD, NekDouble>(m_SysDimen, 0.0);
 }
 
-NekNonlinSysNewton::~NekNonlinSysNewton()
-{
-}
-
 /**
  *
  **/
@@ -76,14 +71,14 @@ int NekNonlinSysNewton::v_SolveSystem(
     Array<OneD, NekDouble> &pOutput, const int nDir, const NekDouble tol,
     [[maybe_unused]] const NekDouble factor)
 {
-    v_SetupNekNonlinSystem(nGlobal, pInput, pInput, nDir);
+    int ntotal = nGlobal - nDir;
 
-    m_Solution = pOutput;
-    Vmath::Vcopy(nGlobal - nDir, pInput, 1, m_Solution, 1);
-
-    int ntotal      = nGlobal - nDir;
+    m_Solution      = pOutput;
     m_NtotLinSysIts = 0;
     m_converged     = false;
+
+    v_SetupNekNonlinSystem(nGlobal, pInput, pInput, nDir);
+    Vmath::Vcopy(ntotal, pInput, 1, m_Solution, 1);
 
     NekDouble resnormOld = 0.0;
     int NttlNonlinIte    = 0;
@@ -129,30 +124,18 @@ bool NekNonlinSysNewton::v_ConvergenceCheck(
     const int nIteration, const Array<OneD, const NekDouble> &Residual,
     const NekDouble tol)
 {
-    bool converged     = false;
-    NekDouble resratio = 1.0;
-    int ntotal         = Residual.size();
-
-    m_SysResNorm = Vmath::Dot(ntotal, Residual, Residual);
+    m_SysResNorm = Vmath::Dot(Residual.size(), Residual, Residual);
     m_rowComm->AllReduce(m_SysResNorm, Nektar::LibUtilities::ReduceSum);
 
     if (nIteration == 0)
     {
         m_SysResNorm0 = m_SysResNorm;
-        resratio      = 1.0;
-    }
-    else
-    {
-        resratio = m_SysResNorm / m_SysResNorm0;
     }
 
-    if (resratio < (m_NonlinIterTolRelativeL2 * m_NonlinIterTolRelativeL2) ||
-        m_SysResNorm < tol * tol)
-    {
-        converged = true;
-    }
+    NekDouble resratio = m_SysResNorm / m_SysResNorm0;
+    NekDouble restol   = m_NonlinIterTolRelativeL2;
 
-    return converged;
+    return resratio < restol * restol || m_SysResNorm < tol * tol;
 }
 
 NekDouble NekNonlinSysNewton::CalcInexactNewtonForcing(

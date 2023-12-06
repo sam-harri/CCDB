@@ -33,7 +33,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <LibUtilities/BasicUtils/Timer.h>
 #include <LibUtilities/LinearAlgebra/NekLinSysIterCG.h>
 
 using namespace std;
@@ -61,10 +60,6 @@ NekLinSysIterCG::NekLinSysIterCG(
 void NekLinSysIterCG::v_InitObject()
 {
     NekLinSysIter::v_InitObject();
-}
-
-NekLinSysIterCG::~NekLinSysIterCG()
-{
 }
 
 /**
