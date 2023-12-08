@@ -190,6 +190,11 @@ OPTION(NEKTAR_BUILD_TESTS             "Build regression tests."        ON)
 OPTION(NEKTAR_BUILD_PERFORMANCE_TESTS "Build performance tests."       OFF)
 OPTION(NEKTAR_BUILD_PYTHON            "Build Nektar++ Python bindings" OFF)
 
+# Option to build solver libraries. Hidden if NEKTAR_BUILD_SOLVERS=OFF
+CMAKE_DEPENDENT_OPTION(NEKTAR_BUILD_SOLVER_LIBS
+    "Build example solver source files into their own libraries" OFF
+    "NEKTAR_BUILD_SOLVERS" OFF)
+
 OPTION(NEKTAR_TEST_ALL "Include full set of regression tests to this build." OFF)
 OPTION(NEKTAR_TEST_USE_HOSTFILE "Use a hostfile to explicitly specify number of
 slots." OFF)
@@ -322,6 +327,11 @@ IF (NEKTAR_BUILD_LIBRARY)
     INCLUDE_DIRECTORIES(library)
 ENDIF()
 
+# Both normal libraries and solver libraries can modify NEKTAR++_LIBRARIES - reset it if we're building either
+if (NEKTAR_BUILD_LIBRARY OR NEKTAR_BUILD_SOLVER_LIBS)
+    SET(NEKTAR++_LIBRARIES "" CACHE INTERNAL "")
+ENDIF()
+
 INCLUDE_DIRECTORIES(utilities)
 ADD_SUBDIRECTORY(utilities)
 
@@ -329,9 +339,6 @@ INCLUDE_DIRECTORIES(solvers)
 ADD_SUBDIRECTORY(solvers)
 
 IF (NEKTAR_BUILD_LIBRARY)
-    # List of Nektar++ libraries will be rebuilt every configuration.
-    SET(NEKTAR++_LIBRARIES "" CACHE INTERNAL "")
-
     ADD_SUBDIRECTORY(library)
     INSTALL(EXPORT Nektar++Libraries DESTINATION ${NEKTAR_CMAKE_DIR} COMPONENT dev)
 ENDIF (NEKTAR_BUILD_LIBRARY)

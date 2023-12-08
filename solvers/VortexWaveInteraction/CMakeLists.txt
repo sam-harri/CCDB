@@ -35,6 +35,9 @@ IF( NEKTAR_SOLVER_VORTEXWAVE )
 
     ADD_SOLVER_EXECUTABLE(VortexWaveInteractionSolver SOURCES
 	${VortexWaveInteractionSolverSource})
+    IF(NEKTAR_BUILD_SOLVER_LIBS)
+        MESSAGE(WARNING, "Solver library build not set up for VortexWaveInteractionSolver - skipping.")
+    ENDIF()
     ADD_SOLVER_UTILITY(CalcL2ToLinfPressure VortexWaveInteractionSolver SOURCES
 	${CalcL2ToLinfPressureSource})
     ADD_SOLVER_UTILITY(CalcVWIplusPressure VortexWaveInteractionSolver SOURCES

@@ -13,6 +13,10 @@ IF( NEKTAR_SOLVER_DIFFUSION )
 
     ADD_NEKTAR_PERFORMANCE_TEST(Perf_TestMMFDiffCube)
 
+    IF(NEKTAR_BUILD_SOLVER_LIBS)
+        MESSAGE(WARNING, "Solver library build not set up for DiffusionSolver - skipping.")
+    ENDIF()
+
     ADD_NEKTAR_TEST(ImDiffusion_m6)
     ADD_NEKTAR_TEST(ImDiffusion_m6_time_int)
     

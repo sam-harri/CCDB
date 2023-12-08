@@ -64,6 +64,63 @@ IF( NEKTAR_SOLVER_COMPRESSIBLE_FLOW )
         Preconditioner/PreconCfs.cpp
         Preconditioner/PreconCfsBRJ.cpp
         )
+    IF (NEKTAR_BUILD_SOLVER_LIBS)
+        SET(CompressibleFlowSolverHeaders
+        ArtificialDiffusion/ArtificialDiffusion.h
+        ArtificialDiffusion/NonSmoothShockCapture.h
+        BoundaryConditions/CFSBndCond.h
+        BoundaryConditions/EnforceEntropyPressure.h
+        BoundaryConditions/EnforceEntropyTotalEnthalpy.h
+        BoundaryConditions/EnforceEntropyVelocity.h
+        BoundaryConditions/ExtrapOrder0BC.h
+        BoundaryConditions/IsentropicVortexBC.h
+        BoundaryConditions/PressureInflowFileBC.h
+        BoundaryConditions/PressureMachTemperatureBC.h
+        BoundaryConditions/PressureOutflowBC.h
+        BoundaryConditions/PressureOutflowNonReflectiveBC.h
+        BoundaryConditions/RiemannInvariantBC.h
+        BoundaryConditions/RinglebFlowBC.h
+        BoundaryConditions/StagnationInflowBC.h
+        BoundaryConditions/SymmetryBC.h
+        BoundaryConditions/TimeDependentBC.h
+        BoundaryConditions/WallBC.h
+        BoundaryConditions/WallViscousBC.h
+        Diffusion/DiffusionLDGNS.h
+        EquationSystems/CompressibleFlowSystem.h
+        EquationSystems/CompressibleFlowSystemImplicit.h
+        EquationSystems/EulerCFE.h
+        EquationSystems/EulerImplicitCFE.h
+        EquationSystems/NavierStokesCFEAxisym.h
+        EquationSystems/NavierStokesCFE.h
+        EquationSystems/NavierStokesImplicitCFE.h
+        Forcing/ForcingAxiSymmetric.h
+        Forcing/ForcingQuasi1D.h
+        Misc/EquationOfState.h
+        Misc/IdealGasEoS.h
+        Misc/PengRobinsonEoS.h
+        Misc/RedlichKwongEoS.h
+        Misc/VanDerWaalsEoS.h
+        Misc/VariableConverter.h
+        Preconditioner/PreconCfsBRJ.h
+        Preconditioner/PreconCfs.h
+        Preconditioner/PreconCfsOp.h
+        RiemannSolvers/AUSM0Solver.h
+        RiemannSolvers/AUSM1Solver.h
+        RiemannSolvers/AUSM2Solver.h
+        RiemannSolvers/AUSM3Solver.h
+        RiemannSolvers/AverageSolver.h
+        RiemannSolvers/CompressibleSolver.h
+        RiemannSolvers/ExactSolverToro.h
+        RiemannSolvers/HLLCSolver.h
+        RiemannSolvers/HLLSolver.h
+        RiemannSolvers/LaxFriedrichsSolver.h
+        RiemannSolvers/RoeSolver.h
+        RiemannSolvers/RoeSolverSIMD.h
+        )
+        # Create separate library. No need to pass source files, as the executable's LIBRARY_SOURCES objects will be reused
+        ADD_SOLVER_LIBRARY(CompressibleFlowSolver HEADERS ${CompressibleFlowSolverHeaders} DEPENDS SolverUtils)
+    ENDIF()
+
     IF(NEKTAR_BUILD_UNIT_TESTS)
       ADD_SUBDIRECTORY(RiemannSolvers/UnitTests)
     ENDIF()

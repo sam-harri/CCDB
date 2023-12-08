@@ -24,6 +24,11 @@ IF( NEKTAR_SOLVER_ADR )
         ./EquationSystems/UnsteadyViscousBurgers.cpp
         ./EquationSystems/EigenValuesAdvection.cpp)
 
+    IF(NEKTAR_BUILD_SOLVER_LIBS)
+        MESSAGE(WARNING, "Solver library build not set up for ADRSolver - skipping.")
+    ENDIF()
+
+    # Parareal solver
     ADD_NEKTAR_PERFORMANCE_TEST(Perf_CubeAllElements)
 
     # Parallel-in-time solver

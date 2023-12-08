@@ -23,6 +23,10 @@ IF( NEKTAR_SOLVER_ACOUSTIC )
     ADD_SOLVER_EXECUTABLE(AcousticSolver SOURCES ${AcousticSolverSource})
     ADD_NEKTAR_EXECUTABLE(APESolver COMPONENT AcousticSolver SOURCES ./APESolver.cpp)
 
+    IF(NEKTAR_BUILD_SOLVER_LIBS)
+        MESSAGE(WARNING, "Solver library build not set up for AcousticSolver - skipping.")
+    ENDIF()
+
     ADD_NEKTAR_TEST(APE_1DPulseSource_WeakDG_MODIFIED)
     ADD_NEKTAR_TEST(APE_1DPulseWall_WeakDG_MODIFIED)
     ADD_NEKTAR_TEST(APE_2DChannel_WeakDG_MODIFIED)
