@@ -43,7 +43,33 @@ IF( NEKTAR_SOLVER_PULSEWAVE )
         RiemannSolvers/UpwindPulseSolver.cpp
         )
 
-        SUBDIRS(Utilities)
+    IF(NEKTAR_BUILD_SOLVER_LIBS)
+        SET(PulseWaveSolverHeaders
+            EquationSystems/AInflow.h
+            EquationSystems/BetaPressureArea.h
+            EquationSystems/EmpiricalPressureArea.h
+            EquationSystems/PowerPressureArea.h
+            EquationSystems/PulseWaveBoundary.h
+            EquationSystems/PulseWavePressureArea.h
+            EquationSystems/PulseWavePropagation.h
+            EquationSystems/PulseWaveSystem.h
+            EquationSystems/QInflow.h
+            EquationSystems/RCROutflow.h
+            EquationSystems/ROutflow.h
+            EquationSystems/TemplatePressureArea.h
+            EquationSystems/TerminalOutflow.h
+            EquationSystems/TimeDependentInflow.h
+            EquationSystems/UInflow.h
+            EquationSystems/UndefinedInOutflow.h
+            RiemannSolvers/UpwindPulseSolver.h
+            Utilities/PulseWaveSystemOutput.h)
+        # Create separate library. No need to pass source files, as the executable's
+        # LIBRARY_SOURCES objects will be reused
+        ADD_SOLVER_LIBRARY(PulseWaveSolver HEADERS ${PulseWaveSolverHeaders}
+                          DEPENDS SolverUtils)
+    ENDIF()
+
+    SUBDIRS(Utilities)
 
     ADD_NEKTAR_PERFORMANCE_TEST(Perf_TwoBifurcations)
 

@@ -11,4 +11,8 @@ IF( NEKTAR_SOLVER_IMAGE_WARPING )
        ./ImageWarpingSolver.cpp 
        ./EquationSystems/ImageWarpingSystem.cpp)
     ADD_SOLVER_EXECUTABLE(ImageWarpingSolver SOURCES ${ImageWarpingSolverSource})
+
+    IF(NEKTAR_BUILD_SOLVER_LIBS)
+        MESSAGE(WARNING, "Solver library build not set up for ImageWarpingSolver - skipping.")
+    ENDIF()
 ENDIF( NEKTAR_SOLVER_IMAGE_WARPING )
