@@ -258,7 +258,7 @@ public:
 
     LIB_UTILITIES_EXPORT inline void SetSysOperators(const NekSysOperators &in)
     {
-        m_operator = in;
+        v_SetSysOperators(in);
     }
 
     LIB_UTILITIES_EXPORT inline const NekSysOperators &GetSysOperators()
@@ -307,6 +307,11 @@ protected:
 
     virtual void v_InitObject()
     {
+    }
+
+    virtual void v_SetSysOperators(const NekSysOperators &in)
+    {
+        m_operator = in;
     }
 
     virtual int v_SolveSystem(

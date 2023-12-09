@@ -78,6 +78,16 @@ public:
         return m_SourceVec;
     }
 
+    LIB_UTILITIES_EXPORT const NekLinSysIterSharedPtr &GetLinSys()
+    {
+        return m_linsol;
+    }
+
+    LIB_UTILITIES_EXPORT int GetNtotLinSysIts()
+    {
+        return m_NtotLinSysIts;
+    }
+
     LIB_UTILITIES_EXPORT void SetNekNonlinSysTolerance(const NekDouble in)
     {
         m_tolerance = in;
@@ -89,11 +99,6 @@ public:
         m_maxiter = in;
     }
 
-    LIB_UTILITIES_EXPORT const NekLinSysIterSharedPtr &GetLinSys()
-    {
-        return m_linsol;
-    }
-
     LIB_UTILITIES_EXPORT void SetNonlinIterTolRelativeL2(const NekDouble in)
     {
         m_NonlinIterTolRelativeL2 = in;
@@ -102,18 +107,6 @@ public:
     LIB_UTILITIES_EXPORT void SetLinSysRelativeTolInNonlin(const NekDouble in)
     {
         m_LinSysRelativeTolInNonlin = in;
-    }
-
-    LIB_UTILITIES_EXPORT int GetNtotLinSysIts()
-    {
-        return m_NtotLinSysIts;
-    }
-
-    LIB_UTILITIES_EXPORT void SetupNekNonlinSystem(
-        const int nGlobal, const Array<OneD, const NekDouble> &pInput,
-        const Array<OneD, const NekDouble> &pSource, const int nDir)
-    {
-        v_SetupNekNonlinSystem(nGlobal, pInput, pSource, nDir);
     }
 
 protected:
@@ -133,10 +126,6 @@ protected:
     Array<OneD, NekDouble> m_SourceVec;
 
     void v_InitObject() override;
-
-    LIB_UTILITIES_EXPORT virtual void v_SetupNekNonlinSystem(
-        const int nGlobal, const Array<OneD, const NekDouble> &pInput,
-        const Array<OneD, const NekDouble> &pSource, const int nDir) = 0;
 
 private:
 };

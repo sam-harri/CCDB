@@ -31,6 +31,7 @@ v5.5.0
 - Pre-allocate memory for GMRES (!1668)
 - Remove arbitrary factor in  `GlobalLinSysIterative.cpp` (!1694)
 - Some tidy-up in LinearAlgebra (!1699)
+- Avoid repeatly operator assignment in NekNonlinSysNewton class (!1709)
 
 **ADRSolver**
 - Add support for spatially-constant, but variable direction, diffusion to

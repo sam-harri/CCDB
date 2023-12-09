@@ -63,6 +63,12 @@ void NekNonlinSysNewton::v_InitObject()
     m_DeltSltn = Array<OneD, NekDouble>(m_SysDimen, 0.0);
 }
 
+void NekNonlinSysNewton::v_SetSysOperators(const NekSysOperators &in)
+{
+    NekSys::v_SetSysOperators(in);
+    m_linsol->SetSysOperators(in);
+}
+
 /**
  *
  **/
@@ -71,13 +77,16 @@ int NekNonlinSysNewton::v_SolveSystem(
     Array<OneD, NekDouble> &pOutput, const int nDir, const NekDouble tol,
     [[maybe_unused]] const NekDouble factor)
 {
+    ASSERTL0(nDir == 0, "nDir != 0 not tested");
+    ASSERTL0(nGlobal == m_SysDimen, "nGlobal != m_SysDimen");
+
     int ntotal = nGlobal - nDir;
 
+    m_SourceVec     = pInput;
     m_Solution      = pOutput;
     m_NtotLinSysIts = 0;
     m_converged     = false;
 
-    v_SetupNekNonlinSystem(nGlobal, pInput, pInput, nDir);
     Vmath::Vcopy(ntotal, pInput, 1, m_Solution, 1);
 
     NekDouble resnormOld = 0.0;
@@ -151,19 +160,6 @@ NekDouble NekNonlinSysNewton::CalcInexactNewtonForcing(
             m_forcingGamma * pow((resnorm / resnormOld), m_forcingAlpha);
         return max(min(m_LinSysRelativeTolInNonlin, tmpForc), 1.0E-6);
     }
-}
-
-void NekNonlinSysNewton::v_SetupNekNonlinSystem(
-    const int nGlobal,
-    [[maybe_unused]] const Array<OneD, const NekDouble> &pInput,
-    const Array<OneD, const NekDouble> &pSource, const int nDir)
-{
-    ASSERTL0(0 == nDir, "0 != nDir not tested");
-    ASSERTL0(m_SysDimen == nGlobal, "m_SysDimen!=nGlobal");
-
-    m_SourceVec = pSource;
-
-    m_linsol->SetSysOperators(m_operator);
 }
 
 } // namespace Nektar::LibUtilities
