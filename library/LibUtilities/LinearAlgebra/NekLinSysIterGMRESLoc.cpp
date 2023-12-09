@@ -133,10 +133,9 @@ void NekLinSysIterGMRESLoc::v_InitObject()
 int NekLinSysIterGMRESLoc::v_SolveSystem(
     const int nLocal, const Array<OneD, const NekDouble> &pInput,
     Array<OneD, NekDouble> &pOutput, [[maybe_unused]] const int nDir,
-    [[maybe_unused]] const NekDouble tol, const NekDouble factor)
+    const NekDouble tol, [[maybe_unused]] const NekDouble factor)
 {
-    m_tolerance     = max(tol, 1.0E-16);
-    m_prec_factor   = factor;
+    m_tolerance     = max(tol, 1.0E-15);
     int niterations = DoGMRES(nLocal, pInput, pOutput);
 
     return niterations;
@@ -400,11 +399,6 @@ NekDouble NekLinSysIterGMRESLoc::DoGmresRestart(
             // m_tolerance * m_rhs_magnitude )
             if ((eps <
                  m_tolerance * m_tolerance * m_rhs_magnitude)) //&& nd > 0)
-            {
-                m_converged = true;
-            }
-            NekDouble tolmin = 1.0E-15;
-            if (eps < tolmin * tolmin * m_rhs_magnitude)
             {
                 m_converged = true;
             }
