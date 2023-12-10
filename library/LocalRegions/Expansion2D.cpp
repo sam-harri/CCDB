@@ -442,23 +442,8 @@ DNekScalMatSharedPtr Expansion2D::CreateMatrix(const MatrixKey &mkey)
 
             // Clear memory (Repeat varcoeff checks)
             DropLocMatrix(advkey);
-            if (mkey.HasVarCoeff(StdRegions::eVarCoeffMass))
-            {
-                DropLocMatrix(masskey);
-            }
-            if ((mkey.HasVarCoeff(StdRegions::eVarCoeffLaplacian)) ||
-                (mkey.HasVarCoeff(StdRegions::eVarCoeffD00)) ||
-                (mkey.HasVarCoeff(StdRegions::eVarCoeffD01)) ||
-                (mkey.HasVarCoeff(StdRegions::eVarCoeffD10)) ||
-                (mkey.HasVarCoeff(StdRegions::eVarCoeffD02)) ||
-                (mkey.HasVarCoeff(StdRegions::eVarCoeffD20)) ||
-                (mkey.HasVarCoeff(StdRegions::eVarCoeffD11)) ||
-                (mkey.HasVarCoeff(StdRegions::eVarCoeffD12)) ||
-                (mkey.HasVarCoeff(StdRegions::eVarCoeffD21)) ||
-                (mkey.HasVarCoeff(StdRegions::eVarCoeffD22)))
-            {
-                DropLocMatrix(lapkey);
-            }
+            DropLocMatrix(masskey);
+            DropLocMatrix(lapkey);
         }
         break;
         case StdRegions::eLinearAdvectionDiffusionReactionGJP:
@@ -468,16 +453,18 @@ DNekScalMatSharedPtr Expansion2D::CreateMatrix(const MatrixKey &mkey)
             NekDouble lambda = mkey.GetConstFactor(StdRegions::eFactorLambda);
 
             // Construct mass matrix (Check for varcoeffs)
-            MatrixKey masskey(StdRegions::eMass, mkey.GetShapeType(), *this);
+            StdRegions::VarCoeffMap massVarcoeffs = StdRegions::NullVarCoeffMap;
             if (mkey.HasVarCoeff(StdRegions::eVarCoeffMass))
             {
-                masskey = MatrixKey(mkey, StdRegions::eMass);
+                massVarcoeffs[StdRegions::eVarCoeffMass] =
+                    mkey.GetVarCoeff(StdRegions::eVarCoeffMass);
             }
+            MatrixKey masskey(StdRegions::eMass, mkey.GetShapeType(), *this,
+                              mkey.GetConstFactors(), massVarcoeffs);
             DNekScalMat &MassMat = *GetLocMatrix(masskey);
 
             // Construct laplacian matrix (Check for varcoeffs)
-            MatrixKey lapkey(StdRegions::eLaplacian, mkey.GetShapeType(), *this,
-                             mkey.GetConstFactors());
+            StdRegions::VarCoeffMap lapVarcoeffs = StdRegions::NullVarCoeffMap;
             if ((mkey.HasVarCoeff(StdRegions::eVarCoeffLaplacian)) ||
                 (mkey.HasVarCoeff(StdRegions::eVarCoeffD00)) ||
                 (mkey.HasVarCoeff(StdRegions::eVarCoeffD01)) ||
@@ -489,8 +476,10 @@ DNekScalMatSharedPtr Expansion2D::CreateMatrix(const MatrixKey &mkey)
                 (mkey.HasVarCoeff(StdRegions::eVarCoeffD21)) ||
                 (mkey.HasVarCoeff(StdRegions::eVarCoeffD22)))
             {
-                lapkey = MatrixKey(mkey, StdRegions::eLaplacian);
+                lapVarcoeffs = mkey.GetVarCoeffs();
             }
+            MatrixKey lapkey(StdRegions::eLaplacian, mkey.GetShapeType(), *this,
+                             mkey.GetConstFactors(), lapVarcoeffs);
             DNekScalMat &LapMat = *GetLocMatrix(lapkey);
 
             // Construct advection matrix
@@ -523,23 +512,8 @@ DNekScalMatSharedPtr Expansion2D::CreateMatrix(const MatrixKey &mkey)
 
             // Clear memory
             DropLocMatrix(advkey);
-            if (mkey.HasVarCoeff(StdRegions::eVarCoeffMass))
-            {
-                DropLocMatrix(masskey);
-            }
-            if ((mkey.HasVarCoeff(StdRegions::eVarCoeffLaplacian)) ||
-                (mkey.HasVarCoeff(StdRegions::eVarCoeffD00)) ||
-                (mkey.HasVarCoeff(StdRegions::eVarCoeffD01)) ||
-                (mkey.HasVarCoeff(StdRegions::eVarCoeffD10)) ||
-                (mkey.HasVarCoeff(StdRegions::eVarCoeffD02)) ||
-                (mkey.HasVarCoeff(StdRegions::eVarCoeffD20)) ||
-                (mkey.HasVarCoeff(StdRegions::eVarCoeffD11)) ||
-                (mkey.HasVarCoeff(StdRegions::eVarCoeffD12)) ||
-                (mkey.HasVarCoeff(StdRegions::eVarCoeffD21)) ||
-                (mkey.HasVarCoeff(StdRegions::eVarCoeffD22)))
-            {
-                DropLocMatrix(lapkey);
-            }
+            DropLocMatrix(masskey);
+            DropLocMatrix(lapkey);
         }
         break;
         case StdRegions::eNormDerivOnTrace:

@@ -74,6 +74,8 @@ protected:
     /// integer for advection velocity
     int m_intOrder;
     std::string m_convectiveType;
+    /// Array checking whether GlobalLinSys needs to be unset
+    Array<OneD, NekInt> m_unsetGlobalLinSys;
 
     // Virtual functions
     void v_GenerateSummary(SolverUtils::SummaryList &s) override;
@@ -112,6 +114,10 @@ protected:
 
     void AddImplicitSkewSymAdvection(StdRegions::VarCoeffMap varcoeffs,
                                      NekDouble aii_Dt);
+
+    // Function to check whether UnsetGlobalLinSys has to be called
+    // at i-th call of LinearAdvectionDiffusionReactionSolve in SolveViscous
+    void CheckUnsetGlobalLinSys(Array<OneD, NekInt> &unsetGlobalLinSys);
 
 private:
 };

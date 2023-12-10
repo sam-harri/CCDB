@@ -34,6 +34,7 @@
 
 #include <IncNavierStokesSolver/EquationSystems/VelocityCorrectionSchemeImplicit.h>
 #include <LibUtilities/BasicUtils/Timer.h>
+#include <MultiRegions/ContField.h>
 #include <SolverUtils/Core/Misc.h>
 
 #include <boost/algorithm/string.hpp>
@@ -206,6 +207,12 @@ void VCSImplicit::v_DoInitialise(bool dumpInitialConditions)
             }
         }
     }
+
+    // Check whether multiple or single GlobalLinSys are
+    // required and when to delete them
+    // Initialise to always reset GlobalLinSys
+    m_unsetGlobalLinSys = Array<OneD, NekInt>(m_velocity.size(), 1);
+    CheckUnsetGlobalLinSys(m_unsetGlobalLinSys);
 
     // Check skew-symmetric advection operator
     // Default to Convective operator = false
@@ -453,7 +460,7 @@ void VCSImplicit::v_SolveViscous(
         // assumes same matrix for each velocity)
         // - Catches Null return from 3DH1D solve by checking matrix type
         // is a LinearADR matrix (variant)
-        if (i == m_nConvectiveFields - 1 &&
+        if (m_unsetGlobalLinSys[i] &&
             (gkey.GetMatrixType() ==
                  StdRegions::eLinearAdvectionDiffusionReaction ||
              gkey.GetMatrixType() ==
@@ -542,6 +549,41 @@ void VCSImplicit::AddImplicitSkewSymAdvection(StdRegions::VarCoeffMap varcoeffs,
 
     // Assign VarcoeffMass
     varcoeffs[StdRegions::eVarCoeffMass] = divAdvVel;
+}
+
+void VCSImplicit::CheckUnsetGlobalLinSys(Array<OneD, NekInt> &unsetGlobalLinSys)
+{
+    // Loop over all convected Fields (excludes pressure)
+    for (int i = 0; i < m_nConvectiveFields; ++i)
+    {
+        // Always unset after last solve
+        if (i == m_nConvectiveFields - 1)
+        {
+            unsetGlobalLinSys[i] = 1;
+            continue;
+        }
+
+        auto contField =
+            std::dynamic_pointer_cast<MultiRegions::ContField>(m_fields[i]);
+        // Check against all solves after this one, whether same
+        // Global Linear system is required
+        for (int j = i + 1; j < m_nConvectiveFields; ++j)
+        {
+            // If same BCs (ie GlobalLinSys) in j-solves, save the GlobalLinSys
+            // for re-use
+            if (std::dynamic_pointer_cast<MultiRegions::ContField>(m_fields[j])
+                    ->SameTypeOfBoundaryConditions(*contField))
+            {
+                unsetGlobalLinSys[i] = 0;
+            }
+            // If no same BCs (ie GlobalLinSys) in j-solves, UnsetGlobalLinSys()
+            // for i-solve
+            else
+            {
+                unsetGlobalLinSys[i] = 1;
+            }
+        }
+    }
 }
 
 } // namespace Nektar
