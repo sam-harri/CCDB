@@ -105,7 +105,8 @@ public:
     GetGlobalBndLinSys(const GlobalLinSysKey &mkey);
 
     /// Check to see if expansion has the same BCs as In
-    bool SameTypeOfBoundaryConditions(const DisContField &In);
+    MULTI_REGIONS_EXPORT bool SameTypeOfBoundaryConditions(
+        const DisContField &In);
 
     // Return the internal vector which directs whether the normal flux
     // at the trace defined by Left and Right Adjacent elements
