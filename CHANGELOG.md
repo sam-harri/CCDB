@@ -35,6 +35,7 @@ v5.5.0
 - Remove redundant tolerance limiter in GMRES (!1707)
 - Remove unused tolerance parameter in NekSys class and subclasses (1708)
 - Avoid repeatly operator assignment in NekNonlinSysNewton class (!1709)
+- Add an exact solution for GetLocCoords of straight-edge quad elements (!1704)
 
 **ADRSolver**
 - Add support for spatially-constant, but variable direction, diffusion to

@@ -203,7 +203,7 @@ protected:
     Array<OneD, NekDouble> m_boundingBox;
     Array<OneD, Array<OneD, NekDouble>> m_isoParameter;
     Array<OneD, Array<OneD, NekDouble>> m_invIsoParam;
-    bool m_straightEdge;
+    int m_straightEdge;
 
     /// Handles generation of geometry factors.
     void GenGeomFactors();

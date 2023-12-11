@@ -236,12 +236,12 @@ void TriGeom::v_GenGeomFactors()
         TriGeom::v_FillGeom();
 
         // check to see if expansions are linear
-        m_straightEdge = true;
+        m_straightEdge = 1;
         if (m_xmap->GetBasisNumModes(0) != 2 ||
             m_xmap->GetBasisNumModes(1) != 2)
         {
             Gtype          = eDeformed;
-            m_straightEdge = false;
+            m_straightEdge = 0;
         }
 
         m_manifold    = Array<OneD, int>(2);

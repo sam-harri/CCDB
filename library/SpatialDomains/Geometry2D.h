@@ -92,8 +92,8 @@ protected:
                                     const Array<OneD, const NekDouble> &ptsy,
                                     Array<OneD, NekDouble> &Lcoords,
                                     NekDouble &dist);
-    void NewtonIterationForLocCoord(const Array<OneD, const NekDouble> &coords,
-                                    Array<OneD, NekDouble> &Lcoords);
+    void SolveStraightEdgeQuad(const Array<OneD, const NekDouble> &coords,
+                               Array<OneD, NekDouble> &Lcoords);
     void v_CalculateInverseIsoParam() override;
     int v_AllLeftCheck(const Array<OneD, const NekDouble> &gloCoord) override;
 

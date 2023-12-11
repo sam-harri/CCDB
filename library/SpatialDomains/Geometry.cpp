@@ -50,7 +50,7 @@ GeomFactorsVector Geometry::m_regGeomFactorsManager;
 Geometry::Geometry()
     : m_coordim(0), m_geomFactorsState(eNotFilled), m_state(eNotFilled),
       m_setupState(false), m_shapeType(LibUtilities::eNoShapeType),
-      m_globalID(-1), m_straightEdge(false)
+      m_globalID(-1), m_straightEdge(0)
 {
 }
 
@@ -60,7 +60,7 @@ Geometry::Geometry()
 Geometry::Geometry(const int coordim)
     : m_coordim(coordim), m_geomFactorsState(eNotFilled), m_state(eNotFilled),
       m_setupState(false), m_shapeType(LibUtilities::eNoShapeType),
-      m_globalID(-1), m_straightEdge(false)
+      m_globalID(-1), m_straightEdge(0)
 {
 }
 
