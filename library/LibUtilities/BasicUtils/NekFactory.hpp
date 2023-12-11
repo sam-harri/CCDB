@@ -43,6 +43,7 @@
 #include <string>
 
 #ifdef NEKTAR_USE_THREAD_SAFETY
+#include <mutex>
 #include <shared_mutex>
 #include <thread>
 #endif
