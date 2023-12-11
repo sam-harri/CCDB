@@ -32,6 +32,7 @@ v5.5.0
 - Remove arbitrary factor in  `GlobalLinSysIterative.cpp` (!1694)
 - Some tidy-up in LinearAlgebra (!1699)
 - Updated hdf5 to 1.12.3 (!1696)
+- Remove redundant tolerance limiter in GMRES (!1707)
 
 **ADRSolver**
 - Add support for spatially-constant, but variable direction, diffusion to

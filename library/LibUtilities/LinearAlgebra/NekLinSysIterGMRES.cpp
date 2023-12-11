@@ -129,10 +129,9 @@ void NekLinSysIterGMRES::v_InitObject()
 int NekLinSysIterGMRES::v_SolveSystem(
     const int nGlobal, const Array<OneD, const NekDouble> &pInput,
     Array<OneD, NekDouble> &pOutput, const int nDir, const NekDouble tol,
-    const NekDouble factor)
+    [[maybe_unused]] const NekDouble factor)
 {
-    m_tolerance     = max(tol, 1.0E-16);
-    m_prec_factor   = factor;
+    m_tolerance     = max(tol, 1.0E-15);
     int niterations = DoGMRES(nGlobal, pInput, pOutput, nDir);
 
     return niterations;
@@ -415,11 +414,6 @@ NekDouble NekLinSysIterGMRES::DoGmresRestart(
         if ((!truncted) || (nd < m_KrylovMaxHessMatBand))
         {
             if ((eps < m_tolerance * m_tolerance * m_rhs_magnitude) && nd > 0)
-            {
-                m_converged = true;
-            }
-            NekDouble tolmin = 1.0E-15;
-            if (eps < tolmin * tolmin * m_rhs_magnitude)
             {
                 m_converged = true;
             }
