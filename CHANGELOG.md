@@ -34,6 +34,7 @@ v5.5.0
 - Updated hdf5 to 1.12.3 (!1696)
 - Remove redundant tolerance limiter in GMRES (!1707)
 - Remove unused tolerance parameter in NekSys class and subclasses (1708)
+- Avoid repeatly operator assignment in NekNonlinSysNewton class (!1709)
 
 **ADRSolver**
 - Add support for spatially-constant, but variable direction, diffusion to

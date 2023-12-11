@@ -79,6 +79,8 @@ protected:
 
     void v_InitObject() override;
 
+    void v_SetSysOperators(const NekSysOperators &in) override;
+
     int v_SolveSystem(const int nGlobal,
                       const Array<OneD, const NekDouble> &pInput,
                       Array<OneD, NekDouble> &pOutput, const int nDir,
@@ -87,11 +89,6 @@ protected:
     bool v_ConvergenceCheck(const int nIteration,
                             const Array<OneD, const NekDouble> &Residual,
                             const NekDouble tol) override;
-
-    void v_SetupNekNonlinSystem(const int nGlobal,
-                                const Array<OneD, const NekDouble> &pInput,
-                                const Array<OneD, const NekDouble> &pSource,
-                                const int nDir) override;
 
 private:
     NekDouble CalcInexactNewtonForcing(const int &k,
