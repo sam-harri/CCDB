@@ -79,10 +79,6 @@ public:
     {
         m_rhs_magnitude = mag;
     }
-    LIB_UTILITIES_EXPORT void SetNekLinSysTolerance(const NekDouble in)
-    {
-        m_tolerance = in;
-    }
 
     LIB_UTILITIES_EXPORT void SetNekLinSysMaxIterations(const unsigned int in)
     {

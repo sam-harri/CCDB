@@ -47,24 +47,14 @@ namespace Nektar::LibUtilities
 
 NekSys::NekSys(const LibUtilities::SessionReaderSharedPtr &pSession,
                const LibUtilities::CommSharedPtr &vRowComm, const int nDimen,
-               const NekSysKey &pKey)
+               [[maybe_unused]] const NekSysKey &pKey)
 {
-    m_tolerance = pKey.m_Tolerance;
-    m_verbose   = false;
-    m_root      = false;
-    m_rowComm   = vRowComm;
-
+    m_rowComm      = vRowComm;
+    m_root         = m_rowComm->GetRank() == 0;
     m_FlagWarnings = true;
-
-    if (0 == m_rowComm->GetRank())
-    {
-        m_root = true;
-    }
-    m_verbose = pSession->DefinesCmdLineArgument("verbose");
-
-    m_converged = false;
-
-    m_SysDimen = nDimen;
+    m_verbose      = pSession->DefinesCmdLineArgument("verbose");
+    m_converged    = false;
+    m_SysDimen     = nDimen;
 }
 
 bool NekSys::v_ConvergenceCheck([[maybe_unused]] const int nIteration,

@@ -58,18 +58,6 @@ NekLinSysIter::NekLinSysIter(
 {
     string variable = pSession->GetVariable(0);
 
-    if (pSession->DefinesGlobalSysSolnInfo(variable, "NekLinSysTolerance"))
-    {
-        m_tolerance = boost::lexical_cast<NekDouble>(
-            pSession->GetGlobalSysSolnInfo(variable, "NekLinSysTolerance")
-                .c_str());
-    }
-    else
-    {
-        pSession->LoadParameter("NekLinSysTolerance", m_tolerance,
-                                pKey.m_NekLinSysTolerance);
-    }
-
     if (pSession->DefinesGlobalSysSolnInfo(variable, "NekLinSysMaxIterations"))
     {
         m_maxiter = boost::lexical_cast<int>(
