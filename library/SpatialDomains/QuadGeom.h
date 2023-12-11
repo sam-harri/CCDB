@@ -84,6 +84,7 @@ protected:
     SPATIAL_DOMAINS_EXPORT void v_Reset(CurveMap &curvedEdges,
                                         CurveMap &curvedFaces) override;
     SPATIAL_DOMAINS_EXPORT void v_Setup() override;
+    void PreSolveStraightEdge();
 
 private:
     void SetUpXmap();

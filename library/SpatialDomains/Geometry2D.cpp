@@ -106,78 +106,31 @@ int Geometry2D::v_AllLeftCheck(const Array<OneD, const NekDouble> &gloCoord)
     return nc;
 }
 
-void Geometry2D::NewtonIterationForLocCoord(
+void Geometry2D::SolveStraightEdgeQuad(
     const Array<OneD, const NekDouble> &coords, Array<OneD, NekDouble> &Lcoords)
 {
-    // Maximum iterations for convergence
-    const int MaxIterations = 51;
-    // |x-xp|^2 < EPSILON  error    tolerance
-    const NekDouble Tol = 1.e-8;
-    // |r,s|    > LcoordDIV stop   the search
-    const NekDouble LcoordDiv = 15.0;
-
-    NekDouble ScaledTol = fabs(m_isoParameter[0][1] * m_isoParameter[1][2] -
-                               m_isoParameter[1][1] * m_isoParameter[0][2]);
-    ScaledTol *= Tol * Tol;
-
-    NekDouble xmap, ymap, F1, F2;
-    NekDouble derx_1, derx_2, dery_1, dery_2, jac;
-
-    NekDouble res;
-    int cnt = 0;
-    while (cnt++ < MaxIterations)
+    int i0 = 0, i1 = 1, j1 = 0, j2 = 1;
+    if (m_straightEdge & 2)
     {
-        NekDouble tmp = Lcoords[0] * Lcoords[1];
-        // calculate the global point corresponding to Lcoords
-        xmap = m_isoParameter[0][0] + m_isoParameter[0][1] * Lcoords[0] +
-               m_isoParameter[0][2] * Lcoords[1] + m_isoParameter[0][3] * tmp;
-        ymap = m_isoParameter[1][0] + m_isoParameter[1][1] * Lcoords[0] +
-               m_isoParameter[1][2] * Lcoords[1] + m_isoParameter[1][3] * tmp;
-
-        F1 = coords[0] - xmap;
-        F2 = coords[1] - ymap;
-
-        res = F1 * F1 + F2 * F2;
-        if (res < ScaledTol)
-        {
-            break;
-        }
-
-        // Interpolate derivative metric at Lcoords
-        derx_1 = m_isoParameter[0][1] + m_isoParameter[0][3] * Lcoords[1];
-        derx_2 = m_isoParameter[0][2] + m_isoParameter[0][3] * Lcoords[0];
-        dery_1 = m_isoParameter[1][1] + m_isoParameter[1][3] * Lcoords[1];
-        dery_2 = m_isoParameter[1][2] + m_isoParameter[1][3] * Lcoords[0];
-
-        jac = 1. / (dery_2 * derx_1 - dery_1 * derx_2);
-
-        // use analytical inverse of derivitives which are
-        // also similar to those of metric factors.
-        Lcoords[0] += (dery_2 * F1 - derx_2 * F2) * jac;
-
-        Lcoords[1] += (-dery_1 * F1 + derx_1 * F2) * jac;
-
-        if (!(std::isfinite(Lcoords[0]) && std::isfinite(Lcoords[1])) ||
-            fabs(Lcoords[0]) > LcoordDiv || fabs(Lcoords[1]) > LcoordDiv)
-        {
-            std::ostringstream ss;
-            ss << "Iteration has diverged in NewtonIterationForLocCoord in "
-                  "element "
-               << GetGlobalID();
-            WARNINGL1(false, ss.str());
-            return;
-        }
+        i0 = 1;
+        i1 = 0;
     }
-
-    if (cnt >= MaxIterations)
+    if (m_straightEdge & 4)
     {
-        std::ostringstream ss;
-
-        ss << "Reached MaxIterations (" << MaxIterations
-           << ") in Newton iteration ";
-
-        WARNINGL1(cnt < MaxIterations, ss.str());
+        j1 = 1;
+        j2 = 0;
     }
+    NekDouble beta  = m_isoParameter[1][2];
+    NekDouble gamma = m_isoParameter[1][3];
+    NekDouble tty   = (coords[i1] - gamma * coords[i0] - m_isoParameter[1][0]) *
+                    m_isoParameter[1][1];
+    NekDouble denom = 1. / (m_isoParameter[0][2] + m_isoParameter[0][3] * tty);
+    NekDouble epsilon = -m_isoParameter[0][3] * beta * denom;
+    NekDouble h =
+        (m_isoParameter[0][0] + m_isoParameter[0][1] * tty - coords[i0]) *
+        denom;
+    Lcoords[j2] = -h / (0.5 + sqrt(0.25 - epsilon * h));
+    Lcoords[j1] = -beta * Lcoords[j2] + tty;
 }
 
 void Geometry2D::NewtonIterationForLocCoord(
@@ -334,8 +287,7 @@ NekDouble Geometry2D::v_GetLocCoords(const Array<OneD, const NekDouble> &coords,
     }
     else if (m_straightEdge)
     {
-        ClampLocCoords(Lcoords, 0.);
-        NewtonIterationForLocCoord(tmpcoords, Lcoords);
+        SolveStraightEdgeQuad(tmpcoords, Lcoords);
     }
     else if (GetMetricInfo()->GetGtype() == eDeformed)
     {

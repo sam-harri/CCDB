@@ -32,6 +32,7 @@ v5.5.0
 - Remove arbitrary factor in  `GlobalLinSysIterative.cpp` (!1694)
 - Some tidy-up in LinearAlgebra (!1699)
 - Updated hdf5 to 1.12.3 (!1696)
+- Add an exact solution for GetLocCoords of straight-edge quad elements (!1704)
 
 **ADRSolver**
 - Add support for spatially-constant, but variable direction, diffusion to
