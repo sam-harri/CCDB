@@ -71,12 +71,11 @@ void NekLinSysIterFixedpointJacobi::v_InitObject()
 int NekLinSysIterFixedpointJacobi::v_SolveSystem(
     const int nGlobal, const Array<OneD, const NekDouble> &pRhs,
     Array<OneD, NekDouble> &pSolution, [[maybe_unused]] const int nDir,
-    const NekDouble tol, const NekDouble factor)
+    const NekDouble tol, [[maybe_unused]] const NekDouble factor)
 {
 
     int niterations = 0;
     m_tolerance     = max(tol, 1.0E-16);
-    m_prec_factor   = factor;
 
     Array<OneD, NekDouble> pSol0(nGlobal);
     Vmath::Vcopy(nGlobal, pSolution, 1, pSol0, 1);

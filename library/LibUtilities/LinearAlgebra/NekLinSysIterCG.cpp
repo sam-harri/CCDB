@@ -69,10 +69,9 @@ int NekLinSysIterCG::v_SolveSystem(const int nGlobal,
                                    const Array<OneD, const NekDouble> &pInput,
                                    Array<OneD, NekDouble> &pOutput,
                                    const int nDir, const NekDouble tol,
-                                   const NekDouble factor)
+                                   [[maybe_unused]] const NekDouble factor)
 {
-    m_tolerance   = max(tol, 1.0E-16);
-    m_prec_factor = factor;
+    m_tolerance = max(tol, 1.0E-16);
 
     DoConjugateGradient(nGlobal, pInput, pOutput, nDir);
 
