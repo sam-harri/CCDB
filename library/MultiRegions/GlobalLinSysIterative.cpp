@@ -72,7 +72,6 @@ GlobalLinSysIterative::GlobalLinSysIterative(
 {
     m_tolerance           = pLocToGloMap->GetIterativeTolerance();
     m_isAbsoluteTolerance = pLocToGloMap->IsAbsoluteTolerance();
-    m_maxiter             = pLocToGloMap->GetMaxIterations();
     m_linSysIterSolver    = pLocToGloMap->GetLinSysIterSolver();
 
     LibUtilities::CommSharedPtr vComm =

@@ -65,9 +65,6 @@ protected:
     /// Global to universal unique map
     Array<OneD, int> m_map;
 
-    /// maximum iterations
-    int m_maxiter;
-
     /// Tolerance of iterative solver.
     NekDouble m_tolerance;
 

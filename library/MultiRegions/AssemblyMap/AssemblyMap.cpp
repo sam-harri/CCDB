@@ -150,16 +150,6 @@ AssemblyMap::AssemblyMap(const LibUtilities::SessionReaderSharedPtr &pSession,
         m_isAbsoluteTolerance = false;
     }
 
-    if (pSession->DefinesGlobalSysSolnInfo(variable, "MaxIterations"))
-    {
-        m_maxIterations = boost::lexical_cast<int>(
-            pSession->GetGlobalSysSolnInfo(variable, "MaxIterations").c_str());
-    }
-    else
-    {
-        pSession->LoadParameter("MaxIterations", m_maxIterations, 5000);
-    }
-
     if (pSession->DefinesGlobalSysSolnInfo(variable, "SuccessiveRHS"))
     {
         m_successiveRHS = boost::lexical_cast<int>(
@@ -195,7 +185,6 @@ AssemblyMap::AssemblyMap(
     : m_session(oldLevelMap->m_session), m_comm(oldLevelMap->GetComm()),
       m_hash(0), m_solnType(oldLevelMap->m_solnType),
       m_preconType(oldLevelMap->m_preconType),
-      m_maxIterations(oldLevelMap->m_maxIterations),
       m_iterativeTolerance(oldLevelMap->m_iterativeTolerance),
       m_successiveRHS(oldLevelMap->m_successiveRHS),
       m_linSysIterSolver(oldLevelMap->m_linSysIterSolver),
@@ -1381,11 +1370,6 @@ NekDouble AssemblyMap::GetIterativeTolerance() const
 bool AssemblyMap::IsAbsoluteTolerance() const
 {
     return m_isAbsoluteTolerance;
-}
-
-int AssemblyMap::GetMaxIterations() const
-{
-    return m_maxIterations;
 }
 
 int AssemblyMap::GetSuccessiveRHS() const

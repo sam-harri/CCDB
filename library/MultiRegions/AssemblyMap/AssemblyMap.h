@@ -308,7 +308,6 @@ public:
     MULTI_REGIONS_EXPORT std::string GetPreconType() const;
     MULTI_REGIONS_EXPORT NekDouble GetIterativeTolerance() const;
     MULTI_REGIONS_EXPORT bool IsAbsoluteTolerance() const;
-    MULTI_REGIONS_EXPORT int GetMaxIterations() const;
     MULTI_REGIONS_EXPORT int GetSuccessiveRHS() const;
     MULTI_REGIONS_EXPORT std::string GetLinSysIterSolver() const;
 
@@ -406,9 +405,6 @@ protected:
 
     /// Type type of preconditioner to use in iterative solver.
     std::string m_preconType;
-
-    /// Maximum iterations for iterative solver
-    int m_maxIterations;
 
     /// Tolerance for iterative solver
     NekDouble m_iterativeTolerance;
