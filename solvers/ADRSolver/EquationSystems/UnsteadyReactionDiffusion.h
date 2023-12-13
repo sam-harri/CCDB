@@ -35,15 +35,14 @@
 #ifndef NEKTAR_SOLVERS_ADRSOLVER_EQUATIONSYSTEMS_UNSTEADYREACTIONDIFFUSION_H
 #define NEKTAR_SOLVERS_ADRSOLVER_EQUATIONSYSTEMS_UNSTEADYREACTIONDIFFUSION_H
 
-#include <SolverUtils/Diffusion/Diffusion.h>
+#include <ADRSolver/EquationSystems/UnsteadyDiffusion.h>
 #include <SolverUtils/Forcing/Forcing.h>
-#include <SolverUtils/UnsteadySystem.h>
 
 using namespace Nektar::SolverUtils;
 
 namespace Nektar
 {
-class UnsteadyReactionDiffusion : public UnsteadySystem
+class UnsteadyReactionDiffusion : public UnsteadyDiffusion
 {
 public:
     friend class MemoryManager<UnsteadyReactionDiffusion>;
@@ -84,7 +83,6 @@ protected:
         NekDouble lambda);
 
 private:
-    NekDouble m_epsilon;
     /// Forcing terms
     std::vector<SolverUtils::ForcingSharedPtr> m_forcing;
 };

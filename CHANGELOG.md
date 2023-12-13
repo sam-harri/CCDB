@@ -41,6 +41,7 @@ v5.5.0
 - Add support for spatially-constant, but variable direction, diffusion to
   ADRSolver. (!1669)
 - Inline Vmath library (!1667)
+- Refactor UnsteadyReactionDiffusion as a subclass of UnsteadyDiffusion (!1713)
 
 **CardiacEPSolver**
 - Fix cell model history point filter output after base class change (!1342)

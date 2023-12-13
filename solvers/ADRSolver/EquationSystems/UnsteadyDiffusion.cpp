@@ -59,7 +59,7 @@ void UnsteadyDiffusion::v_InitObject(bool DeclareFields)
 {
     UnsteadySystem::v_InitObject(DeclareFields);
 
-    m_session->LoadParameter("wavefreq", m_waveFreq, 0.0);
+    // Load diffusion parameter
     m_session->LoadParameter("epsilon", m_epsilon, 1.0);
 
     m_session->MatchSolverInfo("SpectralVanishingViscosity", "True",
