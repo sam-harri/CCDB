@@ -32,11 +32,10 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <iomanip>
-#include <iostream>
-
 #include <ADRSolver/EquationSystems/UnsteadyReactionDiffusion.h>
 #include <LibUtilities/TimeIntegration/TimeIntegrationScheme.h>
+#include <iomanip>
+#include <iostream>
 
 using namespace std;
 
@@ -49,7 +48,7 @@ string UnsteadyReactionDiffusion::className =
 UnsteadyReactionDiffusion::UnsteadyReactionDiffusion(
     const LibUtilities::SessionReaderSharedPtr &pSession,
     const SpatialDomains::MeshGraphSharedPtr &pGraph)
-    : UnsteadySystem(pSession, pGraph)
+    : UnsteadyDiffusion(pSession, pGraph)
 {
 }
 
@@ -63,12 +62,39 @@ void UnsteadyReactionDiffusion::v_InitObject(bool DeclareFields)
     ASSERTL0(m_intScheme->GetIntegrationSchemeType() == LibUtilities::eIMEX,
              "Reaction-diffusion requires an implicit-explicit timestepping"
              " (e.g. IMEXOrder2)");
-    ASSERTL0(m_projectionType == MultiRegions::eGalerkin,
-             "Reaction-diffusion requires use of continuous Galerkin"
-             "projection.");
 
     // Load diffusion parameter
     m_session->LoadParameter("epsilon", m_epsilon, 0.0);
+
+    m_session->MatchSolverInfo("SpectralVanishingViscosity", "True",
+                               m_useSpecVanVisc, false);
+
+    if (m_useSpecVanVisc)
+    {
+        m_session->LoadParameter("SVVCutoffRatio", m_sVVCutoffRatio, 0.75);
+        m_session->LoadParameter("SVVDiffCoeff", m_sVVDiffCoeff, 0.1);
+    }
+
+    int npoints = m_fields[0]->GetNpoints();
+
+    if (m_session->DefinesParameter("d00"))
+    {
+        m_d00 = m_session->GetParameter("d00");
+        m_varcoeff[StdRegions::eVarCoeffD00] =
+            Array<OneD, NekDouble>(npoints, m_session->GetParameter("d00"));
+    }
+    if (m_session->DefinesParameter("d11"))
+    {
+        m_d11 = m_session->GetParameter("d11");
+        m_varcoeff[StdRegions::eVarCoeffD11] =
+            Array<OneD, NekDouble>(npoints, m_session->GetParameter("d11"));
+    }
+    if (m_session->DefinesParameter("d22"))
+    {
+        m_d22 = m_session->GetParameter("d22");
+        m_varcoeff[StdRegions::eVarCoeffD22] =
+            Array<OneD, NekDouble>(npoints, m_session->GetParameter("d22"));
+    }
 
     // Forcing terms
     m_forcing = SolverUtils::Forcing::Load(m_session, shared_from_this(),
@@ -124,17 +150,7 @@ void UnsteadyReactionDiffusion::DoOdeProjection(
     const Array<OneD, const Array<OneD, NekDouble>> &inarray,
     Array<OneD, Array<OneD, NekDouble>> &outarray, const NekDouble time)
 {
-    int i;
-    int nvariables = inarray.size();
-    SetBoundaryConditions(time);
-
-    Array<OneD, NekDouble> coeffs(m_fields[0]->GetNcoeffs());
-
-    for (i = 0; i < nvariables; ++i)
-    {
-        m_fields[i]->FwdTrans(inarray[i], coeffs);
-        m_fields[i]->BwdTrans(coeffs, outarray[i]);
-    }
+    UnsteadyDiffusion::DoOdeProjection(inarray, outarray, time);
 }
 
 /**
@@ -142,30 +158,10 @@ void UnsteadyReactionDiffusion::DoOdeProjection(
  */
 void UnsteadyReactionDiffusion::DoImplicitSolve(
     const Array<OneD, const Array<OneD, NekDouble>> &inarray,
-    Array<OneD, Array<OneD, NekDouble>> &outarray,
-    [[maybe_unused]] const NekDouble time, const NekDouble lambda)
+    Array<OneD, Array<OneD, NekDouble>> &outarray, const NekDouble time,
+    const NekDouble lambda)
 {
-    StdRegions::ConstFactorMap factors;
-
-    int nvariables                     = inarray.size();
-    int npoints                        = m_fields[0]->GetNpoints();
-    factors[StdRegions::eFactorLambda] = 1.0 / lambda / m_epsilon;
-
-    // We solve ( \nabla^2 - HHlambda ) Y[i] = rhs [i] inarray = input:
-    // \hat{rhs} -> output: \hat{Y} outarray = output: nabla^2 \hat{Y} where
-    // \hat = modal coeffs
-    for (int i = 0; i < nvariables; ++i)
-    {
-        // Multiply 1.0/timestep/lambda
-        Vmath::Smul(npoints, -factors[StdRegions::eFactorLambda], inarray[i], 1,
-                    outarray[i], 1);
-
-        // Solve a system of equations with Helmholtz solver
-        m_fields[i]->HelmSolve(outarray[i], m_fields[i]->UpdateCoeffs(),
-                               factors);
-        m_fields[i]->BwdTrans(m_fields[i]->GetCoeffs(), outarray[i]);
-        m_fields[i]->SetPhysState(false);
-    }
+    UnsteadyDiffusion::DoImplicitSolve(inarray, outarray, time, lambda);
 }
 
 } // namespace Nektar
