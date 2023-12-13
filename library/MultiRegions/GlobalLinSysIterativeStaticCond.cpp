@@ -445,42 +445,12 @@ void GlobalLinSysIterativeStaticCond::v_PreSolve(int scLevel,
             m_precon->BuildPreconditioner();
         }
 
-#if 1 // to be consistent with original
-
         int nGloBndDofs = m_locToGloMap.lock()->GetNumGlobalBndCoeffs();
         Array<OneD, NekDouble> F_gloBnd(nGloBndDofs);
         NekVector<NekDouble> F_GloBnd(nGloBndDofs, F_gloBnd, eWrapper);
 
         m_locToGloMap.lock()->AssembleBnd(F_bnd, F_gloBnd);
         Set_Rhs_Magnitude(F_GloBnd);
-
-#else
-        int nLocBndDofs = m_locToGloMap.lock()->GetNumLocalBndCoeffs();
-
-        // Set_Rhs_Magnitude - version using local array
-
-        Array<OneD, NekDouble> vExchange(1, 0.0);
-
-        vExchange[0] += Blas::Ddot(nLocBndDofs, F_bnd, 1, F_bnd, 1);
-        m_expList.lock()->GetComm()->GetRowComm()->AllReduce(
-            vExchange, Nektar::LibUtilities::ReduceSum);
-
-        // To ensure that very different rhs values are not being
-        // used in subsequent solvers such as the velocit solve in
-        // INC NS. If this works we then need to work out a better
-        // way to control this.
-        NekDouble new_rhs_mag = (vExchange[0] > 1e-6) ? vExchange[0] : 1.0;
-
-        if (m_rhs_magnitude == NekConstants::kNekUnsetDouble)
-        {
-            m_rhs_magnitude = new_rhs_mag;
-        }
-        else
-        {
-            m_rhs_magnitude = (m_rhs_mag_sm * (m_rhs_magnitude) +
-                               (1.0 - m_rhs_mag_sm) * new_rhs_mag);
-        }
-#endif
     }
     else
     {
