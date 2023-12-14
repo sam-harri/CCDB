@@ -55,6 +55,7 @@ v5.5.0
 - Add a new feature of elasticaly mounted object using the moving reference frame (!1495)
 - Some tidy-up (!1693)
 - Fix memory leak in VCSImplicit due to matrix updating (!1688)
+- Rename Simo-/Dong-advection to Extrapolated/Updated respectively for VCSImplicit (!1717)
 
 **CompressibleFlowSolver**
 - Add three subsonic inflow boundary conditions: EnforceEntropyPresure, EnforceEntropyVelocity, and EnforceEntropyTotalEnthalpy (!1398)
