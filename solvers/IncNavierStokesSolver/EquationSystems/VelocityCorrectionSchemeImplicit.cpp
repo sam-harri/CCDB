@@ -29,7 +29,7 @@
 // DEALINGS IN THE SOFTWARE.
 //
 // Description: Implicit Velocity Correction Scheme for the Incompressible
-// Navier Stokes equations based on Dong and Shen 2010
+// Navier Stokes equations similar to Dong and Shen 2010
 ///////////////////////////////////////////////////////////////////////////////
 
 #include <IncNavierStokesSolver/EquationSystems/VelocityCorrectionSchemeImplicit.h>
@@ -186,13 +186,13 @@ void VCSImplicit::v_DoInitialise(bool dumpInitialConditions)
             Array<OneD, NekDouble>(m_fields[i]->GetTotPoints(), 0.0);
     }
 
-    // Check advection velocity: Simo or Dong scheme
-    // Default to Simo scheme
-    m_session->MatchSolverInfo("AdvectionVelocity", "Simo", m_advectionVelocity,
-                               true);
+    // Check advection velocity: Extrapolated or Updated scheme
+    // Default to Extrapolated scheme
+    m_session->MatchSolverInfo("AdvectionVelocity", "Extrapolated",
+                               m_advectionVelocity, true);
 
-    // Extrapolated velocity (for 2nd order Simo scheme)
-    // Only initiliase for Simo scheme
+    // Extrapolated velocity (for 2nd order scheme)
+    // Only initiliase for Extrapolated scheme
     if (m_advectionVelocity)
     {
         m_extVel =
@@ -323,13 +323,13 @@ void VCSImplicit::v_SetUpViscousForcing(
     // Build Advection Velocity
     for (int i = 0; i < nvel; ++i)
     {
-        // Advection Velocity = u^*n+1; Simo and Armero, 1994
+        // Extrapolated Advection Velocity = u^*n+1
         if (m_advectionVelocity)
         {
             Vmath::Smul(phystot, 1.0 / m_diffCoeff[i],
                         m_extVel[i][m_intOrder - 1], 1, m_AdvVel[i], 1);
         }
-        // Advection Velocity = u^*n+1 - (...); Dong and Shen, 2010
+        // Updated Advection Velocity = u^*n+1 - (...)
         else
         {
             // Get velocity fields [u^n, v^n, ..] for curl of vorticity
@@ -503,7 +503,7 @@ void VCSImplicit::v_EvaluateAdvection_SetPressureBCs(
     timer.Stop();
     timer.AccumulateRegion("Pressure BCs");
 
-    // If Simo-advection: Extrapolate velocity
+    // Extrapolate advection velocity with StifflyStableBeta coefficients
     if (m_advectionVelocity)
     {
         for (int i = 0; i < m_velocity.size(); ++i)
