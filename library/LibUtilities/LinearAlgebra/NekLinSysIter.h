@@ -103,7 +103,6 @@ protected:
     NekDouble m_rhs_magnitude = NekConstants::kNekUnsetDouble;
 
     int m_totalIterations   = 0;
-    NekDouble m_rhs_mag_sm  = 0.9;
     NekDouble m_prec_factor = 1.0;
 
     // This is the maximum number of solution vectors that can be stored

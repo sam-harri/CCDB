@@ -435,6 +435,12 @@ void GlobalLinSysIterativeStaticCond::v_UniqueMap()
 void GlobalLinSysIterativeStaticCond::v_PreSolve(int scLevel,
                                                  Array<OneD, NekDouble> &F_bnd)
 {
+    if (m_isAbsoluteTolerance)
+    {
+        m_rhs_magnitude = 1.0;
+        return;
+    }
+
     if (scLevel == 0)
     {
         // When matrices are supplied to the constructor at the top
@@ -448,9 +454,33 @@ void GlobalLinSysIterativeStaticCond::v_PreSolve(int scLevel,
         int nGloBndDofs = m_locToGloMap.lock()->GetNumGlobalBndCoeffs();
         Array<OneD, NekDouble> F_gloBnd(nGloBndDofs);
         NekVector<NekDouble> F_GloBnd(nGloBndDofs, F_gloBnd, eWrapper);
-
         m_locToGloMap.lock()->AssembleBnd(F_bnd, F_gloBnd);
-        Set_Rhs_Magnitude(F_GloBnd);
+
+        NekDouble vExchange(0.0);
+        if (m_map.size() > 0)
+        {
+            vExchange = Vmath::Dot2(F_GloBnd.GetDimension(), &F_GloBnd[0],
+                                    &F_GloBnd[0], &m_map[0]);
+        }
+
+        m_expList.lock()->GetComm()->GetRowComm()->AllReduce(
+            vExchange, Nektar::LibUtilities::ReduceSum);
+
+        // To ensure that very different rhs values are not being
+        // used in subsequent solvers such as the velocity solve in
+        // INC NS. If this works we then need to work out a better
+        // way to control this.
+        NekDouble new_rhs_mag = (vExchange > 1e-6) ? vExchange : 1.0;
+
+        if (m_rhs_magnitude == NekConstants::kNekUnsetDouble)
+        {
+            m_rhs_magnitude = new_rhs_mag;
+        }
+        else
+        {
+            m_rhs_magnitude = (m_rhs_mag_sm * (m_rhs_magnitude) +
+                               (1.0 - m_rhs_mag_sm) * new_rhs_mag);
+        }
     }
     else
     {
