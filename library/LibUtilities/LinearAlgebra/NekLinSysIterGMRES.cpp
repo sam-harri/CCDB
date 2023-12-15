@@ -155,7 +155,11 @@ int NekLinSysIterGMRES::DoGMRES(const int nGlobal,
 {
     m_prec_factor = NekConstants::kNekUnsetDouble;
 
-    m_rhs_magnitude = 1.0;
+    if (m_rhs_magnitude == NekConstants::kNekUnsetDouble)
+    {
+        NekVector<NekDouble> inGlob(nGlobal, pInput, eWrapper);
+        Set_Rhs_Magnitude(inGlob);
+    }
 
     // Get vector sizes
     NekDouble eps = 0.0;

@@ -159,8 +159,10 @@ int NekLinSysIterGMRESLoc::DoGMRES(const int nLocal,
                                    Array<OneD, NekDouble> &pOutput)
 {
     m_prec_factor = NekConstants::kNekUnsetDouble;
-
-    m_rhs_magnitude = 1.0;
+    if (m_rhs_magnitude == NekConstants::kNekUnsetDouble)
+    {
+        Set_Rhs_Magnitude(pInput);
+    }
 
     NekDouble eps = 0.0;
     Array<OneD, NekDouble> tmp;
