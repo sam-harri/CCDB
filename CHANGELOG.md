@@ -64,6 +64,9 @@ v5.5.0
 - Some tidy-up in the compressible flow solver (!1698)
 - Fix ESDIRK scheme for compressible flow solver (!1690)
 
+**Documentation**
+- Update instructions for VS2022 (!1714)
+
 **ShallowWaterSolver**
 - Reduce memory footprint of the Peregrine solver(!1680)
 - Fix Peregrine solver for Parareal output(!1689)
