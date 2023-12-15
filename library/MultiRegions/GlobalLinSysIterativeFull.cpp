@@ -293,7 +293,7 @@ void GlobalLinSysIterativeFull::v_SolveLinearSystem(
         m_precon->BuildPreconditioner();
     }
 
-    m_linsol->setRhsMagnitude(m_rhs_magnitude);
+    m_linsol->setRhsMagnitude(m_isAbsoluteTolerance ? 1.0 : m_rhs_magnitude);
 
     if (m_useProjection)
     {

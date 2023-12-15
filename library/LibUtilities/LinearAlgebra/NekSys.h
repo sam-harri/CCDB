@@ -223,7 +223,6 @@ public:
     bool m_NekLinSysRightPrecon                = true;
     bool m_DifferenceFlag0                     = false;
     bool m_DifferenceFlag1                     = false;
-    bool m_useProjection                       = false;
     std::string m_LinSysIterSolverTypeInNonlin = "GMRES";
 };
 
