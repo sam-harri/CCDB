@@ -62,7 +62,7 @@ public:
     static std::string className;
 
     /// Destructor
-    ~UnsteadyReactionDiffusion() override;
+    ~UnsteadyReactionDiffusion() override = default;
 
 protected:
     UnsteadyReactionDiffusion(
@@ -74,13 +74,6 @@ protected:
     void DoOdeRhs(const Array<OneD, const Array<OneD, NekDouble>> &inarray,
                   Array<OneD, Array<OneD, NekDouble>> &outarray,
                   const NekDouble time);
-    void DoOdeProjection(
-        const Array<OneD, const Array<OneD, NekDouble>> &inarray,
-        Array<OneD, Array<OneD, NekDouble>> &outarray, const NekDouble time);
-    void DoImplicitSolve(
-        const Array<OneD, const Array<OneD, NekDouble>> &inarray,
-        Array<OneD, Array<OneD, NekDouble>> &outarray, NekDouble time,
-        NekDouble lambda);
 
 private:
     /// Forcing terms

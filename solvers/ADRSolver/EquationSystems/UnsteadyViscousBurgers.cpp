@@ -167,13 +167,6 @@ void UnsteadyViscousBurgers::v_InitObject(bool DeclareFields)
 }
 
 /**
- * @brief Unsteady linear advection diffusion equation destructor.
- */
-UnsteadyViscousBurgers::~UnsteadyViscousBurgers()
-{
-}
-
-/**
  * @brief Get the normal velocity for the unsteady linear advection
  * diffusion equation.
  */

@@ -54,11 +54,11 @@ public:
         p->InitObject();
         return p;
     }
-    /// Name of class
-    static std::string className1;
-    static std::string className2;
 
-    ~Poisson() override;
+    /// Name of class
+    static std::string className;
+
+    ~Poisson() override = default;
 
 protected:
     Poisson(const LibUtilities::SessionReaderSharedPtr &pSession,

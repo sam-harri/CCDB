@@ -147,10 +147,6 @@ void EigenValuesAdvection::v_DoInitialise(
 {
 }
 
-EigenValuesAdvection::~EigenValuesAdvection()
-{
-}
-
 void EigenValuesAdvection::v_DoSolve()
 {
     int nvariables = 1;

@@ -60,10 +60,11 @@ public:
     /// Name of class
     static std::string className;
 
-    ~SteadyAdvectionDiffusion() override;
+    ~SteadyAdvectionDiffusion() override = default;
 
 protected:
     NekDouble m_lambda;
+    NekDouble m_epsilon;
     Array<OneD, Array<OneD, NekDouble>> m_velocity;
 
     SteadyAdvectionDiffusion(

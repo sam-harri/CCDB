@@ -60,13 +60,10 @@ void SteadyAdvectionDiffusionReaction::v_InitObject(bool DeclareFields)
     }
 }
 
-SteadyAdvectionDiffusionReaction::~SteadyAdvectionDiffusionReaction()
-{
-}
-
 void SteadyAdvectionDiffusionReaction::v_GenerateSummary(
     SolverUtils::SummaryList &s)
 {
     SteadyAdvectionDiffusion::v_GenerateSummary(s);
+    SolverUtils::AddSummaryItem(s, "Lambda", m_lambda);
 }
 } // namespace Nektar

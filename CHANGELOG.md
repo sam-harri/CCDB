@@ -44,6 +44,7 @@ v5.5.0
   ADRSolver. (!1669)
 - Inline Vmath library (!1667)
 - Refactor UnsteadyReactionDiffusion as a subclass of UnsteadyDiffusion (!1713)
+- Tidy-up ADRSolver (!1715)
 
 **CardiacEPSolver**
 - Fix cell model history point filter output after base class change (!1342)

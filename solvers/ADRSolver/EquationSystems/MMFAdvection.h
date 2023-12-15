@@ -80,7 +80,7 @@ public:
     TestType m_TestType;
 
     /// Destructor
-    ~MMFAdvection() override;
+    ~MMFAdvection() override = default;
 
 protected:
     SolverUtils::RiemannSolverSharedPtr m_riemannSolver;
@@ -97,10 +97,6 @@ protected:
 
     Array<OneD, Array<OneD, NekDouble>> m_veldotMF;
     Array<OneD, NekDouble> m_vellc;
-
-    // Plane (used only for Discontinous projection
-    //        with 3DHomogenoeus1D expansion)
-    int m_planeNumber;
 
     /// Session reader
     MMFAdvection(const LibUtilities::SessionReaderSharedPtr &pSession,

@@ -61,7 +61,7 @@ public:
     /// Name of class
     static std::string className;
 
-    ~Projection() override;
+    ~Projection() override = default;
 
 protected:
     Projection(const LibUtilities::SessionReaderSharedPtr &pSession,

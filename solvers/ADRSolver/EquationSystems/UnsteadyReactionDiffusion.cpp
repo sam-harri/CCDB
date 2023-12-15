@@ -57,60 +57,18 @@ UnsteadyReactionDiffusion::UnsteadyReactionDiffusion(
  */
 void UnsteadyReactionDiffusion::v_InitObject(bool DeclareFields)
 {
-    UnsteadySystem::v_InitObject(DeclareFields);
-
-    ASSERTL0(m_intScheme->GetIntegrationSchemeType() == LibUtilities::eIMEX,
-             "Reaction-diffusion requires an implicit-explicit timestepping"
-             " (e.g. IMEXOrder2)");
-
-    // Load diffusion parameter
-    m_session->LoadParameter("epsilon", m_epsilon, 0.0);
-
-    m_session->MatchSolverInfo("SpectralVanishingViscosity", "True",
-                               m_useSpecVanVisc, false);
-
-    if (m_useSpecVanVisc)
-    {
-        m_session->LoadParameter("SVVCutoffRatio", m_sVVCutoffRatio, 0.75);
-        m_session->LoadParameter("SVVDiffCoeff", m_sVVDiffCoeff, 0.1);
-    }
-
-    int npoints = m_fields[0]->GetNpoints();
-
-    if (m_session->DefinesParameter("d00"))
-    {
-        m_d00 = m_session->GetParameter("d00");
-        m_varcoeff[StdRegions::eVarCoeffD00] =
-            Array<OneD, NekDouble>(npoints, m_session->GetParameter("d00"));
-    }
-    if (m_session->DefinesParameter("d11"))
-    {
-        m_d11 = m_session->GetParameter("d11");
-        m_varcoeff[StdRegions::eVarCoeffD11] =
-            Array<OneD, NekDouble>(npoints, m_session->GetParameter("d11"));
-    }
-    if (m_session->DefinesParameter("d22"))
-    {
-        m_d22 = m_session->GetParameter("d22");
-        m_varcoeff[StdRegions::eVarCoeffD22] =
-            Array<OneD, NekDouble>(npoints, m_session->GetParameter("d22"));
-    }
+    UnsteadyDiffusion::v_InitObject(DeclareFields);
 
     // Forcing terms
     m_forcing = SolverUtils::Forcing::Load(m_session, shared_from_this(),
                                            m_fields, m_fields.size());
 
+    // Reset OdeRhs functor
     m_ode.DefineOdeRhs(&UnsteadyReactionDiffusion::DoOdeRhs, this);
-    m_ode.DefineProjection(&UnsteadyReactionDiffusion::DoOdeProjection, this);
-    m_ode.DefineImplicitSolve(&UnsteadyReactionDiffusion::DoImplicitSolve,
-                              this);
-}
 
-/**
- * @brief Unsteady diffusion problem destructor.
- */
-UnsteadyReactionDiffusion::~UnsteadyReactionDiffusion()
-{
+    ASSERTL0(m_intScheme->GetIntegrationSchemeType() == LibUtilities::eIMEX,
+             "Reaction-diffusion requires an implicit-explicit timestepping"
+             " (e.g. IMEXOrder2)");
 }
 
 /**
@@ -137,31 +95,6 @@ void UnsteadyReactionDiffusion::DoOdeRhs(
         // set up non-linear terms
         x->Apply(m_fields, inarray, outarray, time);
     }
-}
-
-/**
- * @brief Compute the projection for the unsteady diffusion problem.
- *
- * @param inarray    Given fields.
- * @param outarray   Calculated solution.
- * @param time       Time.
- */
-void UnsteadyReactionDiffusion::DoOdeProjection(
-    const Array<OneD, const Array<OneD, NekDouble>> &inarray,
-    Array<OneD, Array<OneD, NekDouble>> &outarray, const NekDouble time)
-{
-    UnsteadyDiffusion::DoOdeProjection(inarray, outarray, time);
-}
-
-/**
- * @brief Implicit solution of the unsteady diffusion problem.
- */
-void UnsteadyReactionDiffusion::DoImplicitSolve(
-    const Array<OneD, const Array<OneD, NekDouble>> &inarray,
-    Array<OneD, Array<OneD, NekDouble>> &outarray, const NekDouble time,
-    const NekDouble lambda)
-{
-    UnsteadyDiffusion::DoImplicitSolve(inarray, outarray, time, lambda);
 }
 
 } // namespace Nektar

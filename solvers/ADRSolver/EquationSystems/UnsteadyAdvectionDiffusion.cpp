@@ -48,9 +48,9 @@ std::string UnsteadyAdvectionDiffusion::className =
 UnsteadyAdvectionDiffusion::UnsteadyAdvectionDiffusion(
     const LibUtilities::SessionReaderSharedPtr &pSession,
     const SpatialDomains::MeshGraphSharedPtr &pGraph)
-    : UnsteadySystem(pSession, pGraph), AdvectionSystem(pSession, pGraph)
+    : UnsteadySystem(pSession, pGraph),
+      AdvectionSystem(pSession, pGraph), m_planeNumber{0}
 {
-    m_planeNumber = 0;
 }
 
 /**
@@ -67,6 +67,8 @@ void UnsteadyAdvectionDiffusion::v_InitObject(bool DeclareFields)
     // turn on substepping
     m_session->MatchSolverInfo("Extrapolation", "SubStepping",
                                m_subSteppingScheme, false);
+
+    m_session->LoadParameter("MinSubSteps", m_minsubsteps, 1);
 
     // Define Velocity fields
     m_velocity = Array<OneD, Array<OneD, NekDouble>>(m_spacedim);
@@ -196,13 +198,6 @@ void UnsteadyAdvectionDiffusion::v_InitObject(bool DeclareFields)
                  "substepping");
         SetUpSubSteppingTimeIntegration(m_intScheme);
     }
-}
-
-/**
- * @brief Unsteady linear advection diffusion equation destructor.
- */
-UnsteadyAdvectionDiffusion::~UnsteadyAdvectionDiffusion()
-{
 }
 
 /**
@@ -487,7 +482,6 @@ bool UnsteadyAdvectionDiffusion::v_PreIntegrate(int step)
  */
 void UnsteadyAdvectionDiffusion::SubStepAdvance(int nstep, NekDouble time)
 {
-    int n;
     int nsubsteps;
 
     NekDouble dt;
@@ -529,7 +523,7 @@ void UnsteadyAdvectionDiffusion::SubStepAdvance(int nstep, NekDouble time)
         m_subStepIntegrationScheme->InitializeScheme(dt, fields, time,
                                                      m_subStepIntegrationOps);
 
-        for (n = 0; n < nsubsteps; ++n)
+        for (int n = 0; n < nsubsteps; ++n)
         {
             fields = m_subStepIntegrationScheme->TimeIntegrate(n, dt);
         }

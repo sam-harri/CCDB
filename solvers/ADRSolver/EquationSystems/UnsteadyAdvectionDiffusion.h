@@ -38,8 +38,6 @@
 #include <SolverUtils/AdvectionSystem.h>
 #include <SolverUtils/Diffusion/Diffusion.h>
 #include <SolverUtils/Forcing/Forcing.h>
-#include <SolverUtils/RiemannSolvers/RiemannSolver.h>
-#include <SolverUtils/UnsteadySystem.h>
 
 namespace Nektar
 {
@@ -63,7 +61,7 @@ public:
     static std::string className;
 
     /// Destructor
-    ~UnsteadyAdvectionDiffusion() override;
+    ~UnsteadyAdvectionDiffusion() override = default;
 
 protected:
     bool m_subSteppingScheme;
@@ -160,9 +158,6 @@ protected:
     LibUtilities::TimeIntegrationSchemeOperators m_subStepIntegrationOps;
 
     int m_intSteps;
-
-    NekDouble m_cflSafetyFactor;
-    int m_infosteps;
     int m_minsubsteps;
 
 private:

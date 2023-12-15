@@ -37,8 +37,6 @@
 
 #include <SolverUtils/AdvectionSystem.h>
 #include <SolverUtils/Forcing/Forcing.h>
-#include <SolverUtils/RiemannSolvers/RiemannSolver.h>
-#include <SolverUtils/UnsteadySystem.h>
 
 namespace Nektar
 {
@@ -62,7 +60,7 @@ public:
     static std::string className;
 
     /// Destructor
-    ~UnsteadyInviscidBurger() override;
+    ~UnsteadyInviscidBurger() override = default;
 
 protected:
     SolverUtils::RiemannSolverSharedPtr m_riemannSolver;

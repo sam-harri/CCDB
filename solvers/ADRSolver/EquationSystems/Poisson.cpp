@@ -38,10 +38,8 @@ using namespace std;
 
 namespace Nektar
 {
-string Poisson::className1 = GetEquationSystemFactory().RegisterCreatorFunction(
+string Poisson::className = GetEquationSystemFactory().RegisterCreatorFunction(
     "Poisson", Poisson::create);
-string Poisson::className2 = GetEquationSystemFactory().RegisterCreatorFunction(
-    "SteadyDiffusion", Poisson::create);
 
 Poisson::Poisson(const LibUtilities::SessionReaderSharedPtr &pSession,
                  const SpatialDomains::MeshGraphSharedPtr &pGraph)
@@ -54,10 +52,6 @@ void Poisson::v_InitObject(bool DeclareFields)
     Laplace::v_InitObject(DeclareFields);
 
     GetFunction("Forcing")->Evaluate(m_session->GetVariables(), m_fields);
-}
-
-Poisson::~Poisson()
-{
 }
 
 void Poisson::v_GenerateSummary(SolverUtils::SummaryList &s)
