@@ -103,11 +103,10 @@ int NekNonlinSysNewton::v_SolveSystem(
 
         NekDouble LinSysRelativeIteTol =
             CalcInexactNewtonForcing(NttlNonlinIte, resnormOld, m_SysResNorm);
-        NekDouble LinSysTol = LinSysRelativeIteTol * sqrt(m_SysResNorm);
-        resnormOld          = m_SysResNorm;
-
-        int ntmpLinSysIts =
-            m_linsol->SolveSystem(ntotal, m_Residual, m_DeltSltn, 0, LinSysTol);
+        resnormOld = m_SysResNorm;
+        m_linsol->setRhsMagnitude(m_SysResNorm);
+        int ntmpLinSysIts = m_linsol->SolveSystem(
+            ntotal, m_Residual, m_DeltSltn, 0, LinSysRelativeIteTol);
         m_NtotLinSysIts += ntmpLinSysIts;
 
         Vmath::Vsub(ntotal, m_Solution, 1, m_DeltSltn, 1, m_Solution, 1);

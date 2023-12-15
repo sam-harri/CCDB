@@ -37,6 +37,7 @@ v5.5.0
 - Avoid repeatly operator assignment in NekNonlinSysNewton class (!1709)
 - Add an exact solution for GetLocCoords of straight-edge quad elements (!1704)
 - Remove MaxIterations parameter from AssemblyMap (!1710)
+- Consistently use relative tolerance for GMRES (!1706)
 
 **ADRSolver**
 - Add support for spatially-constant, but variable direction, diffusion to
