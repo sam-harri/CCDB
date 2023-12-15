@@ -67,7 +67,7 @@ protected:
     Laplace(const LibUtilities::SessionReaderSharedPtr &pSession,
             const SpatialDomains::MeshGraphSharedPtr &pGraph);
 
-    ~Laplace() override;
+    ~Laplace() override = default;
 
     void v_InitObject(bool DeclareFields = true) override;
     void v_GenerateSummary(SolverUtils::SummaryList &s) override;

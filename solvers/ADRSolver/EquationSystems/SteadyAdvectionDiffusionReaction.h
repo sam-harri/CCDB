@@ -58,7 +58,7 @@ public:
     /// Name of class
     static std::string className;
 
-    ~SteadyAdvectionDiffusionReaction() override;
+    ~SteadyAdvectionDiffusionReaction() override = default;
 
 protected:
     SteadyAdvectionDiffusionReaction(
@@ -66,7 +66,6 @@ protected:
         const SpatialDomains::MeshGraphSharedPtr &pGraph);
 
     void v_InitObject(bool DeclareFields = true) override;
-
     void v_GenerateSummary(SolverUtils::SummaryList &s) override;
 };
 } // namespace Nektar

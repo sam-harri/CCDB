@@ -127,13 +127,6 @@ void UnsteadyInviscidBurger::v_InitObject(bool DeclareFields)
 }
 
 /**
- * @brief Inviscid Burger equation destructor.
- */
-UnsteadyInviscidBurger::~UnsteadyInviscidBurger()
-{
-}
-
-/**
  * @brief Get the normal velocity for the inviscid Burger equation.
  */
 Array<OneD, NekDouble> &UnsteadyInviscidBurger::GetNormalVelocity()

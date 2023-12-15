@@ -62,7 +62,7 @@ public:
     static std::string className;
 
     /// Destructor
-    ~UnsteadyDiffusion() override;
+    ~UnsteadyDiffusion() override = default;
 
 protected:
     NekDouble m_epsilon;
@@ -76,11 +76,10 @@ protected:
     SolverUtils::DiffusionSharedPtr m_diffusion;
     SolverUtils::RiemannSolverSharedPtr m_riemannSolver;
 
-    void v_GenerateSummary(SummaryList &s) override;
-
     UnsteadyDiffusion(const LibUtilities::SessionReaderSharedPtr &pSession,
                       const SpatialDomains::MeshGraphSharedPtr &pGraph);
 
+    void v_GenerateSummary(SummaryList &s) override;
     void v_InitObject(bool DeclareFields = true) override;
 
     void GetFluxVector(

@@ -38,8 +38,6 @@
 #include <SolverUtils/AdvectionSystem.h>
 #include <SolverUtils/Diffusion/Diffusion.h>
 #include <SolverUtils/Forcing/Forcing.h>
-#include <SolverUtils/RiemannSolvers/RiemannSolver.h>
-#include <SolverUtils/UnsteadySystem.h>
 
 using namespace Nektar::SolverUtils;
 
@@ -65,7 +63,7 @@ public:
     static std::string className;
 
     /// Destructor
-    ~UnsteadyViscousBurgers() override;
+    ~UnsteadyViscousBurgers() override = default;
 
 protected:
     bool m_useSpecVanVisc;        // Use Spectral Vanishing Viscosity

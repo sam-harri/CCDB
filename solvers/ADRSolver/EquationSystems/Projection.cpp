@@ -55,15 +55,11 @@ void Projection::v_InitObject(bool DeclareFields)
     GetFunction("Forcing")->Evaluate(m_session->GetVariables(), m_fields);
 }
 
-Projection::~Projection()
-{
-}
-
 void Projection::v_DoSolve()
 {
     for (int i = 0; i < m_fields.size(); ++i)
     {
-        // Zero field so initial conditions are zero
+        // Zero initial guess
         Vmath::Zero(m_fields[i]->GetNcoeffs(), m_fields[i]->UpdateCoeffs(), 1);
         m_fields[i]->FwdTrans(m_fields[i]->GetPhys(),
                               m_fields[i]->UpdateCoeffs());

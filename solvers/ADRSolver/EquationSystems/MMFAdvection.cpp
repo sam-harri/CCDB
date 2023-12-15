@@ -52,7 +52,6 @@ MMFAdvection::MMFAdvection(const LibUtilities::SessionReaderSharedPtr &pSession,
     : UnsteadySystem(pSession, pGraph), MMFSystem(pSession, pGraph),
       AdvectionSystem(pSession, pGraph)
 {
-    m_planeNumber = 0;
 }
 
 /**
@@ -192,13 +191,6 @@ void MMFAdvection::v_InitObject(bool DeclareFields)
     {
         ASSERTL0(false, "Implicit unsteady Advection not set up.");
     }
-}
-
-/**
- * @brief Unsteady linear advection equation destructor.
- */
-MMFAdvection::~MMFAdvection()
-{
 }
 
 void MMFAdvection::v_DoSolve()

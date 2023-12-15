@@ -37,7 +37,6 @@
 
 #include <SolverUtils/AdvectionSystem.h>
 #include <SolverUtils/Forcing/Forcing.h>
-#include <SolverUtils/RiemannSolvers/RiemannSolver.h>
 
 namespace Nektar
 {
@@ -61,21 +60,18 @@ public:
     static std::string className;
 
     /// Destructor
-    ~UnsteadyAdvection() override;
+    ~UnsteadyAdvection() override = default;
 
 protected:
     bool m_useGJPStabilisation;
     // scaling factor for GJP penalisation, default = 1.0
     NekDouble m_GJPJumpScale;
+
     SolverUtils::RiemannSolverSharedPtr m_riemannSolver;
 
     /// Advection velocity
     Array<OneD, Array<OneD, NekDouble>> m_velocity;
     Array<OneD, NekDouble> m_traceVn;
-
-    // Plane (used only for Discontinous projection
-    //        with 3DHomogenoeus1D expansion)
-    int m_planeNumber;
 
     /// Forcing terms
     std::vector<SolverUtils::ForcingSharedPtr> m_forcing;

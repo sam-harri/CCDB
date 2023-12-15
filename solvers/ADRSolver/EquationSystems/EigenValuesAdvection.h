@@ -62,7 +62,7 @@ public:
     /// Name of class
     static std::string className;
 
-    ~EigenValuesAdvection() override;
+    ~EigenValuesAdvection() override = default;
 
 protected:
     SolverUtils::RiemannSolverSharedPtr m_riemannSolver;

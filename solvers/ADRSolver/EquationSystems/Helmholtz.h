@@ -56,10 +56,9 @@ public:
     }
 
     /// Name of class
-    static std::string className1;
-    static std::string className2;
+    static std::string className;
 
-    ~Helmholtz() override;
+    ~Helmholtz() override = default;
 
 protected:
     Helmholtz(const LibUtilities::SessionReaderSharedPtr &pSession,

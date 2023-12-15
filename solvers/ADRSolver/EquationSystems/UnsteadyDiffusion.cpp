@@ -33,9 +33,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include <ADRSolver/EquationSystems/UnsteadyDiffusion.h>
-#include <LibUtilities/TimeIntegration/TimeIntegrationScheme.h>
-#include <iomanip>
-#include <iostream>
 
 using namespace std;
 
@@ -108,9 +105,7 @@ void UnsteadyDiffusion::v_InitObject(bool DeclareFields)
             m_diffusion->InitObject(m_session, m_fields);
             break;
         }
-
         case MultiRegions::eGalerkin:
-        case MultiRegions::eMixed_CG_Discontinuous:
         {
             // In case of Galerkin explicit diffusion gives an error
             if (m_explicitDiffusion)
@@ -118,6 +113,12 @@ void UnsteadyDiffusion::v_InitObject(bool DeclareFields)
                 ASSERTL0(false, "Explicit Galerkin diffusion not set up.");
             }
             // In case of Galerkin implicit diffusion: do nothing
+            break;
+        }
+        default:
+        {
+            ASSERTL0(false, "Unknown projection scheme");
+            break;
         }
     }
 
@@ -132,13 +133,6 @@ void UnsteadyDiffusion::v_InitObject(bool DeclareFields)
         m_ode.DefineProjection(&UnsteadyDiffusion::DoOdeProjection, this);
         m_ode.DefineImplicitSolve(&UnsteadyDiffusion::DoImplicitSolve, this);
     }
-}
-
-/**
- * @brief Unsteady diffusion problem destructor.
- */
-UnsteadyDiffusion::~UnsteadyDiffusion()
-{
 }
 
 void UnsteadyDiffusion::v_GenerateSummary(SummaryList &s)
@@ -203,7 +197,6 @@ void UnsteadyDiffusion::DoOdeProjection(
             break;
         }
         case MultiRegions::eGalerkin:
-        case MultiRegions::eMixed_CG_Discontinuous:
         {
             Array<OneD, NekDouble> coeffs(m_fields[0]->GetNcoeffs());
 
