@@ -55,74 +55,10 @@ NekNonlinSys::NekNonlinSys(const LibUtilities::SessionReaderSharedPtr &pSession,
                            const int nDimen, const NekSysKey &pKey)
     : NekSys(pSession, vRowComm, nDimen, pKey)
 {
-    string variable = pSession->GetVariable(0);
-
-    if (pSession->DefinesGlobalSysSolnInfo(variable, "NekNonlinSysTolerance"))
-    {
-        m_tolerance = boost::lexical_cast<NekDouble>(
-            pSession->GetGlobalSysSolnInfo(variable, "NekNonlinSysTolerance")
-                .c_str());
-    }
-    else
-    {
-        pSession->LoadParameter("NekNonlinSysTolerance", m_tolerance,
-                                pKey.m_NekNonlinSysTolerance);
-    }
-
-    if (pSession->DefinesGlobalSysSolnInfo(variable,
-                                           "NekNonlinSysMaxIterations"))
-    {
-        m_maxiter = boost::lexical_cast<int>(
-            pSession
-                ->GetGlobalSysSolnInfo(variable, "NekNonlinSysMaxIterations")
-                .c_str());
-    }
-    else
-    {
-        pSession->LoadParameter("NekNonlinSysMaxIterations", m_maxiter,
-                                pKey.m_NekNonlinSysMaxIterations);
-    }
-
-    if (pSession->DefinesGlobalSysSolnInfo(variable, "NonlinIterTolRelativeL2"))
-    {
-        m_NonlinIterTolRelativeL2 = boost::lexical_cast<NekDouble>(
-            pSession->GetGlobalSysSolnInfo(variable, "NonlinIterTolRelativeL2")
-                .c_str());
-    }
-    else
-    {
-        pSession->LoadParameter("NonlinIterTolRelativeL2",
-                                m_NonlinIterTolRelativeL2,
-                                pKey.m_NonlinIterTolRelativeL2);
-    }
-
-    if (pSession->DefinesGlobalSysSolnInfo(variable,
-                                           "LinSysRelativeTolInNonlin"))
-    {
-        m_LinSysRelativeTolInNonlin = boost::lexical_cast<NekDouble>(
-            pSession
-                ->GetGlobalSysSolnInfo(variable, "LinSysRelativeTolInNonlin")
-                .c_str());
-    }
-    else
-    {
-        pSession->LoadParameter("LinSysRelativeTolInNonlin",
-                                m_LinSysRelativeTolInNonlin,
-                                pKey.m_LinSysRelativeTolInNonlin);
-    }
-
-    if (pSession->DefinesGlobalSysSolnInfo(variable,
-                                           "LinSysIterSolverTypeInNonlin"))
-    {
-        m_LinSysIterSolverType = pSession->GetGlobalSysSolnInfo(
-            variable, "LinSysIterSolverTypeInNonlin");
-    }
-    else
-    {
-        pSession->LoadSolverInfo("LinSysIterSolverTypeInNonlin",
-                                 m_LinSysIterSolverType,
-                                 pKey.m_LinSysIterSolverTypeInNonlin);
-    }
+    m_maxiter                   = pKey.m_NekNonlinSysMaxIterations;
+    m_NonlinIterTolRelativeL2   = pKey.m_NonlinIterTolRelativeL2;
+    m_LinSysRelativeTolInNonlin = pKey.m_LinSysRelativeTolInNonlin;
+    m_LinSysIterSolverType      = pKey.m_LinSysIterSolverTypeInNonlin;
 
     ASSERTL0(LibUtilities::GetNekLinSysIterFactory().ModuleExists(
                  m_LinSysIterSolverType),

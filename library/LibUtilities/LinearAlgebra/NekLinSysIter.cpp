@@ -56,33 +56,9 @@ NekLinSysIter::NekLinSysIter(
     const NekSysKey &pKey)
     : NekSys(pSession, vRowComm, nDimen, pKey)
 {
-    string variable = pSession->GetVariable(0);
-
-    if (pSession->DefinesGlobalSysSolnInfo(variable, "NekLinSysMaxIterations"))
-    {
-        m_maxiter = boost::lexical_cast<int>(
-            pSession->GetGlobalSysSolnInfo(variable, "NekLinSysMaxIterations")
-                .c_str());
-    }
-    else
-    {
-        pSession->LoadParameter("NekLinSysMaxIterations", m_maxiter,
-                                pKey.m_NekLinSysMaxIterations);
-    }
-
-    if (pSession->DefinesGlobalSysSolnInfo(variable, "LinSysMaxStorage"))
-    {
-        m_LinSysMaxStorage = boost::lexical_cast<int>(
-            pSession->GetGlobalSysSolnInfo(variable, "LinSysMaxStorage")
-                .c_str());
-    }
-    else
-    {
-        pSession->LoadParameter("LinSysMaxStorage", m_LinSysMaxStorage,
-                                pKey.m_LinSysMaxStorage);
-    }
-
-    m_isLocal = false;
+    m_maxiter          = pKey.m_NekLinSysMaxIterations;
+    m_LinSysMaxStorage = pKey.m_LinSysMaxStorage;
+    m_isLocal          = false;
 }
 
 void NekLinSysIter::v_InitObject()

@@ -87,13 +87,46 @@ void CFSImplicit::InitialiseNonlinSysSolver()
              "NekNonlinSys '" + SolverType + "' is not defined.\n");
     int ntotal = m_fields[0]->GetNcoeffs() * m_fields.size();
 
+    // Create the key to hold settings for nonlin solver
     LibUtilities::NekSysKey key = LibUtilities::NekSysKey();
+    // Load required LinSys parameters:
+    m_session->LoadParameter("NekLinSysMaxIterations",
+                             key.m_NekLinSysMaxIterations, 30);
+    m_session->LoadParameter("LinSysMaxStorage", key.m_LinSysMaxStorage, 30);
+    m_session->LoadParameter("GMRESMaxHessMatBand", key.m_KrylovMaxHessMatBand,
+                             31);
+    m_session->MatchSolverInfo("GMRESLeftPrecon", "True",
+                               key.m_NekLinSysLeftPrecon, false);
+    m_session->MatchSolverInfo("GMRESRightPrecon", "True",
+                               key.m_NekLinSysRightPrecon, true);
+    // Load required NonLinSys parameters:
+    m_session->LoadParameter("NekNonlinSysMaxIterations",
+                             key.m_NekNonlinSysMaxIterations, 10);
+    m_session->LoadParameter("NonlinIterTolRelativeL2",
+                             key.m_NonlinIterTolRelativeL2, 1.0E-3);
+    m_session->LoadParameter("LinSysRelativeTolInNonlin",
+                             key.m_LinSysRelativeTolInNonlin, 5.0E-2);
+    m_session->LoadSolverInfo("LinSysIterSolverTypeInNonlin",
+                              key.m_LinSysIterSolverTypeInNonlin, "GMRES");
 
-    key.m_NonlinIterTolRelativeL2   = 1.0E-3;
-    key.m_LinSysRelativeTolInNonlin = 5.0E-2;
-    key.m_NekNonlinSysMaxIterations = 10;
-    key.m_NekLinSysMaxIterations    = 30;
-    key.m_LinSysMaxStorage          = 30;
+    int GMRESCentralDifference = 0;
+    m_session->LoadParameter("GMRESCentralDifference", GMRESCentralDifference,
+                             0);
+    switch (GMRESCentralDifference)
+    {
+        case 1:
+            key.m_DifferenceFlag0 = true;
+            key.m_DifferenceFlag1 = false;
+            break;
+        case 2:
+            key.m_DifferenceFlag0 = true;
+            key.m_DifferenceFlag1 = true;
+            break;
+        default:
+            key.m_DifferenceFlag0 = false;
+            key.m_DifferenceFlag1 = false;
+            break;
+    }
 
     m_nonlinsol = LibUtilities::GetNekNonlinSysFactory().CreateInstance(
         SolverType, m_session, m_comm->GetRowComm(), ntotal, key);
