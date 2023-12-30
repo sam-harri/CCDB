@@ -61,8 +61,23 @@ public:
         ASSERTL0(
             LibUtilities::GetNekNonlinSysFactory().ModuleExists(SolverType),
             "NekNonlinSys '" + SolverType + "' is not defined.\n");
+
+        // Create the key to hold solver settings
+        auto sysKey = LibUtilities::NekSysKey();
+        pSession->LoadParameter("NekLinSysMaxIterations",
+                                sysKey.m_NekLinSysMaxIterations, 5000);
+        pSession->LoadParameter("LinSysMaxStorage", sysKey.m_LinSysMaxStorage,
+                                100);
+        // Load required NonLinSys parameters:
+        m_session->LoadParameter("NekNonlinSysMaxIterations",
+                                 sysKey.m_NekNonlinSysMaxIterations, 100);
+        m_session->LoadParameter("NonlinIterTolRelativeL2",
+                                 sysKey.m_NonlinIterTolRelativeL2, 1.0E-6);
+        m_session->LoadParameter("LinSysRelativeTolInNonlin",
+                                 sysKey.m_LinSysRelativeTolInNonlin, 1.0E-2);
+
         m_nonlinsol = LibUtilities::GetNekNonlinSysFactory().CreateInstance(
-            SolverType, m_session, m_comm, m_matDim, LibUtilities::NekSysKey());
+            SolverType, m_session, m_comm, m_matDim, sysKey);
 
         m_NekSysOp.DefineNekSysResEval(&LinSysDemo::DoRhs, this);
         m_NekSysOp.DefineNekSysLhsEval(&LinSysDemo::DoLhs, this);

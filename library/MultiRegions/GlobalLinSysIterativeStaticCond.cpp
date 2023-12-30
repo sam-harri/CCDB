@@ -543,9 +543,61 @@ void GlobalLinSysIterativeStaticCond::v_SolveLinearSystem(
                      m_linSysIterSolver),
                  "NekLinSysIter '" + m_linSysIterSolver +
                      "' is not defined.\n");
+
+        // Create the key to hold solver settings
+        auto sysKey     = LibUtilities::NekSysKey();
+        string variable = plocToGloMap->GetVariable();
+
+        // Either get the solnInfo from <GlobalSysSolInfo> or from
+        // <Parameters>
+        if (pSession->DefinesGlobalSysSolnInfo(variable,
+                                               "NekLinSysMaxIterations"))
+        {
+            sysKey.m_NekLinSysMaxIterations = boost::lexical_cast<int>(
+                pSession
+                    ->GetGlobalSysSolnInfo(variable, "NekLinSysMaxIterations")
+                    .c_str());
+        }
+        else
+        {
+            pSession->LoadParameter("NekLinSysMaxIterations",
+                                    sysKey.m_NekLinSysMaxIterations, 5000);
+        }
+
+        if (pSession->DefinesGlobalSysSolnInfo(variable, "LinSysMaxStorage"))
+        {
+            sysKey.m_LinSysMaxStorage = boost::lexical_cast<int>(
+                pSession->GetGlobalSysSolnInfo(variable, "LinSysMaxStorage")
+                    .c_str());
+        }
+        else
+        {
+            pSession->LoadParameter("LinSysMaxStorage",
+                                    sysKey.m_LinSysMaxStorage, 100);
+        }
+
+        if (pSession->DefinesGlobalSysSolnInfo(variable, "GMRESMaxHessMatBand"))
+        {
+            sysKey.m_KrylovMaxHessMatBand = boost::lexical_cast<int>(
+                pSession->GetGlobalSysSolnInfo(variable, "GMRESMaxHessMatBand")
+                    .c_str());
+        }
+        else
+        {
+            pSession->LoadParameter("GMRESMaxHessMatBand",
+                                    sysKey.m_KrylovMaxHessMatBand,
+                                    sysKey.m_LinSysMaxStorage + 1);
+        }
+
+        // The following settings have no correponding tests and are rarely
+        // used.
+        pSession->MatchSolverInfo("GMRESLeftPrecon", "True",
+                                  sysKey.m_NekLinSysLeftPrecon, false);
+        pSession->MatchSolverInfo("GMRESRightPrecon", "True",
+                                  sysKey.m_NekLinSysRightPrecon, true);
+
         m_linsol = LibUtilities::GetNekLinSysIterFactory().CreateInstance(
-            m_linSysIterSolver, pSession, vRowComm, nGlobal - nDir,
-            LibUtilities::NekSysKey());
+            m_linSysIterSolver, pSession, vRowComm, nGlobal - nDir, sysKey);
 
         m_linsol->SetSysOperators(m_NekSysOp);
         v_UniqueMap();

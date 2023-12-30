@@ -67,9 +67,15 @@ public:
                      LinSysIterSolverType),
                  "NekLinSysIter '" + LinSysIterSolverType +
                      "' is not defined.\n");
+
+        // Create the key to hold solver settings
+        auto sysKey = LibUtilities::NekSysKey();
+        pSession->LoadParameter("NekLinSysMaxIterations",
+                                sysKey.m_NekLinSysMaxIterations, 5000);
+        pSession->LoadParameter("LinSysMaxStorage", sysKey.m_LinSysMaxStorage,
+                                100);
         m_linsol = LibUtilities::GetNekLinSysIterFactory().CreateInstance(
-            LinSysIterSolverType, m_session, m_comm, m_matDim,
-            LibUtilities::NekSysKey());
+            LinSysIterSolverType, m_session, m_comm, m_matDim, sysKey);
 
         m_NekSysOp.DefineNekSysLhsEval(&LinSysDemo::DoLhs, this);
         m_NekSysOp.DefineNekSysFixPointIte(&LinSysDemo::DoFixedPoint, this);

@@ -55,51 +55,16 @@ NekLinSysIterGMRES::NekLinSysIterGMRES(
     const NekSysKey &pKey)
     : NekLinSysIter(pSession, vRowComm, nDimen, pKey)
 {
-    std::vector<std::string> variables(1);
-    variables[0]    = pSession->GetVariable(0);
-    string variable = variables[0];
+    m_NekLinSysLeftPrecon  = pKey.m_NekLinSysLeftPrecon;
+    m_NekLinSysRightPrecon = pKey.m_NekLinSysRightPrecon;
 
-    pSession->MatchSolverInfo("GMRESLeftPrecon", "True", m_NekLinSysLeftPrecon,
-                              pKey.m_NekLinSysLeftPrecon);
-    pSession->MatchSolverInfo("GMRESRightPrecon", "False",
-                              m_NekLinSysRightPrecon,
-                              pKey.m_NekLinSysRightPrecon);
-
-    if (pSession->DefinesGlobalSysSolnInfo(variable, "GMRESMaxHessMatBand"))
-    {
-        m_KrylovMaxHessMatBand = boost::lexical_cast<int>(
-            pSession->GetGlobalSysSolnInfo(variable, "GMRESMaxHessMatBand")
-                .c_str());
-    }
-    else
-    {
-        pSession->LoadParameter("GMRESMaxHessMatBand", m_KrylovMaxHessMatBand,
-                                m_LinSysMaxStorage + 1);
-    }
+    m_KrylovMaxHessMatBand = pKey.m_KrylovMaxHessMatBand;
 
     m_maxrestart = ceil(NekDouble(m_maxiter) / NekDouble(m_LinSysMaxStorage));
     m_LinSysMaxStorage = min(m_maxiter, m_LinSysMaxStorage);
 
-    int GMRESCentralDifference = 0;
-    pSession->LoadParameter("GMRESCentralDifference", GMRESCentralDifference,
-                            0);
-
-    switch (GMRESCentralDifference)
-    {
-        case 1:
-            m_DifferenceFlag0 = true;
-            m_DifferenceFlag1 = false;
-            break;
-        case 2:
-            m_DifferenceFlag0 = true;
-            m_DifferenceFlag1 = true;
-            break;
-
-        default:
-            m_DifferenceFlag0 = false;
-            m_DifferenceFlag1 = false;
-            break;
-    }
+    m_DifferenceFlag0 = pKey.m_DifferenceFlag0;
+    m_DifferenceFlag1 = pKey.m_DifferenceFlag1;
 
     // Allocate array storage of coefficients
     // Hessenburg matrix
