@@ -187,8 +187,8 @@ struct HelmholtzTemplate
         std::vector<vec_t, allocator<vec_t>> bwd(nqTot), deriv0(nqTot),
             deriv1(nqTot);
 
-        const vec_t *jac_ptr;
-        const vec_t *df_ptr;
+        const vec_t *jac_ptr = {};
+        const vec_t *df_ptr  = {};
 
         // Get size of derivative factor block
         auto dfSize = ndf;
@@ -231,17 +231,16 @@ struct HelmholtzTemplate
             DiffusionCoeff2DKernel<SHAPE_TYPE, DEFORMED>(
                 nq0, nq1, this->m_isConstVarDiff, this->m_constVarDiff,
                 this->m_isVarDiff, this->m_varD00, this->m_varD01,
-                this->m_varD11, df_ptr, this->m_h0, this->m_h1, bwd, deriv0,
-                deriv1);
+                this->m_varD11, df_ptr, this->m_h0, this->m_h1, deriv0, deriv1);
 
             // Step 4: Apply Laplacian metrics & inner product
             IProduct2DKernel<SHAPE_TYPE, false, true, DEFORMED>(
-                nm0, nm1, nq0, nq1, correct, bwd, this->m_dbdata[0],
+                nm0, nm1, nq0, nq1, correct, deriv0, this->m_dbdata[0],
                 this->m_bdata[1], this->m_w[0], this->m_w[1], jac_ptr, wsp0,
                 tmpOut);
 
             IProduct2DKernel<SHAPE_TYPE, false, true, DEFORMED>(
-                nm0, nm1, nq0, nq1, correct, deriv0, this->m_bdata[0],
+                nm0, nm1, nq0, nq1, correct, deriv1, this->m_bdata[0],
                 this->m_dbdata[1], this->m_w[0], this->m_w[1], jac_ptr, wsp0,
                 tmpOut);
 
@@ -280,8 +279,8 @@ struct HelmholtzTemplate
         std::vector<vec_t, allocator<vec_t>> bwd(nqTot), deriv0(nqTot),
             deriv1(nqTot);
 
-        const vec_t *jac_ptr;
-        const vec_t *df_ptr;
+        const vec_t *jac_ptr = {};
+        const vec_t *df_ptr  = {};
 
         // Get size of derivative factor block
         auto dfSize = ndf;
@@ -324,17 +323,16 @@ struct HelmholtzTemplate
             DiffusionCoeff2DKernel<SHAPE_TYPE, DEFORMED>(
                 nq0, nq1, this->m_isConstVarDiff, this->m_constVarDiff,
                 this->m_isVarDiff, this->m_varD00, this->m_varD01,
-                this->m_varD11, df_ptr, this->m_h0, this->m_h1, bwd, deriv0,
-                deriv1);
+                this->m_varD11, df_ptr, this->m_h0, this->m_h1, deriv0, deriv1);
 
             // Step 4: Apply Laplacian metrics & inner product
             IProduct2DKernel<SHAPE_TYPE, false, true, DEFORMED>(
-                nm0, nm1, nq0, nq1, correct, bwd, this->m_dbdata[0],
+                nm0, nm1, nq0, nq1, correct, deriv0, this->m_dbdata[0],
                 this->m_bdata[1], this->m_w[0], this->m_w[1], jac_ptr, wsp0,
                 tmpOut);
 
             IProduct2DKernel<SHAPE_TYPE, false, true, DEFORMED>(
-                nm0, nm1, nq0, nq1, correct, deriv0, this->m_bdata[0],
+                nm0, nm1, nq0, nq1, correct, deriv1, this->m_bdata[0],
                 this->m_dbdata[1], this->m_w[0], this->m_w[1], jac_ptr, wsp0,
                 tmpOut);
 
@@ -385,8 +383,8 @@ struct HelmholtzTemplate
         std::vector<vec_t, allocator<vec_t>> deriv0(nqTot), deriv1(nqTot),
             deriv2(nqTot);
 
-        const vec_t *jac_ptr;
-        const vec_t *df_ptr;
+        const vec_t *jac_ptr = {};
+        const vec_t *df_ptr  = {};
 
         // Get size of derivative factor block
         auto dfSize = ndf;
@@ -489,8 +487,8 @@ struct HelmholtzTemplate
         std::vector<vec_t, allocator<vec_t>> deriv0(nqTot), deriv1(nqTot),
             deriv2(nqTot);
 
-        const vec_t *jac_ptr;
-        const vec_t *df_ptr;
+        const vec_t *jac_ptr = {};
+        const vec_t *df_ptr  = {};
 
         // Get size of derivative factor block
         auto dfSize = ndf;

@@ -40,6 +40,7 @@ v5.5.0
 - Consistently use relative tolerance for GMRES (!1706)
 - Fix use of absolute tolerance for iterative solvers (!1711)
 - Move solver info loading form NekSys (and its derived classes) to the callers (!1716)
+- Tidy physderiv and helmholtz in MatrixFreeOps (!1653)
 
 **ADRSolver**
 - Add support for spatially-constant, but variable direction, diffusion to
