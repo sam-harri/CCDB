@@ -58,7 +58,6 @@ NEK_FORCE_INLINE static void DiffusionCoeffTriKernel(
     const Array<OneD, NekDouble> &varD11, const vec_t *df_ptr,
     const std::vector<vec_t, allocator<vec_t>> &m_h0,
     const std::vector<vec_t, allocator<vec_t>> &m_h1,
-    std::vector<vec_t, allocator<vec_t>> &bwd,
     std::vector<vec_t, allocator<vec_t>> &deriv0,
     std::vector<vec_t, allocator<vec_t>> &deriv1)
 {
@@ -150,11 +149,11 @@ NEK_FORCE_INLINE static void DiffusionCoeffTriKernel(
 
             tmp = metric00 * d0;
             tmp.fma(metric01, d1);
-            bwd[cnt] = tmp;
+            deriv0[cnt] = tmp;
 
             tmp = metric01 * d0;
             tmp.fma(metric11, d1);
-            deriv0[cnt] = tmp;
+            deriv1[cnt] = tmp;
         }
     }
 }
@@ -167,7 +166,6 @@ NEK_FORCE_INLINE static void DiffusionCoeffQuadKernel(
     const Array<OneD, NekDouble> &constVarDiff, const bool isVarDiff,
     const Array<OneD, NekDouble> &varD00, const Array<OneD, NekDouble> &varD01,
     const Array<OneD, NekDouble> &varD11, const vec_t *df_ptr,
-    std::vector<vec_t, allocator<vec_t>> &bwd,
     std::vector<vec_t, allocator<vec_t>> &deriv0,
     std::vector<vec_t, allocator<vec_t>> &deriv1)
 {
@@ -273,11 +271,11 @@ NEK_FORCE_INLINE static void DiffusionCoeffQuadKernel(
 
                     vec_t tmp = metric00 * d0;
                     tmp.fma(metric01, d1);
-                    bwd[cnt] = tmp;
+                    deriv0[cnt] = tmp;
 
                     tmp = metric01 * d0;
                     tmp.fma(metric11, d1);
-                    deriv0[cnt] = tmp;
+                    deriv1[cnt] = tmp;
                 }
             }
         }
@@ -290,11 +288,11 @@ NEK_FORCE_INLINE static void DiffusionCoeffQuadKernel(
 
                 vec_t tmp = metric00 * d0;
                 tmp.fma(metric01, d1);
-                bwd[i] = tmp;
+                deriv0[i] = tmp;
 
                 tmp = metric01 * d0;
                 tmp.fma(metric11, d1);
-                deriv0[i] = tmp;
+                deriv1[i] = tmp;
             }
         }
     }
@@ -336,11 +334,11 @@ NEK_FORCE_INLINE static void DiffusionCoeffQuadKernel(
 
                     vec_t tmp = metric00 * d0;
                     tmp.fma(metric01, d1);
-                    bwd[cnt] = tmp;
+                    deriv0[cnt] = tmp;
 
                     tmp = metric01 * d0;
                     tmp.fma(metric11, d1);
-                    deriv0[cnt] = tmp;
+                    deriv1[cnt] = tmp;
                 }
             }
         }
@@ -375,11 +373,11 @@ NEK_FORCE_INLINE static void DiffusionCoeffQuadKernel(
 
                     vec_t tmp = metric00 * d0;
                     tmp.fma(metric01, d1);
-                    bwd[cnt] = tmp;
+                    deriv0[cnt] = tmp;
 
                     tmp = metric01 * d0;
                     tmp.fma(metric11, d1);
-                    deriv0[cnt] = tmp;
+                    deriv1[cnt] = tmp;
                 }
             }
         }
@@ -1438,18 +1436,17 @@ NEK_FORCE_INLINE static void DiffusionCoeff2DKernel(
     const Array<OneD, NekDouble> &varD11, const vec_t *df_ptr,
     [[maybe_unused]] const std::vector<vec_t, allocator<vec_t>> &h0,
     [[maybe_unused]] const std::vector<vec_t, allocator<vec_t>> &h1,
-    std::vector<vec_t, allocator<vec_t>> &bwd,
     std::vector<vec_t, allocator<vec_t>> &deriv0,
     std::vector<vec_t, allocator<vec_t>> &deriv1)
 {
 #if defined(SHAPE_TYPE_TRI)
     DiffusionCoeffTriKernel<DEFORMED>(nq0, nq1, isConstVarDiff, constVarDiff,
                                       isVarDiff, varD00, varD01, varD11, df_ptr,
-                                      h0, h1, bwd, deriv0, deriv1);
+                                      h0, h1, deriv0, deriv1);
 #elif defined(SHAPE_TYPE_QUAD)
     DiffusionCoeffQuadKernel<DEFORMED>(nq0, nq1, isConstVarDiff, constVarDiff,
                                        isVarDiff, varD00, varD01, varD11,
-                                       df_ptr, bwd, deriv0, deriv1);
+                                       df_ptr, deriv0, deriv1);
 #endif
 }
 
