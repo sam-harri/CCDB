@@ -163,17 +163,20 @@ void DriverParallelInTime::SetParallelInTimeEquationSystem(
                   : 1;
 
     // Convert into string.
-    std::string npx_string = std::to_string(npx);
-    std::string npy_string = std::to_string(npy);
-    std::string npz_string = std::to_string(npz);
-    std::string nsz_string = std::to_string(nsz);
-    std::string npt_string = std::to_string(npt);
+    std::string npx_string    = std::to_string(npx);
+    std::string npy_string    = std::to_string(npy);
+    std::string npz_string    = std::to_string(npz);
+    std::string nsz_string    = std::to_string(nsz);
+    std::string npt_string    = std::to_string(npt);
+    std::string driver_string = "Driver=" + m_session->GetSolverInfo("Driver");
 
     // use-opt-file
     bool useOptFile         = m_session->DefinesCmdLineArgument("use-opt-file");
     std::string optfilename = useOptFile ? m_session->GetFilenames()[0] : "";
 
     char *argv[] = {const_cast<char *>("Solver"), // this is just a place holder
+                    const_cast<char *>("--solverinfo"),
+                    const_cast<char *>(driver_string.c_str()),
                     const_cast<char *>("--npx"),
                     const_cast<char *>(npx_string.c_str()),
                     const_cast<char *>("--npy"),
@@ -189,7 +192,7 @@ void DriverParallelInTime::SetParallelInTimeEquationSystem(
                     const_cast<char *>(optfilename.c_str()),
                     nullptr};
 
-    size_t argc = useOptFile ? 14 : 12;
+    size_t argc = useOptFile ? 16 : 14;
 
     // Get list of session file names.
     std::vector<std::string> sessionFileNames;
@@ -351,20 +354,6 @@ void DriverParallelInTime::PrintHeader(const std::string &title, const char c)
 /**
  *
  */
-void DriverParallelInTime::PrintComputationalTime(void)
-{
-    if (m_chunkRank == m_numChunks - 1 &&
-        m_comm->GetSpaceComm()->GetRank() == 0)
-    {
-        std::cout << "Total Computation Time : " << m_CPUtime << "s"
-                  << std::endl
-                  << std::flush;
-    }
-}
-
-/**
- *
- */
 void DriverParallelInTime::RecvFromPreviousProc(
     Array<OneD, Array<OneD, NekDouble>> &array, int &convergence)
 {
@@ -492,13 +481,9 @@ void DriverParallelInTime::EvaluateExactSolution(const size_t timeLevel,
 void DriverParallelInTime::SolutionConvergenceMonitoring(const size_t timeLevel,
                                                          const size_t iter)
 {
-    m_timer.Stop();
-    m_CPUtime += m_timer.Elapsed().count();
     PrintHeader((boost::format("ITERATION %1%") % iter).str(), '-');
     UpdateErrorNorm(timeLevel, true);
     PrintErrorNorm(timeLevel, true);
-    PrintComputationalTime();
-    m_timer.Start();
 }
 
 /**
@@ -506,10 +491,8 @@ void DriverParallelInTime::SolutionConvergenceMonitoring(const size_t timeLevel,
  */
 void DriverParallelInTime::SolutionConvergenceSummary(const size_t timeLevel)
 {
-    m_CPUtime += m_timer.Elapsed().count();
     UpdateErrorNorm(timeLevel, false);
     PrintErrorNorm(timeLevel, false);
-    PrintComputationalTime();
 }
 
 /**
@@ -662,7 +645,6 @@ void DriverParallelInTime::Interpolate(
         {
             // Assign memory for coefficient space.
             Array<OneD, NekDouble> incoeff(infield[n]->GetNcoeffs());
-            Array<OneD, NekDouble> outcoeff(outfield[n]->GetNcoeffs());
 
             // Transform solution from physical to coefficient space.
             infield[n]->FwdTransLocalElmt(inphys, incoeff);
@@ -675,28 +657,22 @@ void DriverParallelInTime::Interpolate(
 
                 // Get the offset of elements in the storage arrays.
                 size_t inoffset  = infield[n]->GetCoeff_Offset(i);
-                size_t outoffset = outfield[n]->GetCoeff_Offset(i);
+                size_t outoffset = outfield[n]->GetPhys_Offset(i);
 
-                // Extract data from infield -> outfield.
-                Array<OneD, const NekDouble> indata(inElmt->GetNcoeffs(),
-                                                    &incoeff[inoffset]);
-                Array<OneD, NekDouble> bwd(outElmt->GetTotPoints());
-                Array<OneD, NekDouble> outdata(outElmt->GetNcoeffs());
-                StdRegions::StdExpansionSharedPtr inExp;
-                StdRegions::StdExpansionSharedPtr outExp;
+                // Interpolate elements.
+                Array<OneD, NekDouble> tmp;
+                StdRegions::StdExpansionSharedPtr expPtr;
                 if (inElmt->DetShapeType() == LibUtilities::Seg)
                 {
-                    inExp = std::make_shared<StdRegions::StdSegExp>(
+                    expPtr = std::make_shared<StdRegions::StdSegExp>(
                         LibUtilities::BasisKey(
                             inElmt->GetBasis(0)->GetBasisType(),
                             inElmt->GetBasis(0)->GetNumModes(),
                             outElmt->GetBasis(0)->GetPointsKey()));
-                    outExp = std::make_shared<StdRegions::StdSegExp>(
-                        outElmt->GetBasis(0)->GetBasisKey());
                 }
                 else if (inElmt->DetShapeType() == LibUtilities::Quad)
                 {
-                    inExp = std::make_shared<StdRegions::StdQuadExp>(
+                    expPtr = std::make_shared<StdRegions::StdQuadExp>(
                         LibUtilities::BasisKey(
                             inElmt->GetBasis(0)->GetBasisType(),
                             inElmt->GetBasis(0)->GetNumModes(),
@@ -705,13 +681,10 @@ void DriverParallelInTime::Interpolate(
                             inElmt->GetBasis(1)->GetBasisType(),
                             inElmt->GetBasis(1)->GetNumModes(),
                             outElmt->GetBasis(1)->GetPointsKey()));
-                    outExp = std::make_shared<StdRegions::StdQuadExp>(
-                        outElmt->GetBasis(0)->GetBasisKey(),
-                        outElmt->GetBasis(1)->GetBasisKey());
                 }
                 else if (inElmt->DetShapeType() == LibUtilities::Tri)
                 {
-                    inExp = std::make_shared<StdRegions::StdTriExp>(
+                    expPtr = std::make_shared<StdRegions::StdTriExp>(
                         LibUtilities::BasisKey(
                             inElmt->GetBasis(0)->GetBasisType(),
                             inElmt->GetBasis(0)->GetNumModes(),
@@ -720,13 +693,10 @@ void DriverParallelInTime::Interpolate(
                             inElmt->GetBasis(1)->GetBasisType(),
                             inElmt->GetBasis(1)->GetNumModes(),
                             outElmt->GetBasis(1)->GetPointsKey()));
-                    outExp = std::make_shared<StdRegions::StdTriExp>(
-                        outElmt->GetBasis(0)->GetBasisKey(),
-                        outElmt->GetBasis(1)->GetBasisKey());
                 }
                 else if (inElmt->DetShapeType() == LibUtilities::Hex)
                 {
-                    inExp = std::make_shared<StdRegions::StdHexExp>(
+                    expPtr = std::make_shared<StdRegions::StdHexExp>(
                         LibUtilities::BasisKey(
                             inElmt->GetBasis(0)->GetBasisType(),
                             inElmt->GetBasis(0)->GetNumModes(),
@@ -739,14 +709,10 @@ void DriverParallelInTime::Interpolate(
                             inElmt->GetBasis(2)->GetBasisType(),
                             inElmt->GetBasis(2)->GetNumModes(),
                             outElmt->GetBasis(2)->GetPointsKey()));
-                    outExp = std::make_shared<StdRegions::StdHexExp>(
-                        outElmt->GetBasis(0)->GetBasisKey(),
-                        outElmt->GetBasis(1)->GetBasisKey(),
-                        outElmt->GetBasis(2)->GetBasisKey());
                 }
                 else if (inElmt->DetShapeType() == LibUtilities::Prism)
                 {
-                    inExp = std::make_shared<StdRegions::StdPrismExp>(
+                    expPtr = std::make_shared<StdRegions::StdPrismExp>(
                         LibUtilities::BasisKey(
                             inElmt->GetBasis(0)->GetBasisType(),
                             inElmt->GetBasis(0)->GetNumModes(),
@@ -759,14 +725,10 @@ void DriverParallelInTime::Interpolate(
                             inElmt->GetBasis(2)->GetBasisType(),
                             inElmt->GetBasis(2)->GetNumModes(),
                             outElmt->GetBasis(2)->GetPointsKey()));
-                    outExp = std::make_shared<StdRegions::StdPrismExp>(
-                        outElmt->GetBasis(0)->GetBasisKey(),
-                        outElmt->GetBasis(1)->GetBasisKey(),
-                        outElmt->GetBasis(2)->GetBasisKey());
                 }
                 else if (inElmt->DetShapeType() == LibUtilities::Pyr)
                 {
-                    inExp = std::make_shared<StdRegions::StdPyrExp>(
+                    expPtr = std::make_shared<StdRegions::StdPyrExp>(
                         LibUtilities::BasisKey(
                             inElmt->GetBasis(0)->GetBasisType(),
                             inElmt->GetBasis(0)->GetNumModes(),
@@ -779,14 +741,10 @@ void DriverParallelInTime::Interpolate(
                             inElmt->GetBasis(2)->GetBasisType(),
                             inElmt->GetBasis(2)->GetNumModes(),
                             outElmt->GetBasis(2)->GetPointsKey()));
-                    outExp = std::make_shared<StdRegions::StdPyrExp>(
-                        outElmt->GetBasis(0)->GetBasisKey(),
-                        outElmt->GetBasis(1)->GetBasisKey(),
-                        outElmt->GetBasis(2)->GetBasisKey());
                 }
                 else if (inElmt->DetShapeType() == LibUtilities::Tet)
                 {
-                    inExp = std::make_shared<StdRegions::StdTetExp>(
+                    expPtr = std::make_shared<StdRegions::StdTetExp>(
                         LibUtilities::BasisKey(
                             inElmt->GetBasis(0)->GetBasisType(),
                             inElmt->GetBasis(0)->GetNumModes(),
@@ -799,18 +757,9 @@ void DriverParallelInTime::Interpolate(
                             inElmt->GetBasis(2)->GetBasisType(),
                             inElmt->GetBasis(2)->GetNumModes(),
                             outElmt->GetBasis(2)->GetPointsKey()));
-                    outExp = std::make_shared<StdRegions::StdTetExp>(
-                        outElmt->GetBasis(0)->GetBasisKey(),
-                        outElmt->GetBasis(1)->GetBasisKey(),
-                        outElmt->GetBasis(2)->GetBasisKey());
                 }
-                inExp->BwdTrans(indata, bwd);
-                outExp->FwdTrans(bwd, outdata);
-                Vmath::Vcopy(outElmt->GetNcoeffs(), outdata.get(), 1,
-                             &outcoeff[outoffset], 1);
+                expPtr->BwdTrans(incoeff + inoffset, tmp = outphys + outoffset);
             }
-            // Transform solution back to physical space.
-            outfield[n]->BwdTrans(outcoeff, outphys);
         }
     }
 }

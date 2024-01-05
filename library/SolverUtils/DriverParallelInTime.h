@@ -73,8 +73,6 @@ protected:
 
     void PrintHeader(const std::string &title, const char c);
 
-    void PrintComputationalTime(void);
-
     void RecvFromPreviousProc(Array<OneD, Array<OneD, NekDouble>> &array,
                               int &convergence);
 
@@ -120,12 +118,6 @@ protected:
         const Array<OneD, MultiRegions::ExpListSharedPtr> &outfield,
         const Array<OneD, Array<OneD, NekDouble>> &inarray,
         Array<OneD, Array<OneD, NekDouble>> &outarray);
-
-    /// Timer.
-    Nektar::LibUtilities::Timer m_timer;
-
-    /// CPU time.
-    NekDouble m_CPUtime;
 
     /// Total time integration interval.
     NekDouble m_totalTime;

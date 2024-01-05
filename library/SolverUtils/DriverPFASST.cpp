@@ -73,6 +73,12 @@ void DriverPFASST::v_InitObject(std::ostream &out)
  */
 void DriverPFASST::v_Execute([[maybe_unused]] std::ostream &out)
 {
+    // Timing.
+    Nektar::LibUtilities::Timer timer;
+    NekDouble totalTime = 0.0, predictorTime = 0.0, fineSolveTime = 0.0,
+              coarseSolveTime = 0.0, fasTime = 0.0;
+
+    // Initialie time step parameters.
     size_t step     = m_chunkRank;
     m_totalTime     = m_timestep[0] * m_nsteps[0];
     m_numWindowsPIT = m_nsteps[0] / m_numChunks;
@@ -80,10 +86,9 @@ void DriverPFASST::v_Execute([[maybe_unused]] std::ostream &out)
 
     // Start iteration windows.
     m_comm->GetTimeComm()->Block();
-    m_CPUtime = 0.0;
     for (size_t w = 0; w < m_numWindowsPIT; w++)
     {
-        m_timer.Start();
+        timer.Start();
         PrintHeader((boost::format("WINDOWS #%1%") % (w + 1)).str(), '*');
 
         // Compute initial guess for coarse solver.
@@ -105,6 +110,9 @@ void DriverPFASST::v_Execute([[maybe_unused]] std::ostream &out)
             InterpolateSolution(timeLevel);
             InterpolateResidual(timeLevel);
         }
+        timer.Stop();
+        predictorTime += timer.Elapsed().count();
+        totalTime += timer.Elapsed().count();
 
         // Start CorrectInitialPFASST iteration.
         size_t k            = 0;
@@ -123,12 +131,23 @@ void DriverPFASST::v_Execute([[maybe_unused]] std::ostream &out)
                 std::cout << "Iteration " << k + 1 << std::endl << std::flush;
             }
 
+            // Performe sweep (parallel-in-time).
+            timer.Start();
+            RunSweep(m_time, 0, true);
+            timer.Stop();
+            fineSolveTime += timer.Elapsed().count();
+            totalTime += timer.Elapsed().count();
+
             // Fine-to-coarse
+            timer.Start();
             for (size_t timeLevel = 0; timeLevel < m_nTimeLevel - 1;
                  timeLevel++)
             {
                 // Performe sweep (parallel-in-time).
-                RunSweep(m_time, timeLevel, true);
+                if (timeLevel != 0)
+                {
+                    RunSweep(m_time, timeLevel, true);
+                }
 
                 // Compute FAS correction (parallel-in-time).
                 RestrictSolution(timeLevel);
@@ -147,19 +166,33 @@ void DriverPFASST::v_Execute([[maybe_unused]] std::ostream &out)
                     PrintErrorNorm(timeLevel, true);
                 }
             }
+            timer.Stop();
+            fasTime += timer.Elapsed().count();
+            totalTime += timer.Elapsed().count();
 
             // Perform coarse sweep (serial-in-time).
+            timer.Start();
             RecvFromPreviousProc(m_SDCSolver[m_nTimeLevel - 1]
                                      ->UpdateFirstQuadratureSolutionVector(),
                                  convergencePrev[m_nTimeLevel - 1]);
+            timer.Stop();
+            totalTime += timer.Elapsed().count();
+            timer.Start();
             RunSweep(m_time, m_nTimeLevel - 1, true);
+            timer.Stop();
+            coarseSolveTime += timer.Elapsed().count();
+            totalTime += timer.Elapsed().count();
             convergenceCurr = (vL2ErrorMax() < m_tolerPIT &&
                                convergencePrev[m_nTimeLevel - 1]);
+            timer.Start();
             SendToNextProc(m_SDCSolver[m_nTimeLevel - 1]
                                ->UpdateLastQuadratureSolutionVector(),
                            convergenceCurr);
+            timer.Stop();
+            totalTime += timer.Elapsed().count();
 
             // Coarse-to-fine.
+            timer.Start();
             for (size_t timeLevel = m_nTimeLevel - 1; timeLevel > 0;
                  timeLevel--)
             {
@@ -179,27 +212,66 @@ void DriverPFASST::v_Execute([[maybe_unused]] std::ostream &out)
                     RunSweep(m_time, timeLevel - 1, true);
                 }
             }
+            timer.Stop();
+            fasTime += timer.Elapsed().count();
+            totalTime += timer.Elapsed().count();
             k++;
         }
 
         // Apply windowing.
+        timer.Start();
         if (w < m_numWindowsPIT - 1)
         {
             ApplyWindowing();
         }
-        m_timer.Stop();
+        timer.Stop();
+        totalTime += timer.Elapsed().count();
 
         // Update field and write output.
         WriteOutput(step, m_time);
+        if (m_chunkRank == m_numChunks - 1 &&
+            m_comm->GetSpaceComm()->GetRank() == 0)
+        {
+            std::cout << "Total Computation Time : " << totalTime << "s"
+                      << std::endl
+                      << std::flush;
+            std::cout << " - Predictor Time = " << predictorTime << "s"
+                      << std::endl
+                      << std::flush;
+            std::cout << " - Coarse Solve Time = " << coarseSolveTime << "s"
+                      << std::endl
+                      << std::flush;
+            std::cout << " - Fine Solve Time = " << fineSolveTime << "s"
+                      << std::endl
+                      << std::flush;
+            std::cout << " - FAS Correction Time = " << fasTime << "s"
+                      << std::endl
+                      << std::flush;
+        }
         step += m_numChunks;
-        m_CPUtime += m_timer.Elapsed().count();
     }
 
     m_comm->GetTimeComm()->Block();
     PrintHeader("SUMMARY", '*');
     EvaluateExactSolution(0, m_time + m_chunkTime);
     SolutionConvergenceSummary(0);
-    SpeedUpAnalysis();
+    if (m_chunkRank == m_numChunks - 1 &&
+        m_comm->GetSpaceComm()->GetRank() == 0)
+    {
+        std::cout << "Total Computation Time : " << totalTime << "s"
+                  << std::endl
+                  << std::flush;
+        std::cout << " - Predictor Time = " << predictorTime << "s" << std::endl
+                  << std::flush;
+        std::cout << " - Coarse Solve Time = " << coarseSolveTime << "s"
+                  << std::endl
+                  << std::flush;
+        std::cout << " - Fine Solve Time = " << fineSolveTime << "s"
+                  << std::endl
+                  << std::flush;
+        std::cout << " - FAS Correction Time = " << fasTime << "s" << std::endl
+                  << std::flush;
+    }
 }
 
 /**
@@ -902,262 +974,6 @@ void DriverPFASST::WriteOutput(const size_t step, const NekDouble time)
         // Write checkpoint.
         m_EqSys[timeLevel]->WriteFld(filename);
     }
-}
-
-/**
- *
- */
-void DriverPFASST::SpeedUpAnalysis(void)
-{
-    // Print header.
-    PrintHeader("PFASST SPEED-UP ANALYSIS", '*');
-
-    // Mean communication time.
-    NekDouble commTime = EstimateCommunicationTime();
-    PrintHeader("Mean Communication Time = " +
-                    (boost::format("%1$.6e") % commTime).str() + "s",
-                '-');
-
-    // Mean FAS correction time.
-    NekDouble fasTime = EstimateFASCorrectionTime();
-    PrintHeader("Mean FAS Correction Time = " +
-                    (boost::format("%1$.6e") % fasTime).str() + "s",
-                '-');
-
-    // Mean coarse solver time.
-    NekDouble coarseSolveTime = EstimateSolverTime(m_nTimeLevel - 1);
-    PrintHeader("Mean Coarse Solve Time = " +
-                    (boost::format("%1$.6e") % coarseSolveTime).str() + "s",
-                '-');
-
-    // Mean fine solver time.
-    NekDouble fineSolveTime = EstimateSolverTime(0);
-    PrintHeader("Mean Fine Solve Time = " +
-                    (boost::format("%1$.6e") % fineSolveTime).str() + "s",
-                '-');
-
-    // Mean predictor time.
-    NekDouble predictorTime = EstimatePredictorTime();
-    PrintHeader("Mean Predictor Time = " +
-                    (boost::format("%1$.6e") % predictorTime).str() + "s",
-                '-');
-
-    // Mean overhead time.
-    NekDouble overheadTime = EstimateOverheadTime();
-    PrintHeader("Mean Overhead Time = " +
-                    (boost::format("%1$.6e") % overheadTime).str() + "s",
-                '-');
-
-    // Print speedup time.
-    PrintSpeedUp(fineSolveTime, coarseSolveTime, fasTime, commTime,
-                 predictorTime, overheadTime);
-}
-
-/**
- *
- */
-void DriverPFASST::PrintSpeedUp(NekDouble fineSolveTime,
-                                NekDouble coarseSolveTime, NekDouble fasTime,
-                                NekDouble commTime, NekDouble predictTime,
-                                NekDouble overheadTime)
-{
-    if (m_chunkRank == m_numChunks - 1 &&
-        m_comm->GetSpaceComm()->GetRank() == 0)
-    {
-        // Print maximum theoretical speed-up.
-        PrintHeader("Maximum Speed-up", '-');
-        for (size_t k = 1; k <= m_numChunks; k++)
-        {
-            NekDouble speedup =
-                ComputeSpeedUp(k, fineSolveTime, coarseSolveTime, 0.0, 0.0,
-                               predictTime, overheadTime);
-            std::cout << "Speed-up (" << k << ") = " << speedup << std::endl
-                      << std::flush;
-        }
-
-        // Print speed-up with fas correction.
-        PrintHeader("Speed-up with fas", '-');
-        for (size_t k = 1; k <= m_numChunks; k++)
-        {
-            NekDouble speedup =
-                ComputeSpeedUp(k, fineSolveTime, coarseSolveTime, fasTime, 0.0,
-                               predictTime, overheadTime);
-            std::cout << "Speed-up (" << k << ") = " << speedup << std::endl
-                      << std::flush;
-        }
-
-        // Print speed-up with fas correction and communication.
-        PrintHeader("Speed-up with comm. and fas", '-');
-        for (size_t k = 1; k <= m_numChunks; k++)
-        {
-            NekDouble speedup =
-                ComputeSpeedUp(k, fineSolveTime, coarseSolveTime, fasTime,
-                               commTime, predictTime, overheadTime);
-            std::cout << "Speed-up (" << k << ") = " << speedup << std::endl
-                      << std::flush;
-        }
-        std::cout << "-------------------------------------------" << std::endl
-                  << std::flush;
-    }
-}
-
-/**
- *
- */
-NekDouble DriverPFASST::ComputeSpeedUp(const size_t iter,
-                                       NekDouble fineSolveTime,
-                                       NekDouble coarseSolveTime,
-                                       NekDouble fasTime, NekDouble commTime,
-                                       NekDouble predictorTime,
-                                       NekDouble overheadTime)
-{
-    // The speed-up estimate based on "Emmett, M., & Minion, M. (2012). Toward
-    // an efficient parallel in time method for partial differential equations.
-    // Communications in Applied Mathematics and Computational Science, 7(1),
-    // 105-132" and on "Lunet, T., Bodart, J., Gratton, S., &
-    // Vasseur, X. (2018). Time-parallel simulation of the decay of homogeneous
-    // turbulence using parareal with spatial coarsening. Computing and
-    // Visualization in Science, 19, 31-44".
-
-    size_t Kiter             = m_SDCSolver[0]->GetMaxOrder();
-    size_t nComm             = (iter * (2 * m_numChunks - iter - 1)) / 2;
-    NekDouble ratio          = double(iter) / m_numChunks;
-    NekDouble ratioPredictor = predictorTime / fineSolveTime;
-    NekDouble ratioSolve     = coarseSolveTime / fineSolveTime;
-    NekDouble ratioFAS       = fasTime / fineSolveTime;
-    NekDouble ratioComm      = commTime / fineSolveTime;
-    NekDouble ratioOverhead  = overheadTime / fineSolveTime;
-
-    // Speed-up relative to SDC.
-    return Kiter / (ratioPredictor + ratio * (1.0 + ratioSolve + ratioFAS) +
-                    (ratioComm * nComm + ratioOverhead) / m_numChunks);
-    // Speed-up relative to MLSDC.
-    /*return Kiter * (1.0 + ratioSolve + ratioFAS + ratioOverhead / m_numChunks)
-       / (ratioPredictor + ratio * (1.0 + ratioSolve + ratioFAS) +
-            (ratioComm * nComm + ratioOverhead) / m_numChunks);*/
-}
-
-/**
- *
- */
-NekDouble DriverPFASST::EstimateCommunicationTime(void)
-{
-    // Allocate memory.
-    NekDouble commTime = 0.0;
-    Array<OneD, Array<OneD, NekDouble>> buffer1(m_nVar);
-    Array<OneD, Array<OneD, NekDouble>> buffer2(m_nVar);
-    for (size_t timeLevel = 0; timeLevel < m_nTimeLevel; timeLevel++)
-    {
-        for (size_t i = 0; i < m_nVar; ++i)
-        {
-            buffer1[i] = Array<OneD, NekDouble>(m_npts[timeLevel], 0.0);
-            buffer2[i] = Array<OneD, NekDouble>(m_npts[timeLevel], 0.0);
-        }
-        commTime +=
-            DriverParallelInTime ::EstimateCommunicationTime(buffer1, buffer2);
-    }
-
-    return commTime;
-}
-
-/**
- *
- */
-NekDouble DriverPFASST::EstimatePredictorTime(void)
-{
-    // Estimate coarse overhead time.
-    size_t niter = 20;
-    Nektar::LibUtilities::Timer timer;
-    timer.Start();
-    for (size_t i = 0; i < niter; i++)
-    {
-        RunSweep(m_time, m_nTimeLevel - 1);
-        UpdateFirstQuadrature(m_nTimeLevel - 1);
-        PropagateQuadratureSolutionAndResidual(m_nTimeLevel - 1, 0);
-    }
-    timer.Stop();
-    return timer.Elapsed().count() / niter;
-}
-
-/**
- *
- */
-NekDouble DriverPFASST::EstimateFASCorrectionTime(void)
-{
-    // Average restriction time over niter iteration.
-    size_t niter = 20;
-    Nektar::LibUtilities::Timer timer;
-    timer.Start();
-    for (size_t n = 0; n < niter; n++)
-    {
-        for (size_t timeLevel = 0; timeLevel < m_nTimeLevel - 1; timeLevel++)
-        {
-            if (timeLevel != 0)
-            {
-                RunSweep(m_time, timeLevel, true);
-            }
-            RestrictSolution(timeLevel);
-            RestrictResidual(timeLevel);
-            IntegratedResidualEval(timeLevel);
-            IntegratedResidualEval(timeLevel + 1);
-            ComputeFASCorrection(timeLevel + 1);
-        }
-
-        for (size_t timeLevel = m_nTimeLevel - 1; timeLevel > 0; timeLevel--)
-        {
-            CorrectSolution(timeLevel - 1);
-            CorrectResidual(timeLevel - 1);
-            CorrectInitialSolution(timeLevel - 1);
-            if (timeLevel - 1 != 0)
-            {
-                RunSweep(m_time, timeLevel - 1, true);
-            }
-        }
-    }
-    timer.Stop();
-    return timer.Elapsed().count() / niter;
-}
-
-/**
- *
- */
-NekDouble DriverPFASST::EstimateSolverTime(size_t timeLevel)
-{
-    // Estimate solver time.
-    size_t niter = 20;
-    Nektar::LibUtilities::Timer timer;
-    timer.Start();
-    for (size_t i = 0; i < niter; i++)
-    {
-        RunSweep(m_time, timeLevel, true);
-    }
-    timer.Stop();
-    return timer.Elapsed().count() / niter;
-}
-
-/**
- *
- */
-NekDouble DriverPFASST::EstimateOverheadTime(void)
-{
-    // Estimate overhead time.
-    size_t niter = 20;
-    Nektar::LibUtilities::Timer timer;
-    timer.Start();
-    for (size_t i = 0; i < niter; i++)
-    {
-        ResidualEval(m_time, m_nTimeLevel - 1, 0);
-        PropagateQuadratureSolutionAndResidual(m_nTimeLevel - 1, 0);
-        RunSweep(m_time, m_nTimeLevel - 1);
-        for (size_t timeLevel = m_nTimeLevel - 1; timeLevel > 0; timeLevel--)
-        {
-            InterpolateSolution(timeLevel);
-            InterpolateResidual(timeLevel);
-        }
-        ApplyWindowing();
-    }
-    timer.Stop();
-    return timer.Elapsed().count() / niter;
 }
 
 } // namespace Nektar::SolverUtils

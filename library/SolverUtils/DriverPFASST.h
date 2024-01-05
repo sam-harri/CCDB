@@ -147,27 +147,6 @@ private:
 
     void WriteOutput(const size_t step, const NekDouble time);
 
-    void SpeedUpAnalysis();
-
-    void PrintSpeedUp(NekDouble fineSolveTime, NekDouble coarseSolveTime,
-                      NekDouble fasTime, NekDouble commTime,
-                      NekDouble predictorTime, NekDouble overheadTime);
-
-    NekDouble ComputeSpeedUp(const size_t iter, NekDouble fineSolveTime,
-                             NekDouble coarseSolveTime, NekDouble fastTime,
-                             NekDouble commTime, NekDouble predictorTime,
-                             NekDouble overheadTime);
-
-    NekDouble EstimateCommunicationTime(void);
-
-    NekDouble EstimateFASCorrectionTime(void);
-
-    NekDouble EstimateSolverTime(const size_t timeLevel);
-
-    NekDouble EstimatePredictorTime(void);
-
-    NekDouble EstimateOverheadTime(void);
-
     // Storage of PFASST
     Array<OneD, size_t> m_QuadPts;
     Array<OneD, Array<OneD, NekDouble>> m_ImatFtoC;
