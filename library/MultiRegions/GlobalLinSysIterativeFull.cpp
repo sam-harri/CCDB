@@ -75,13 +75,6 @@ GlobalLinSysIterativeFull::GlobalLinSysIterativeFull(
 }
 
 /**
- *
- */
-GlobalLinSysIterativeFull::~GlobalLinSysIterativeFull()
-{
-}
-
-/**
  * Solve a global linear system with Dirichlet forcing using a
  * conjugate gradient method. This routine performs handling of the
  * Dirichlet forcing terms and wraps the underlying iterative solver
@@ -105,77 +98,68 @@ void GlobalLinSysIterativeFull::v_Solve(
     const AssemblyMapSharedPtr &pLocToGloMap,
     const Array<OneD, const NekDouble> &pDirForcing)
 {
-    std::shared_ptr<MultiRegions::ExpList> expList = m_expList.lock();
-    bool vCG                                       = false;
-    m_locToGloMap                                  = pLocToGloMap;
-
-    if (std::dynamic_pointer_cast<AssemblyMapCG>(pLocToGloMap))
-    {
-        vCG = true;
-    }
-    else if (std::dynamic_pointer_cast<AssemblyMapDG>(pLocToGloMap))
-    {
-        vCG = false;
-    }
-    else
-    {
-        NEKERROR(ErrorUtil::efatal, "Unknown map type");
-    }
+    m_locToGloMap = pLocToGloMap;
 
     bool dirForcCalculated = (bool)pDirForcing.size();
     int nDirDofs           = pLocToGloMap->GetNumGlobalDirBndCoeffs();
     int nGlobDofs          = pLocToGloMap->GetNumGlobalCoeffs();
     int nLocDofs           = pLocToGloMap->GetNumLocalCoeffs();
 
-    int nDirTotal = nDirDofs;
+    int nDirTotal                                  = nDirDofs;
+    std::shared_ptr<MultiRegions::ExpList> expList = m_expList.lock();
     expList->GetComm()->GetRowComm()->AllReduce(nDirTotal,
                                                 LibUtilities::ReduceSum);
 
-    Array<OneD, NekDouble> tmp(nLocDofs);
-    Array<OneD, NekDouble> tmp1(nLocDofs);
-
     if (nDirTotal)
     {
-        // calculate the Dirichlet forcing
+        Array<OneD, NekDouble> rhs(nLocDofs);
+
+        // Calculate the Dirichlet forcing
         if (dirForcCalculated)
         {
-            Vmath::Vsub(nLocDofs, pLocInput, 1, pDirForcing, 1, tmp1, 1);
+            // Assume pDirForcing is in local space
+            ASSERTL0(
+                pDirForcing.size() >= nLocDofs,
+                "DirForcing is not of sufficient size. Is it in local space?");
+            Vmath::Vsub(nLocDofs, pLocInput, 1, pDirForcing, 1, rhs, 1);
         }
         else
         {
-            // Calculate the dirichlet forcing B_b (== X_b) and
-            // substract it from the rhs
-            expList->GeneralMatrixOp(m_linSysKey, pLocOutput, tmp);
+            // Calculate initial condition and Dirichlet forcing and subtract it
+            // from the rhs
+            expList->GeneralMatrixOp(m_linSysKey, pLocOutput, rhs);
 
             // Iterate over all the elements computing Robin BCs where
             // necessary
             for (auto &r : m_robinBCInfo) // add robin mass matrix
             {
                 RobinBCInfoSharedPtr rBC;
-                Array<OneD, NekDouble> tmploc;
+                Array<OneD, NekDouble> rhsloc;
 
                 int n      = r.first;
                 int offset = expList->GetCoeff_Offset(n);
 
                 LocalRegions::ExpansionSharedPtr vExp = expList->GetExp(n);
-                // add local matrix contribution
+                // Add local matrix contribution
                 for (rBC = r.second; rBC; rBC = rBC->next)
                 {
                     vExp->AddRobinTraceContribution(
                         rBC->m_robinID, rBC->m_robinPrimitiveCoeffs,
-                        pLocOutput + offset, tmploc = tmp + offset);
+                        pLocOutput + offset, rhsloc = rhs + offset);
                 }
             }
-
-            Vmath::Vsub(nLocDofs, pLocInput, 1, tmp, 1, tmp1, 1);
+            Vmath::Vsub(nLocDofs, pLocInput, 1, rhs, 1, rhs, 1);
         }
-        if (vCG)
-        {
-            // solve for perturbation from initial guess in pOutput
-            SolveLinearSystem(nGlobDofs, tmp1, tmp, pLocToGloMap, nDirDofs);
 
-            // Add back initial condition
-            Vmath::Vadd(nLocDofs, tmp, 1, pLocOutput, 1, pLocOutput, 1);
+        if (std::dynamic_pointer_cast<AssemblyMapCG>(pLocToGloMap))
+        {
+            Array<OneD, NekDouble> diff(nLocDofs);
+
+            // Solve for perturbation from initial guess in pOutput
+            SolveLinearSystem(nGlobDofs, rhs, diff, pLocToGloMap, nDirDofs);
+
+            // Add back initial and boundary condition
+            Vmath::Vadd(nLocDofs, diff, 1, pLocOutput, 1, pLocOutput, 1);
         }
         else
         {

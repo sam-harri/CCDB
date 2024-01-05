@@ -31,6 +31,7 @@
 // Description: GlobalLinSysDirectFull header
 //
 ///////////////////////////////////////////////////////////////////////////////
+
 #ifndef NEKTAR_LIB_MULTIREGIONS_GLOBALLINSYSDIRECTFULL_H
 #define NEKTAR_LIB_MULTIREGIONS_GLOBALLINSYSDIRECTFULL_H
 
@@ -67,7 +68,7 @@ public:
         const std::weak_ptr<ExpList> &pExpList,
         const std::shared_ptr<AssemblyMap> &pLocToGloMap);
 
-    MULTI_REGIONS_EXPORT ~GlobalLinSysDirectFull() override;
+    MULTI_REGIONS_EXPORT ~GlobalLinSysDirectFull() override = default;
 
 protected:
     /// Solve the linear system for given input and output vectors

@@ -42,6 +42,7 @@ v5.5.0
 - Move solver info loading form NekSys (and its derived classes) to the callers (!1716)
 - Tidy physderiv and helmholtz in MatrixFreeOps (!1653)
 - Remove time estimation for Parareal and PFASST drivers (!1691)
+- Tidy and clarify implementation of Dirichlet boundary condition in GlobalLinSys (!1724)
 
 **ADRSolver**
 - Add support for spatially-constant, but variable direction, diffusion to
