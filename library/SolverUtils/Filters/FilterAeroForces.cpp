@@ -1180,7 +1180,8 @@ void FilterAeroForces::CalculateForces(
         colComm->AllReduce(m_Mvplane[i], LibUtilities::ReduceSum);
     }
 
-    // Pass force (computatonal frame) to FluidInterface
+    // Pass force (computatonal frame) to FluidInterface (required for
+    // MovingReferenceFrame)
     Array<OneD, NekDouble> aeroforces(6, 0.);
     for (size_t i = 0; i < m_Ft.size(); ++i)
     {

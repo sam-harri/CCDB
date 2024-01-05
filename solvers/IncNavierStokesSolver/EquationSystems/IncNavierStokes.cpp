@@ -168,9 +168,9 @@ void IncNavierStokes::v_InitObject(bool DeclareField)
     {
         m_movingFrameVelsxyz = Array<OneD, NekDouble>(12, 0.0);
         m_movingFrameData    = Array<OneD, NekDouble>(9, 0.0);
-        m_aeroForces         = Array<OneD, NekDouble>(6, 0.0);
         m_pivotPoint         = m_movingFrameData + 6;
     }
+    m_aeroForces = Array<OneD, NekDouble>(6, 0.0);
 
     // Forcing terms
     m_forcing = SolverUtils::Forcing::Load(m_session, shared_from_this(),
