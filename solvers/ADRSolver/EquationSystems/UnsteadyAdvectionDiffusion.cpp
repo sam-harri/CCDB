@@ -32,8 +32,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <iostream>
-
 #include <ADRSolver/EquationSystems/UnsteadyAdvectionDiffusion.h>
 #include <LibUtilities/TimeIntegration/TimeIntegrationScheme.h>
 
@@ -43,13 +41,13 @@ using namespace LibUtilities;
 
 std::string UnsteadyAdvectionDiffusion::className =
     SolverUtils::GetEquationSystemFactory().RegisterCreatorFunction(
-        "UnsteadyAdvectionDiffusion", UnsteadyAdvectionDiffusion::create);
+        "UnsteadyAdvectionDiffusion", UnsteadyAdvectionDiffusion::create,
+        "Unsteady Advection-Diffusion equation");
 
 UnsteadyAdvectionDiffusion::UnsteadyAdvectionDiffusion(
     const LibUtilities::SessionReaderSharedPtr &pSession,
     const SpatialDomains::MeshGraphSharedPtr &pGraph)
-    : UnsteadySystem(pSession, pGraph),
-      AdvectionSystem(pSession, pGraph), m_planeNumber{0}
+    : UnsteadySystem(pSession, pGraph), UnsteadyAdvection(pSession, pGraph)
 {
 }
 
@@ -59,10 +57,17 @@ UnsteadyAdvectionDiffusion::UnsteadyAdvectionDiffusion(
  */
 void UnsteadyAdvectionDiffusion::v_InitObject(bool DeclareFields)
 {
-    AdvectionSystem::v_InitObject(DeclareFields);
+    UnsteadyAdvection::v_InitObject(DeclareFields);
 
-    m_session->LoadParameter("wavefreq", m_waveFreq, 0.0);
     m_session->LoadParameter("epsilon", m_epsilon, 1.0);
+
+    m_session->MatchSolverInfo("SpectralVanishingViscosity", "True",
+                               m_useSpecVanVisc, false);
+    if (m_useSpecVanVisc)
+    {
+        m_session->LoadParameter("SVVCutoffRatio", m_sVVCutoffRatio, 0.75);
+        m_session->LoadParameter("SVVDiffCoeff", m_sVVDiffCoeff, 0.1);
+    }
 
     // turn on substepping
     m_session->MatchSolverInfo("Extrapolation", "SubStepping",
@@ -70,61 +75,12 @@ void UnsteadyAdvectionDiffusion::v_InitObject(bool DeclareFields)
 
     m_session->LoadParameter("MinSubSteps", m_minsubsteps, 1);
 
-    // Define Velocity fields
-    m_velocity = Array<OneD, Array<OneD, NekDouble>>(m_spacedim);
-    std::vector<std::string> vel;
-    vel.push_back("Vx");
-    vel.push_back("Vy");
-    vel.push_back("Vz");
-    vel.resize(m_spacedim);
-
-    GetFunction("AdvectionVelocity")->Evaluate(vel, m_velocity);
-
-    m_session->MatchSolverInfo("SpectralVanishingViscosity", "True",
-                               m_useSpecVanVisc, false);
-
-    // check to see if it is explicity turned off
-    m_session->MatchSolverInfo("GJPStabilisation", "False",
-                               m_useGJPStabilisation, true);
-
-    // if GJPStabilisation set to False bool will be true and
-    // if not false so negate/revese bool
-    m_useGJPStabilisation = !m_useGJPStabilisation;
-
-    m_session->LoadParameter("GJPJumpScale", m_GJPJumpScale, 1.0);
-
-    if (m_useSpecVanVisc)
-    {
-        m_session->LoadParameter("SVVCutoffRatio", m_sVVCutoffRatio, 0.75);
-        m_session->LoadParameter("SVVDiffCoeff", m_sVVDiffCoeff, 0.1);
-    }
-
     // Type of advection and diffusion classes to be used
     switch (m_projectionType)
     {
         // Discontinuous field
         case MultiRegions::eDiscontinuous:
         {
-            // Do not forwards transform initial condition
-            m_homoInitialFwd = false;
-
-            // Advection term
-            std::string advName;
-            std::string riemName;
-            m_session->LoadSolverInfo("AdvectionType", advName, "WeakDG");
-            m_advObject = SolverUtils::GetAdvectionFactory().CreateInstance(
-                advName, advName);
-            m_advObject->SetFluxVector(
-                &UnsteadyAdvectionDiffusion::GetFluxVectorAdv, this);
-            m_session->LoadSolverInfo("UpwindType", riemName, "Upwind");
-            m_riemannSolver =
-                SolverUtils::GetRiemannSolverFactory().CreateInstance(
-                    riemName, m_session);
-            m_riemannSolver->SetScalar(
-                "Vn", &UnsteadyAdvectionDiffusion::GetNormalVelocity, this);
-            m_advObject->SetRiemannSolver(m_riemannSolver);
-            m_advObject->InitObject(m_session, m_fields);
-
             // Diffusion term
             if (m_explicitDiffusion)
             {
@@ -149,13 +105,14 @@ void UnsteadyAdvectionDiffusion::v_InitObject(bool DeclareFields)
             std::string advName;
             m_session->LoadSolverInfo("AdvectionType", advName,
                                       "NonConservative");
-            m_advObject = SolverUtils::GetAdvectionFactory().CreateInstance(
-                advName, advName);
-            m_advObject->SetFluxVector(
-                &UnsteadyAdvectionDiffusion::GetFluxVectorAdv, this);
-
             if (advName.compare("WeakDG") == 0)
             {
+                // Define the normal velocity fields
+                if (m_fields[0]->GetTrace())
+                {
+                    m_traceVn = Array<OneD, NekDouble>(GetTraceNpoints());
+                }
+
                 std::string riemName;
                 m_session->LoadSolverInfo("UpwindType", riemName, "Upwind");
                 m_riemannSolver =
@@ -182,13 +139,8 @@ void UnsteadyAdvectionDiffusion::v_InitObject(bool DeclareFields)
         }
     }
 
-    // Forcing terms
-    m_forcing = SolverUtils::Forcing::Load(m_session, shared_from_this(),
-                                           m_fields, m_fields.size());
-
     m_ode.DefineImplicitSolve(&UnsteadyAdvectionDiffusion::DoImplicitSolve,
                               this);
-    m_ode.DefineProjection(&UnsteadyAdvectionDiffusion::DoOdeProjection, this);
     m_ode.DefineOdeRhs(&UnsteadyAdvectionDiffusion::DoOdeRhs, this);
 
     if (m_subSteppingScheme) // Substepping
@@ -198,40 +150,6 @@ void UnsteadyAdvectionDiffusion::v_InitObject(bool DeclareFields)
                  "substepping");
         SetUpSubSteppingTimeIntegration(m_intScheme);
     }
-}
-
-/**
- * @brief Get the normal velocity for the unsteady linear advection
- * diffusion equation.
- */
-Array<OneD, NekDouble> &UnsteadyAdvectionDiffusion::GetNormalVelocity()
-{
-    return GetNormalVel(m_velocity);
-}
-
-Array<OneD, NekDouble> &UnsteadyAdvectionDiffusion::GetNormalVel(
-    const Array<OneD, const Array<OneD, NekDouble>> &velfield)
-{
-    // Number of trace (interface) points
-    int i;
-    int nTracePts = GetTraceNpoints();
-
-    // Auxiliary variable to compute the normal velocity
-    Array<OneD, NekDouble> tmp(nTracePts);
-    m_traceVn = Array<OneD, NekDouble>(nTracePts, 0.0);
-
-    // Reset the normal velocity
-    Vmath::Zero(nTracePts, m_traceVn, 1);
-
-    for (i = 0; i < velfield.size(); ++i)
-    {
-        m_fields[0]->ExtractTracePhys(velfield[i], tmp);
-
-        Vmath::Vvtvp(nTracePts, m_traceNormals[i], 1, tmp, 1, m_traceVn, 1,
-                     m_traceVn, 1);
-    }
-
-    return m_traceVn;
 }
 
 /**
@@ -252,15 +170,7 @@ void UnsteadyAdvectionDiffusion::DoOdeRhs(
     // Number of solution points
     int nSolutionPts = GetNpoints();
 
-    // RHS computation using the new advection base class
-    m_advObject->Advect(nVariables, m_fields, m_velocity, inarray, outarray,
-                        time);
-
-    // Negate the RHS
-    for (int i = 0; i < nVariables; ++i)
-    {
-        Vmath::Neg(nSolutionPts, outarray[i], 1);
-    }
+    UnsteadyAdvection::DoOdeRhs(inarray, outarray, time);
 
     if (m_explicitDiffusion)
     {
@@ -276,64 +186,6 @@ void UnsteadyAdvectionDiffusion::DoOdeRhs(
         {
             Vmath::Vadd(nSolutionPts, &outarrayDiff[i][0], 1, &outarray[i][0],
                         1, &outarray[i][0], 1);
-        }
-    }
-
-    // Add forcing terms
-    for (auto &x : m_forcing)
-    {
-        // set up non-linear terms
-        x->Apply(m_fields, inarray, outarray, time);
-    }
-}
-
-/**
- * @brief Compute the projection for the unsteady advection
- * diffusion problem.
- *
- * @param inarray    Given fields.
- * @param outarray   Calculated solution.
- * @param time       Time.
- */
-void UnsteadyAdvectionDiffusion::DoOdeProjection(
-    const Array<OneD, const Array<OneD, NekDouble>> &inarray,
-    Array<OneD, Array<OneD, NekDouble>> &outarray, const NekDouble time)
-{
-    int i;
-    int nvariables = inarray.size();
-    SetBoundaryConditions(time);
-    switch (m_projectionType)
-    {
-        case MultiRegions::eDiscontinuous:
-        {
-            // Just copy over array
-            if (inarray != outarray)
-            {
-                int npoints = GetNpoints();
-
-                for (i = 0; i < nvariables; ++i)
-                {
-                    Vmath::Vcopy(npoints, inarray[i], 1, outarray[i], 1);
-                }
-            }
-            break;
-        }
-        case MultiRegions::eGalerkin:
-        case MultiRegions::eMixed_CG_Discontinuous:
-        {
-            Array<OneD, NekDouble> coeffs(m_fields[0]->GetNcoeffs());
-
-            for (i = 0; i < nvariables; ++i)
-            {
-                m_fields[i]->FwdTrans(inarray[i], coeffs);
-                m_fields[i]->BwdTrans(coeffs, outarray[i]);
-            }
-            break;
-        }
-        default:
-        {
-            ASSERTL0(false, "Unknown projection scheme");
-            break;
         }
     }
 }
@@ -367,6 +219,7 @@ void UnsteadyAdvectionDiffusion::DoImplicitSolve(
         factors[StdRegions::eFactorSVVCutoffRatio] = m_sVVCutoffRatio;
         factors[StdRegions::eFactorSVVDiffCoeff]   = m_sVVDiffCoeff / m_epsilon;
     }
+
     if (m_projectionType == MultiRegions::eDiscontinuous)
     {
         factors[StdRegions::eFactorTau] = 1.0;
@@ -402,37 +255,8 @@ void UnsteadyAdvectionDiffusion::DoImplicitSolve(
 }
 
 /**
- * @brief Return the flux vector for the advection part.
- *
- * @param physfield   Fields.
- * @param flux        Resulting flux.
- */
-void UnsteadyAdvectionDiffusion::GetFluxVectorAdv(
-    const Array<OneD, Array<OneD, NekDouble>> &physfield,
-    Array<OneD, Array<OneD, Array<OneD, NekDouble>>> &flux)
-{
-    ASSERTL1(flux[0].size() == m_velocity.size(),
-             "Dimension of flux array and velocity array do not match");
-
-    const int nq = m_fields[0]->GetNpoints();
-
-    for (int i = 0; i < flux.size(); ++i)
-    {
-        for (int j = 0; j < flux[0].size(); ++j)
-        {
-            Vmath::Vmul(nq, physfield[i], 1, m_velocity[j], 1, flux[i][j], 1);
-        }
-    }
-}
-
-/**
  * @brief Return the flux vector for the diffusion part.
  *
- * @param i           Equation number.
- * @param j           Spatial direction.
- * @param physfield   Fields.
- * @param derivatives First order derivatives.
- * @param flux        Resulting flux.
  */
 void UnsteadyAdvectionDiffusion::GetFluxVectorDiff(
     [[maybe_unused]] const Array<OneD, Array<OneD, NekDouble>> &inarray,
@@ -454,13 +278,13 @@ void UnsteadyAdvectionDiffusion::GetFluxVectorDiff(
 
 void UnsteadyAdvectionDiffusion::v_GenerateSummary(SolverUtils::SummaryList &s)
 {
-    AdvectionSystem::v_GenerateSummary(s);
-    if (m_useGJPStabilisation)
+    UnsteadyAdvection::v_GenerateSummary(s);
+    if (m_useSpecVanVisc)
     {
-        SolverUtils::AddSummaryItem(
-            s, "GJP Stab. Impl.    ",
-            m_session->GetSolverInfo("GJPStabilisation"));
-        SolverUtils::AddSummaryItem(s, "GJP Stab. JumpScale", m_GJPJumpScale);
+        std::stringstream ss;
+        ss << "SVV (cut off = " << m_sVVCutoffRatio
+           << ", coeff = " << m_sVVDiffCoeff << ")";
+        SolverUtils::AddSummaryItem(s, "Smoothing", ss.str());
     }
 }
 
@@ -880,7 +704,6 @@ Array<OneD, NekDouble> UnsteadyAdvectionDiffusion::GetMaxStdVelocity(
             }
 
             maxV[el] = sqrt(maxV[el]);
-            // cout << maxV[el]*maxV[el] << endl;
         }
     }
 

@@ -56,6 +56,7 @@ public:
         p->InitObject();
         return p;
     }
+
     /// Name of class
     static std::string className;
 
@@ -101,6 +102,10 @@ protected:
 
     /// Get the normal velocity
     Array<OneD, NekDouble> &GetNormalVelocity();
+
+    /// Get the normal velocity based on input velfield
+    Array<OneD, NekDouble> &GetNormalVel(
+        const Array<OneD, const Array<OneD, NekDouble>> &velfield);
 
     /// Initialise the object
     void v_InitObject(bool DeclareFields = true) override;
