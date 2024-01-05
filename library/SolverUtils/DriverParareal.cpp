@@ -73,10 +73,15 @@ void DriverParareal::v_InitObject(std::ostream &out)
  */
 void DriverParareal::v_Execute([[maybe_unused]] std::ostream &out)
 {
+    // Timing.
+    Nektar::LibUtilities::Timer timer;
+    NekDouble totalTime = 0.0, predictorTime = 0.0, coarseSolveTime = 0.0,
+              fineSolveTime = 0.0, correctionTime = 0.0;
+
     // Get and assert parameters from session file.
     AssertParameters();
 
-    // Print solver info.
+    // Initialie time step parameters.
     m_totalTime = m_timestep[m_fineLevel] * m_nsteps[m_fineLevel];
     m_chunkTime = m_totalTime / m_numChunks / m_numWindowsPIT;
     m_nsteps[m_fineLevel] /= m_numChunks * m_numWindowsPIT;
@@ -84,11 +89,10 @@ void DriverParareal::v_Execute([[maybe_unused]] std::ostream &out)
 
     // Start iteration windows.
     m_comm->GetTimeComm()->Block();
-    m_CPUtime = 0.0;
-    m_timer.Start();
     UpdateInitialConditionFromSolver(m_fineLevel);
     for (size_t w = 0; w < m_numWindowsPIT; w++)
     {
+        timer.Start();
         // Initialize time for the current window.
         m_time = (w * m_numChunks) * m_chunkTime + m_chunkRank * m_chunkTime;
 
@@ -121,10 +125,23 @@ void DriverParareal::v_Execute([[maybe_unused]] std::ostream &out)
         {
             EvaluateExactSolution(m_fineLevel, m_time + m_chunkTime);
         }
+        timer.Stop();
+        predictorTime += timer.Elapsed().count();
+        totalTime += timer.Elapsed().count();
 
         // Solution convergence monitoring.
+        timer.Start();
         CopyToPhysField(m_fineLevel, m_coarseSolution);
         SolutionConvergenceMonitoring(m_fineLevel, 0);
+        timer.Stop();
+        totalTime += timer.Elapsed().count();
+        if (m_chunkRank == m_numChunks - 1 &&
+            m_comm->GetSpaceComm()->GetRank() == 0)
+        {
+            std::cout << "Total Computation Time : " << totalTime << "s"
+                      << std::endl
+                      << std::flush;
+        }
 
         // Start Parareal iteration.
         size_t iter         = 1;
@@ -133,38 +150,82 @@ void DriverParareal::v_Execute([[maybe_unused]] std::ostream &out)
         while (iter <= m_iterMaxPIT && !convergenceCurr)
         {
             // Use previous parareal solution as "exact solution", if necessary.
+            timer.Start();
             if (!m_exactSolution)
             {
                 CopyFromPhysField(m_fineLevel, m_exactsoln);
             }
+            timer.Stop();
+            totalTime += timer.Elapsed().count();
 
             // Calculate fine solution (parallel-in-time).
+            timer.Start();
             UpdateSolverInitialCondition(m_fineLevel);
             UpdateSolution(m_fineLevel, m_time, m_nsteps[m_fineLevel], w, iter);
+            timer.Stop();
+            fineSolveTime += timer.Elapsed().count();
+            totalTime += timer.Elapsed().count();
 
             // Compute F -> F - Gold
+            timer.Start();
             CorrectionWithOldCoarseSolution();
+            timer.Stop();
+            correctionTime += timer.Elapsed().count();
+            totalTime += timer.Elapsed().count();
 
             // Receive coarse solution from previous processor.
+            timer.Start();
             RecvFromPreviousProc(m_initialCondition, convergencePrev);
+            timer.Stop();
+            totalTime += timer.Elapsed().count();
 
             // Calculate coarse solution (serial-in-time).
+            timer.Start();
             UpdateSolverInitialCondition(m_coarseLevel);
             UpdateSolution(m_coarseLevel, m_time, m_nsteps[m_coarseLevel], w,
                            iter);
+            timer.Stop();
+            coarseSolveTime += timer.Elapsed().count();
+            totalTime += timer.Elapsed().count();
 
             // Compute F -> F + Gnew
+            timer.Start();
             CorrectionWithNewCoarseSolution();
+            timer.Stop();
+            correctionTime += timer.Elapsed().count();
+            totalTime += timer.Elapsed().count();
 
             // Solution convergence monitoring.
             SolutionConvergenceMonitoring(m_fineLevel, iter);
+            if (m_chunkRank == m_numChunks - 1 &&
+                m_comm->GetSpaceComm()->GetRank() == 0)
+            {
+                std::cout << "Total Computation Time : " << totalTime << "s"
+                          << std::endl
+                          << std::flush;
+                std::cout << " - Predictor Time : " << predictorTime << "s"
+                          << std::endl
+                          << std::flush;
+                std::cout << " - Coarse Solve Time : " << coarseSolveTime << "s"
+                          << std::endl
+                          << std::flush;
+                std::cout << " - Fine Solve Time : " << fineSolveTime << "s"
+                          << std::endl
+                          << std::flush;
+                std::cout << " - Correction Time : " << correctionTime << "s"
+                          << std::endl
+                          << std::flush;
+            }
 
             // Check convergence of L2 error for each time chunk.
             convergenceCurr = (vL2ErrorMax() < m_tolerPIT && convergencePrev) ||
                               (m_chunkRank + 1 == iter);
 
             // Send solution to next processor.
+            timer.Start();
             SendToNextProc(m_fineSolution, convergenceCurr);
+            timer.Stop();
+            totalTime += timer.Elapsed().count();
 
             // Increment iteration index.
             iter++;
@@ -177,15 +238,34 @@ void DriverParareal::v_Execute([[maybe_unused]] std::ostream &out)
         WriteTimeChunkOuput();
 
         // Apply windowing.
+        timer.Start();
         ApplyWindowing(w);
+        timer.Stop();
+        totalTime += timer.Elapsed().count();
     }
-    m_timer.Stop();
 
     m_comm->GetTimeComm()->Block();
     PrintHeader("SUMMARY", '*');
     EvaluateExactSolution(m_fineLevel, m_time + m_chunkTime);
     SolutionConvergenceSummary(m_fineLevel);
-    SpeedUpAnalysis();
+    if (m_chunkRank == m_numChunks - 1 &&
+        m_comm->GetSpaceComm()->GetRank() == 0)
+    {
+        std::cout << "Total Computation Time : " << totalTime << "s"
+                  << std::endl
+                  << std::flush;
+        std::cout << " - Predictor Time : " << predictorTime << "s" << std::endl
+                  << std::flush;
+        std::cout << " - Coarse Solve Time : " << coarseSolveTime << "s"
+                  << std::endl
+                  << std::flush;
+        std::cout << " - Fine Solve Time : " << fineSolveTime << "s"
+                  << std::endl
+                  << std::flush;
+        std::cout << " - Correction Time : " << correctionTime << "s"
+                  << std::endl
+                  << std::flush;
+    }
 }
 
 /**
@@ -487,211 +567,6 @@ void DriverParareal::WriteTimeChunkOuput(void)
 
     // Output solution files.
     m_EqSys[m_fineLevel]->Output();
-}
-
-/**
- *
- */
-void DriverParareal::SpeedUpAnalysis(void)
-{
-    // Print header.
-    PrintHeader("PARAREAL SPEED-UP ANALYSIS", '*');
-
-    // Mean communication time.
-    NekDouble commTime = EstimateCommunicationTime();
-    PrintHeader("Mean Communication Time = " +
-                    (boost::format("%1$.6e") % commTime).str() + "s",
-                '-');
-
-    // Mean restriction time.
-    NekDouble restTime = EstimateRestrictionTime();
-    PrintHeader("Mean Restriction Time = " +
-                    (boost::format("%1$.6e") % restTime).str() + "s",
-                '-');
-
-    // Mean interpolation time.
-    NekDouble interTime = EstimateInterpolationTime();
-    PrintHeader("Mean Interpolation Time = " +
-                    (boost::format("%1$.6e") % interTime).str() + "s",
-                '-');
-
-    // Mean coarse solver time.
-    NekDouble coarseSolveTime = EstimateSolverTime(m_coarseLevel, 10);
-    PrintHeader("Mean Coarse Solve Time = " +
-                    (boost::format("%1$.6e") % coarseSolveTime).str() + "s",
-                '-');
-
-    // Mean fine solver time.
-    NekDouble fineSolveTime = EstimateSolverTime(m_fineLevel, 100);
-    PrintHeader("Mean Fine Solve Time = " +
-                    (boost::format("%1$.6e") % fineSolveTime).str() + "s",
-                '-');
-
-    // Mean predictor time.
-    NekDouble predictorTime = EstimatePredictorTime();
-    PrintHeader("Mean Predictor Time = " +
-                    (boost::format("%1$.6e") % predictorTime).str() + "s",
-                '-');
-
-    // Print speedup time.
-    PrintSpeedUp(fineSolveTime, coarseSolveTime, restTime, interTime, commTime,
-                 predictorTime);
-}
-
-/**
- *
- */
-void DriverParareal::PrintSpeedUp(NekDouble fineSolveTime,
-                                  NekDouble coarseSolveTime, NekDouble restTime,
-                                  NekDouble interTime, NekDouble commTime,
-                                  NekDouble predictTime)
-{
-    if (m_chunkRank == m_numChunks - 1 &&
-        m_comm->GetSpaceComm()->GetRank() == 0)
-    {
-        // Print maximum theoretical speed-up.
-        PrintHeader("Maximum Speed-up", '-');
-        for (size_t k = 1; k <= m_numChunks; k++)
-        {
-            NekDouble speedup = ComputeSpeedUp(
-                k, fineSolveTime, coarseSolveTime, 0.0, 0.0, 0.0, predictTime);
-            std::cout << "Speed-up (" << k << ") = " << speedup << std::endl
-                      << std::flush;
-        }
-
-        // Print speed-up with interpolation and restriction.
-        PrintHeader("Speed-up with interp.", '-');
-        for (size_t k = 1; k <= m_numChunks; k++)
-        {
-            NekDouble speedup =
-                ComputeSpeedUp(k, fineSolveTime, coarseSolveTime, restTime,
-                               interTime, 0.0, predictTime);
-            std::cout << "Speed-up (" << k << ") = " << speedup << std::endl
-                      << std::flush;
-        }
-
-        // Print speed-up with interpolation, restriction and communication.
-        PrintHeader("Speed-up with comm. and interp.", '-');
-        for (size_t k = 1; k <= m_numChunks; k++)
-        {
-            NekDouble speedup =
-                ComputeSpeedUp(k, fineSolveTime, coarseSolveTime, restTime,
-                               interTime, commTime, predictTime);
-            std::cout << "Speed-up (" << k << ") = " << speedup << std::endl
-                      << std::flush;
-        }
-        std::cout << "-------------------------------------------" << std::endl
-                  << std::flush;
-    }
-}
-
-/**
- *
- */
-NekDouble DriverParareal::ComputeSpeedUp(
-    const size_t iter, NekDouble fineSolveTime, NekDouble coarseSolveTime,
-    NekDouble restTime, NekDouble interTime, NekDouble commTime,
-    NekDouble predictorTime)
-{
-    // The speed-up estimate is based on "Lunet, T., Bodart, J., Gratton, S., &
-    // Vasseur, X. (2018). Time-parallel simulation of the decay of homogeneous
-    // turbulence using parareal with spatial coarsening. Computing and
-    // Visualization in Science, 19, 31-44".
-
-    size_t nComm             = (iter * (2 * m_numChunks - iter - 1)) / 2;
-    NekDouble ratio          = double(iter) / m_numChunks;
-    NekDouble ratioPredictor = predictorTime / fineSolveTime;
-    NekDouble ratioSolve     = coarseSolveTime / fineSolveTime;
-    NekDouble ratioInterp    = (restTime + interTime) / fineSolveTime;
-    NekDouble ratioComm      = commTime / fineSolveTime;
-
-    return 1.0 / (ratioPredictor + ratio * (1.0 + ratioSolve + ratioInterp) +
-                  (ratioComm * nComm) / m_numChunks);
-}
-
-/**
- *
- */
-NekDouble DriverParareal::EstimateCommunicationTime(void)
-{
-    // Allocate memory.
-    Array<OneD, Array<OneD, NekDouble>> buffer1(m_nVar);
-    Array<OneD, Array<OneD, NekDouble>> buffer2(m_nVar);
-    for (size_t i = 0; i < m_nVar; ++i)
-    {
-        buffer1[i] = Array<OneD, NekDouble>(m_npts[m_fineLevel], 0.0);
-        buffer2[i] = Array<OneD, NekDouble>(m_npts[m_fineLevel], 0.0);
-    }
-
-    // Estimate communication time.
-    return DriverParallelInTime::EstimateCommunicationTime(buffer1, buffer2);
-}
-
-/**
- *
- */
-NekDouble DriverParareal::EstimateRestrictionTime(void)
-{
-    if (m_npts[m_fineLevel] == m_npts[m_coarseLevel])
-    {
-        return 0.0;
-    }
-
-    // Average restriction time over niter iteration.
-    size_t niter = 20;
-    m_timer.Start();
-    for (size_t n = 0; n < niter; n++)
-    {
-        UpdateSolverInitialCondition(m_coarseLevel);
-    }
-    m_timer.Stop();
-    return m_timer.Elapsed().count() / niter;
-}
-
-/**
- *
- */
-NekDouble DriverParareal::EstimateInterpolationTime(void)
-{
-    if (m_npts[m_fineLevel] == m_npts[m_coarseLevel])
-    {
-        return 0.0;
-    }
-
-    // Average interpolation time over niter iteration.
-    size_t niter = 20;
-    m_timer.Start();
-    for (size_t n = 0; n < niter; n++)
-    {
-        InterpolateCoarseSolution();
-    }
-    m_timer.Stop();
-    return m_timer.Elapsed().count() / niter;
-}
-
-/**
- *
- */
-NekDouble DriverParareal::EstimateSolverTime(const size_t timeLevel,
-                                             const size_t nstep)
-{
-    // Turnoff I/O.
-    m_EqSys[timeLevel]->SetInfoSteps(0);
-    m_EqSys[timeLevel]->SetCheckpointSteps(0);
-
-    // Estimate solver time.
-    m_timer.Start();
-    UpdateSolution(timeLevel, m_time + m_chunkTime, nstep, 0, 0);
-    m_timer.Stop();
-    return m_timer.Elapsed().count() * m_nsteps[timeLevel] / nstep;
-}
-
-/**
- *
- */
-NekDouble DriverParareal::EstimatePredictorTime(void)
-{
-    return EstimateSolverTime(m_coarseLevel, 10);
 }
 
 } // namespace Nektar::SolverUtils

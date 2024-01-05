@@ -580,7 +580,8 @@ void UnsteadySystem::v_PrintSummaryStatistics(const NekDouble intTime)
         }
 
         if (m_session->GetSolverInfo("Driver") != "SteadyState" &&
-            m_session->GetSolverInfo("Driver") != "Parareal")
+            m_session->GetSolverInfo("Driver") != "Parareal" &&
+            m_session->GetSolverInfo("Driver") != "PFASST")
         {
             cout << "Time-integration  : " << intTime << "s" << endl;
         }
