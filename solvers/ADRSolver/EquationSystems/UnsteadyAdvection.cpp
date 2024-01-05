@@ -128,6 +128,7 @@ void UnsteadyAdvection::v_InitObject(bool DeclareFields)
         }
         // Continuous field
         case MultiRegions::eGalerkin:
+        case MultiRegions::eMixed_CG_Discontinuous:
         {
             string advName;
             m_session->LoadSolverInfo("AdvectionType", advName,
@@ -175,6 +176,13 @@ void UnsteadyAdvection::v_InitObject(bool DeclareFields)
  */
 Array<OneD, NekDouble> &UnsteadyAdvection::GetNormalVelocity()
 {
+    GetNormalVel(m_velocity);
+    return m_traceVn;
+}
+
+Array<OneD, NekDouble> &UnsteadyAdvection::GetNormalVel(
+    const Array<OneD, const Array<OneD, NekDouble>> &velfield)
+{
     // Number of trace (interface) points
     int nTracePts = GetTraceNpoints();
 
@@ -184,9 +192,9 @@ Array<OneD, NekDouble> &UnsteadyAdvection::GetNormalVelocity()
     // Reset the normal velocity
     Vmath::Zero(nTracePts, m_traceVn, 1);
 
-    for (int i = 0; i < m_velocity.size(); ++i)
+    for (int i = 0; i < velfield.size(); ++i)
     {
-        m_fields[0]->ExtractTracePhys(m_velocity[i], tmp);
+        m_fields[0]->ExtractTracePhys(velfield[i], tmp);
 
         Vmath::Vvtvp(nTracePts, m_traceNormals[i], 1, tmp, 1, m_traceVn, 1,
                      m_traceVn, 1);
@@ -272,28 +280,25 @@ void UnsteadyAdvection::DoOdeProjection(
         }
         // Continuous projection
         case MultiRegions::eGalerkin:
+        case MultiRegions::eMixed_CG_Discontinuous:
         {
             int ncoeffs = m_fields[0]->GetNcoeffs();
             Array<OneD, NekDouble> coeffs(ncoeffs, 0.0);
-
-            StdRegions::ConstFactorMap factors;
-            StdRegions::MatrixType mtype = StdRegions::eMass;
-
-            Array<OneD, NekDouble> wsp(ncoeffs);
-
-            for (int i = 0; i < nVariables; ++i)
+            if (m_useGJPStabilisation)
             {
-                MultiRegions::ContFieldSharedPtr cfield =
-                    std::dynamic_pointer_cast<MultiRegions::ContField>(
-                        m_fields[i]);
+                StdRegions::ConstFactorMap factors;
+                StdRegions::MatrixType mtype = StdRegions::eMass;
 
-                // copy inarray
-                Array<OneD, NekDouble> in = inarray[i];
+                Array<OneD, NekDouble> wsp(ncoeffs);
 
-                m_fields[i]->IProductWRTBase(in, wsp);
-
-                if (m_useGJPStabilisation)
+                for (int i = 0; i < nVariables; ++i)
                 {
+                    MultiRegions::ContFieldSharedPtr cfield =
+                        std::dynamic_pointer_cast<MultiRegions::ContField>(
+                            m_fields[i]);
+
+                    m_fields[i]->IProductWRTBase(inarray[i], wsp);
+
                     const MultiRegions::GJPStabilisationSharedPtr GJPData =
                         cfield->GetGJPForcing();
 
@@ -307,19 +312,27 @@ void UnsteadyAdvection::DoOdeProjection(
 
                     // to set up forcing need initial guess in
                     // physical space
-                    NekDouble scale = -1.0 * factors[StdRegions::eFactorGJP];
+                    NekDouble scale = -factors[StdRegions::eFactorGJP];
 
                     GJPData->Apply(inarray[i], wsp, NullNekDouble1DArray,
                                    scale);
+
+                    // Solve the system
+                    MultiRegions::GlobalLinSysKey key(
+                        mtype, cfield->GetLocalToGlobalMap(), factors);
+
+                    cfield->GlobalSolve(key, wsp, coeffs, NullNekDouble1DArray);
+
+                    m_fields[i]->BwdTrans(coeffs, outarray[i]);
                 }
-
-                // Solve the system
-                MultiRegions::GlobalLinSysKey key(
-                    mtype, cfield->GetLocalToGlobalMap(), factors);
-
-                cfield->GlobalSolve(key, wsp, coeffs, NullNekDouble1DArray);
-
-                m_fields[i]->BwdTrans(coeffs, outarray[i]);
+            }
+            else
+            {
+                for (int i = 0; i < nVariables; ++i)
+                {
+                    m_fields[i]->FwdTrans(inarray[i], coeffs);
+                    m_fields[i]->BwdTrans(coeffs, outarray[i]);
+                }
             }
             break;
         }

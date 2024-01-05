@@ -35,13 +35,12 @@
 #ifndef NEKTAR_SOLVERS_ADRSOLVER_EQUATIONSYSTEMS_UNSTEADYADVECTIONDIFFUSION_H
 #define NEKTAR_SOLVERS_ADRSOLVER_EQUATIONSYSTEMS_UNSTEADYADVECTIONDIFFUSION_H
 
-#include <SolverUtils/AdvectionSystem.h>
+#include <ADRSolver/EquationSystems/UnsteadyAdvection.h>
 #include <SolverUtils/Diffusion/Diffusion.h>
-#include <SolverUtils/Forcing/Forcing.h>
 
 namespace Nektar
 {
-class UnsteadyAdvectionDiffusion : public SolverUtils::AdvectionSystem
+class UnsteadyAdvectionDiffusion : public UnsteadyAdvection
 {
 public:
     friend class MemoryManager<UnsteadyAdvectionDiffusion>;
@@ -57,6 +56,7 @@ public:
         p->InitObject();
         return p;
     }
+
     /// Name of class
     static std::string className;
 
@@ -65,34 +65,20 @@ public:
 
 protected:
     bool m_subSteppingScheme;
+
+    // Use Spectral Vanishing Viscosity
     bool m_useSpecVanVisc;
-    bool m_useGJPStabilisation;
-    // scaling factor for GJP penalisation, default = 1.0
-    NekDouble m_GJPJumpScale;
-    NekDouble
-        m_sVVCutoffRatio; // cut off ratio from which to start decayhing modes
-    NekDouble m_sVVDiffCoeff; // Diffusion coefficient of SVV modes
-    SolverUtils::RiemannSolverSharedPtr m_riemannSolver;
+    // cut off ratio from which to start decayhing modes
+    NekDouble m_sVVCutoffRatio;
+    // Diffusion coefficient of SVV modes
+    NekDouble m_sVVDiffCoeff;
+
     SolverUtils::DiffusionSharedPtr m_diffusion;
-    Array<OneD, Array<OneD, NekDouble>> m_velocity;
-    Array<OneD, NekDouble> m_traceVn;
-
-    // Plane (used only for Discontinous projection
-    //        with 3DHomogenoeus1D expansion)
-    int m_planeNumber;
-
-    /// Forcing terms
-    std::vector<SolverUtils::ForcingSharedPtr> m_forcing;
 
     /// Session reader
     UnsteadyAdvectionDiffusion(
         const LibUtilities::SessionReaderSharedPtr &pSession,
         const SpatialDomains::MeshGraphSharedPtr &pGraph);
-
-    /// Evaluate the flux at each solution point for the advection part
-    void GetFluxVectorAdv(
-        const Array<OneD, Array<OneD, NekDouble>> &physfield,
-        Array<OneD, Array<OneD, Array<OneD, NekDouble>>> &flux);
 
     /// Evaluate the flux at each solution point for the diffusion part
     void GetFluxVectorDiff(
@@ -105,23 +91,11 @@ protected:
                   Array<OneD, Array<OneD, NekDouble>> &outarray,
                   const NekDouble time);
 
-    /// Perform the projection
-    void DoOdeProjection(
-        const Array<OneD, const Array<OneD, NekDouble>> &inarray,
-        Array<OneD, Array<OneD, NekDouble>> &outarray, const NekDouble time);
-
     /// Solve implicitly the diffusion term
     void DoImplicitSolve(
         const Array<OneD, const Array<OneD, NekDouble>> &inarray,
         Array<OneD, Array<OneD, NekDouble>> &outarray, NekDouble time,
         NekDouble lambda);
-
-    /// Get the normal velocity based on m_velocity
-    Array<OneD, NekDouble> &GetNormalVelocity();
-
-    /// Get the normal velocity based on input velfield
-    Array<OneD, NekDouble> &GetNormalVel(
-        const Array<OneD, const Array<OneD, NekDouble>> &velfield);
 
     /// Initialise the object
     void v_InitObject(bool DeclareFields = true) override;
@@ -134,7 +108,9 @@ protected:
 
     // SubsStepping methods -> Probably could be set up in separate class
     void SubStepAdvance(int nstep, NekDouble time);
+
     NekDouble GetSubstepTimeStep();
+
     void SetUpSubSteppingTimeIntegration(
         const LibUtilities::TimeIntegrationSchemeSharedPtr &IntegrationScheme);
 
@@ -161,7 +137,6 @@ protected:
     int m_minsubsteps;
 
 private:
-    NekDouble m_waveFreq;
     NekDouble m_epsilon;
 };
 } // namespace Nektar
