@@ -64,7 +64,7 @@ public:
         const std::weak_ptr<ExpList> &pExpList,
         const std::shared_ptr<AssemblyMap> &pLocToGloMap);
 
-    MULTI_REGIONS_EXPORT ~GlobalLinSysIterativeFull() override;
+    MULTI_REGIONS_EXPORT ~GlobalLinSysIterativeFull() override = default;
 
 protected:
     /// Solve the linear system for given input and output vectors

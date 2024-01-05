@@ -116,10 +116,6 @@ GlobalLinSysPETScFull::GlobalLinSysPETScFull(
     MatAssemblyEnd(m_matrix, MAT_FINAL_ASSEMBLY);
 }
 
-GlobalLinSysPETScFull::~GlobalLinSysPETScFull()
-{
-}
-
 /**
  * Solve the linear system using a full global matrix system.
  */
@@ -129,70 +125,71 @@ void GlobalLinSysPETScFull::v_Solve(
     const AssemblyMapSharedPtr &pLocToGloMap,
     const Array<OneD, const NekDouble> &pDirForcing)
 {
+    m_locToGloMap = pLocToGloMap;
+
+    bool dirForcCalculated = (bool)pDirForcing.size();
+    int nDirDofs           = pLocToGloMap->GetNumGlobalDirBndCoeffs();
+    int nGlobDofs          = pLocToGloMap->GetNumGlobalCoeffs();
+    int nLocDofs           = pLocToGloMap->GetNumLocalCoeffs();
+
+    int nDirTotal                                  = nDirDofs;
     std::shared_ptr<MultiRegions::ExpList> expList = m_expList.lock();
-    bool dirForcCalculated                         = (bool)pDirForcing.size();
-    int nDirDofs  = pLocToGloMap->GetNumGlobalDirBndCoeffs();
-    int nGlobDofs = pLocToGloMap->GetNumGlobalCoeffs();
-    int nLocDofs  = pLocToGloMap->GetNumLocalCoeffs();
-
-    m_locToGloMap = pLocToGloMap; // required for DoMatrixMultiply
-
-    Array<OneD, NekDouble> tmp(nLocDofs);
-    Array<OneD, NekDouble> tmp1(nLocDofs);
-    Array<OneD, NekDouble> global(nGlobDofs, 0.0);
-
-    int nDirTotal = nDirDofs;
     expList->GetComm()->GetRowComm()->AllReduce(nDirTotal,
                                                 LibUtilities::ReduceSum);
 
     if (nDirTotal)
     {
-        // calculate the dirichlet forcing
+        Array<OneD, NekDouble> rhs(nLocDofs);
+
+        // Calculate the Dirichlet forcing
         if (dirForcCalculated)
         {
-            // assume pDirForcing is in local space
+            // Assume pDirForcing is in local space
             ASSERTL0(
                 pDirForcing.size() >= nLocDofs,
                 "DirForcing is not of sufficient size. Is it in local space?");
-            Vmath::Vsub(nLocDofs, pLocInput, 1, pDirForcing, 1, tmp1, 1);
+            Vmath::Vsub(nLocDofs, pLocInput, 1, pDirForcing, 1, rhs, 1);
         }
         else
         {
-            // Calculate the dirichlet forcing and substract it
+            // Calculate initial condition and Dirichlet forcing and subtract it
             // from the rhs
-            expList->GeneralMatrixOp(m_linSysKey, pLocOutput, tmp);
+            expList->GeneralMatrixOp(m_linSysKey, pLocOutput, rhs);
 
-            // Apply robin boundary conditions to the solution.
+            // Iterate over all the elements computing Robin BCs where
+            // necessary
             for (auto &r : m_robinBCInfo) // add robin mass matrix
             {
                 RobinBCInfoSharedPtr rBC;
-                Array<OneD, NekDouble> tmploc;
+                Array<OneD, NekDouble> rhsloc;
 
-                int n = r.first;
-
+                int n      = r.first;
                 int offset = expList->GetCoeff_Offset(n);
-                LocalRegions::ExpansionSharedPtr vExp = expList->GetExp(n);
 
-                // add local matrix contribution
+                LocalRegions::ExpansionSharedPtr vExp = expList->GetExp(n);
+                // Add local matrix contribution
                 for (rBC = r.second; rBC; rBC = rBC->next)
                 {
                     vExp->AddRobinTraceContribution(
                         rBC->m_robinID, rBC->m_robinPrimitiveCoeffs,
-                        pLocOutput + offset, tmploc = tmp + offset);
+                        pLocOutput + offset, rhsloc = rhs + offset);
                 }
             }
-
-            Vmath::Vsub(nLocDofs, pLocInput, 1, tmp, 1, tmp1, 1);
+            Vmath::Vsub(nLocDofs, pLocInput, 1, rhs, 1, rhs, 1);
         }
 
-        SolveLinearSystem(nGlobDofs, tmp1, tmp, pLocToGloMap, nDirDofs);
+        Array<OneD, NekDouble> diff(nLocDofs);
+
+        // Solve for perturbation from initial guess in pOutput
+        SolveLinearSystem(nGlobDofs, rhs, diff, pLocToGloMap, nDirDofs);
 
         // Add back initial and boundary condition
-        Vmath::Vadd(nLocDofs, tmp, 1, pLocOutput, 1, pLocOutput, 1);
+        Vmath::Vadd(nLocDofs, diff, 1, pLocOutput, 1, pLocOutput, 1);
     }
     else
     {
-        SolveLinearSystem(nGlobDofs, pLocInput, pLocOutput, pLocToGloMap);
+        SolveLinearSystem(nGlobDofs, pLocInput, pLocOutput, pLocToGloMap,
+                          nDirDofs);
     }
 }
 

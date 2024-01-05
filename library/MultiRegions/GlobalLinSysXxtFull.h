@@ -31,8 +31,10 @@
 // Description: GlobalLinSysXxtFull header
 //
 ///////////////////////////////////////////////////////////////////////////////
+
 #ifndef NEKTAR_LIB_MULTIREGIONS_GLOBALLINSYSDIRECTXXT_H
 #define NEKTAR_LIB_MULTIREGIONS_GLOBALLINSYSDIRECTXXT_H
+
 #include <MultiRegions/AssemblyMap/AssemblyMapCG.h>
 #include <MultiRegions/GlobalLinSysXxt.h>
 #include <MultiRegions/MultiRegionsDeclspec.h>
@@ -67,7 +69,7 @@ public:
         const std::weak_ptr<ExpList> &pExpList,
         const std::shared_ptr<AssemblyMap> &pLocToGloMap);
 
-    MULTI_REGIONS_EXPORT ~GlobalLinSysXxtFull() override;
+    MULTI_REGIONS_EXPORT ~GlobalLinSysXxtFull() override = default;
 
 private:
     void AssembleMatrixArrays(const std::shared_ptr<AssemblyMap> &pLocToGloMap);
