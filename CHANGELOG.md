@@ -99,6 +99,7 @@ v5.5.0
 - Use `[[maybe_unused]]` attribute in solvers (!1683)
 - Use `[[maybe_unused]]` attribute in library (!1684)
 - Fix sse2 SIMD bug (!1559)
+- Improved the Incompressible NS section of User-guide (!1719)
 
 v5.4.0
 ------
