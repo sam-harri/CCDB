@@ -228,11 +228,5 @@
             <E VAR="w" VALUE="y*(1-y)" />
             <E VAR="p" VALUE="-2*Kinvis*(z-1)" />
         </FUNCTION>
-        <FUNCTION NAME="InitialConditions">
-            <E VAR="u" VALUE="0" />
-            <E VAR="v" VALUE="0" />
-            <E VAR="w" VALUE="y*(1-y)" />
-            <E VAR="p" VALUE="-2*Kinvis*(z-1)" />
-        </FUNCTION>
     </CONDITIONS>
 </NEKTAR>

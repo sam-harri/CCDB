@@ -64,6 +64,7 @@ v5.5.0
 - Some tidy-up (!1693)
 - Fix memory leak in VCSImplicit due to matrix updating (!1688)
 - Rename Simo-/Dong-advection to Extrapolated/Updated respectively for VCSImplicit (!1717)
+- Update test for SuccessiveRHS parameter (!1727)
 
 **CompressibleFlowSolver**
 - Add three subsonic inflow boundary conditions: EnforceEntropyPresure, EnforceEntropyVelocity, and EnforceEntropyTotalEnthalpy (!1398)

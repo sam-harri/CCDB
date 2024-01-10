@@ -21,7 +21,6 @@
             <I PROPERTY="EQTYPE" VALUE="UnsteadyNavierStokes" />
             <I PROPERTY="AdvectionForm" VALUE="Convective" />
             <I PROPERTY="GLOBALSYSSOLN" VALUE="IterativeStaticCond" />
-            <I PROPERTY="SuccessiveRHS" VALUE="30" />
             <I PROPERTY="SpectralhpDealiasing" VALUE="True" />
             <I PROPERTY="PRECONDITIONER" VALUE="FullLinearSpaceWithDiagonal" />
             <I PROPERTY="WeightPartitions" VALUE="NonUniform" />
@@ -46,6 +45,7 @@
             <P>Kinvis = Ufstr*Linf/Re</P>
             <!-- C_MP=0.24[m] and Re_c|MP_EXP = 5.75e5 -->
             <P>IterativeSolverTolerance = 1e-8</P>
+            <P>SuccessiveRHS = 30</P>
             <P>SVVDiffCoeff = 2.5</P>
             <P>SVVCutoffRatio = 0.4</P>
         </PARAMETERS>
