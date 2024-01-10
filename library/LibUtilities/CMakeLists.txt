@@ -200,7 +200,6 @@ SET(LinearAlgebraHeaders
 ./LinearAlgebra/MatrixOperations.hpp
 ./LinearAlgebra/MatrixStorageType.h
 ./LinearAlgebra/MatrixType.h
-./LinearAlgebra/NekLinAlgAlgorithms.hpp
 ./LinearAlgebra/NekLinSys.hpp
 ./LinearAlgebra/NekLinSysIter.h
 ./LinearAlgebra/NekLinSysIterCG.h

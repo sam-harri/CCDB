@@ -3,7 +3,6 @@ SET(UnitTestSources
     ScaledMatrixUnitTests.cpp
     BlockMatrixUnitTests.cpp
     testLinearSystem.cpp
-    testNekLinAlgAlgorithms.cpp
     testNekMatrix.cpp
     testNekPoint.cpp
     testNekVector.cpp

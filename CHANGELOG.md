@@ -43,6 +43,7 @@ v5.5.0
 - Tidy physderiv and helmholtz in MatrixFreeOps (!1653)
 - Remove time estimation for Parareal and PFASST drivers (!1691)
 - Tidy and clarify implementation of Dirichlet boundary condition in GlobalLinSys (!1724)
+- Remove unused file NekLinAlgAlgorithms.hpp (!1728)
 
 **ADRSolver**
 - Add support for spatially-constant, but variable direction, diffusion to
