@@ -142,7 +142,6 @@ int NekLinSysIterGMRESLoc::DoGMRES(const int nLocal,
         truncted = true;
     }
 
-    int nwidthcolm = 13;
     for (int nrestart = 0; nrestart < m_maxrestart; ++nrestart)
     {
         eps = DoGmresRestart(restarted, truncted, nLocal, pInput, pOutput);
@@ -175,6 +174,8 @@ int NekLinSysIterGMRESLoc::DoGMRES(const int nLocal,
 
         if (m_root)
         {
+            int nwidthcolm = 13;
+
             cout << std::scientific << std::setw(nwidthcolm)
                  << std::setprecision(nwidthcolm - 8)
                  << "       GMRES iterations made = " << m_totalIterations
@@ -239,12 +240,13 @@ NekDouble NekLinSysIterGMRESLoc::DoGmresRestart(
 
     if (restarted)
     {
-        // This is tmp2=Ax
+        // This is A*x
         m_operator.DoNekSysLhsEval(pOutput, r0, m_DifferenceFlag0);
 
         // The first search direction
         beta = -1.0;
-        // This is r0=b-AX
+
+        // This is r0 = b-A*x
         Vmath::Svtvp(nLocal, beta, r0, 1, pInput, 1, r0, 1);
     }
     else
@@ -308,6 +310,8 @@ NekDouble NekLinSysIterGMRESLoc::DoGmresRestart(
 
     // Normlized by r0 norm V(:,1)=r0/norm(r0)
     alpha = 1.0 / eta[0];
+
+    // Scalar multiplication
     if (m_V_total[0].size() == 0)
     {
         m_V_total[0] = Array<OneD, NekDouble>(nLocal, 0.0);
@@ -315,12 +319,12 @@ NekDouble NekLinSysIterGMRESLoc::DoGmresRestart(
     Vmath::Smul(nLocal, alpha, r0, 1, m_V_total[0], 1);
 
     // restarted Gmres(m) process
-    int nswp = 0;
     if (m_NekLinSysRightPrecon)
     {
         V1 = Array<OneD, NekDouble>(nLocal, 0.0);
     }
 
+    int nswp = 0;
     for (int nd = 0; nd < m_LinSysMaxStorage; ++nd)
     {
         if (m_V_total[nd + 1].size() == 0)
@@ -340,6 +344,7 @@ NekDouble NekLinSysIterGMRESLoc::DoGmresRestart(
         {
             V1 = m_V_total[nd];
         }
+
         // w here is no need to add nDir due to temporary Array
         idtem    = id[nd];
         starttem = id_start[idtem];
@@ -357,20 +362,18 @@ NekDouble NekLinSysIterGMRESLoc::DoGmresRestart(
         DoGivensRotation(starttem, endtem, cs, sn, h2, eta);
 
         eps = eta[nd + 1] * eta[nd + 1];
+
         // This Gmres merge truncted Gmres to accelerate.
         // If truncted, cannot jump out because
         // the last term of eta is not residual
         if ((!truncted) || (nd < m_KrylovMaxHessMatBand))
         {
-            // If (eps * m_prec_factor < m_tolerance *
-            // m_tolerance * m_rhs_magnitude )
             if ((eps <
                  m_tolerance * m_tolerance * m_rhs_magnitude)) //&& nd > 0)
             {
                 m_converged = true;
             }
         }
-
         nswp++;
         m_totalIterations++;
 
@@ -381,6 +384,7 @@ NekDouble NekLinSysIterGMRESLoc::DoGmresRestart(
     }
 
     DoBackward(nswp, m_Upper, eta, y_total);
+
     // calculate output y_total*V_total
     Array<OneD, NekDouble> solution(nLocal, 0.0);
     for (int i = 0; i < nswp; ++i)
@@ -394,6 +398,7 @@ NekDouble NekLinSysIterGMRESLoc::DoGmresRestart(
         m_operator.DoNekSysPrecon(solution, solution, true);
     }
 
+    // Update output.
     Vmath::Vadd(nLocal, solution, 1, pOutput, 1, pOutput, 1);
 
     return eps;
@@ -515,14 +520,13 @@ void NekLinSysIterGMRESLoc::DoBackward(const int number,
     int maxid = number - 1;
     NekDouble sum;
     y[maxid] = b[maxid] / A[maxid][maxid];
-
     for (int i = maxid - 1; i > -1; --i)
     {
         sum = b[i];
         for (int j = i + 1; j < number; ++j)
         {
             // i and j changes due to use Array<OneD,Array<OneD,NekDouble>>
-            sum = sum - y[j] * A[j][i];
+            sum -= y[j] * A[j][i];
         }
         y[i] = sum / A[i][i];
     }

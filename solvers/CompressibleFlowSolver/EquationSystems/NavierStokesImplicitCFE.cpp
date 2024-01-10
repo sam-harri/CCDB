@@ -52,10 +52,6 @@ NavierStokesImplicitCFE::NavierStokesImplicitCFE(
 {
 }
 
-NavierStokesImplicitCFE::~NavierStokesImplicitCFE()
-{
-}
-
 /**
  * @brief Initialization object for CompressibleFlowSystem class.
  */

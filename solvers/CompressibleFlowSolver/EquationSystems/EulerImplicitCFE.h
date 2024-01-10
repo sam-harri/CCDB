@@ -61,7 +61,7 @@ public:
     /// Name of class.
     static std::string className;
 
-    ~EulerImplicitCFE() override;
+    ~EulerImplicitCFE() override = default;
 
 protected:
     EulerImplicitCFE(const LibUtilities::SessionReaderSharedPtr &pSession,

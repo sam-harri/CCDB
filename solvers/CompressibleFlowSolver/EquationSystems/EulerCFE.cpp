@@ -62,13 +62,6 @@ void EulerCFE::v_InitObject(bool DeclareFields)
 }
 
 /**
- * @brief Destructor for EulerCFE class.
- */
-EulerCFE::~EulerCFE()
-{
-}
-
-/**
  * @brief Apply artificial diffusion (Laplacian operator)
  */
 void EulerCFE::v_DoDiffusion(
@@ -88,14 +81,7 @@ void EulerCFE::v_DoDiffusion(
  */
 bool EulerCFE::v_SupportsShockCaptType(const std::string type) const
 {
-    if (type == "NonSmooth" || type == "Off")
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
+    return (type == "NonSmooth" || type == "Off");
 }
 
 } // namespace Nektar

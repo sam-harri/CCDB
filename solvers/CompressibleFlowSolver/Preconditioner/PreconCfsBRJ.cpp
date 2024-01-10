@@ -190,7 +190,7 @@ void PreconCfsBRJ::v_BuildPreconCfs(
     const Array<OneD, const Array<OneD, NekDouble>> &intmp,
     [[maybe_unused]] const NekDouble time, const NekDouble lambda)
 {
-    if (0 < m_PreconItsStep)
+    if (m_PreconItsStep > 0)
     {
         SNekBlkMatSharedPtr PreconMatSingle;
         using vec_t    = simd<NekSingle>;
@@ -309,7 +309,6 @@ void PreconCfsBRJ::PreconBlkDiag(
     // vectorized matrix multiply
     std::vector<vec_t, tinysimd::allocator<vec_t>> Sinarray(m_max_nblocks);
     std::vector<vec_t, tinysimd::allocator<vec_t>> Soutarray(m_max_nElmtDof);
-    // std::vector<vec_t, tinysimd::allocator<vec_t>> tmp;
 
     alignas(vec_t::alignment) std::array<NekSingle, vec_t::width> tmp;
 

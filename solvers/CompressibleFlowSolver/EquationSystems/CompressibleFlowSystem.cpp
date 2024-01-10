@@ -122,13 +122,6 @@ void CompressibleFlowSystem::v_InitObject(bool DeclareFields)
 }
 
 /**
- * @brief Destructor for CompressibleFlowSystem class.
- */
-CompressibleFlowSystem::~CompressibleFlowSystem()
-{
-}
-
-/**
  * @brief Load CFS parameters from the session file
  */
 void CompressibleFlowSystem::InitialiseParameters()
@@ -215,9 +208,11 @@ void CompressibleFlowSystem::DoOdeRhs(
     const Array<OneD, const Array<OneD, NekDouble>> &inarray,
     Array<OneD, Array<OneD, NekDouble>> &outarray, const NekDouble time)
 {
+    LibUtilities::Timer timer;
+
     size_t nvariables = inarray.size();
-    size_t npoints    = GetNpoints();
     size_t nTracePts  = GetTraceTotPoints();
+    size_t npoints    = GetNpoints();
 
     m_bndEvaluateTime = time;
 
@@ -241,7 +236,6 @@ void CompressibleFlowSystem::DoOdeRhs(
     }
 
     // Calculate advection
-    LibUtilities::Timer timer;
     timer.Start();
     DoAdvection(inarray, outarray, time, Fwd, Bwd);
     timer.Stop();
@@ -298,14 +292,13 @@ void CompressibleFlowSystem::DoOdeProjection(
     const Array<OneD, const Array<OneD, NekDouble>> &inarray,
     Array<OneD, Array<OneD, NekDouble>> &outarray, const NekDouble time)
 {
-    size_t nvariables = inarray.size();
-
     switch (m_projectionType)
     {
         case MultiRegions::eDiscontinuous:
         {
             // Just copy over array
-            int npoints = GetNpoints();
+            size_t nvariables = inarray.size();
+            size_t npoints    = GetNpoints();
 
             for (size_t i = 0; i < nvariables; ++i)
             {
@@ -1068,8 +1061,6 @@ void CompressibleFlowSystem::EvaluateIsentropicVortex(
     m_session->LoadParameter("IsentropicX0", x0, 5.0);
     m_session->LoadParameter("IsentropicY0", y0, 0.0);
 
-    int nq = x.size();
-
     // Flow parameters
     NekDouble r, xbar, ybar, tmp;
     NekDouble fac = 1.0 / (16.0 * m_gamma * M_PI * M_PI);
@@ -1077,11 +1068,11 @@ void CompressibleFlowSystem::EvaluateIsentropicVortex(
     // In 3D zero rhow field.
     if (m_spacedim == 3)
     {
-        Vmath::Zero(nq, &u[3][o], 1);
+        Vmath::Zero(nTotQuadPoints, &u[3][o], 1);
     }
 
     // Fill storage
-    for (int i = 0; i < nq; ++i)
+    for (int i = 0; i < nTotQuadPoints; ++i)
     {
         xbar = x[i] - u0 * time - x0;
         ybar = y[i] - v0 * time - y0;

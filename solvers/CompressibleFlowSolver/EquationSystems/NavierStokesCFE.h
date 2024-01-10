@@ -64,7 +64,7 @@ public:
     // Name of class
     static std::string className;
 
-    ~NavierStokesCFE() override;
+    ~NavierStokesCFE() override = default;
 
 protected:
     std::string m_ViscosityType;

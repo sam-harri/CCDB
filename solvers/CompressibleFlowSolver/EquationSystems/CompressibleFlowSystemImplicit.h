@@ -50,60 +50,7 @@ public:
     CFSImplicit(const LibUtilities::SessionReaderSharedPtr &pSession,
                 const SpatialDomains::MeshGraphSharedPtr &pGraph);
 
-    ~CFSImplicit() override;
-
-    void v_InitObject(bool DeclareFields = true) override;
-
-    void v_DoSolve() override;
-
-    void v_PrintStatusInformation(const int step,
-                                  const NekDouble cpuTime) override;
-
-    void v_PrintSummaryStatistics(const NekDouble intTime) override;
-
-    void InitialiseNonlinSysSolver();
-
-    void NonlinSysEvaluatorCoeff1D(const Array<OneD, const NekDouble> &inarray,
-                                   Array<OneD, NekDouble> &out,
-                                   const bool &flag);
-
-    void NonlinSysEvaluatorCoeff(
-        const Array<OneD, const NekDouble> &inarray,
-        Array<OneD, NekDouble> &out, const bool &flag = true,
-        const Array<OneD, const NekDouble> &source = NullNekDouble1DArray);
-
-    void NonlinSysEvaluatorCoeff(
-        const Array<OneD, const Array<OneD, NekDouble>> &inarray,
-        Array<OneD, Array<OneD, NekDouble>> &out,
-        const Array<OneD, const Array<OneD, NekDouble>> &source =
-            NullNekDoubleArrayOfArray);
-
-    void DoOdeImplicitRhs(
-        const Array<OneD, const Array<OneD, NekDouble>> &inarray,
-        Array<OneD, Array<OneD, NekDouble>> &outarray, const NekDouble time);
-
-    void DoOdeRhsCoeff(const Array<OneD, const Array<OneD, NekDouble>> &inarray,
-                       Array<OneD, Array<OneD, NekDouble>> &outarray,
-                       const NekDouble time);
-
-    void DoAdvectionCoeff(
-        const Array<OneD, const Array<OneD, NekDouble>> &inarray,
-        Array<OneD, Array<OneD, NekDouble>> &outarray, const NekDouble time,
-        const Array<OneD, const Array<OneD, NekDouble>> &pFwd,
-        const Array<OneD, const Array<OneD, NekDouble>> &pBwd);
-
-    void DoImplicitSolve(
-        const Array<OneD, const Array<OneD, NekDouble>> &inpnts,
-        Array<OneD, Array<OneD, NekDouble>> &outpnt, const NekDouble time,
-        const NekDouble lambda);
-
-    void DoImplicitSolveCoeff(
-        const Array<OneD, const Array<OneD, NekDouble>> &inpnts,
-        const Array<OneD, const NekDouble> &inarray,
-        Array<OneD, NekDouble> &out, const NekDouble time,
-        const NekDouble lambda);
-
-    void CalcRefValues(const Array<OneD, const NekDouble> &inarray);
+    ~CFSImplicit() override = default;
 
 protected:
     bool m_viscousJacFlag;
@@ -127,7 +74,7 @@ protected:
     NekDouble m_TimeIntegLambda = 0.0;
     NekDouble m_inArrayNorm     = -1.0;
     NekDouble m_jacobiFreeEps;
-    NekDouble m_newtonAbsoluteIteTol;
+    NekDouble m_newtonRelativeIteTol;
 
     TensorOfArray4D<NekSingle> m_stdSMatDataDBB;
     TensorOfArray5D<NekSingle> m_stdSMatDataDBDB;
@@ -140,6 +87,62 @@ protected:
     // switched on/off in DoImplicitSolve() to ensure that the AV is only
     // updated once every stage in a multi-stage time integration scheme
     bool m_updateShockCaptPhys{true};
+
+    void v_InitObject(bool DeclareFields = true) override;
+
+    void InitialiseNonlinSysSolver();
+
+    void v_DoSolve() override;
+
+    void v_PrintStatusInformation(const int step,
+                                  const NekDouble cpuTime) override;
+
+    void v_PrintSummaryStatistics(const NekDouble intTime) override;
+
+    void NonlinSysEvaluatorCoeff1D(const Array<OneD, const NekDouble> &inarray,
+                                   Array<OneD, NekDouble> &out,
+                                   const bool &flag = true);
+
+    void NonlinSysEvaluatorCoeff(
+        const Array<OneD, const Array<OneD, NekDouble>> &inarray,
+        Array<OneD, Array<OneD, NekDouble>> &out);
+
+    void DoOdeImplicitRhs(
+        const Array<OneD, const Array<OneD, NekDouble>> &inarray,
+        Array<OneD, Array<OneD, NekDouble>> &outarray, const NekDouble time);
+
+    void DoOdeRhsCoeff(const Array<OneD, const Array<OneD, NekDouble>> &inarray,
+                       Array<OneD, Array<OneD, NekDouble>> &outarray,
+                       const NekDouble time);
+
+    void DoAdvectionCoeff(
+        const Array<OneD, const Array<OneD, NekDouble>> &inarray,
+        Array<OneD, Array<OneD, NekDouble>> &outarray, const NekDouble time,
+        const Array<OneD, const Array<OneD, NekDouble>> &pFwd,
+        const Array<OneD, const Array<OneD, NekDouble>> &pBwd);
+
+    void DoDiffusionCoeff(
+        const Array<OneD, const Array<OneD, NekDouble>> &inarray,
+        Array<OneD, Array<OneD, NekDouble>> &outarray,
+        const Array<OneD, const Array<OneD, NekDouble>> &pFwd,
+        const Array<OneD, const Array<OneD, NekDouble>> &pBwd);
+
+    void DoImplicitSolve(
+        const Array<OneD, const Array<OneD, NekDouble>> &inpnts,
+        Array<OneD, Array<OneD, NekDouble>> &outpnt, const NekDouble time,
+        const NekDouble lambda);
+
+    void DoImplicitSolveCoeff(
+        const Array<OneD, const Array<OneD, NekDouble>> &inpnts,
+        const Array<OneD, const NekDouble> &inarray,
+        Array<OneD, NekDouble> &out, const NekDouble time,
+        const NekDouble lambda);
+
+    void MatrixMultiplyMatrixFreeCoeff(
+        const Array<OneD, const NekDouble> &inarray,
+        Array<OneD, NekDouble> &out, const bool &flag = false);
+
+    void CalcRefValues(const Array<OneD, const NekDouble> &inarray);
 
     void PreconCoeff(const Array<OneD, NekDouble> &inarray,
                      Array<OneD, NekDouble> &outarray, const bool &flag);
@@ -326,15 +329,6 @@ protected:
     {
         v_CalcPhysDeriv(inarray, qfield);
     }
-
-    void DoDiffusionCoeff(
-        const Array<OneD, const Array<OneD, NekDouble>> &inarray,
-        Array<OneD, Array<OneD, NekDouble>> &outarray,
-        const Array<OneD, const Array<OneD, NekDouble>> &pFwd,
-        const Array<OneD, const Array<OneD, NekDouble>> &pBwd);
-    void MatrixMultiplyMatrixFreeCoeff(
-        const Array<OneD, const NekDouble> &inarray,
-        Array<OneD, NekDouble> &out, const bool &flag = false);
 
     void CalcMuDmuDT(const Array<OneD, const Array<OneD, NekDouble>> &inarray,
                      Array<OneD, NekDouble> &mu, Array<OneD, NekDouble> &DmuDT)

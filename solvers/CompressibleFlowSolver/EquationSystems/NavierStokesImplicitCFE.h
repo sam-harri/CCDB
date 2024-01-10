@@ -67,7 +67,7 @@ public:
     // Name of class
     static std::string className;
 
-    ~NavierStokesImplicitCFE() override;
+    ~NavierStokesImplicitCFE() override = default;
 
     typedef std::function<void(
         const Array<OneD, NekDouble> &, const NekDouble &,

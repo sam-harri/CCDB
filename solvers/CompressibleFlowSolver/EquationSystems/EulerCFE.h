@@ -56,10 +56,11 @@ public:
         p->InitObject();
         return p;
     }
+
     /// Name of class.
     static std::string className;
 
-    ~EulerCFE() override;
+    ~EulerCFE() override = default;
 
 protected:
     EulerCFE(const LibUtilities::SessionReaderSharedPtr &pSession,

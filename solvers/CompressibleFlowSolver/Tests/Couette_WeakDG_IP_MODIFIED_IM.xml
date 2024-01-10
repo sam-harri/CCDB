@@ -44,7 +44,7 @@
             <P> Pr                    = 0.72                          </P>
             <P> L                     = 1                             </P>
             <P> NonlinIterTolRelativeL2   = 1.0E-10                   </P>
-            <P> NewtonAbsoluteIteTol      = 1.0E-10                   </P>
+            <P> NewtonRelativeIteTol      = 1.0E-10                   </P>
             <P> LinSysRelativeTolInNonlin = 1.0E-10                   </P>
             <P> NekNonlinSysMaxIterations = 10                        </P>
             <P> NekLinSysMaxIterations    = 50                        </P>

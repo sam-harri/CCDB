@@ -62,7 +62,7 @@ class CompressibleFlowSystem : public SolverUtils::AdvectionSystem,
 public:
     friend class MemoryManager<CompressibleFlowSystem>;
 
-    ~CompressibleFlowSystem() override;
+    ~CompressibleFlowSystem() override = default;
 
     /// Function to calculate the stability limit for DG/CG.
     NekDouble GetStabilityLimit(int n);

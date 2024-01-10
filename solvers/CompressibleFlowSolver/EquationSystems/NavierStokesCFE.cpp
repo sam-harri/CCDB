@@ -50,10 +50,6 @@ NavierStokesCFE::NavierStokesCFE(
 {
 }
 
-NavierStokesCFE::~NavierStokesCFE()
-{
-}
-
 /**
  * @brief Initialization object for CompressibleFlowSystem class.
  */
