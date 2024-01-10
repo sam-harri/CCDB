@@ -31,6 +31,7 @@ v5.5.0
 - Pre-allocate memory for GMRES (!1668)
 - Remove arbitrary factor in  `GlobalLinSysIterative.cpp` (!1694)
 - Some tidy-up in LinearAlgebra (!1699)
+- Some further tidy-up in LinearAlgebra (!1700)
 - Updated hdf5 to 1.12.3 (!1696)
 - Remove redundant tolerance limiter in GMRES (!1707)
 - Remove unused tolerance parameter in NekSys class and subclasses (1708)
@@ -65,6 +66,7 @@ v5.5.0
 - Update implicit solver for implicit PFASST (!1659)
 - Some tidy-up in the compressible flow solver (!1698)
 - Fix ESDIRK scheme for compressible flow solver (!1690)
+- Some further tidy-up in compressible flow solver (!1700)
 
 **Documentation**
 - Update instructions for VS2022 (!1714)

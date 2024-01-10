@@ -119,7 +119,7 @@
             <P> L                     = 1                             </P>
             <!-- Tighter tolerances should not change the results; this has already been checked -->
             <P> NonlinIterTolRelativeL2   = 1.0E-4                    </P>
-            <P> NewtonAbsoluteIteTol      = 1.0E-10                   </P>
+            <P> NewtonRelativeIteTol      = 1.0E-10                   </P>
             <P> LinSysRelativeTolInNonlin = 1.0E-4                    </P>
             <P> NekNonlinSysMaxIterations = 50                        </P>
             <P> NekLinSysMaxIterations    = 50                        </P>

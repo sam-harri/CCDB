@@ -61,9 +61,7 @@ bool NekSys::v_ConvergenceCheck([[maybe_unused]] const int nIteration,
                                 const Array<OneD, const NekDouble> &Residual,
                                 const NekDouble tol)
 {
-    int ntotal = Residual.size();
-
-    NekDouble SysResNorm = Vmath::Dot(ntotal, Residual, Residual);
+    NekDouble SysResNorm = Vmath::Dot(Residual.size(), Residual, Residual);
     m_rowComm->AllReduce(SysResNorm, Nektar::LibUtilities::ReduceSum);
 
     return SysResNorm < tol * tol;

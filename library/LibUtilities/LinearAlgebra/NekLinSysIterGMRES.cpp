@@ -536,14 +536,13 @@ void NekLinSysIterGMRES::DoBackward(const int number,
     int maxid = number - 1;
     NekDouble sum;
     y[maxid] = b[maxid] / A[maxid][maxid];
-
     for (int i = maxid - 1; i > -1; --i)
     {
         sum = b[i];
         for (int j = i + 1; j < number; ++j)
         {
             // i and j changes due to use Array<OneD,Array<OneD,NekDouble>>
-            sum = sum - y[j] * A[j][i];
+            sum -= y[j] * A[j][i];
         }
         y[i] = sum / A[i][i];
     }
