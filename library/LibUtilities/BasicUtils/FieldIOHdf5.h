@@ -263,13 +263,6 @@ private:
         H5::PListSharedPtr readPL, H5::GroupSharedPtr root,
         std::vector<uint64_t> &decomps, uint64_t decomp, OffsetHelper offset,
         std::string group, FieldDefinitionsSharedPtr def);
-
-    LIB_UTILITIES_EXPORT void ImportFieldData(
-        H5::PListSharedPtr readPL, H5::DataSetSharedPtr data_dset,
-        H5::DataSpaceSharedPtr data_fspace, uint64_t data_i,
-        std::vector<uint64_t> &decomps, uint64_t decomp,
-        const FieldDefinitionsSharedPtr fielddef,
-        std::vector<NekDouble> &fielddata);
 };
 } // namespace Nektar::LibUtilities
 #endif

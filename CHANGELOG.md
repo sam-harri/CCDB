@@ -29,6 +29,7 @@ v5.5.0
 - Replace `boost::regex` with `std::regex` (!1676)
 - Update SDC scheme for implicit PFASST (!1659)
 - Pre-allocate memory for GMRES (!1668)
+- Update hdf5 read to only read in selected elements to reduce memory overhead (!1351)
 - Remove arbitrary factor in  `GlobalLinSysIterative.cpp` (!1694)
 - Some tidy-up in LinearAlgebra (!1699)
 - Some further tidy-up in LinearAlgebra (!1700)
