@@ -284,6 +284,9 @@ protected:
     LIB_UTILITIES_EXPORT int CheckFieldDefinition(
         const FieldDefinitionsSharedPtr &fielddefs);
 
+    LIB_UTILITIES_EXPORT std::vector<unsigned int> GetNumberOfCoeffsPerElement(
+        const FieldDefinitionsSharedPtr &fielddefs);
+
     LIB_UTILITIES_EXPORT std::string SetUpOutput(const std::string outname,
                                                  bool perRank,
                                                  bool backup = false);
