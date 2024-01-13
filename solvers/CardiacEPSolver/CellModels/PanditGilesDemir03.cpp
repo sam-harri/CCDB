@@ -36,6 +36,7 @@
 #include <LibUtilities/BasicUtils/Vmath.hpp>
 #include <iostream>
 #include <string>
+
 namespace Nektar
 {
 std::string PanditGilesDemir03::className =
@@ -47,17 +48,17 @@ std::string PanditGilesDemir03::className =
  *
  */
 PanditGilesDemir03::PanditGilesDemir03(
-    const LibUtilities::SessionReaderSharedPtr &pSession, const int nq)
-    : CellModel(pSession, nq)
+    const LibUtilities::SessionReaderSharedPtr &pSession,
+    const MultiRegions::ExpListSharedPtr &pField)
+    : CellModel(pSession, pField)
 {
-    m_nq = nq;
 }
 
 void PanditGilesDemir03::v_Update(
     const Array<OneD, const Array<OneD, NekDouble>> &inarray,
-    Array<OneD, Array<OneD, NekDouble>> &outarray, const NekDouble time)
+    Array<OneD, Array<OneD, NekDouble>> &outarray,
+    [[maybe_unused]] const NekDouble time)
 {
-    int nvariables = inarray.size();
     for (size_t i = 0; i < m_nq; ++i)
     {
         // Inputs:
@@ -1488,6 +1489,14 @@ void PanditGilesDemir03::v_Update(
 void PanditGilesDemir03::v_GenerateSummary(SummaryList &s)
 {
     SolverUtils::AddSummaryItem(s, "Cell model", "PanditGilesDemir03");
+}
+
+/**
+ *
+ */
+void PanditGilesDemir03::v_SetInitialConditions()
+{
+    ASSERTL0(false, "PanditGilesDemir03 cell model not currently usable.");
 }
 
 } // namespace Nektar

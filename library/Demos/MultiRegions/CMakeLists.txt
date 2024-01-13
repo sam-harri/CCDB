@@ -31,12 +31,6 @@ ADD_NEKTAR_EXECUTABLE(Int3DHomo1D
 ADD_NEKTAR_EXECUTABLE(SteadyAdvectionDiffusionReaction2D
      COMPONENT demos DEPENDS MultiRegions SOURCES SteadyAdvectionDiffusionReaction2D.cpp)
 
-# Add ExtraDemos subdirectory.
-IF (IS_DIRECTORY ExtraDemos)
-    ADD_SUBDIRECTORY(ExtraDemos)
-ENDIF()
-
-
 ADD_NEKTAR_TEST(Helmholtz1D_CG_P8)
 ADD_NEKTAR_TEST(Helmholtz1D_CG_P8_periodic)
 ADD_NEKTAR_TEST(Helmholtz1D_CG_P8_RBC)

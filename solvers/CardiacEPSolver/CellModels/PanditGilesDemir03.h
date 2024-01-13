@@ -44,10 +44,11 @@ class PanditGilesDemir03 : public CellModel
 public:
     /// Creates an instance of this class
     static CellModelSharedPtr create(
-        const LibUtilities::SessionReaderSharedPtr &pSession, const int nq)
+        const LibUtilities::SessionReaderSharedPtr &pSession,
+        const MultiRegions::ExpListSharedPtr &pField)
     {
         return MemoryManager<PanditGilesDemir03>::AllocateSharedPtr(pSession,
-                                                                    nq);
+                                                                    pField);
     }
 
     /// Name of class
@@ -55,22 +56,24 @@ public:
 
     /// Constructor
     PanditGilesDemir03(const LibUtilities::SessionReaderSharedPtr &pSession,
-                       const int nq);
+                       const MultiRegions::ExpListSharedPtr &pField);
 
     /// Desctructor
-    virtual ~PanditGilesDemir03()
+    ~PanditGilesDemir03() override
     {
     }
 
 protected:
     /// Computes the reaction terms $f(u,v)$ and $g(u,v)$.
-    virtual void v_Update(
-        const Array<OneD, const Array<OneD, NekDouble>> &inarray,
-        Array<OneD, Array<OneD, NekDouble>> &outarray,
-        const NekDouble time) override;
+    void v_Update(const Array<OneD, const Array<OneD, NekDouble>> &inarray,
+                  Array<OneD, Array<OneD, NekDouble>> &outarray,
+                  const NekDouble time) override;
 
     /// Prints a summary of the model parameters.
-    virtual void v_GenerateSummary(SummaryList &s) override;
+    void v_GenerateSummary(SummaryList &s) override;
+
+    /// Set initial conditions for the cell model
+    void v_SetInitialConditions() override;
 };
 
 } // namespace Nektar
