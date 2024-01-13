@@ -16,6 +16,7 @@ elif [[ $BUILD_TYPE == "full" ]]; then
         -DNEKTAR_USE_SCOTCH:BOOL=ON \
         -DNEKTAR_USE_PETSC:BOOL=ON \
         -DNEKTAR_USE_HDF5:BOOL=ON \
+        -DNEKTAR_USE_METIS:BOOL=ON \
         -DNEKTAR_USE_MESHGEN:BOOL=ON \
         -DNEKTAR_USE_CCM:BOOL=ON \
         -DNEKTAR_CCMIO_URL=https://www.nektar.info/ccmio/libccmio-2.6.1.tar.gz \
@@ -23,6 +24,7 @@ elif [[ $BUILD_TYPE == "full" ]]; then
         -DNEKTAR_USE_VTK:BOOL=ON \
         -DNEKTAR_BUILD_PYTHON:BOOL=ON \
         -DNEKTAR_TEST_USE_HOSTFILE=ON \
+        -DNEKTAR_UTILITY_EXTRAS=ON \
         -DNEKTAR_ERROR_ON_WARNINGS=OFF"
     if [[ $BUILD_SIMD == "avx2" ]]; then
         BUILD_OPTS="$BUILD_OPTS -DNEKTAR_ENABLE_SIMD_AVX2:BOOL=ON"

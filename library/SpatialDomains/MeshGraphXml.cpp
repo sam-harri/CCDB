@@ -101,13 +101,17 @@ void MeshGraphXml::v_PartitionMesh(
     }
     else
     {
-        // Default partitioner to use is Metis. Use Scotch as default if it is
-        // installed. Override default with command-line flags if they are set.
-        string partitionerName = "Metis";
-        if (GetMeshPartitionFactory().ModuleExists("Scotch"))
+        // Default partitioner to use is Scotch, if it is installed.
+        bool haveScotch = GetMeshPartitionFactory().ModuleExists("Scotch");
+        bool haveMetis  = GetMeshPartitionFactory().ModuleExists("Metis");
+
+        string partitionerName = "Scotch";
+        if (!haveScotch && haveMetis)
         {
-            partitionerName = "Scotch";
+            partitionerName = "Metis";
         }
+
+        // Override default with command-line flags if they are set.
         if (session->DefinesCmdLineArgument("use-metis"))
         {
             partitionerName = "Metis";
@@ -177,6 +181,10 @@ void MeshGraphXml::v_PartitionMesh(
 
         if (commMesh->GetSize() > 1)
         {
+            ASSERTL0(haveScotch || haveMetis,
+                     "Valid partitioner not found! Either Scotch or METIS "
+                     "should be used.");
+
             int nParts = commMesh->GetSize();
 
             if (session->GetSharedFilesystem())

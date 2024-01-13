@@ -18,6 +18,7 @@ IF( NEKTAR_SOLVER_CARDIAC_EP )
         CellModels/FentonKarma.cpp
         CellModels/LuoRudy91.cpp
         CellModels/Fox02.cpp
+        CellModels/PanditGilesDemir03.cpp
         CellModels/Winslow99.cpp
         CellModels/TenTusscher06.cpp
         Filters/FilterCheckpointCellModel.cpp

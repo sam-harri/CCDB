@@ -51,9 +51,9 @@ inline static void PartGraphVKway(int &nVerts, int &nVertConds,
                                   int &nparts, int &volume,
                                   Nektar::Array<Nektar::OneD, int> &part)
 {
-    int *vwgt   = 0;
-    int *vsize  = 0;
-    int *adjwgt = 0;
+    int *vwgt   = nullptr;
+    int *vsize  = nullptr;
+    int *adjwgt = nullptr;
     if (vertWgt.size() > 0)
     {
         vwgt = &vertWgt[0];
@@ -71,7 +71,8 @@ inline static void PartGraphVKway(int &nVerts, int &nVertConds,
     int options[METIS_NOPTIONS];
     METIS_SetDefaultOptions(options);
     METIS_PartGraphKway(&nVerts, &ncon, &xadj[0], &adjcy[0], vwgt, vsize,
-                        adjwgt, &nparts, 0, 0, options, &volume, &part[0]);
+                        adjwgt, &nparts, nullptr, nullptr, options, &volume,
+                        &part[0]);
 }
 } // namespace Metis
 #endif // NEKTAR_LIB_UTILITIES_BASICUTILS_METIS_HPP

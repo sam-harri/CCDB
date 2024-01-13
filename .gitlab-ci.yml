@@ -209,6 +209,17 @@ include:
   allow_failure: true
   timeout: 15m
 
+.uncompiled-files-template: &uncompiled-files-template
+  <<: *execution-conditions
+  image: $CI_REGISTRY_IMAGE:env-ubuntu-jammy-full
+  needs: ["ubuntu-jammy-full-build-env"]
+  stage: quality-checks
+  script:
+    - cd "$CI_PROJECT_DIR"
+    - EXPORT_COMPILE_COMMANDS=1 BUILD_TYPE=full bash -x .gitlab-ci/build-and-test.sh
+    - python3 .gitlab-ci/check-compiled-files.py build/compile_commands.json
+  timeout: 15m
+
 ################################################
 ###################  DEBIAN  ###################
 ################################################
@@ -571,6 +582,11 @@ ubuntu-bionic-full-warnings:
 ## CLANG-TIDY
 ubuntu-jammy-clang-tidy:
   <<: *clang-tidy-template
+  needs: []
+
+## UNCOMPILED FILES
+ubuntu-jammy-uncompiled-files:
+  <<: *uncompiled-files-template
   needs: []
   
 ################################################

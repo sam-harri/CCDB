@@ -94,6 +94,7 @@ v5.5.0
 - Disable macOS Intel runner (!1655)
 - Upgrade Win10 runners (!1656)
 - Add `clang-tidy` support to CI for static analysis (!1556)
+- Remove some uncompiled files and add quality step to check (!1672)
 - Add `clang-15` tester (!1671)
 
 **NekMesh**
