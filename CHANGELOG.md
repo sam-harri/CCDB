@@ -54,6 +54,7 @@ v5.5.0
 - Refactor UnsteadyReactionDiffusion as a subclass of UnsteadyDiffusion (!1713)
 - Tidy-up ADRSolver (!1715)
 - Refactor UnsteadyAdvectionDiffusion as a subclass of UnsteadyAdvection (!1720)
+- Update UnsteadyReactionDiffusion solver for explicit time-stepping (!1731)
 
 **CardiacEPSolver**
 - Fix cell model history point filter output after base class change (!1342)
