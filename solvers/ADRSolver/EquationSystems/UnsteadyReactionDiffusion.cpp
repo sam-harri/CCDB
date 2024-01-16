@@ -33,7 +33,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include <ADRSolver/EquationSystems/UnsteadyReactionDiffusion.h>
-#include <LibUtilities/TimeIntegration/TimeIntegrationScheme.h>
 #include <iomanip>
 #include <iostream>
 
@@ -65,10 +64,6 @@ void UnsteadyReactionDiffusion::v_InitObject(bool DeclareFields)
 
     // Reset OdeRhs functor
     m_ode.DefineOdeRhs(&UnsteadyReactionDiffusion::DoOdeRhs, this);
-
-    ASSERTL0(m_intScheme->GetIntegrationSchemeType() == LibUtilities::eIMEX,
-             "Reaction-diffusion requires an implicit-explicit timestepping"
-             " (e.g. IMEXOrder2)");
 }
 
 /**
@@ -83,10 +78,17 @@ void UnsteadyReactionDiffusion::DoOdeRhs(
     const Array<OneD, const Array<OneD, NekDouble>> &inarray,
     Array<OneD, Array<OneD, NekDouble>> &outarray, const NekDouble time)
 {
-    // RHS should be set to zero.
-    for (int i = 0; i < outarray.size(); ++i)
+    if (m_explicitDiffusion)
     {
-        Vmath::Zero(outarray[i].size(), &outarray[i][0], 1);
+        UnsteadyDiffusion::DoOdeRhs(inarray, outarray, time);
+    }
+    else
+    {
+        // RHS should be set to zero.
+        for (int i = 0; i < outarray.size(); ++i)
+        {
+            Vmath::Zero(outarray[i].size(), &outarray[i][0], 1);
+        }
     }
 
     // Add forcing terms for reaction.

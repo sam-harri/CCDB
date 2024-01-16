@@ -217,6 +217,7 @@ IF( NEKTAR_SOLVER_ADR )
 
     # Reaction-diffusion
     ADD_NEKTAR_TEST(ReactionDiffusion2D)
+    ADD_NEKTAR_TEST(ExReactionDiffusion2D)
 
     ADD_NEKTAR_TEST(Helmholtz1D_8modes_DG)
     ADD_NEKTAR_TEST(Helmholtz1D_8modes)
