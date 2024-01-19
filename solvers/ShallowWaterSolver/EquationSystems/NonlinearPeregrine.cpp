@@ -921,7 +921,7 @@ void NonlinearPeregrine::NumericalFluxForcing(
 
     //-----------------------------------------------------
     // get the physical values at the trace
-    // (any time-dependent BC previuosly put in fields[1] and [2]
+    // (any time-dependent BC previously put in fields[1] and [2]
 
     m_fields[1]->GetFwdBwdTracePhys(inarray[0], Fwd[0], Bwd[0]);
     m_fields[2]->GetFwdBwdTracePhys(inarray[1], Fwd[1], Bwd[1]);

@@ -83,10 +83,17 @@ void UnsteadyReactionDiffusion::DoOdeRhs(
     const Array<OneD, const Array<OneD, NekDouble>> &inarray,
     Array<OneD, Array<OneD, NekDouble>> &outarray, const NekDouble time)
 {
-    // RHS should be set to zero.
-    for (int i = 0; i < outarray.size(); ++i)
+    if (m_explicitDiffusion)
     {
-        Vmath::Zero(outarray[i].size(), &outarray[i][0], 1);
+        UnsteadyDiffusion::DoOdeRhs(inarray, outarray, time);
+    }
+    else
+    {
+        // RHS should be set to zero.
+        for (int i = 0; i < outarray.size(); ++i)
+        {
+            Vmath::Zero(outarray[i].size(), &outarray[i][0], 1);
+        }
     }
 
     // Add forcing terms for reaction.

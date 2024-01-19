@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 //
-// File: UnsteadyInviscidBurger.h
+// File: UnsteadyInviscidBurgers.h
 //
 // For more information, please see: http://www.nektar.info
 //
@@ -28,22 +28,22 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 //
-// Description: Unsteady inviscid Burger solve routines
+// Description: Unsteady inviscid Burgers solve routines
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef NEKTAR_SOLVERS_ADRSOLVER_EQUATIONSYSTEMS_UNSTEADYINVISCIDBURGER_H
-#define NEKTAR_SOLVERS_ADRSOLVER_EQUATIONSYSTEMS_UNSTEADYINVISCIDBURGER_H
+#ifndef NEKTAR_SOLVERS_ADRSOLVER_EQUATIONSYSTEMS_UNSTEADYINVISCIDBURGERS_H
+#define NEKTAR_SOLVERS_ADRSOLVER_EQUATIONSYSTEMS_UNSTEADYINVISCIDBURGERS_H
 
 #include <SolverUtils/AdvectionSystem.h>
 #include <SolverUtils/Forcing/Forcing.h>
 
 namespace Nektar
 {
-class UnsteadyInviscidBurger : public SolverUtils::AdvectionSystem
+class UnsteadyInviscidBurgers : public SolverUtils::AdvectionSystem
 {
 public:
-    friend class MemoryManager<UnsteadyInviscidBurger>;
+    friend class MemoryManager<UnsteadyInviscidBurgers>;
 
     /// Creates an instance of this class
     static SolverUtils::EquationSystemSharedPtr create(
@@ -51,8 +51,8 @@ public:
         const SpatialDomains::MeshGraphSharedPtr &pGraph)
     {
         SolverUtils::EquationSystemSharedPtr p =
-            MemoryManager<UnsteadyInviscidBurger>::AllocateSharedPtr(pSession,
-                                                                     pGraph);
+            MemoryManager<UnsteadyInviscidBurgers>::AllocateSharedPtr(pSession,
+                                                                      pGraph);
         p->InitObject();
         return p;
     }
@@ -60,7 +60,7 @@ public:
     static std::string className;
 
     /// Destructor
-    ~UnsteadyInviscidBurger() override = default;
+    ~UnsteadyInviscidBurgers() override = default;
 
 protected:
     SolverUtils::RiemannSolverSharedPtr m_riemannSolver;
@@ -70,8 +70,12 @@ protected:
     std::vector<SolverUtils::ForcingSharedPtr> m_forcing;
 
     /// Session reader
-    UnsteadyInviscidBurger(const LibUtilities::SessionReaderSharedPtr &pSession,
-                           const SpatialDomains::MeshGraphSharedPtr &pGraph);
+    UnsteadyInviscidBurgers(
+        const LibUtilities::SessionReaderSharedPtr &pSession,
+        const SpatialDomains::MeshGraphSharedPtr &pGraph);
+
+    /// Get the normal velocity
+    Array<OneD, NekDouble> &GetNormalVelocity();
 
     /// Evaluate the flux at each solution point
     void GetFluxVector(const Array<OneD, Array<OneD, NekDouble>> &physfield,
@@ -87,11 +91,11 @@ protected:
         const Array<OneD, const Array<OneD, NekDouble>> &inarray,
         Array<OneD, Array<OneD, NekDouble>> &outarray, const NekDouble time);
 
-    /// Get the normal velocity
-    Array<OneD, NekDouble> &GetNormalVelocity();
-
     /// Initialise the object
     void v_InitObject(bool DeclareFields = true) override;
+
+    /// Print Summary
+    void v_GenerateSummary(SolverUtils::SummaryList &s) override;
 
 private:
 };

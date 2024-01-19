@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 //
-// File: UnsteadyInviscidBurger.cpp
+// File: UnsteadyInviscidBurgers.cpp
 //
 // For more information, please see: http://www.nektar.info
 //
@@ -28,22 +28,21 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 //
-// Description: Unsteady inviscid Burger solve routines
+// Description: Unsteady inviscid Burgers solve routines
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <ADRSolver/EquationSystems/UnsteadyInviscidBurger.h>
-
-using namespace std;
+#include <ADRSolver/EquationSystems/UnsteadyInviscidBurgers.h>
+#include <LibUtilities/BasicUtils/Timer.h>
 
 namespace Nektar
 {
-string UnsteadyInviscidBurger::className =
+std::string UnsteadyInviscidBurgers::className =
     SolverUtils::GetEquationSystemFactory().RegisterCreatorFunction(
-        "UnsteadyInviscidBurger", UnsteadyInviscidBurger::create,
-        "Inviscid Burger equation");
+        "UnsteadyInviscidBurgers", UnsteadyInviscidBurgers::create,
+        "Inviscid Burgers equation");
 
-UnsteadyInviscidBurger::UnsteadyInviscidBurger(
+UnsteadyInviscidBurgers::UnsteadyInviscidBurgers(
     const LibUtilities::SessionReaderSharedPtr &pSession,
     const SpatialDomains::MeshGraphSharedPtr &pGraph)
     : UnsteadySystem(pSession, pGraph), AdvectionSystem(pSession, pGraph)
@@ -51,55 +50,55 @@ UnsteadyInviscidBurger::UnsteadyInviscidBurger(
 }
 
 /**
- * @brief Initialisation object for the inviscid Burger equation.
+ * @brief Initialisation object for the inviscid Burgers equation.
  */
-void UnsteadyInviscidBurger::v_InitObject(bool DeclareFields)
+void UnsteadyInviscidBurgers::v_InitObject(bool DeclareFields)
 {
-    // Call to the initialisation object of UnsteadySystem
     AdvectionSystem::v_InitObject(DeclareFields);
-
-    // Define the normal velocity fields
-    if (m_fields[0]->GetTrace())
-    {
-        m_traceVn = Array<OneD, NekDouble>(GetTraceNpoints());
-    }
 
     // Type of advection class to be used
     switch (m_projectionType)
     {
-        // Continuous field
-        case MultiRegions::eGalerkin:
-        {
-            string advName;
-            m_session->LoadSolverInfo("AdvectionType", advName,
-                                      "NonConservative");
-            m_advObject = SolverUtils::GetAdvectionFactory().CreateInstance(
-                advName, advName);
-            m_advObject->SetFluxVector(&UnsteadyInviscidBurger::GetFluxVector,
-                                       this);
-            break;
-        }
         // Discontinuous field
         case MultiRegions::eDiscontinuous:
         {
-            string advName;
-            string riemName;
+            // Do not forwards transform initial condition
+            m_homoInitialFwd = false;
 
+            // Define the normal velocity fields
+            if (m_fields[0]->GetTrace())
+            {
+                m_traceVn = Array<OneD, NekDouble>(GetTraceNpoints());
+            }
+
+            // Advection term
+            std::string advName;
+            std::string riemName;
             m_session->LoadSolverInfo("AdvectionType", advName, "WeakDG");
             m_advObject = SolverUtils::GetAdvectionFactory().CreateInstance(
                 advName, advName);
-            m_advObject->SetFluxVector(&UnsteadyInviscidBurger::GetFluxVector,
+            m_advObject->SetFluxVector(&UnsteadyInviscidBurgers::GetFluxVector,
                                        this);
-
             m_session->LoadSolverInfo("UpwindType", riemName, "Upwind");
             m_riemannSolver =
                 SolverUtils::GetRiemannSolverFactory().CreateInstance(
                     riemName, m_session);
             m_riemannSolver->SetScalar(
-                "Vn", &UnsteadyInviscidBurger::GetNormalVelocity, this);
-
+                "Vn", &UnsteadyInviscidBurgers::GetNormalVelocity, this);
             m_advObject->SetRiemannSolver(m_riemannSolver);
             m_advObject->InitObject(m_session, m_fields);
+            break;
+        }
+        // Continuous field
+        case MultiRegions::eGalerkin:
+        {
+            std::string advName;
+            m_session->LoadSolverInfo("AdvectionType", advName,
+                                      "NonConservative");
+            m_advObject = SolverUtils::GetAdvectionFactory().CreateInstance(
+                advName, advName);
+            m_advObject->SetFluxVector(&UnsteadyInviscidBurgers::GetFluxVector,
+                                       this);
             break;
         }
         default:
@@ -113,13 +112,11 @@ void UnsteadyInviscidBurger::v_InitObject(bool DeclareFields)
     m_forcing = SolverUtils::Forcing::Load(m_session, shared_from_this(),
                                            m_fields, m_fields.size());
 
-    // If explicit it computes RHS and PROJECTION for the time integration
     if (m_explicitAdvection)
     {
-        m_ode.DefineOdeRhs(&UnsteadyInviscidBurger::DoOdeRhs, this);
-        m_ode.DefineProjection(&UnsteadyInviscidBurger::DoOdeProjection, this);
+        m_ode.DefineOdeRhs(&UnsteadyInviscidBurgers::DoOdeRhs, this);
+        m_ode.DefineProjection(&UnsteadyInviscidBurgers::DoOdeProjection, this);
     }
-    // Otherwise it gives an error because (no implicit integration)
     else
     {
         ASSERTL0(false, "Implicit unsteady Advection not set up.");
@@ -127,88 +124,65 @@ void UnsteadyInviscidBurger::v_InitObject(bool DeclareFields)
 }
 
 /**
- * @brief Get the normal velocity for the inviscid Burger equation.
+ * @brief Get the normal velocity for the inviscid Burgers equation.
  */
-Array<OneD, NekDouble> &UnsteadyInviscidBurger::GetNormalVelocity()
+Array<OneD, NekDouble> &UnsteadyInviscidBurgers::GetNormalVelocity()
 {
-    // Counter variable
-    int i;
-
     // Number of trace (interface) points
     int nTracePts = GetTraceNpoints();
 
     // Number of solution points
     int nSolutionPts = GetNpoints();
 
-    // Number of fields (variables of the problem)
-    int nVariables = m_fields.size();
-
     // Auxiliary variables to compute the normal velocity
     Array<OneD, NekDouble> Fwd(nTracePts);
     Array<OneD, NekDouble> Bwd(nTracePts);
-    Array<OneD, Array<OneD, NekDouble>> physfield(nVariables);
+    Array<OneD, NekDouble> physfield(nSolutionPts);
 
     // Reset the normal velocity
     Vmath::Zero(nTracePts, m_traceVn, 1);
 
-    // The TimeIntegration Class does not update the physical values of the
-    // solution. It is thus necessary to transform back the coefficient into
-    // the physical space and save them in physfield to compute the normal
-    // advection velocity properly. However it remains a critical point.
-    for (i = 0; i < nVariables; ++i)
+    for (int i = 0; i < m_spacedim; ++i)
     {
-        physfield[i] = Array<OneD, NekDouble>(nSolutionPts);
-        m_fields[i]->BwdTrans(m_fields[i]->GetCoeffs(), physfield[i]);
-    }
-
-    /// Extract the physical values at the trace space
-    m_fields[0]->GetFwdBwdTracePhys(physfield[0], Fwd, Bwd, true);
-    Vmath::Vadd(nTracePts, Fwd, 1, Bwd, 1, Fwd, 1);
-    Vmath::Smul(nTracePts, 0.5, Fwd, 1, Fwd, 1);
-
-    /// Compute the normal velocity
-    for (i = 0; i < m_spacedim; ++i)
-    {
+        m_fields[i]->BwdTrans(m_fields[i]->GetCoeffs(), physfield);
+        m_fields[i]->GetFwdBwdTracePhys(physfield, Fwd, Bwd, true);
+        Vmath::Vadd(nTracePts, Fwd, 1, Bwd, 1, Fwd, 1);
+        Vmath::Smul(nTracePts, 0.5, Fwd, 1, Fwd, 1);
         Vmath::Vvtvp(nTracePts, m_traceNormals[i], 1, Fwd, 1, m_traceVn, 1,
                      m_traceVn, 1);
-
-        Vmath::Smul(nTracePts, 0.5, m_traceVn, 1, m_traceVn, 1);
     }
+    Vmath::Smul(nTracePts, 0.5, m_traceVn, 1, m_traceVn, 1);
+
     return m_traceVn;
 }
 
 /**
- * @brief Compute the right-hand side for the inviscid Burger equation.
+ * @brief Compute the right-hand side for the inviscid Burgers equation.
  *
  * @param inarray    Given fields.
  * @param outarray   Calculated solution.
  * @param time       Time.
  */
-void UnsteadyInviscidBurger::DoOdeRhs(
+void UnsteadyInviscidBurgers::DoOdeRhs(
     const Array<OneD, const Array<OneD, NekDouble>> &inarray,
     Array<OneD, Array<OneD, NekDouble>> &outarray, const NekDouble time)
 {
-    // Counter variable
-    int i;
-
     // Number of fields (variables of the problem)
     int nVariables = inarray.size();
 
     // Number of solution points
     int nSolutionPts = GetNpoints();
 
-    // Unused variable for WeakDG and FR
-    Array<OneD, Array<OneD, NekDouble>> advVel(nVariables);
-    for (int i = 0; i < nVariables; ++i)
-    {
-        advVel[i] = inarray[i];
-    }
-
+    LibUtilities::Timer timer;
+    timer.Start();
     // RHS computation using the new advection base class
-    m_advObject->Advect(nVariables, m_fields, advVel, inarray, outarray, time);
+    m_advObject->Advect(nVariables, m_fields, inarray, inarray, outarray, time);
+    timer.Stop();
+    // Elapsed time
+    timer.AccumulateRegion("Advect");
 
     // Negate the RHS
-    for (i = 0; i < nVariables; ++i)
+    for (int i = 0; i < nVariables; ++i)
     {
         Vmath::Neg(nSolutionPts, outarray[i], 1);
     }
@@ -222,19 +196,16 @@ void UnsteadyInviscidBurger::DoOdeRhs(
 }
 
 /**
- * @brief Compute the projection for the inviscid Burger equation.
+ * @brief Compute the projection for the inviscid Burgers equation.
  *
  * @param inarray    Given fields.
  * @param outarray   Calculated solution.
  * @param time       Time.
  */
-void UnsteadyInviscidBurger::DoOdeProjection(
+void UnsteadyInviscidBurgers::DoOdeProjection(
     const Array<OneD, const Array<OneD, NekDouble>> &inarray,
     Array<OneD, Array<OneD, NekDouble>> &outarray, const NekDouble time)
 {
-    // Counter variable
-    int i;
-
     // Number of variables of the problem
     int nVariables = inarray.size();
 
@@ -247,27 +218,24 @@ void UnsteadyInviscidBurger::DoOdeProjection(
         // Discontinuous projection
         case MultiRegions::eDiscontinuous:
         {
-            // Number of quadrature points
-            int nQuadraturePts = GetNpoints();
-
             // Just copy over array
             if (inarray != outarray)
             {
-                for (i = 0; i < nVariables; ++i)
+                int npoints = GetNpoints();
+
+                for (int i = 0; i < nVariables; ++i)
                 {
-                    Vmath::Vcopy(nQuadraturePts, inarray[i], 1, outarray[i], 1);
+                    Vmath::Vcopy(npoints, inarray[i], 1, outarray[i], 1);
                 }
             }
             break;
         }
-
         // Continuous projection
         case MultiRegions::eGalerkin:
-        case MultiRegions::eMixed_CG_Discontinuous:
         {
             Array<OneD, NekDouble> coeffs(m_fields[0]->GetNcoeffs());
 
-            for (i = 0; i < nVariables; ++i)
+            for (int i = 0; i < nVariables; ++i)
             {
                 m_fields[i]->FwdTrans(inarray[i], coeffs);
                 m_fields[i]->BwdTrans(coeffs, outarray[i]);
@@ -275,19 +243,20 @@ void UnsteadyInviscidBurger::DoOdeProjection(
             break;
         }
         default:
+        {
             ASSERTL0(false, "Unknown projection scheme");
             break;
+        }
     }
 }
 
 /**
- * @brief Return the flux vector for the inviscid Burger equation.
+ * @brief Return the flux vector for the inviscid Burgers equation.
  *
- * @param i           Component of the flux vector to calculate.
  * @param physfield   Fields.
  * @param flux        Resulting flux.
  */
-void UnsteadyInviscidBurger::GetFluxVector(
+void UnsteadyInviscidBurgers::GetFluxVector(
     const Array<OneD, Array<OneD, NekDouble>> &physfield,
     Array<OneD, Array<OneD, Array<OneD, NekDouble>>> &flux)
 {
@@ -301,5 +270,10 @@ void UnsteadyInviscidBurger::GetFluxVector(
             Vmath::Smul(nq, 0.5, flux[i][j], 1, flux[i][j], 1);
         }
     }
+}
+
+void UnsteadyInviscidBurgers::v_GenerateSummary(SolverUtils::SummaryList &s)
+{
+    AdvectionSystem::v_GenerateSummary(s);
 }
 } // namespace Nektar

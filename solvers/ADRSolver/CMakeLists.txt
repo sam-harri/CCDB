@@ -19,7 +19,7 @@ IF( NEKTAR_SOLVER_ADR )
         ./EquationSystems/MMFAdvection.cpp
         ./EquationSystems/UnsteadyDiffusion.cpp
         ./EquationSystems/UnsteadyAdvectionDiffusion.cpp
-        ./EquationSystems/UnsteadyInviscidBurger.cpp
+        ./EquationSystems/UnsteadyInviscidBurgers.cpp
         ./EquationSystems/UnsteadyReactionDiffusion.cpp
         ./EquationSystems/UnsteadyViscousBurgers.cpp
         ./EquationSystems/EigenValuesAdvection.cpp)
@@ -165,20 +165,23 @@ IF( NEKTAR_SOLVER_ADR )
     ADD_NEKTAR_TEST(Advection3D_DG_pyr)
     ADD_NEKTAR_TEST(Advection3D_DG_pyr_varP)
 
-    # 1D inviscid Burger (DG/FR)
-    ADD_NEKTAR_TEST(InviscidBurger1D_FRDG_GLL_LAGRANGE_SEM LENGTHY)
-    ADD_NEKTAR_TEST(InviscidBurger1D_FRDG_GAUSS_LAGRANGE)
-    ADD_NEKTAR_TEST(InviscidBurger1D_FRDG_GLL_LAGRANGE)
-    ADD_NEKTAR_TEST(InviscidBurger1D_FRDG_MODIFIED)
-    ADD_NEKTAR_TEST(InviscidBurger1D_FRSD_GLL_LAGRANGE_SEM LENGTHY)
-    ADD_NEKTAR_TEST(InviscidBurger1D_FRSD_GLL_LAGRANGE LENGTHY)
-    ADD_NEKTAR_TEST(InviscidBurger1D_FRSD_MODIFIED LENGTHY)
-    ADD_NEKTAR_TEST(InviscidBurger1D_FRHU_GLL_LAGRANGE_SEM LENGTHY)
-    ADD_NEKTAR_TEST(InviscidBurger1D_FRHU_GLL_LAGRANGE LENGTHY)
-    ADD_NEKTAR_TEST(InviscidBurger1D_FRHU_MODIFIED LENGTHY)
-    ADD_NEKTAR_TEST(InviscidBurger1D_WeakDG_GLL_LAGRANGE)
-    ADD_NEKTAR_TEST(InviscidBurger1D_WeakDG_GAUSS_LAGRANGE)
-    ADD_NEKTAR_TEST(InviscidBurger1D_WeakDG_MODIFIED)
+    # 1D inviscid Burgers (DG/FR)
+    ADD_NEKTAR_TEST(InviscidBurgers1D_FRDG_GLL_LAGRANGE_SEM LENGTHY)
+    ADD_NEKTAR_TEST(InviscidBurgers1D_FRDG_GAUSS_LAGRANGE)
+    ADD_NEKTAR_TEST(InviscidBurgers1D_FRDG_GLL_LAGRANGE)
+    ADD_NEKTAR_TEST(InviscidBurgers1D_FRDG_MODIFIED)
+    ADD_NEKTAR_TEST(InviscidBurgers1D_FRSD_GLL_LAGRANGE_SEM LENGTHY)
+    ADD_NEKTAR_TEST(InviscidBurgers1D_FRSD_GLL_LAGRANGE LENGTHY)
+    ADD_NEKTAR_TEST(InviscidBurgers1D_FRSD_MODIFIED LENGTHY)
+    ADD_NEKTAR_TEST(InviscidBurgers1D_FRHU_GLL_LAGRANGE_SEM LENGTHY)
+    ADD_NEKTAR_TEST(InviscidBurgers1D_FRHU_GLL_LAGRANGE LENGTHY)
+    ADD_NEKTAR_TEST(InviscidBurgers1D_FRHU_MODIFIED LENGTHY)
+    ADD_NEKTAR_TEST(InviscidBurgers1D_WeakDG_GLL_LAGRANGE)
+    ADD_NEKTAR_TEST(InviscidBurgers1D_WeakDG_GAUSS_LAGRANGE)
+    ADD_NEKTAR_TEST(InviscidBurgers1D_WeakDG_MODIFIED)
+    ADD_NEKTAR_TEST(InviscidBurgers1D_WeakDG)
+    ADD_NEKTAR_TEST(ViscousBurgers1D_WeakDG)
+    ADD_NEKTAR_TEST(ViscousBurgers1D_WeakDG_IMEX)
 
     # 1D explicit diffusion (LDG/LFR)
     ADD_NEKTAR_TEST(ExDiffusion_1D_LDG)

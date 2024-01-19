@@ -34,12 +34,11 @@
 
 #include <ADRSolver/EquationSystems/Laplace.h>
 
-using namespace std;
-
 namespace Nektar
 {
-string Laplace::className = GetEquationSystemFactory().RegisterCreatorFunction(
-    "Laplace", Laplace::create);
+std::string Laplace::className =
+    GetEquationSystemFactory().RegisterCreatorFunction("Laplace",
+                                                       Laplace::create);
 
 Laplace::Laplace(const LibUtilities::SessionReaderSharedPtr &pSession,
                  const SpatialDomains::MeshGraphSharedPtr &pGraph)

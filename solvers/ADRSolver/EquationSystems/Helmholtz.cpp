@@ -34,11 +34,9 @@
 
 #include <ADRSolver/EquationSystems/Helmholtz.h>
 
-using namespace std;
-
 namespace Nektar
 {
-string Helmholtz::className =
+std::string Helmholtz::className =
     GetEquationSystemFactory().RegisterCreatorFunction("Helmholtz",
                                                        Helmholtz::create);
 
