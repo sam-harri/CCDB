@@ -2,10 +2,10 @@
 <test>
     <description>3D channel flow, all elements, HDF5 input, P=3</description>
     <executable>IncNavierStokesSolver</executable>
-    <parameters>CubeAllElements_ChanFlow.xml</parameters>
+    <parameters>ChannelFlow3D.xml</parameters>
     <files>
-        <file description="Session File">CubeAllElements_ChanFlow.xml</file>
-        <file description="Geometry File">CubeAllElements_ChanFlow.nekg</file>
+        <file description="Session File">ChannelFlow3D.xml</file>
+        <file description="Geometry File">ChannelFlow3D.nekg</file>
     </files>
     <metrics>
         <metric type="L2" id="1">

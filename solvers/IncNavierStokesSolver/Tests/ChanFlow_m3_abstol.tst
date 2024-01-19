@@ -4,7 +4,7 @@
     <executable>IncNavierStokesSolver</executable>
     <parameters>ChanFlow_m3_abstol.xml</parameters>
     <files>
-        <file description="Session File">ChanFlow_m3.xml</file>
+        <file description="Session File">ChannelFlow2D.xml</file>
     </files>
     <metrics>
         <metric type="L2" id="1">
