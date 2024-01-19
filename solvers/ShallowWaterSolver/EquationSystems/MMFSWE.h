@@ -105,8 +105,6 @@ protected:
 
     /// Advection velocity
     Array<OneD, Array<OneD, NekDouble>> m_velocity;
-    Array<OneD, NekDouble> m_traceVn;
-
     Array<OneD, Array<OneD, NekDouble>> m_veldotMF;
     Array<OneD, NekDouble> m_vellc;
 
@@ -158,9 +156,6 @@ protected:
     void ComputeVorticity(const Array<OneD, const NekDouble> &u,
                           const Array<OneD, const NekDouble> &v,
                           Array<OneD, NekDouble> &Vorticity);
-
-    /// Get the normal velocity
-    void GetNormalVelocity(Array<OneD, NekDouble> &traceVn);
 
     void ComputeNablaCdotVelocity(Array<OneD, NekDouble> &vellc);
 

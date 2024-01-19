@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <test>
-    <description>1D unsteady WeakDG inviscidBurger GLL_LAGRANGE, P=10</description>
+    <description>1D unsteady WeakDG inviscidBurgers GLL_LAGRANGE, P=10</description>
     <executable>ADRSolver</executable>
-    <parameters>InviscidBurger1D_WeakDG_GLL_LAGRANGE.xml</parameters>
+    <parameters>InviscidBurgers1D_WeakDG_GLL_LAGRANGE.xml</parameters>
     <files>
-        <file description="Session File">InviscidBurger1D_WeakDG_GLL_LAGRANGE.xml</file>
+        <file description="Session File">InviscidBurgers1D_WeakDG_GLL_LAGRANGE.xml</file>
     </files>
     <metrics>
         <metric type="L2" id="1">

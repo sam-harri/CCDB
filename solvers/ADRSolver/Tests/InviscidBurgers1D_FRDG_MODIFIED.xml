@@ -32,7 +32,7 @@
     </GEOMETRY>
 
     <EXPANSIONS>
-        <E COMPOSITE="C[0]" NUMMODES="11" FIELDS="u" TYPE="GLL_LAGRANGE_SEM" />
+        <E COMPOSITE="C[0]" NUMMODES="11" FIELDS="u" TYPE="MODIFIED" />
     </EXPANSIONS>
 
     <CONDITIONS>
@@ -46,9 +46,9 @@
         </PARAMETERS>
 
         <SOLVERINFO>
-            <I PROPERTY="EQTYPE"                VALUE="UnsteadyInviscidBurger"  />
+            <I PROPERTY="EQTYPE"                VALUE="UnsteadyInviscidBurgers" />
             <I PROPERTY="Projection"            VALUE="DisContinuous"           />
-            <I PROPERTY="AdvectionType"         VALUE="FRSD"                    />
+            <I PROPERTY="AdvectionType"         VALUE="FRDG"                    />
             <I PROPERTY="UpwindType"            VALUE="Upwind"                  />
             <I PROPERTY="TimeIntegrationMethod" VALUE="ClassicalRungeKutta4"    />
         </SOLVERINFO>

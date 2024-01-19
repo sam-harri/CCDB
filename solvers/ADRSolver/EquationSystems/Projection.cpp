@@ -34,11 +34,9 @@
 
 #include <ADRSolver/EquationSystems/Projection.h>
 
-using namespace std;
-
 namespace Nektar
 {
-string Projection::className =
+std::string Projection::className =
     GetEquationSystemFactory().RegisterCreatorFunction("Projection",
                                                        Projection::create);
 
@@ -72,7 +70,7 @@ void Projection::v_GenerateSummary(SolverUtils::SummaryList &s)
     EquationSystem::SessionSummary(s);
     for (int i = 0; i < m_fields.size(); ++i)
     {
-        stringstream name;
+        std::stringstream name;
         name << "Forcing func [" << i << "]";
         SolverUtils::AddSummaryItem(
             s, name.str(),

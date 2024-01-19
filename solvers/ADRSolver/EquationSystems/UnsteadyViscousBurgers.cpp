@@ -28,46 +28,40 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 //
-// Description: Unsteady advection-diffusion solve routines
+// Description: Unsteady viscous Burgers solve routines
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <iostream>
-
 #include <ADRSolver/EquationSystems/UnsteadyViscousBurgers.h>
-
-using namespace std;
 
 namespace Nektar
 {
-string UnsteadyViscousBurgers::className =
+std::string UnsteadyViscousBurgers::className =
     SolverUtils::GetEquationSystemFactory().RegisterCreatorFunction(
-        "UnsteadyViscousBurgers", UnsteadyViscousBurgers::create);
+        "UnsteadyViscousBurgers", UnsteadyViscousBurgers::create,
+        "Viscous Burgers equation");
 
 UnsteadyViscousBurgers::UnsteadyViscousBurgers(
     const LibUtilities::SessionReaderSharedPtr &pSession,
     const SpatialDomains::MeshGraphSharedPtr &pGraph)
-    : UnsteadySystem(pSession, pGraph), AdvectionSystem(pSession, pGraph),
-      m_varCoeffLap(StdRegions::NullVarCoeffMap)
+    : UnsteadySystem(pSession, pGraph),
+      UnsteadyInviscidBurgers(pSession, pGraph)
 {
-    m_planeNumber = 0;
 }
 
 /**
- * @brief Initialisation object for the unsteady linear advection
- * diffusion equation.
+ * @brief Initialisation object for the viscous Burgers equation.
  */
 void UnsteadyViscousBurgers::v_InitObject(bool DeclareFields)
 {
-    AdvectionSystem::v_InitObject(DeclareFields);
+    UnsteadyInviscidBurgers::v_InitObject(DeclareFields);
 
-    m_session->LoadParameter("wavefreq", m_waveFreq, 0.0);
-    m_session->LoadParameter("epsilon", m_epsilon, 0.0);
-
+    m_session->LoadParameter("epsilon", m_epsilon, 1.0);
     m_session->MatchSolverInfo("SpectralVanishingViscosity", "True",
                                m_useSpecVanVisc, false);
     m_session->MatchSolverInfo("SpectralVanishingViscosity", "VarDiff",
                                m_useSpecVanViscVarDiff, false);
+
     if (m_useSpecVanViscVarDiff)
     {
         m_useSpecVanVisc = true;
@@ -79,62 +73,47 @@ void UnsteadyViscousBurgers::v_InitObject(bool DeclareFields)
         m_session->LoadParameter("SVVDiffCoeff", m_sVVDiffCoeff, 0.1);
     }
 
-    // Type of advection and diffusion classes to be used
+    // Type of diffusion classes to be used
     switch (m_projectionType)
     {
         // Discontinuous field
         case MultiRegions::eDiscontinuous:
         {
-            ASSERTL0(false, "Need to implement for DG");
-            // Do not forwards transform initial condition
-            m_homoInitialFwd = false;
-
-            // Advection term
-            string advName;
-            string riemName;
-            m_session->LoadSolverInfo("AdvectionType", advName, "WeakDG");
-            m_advObject = SolverUtils::GetAdvectionFactory().CreateInstance(
-                advName, advName);
-            m_advObject->SetFluxVector(
-                &UnsteadyViscousBurgers::GetFluxVectorAdv, this);
-            m_session->LoadSolverInfo("UpwindType", riemName, "Upwind");
-            m_riemannSolver =
-                SolverUtils::GetRiemannSolverFactory().CreateInstance(
-                    riemName, m_session);
-            m_advObject->SetRiemannSolver(m_riemannSolver);
-            m_advObject->InitObject(m_session, m_fields);
-
-            // Diffusion term
-            std::string diffName;
-            m_session->LoadSolverInfo("DiffusionType", diffName, "LDG");
-            m_diffusion = SolverUtils::GetDiffusionFactory().CreateInstance(
-                diffName, diffName);
-            m_diffusion->SetFluxVector(
-                &UnsteadyViscousBurgers::GetFluxVectorDiff, this);
-            m_diffusion->InitObject(m_session, m_fields);
+            if (m_explicitDiffusion)
+            {
+                std::string diffName;
+                m_session->LoadSolverInfo("DiffusionType", diffName, "LDG");
+                m_diffusion = SolverUtils::GetDiffusionFactory().CreateInstance(
+                    diffName, diffName);
+                m_diffusion->SetFluxVector(
+                    &UnsteadyViscousBurgers::GetFluxVectorDiff, this);
+                m_diffusion->InitObject(m_session, m_fields);
+            }
             break;
         }
         // Continuous field
         case MultiRegions::eGalerkin:
-        case MultiRegions::eMixed_CG_Discontinuous:
         {
-            // Advection term
             std::string advName;
             m_session->LoadSolverInfo("AdvectionType", advName,
                                       "NonConservative");
-            m_advObject = SolverUtils::GetAdvectionFactory().CreateInstance(
-                advName, advName);
-            m_advObject->SetFluxVector(
-                &UnsteadyViscousBurgers::GetFluxVectorAdv, this);
-
-            if (m_useSpecVanViscVarDiff)
+            if (advName.compare("WeakDG") == 0)
             {
-                Array<OneD, Array<OneD, NekDouble>> vel(m_fields.size());
-                for (int i = 0; i < m_fields.size(); ++i)
+                // Define the normal velocity fields
+                if (m_fields[0]->GetTrace())
                 {
-                    vel[i] = m_fields[i]->UpdatePhys();
+                    m_traceVn = Array<OneD, NekDouble>(GetTraceNpoints());
                 }
-                SVVVarDiffCoeff(vel, m_varCoeffLap);
+
+                std::string riemName;
+                m_session->LoadSolverInfo("UpwindType", riemName, "Upwind");
+                m_riemannSolver =
+                    SolverUtils::GetRiemannSolverFactory().CreateInstance(
+                        riemName, m_session);
+                m_riemannSolver->SetScalar(
+                    "Vn", &UnsteadyViscousBurgers::GetNormalVelocity, this);
+                m_advObject->SetRiemannSolver(m_riemannSolver);
+                m_advObject->InitObject(m_session, m_fields);
             }
 
             // In case of Galerkin explicit diffusion gives an error
@@ -142,7 +121,6 @@ void UnsteadyViscousBurgers::v_InitObject(bool DeclareFields)
             {
                 ASSERTL0(false, "Explicit Galerkin diffusion not set up.");
             }
-            // In case of Galerkin implicit diffusion: do nothing
             break;
         }
         default:
@@ -152,52 +130,12 @@ void UnsteadyViscousBurgers::v_InitObject(bool DeclareFields)
         }
     }
 
-    // Forcing terms
-    m_forcing = SolverUtils::Forcing::Load(m_session, shared_from_this(),
-                                           m_fields, m_fields.size());
-
     m_ode.DefineImplicitSolve(&UnsteadyViscousBurgers::DoImplicitSolve, this);
     m_ode.DefineOdeRhs(&UnsteadyViscousBurgers::DoOdeRhs, this);
-
-    if (m_projectionType == MultiRegions::eDiscontinuous &&
-        m_explicitDiffusion == 1)
-    {
-        m_ode.DefineProjection(&UnsteadyViscousBurgers::DoOdeProjection, this);
-    }
 }
 
 /**
- * @brief Get the normal velocity for the unsteady linear advection
- * diffusion equation.
- */
-Array<OneD, NekDouble> &UnsteadyViscousBurgers::GetNormalVelocity(
-    Array<OneD, Array<OneD, NekDouble>> &inarray)
-{
-    // Number of trace (interface) points
-    int i;
-    int nTracePts = GetTraceNpoints();
-
-    // Auxiliary variable to compute the normal velocity
-    Array<OneD, NekDouble> tmp(nTracePts);
-    m_traceVn = Array<OneD, NekDouble>(nTracePts, 0.0);
-
-    // Reset the normal velocity
-    Vmath::Zero(nTracePts, m_traceVn, 1);
-
-    for (i = 0; i < inarray.size(); ++i)
-    {
-        m_fields[0]->ExtractTracePhys(inarray[i], tmp);
-
-        Vmath::Vvtvp(nTracePts, m_traceNormals[i], 1, tmp, 1, m_traceVn, 1,
-                     m_traceVn, 1);
-    }
-
-    return m_traceVn;
-}
-
-/**
- * @brief Compute the right-hand side for the unsteady linear advection
- * diffusion problem.
+ * @brief Compute the right-hand side for the viscous Burgers equation.
  *
  * @param inarray    Given fields.
  * @param outarray   Calculated solution.
@@ -213,82 +151,23 @@ void UnsteadyViscousBurgers::DoOdeRhs(
     // Number of solution points
     int nSolutionPts = GetNpoints();
 
-    Array<OneD, Array<OneD, NekDouble>> outarrayDiff(nVariables);
+    UnsteadyInviscidBurgers::DoOdeRhs(inarray, outarray, time);
 
-    for (int i = 0; i < nVariables; ++i)
+    if (m_explicitDiffusion)
     {
-        outarrayDiff[i] = Array<OneD, NekDouble>(nSolutionPts, 0.0);
-    }
+        Array<OneD, Array<OneD, NekDouble>> outarrayDiff(nVariables);
 
-    // RHS computation using the new advection base class
-    m_advObject->Advect(nVariables, m_fields, inarray, inarray, outarray, time);
+        for (int i = 0; i < nVariables; ++i)
+        {
+            outarrayDiff[i] = Array<OneD, NekDouble>(nSolutionPts, 0.0);
+        }
 
-    // Negate the RHS
-    for (int i = 0; i < nVariables; ++i)
-    {
-        Vmath::Neg(nSolutionPts, outarray[i], 1);
-    }
-
-    // No explicit diffusion for CG
-    if (m_projectionType == MultiRegions::eDiscontinuous)
-    {
         m_diffusion->Diffuse(nVariables, m_fields, inarray, outarrayDiff);
 
         for (int i = 0; i < nVariables; ++i)
         {
-            Vmath::Vadd(nSolutionPts, &outarray[i][0], 1, &outarrayDiff[i][0],
+            Vmath::Vadd(nSolutionPts, &outarrayDiff[i][0], 1, &outarray[i][0],
                         1, &outarray[i][0], 1);
-        }
-    }
-
-    // Add forcing terms
-    for (auto &x : m_forcing)
-    {
-        // set up non-linear terms
-        x->Apply(m_fields, inarray, outarray, time);
-    }
-}
-
-/**
- * @brief Compute the projection for the unsteady advection
- * diffusion problem.
- *
- * @param inarray    Given fields.
- * @param outarray   Calculated solution.
- * @param time       Time.
- */
-void UnsteadyViscousBurgers::DoOdeProjection(
-    const Array<OneD, const Array<OneD, NekDouble>> &inarray,
-    Array<OneD, Array<OneD, NekDouble>> &outarray, const NekDouble time)
-{
-    int i;
-    int nvariables = inarray.size();
-    SetBoundaryConditions(time);
-    switch (m_projectionType)
-    {
-        case MultiRegions::eDiscontinuous:
-        {
-            // Just copy over array
-            if (inarray != outarray)
-            {
-                int npoints = GetNpoints();
-
-                for (i = 0; i < nvariables; ++i)
-                {
-                    Vmath::Vcopy(npoints, inarray[i], 1, outarray[i], 1);
-                }
-            }
-            break;
-        }
-        case MultiRegions::eGalerkin:
-        case MultiRegions::eMixed_CG_Discontinuous:
-        {
-            // Do nothing for the moment.
-        }
-        default:
-        {
-            ASSERTL0(false, "Unknown projection scheme");
-            break;
         }
     }
 }
@@ -317,12 +196,15 @@ void UnsteadyViscousBurgers::DoImplicitSolve(
         factors[StdRegions::eFactorSVVDiffCoeff]   = m_sVVDiffCoeff / m_epsilon;
     }
 
-    Array<OneD, Array<OneD, NekDouble>> F(nvariables);
-    F[0] = Array<OneD, NekDouble>(nq * nvariables);
-
-    for (int n = 1; n < nvariables; ++n)
+    if (m_projectionType == MultiRegions::eDiscontinuous)
     {
-        F[n] = F[n - 1] + nq;
+        factors[StdRegions::eFactorTau] = 1.0;
+    }
+
+    Array<OneD, Array<OneD, NekDouble>> F(nvariables);
+    for (int n = 0; n < nvariables; ++n)
+    {
+        F[n] = Array<OneD, NekDouble>(nq);
     }
 
     // We solve ( \nabla^2 - HHlambda ) Y[i] = rhs [i]
@@ -355,6 +237,7 @@ void UnsteadyViscousBurgers::DoImplicitSolve(
         }
         ++cnt;
     }
+
     for (int i = 0; i < nvariables; ++i)
     {
         // Solve a system of equations with Helmholtz solver
@@ -366,35 +249,8 @@ void UnsteadyViscousBurgers::DoImplicitSolve(
 }
 
 /**
- * @brief Return the flux vector for the advection part.
- *
- * @param physfield   Fields.
- * @param flux        Resulting flux.
- */
-void UnsteadyViscousBurgers::GetFluxVectorAdv(
-    const Array<OneD, Array<OneD, NekDouble>> &physfield,
-    Array<OneD, Array<OneD, Array<OneD, NekDouble>>> &flux)
-{
-
-    const int nq = m_fields[0]->GetNpoints();
-
-    for (int i = 0; i < flux.size(); ++i)
-    {
-        for (int j = 0; j < flux[0].size(); ++j)
-        {
-            Vmath::Vmul(nq, physfield[i], 1, physfield[j], 1, flux[i][j], 1);
-        }
-    }
-}
-
-/**
  * @brief Return the flux vector for the diffusion part.
  *
- * @param i           Equation number.
- * @param j           Spatial direction.
- * @param physfield   Fields.
- * @param derivatives First order derivatives.
- * @param flux        Resulting flux.
  */
 void UnsteadyViscousBurgers::GetFluxVectorDiff(
     [[maybe_unused]] const Array<OneD, Array<OneD, NekDouble>> &inarray,
@@ -404,7 +260,6 @@ void UnsteadyViscousBurgers::GetFluxVectorDiff(
     unsigned int nDim              = qfield.size();
     unsigned int nConvectiveFields = qfield[0].size();
     unsigned int nPts              = qfield[0][0].size();
-
     for (unsigned int j = 0; j < nDim; ++j)
     {
         for (unsigned int i = 0; i < nConvectiveFields; ++i)
@@ -417,13 +272,13 @@ void UnsteadyViscousBurgers::GetFluxVectorDiff(
 
 void UnsteadyViscousBurgers::v_GenerateSummary(SolverUtils::SummaryList &s)
 {
-    AdvectionSystem::v_GenerateSummary(s);
+    UnsteadyInviscidBurgers::v_GenerateSummary(s);
     if (m_useSpecVanVisc)
     {
-        stringstream ss;
+        std::stringstream ss;
         ss << "SVV (cut off = " << m_sVVCutoffRatio
            << ", coeff = " << m_sVVDiffCoeff << ")";
-        AddSummaryItem(s, "Smoothing", ss.str());
+        SolverUtils::AddSummaryItem(s, "Smoothing", ss.str());
     }
 }
 } // namespace Nektar

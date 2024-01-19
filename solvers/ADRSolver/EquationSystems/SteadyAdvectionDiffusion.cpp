@@ -31,13 +31,12 @@
 // Description: Steady advection-diffusion solve routines
 //
 ///////////////////////////////////////////////////////////////////////////////
-#include <ADRSolver/EquationSystems/SteadyAdvectionDiffusion.h>
 
-using namespace std;
+#include <ADRSolver/EquationSystems/SteadyAdvectionDiffusion.h>
 
 namespace Nektar
 {
-string SteadyAdvectionDiffusion::className =
+std::string SteadyAdvectionDiffusion::className =
     GetEquationSystemFactory().RegisterCreatorFunction(
         "SteadyAdvectionDiffusion", SteadyAdvectionDiffusion::create);
 
@@ -82,7 +81,7 @@ void SteadyAdvectionDiffusion::v_GenerateSummary(
 void SteadyAdvectionDiffusion::v_DoInitialise(
     [[maybe_unused]] bool dumpInitialConditions)
 {
-    // set initial forcing from session file
+    // Set initial forcing from session file
     GetFunction("Forcing")->Evaluate(m_session->GetVariables(), m_fields);
 }
 

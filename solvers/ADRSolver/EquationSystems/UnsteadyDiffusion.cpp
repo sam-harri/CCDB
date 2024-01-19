@@ -122,17 +122,9 @@ void UnsteadyDiffusion::v_InitObject(bool DeclareFields)
         }
     }
 
-    if (m_explicitDiffusion)
-    {
-        m_ode.DefineOdeRhs(&UnsteadyDiffusion::DoOdeRhs, this);
-        m_ode.DefineProjection(&UnsteadyDiffusion::DoOdeProjection, this);
-    }
-    else
-    {
-        m_ode.DefineOdeRhs(&UnsteadyDiffusion::DoOdeRhs, this);
-        m_ode.DefineProjection(&UnsteadyDiffusion::DoOdeProjection, this);
-        m_ode.DefineImplicitSolve(&UnsteadyDiffusion::DoImplicitSolve, this);
-    }
+    m_ode.DefineOdeRhs(&UnsteadyDiffusion::DoOdeRhs, this);
+    m_ode.DefineProjection(&UnsteadyDiffusion::DoOdeProjection, this);
+    m_ode.DefineImplicitSolve(&UnsteadyDiffusion::DoImplicitSolve, this);
 }
 
 void UnsteadyDiffusion::v_GenerateSummary(SummaryList &s)

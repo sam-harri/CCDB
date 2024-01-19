@@ -46,9 +46,9 @@
         </PARAMETERS>
 
         <SOLVERINFO>
-            <I PROPERTY="EQTYPE"                VALUE="UnsteadyInviscidBurger"  />
+            <I PROPERTY="EQTYPE"                VALUE="UnsteadyInviscidBurgers" />
             <I PROPERTY="Projection"            VALUE="DisContinuous"           />
-            <I PROPERTY="AdvectionType"         VALUE="FRHU"                    />
+            <I PROPERTY="AdvectionType"         VALUE="FRDG"                    />
             <I PROPERTY="UpwindType"            VALUE="Upwind"                  />
             <I PROPERTY="TimeIntegrationMethod" VALUE="ClassicalRungeKutta4"    />
         </SOLVERINFO>
