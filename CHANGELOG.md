@@ -97,6 +97,7 @@ v5.5.0
 - Add `clang-tidy` support to CI for static analysis (!1556)
 - Remove some uncompiled files and add quality step to check (!1672)
 - Add `clang-15` tester (!1671)
+- Update performance tests to use minimum execution time (!1733)
 
 **NekMesh**
 - Replace deprecated boost::filesystem functions (!1654)
