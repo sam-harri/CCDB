@@ -15,16 +15,6 @@
         </COMPOSITE>
         <DOMAIN> C[0] </DOMAIN>
     </GEOMETRY>
-    <Metadata>
-        <Provenance>
-            <GitBranch>refs/heads/feature/bodyforce-vars</GitBranch>
-            <GitSHA1>5305c77133bf3fac0933a3327f72c12d2b2618e1</GitSHA1>
-            <Hostname>kingscross</Hostname>
-            <NektarVersion>5.0.0</NektarVersion>
-            <Timestamp>14-Aug-2019 16:07:12</Timestamp>
-        </Provenance>
-        <NekMeshCommandLine>-m peralign:surf1=1:surf2=3:dir=y -m peralign:surf1=2:surf2=4:dir=x square-quads.msh DiffusionReaction2D.xml </NekMeshCommandLine>
-    </Metadata>
     <EXPANSIONS>
         <E COMPOSITE="C[0]" NUMMODES="6" TYPE="MODIFIED" FIELDS="u" />
     </EXPANSIONS>
@@ -42,11 +32,15 @@
             <P> epsilon        = 0.2              </P>
         </PARAMETERS>
 
+        <TIMEINTEGRATIONSCHEME>
+            <METHOD> IMEX </METHOD>
+            <ORDER> 3 </ORDER>
+        </TIMEINTEGRATIONSCHEME>
+
         <SOLVERINFO>
             <I PROPERTY="EQTYPE"                VALUE="UnsteadyReactionDiffusion" />
             <I PROPERTY="Projection"            VALUE="Continuous"                />
             <I PROPERTY="DiffusionAdvancement"  VALUE="Implicit"                  />
-            <I PROPERTY="TimeIntegrationMethod" VALUE="IMEXOrder3"                />
         </SOLVERINFO>
 
         <VARIABLES>
