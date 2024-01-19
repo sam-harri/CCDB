@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <NEKTAR>
-    <GEOMETRY DIM="3" SPACE="3" HDF5FILE="CubeAllElements_ChanFlow.nekg" />
+    <GEOMETRY DIM="3" SPACE="3" HDF5FILE="ChannelFlow3D.nekg" />
     <EXPANSIONS>
         <E COMPOSITE="C[0,7-9]" NUMMODES="4" TYPE="MODIFIED" FIELDS="u,v,w,p" />
     </EXPANSIONS>
@@ -29,7 +29,7 @@
         </VARIABLES>
 
         <BOUNDARYREGIONS>
-            <B ID="0"> C[1] </B>  <!-- Inlet -->
+            <B ID="0"> C[1] </B>    <!-- Inlet -->
             <B ID="1"> C[6] </B>    <!-- Outlet -->
             <B ID="2"> C[2] </B>    <!-- Wall -->
             <B ID="3"> C[3] </B>    <!-- Wall left -->

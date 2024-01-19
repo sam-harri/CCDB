@@ -2,9 +2,9 @@
 <test>
     <description>Laminar Channel Flow 3D homogeneous 1D, P=3, 20 Fourier modes (MVM)</description>
     <executable>IncNavierStokesSolver</executable>
-    <parameters>ChanFlow_3DH1D_MVM.xml</parameters>
+    <parameters>ChannelFlowQuasi3D.xml</parameters>
     <files>
-        <file description="Session File">ChanFlow_3DH1D_MVM.xml</file>
+        <file description="Session File">ChannelFlowQuasi3D.xml</file>
     </files>
     <metrics>
         <metric type="L2" id="1">
