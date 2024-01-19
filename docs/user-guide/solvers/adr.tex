@@ -1,15 +1,11 @@
 \chapter{Advection-Diffusion-Reaction Solver}
 
-%3.4/UserGuide/Tutorial/ADRSolver
-%3.4/UserGuide/Examples/ADRSolver/1DAdvection
-%3.4/UserGuide/Examples/ADRSolver/3DAdvectionMassTransport
-%3.4/UserGuide/Examples/ADRSolver/Helmholtz2D
 
 \section{Synopsis}
 
 The ADRSolver is designed to solve partial differential equations of the form:
 \begin{equation}
-\alpha \dfrac{\partial u}{\partial t} + \lambda u + \nu \nabla u + \epsilon \nabla \cdot (D \nabla u) = f
+\alpha \dfrac{\partial u}{\partial t} + \lambda u + \mathbf{V} \cdot \nabla u + f = \epsilon \nabla \cdot (D \nabla u) + R(u)
 \end{equation}
 in either discontinuous or continuous projections of the solution field.
 For a full list of the equations which are supported, and the capabilities of each equation,
@@ -30,25 +26,30 @@ $\nabla^2 u = 0$ &
     \inltt{Laplace} & All &  Continuous/Discontinuous	\\
 $\nabla^2 u  =  f$ &
     \inltt{Poisson} & All &  Continuous/Discontinuous	\\
-$\nabla^2 u  + \lambda u =  f$ &
+$\nabla^2 u  - \lambda u = f$ &
     \inltt{Helmholtz} & All & Continuous/Discontinuous \\
-$\epsilon \nabla^2 u + \mathbf{V}\nabla u = f$ &
+$\epsilon \nabla^2 u - \mathbf{V} \cdot \nabla u = f$ &
     \inltt{SteadyAdvectionDiffusion} & 2D only & Continuous/Discontinuous \\
-$\epsilon \nabla^2 u +  \lambda u = f$ &
-    \inltt{SteadyDiffusionReaction} & 2D only &  Continuous/Discontinuous \\
-$\epsilon \nabla^2 u + \mathbf{V}\nabla u + \lambda u = f$ &
+$\epsilon \nabla^2 u - \mathbf{V} \cdot \nabla u + \lambda u = f$ &
+%$\epsilon \nabla^2 u - \mathbf{V} \cdot \nabla u - \lambda u = f$ &
     \inltt{SteadyAdvectionDiffusionReaction} & 2D only &
     Continuous/Discontinuous \\
-$ \dfrac{\partial u}{\partial t} + \mathbf{V}\nabla u = f$ &
+$ \dfrac{\partial u}{\partial t} + \mathbf{V} \cdot \nabla u = 0$ &
+%$ \dfrac{\partial u}{\partial t} + \mathbf{V} \cdot \nabla u = R(u)$ &
     \inltt{UnsteadyAdvection} & All & Continuous/Discontinuous \\
-$\dfrac{\partial u}{\partial t}  = \epsilon \nabla^2 u$ &
-    \inltt{UnsteadyDiffusion} & All & Continuous/Discontinuous \\
-$\dfrac{\partial u}{\partial t}  = \epsilon \nabla^2 u + R(u)$ &
-    \inltt{UnsteadyReactionDiffusion} & All & Continuous \\
-$\dfrac{\partial u}{\partial t}  + \mathbf{V}\nabla u = \epsilon \nabla^2 u$ &
+$\dfrac{\partial u}{\partial t}  + \mathbf{V} \cdot \nabla u = \epsilon \nabla^2 u$ &
+%$\dfrac{\partial u}{\partial t}  + \mathbf{V} \cdot \nabla u = \epsilon \nabla^2 u + R(u)$ &
     \inltt{UnsteadyAdvectionDiffusion} & All & Continuous/Discontinuous \\
+$\dfrac{\partial u}{\partial t}  = \epsilon \nabla \cdot ( D \nabla u)$ &
+    \inltt{UnsteadyDiffusion} & All & Continuous/Discontinuous \\
+$\dfrac{\partial u}{\partial t}  = \epsilon \nabla \cdot ( D \nabla u) + R(u)$ &
+    \inltt{UnsteadyReactionDiffusion} & All & Continuous/Discontinuous \\
 $\dfrac{\partial u}{\partial t}  + u\nabla u =  0$ &
-    \inltt{UnsteadyInviscidBurger} & 1D only & Continuous/Discontinuous \\
+%$\dfrac{\partial u}{\partial t}  + u\nabla u = R(u)$ &
+    \inltt{UnsteadyInviscidBurgers} & 1D only & Continuous/Discontinuous \\
+$\dfrac{\partial u}{\partial t}  + u\nabla u =  \epsilon \nabla^2 u$ &
+%$\dfrac{\partial u}{\partial t}  + u\nabla u =  \epsilon \nabla^2 u + R(u)$ &
+    \inltt{UnsteadyViscousBurgers} & 1D only & Continuous/Discontinuous \\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -66,7 +67,7 @@ ADRSolver session.xml
 
 The type of equation which is to be solved is specified through the EquationType
 SOLVERINFO option in the session file. This can be set as in table \ref{t:ADR1}.
-At present, the Steady non-symmetric solvers cannot be used in parallel. \\
+At present, the parallel run for steady solvers is not supported \\
 
 \subsection{Time Integration Scheme}
 
@@ -81,10 +82,11 @@ At present, the Steady non-symmetric solvers cannot be used in parallel. \\
     \textbf{ IMEX} & \textbf{Implicit}   \\
 \midrule
 \inltt{UnsteadyAdvection} &  \checkmark 	 &	 & 	&\\
+\inltt{UnsteadyAdvectionDiffusion} &  \checkmark	 &   	& \checkmark	&\\
 \inltt{UnsteadyDiffusion} &  \checkmark 	 & \checkmark 	 & 	&\\
-\inltt{UnsteadyReactionDiffusion} &  	 &  	 & \checkmark	&\\
-\inltt{UnsteadyAdvectionDiffusion} &  	 &   	& \checkmark	&\\
-\inltt{UnsteadyInviscidBurger} &  \checkmark 	 &	 & 	&\\
+\inltt{UnsteadyReactionDiffusion} &  \checkmark &  	 & \checkmark	&\\
+\inltt{UnsteadyInviscidBurgers} &  \checkmark 	 &	 & 	&\\
+\inltt{UnsteadyViscousBurgers} &  \checkmark    &   	& \checkmark	&\\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -135,14 +137,14 @@ The following parameters can be specified in the \inltt{PARAMETERS} section of
 the session file:
 \begin{itemize}
 \item \inltt{epsilon}: sets the diffusion coefficient $\epsilon$.\\
-\textit{Can be used} in: SteadyDiffusionReaction, SteadyAdvectionDiffusionReaction, UnsteadyDiffusion, UnsteadyAdvectionDiffusion. \\
-\textit{Default value}: 0.
+\textit{Can be used} in: SteadyAdvectionDiffusion, SteadyAdvectionDiffusionReaction, UnsteadyDiffusion, UnsteadyReactionDiffusion, UnsteadyAdvectionDiffusion, and UnsteadyViscousBurgers. \\
+\textit{Default value}: 1.
 \item  \inltt{d00}, \inltt{d11}, \inltt{d22}: sets the diagonal entries of the
 diffusion tensor $D$. \\
-\textit{Can be used in}: UnsteadyDiffusion \\
+\textit{Can be used in}: UnsteadyDiffusion and UnsteadyReactionDiffusion \\
 \textit{Default value}: All set to 1 (i.e. identity matrix).
 \item  \inltt{lambda}: sets the reaction coefficient  $\lambda$. \\
-\textit{Can be used in}: SteadyDiffusionReaction, Helmholtz, SteadyAdvectionDiffusionReaction\\
+\textit{Can be used in}: Helmholtz and SteadyAdvectionDiffusionReaction\\
 \textit{Default value}: 0.
 \end{itemize}
 
@@ -161,109 +163,14 @@ of the session file:
 Example files for the ADRSolver are provided in
 \inltt{solvers/ADRSolver/Examples}
 
-\subsection{1D Advection equation}
 
-In this example, it will be demonstrated how the Advection equation can be
-solved on a one-dimensional domain.
-
-\subsubsection{Advection equation}
-We consider the hyperbolic partial differential equation:
-\begin{equation}
-\dfrac{\partial u}{\partial t} + \dfrac{\partial f}{\partial x} = 0,
-\end{equation}
-where $f =  a u$ is the advection flux.
-
-\subsubsection{Input file}
-The input for this example is given in the example file \inlsh{Advection1D.xml}
-
-The geometry section defines a 1D domain consisting of $10$ segments. On each
-segment an expansion consisting of $4$ Lagrange polynomials on the
-Gauss-Lobotto-Legendre points is used as specified by
-\begin{lstlisting}[style=XMLStyle]
-<EXPANSIONS>
-    <E COMPOSITE="C[0]" FIELDS="u" TYPE="GLL_LAGRANGE_SEM" NUMMODES="4"/>
-</EXPANSIONS>
-\end{lstlisting}
-
-Since we are solving the unsteady advection problem, we must specify this in the
-solver information. We also choose to use a discontinuous flux-reconstruction
-projection and use a Runge-Kutta order 4 time-integration scheme.
-\begin{lstlisting}[style=XMLStyle]
-<TIMEINTEGRATIONSCHEME>
-  <METHOD> RungeKutta </METHOD>
-  <ORDER> 4 </ORDER>
-</TIMEINTEGRATIONSCHEME>
-
-<SOLVERINFO>
-    <I PROPERTY="EQTYPE"                VALUE="UnsteadyAdvection"    />
-    <I PROPERTY="Projection"            VALUE="DisContinuous"        />
-    <I PROPERTY="AdvectionType"         VALUE="FRDG"                 />
-    <I PROPERTY="UpwindType"            VALUE="Upwind"               />
-</SOLVERINFO>
-\end{lstlisting}
-
-We choose to advect our solution for $20$ time units with a time-step of $0.01$
-and so provide the following parameters
-\begin{lstlisting}[style=XMLStyle]
-<P> FinTime         = 20                   </P>
-<P> TimeStep        = 0.01                 </P>
-<P> NumSteps        = FinTime/TimeStep     </P>
-\end{lstlisting}
-
-We also specify the advection velocity. We first define dummy parameters
-\begin{lstlisting}[style=XMLStyle]
-<P> advx            = 1                     </P>
-<P> advy            = 0                     </P>
-\end{lstlisting}
-and then define the actual advection function as
-\begin{lstlisting}[style=XMLStyle]
-<FUNCTION NAME="AdvectionVelocity">
-    <E VAR="Vx" VALUE="advx" />
-</FUNCTION>
-\end{lstlisting}
-
-Two boundary regions are defined, one at each end of the domain, and periodicity
-is enforced
-\begin{lstlisting}[style=XMLStyle]
-<BOUNDARYREGIONS>
-    <B ID="0"> C[1] </B>
-    <B ID="1"> C[2] </B>
-</BOUNDARYREGIONS>
-
-<BOUNDARYCONDITIONS>
-    <REGION REF="0">
-        <P VAR="u" VALUE="[1]" />
-    </REGION>
-    <REGION REF="1">
-        <P VAR="u" VALUE="[0]" />
-    </REGION>
-</BOUNDARYCONDITIONS>
-\end{lstlisting}
-
-Finally, we specify the initial value of the solution on the domain
-\begin{lstlisting}[style=XMLStyle]
-<FUNCTION NAME="InitialConditions">
-    <E VAR="u" VALUE="exp(-20.0*x*x)" />
-</FUNCTION>
-
-<FUNCTION NAME="ExactSolution">
-    <E VAR="u" VALUE="exp(-20.0*x*x)" />
-</FUNCTION>
-\end{lstlisting}
-
-\subsubsection{Running the code}
-\begin{lstlisting}[style=BashInputStyle]
-ADRSolver Advection1D.xml
-\end{lstlisting}
-
-To visualise the output, we can convert it into either TecPlot or VTK formats
-\begin{lstlisting}[style=BashInputStyle]
-FieldConvert Advection1D.xml Advection1D.fld Advection1D.dat
-FieldConvert Advection1D.xml Advection1D.fld Advection1D.vtu
-\end{lstlisting}
+% Projection: 2D Problem
+\subsection{Projection: 2D Problem}
+to be completed
 
 
-\subsection{2D Helmholtz Problem}
+% Helmholtz: 2D Problem
+\subsection{Helmholtz: Two-dimensional octagonal plane}
 
 In this example, it will be demonstrated how the Helmholtz equation can be solved on a two-dimensional domain.
 
@@ -272,7 +179,7 @@ In this example, it will be demonstrated how the Helmholtz equation can be solve
 We consider the elliptic partial differential equation:
 
 \begin{equation}
-\nabla^2 u  + \lambda u =  f
+\nabla^2 u  - \lambda u =  f
 \end{equation}
 
 where $\nabla^2$ is the Laplacian and $\lambda$ is a real positive constant.
@@ -280,7 +187,7 @@ where $\nabla^2$ is the Laplacian and $\lambda$ is a real positive constant.
 \subsubsection{Input file}
 
 The input for this example is given in the example file
-\inlsh{Helmholtz2D\_modal.xml}
+\inltt{Helmholtz2D\_modal.xml}
 
 The geometry for this problem is a two-dimensional octagonal plane containing
 both triangles and quadrilaterals. Note that a mesh composite may only contain
@@ -376,12 +283,12 @@ This execution should print out a summary of input file, the $L_2$ and
 $L_{inf}$ errors and the time spent on the calculation.
 
 \subsubsection{Post-processing}
-Simulation results are written in the file Helmholtz2D\_modal.fld. We can choose
+Simulation results are written in the file \inltt{Helmholtz2D\_modal.fld}. We can choose
 to visualise the output in Gmsh
 \begin{lstlisting}[style=BashInputStyle]
 FieldConvert Helmholtz2D_modal.xml Helmholtz2D_modal.fld Helmholtz2D_modal.vtu
 \end{lstlisting}
-which generates the file Helmholtz2D\_modal.vtu which can be visualised and is
+which generates the file \inltt{Helmholtz2D\_modal.vtu} which can be visualised and is
 shown in Fig.~\ref{f:adrsolver:helmholtz2D}
 
 \begin{figure}
@@ -393,7 +300,117 @@ shown in Fig.~\ref{f:adrsolver:helmholtz2D}
 \end{figure}
 
 
-\subsection{Advection dominated mass transport in a pipe}
+% SteadyAdvectionDiffusion: 2D Problem
+\subsection{SteadyAdvectionDiffusion: 2D Problem}
+to be completed
+
+
+% SteadyAdvectionDiffusionReaction: 2D Problem
+\subsection{SteadyAdvectionDiffusionReaction: 2D Problem}
+to be completed
+
+
+% UnsteadyAdvection: 1D Advection equation
+\subsection{UnsteadyAdvection: 1D Advection equation}
+
+In this example, it will be demonstrated how the Advection equation can be
+solved on a one-dimensional domain.
+
+\subsubsection{Advection equation}
+We consider the hyperbolic partial differential equation:
+\begin{equation}
+\dfrac{\partial u}{\partial t} + a\dfrac{\partial u}{\partial x} = 0,
+\end{equation}
+where $a$ is the advection velocity.
+
+\subsubsection{Input file}
+The input for this example is given in the example file \inltt{Advection1D\_WeakDG\_GLL\_LAGRANGE.xml}
+
+The geometry section defines a 1D domain consisting of $10$ segments. On each
+segment an expansion consisting of $4$ Lagrange polynomials on the
+Gauss-Lobotto-Legendre points is used as specified by
+\begin{lstlisting}[style=XMLStyle]
+<EXPANSIONS>
+    <E COMPOSITE="C[0]" FIELDS="u" TYPE="GLL_LAGRANGE_SEM" NUMMODES="4"/>
+</EXPANSIONS>
+\end{lstlisting}
+
+Since we are solving the unsteady advection problem, we must specify this in the
+solver information. We also choose to use a discontinuous flux-reconstruction
+projection and use a Runge-Kutta order 4 time-integration scheme.
+\begin{lstlisting}[style=XMLStyle]
+<TIMEINTEGRATIONSCHEME>
+  <METHOD> RungeKutta </METHOD>
+  <ORDER> 4 </ORDER>
+</TIMEINTEGRATIONSCHEME>
+
+<SOLVERINFO>
+    <I PROPERTY="EQTYPE"                VALUE="UnsteadyAdvection"    />
+    <I PROPERTY="Projection"            VALUE="DisContinuous"        />
+    <I PROPERTY="AdvectionType"         VALUE="WeakDG"                 />
+    <I PROPERTY="UpwindType"            VALUE="Upwind"               />
+</SOLVERINFO>
+\end{lstlisting}
+
+We choose to advect our solution for $20$ time units with a time-step of $0.01$
+and so provide the following parameters
+\begin{lstlisting}[style=XMLStyle]
+<P> FinTime         = 20                   </P>
+<P> TimeStep        = 0.01                 </P>
+<P> NumSteps        = FinTime/TimeStep     </P>
+\end{lstlisting}
+
+We also specify the advection velocity. We first define dummy parameters
+\begin{lstlisting}[style=XMLStyle]
+<P> advx            = 1                     </P>
+<P> advy            = 0                     </P>
+\end{lstlisting}
+and then define the actual advection function as
+\begin{lstlisting}[style=XMLStyle]
+<FUNCTION NAME="AdvectionVelocity">
+    <E VAR="Vx" VALUE="advx" />
+</FUNCTION>
+\end{lstlisting}
+
+Two boundary regions are defined, one at each end of the domain, and periodicity
+is enforced
+\begin{lstlisting}[style=XMLStyle]
+<BOUNDARYREGIONS>
+    <B ID="0"> C[1] </B>
+    <B ID="1"> C[2] </B>
+</BOUNDARYREGIONS>
+
+<BOUNDARYCONDITIONS>
+    <REGION REF="0">
+        <P VAR="u" VALUE="[1]" />
+    </REGION>
+    <REGION REF="1">
+        <P VAR="u" VALUE="[0]" />
+    </REGION>
+</BOUNDARYCONDITIONS>
+\end{lstlisting}
+
+Finally, we specify the initial value of the solution on the domain
+\begin{lstlisting}[style=XMLStyle]
+<FUNCTION NAME="InitialConditions">
+    <E VAR="u" VALUE="exp(-20.0*x*x)" />
+</FUNCTION>
+\end{lstlisting}
+
+\subsubsection{Running the code}
+\begin{lstlisting}[style=BashInputStyle]
+ADRSolver Advection1D_WeakDG_GLL_LAGRANGE.xml
+\end{lstlisting}
+
+To visualise the output, we can convert it into either Tecplot or VTK formats
+\begin{lstlisting}[style=BashInputStyle]
+FieldConvert Advection1D_WeakDG_GLL_LAGRANGE.xml Advection1D_WeakDG_GLL_LAGRANGE.fld Advection1D_WeakDG_GLL_LAGRANGE.dat
+FieldConvert Advection1D_WeakDG_GLL_LAGRANGE.xml Advection1D_WeakDG_GLL_LAGRANGE.fld Advection1D_WeakDG_GLL_LAGRANGE.vtu
+\end{lstlisting}
+
+
+% UnsteadyAdvectionDiffusion: Advection dominated mass transport in a pipe
+\subsection{UnsteadyAdvectionDiffusion: Advection dominated mass transport in a pipe}
 
 The following example demonstrates the application of the ADRsolver for
 modelling advection dominated mass transport in a straight pipe.
@@ -406,7 +423,7 @@ $O(10^{-10})$.
 The governing equation for modelling mass transport is the unsteady advection
 diffusion equation:
 \begin{align*}
-\dfrac{\partial u}{\partial t}  + v\nabla u +  \epsilon \nabla^2 u = 0
+\dfrac{\partial u}{\partial t}  + a\nabla u +  \epsilon \nabla^2 u = 0
 \end{align*}
 
 For small diffusion coefficient, $\epsilon$, the transport is dominated by
@@ -572,30 +589,160 @@ streamwise direction, as shown in Fig.~\ref{f:adrsolver:masstransport}.
 \end{center}
 \end{figure}
 
-\subsection{Unsteady reaction-diffusion systems}
 
+% UnsteadyDiffusion: 2D Anisotropic diffusion problem
+\subsection{UnsteadyDiffusion: 2D Anisotropic diffusion problem}
+
+\subsubsection{Unsteady diffusion equation}
+The ADRSolver supports the solution of a single-variable system
+\[
+  \frac{\partial u}{\partial t} = \epsilon \nabla \cdot ( D \nabla u)
+\]
+where the diffusion coefficient $\epsilon$ and the diagonal components of the anisotropic 
+diffusion tensor $D$ are defined using the session file.
+
+\subsubsection{Input file}
+The input for this example is given in the example file \inltt{ImDiffusion\_VarCoeff.xml}.
+
+The two-dimensional geometry for this problem contains both
+triangles and quadrilaterals. Note that a mesh composite may only contain one type of
+element. Therefore, we define two composites for the domain, while the rest are used for
+enforcing boundary conditions.
+\begin{lstlisting}[style=XMLStyle]
+<COMPOSITE>
+    <C ID="0"> T[0-3] </C>
+    <C ID="1"> Q[4-5] </C>
+    <C ID="2"> E[2,7,4,9] </C>
+    <C ID="3"> E[0,1,10,11] </C>
+</COMPOSITE>
+
+<DOMAIN> C[0-1] </DOMAIN
+\end{lstlisting}
+
+For both the triangular and quadrilateral elements, we use the modified Legendre basis
+with 12 modes (maximum polynomial order is 11).
+\begin{lstlisting}[style=XMLStyle]
+<EXPANSIONS>
+    <E COMPOSITE="C[0]" NUMMODES="12" FIELDS="u" TYPE="MODIFIED" />
+    <E COMPOSITE="C[1]" NUMMODES="12" FIELDS="u" TYPE="MODIFIED" />
+</EXPANSIONS>
+\end{lstlisting}
+
+The Continuous Galerkin Method is used as projection scheme along with a third-order DIRK scheme to 
+solve the diffusion equation, so we need to specify the following time-integration scheme and solver information.
+\begin{lstlisting}[style=XMLStyle]
+<TIMEINTEGRATIONSCHEME>
+    <METHOD> DIRK </METHOD>
+    <ORDER> 3 </ORDER>
+</TIMEINTEGRATIONSCHEME>
+
+<SOLVERINFO>
+    <I PROPERTY="EQTYPE" VALUE="UnsteadyDiffusion" />
+    <I PROPERTY="Projection" VALUE="Continuous" />
+    <I PROPERTY="DiffusionAdvancement" VALUE="Implicit" />
+</SOLVERINFO>
+\end{lstlisting}
+For information, while the ADRSolver support both Continuous Galerkin and DisContinuous Galerkin projections with 
+implicit time-integration, only the DisContinuous Galerkin projection is supported when using an explicit time-integration 
+method for the unsteady diffusion problem.
+
+We solve this unsteady problem by considering 200 time units with a time-step of 0.0001 along with an anisotropic diffusion 
+coefficients \inltt{d00} and \inltt{d11} of 0.5 and 2.0, respectively. Please note that if one only desires to consider isotropic 
+diffusion, the parameters \inltt{d00} and \inltt{d11} are not required.
+\begin{lstlisting}[style=XMLStyle]
+<PARAMETERS>
+    <P> TimeStep       = 0.0001           </P>
+    <P> NumSteps       = 200              </P>
+    <P> FinTime        = TimeStep*NumSteps</P>
+    <P> wavefreq       = PI               </P>
+    <P> epsilon        = 1.0              </P>
+    <P> d00            = 0.5              </P>
+    <P> d11            = 2.0              </P>
+</PARAMETERS>
+\end{lstlisting}
+
+
+Both Dirichlet and Neumann boundary conditions are used to specify this problem.
+\begin{lstlisting}[style=XMLStyle]
+<BOUNDARYREGIONS>
+    <B ID="0"> C[2] </B>
+    <B ID="1"> C[3] </B>
+</BOUNDARYREGIONS>
+
+<BOUNDARYCONDITIONS>
+    <REGION REF="0">
+        <D VAR="u" VALUE="0" />
+    </REGION>
+    <REGION REF="1">
+        <N VAR="u" VALUE="0" />
+    </REGION>
+</BOUNDARYCONDITIONS
+\end{lstlisting}
+
+For this problem, we use the following initial condition
+\begin{lstlisting}[style=XMLStyle]
+<FUNCTION NAME="InitialConditions">
+    <E VAR="u" VALUE="sin(wavefreq*x)*cos(wavefreq*y)" />
+</FUNCTION>
+\end{lstlisting}
+
+\subsubsection{Running the code}
+\begin{lstlisting}[style=BashInputStyle]
+ADRSolver ImDiffusion_VarCoeff.xml
+\end{lstlisting}
+
+To visualise the output, we can convert it into either Tecplot or VTK formats
+\begin{lstlisting}[style=BashInputStyle]
+FieldConvert ImDiffusion_VarCoeff.xml ImDiffusion_VarCoeff.fld ImDiffusion_VarCoeff.dat
+FieldConvert ImDiffusion_VarCoeff.xml ImDiffusion_VarCoeff.fld ImDiffusion_VarCoeff.vtu
+\end{lstlisting}
+
+
+% UnsteadyReactionDiffusion: Unsteady reaction-diffusion systems
+\subsection{UnsteadyReactionDiffusion: Unsteady reaction-diffusion systems}
+
+\subsubsection{Unsteady reaction-diffusion equation}
 Reaction-diffusion systems are prevalent in a number of areas relating to the
 modelling of various physical phenomena, and are particularly prevalent in the
 study of chemical interactions and pattern formation. The ADRSolver supports the
 solution of a single-variable system
 \[
-  \frac{\partial u}{\partial t} = \epsilon\nabla^2{u}{x} + R(u)
+  \frac{\partial u}{\partial t} = \epsilon \nabla \cdot ( D \nabla u) + R(u)
 \]
-where the diffusion coefficient $\epsilon$ and reaction term $R(u)$ are defined
-using the session file.
+where the diffusion coefficient $\epsilon$, the diagonal components of the anisotropic 
+diffusion tensor $D$, and reaction term $R(u)$ are defined using the session file.
 
-\subsubsection{Numerical restrictions}
+\subsubsection{Input file}
+The input for this example is given in the example file \inltt{ReactionDiffusion2D.xml}.
 
-The reaction-diffusion system is only supported in a selected configuration,
-which is mostly defined inside the \inltt{SOLVERINFO} block:
+The geometry section defines a 2D domain consisting of 64 quadrilateral elements. 
+\begin{lstlisting}[style=XMLStyle]
+<COMPOSITE>
+    <C ID="0"> Q[0-63] </C>
+    <C ID="1"> E[0,25,42,59,76,93,110,127] </C>
+    <C ID="2"> E[128,130,132,134,136,138,140,142] </C>
+    <C ID="3"> E[23,41,58,75,92,109,126,143] </C>
+    <C ID="4"> E[3,6,9,12,15,18,21,24] </C>
+</COMPOSITE>
+<DOMAIN> C[0] </DOMAIN>
+\end{lstlisting}
 
-\begin{itemize}
-  \item use of a continuous Galerkin discretisation;
-  \item use an implicit-explicit (IMEX) timestepping scheme, such as
-  \inltt{IMEXOrder3};
-\end{itemize}
+For this example, we use the modified Legendre basis with 6 modes.
+\begin{lstlisting}[style=XMLStyle]
+<EXPANSIONS>
+    <E COMPOSITE="C[0]" NUMMODES="6" TYPE="MODIFIED" FIELDS="u" />
+</EXPANSIONS>
+\end{lstlisting}
 
-This naturally leads to the following \inltt{TIMEINTEGRATIONSCHEME} and \inltt{SOLVERINFO} configuration:
+We choose to solve our solution for 100 time units with a time-step of 0.001 and a diffusion coefficient 
+\inltt{epsilon} of 0.2 
+\begin{lstlisting}[style=XMLStyle]
+<P> TimeStep       = 0.001            </P>
+<P> NumSteps       = 100              </P>
+<P> epsilon        = 0.2              </P>
+\end{lstlisting}
+
+The following \inltt{TIMEINTEGRATIONSCHEME} and \inltt{SOLVERINFO} configuration is used:
 \begin{lstlisting}[style=XMLStyle]
 <TIMEINTEGRATIONSCHEME>
     <METHOD> IMEX </METHOD>
@@ -608,18 +755,27 @@ This naturally leads to the following \inltt{TIMEINTEGRATIONSCHEME} and \inltt{S
     <I PROPERTY="DiffusionAdvancement"  VALUE="Implicit"                  />
 </SOLVERINFO>
 \end{lstlisting}
-Further to this, the reaction term $R(u)$ is imposed by the definition of a body
-forcing function. For example, the reaction term $R(u) = 0.1u$ may be defined
-using the function:
+
+Periodic boundary conditions are used 
 \begin{lstlisting}[style=XMLStyle]
-<!-- Body force to enforce reaction term -->
-<FUNCTION NAME="BodyForce">
-    <E VAR="u" EVARS="u" VALUE="0.1*u" />
-</FUNCTION>
+<BOUNDARYCONDITIONS>
+    <REGION REF="0">
+         <P VAR="u" VALUE="[2]" />
+    </REGION>
+    <REGION REF="1">
+         <P VAR="u" VALUE="[3]" />
+    </REGION>
+    <REGION REF="2">
+         <P VAR="u" VALUE="[0]" />
+    </REGION>
+    <REGION REF="3">
+         <P VAR="u" VALUE="[1]" />
+    </REGION>
+</BOUNDARYCONDITIONS>
 \end{lstlisting}
-Note in particular the use of the \inltt{EVARS} (equation variables) attribute,
-which permits the definition of this function in terms of the scalar variable
-$u$. This function should be used together with an appropriate \inltt{FORCING}
+
+Further to this, the reaction term $R(u)$ is imposed by the definition of a body
+forcing function by first specifying an appropriate \inltt{FORCING}
 block (as described in section~\ref{sec:xml:forcing}):
 \begin{lstlisting}[style=XMLStyle]
 <FORCING>
@@ -628,5 +784,34 @@ block (as described in section~\ref{sec:xml:forcing}):
     </FORCE>
 </FORCING>
 \end{lstlisting}
-An example of a simple unsteady reaction-diffusion problem can be found in the
-\inltt{Tests} directory in the session file \inltt{ReactionDiffusion2D.xml}.
+The reaction term can then be defined using the function:
+\begin{lstlisting}[style=XMLStyle]
+<!-- Body force to enforce reaction term -->
+<FUNCTION NAME="BodyForce">
+    <E VAR="u" EVARS="u" VALUE="0.1*u" />
+</FUNCTION>
+\end{lstlisting}
+Note in particular the use of the \inltt{EVARS} (equation variables) attribute,
+which permits the definition of this function in terms of the scalar variable
+$u$. 
+
+\subsubsection{Running the code}
+\begin{lstlisting}[style=BashInputStyle]
+ADRSolver ReactionDiffusion2D.xml
+\end{lstlisting}
+
+To visualise the output, we can convert it into either Tecplot or VTK formats
+\begin{lstlisting}[style=BashInputStyle]
+FieldConvert ReactionDiffusion2D.xml ReactionDiffusion2D.fld ReactionDiffusion2D.dat
+FieldConvert ReactionDiffusion2D.xml ReactionDiffusion2D.fld ReactionDiffusion2D.vtu
+\end{lstlisting}
+
+
+% UnsteadyInviscidBurgers: 2D Problem
+\subsection{UnsteadyInviscidBurgers: 2D Problem}
+to be completed
+
+
+% UnsteadyViscousBurgers: 2D Problem
+\subsection{UnsteadyViscousBurgers: 2D Problem}
+to be completed

@@ -73,11 +73,15 @@
             <P> d11            = 2.0              </P>
         </PARAMETERS>
 
+        <TIMEINTEGRATIONSCHEME>
+            <METHOD> DIRK </METHOD>
+            <ORDER> 3 </ORDER>
+        </TIMEINTEGRATIONSCHEME>
+
         <SOLVERINFO>
             <I PROPERTY="EQTYPE" VALUE="UnsteadyDiffusion" />
             <I PROPERTY="Projection" VALUE="Continuous" />
             <I PROPERTY="DiffusionAdvancement" VALUE="Implicit" />
-            <I PROPERTY="TimeIntegrationMethod" VALUE="DIRKOrder3" />
         </SOLVERINFO>
 
         <VARIABLES>
