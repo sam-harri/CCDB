@@ -101,6 +101,7 @@ v5.5.0
 - Remove some uncompiled files and add quality step to check (!1672)
 - Add `clang-15` tester (!1671)
 - Update performance tests to use minimum execution time (!1733)
+- Fix missing dependencies for clang-tidy and uncompiled-files jobs (!1736)
 
 **NekMesh**
 - Replace deprecated boost::filesystem functions (!1654)
