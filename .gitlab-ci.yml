@@ -157,8 +157,6 @@ include:
 
 .clang-tidy-template: &clang-tidy-template
   <<: *execution-conditions
-  image: $CI_REGISTRY_IMAGE:env-ubuntu-jammy-full
-  needs: ["ubuntu-jammy-full-build-env"]
   stage: quality-checks
   variables:
     NUM_CPUS: 8
@@ -211,8 +209,6 @@ include:
 
 .uncompiled-files-template: &uncompiled-files-template
   <<: *execution-conditions
-  image: $CI_REGISTRY_IMAGE:env-ubuntu-jammy-full
-  needs: ["ubuntu-jammy-full-build-env"]
   stage: quality-checks
   script:
     - cd "$CI_PROJECT_DIR"
@@ -582,12 +578,14 @@ ubuntu-bionic-full-warnings:
 ## CLANG-TIDY
 ubuntu-jammy-clang-tidy:
   <<: *clang-tidy-template
-  needs: []
+  image: $CI_REGISTRY_IMAGE:env-ubuntu-jammy-full
+  needs: ["ubuntu-jammy-full-build-env"]
 
 ## UNCOMPILED FILES
 ubuntu-jammy-uncompiled-files:
   <<: *uncompiled-files-template
-  needs: []
+  image: $CI_REGISTRY_IMAGE:env-ubuntu-jammy-full
+  needs: ["ubuntu-jammy-full-build-env"]
   
 ################################################
 ###################  FEDORA  ###################
