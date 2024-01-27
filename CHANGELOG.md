@@ -2,6 +2,9 @@ Changelog
 =========
 
 v5.5.0
+-----
+**IncNavierStokesSolver**
+- Fixed issue with substepping when using mixed BCs (!1639)
 ------
 **Library**
 - Fix Nektar++Config.cmake to use MPI_CXX (!1224)
