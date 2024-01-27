@@ -422,6 +422,24 @@ void FileFieldInterpolator::InitObject(
         m_timeStart = 0.;
     }
 
+    if (m_session->GetComm()->GetRank() == 0)
+    {
+        cout << "baseflow info : interpolation order " << m_interporder
+             << ", period " << m_period << ", periodicity ";
+        if (m_isperiodic)
+        {
+            cout << "yes\n";
+        }
+        else
+        {
+            cout << "no\n";
+        }
+        cout << "baseflow info : files from " << m_start << " to "
+             << (m_start + (m_slices - 1) * m_skip) << " (skip " << m_skip
+             << ") with " << (m_slices - (m_interporder > 1))
+             << " time intervals" << endl;
+    }
+
     string file = m_session->GetFunctionFilename("Solution", 0);
     DFT(file, pFields, timefromfile);
 }
@@ -657,11 +675,11 @@ void FileFieldInterpolator::DFT(
                  "There are more than one '%d'.");
         int nstart = m_start;
         std::vector<NekDouble> times;
-        for (int i = nstart; i < nstart + m_slices * m_skip; i += m_skip)
+        for (int i = 0; i < m_slices; ++i)
         {
-            auto fmt = boost::format(file) % i;
-            ImportFldBase(fmt.str(), pFields, (i - nstart) / m_skip, params);
-
+            int filen = nstart + i * m_skip;
+            auto fmt  = boost::format(file) % filen;
+            ImportFldBase(fmt.str(), pFields, i, params);
             if (m_session->GetComm()->GetRank() == 0)
             {
                 cout << "read base flow file " << fmt.str() << endl;

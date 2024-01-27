@@ -28,6 +28,8 @@ SET(SOLVER_UTILS_SOURCES
   Filters/Filter.cpp
   Filters/FilterAeroForces.cpp
   Filters/FilterAverageFields.cpp
+  Filters/EvaluatePoints.cpp
+  Filters/FilterLagrangianPoints.cpp
   Filters/FilterMaxMinFields.cpp
   Filters/FilterCheckpoint.cpp
   Filters/FilterEnergy1D.cpp
@@ -84,6 +86,8 @@ SET(SOLVER_UTILS_HEADERS
   Filters/Filter.h
   Filters/FilterAeroForces.h
   Filters/FilterAverageFields.h
+  Filters/EvaluatePoints.h
+  Filters/FilterLagrangianPoints.h
   Filters/FilterMaxMinFields.h
   Filters/FilterCheckpoint.h
   Filters/FilterEnergy1D.h
