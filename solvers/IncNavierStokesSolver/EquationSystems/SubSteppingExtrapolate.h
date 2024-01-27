@@ -97,6 +97,8 @@ protected:
         const Array<OneD, const Array<OneD, NekDouble>> &inarray,
         NekDouble Aii_Dt, NekDouble kinvis) override;
 
+    void v_AccelerationBDF(Array<OneD, Array<OneD, NekDouble>> &array) override;
+
     void v_SubStepAdvance(int nstep, NekDouble time) override;
 
     void v_MountHOPBCs(int HBCdata, NekDouble kinvis, Array<OneD, NekDouble> &Q,

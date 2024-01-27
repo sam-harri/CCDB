@@ -126,6 +126,13 @@ public:
         LocTraceToTraceMap = m_locTraceToTraceMap;
     }
 
+    MULTI_REGIONS_EXPORT void GetFwdBwdTracePhys(
+        const Array<OneD, const NekDouble> &field, Array<OneD, NekDouble> &Fwd,
+        Array<OneD, NekDouble> &Bwd,
+        const Array<OneD, const SpatialDomains::BoundaryConditionShPtr>
+            &bndCond,
+        const Array<OneD, const ExpListSharedPtr> &BndCondExp);
+
 protected:
     /// The number of boundary segments on which Dirichlet boundary
     /// conditions are imposed.
@@ -305,6 +312,13 @@ protected:
     void v_FillBwdWithBoundCond(const Array<OneD, NekDouble> &Fwd,
                                 Array<OneD, NekDouble> &Bwd,
                                 bool PutFwdInBwdOnBCs) override;
+
+    void FillBwdWithBoundCond(
+        const Array<OneD, NekDouble> &Fwd, Array<OneD, NekDouble> &Bwd,
+        const Array<OneD, const SpatialDomains::BoundaryConditionShPtr>
+            &bndConditions,
+        const Array<OneD, const ExpListSharedPtr> &BndCondExpansions,
+        bool PutFwdInBwdOnBCs);
 
     const Array<OneD, const NekDouble> &v_GetBndCondBwdWeight() override;
 

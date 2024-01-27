@@ -322,15 +322,15 @@
             <I PROPERTY="EQTYPE"                VALUE="UnsteadyNavierStokes" />
             <I PROPERTY="AdvectionForm"         VALUE="Convective" />
             <I PROPERTY="Projection"            VALUE="Mixed_CG_Discontinuous" />
-            <I PROPERTY="Extrapolation" VALUE="SubStepping"   />
+            <I PROPERTY="Extrapolation"         VALUE="SubStepping"   />
             <I PROPERTY="TimeIntegrationMethod" VALUE="BDFImplicitOrder1" />
-            <--!I PROPERTY="CollectionOptions" VALUE="AutoTuning" /-->
+            <!--I PROPERTY="CollectionOptions"  VALUE="AutoTuning" /-->
             <I PROPERTY="GlobalSysSoln" VALUE="IterativeStaticCond" />
         </SOLVERINFO>
 
         <PARAMETERS>
-            <P> TimeStep      = 0.005        </P>
-            <P> NumSteps      = 10 </P>
+            <P> TimeStep      = 0.05        </P>
+            <P> NumSteps      = 20 </P>
             <P> IO_CheckSteps = 10    </P>
             <P> IO_InfoSteps  = 1    </P>
             <P> Kinvis        = 0.025        </P>
@@ -367,8 +367,11 @@
                 <D VAR="p" VALUE="0.5*(1-exp(-2*0.963740544195769*x))" />
             </REGION>
             <REGION REF="2">
-                <D VAR="u" VALUE="(1-exp(-0.963740544195769*x)*cos(2*PI*y))" />
-                <D VAR="v" VALUE="(-0.963740544195769/(2*PI))*exp(-0.963740544195769*x)*sin(2*PI*y)" />
+                <!--<D VAR="u" VALUE="(1-exp(-0.963740544195769*x)*cos(2*PI*y))" /> -->
+                <!--<D VAR="v" VALUE="(-0.963740544195769/(2*PI))*exp(-0.963740544195769*x)*sin(2*PI*y)" /-->
+                <N  VAR="u" VALUE="0.0" />
+                <D VAR="v" VALUE="0.0" />
+                <D VAR="w" VALUE="0" />
                 <D VAR="w" VALUE="0" />
                 <N VAR="p" USERDEFINEDTYPE="H" VALUE="0" />
             </REGION>
