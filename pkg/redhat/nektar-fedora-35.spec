@@ -396,7 +396,7 @@ mkdir $MPI_COMPILER;                                        \
 cd $MPI_COMPILER;                                           \
 %{cmake}                                                  \\\
     -DCMAKE_INSTALL_PREFIX=$INSTALL_PREFIX                \\\
-    -DCMAKE_CXX_STANDARD=14                               \\\
+    -DCMAKE_CXX_STANDARD=17                               \\\
     -DCMAKE_CXX_IMPLICIT_INCLUDE_DIRECTORIES=/usr/include \\\
     -DNEKTAR_ERROR_ON_WARNINGS=OFF                        \\\
     -DNEKTAR_LIB_DIR=$NEKTAR_LIBDIR                       \\\
@@ -412,6 +412,7 @@ cd $MPI_COMPILER;                                           \
     -DNEKTAR_SOLVER_ELASTICITY=OFF                        \\\
     -DNEKTAR_SOLVER_DIFFUSION=OFF                         \\\
     -DNEKTAR_SOLVER_MMF=OFF                               \\\
+    -DNEKTAR_SOLVER_REVIEWSOLUTION=OFF                    \\\
     -DNEKTAR_SOLVER_VORTEXWAVE=OFF                        \\\
     -DNEKTAR_BUILD_PYTHON=ON                              \\\
     -DNEKTAR_USE_MESHGEN=ON                               \\\
