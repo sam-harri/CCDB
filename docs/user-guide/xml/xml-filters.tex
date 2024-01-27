@@ -1033,3 +1033,41 @@ An example is given below:
     </FILTER>
   </FILTERS>
 \end{lstlisting}
+
+\subsection{Lagrangian points Tracking}\label{filters:LagrangianPoints}
+
+The \inltt{FilterLagrangianPoints} filter tracks Lagrangian points in parallel. The following parameters are supported:
+\begin{center}
+    \begin{tabularx}{0.99\textwidth}{lllX}
+        \toprule
+        \textbf{Option name} & \textbf{Required} & \textbf{Default} &
+        \textbf{Description} \\
+        \midrule
+        \inltt{OutputFile}   & \xmark   & Session name &
+        OutputFile\_R\%05d\_T\%010.6lf.plt is output file name for the Lagrangian points. R is followed by the thread number and T is followed by the instantaneous time.\\
+        \inltt{OutputFrequency}                & \xmark   & 1 &
+        Output frequency of the Lagrangian points.  \\
+        \inltt{Box\_n}        & \cmark   & N/A &
+        Box\_n = Nx,Ny,Nz, xmin,xmax, ymin,ymax, zmin,zmax. Points defined by a box that initially owned by the thread n. At least one box needs to be assigned\\
+        \inltt{RootOutputL2Norm}      & \xmark   & 0 &
+        Root thread outputs the L2 norm of the physics values over the points if RootOutputL2Norm is 1.\\
+        \inltt{FrameVelocity}      & \xmark   & 0 &
+        The frame velocity which will be subtracted from the points' velocity.\\
+        \inltt{IntOrder}      & \xmark   & 1 &
+        Time integration order for points tracking. The points will be set as stationary if IntOrder is 0.\\
+        \bottomrule
+    \end{tabularx}
+\end{center}
+
+An example is given below:
+\begin{lstlisting}[style=XMLStyle]
+  <FILTERS>
+    <FILTER TYPE="LagrangianPoints">
+      <PARAM NAME="OutputFile">Points</PARAM>
+      <PARAM NAME="OutputFrequency">10</PARAM>
+      <PARAM NAME="Box_0">0, 1,32,0.3,0.6,0.0,0.49</PARAM>
+      <PARAM NAME="Box_1">32, 1,32,0.3,0.6,0.51,1.0</PARAM>
+      <PARAM NAME="RootOutputL2Norm">1</PARAM>
+    </FILTER>
+  </FILTERS>
+\end{lstlisting}
