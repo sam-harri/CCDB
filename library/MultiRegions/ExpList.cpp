@@ -5069,6 +5069,8 @@ void ExpList::v_FwdTrans(const Array<OneD, const NekDouble> &inarray,
 void ExpList::v_IProductWRTBase(const Array<OneD, const NekDouble> &inarray,
                                 Array<OneD, NekDouble> &outarray)
 {
+    LibUtilities::Timer timer;
+    timer.Start();
     // initialise if required
     if (m_collectionsDoInit[Collections::eIProductWRTBase])
     {
@@ -5092,6 +5094,9 @@ void ExpList::v_IProductWRTBase(const Array<OneD, const NekDouble> &inarray,
         output_offset +=
             m_collections[i].GetOutputSize(Collections::eIProductWRTBase);
     }
+    timer.Stop();
+    // Elapsed time
+    timer.AccumulateRegion("Collections:IProductWRTBase", 10);
 }
 
 /**

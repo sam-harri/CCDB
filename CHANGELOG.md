@@ -76,6 +76,7 @@ v5.5.0
 - Update test for SuccessiveRHS parameter (!1727)
 - Fix segmentation error in IncNavierStokesSolver when AeroForces filter is used (!1726)
 - Added Examples in solvers/IncNavierStokesSolver/Examples, matching with the user-guide (!1723)
+- Extend support for IO timer levels to IncNavierStokesSolver (!1732)
 
 **CompressibleFlowSolver**
 - Add three subsonic inflow boundary conditions: EnforceEntropyPresure, EnforceEntropyVelocity, and EnforceEntropyTotalEnthalpy (!1398)

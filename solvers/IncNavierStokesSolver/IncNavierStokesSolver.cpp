@@ -66,9 +66,14 @@ int main(int argc, char *argv[])
         drv->Execute();
         timer.Stop();
         timer.AccumulateRegion("Execute");
+        // Print out timings
+        int iolevel = 0;
+
+        session->LoadParameter("IO_Timer_Level", iolevel, -1);
 
         // Print out timings
-        LibUtilities::Timer::PrintElapsedRegions(session->GetComm());
+        LibUtilities::Timer::PrintElapsedRegions(session->GetComm(), std::cout,
+                                                 iolevel);
         // Finalise communications
         session->Finalise();
     }
