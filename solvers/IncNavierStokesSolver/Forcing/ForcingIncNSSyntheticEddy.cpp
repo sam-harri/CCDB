@@ -579,7 +579,7 @@ void ForcingIncNSSyntheticEddy::UpdateEddiesPositions()
     // inside the box when they are regenerated.
     // Should include the radius of the eddy, which is 0.41 of the
     // boundary layer thickness. 
-    NekDouble tol = m_lref[0] * 0.2; 
+    NekDouble tol = m_lref[0] * 0.5; 
 
     for (size_t n = 0; n < m_N; ++n)
     {
@@ -596,12 +596,12 @@ void ForcingIncNSSyntheticEddy::UpdateEddiesPositions()
             if (!m_tCase)
             {
                 m_eddyPos[n][1] =
-                    (m_rc[1] - 0.5 * m_lyz[0]) +
-                    (NekSingle(std::rand()) / NekSingle(RAND_MAX)) * m_lyz[0];
+                    (m_rc[1] - 0.5 * m_lyz[0] + 0.5 * m_lref[1]) +
+                    (NekSingle(std::rand()) / NekSingle(RAND_MAX)) * (m_lyz[0] - m_lref[1]); 
                 m_eddyPos[n][2] =
-                    (m_rc[2] - 0.5 * m_lyz[1]) +
-                    (NekSingle(std::rand()) / NekSingle(RAND_MAX)) * m_lyz[1];
-            }
+                    (m_rc[2] - 0.5 * m_lyz[1] + 0.5 * m_lref[2]) +
+                    (NekSingle(std::rand()) / NekSingle(RAND_MAX)) * (m_lyz[1] - m_lref[2]); 
+	    }
             else
             {
                 // same place (center) for the test case
@@ -777,11 +777,13 @@ bool ForcingIncNSSyntheticEddy::InsideBoxOfEddies(NekDouble coord0,
                                                   NekDouble coord1,
                                                   NekDouble coord2)
 {
-    if ((coord0 > (m_rc[0] - m_lref[0])) && (coord0 < (m_rc[0] + m_lref[0])) &&
-        (coord1 > (m_rc[1] - 0.5 * m_lyz[0])) &&
-        (coord1 < (m_rc[1] + 0.5 * m_lyz[0])) &&
-        (coord2 > (m_rc[2] - 0.5 * m_lyz[1])) &&
-        (coord2 < (m_rc[2] + 0.5 * m_lyz[1])))
+    NekDouble tol = 1e-6;
+    if ((coord0 >= (m_rc[0] - m_lref[0] - tol)) && 
+	(coord0 <= (m_rc[0] + m_lref[0] + tol)) &&
+        (coord1 >= (m_rc[1] - 0.5 * m_lyz[0] - tol)) &&
+        (coord1 <= (m_rc[1] + 0.5 * m_lyz[0] + tol)) &&
+        (coord2 >= (m_rc[2] - 0.5 * m_lyz[1] - tol)) &&
+        (coord2 <= (m_rc[2] + 0.5 * m_lyz[1] + tol)))
     {
         return true;
     }
@@ -913,7 +915,7 @@ void ForcingIncNSSyntheticEddy::SetCholeskyReyStresses(
 void ForcingIncNSSyntheticEddy::SetNumberOfEddies()
 {
     m_N = int((m_lyz[0] * m_lyz[1]) /
-              (4 * m_lref[m_spacedim - 2] * m_lref[m_spacedim - 1]));
+              (4 * m_lref[m_spacedim - 2] * m_lref[m_spacedim - 1])) + 1;
 }
 
 /**
