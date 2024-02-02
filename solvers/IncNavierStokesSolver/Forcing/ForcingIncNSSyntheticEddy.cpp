@@ -858,9 +858,9 @@ void ForcingIncNSSyntheticEddy::SetCholeskyReyStresses(
     int nElmts = pFields[0]->GetNumElmts();
     // Count the degrees of freedom
     int nqeCount = 0;
-    // Size of Cholesky decomposition matrix - aux vector
-    Array<OneD, NekDouble> A(m_spacedim * (m_spacedim + 1) * 0.5, 0.0);
-    // Cholesky decomposition matrix for the box domain
+    // Block diagonal size 
+    int diagSize = m_spacedim * (m_spacedim + 1) * 0.5;
+    // Cholesky decomposition matrix for the synthetic eddy region (box)
     m_Cholesky = Array<OneD, Array<OneD, NekDouble>>(nqTot);
 
     for (size_t e = 0; e < nElmts; ++e)
@@ -878,7 +878,10 @@ void ForcingIncNSSyntheticEddy::SetCholeskyReyStresses(
         for (size_t i = 0; i < nqe; ++i)
         {
             int l = 0;
-            while (l < m_spacedim * (m_spacedim + 1) / 2)
+    	    // Size of Cholesky decomposition matrix - aux vector
+            Array<OneD, NekDouble> A(diagSize, 0.0);
+
+    	    while (l < diagSize)
             {
                 // Variable to compute the Cholesky decomposition for each
                 // degree of freedom
@@ -901,8 +904,11 @@ void ForcingIncNSSyntheticEddy::SetCholeskyReyStresses(
                                       " is not positive definite from dpptrf";
                 NEKERROR(ErrorUtil::efatal, message.c_str());
             }*/
-            m_Cholesky[nqeCount + i] =
-                Array<OneD, NekDouble>(m_spacedim * (m_spacedim + 1) / 2, A);
+	    m_Cholesky[nqeCount + i] = Array<OneD, NekDouble>(diagSize);
+            for (size_t l = 0; l < diagSize; ++l)
+            {
+               m_Cholesky[nqeCount + i][l] = A[l];
+            }
         }
         nqeCount += nqe;
     }
