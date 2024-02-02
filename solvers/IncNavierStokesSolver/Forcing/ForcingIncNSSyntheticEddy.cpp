@@ -431,17 +431,17 @@ Array<OneD, Array<OneD, NekDouble>> ForcingIncNSSyntheticEddy::
                 mod = (coords0[i] - m_rc[0]) * (coords0[i] - m_rc[0]);
 
                 smoothFac[0][count + i] =
-                    exp(-0.5 * M_PI * mod * 
-                    convTurbTime[0][count + i] * convTurbTime[0][count + i] * 
-                    m_Ub * m_Ub);
+                    exp((-0.5 * M_PI * mod) / 
+                    (convTurbTime[0][count + i] * convTurbTime[0][count + i] * 
+                    m_Ub * m_Ub));
                 smoothFac[1][count + i] =
-                    exp(-0.5 * M_PI * mod * 
-                    convTurbTime[1][count + i] * convTurbTime[1][count + i] * 
-                    m_Ub * m_Ub);
+                    exp((-0.5 * M_PI * mod) / 
+                    (convTurbTime[1][count + i] * convTurbTime[1][count + i] * 
+                    m_Ub * m_Ub));
                 smoothFac[2][count + i] =
-                    exp(-0.5 * M_PI * mod * 
-                    convTurbTime[2][count + i] * convTurbTime[2][count + i] * 
-                    m_Ub * m_Ub);
+                    exp((-0.5 * M_PI * mod) / 
+                    (convTurbTime[2][count + i] * convTurbTime[2][count + i] * 
+                    m_Ub * m_Ub));
             }
         }
         count += nqe;
