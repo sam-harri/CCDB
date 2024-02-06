@@ -335,8 +335,8 @@ void ForcingIncNSSyntheticEddy::CalculateForcing(
                     for (size_t j = 0; j < m_spacedim; ++j)
                     {
                         m_Forcing[j][i] +=
-                            (velFluc[n][j * nqTot + i] * smoothFac[j][i]) /
-                            convTurbTime[j][i];
+                            ((velFluc[n][j * nqTot + i]) / // * smoothFac[j][i]
+                            convTurbTime[j][i]);
                     }
                 }
             }
@@ -472,11 +472,10 @@ Array<OneD, Array<OneD, NekDouble>> ForcingIncNSSyntheticEddy::
     for (auto &n : m_eddiesIDForcing)
     {
         velFluc[n] = Array<OneD, NekDouble>(nqTot * m_spacedim, 0.0);
-
         for (size_t k = 0; k < m_spacedim; ++k)
         {
             for (size_t j = 0; j < k + 1; ++j)
-            {
+	    {
                 for (size_t i = 0; i < nqTot; ++i)
                 {
                     if (m_mask[i])
@@ -574,13 +573,7 @@ Array<OneD, Array<OneD, NekDouble>> ForcingIncNSSyntheticEddy::
 void ForcingIncNSSyntheticEddy::UpdateEddiesPositions()
 {
     NekDouble dt = m_session->GetParameter("TimeStep");
-    // Tolerance when the forcing is applied in the interface 
-    // of the inlet region. Also, the eddies should be created enterily
-    // inside the box when they are regenerated.
-    // Should include the radius of the eddy, which is 0.41 of the
-    // boundary layer thickness. 
-    NekDouble tol = m_lref[0] * 0.5; 
-
+    
     for (size_t n = 0; n < m_N; ++n)
     {
         // Check if any eddy went through the outlet plane (box)
@@ -591,16 +584,16 @@ void ForcingIncNSSyntheticEddy::UpdateEddiesPositions()
         else
         {
             // Generate a new one in the inlet plane
-            m_eddyPos[n][0] = m_rc[0] - m_lref[0] + tol;
+            m_eddyPos[n][0] = m_rc[0] - m_lref[0];
             // Check if test case
             if (!m_tCase)
             {
                 m_eddyPos[n][1] =
-                    (m_rc[1] - 0.5 * m_lyz[0] + 0.5 * m_lref[1]) +
-                    (NekSingle(std::rand()) / NekSingle(RAND_MAX)) * (m_lyz[0] - m_lref[1]); 
+                    (m_rc[1] - 0.5 * m_lyz[0]) +
+                    (NekSingle(std::rand()) / NekSingle(RAND_MAX)) * (m_lyz[0]); 
                 m_eddyPos[n][2] =
                     (m_rc[2] - 0.5 * m_lyz[1] + 0.5 * m_lref[2]) +
-                    (NekSingle(std::rand()) / NekSingle(RAND_MAX)) * (m_lyz[1] - m_lref[2]); 
+                    (NekSingle(std::rand()) / NekSingle(RAND_MAX)) * (m_lyz[1]); 
 	    }
             else
             {
@@ -778,7 +771,7 @@ bool ForcingIncNSSyntheticEddy::InsideBoxOfEddies(NekDouble coord0,
                                                   NekDouble coord2)
 {
     NekDouble tol = 1e-6;
-    if ((coord0 >= (m_rc[0] - m_lref[0] - tol)) && 
+    if ((coord0 >= (m_rc[0] - m_lref[0] - m_lref[0])) && 
 	(coord0 <= (m_rc[0] + m_lref[0] + tol)) &&
         (coord1 >= (m_rc[1] - 0.5 * m_lyz[0] - tol)) &&
         (coord1 <= (m_rc[1] + 0.5 * m_lyz[0] + tol)) &&
