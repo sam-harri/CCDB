@@ -335,7 +335,7 @@ void ForcingIncNSSyntheticEddy::CalculateForcing(
                     for (size_t j = 0; j < m_spacedim; ++j)
                     {
                         m_Forcing[j][i] +=
-                            ((velFluc[n][j * nqTot + i]) / // * smoothFac[j][i]
+                            ((velFluc[n][j * nqTot + i] * smoothFac[j][i]) /
                             convTurbTime[j][i]);
                     }
                 }
@@ -428,7 +428,7 @@ Array<OneD, Array<OneD, NekDouble>> ForcingIncNSSyntheticEddy::
         {
             if (m_mask[count + i])
             {
-                mod = (coords0[i] - m_rc[0]) * (coords0[i] - m_rc[0]);
+                mod = (coords0[i] - m_rc[0] + m_lref[0]) * (coords0[i] - m_rc[0] + m_lref[0]);
 
                 smoothFac[0][count + i] =
                     exp((-0.5 * M_PI * mod) / 
