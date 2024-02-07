@@ -35,8 +35,6 @@
 
 #include <LibUtilities/LinearAlgebra/NekSys.h>
 
-using namespace std;
-
 namespace Nektar::LibUtilities
 {
 /**
@@ -66,20 +64,4 @@ bool NekSys::v_ConvergenceCheck([[maybe_unused]] const int nIteration,
 
     return SysResNorm < tol * tol;
 }
-
-/**
- * Natural guess
- **/
-void NekSys::v_NekSysInitialGuess(const Array<OneD, const NekDouble> &pInput,
-                                  Array<OneD, NekDouble> &pguess)
-{
-    size_t ndim = pInput.size();
-    if (pguess.size() != ndim)
-    {
-        pguess = Array<OneD, NekDouble>{ndim};
-    }
-
-    Vmath::Vcopy(ndim, pInput, 1, pguess, 1);
-}
-
 } // namespace Nektar::LibUtilities

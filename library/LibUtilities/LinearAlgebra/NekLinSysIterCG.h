@@ -62,7 +62,9 @@ public:
         p->InitObject();
         return p;
     }
+
     static std::string className;
+
     /// Constructor for full direct matrix solve.
     LIB_UTILITIES_EXPORT NekLinSysIterCG(
         const LibUtilities::SessionReaderSharedPtr &pSession,

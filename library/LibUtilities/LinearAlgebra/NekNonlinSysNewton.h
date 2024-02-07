@@ -41,8 +41,6 @@
 namespace Nektar::LibUtilities
 {
 
-class NekNonlinSysNewton;
-
 class NekNonlinSysNewton : public NekNonlinSys
 {
 public:
@@ -91,7 +89,7 @@ protected:
                             const NekDouble tol) override;
 
 private:
-    NekDouble CalcInexactNewtonForcing(const int &k,
+    NekDouble CalcInexactNewtonForcing(const int &nIteration,
                                        const NekDouble &resnormOld,
                                        const NekDouble &resnorm);
 };

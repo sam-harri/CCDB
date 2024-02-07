@@ -112,7 +112,7 @@ int NekNonlinSysNewton::v_SolveSystem(
         Vmath::Vsub(ntotal, m_Solution, 1, m_DeltSltn, 1, m_Solution, 1);
     }
 
-    if (((!m_converged) || m_verbose) && m_root && m_FlagWarnings)
+    if ((!m_converged || m_verbose) && m_root && m_FlagWarnings)
     {
         int nwidthcolm = 11;
 
@@ -147,9 +147,10 @@ bool NekNonlinSysNewton::v_ConvergenceCheck(
 }
 
 NekDouble NekNonlinSysNewton::CalcInexactNewtonForcing(
-    const int &k, const NekDouble &resnormOld, const NekDouble &resnorm)
+    const int &nIteration, const NekDouble &resnormOld,
+    const NekDouble &resnorm)
 {
-    if (k == 0 || !m_InexactNewtonForcing)
+    if (nIteration == 0 || !m_InexactNewtonForcing)
     {
         return m_LinSysRelativeTolInNonlin;
     }

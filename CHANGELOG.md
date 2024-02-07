@@ -1,10 +1,12 @@
 Changelog
 =========
 
-v5.5.0
+v5.6.0
 -----
-**IncNavierStokesSolver**
-- Fixed issue with substepping when using mixed BCs (!1639)
+**Library**
+- Clean-up Set_Rhs_Magnitude function in NekLinSysIter (!1729)
+
+v5.5.0
 ------
 **Library**
 - Fix Nektar++Config.cmake to use MPI_CXX (!1224)
@@ -77,6 +79,7 @@ v5.5.0
 - Fix segmentation error in IncNavierStokesSolver when AeroForces filter is used (!1726)
 - Added Examples in solvers/IncNavierStokesSolver/Examples, matching with the user-guide (!1723)
 - Extend support for IO timer levels to IncNavierStokesSolver (!1732)
+- Fixed issue with substepping when using mixed BCs (!1639)
 
 **CompressibleFlowSolver**
 - Add three subsonic inflow boundary conditions: EnforceEntropyPresure, EnforceEntropyVelocity, and EnforceEntropyTotalEnthalpy (!1398)
