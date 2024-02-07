@@ -38,6 +38,7 @@
 
 #include <LibUtilities/BasicUtils/NekFactory.hpp>
 #include <LibUtilities/LinearAlgebra/NekSys.h>
+
 namespace Nektar::LibUtilities
 {
 
@@ -67,6 +68,7 @@ public:
                                                             nDimen, pKey);
         return p;
     }
+
     LIB_UTILITIES_EXPORT NekLinSysIter(
         const LibUtilities::SessionReaderSharedPtr &pSession,
         const LibUtilities::CommSharedPtr &vRowComm, const int nDimen,
@@ -114,7 +116,6 @@ protected:
     // Boolean to identify if iteration acts on local storage
     bool m_isLocal;
 
-    void Set_Rhs_Magnitude(const NekVector<NekDouble> &pIn);
     void Set_Rhs_Magnitude(const Array<OneD, NekDouble> &pIn);
     void SetUniversalUniqueMap();
 
@@ -122,6 +123,7 @@ protected:
 
 private:
 };
+
 } // namespace Nektar::LibUtilities
 
 #endif

@@ -40,6 +40,7 @@
 #include <LibUtilities/BasicUtils/Vmath.hpp>
 #include <LibUtilities/LinearAlgebra/NekMatrix.hpp>
 #include <iomanip>
+
 namespace Nektar::LibUtilities
 {
 
@@ -244,11 +245,13 @@ public:
             pSession, vRowComm, nDimen, pKey);
         return p;
     }
+
     LIB_UTILITIES_EXPORT NekSys(
         const LibUtilities::SessionReaderSharedPtr &pSession,
         const LibUtilities::CommSharedPtr &vRowComm, const int nDimen,
         const NekSysKey &pKey);
     LIB_UTILITIES_EXPORT virtual ~NekSys() = default;
+
     LIB_UTILITIES_EXPORT void InitObject()
     {
         v_InitObject();
@@ -326,10 +329,6 @@ protected:
     virtual bool v_ConvergenceCheck(
         const int nIteration, const Array<OneD, const NekDouble> &Residual,
         const NekDouble tol);
-
-    LIB_UTILITIES_EXPORT virtual void v_NekSysInitialGuess(
-        const Array<OneD, const NekDouble> &pInput,
-        Array<OneD, NekDouble> &pguess);
 };
 } // namespace Nektar::LibUtilities
 #endif

@@ -35,8 +35,6 @@
 
 #include <LibUtilities/LinearAlgebra/NekNonlinSys.h>
 
-using namespace std;
-
 namespace Nektar::LibUtilities
 {
 /**

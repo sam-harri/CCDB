@@ -37,6 +37,7 @@
 #define NEKTAR_LIB_UTILITIES_LINEAR_ALGEBRA_NEK_LINSYS_ITERAT_GMRESLoc_H
 
 #include <LibUtilities/LinearAlgebra/NekLinSysIter.h>
+
 namespace Nektar::LibUtilities
 {
 /// A global linear system.
@@ -59,6 +60,7 @@ public:
         p->InitObject();
         return p;
     }
+
     static std::string className;
 
     LIB_UTILITIES_EXPORT NekLinSysIterGMRESLoc(
