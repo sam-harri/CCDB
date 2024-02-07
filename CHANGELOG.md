@@ -1,10 +1,10 @@
 Changelog
 =========
-
 v5.6.0
 -----
 **Library**
 - Clean-up Set_Rhs_Magnitude function in NekLinSysIter (!1729)
+- Consistently use template parameters in VmathArray (!1748)
 
 v5.5.0
 ------
