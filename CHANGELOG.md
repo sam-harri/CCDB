@@ -7,6 +7,7 @@ v5.6.0
 - Clean-up Set_Rhs_Magnitude function in NekLinSysIter (!1729)
 - Consistently use template parameters in VmathArray (!1748)
 - Fix issue with CMake and zlib versions >= 1.3.0 (!1744)
+- Add 1D demo and test of h-type convergence for a CG projection. (!1738)
 
 v5.5.0
 ------
