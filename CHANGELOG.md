@@ -1,6 +1,11 @@
 Changelog
 =========
 
+v5.6.0
+------
+**Library**
+- Add 1D demo and test of h-type convergence for a CG projection. (!1738)
+
 v5.5.0
 -----
 **IncNavierStokesSolver**
