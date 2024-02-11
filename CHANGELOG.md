@@ -1,5 +1,9 @@
 Changelog
 =========
+v5.6.0
+-----
+**Library**
+- Fix misplaced " in Nektar++Config.cmake (!1742)
 
 v5.5.0
 -----
