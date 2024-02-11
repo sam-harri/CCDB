@@ -14,6 +14,9 @@ v5.6.0
 - Add 1D demo and test of h-type convergence for a CG projection. (!1738)
 - Update NekPy to more modern packaging (!1747)
 
+**NekPy**
+- Add binding to NekPy to check of geometry elements are valid (!1755)
+
 v5.5.0
 ------
 **Library**
