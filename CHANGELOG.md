@@ -8,6 +8,9 @@ v5.6.0
 - Consistently use template parameters in VmathArray (!1748)
 - Fix issue with CMake and zlib versions >= 1.3.0 (!1744)
 
+**NekPy**
+- Add binding to NekPy to check of geometry elements are valid (!1755)
+
 v5.5.0
 ------
 **Library**
