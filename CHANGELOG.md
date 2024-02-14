@@ -14,6 +14,7 @@ v5.6.0
 - Add 1D demo and test of h-type convergence for a CG projection. (!1738)
 - Update NekPy to more modern packaging (!1747)
 - Tidy up tolerance in NekLinSystIter and NekNonlinSysIter solvers (!1722)
+- Enable varcoeffs for Collections (!1701)
 
 **NekPy**
 - Add binding to NekPy to check of geometry elements are valid (!1755)
