@@ -16,6 +16,7 @@ v5.6.0
 
 **NekPy**
 - Add binding to NekPy to check of geometry elements are valid (!1755)
+- Fix PFASST I/O and pre-initialize coarse preconditioner for Parareal (!1749)
 
 v5.5.0
 ------
