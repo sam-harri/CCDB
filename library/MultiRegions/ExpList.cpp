@@ -2421,7 +2421,7 @@ void ExpList::GeneralMatrixOp(const GlobalMatrixKey &gkey,
 {
     int nvarcoeffs = gkey.GetNVarCoeffs();
 
-    if ((nvarcoeffs == 0) && (gkey.GetMatrixType() == StdRegions::eHelmholtz))
+    if (gkey.GetMatrixType() == StdRegions::eHelmholtz)
     {
         // initialise if required
         if (m_collections.size() &&
@@ -2434,14 +2434,25 @@ void ExpList::GeneralMatrixOp(const GlobalMatrixKey &gkey,
             }
             m_collectionsDoInit[Collections::eHelmholtz] = false;
         }
-        else
+
+        // Update factors and varoeffs
+        for (int i = 0; i < m_collections.size(); ++i)
         {
-            for (int i = 0; i < m_collections.size(); ++i)
+            m_collections[i].UpdateFactors(Collections::eHelmholtz,
+                                           gkey.GetConstFactors(),
+                                           m_coll_phys_offset[i]);
+
+            // Restrict varcoeffs to collection size and update
+            StdRegions::VarCoeffMap varcoeffs;
+            if (nvarcoeffs)
             {
-                m_collections[i].CheckFactors(Collections::eHelmholtz,
-                                              gkey.GetConstFactors(),
-                                              m_coll_phys_offset[i]);
+                varcoeffs = StdRegions::RestrictCoeffMap(
+                    gkey.GetVarCoeffs(), m_coll_phys_offset[i],
+                    m_collections[i].GetInputSize(Collections::eHelmholtz,
+                                                  false));
             }
+            m_collections[i].UpdateVarcoeffs(Collections::eHelmholtz,
+                                             varcoeffs);
         }
 
         Array<OneD, NekDouble> tmp;
@@ -5675,8 +5686,8 @@ void ExpList::v_PhysInterp1DScaled([[maybe_unused]] const NekDouble scale,
     for (int i = 0; i < m_collections.size(); ++i)
 
     {
-        m_collections[i].CheckFactors(Collections::ePhysInterp1DScaled, factors,
-                                      m_coll_phys_offset[i]);
+        m_collections[i].UpdateFactors(Collections::ePhysInterp1DScaled,
+                                       factors, m_coll_phys_offset[i]);
     }
     LIKWID_MARKER_START("v_PhysInterp1DScaled");
     timer.Start();
