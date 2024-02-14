@@ -55,13 +55,4 @@ NekSys::NekSys(const LibUtilities::SessionReaderSharedPtr &pSession,
     m_SysDimen     = nDimen;
 }
 
-bool NekSys::v_ConvergenceCheck([[maybe_unused]] const int nIteration,
-                                const Array<OneD, const NekDouble> &Residual,
-                                const NekDouble tol)
-{
-    NekDouble SysResNorm = Vmath::Dot(Residual.size(), Residual, Residual);
-    m_rowComm->AllReduce(SysResNorm, Nektar::LibUtilities::ReduceSum);
-
-    return SysResNorm < tol * tol;
-}
 } // namespace Nektar::LibUtilities

@@ -93,7 +93,7 @@ protected:
     int v_SolveSystem(const int nGlobal,
                       const Array<OneD, const NekDouble> &pInput,
                       Array<OneD, NekDouble> &pOutput, const int nDir,
-                      const NekDouble tol, const NekDouble factor) override;
+                      const NekDouble factor) override;
 
 private:
     /// Actual iterative solve-GMRES
