@@ -38,9 +38,6 @@
 #include <CompressibleFlowSolver/ArtificialDiffusion/ArtificialDiffusion.h>
 #include <CompressibleFlowSolver/BoundaryConditions/CFSBndCond.h>
 #include <CompressibleFlowSolver/Misc/VariableConverter.h>
-#include <CompressibleFlowSolver/Preconditioner/PreconCfs.h>
-#include <CompressibleFlowSolver/Preconditioner/PreconCfsOp.h>
-#include <LibUtilities/LinearAlgebra/NekNonlinSys.h>
 #include <LocalRegions/Expansion2D.h>
 #include <LocalRegions/Expansion3D.h>
 #include <MultiRegions/GlobalMatrixKey.h>
