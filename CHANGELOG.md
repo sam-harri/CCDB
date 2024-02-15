@@ -1,9 +1,5 @@
 Changelog
 =========
-v5.6.0
------
-**Library**
-- Fix misplaced " in Nektar++Config.cmake (!1742)
 
 v5.6.0
 ------
@@ -15,10 +11,15 @@ v5.6.0
 - Update NekPy to more modern packaging (!1747)
 - Tidy up tolerance in NekLinSystIter and NekNonlinSysIter solvers (!1722)
 - Enable varcoeffs for Collections (!1701)
+- Fix misplaced " in Nektar++Config.cmake (!1742)
+
 
 **NekPy**
 - Add binding to NekPy to check of geometry elements are valid (!1755)
 - Fix PFASST I/O and pre-initialize coarse preconditioner for Parareal (!1749)
+
+**NekMesh**
+- Fix optiKind flags in VarOpti for freenodes that are on more than a single curve / surface (!1597)
 
 v5.5.0
 ------
