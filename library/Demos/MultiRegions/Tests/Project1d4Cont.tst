@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <test>
-    <description>Projection h-type convergence with 4 modes (continuous)</description>
-    <executable>Project</executable>
+    <description>Projection h-type convergence with 4 modes in 1D (continuous)</description>
+    <executable>Project1D</executable>
     <parameters>Project_blank.xml -n 4</parameters>
     <files>
         <file description="Blank Session File">Project_blank.xml</file>
