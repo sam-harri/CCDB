@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <test>
-    <description>Projection h-type convergence with 5 modes (continuous)</description>
-    <executable>Project</executable>
+    <description>Projection h-type convergence with 5 modes in 1D (continuous)</description>
+    <executable>Project1D</executable>
     <parameters>Project_blank.xml -n 5</parameters>
     <files>
         <file description="Blank Session File">Project_blank.xml</file>
@@ -14,7 +14,7 @@
             </regex>
             <matches>
                 <match>
-                    <field tolerance="1e-3" id="1">-4.9590018919</field>
+                    <field tolerance="1e-3" id="1">-4.9590018944</field>
                 </match>
             </matches>
         </metric>

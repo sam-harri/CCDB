@@ -8,6 +8,7 @@ v5.6.0
 - Consistently use template parameters in VmathArray (!1748)
 - Fix issue with CMake and zlib versions >= 1.3.0 (!1744)
 - Add 1D demo and test of h-type convergence for a CG projection. (!1738)
+- Add 2D projection demo and tests following 1D added in MR !1738. (!1762)
 - Update NekPy to more modern packaging (!1747)
 - Tidy up tolerance in NekLinSystIter and NekNonlinSysIter solvers (!1722)
 - Enable varcoeffs for Collections (!1701)

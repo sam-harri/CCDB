@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 //
-// File: Project.cpp
+// File: Project1D.cpp
 //
 // For more information, please see: http://www.nektar.info
 //
@@ -33,10 +33,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include <LibUtilities/BasicUtils/SessionReader.h>
-#include <LibUtilities/Communication/Comm.h>
 #include <LibUtilities/Memory/NekMemoryManager.hpp>
 #include <MultiRegions/ContField.h>
-#include <MultiRegions/ExpList.h>
 #include <SpatialDomains/MeshGraph.h>
 #include <iomanip>
 #include <iostream>
