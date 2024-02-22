@@ -180,7 +180,7 @@ ExpList::ExpList(const LibUtilities::SessionReaderSharedPtr &pSession,
     const SpatialDomains::ExpansionInfoMap &expansions =
         graph->GetExpansionInfo(var);
 
-    // Initialise Expansionn Vector
+    // Initialise Expansion Vector
     InitialiseExpVector(expansions);
 
     // Setup phys coeff space
@@ -1596,7 +1596,8 @@ void ExpList::InitialiseExpVector(
                          "Dimension of basis key is greater than 3");
         }
 
-        // Assign next id
+        // Assign next id and fill the global id -> exp id map
+        m_elmtToExpId[exp->GetGeom()->GetGlobalID()] = id;
         exp->SetElmtId(id++);
 
         // Add the expansion
@@ -3059,6 +3060,9 @@ void ExpList::v_Reset()
     LibUtilities::NekManager<LocalRegions::MatrixKey, DNekScalBlkMat,
                              LocalRegions::MatrixKey::opLess>::ClearManager();
 
+    // Reset block matrix map
+    m_blockMat->clear();
+
     // Loop over all elements and reset geometry information.
     for (int i = 0; i < m_exp->size(); ++i)
     {
@@ -3071,6 +3075,21 @@ void ExpList::v_Reset()
     {
         (*m_exp)[i]->Reset();
     }
+
+    CreateCollections(Collections::eNoImpType); // @TODO: Might need to pass in
+                                                // correct type here
+}
+
+void ExpList::ResetMatrices()
+{
+    // Reset matrix managers.
+    LibUtilities::NekManager<LocalRegions::MatrixKey, DNekScalMat,
+                             LocalRegions::MatrixKey::opLess>::ClearManager();
+    LibUtilities::NekManager<LocalRegions::MatrixKey, DNekScalBlkMat,
+                             LocalRegions::MatrixKey::opLess>::ClearManager();
+
+    // Reset block matrix map
+    m_blockMat->clear();
 }
 
 /**
