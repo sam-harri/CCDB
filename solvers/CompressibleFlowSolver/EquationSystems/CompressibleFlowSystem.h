@@ -124,6 +124,10 @@ protected:
         const Array<OneD, const Array<OneD, NekDouble>> &physfield,
         Array<OneD, Array<OneD, NekDouble>> &velocity) override;
 
+    void v_ALEInitObject(
+        int spaceDim,
+        Array<OneD, MultiRegions::ExpListSharedPtr> &fields) override;
+
     void InitialiseParameters();
 
     void InitAdvection();
