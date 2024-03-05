@@ -267,8 +267,8 @@ void NodeOpti1D2D::Optimise()
         NekDouble yc = m_node->m_y;
         NekDouble zc = m_node->m_z;
         NekDouble nt;
-        Array<OneD, NekDouble> p;
 
+        Array<OneD, NekDouble> p;
         Array<OneD, NekDouble> sk(1);
 
         if (m_grad[1] < 1e-6)

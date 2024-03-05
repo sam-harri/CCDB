@@ -47,6 +47,7 @@
 
 namespace Nektar::NekMesh
 {
+
 class Node;
 typedef std::shared_ptr<Node> NodeSharedPtr;
 
