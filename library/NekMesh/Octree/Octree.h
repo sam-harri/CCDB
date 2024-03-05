@@ -76,7 +76,9 @@ struct CurveSource
      */
     bool WithinRange(Array<OneD, NekDouble> p)
     {
-        return curve->GetMinDistance(p) <= R;
+        std::array<NekDouble, 3> x;
+        std::copy(std::begin(p), std::end(p), x.begin());
+        return curve->GetMinDistance(x) <= R;
     }
 };
 

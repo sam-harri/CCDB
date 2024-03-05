@@ -33,6 +33,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <NekMesh/CADSystem/OCE/CADCurveOCE.h>
+#include <array>
 
 using namespace std;
 
@@ -72,7 +73,7 @@ NekDouble CADCurveOCE::Length(NekDouble ti, NekDouble tf)
     return System.Mass() / 1000.0;
 }
 
-NekDouble CADCurveOCE::GetMinDistance(Array<OneD, NekDouble> &xyz)
+NekDouble CADCurveOCE::GetMinDistance(std::array<NekDouble, 3> &xyz)
 {
     gp_Pnt loc(xyz[0] * 1000.0, xyz[1] * 1000.0, xyz[2] * 1000.0);
     GeomAPI_ProjectPointOnCurve proj(loc, m_c, m_b[0], m_b[1]);

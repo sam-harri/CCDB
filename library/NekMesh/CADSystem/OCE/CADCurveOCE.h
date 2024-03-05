@@ -68,7 +68,7 @@ public:
     NekDouble tAtArcLength(NekDouble s) override;
     Array<OneD, NekDouble> GetMinMax() override;
     NekDouble loct(Array<OneD, NekDouble> xyz, NekDouble &t) override;
-    NekDouble GetMinDistance(Array<OneD, NekDouble> &xyz) override;
+    NekDouble GetMinDistance(std::array<NekDouble, 3> &xyz) override;
     NekDouble Curvature(NekDouble t) override;
     Array<OneD, NekDouble> N(NekDouble t) override;
 

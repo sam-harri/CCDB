@@ -1,5 +1,13 @@
 Changelog
 =========
+v5.6.0
+-----
+**Library**
+- Clean-up Set_Rhs_Magnitude function in NekLinSysIter (!1729)
+- Consistently use template parameters in VmathArray (!1748)
+
+**NekMesh**
+- Add feature for r-adaption on user-defined CAD curves (!1349)
 
 v5.6.0
 ------
