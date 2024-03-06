@@ -23,13 +23,13 @@ v5.6.0
 - Fix misplaced " in Nektar++Config.cmake (!1742)
 - Add conditional updating of elemental Mass and Laplacian matrices for LinearADR matrices (!1766)
 
-
 **NekPy**
 - Add binding to NekPy to check of geometry elements are valid (!1755)
 - Fix PFASST I/O and pre-initialize coarse preconditioner for Parareal (!1749)
 
 **NekMesh**
 - Fix optiKind flags in VarOpti for freenodes that are on more than a single curve / surface (!1597)
+- Fix VarOpti Surface Node Sliding on the CAD in 2D  (!1569)
 
 v5.5.0
 ------
@@ -266,6 +266,7 @@ v5.4.0
 
 **NekMesh**
 - Changed CMake to set NEKTAR_USE_THREAD_SAFETY to ON when MeshGen is set to ON (!1546)
+- Fix VarOpti Tolerances (!1569)
 - Fixed a bug where MeshElement/Tetrahedron did not assign edge IDs in the constructor (!1596)
 - Reduce VarOpti memory usage by removing the storage for GetFunctional in NodeOpti (!1633)
 
