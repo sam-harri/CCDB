@@ -211,6 +211,14 @@ vector<vector<NodeSharedPtr>> ProcessVarOpti::GetColouredNodes(
                     continue;
                 }
 
+                // Keep the nodes with 1 CAD Curve to the optimizable(movable)
+                // set
+                if (edge->m_n1->GetCADCurves().size() == 1 &&
+                    edge->m_n2->GetCADCurves().size() == 1)
+                {
+                    continue;
+                }
+
                 boundaryNodes.insert(edge->m_n1);
                 boundaryNodes.insert(edge->m_n2);
                 for (int i = 0; i < edge->m_edgeNodes.size(); i++)
