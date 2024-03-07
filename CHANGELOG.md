@@ -1,15 +1,6 @@
 Changelog
 =========
 v5.6.0
------
-**Library**
-- Clean-up Set_Rhs_Magnitude function in NekLinSysIter (!1729)
-- Consistently use template parameters in VmathArray (!1748)
-
-**NekMesh**
-- Add feature for r-adaption on user-defined CAD curves (!1349)
-
-v5.6.0
 ------
 **Library**
 - Clean-up Set_Rhs_Magnitude function in NekLinSysIter (!1729)
@@ -23,13 +14,14 @@ v5.6.0
 - Fix misplaced " in Nektar++Config.cmake (!1742)
 - Add conditional updating of elemental Mass and Laplacian matrices for LinearADR matrices (!1766)
 
-
 **NekPy**
 - Add binding to NekPy to check of geometry elements are valid (!1755)
 - Fix PFASST I/O and pre-initialize coarse preconditioner for Parareal (!1749)
 
 **NekMesh**
 - Fix optiKind flags in VarOpti for freenodes that are on more than a single curve / surface (!1597)
+- Add feature for r-adaption on user-defined CAD curves (!1349)
+- Add unit testing infrustructure and initial example (!1753)
 
 v5.5.0
 ------
