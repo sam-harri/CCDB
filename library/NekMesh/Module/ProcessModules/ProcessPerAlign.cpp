@@ -165,8 +165,7 @@ void ProcessPerAlign::Process()
     {
         // if the direction is not specified and its a 2D mesh and there is CAD
         // it can figure out the dir on its own
-        Array<OneD, NekDouble> T =
-            m_mesh->m_cad->GetPeriodicTranslationVector(surf1, surf2);
+        auto T = m_mesh->m_cad->GetPeriodicTranslationVector(surf1, surf2);
         NekDouble mag = sqrt(T[0] * T[0] + T[1] * T[1]);
 
         alignDir[0] = T[0] / mag;

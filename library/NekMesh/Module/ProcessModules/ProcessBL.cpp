@@ -1126,7 +1126,7 @@ void ProcessBL::BoundaryLayer3D()
 
                     xp[0] = tEdge;
 
-                    Array<OneD, NekDouble> loc(3);
+                    std::array<NekDouble, 3> loc;
                     loc[0]          = xmap->PhysEvaluate(xp, xc);
                     loc[1]          = xmap->PhysEvaluate(xp, yc);
                     loc[2]          = xmap->PhysEvaluate(xp, zc);
@@ -1152,7 +1152,7 @@ void ProcessBL::BoundaryLayer3D()
                             CADSurfSharedPtr s =
                                 std::dynamic_pointer_cast<CADSurf>(
                                     edg->m_parentCAD);
-                            Array<OneD, NekDouble> uv = s->locuv(loc);
+                            auto uv = s->locuv(loc);
                             edgeNodes[j][k]->SetCADSurf(s, uv);
                         }
                     }
@@ -1401,7 +1401,8 @@ void ProcessBL::BoundaryLayer3D()
                     Array<OneD, NekDouble> xp(1);
                     xp[0] =
                         tb * (1.0 - gll[l]) / 2.0 + te * (1.0 + gll[l]) / 2.0;
-                    Array<OneD, NekDouble> loc(3);
+
+                    std::array<NekDouble, 3> loc;
                     loc[0] = xmap->PhysEvaluate(xp, xc);
                     loc[1] = xmap->PhysEvaluate(xp, yc);
                     loc[2] = xmap->PhysEvaluate(xp, zc);
@@ -1425,7 +1426,7 @@ void ProcessBL::BoundaryLayer3D()
                             CADSurfSharedPtr s =
                                 std::dynamic_pointer_cast<CADSurf>(
                                     nwEdg->m_parentCAD);
-                            Array<OneD, NekDouble> uv = s->locuv(loc);
+                            auto uv = s->locuv(loc);
                             nwEdg->m_edgeNodes.back()->SetCADSurf(s, uv);
                         }
                     }
@@ -1484,7 +1485,7 @@ void ProcessBL::BoundaryLayer3D()
                         }
                     }
 
-                    Array<OneD, NekDouble> loc(3);
+                    std::array<NekDouble, 3> loc;
                     loc[0] = xmape->PhysEvaluate(xp, xce);
                     loc[1] = xmape->PhysEvaluate(xp, yce);
                     loc[2] = xmape->PhysEvaluate(xp, zce);
@@ -1508,7 +1509,7 @@ void ProcessBL::BoundaryLayer3D()
                             CADSurfSharedPtr s =
                                 std::dynamic_pointer_cast<CADSurf>(
                                     nwEdg->m_parentCAD);
-                            Array<OneD, NekDouble> uv = s->locuv(loc);
+                            auto uv = s->locuv(loc);
                             nwEdg->m_edgeNodes.back()->SetCADSurf(s, uv);
                         }
                     }

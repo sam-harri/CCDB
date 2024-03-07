@@ -1,15 +1,6 @@
 Changelog
 =========
 v5.6.0
------
-**Library**
-- Clean-up Set_Rhs_Magnitude function in NekLinSysIter (!1729)
-- Consistently use template parameters in VmathArray (!1748)
-
-**NekMesh**
-- Add feature for r-adaption on user-defined CAD curves (!1349)
-
-v5.6.0
 ------
 **Library**
 - Clean-up Set_Rhs_Magnitude function in NekLinSysIter (!1729)
@@ -30,6 +21,7 @@ v5.6.0
 **NekMesh**
 - Fix optiKind flags in VarOpti for freenodes that are on more than a single curve / surface (!1597)
 - Fix VarOpti Surface Node Sliding on the CAD in 2D  (!1569)
+- Add feature for r-adaption on user-defined CAD curves (!1349)
 
 v5.5.0
 ------

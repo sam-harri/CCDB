@@ -2,9 +2,9 @@
 <test>
     <description>2D internal circle inside a square with r-adaption along the circumference</description>
     <executable>NekMesh</executable>
-    <parameters> -m varopti:linearelastic:nq=2:radaptcurves=1-4:radaptscale=0.5:radaptrad=0.0015:subiter=20:maxiter=500:restol=1e-5:numthreads=1
-    -m varopti:linearelastic:nq=2:radaptcurves=1-4:radaptscale=0.4:subiter=10:maxiter=500:restol=1e-5:numthreads=1
-    -m varopti:hyperelastic:nq=5:numthreads=1 -m jac:list
+    <parameters> -m varopti:linearelastic:nq=2:radaptcurves=1-4:radaptscale=0.5:radaptrad=0.0015:subiter=20:maxiter=500:restol=1e-5:numthreads=2
+    -m varopti:linearelastic:nq=2:radaptcurves=1-4:radaptscale=0.4:subiter=10:maxiter=500:restol=1e-5:numthreads=2
+    -m varopti:hyperelastic:nq=5:numthreads=2 -m jac:list
     2d_circle_square-radapt.mcf 2d_circle_square-out.xml:xml:test</parameters>
     <files>
         <file description="Input File">2d_circle_square-radapt.mcf</file>
