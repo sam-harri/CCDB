@@ -22,6 +22,8 @@ v5.6.0
 - Fix optiKind flags in VarOpti for freenodes that are on more than a single curve / surface (!1597)
 - Fix VarOpti Surface Node Sliding on the CAD in 2D  (!1569)
 - Add feature for r-adaption on user-defined CAD curves (!1349)
+- Add feature for r-adaption on user-defined CAD curves (!1349)
+- Add unit testing infrustructure and initial example (!1753)
 
 v5.5.0
 ------
