@@ -13,6 +13,8 @@ v5.6.0
 - Fix misplaced " in Nektar++Config.cmake (!1742)
 - Add conditional updating of elemental Mass and Laplacian matrices for LinearADR matrices (!1766)
 - Fix PFASST I/O and pre-initialize coarse preconditioner for Parareal (!1749)
+- Remove collection offset arrays since no longer required (!1771)
+
 
 **NekPy**
 - Add binding to NekPy to check of geometry elements are valid (!1755)

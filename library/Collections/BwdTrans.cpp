@@ -100,12 +100,6 @@ public:
         ASSERTL0(false, "Not valid for this operator.");
     }
 
-    void UpdateFactors([[maybe_unused]] StdRegions::FactorMap factors,
-                       [[maybe_unused]] int coll_phys_offset) override
-    {
-        ASSERTL0(false, "Not valid for this operator.");
-    }
-
 protected:
     DNekMatSharedPtr m_mat;
 
@@ -197,12 +191,6 @@ public:
     {
         NEKERROR(ErrorUtil::efatal,
                  "BwdTrans_MatrixFree: Not valid for this operator.");
-    }
-
-    void UpdateFactors([[maybe_unused]] StdRegions::FactorMap factors,
-                       [[maybe_unused]] int coll_phys_offset) override
-    {
-        ASSERTL0(false, "Not valid for this operator.");
     }
 
 private:
@@ -297,12 +285,6 @@ public:
         ASSERTL0(false, "Not valid for this operator.");
     }
 
-    void UpdateFactors([[maybe_unused]] StdRegions::FactorMap factors,
-                       [[maybe_unused]] int coll_phys_offset) override
-    {
-        ASSERTL0(false, "Not valid for this operator.");
-    }
-
 private:
     BwdTrans_IterPerExp(vector<StdRegions::StdExpansionSharedPtr> pCollExp,
                         CoalescedGeomDataSharedPtr pGeomData,
@@ -378,12 +360,6 @@ public:
                     [[maybe_unused]] const Array<OneD, const NekDouble> &input,
                     [[maybe_unused]] Array<OneD, NekDouble> &output,
                     [[maybe_unused]] Array<OneD, NekDouble> &wsp) final
-    {
-        ASSERTL0(false, "Not valid for this operator.");
-    }
-
-    void UpdateFactors([[maybe_unused]] StdRegions::FactorMap factors,
-                       [[maybe_unused]] int coll_phys_offset) override
     {
         ASSERTL0(false, "Not valid for this operator.");
     }
@@ -470,12 +446,6 @@ public:
                     [[maybe_unused]] const Array<OneD, const NekDouble> &input,
                     [[maybe_unused]] Array<OneD, NekDouble> &output,
                     [[maybe_unused]] Array<OneD, NekDouble> &wsp) final
-    {
-        ASSERTL0(false, "Not valid for this operator.");
-    }
-
-    void UpdateFactors([[maybe_unused]] StdRegions::FactorMap factors,
-                       [[maybe_unused]] int coll_phys_offset) override
     {
         ASSERTL0(false, "Not valid for this operator.");
     }
@@ -573,12 +543,6 @@ public:
         ASSERTL0(false, "Not valid for this operator.");
     }
 
-    void UpdateFactors([[maybe_unused]] StdRegions::FactorMap factors,
-                       [[maybe_unused]] int coll_phys_offset) override
-    {
-        ASSERTL0(false, "Not valid for this operator.");
-    }
-
 protected:
     const int m_nquad0;
     const int m_nquad1;
@@ -665,12 +629,6 @@ public:
                     [[maybe_unused]] const Array<OneD, const NekDouble> &input,
                     [[maybe_unused]] Array<OneD, NekDouble> &output,
                     [[maybe_unused]] Array<OneD, NekDouble> &wsp) final
-    {
-        ASSERTL0(false, "Not valid for this operator.");
-    }
-
-    void UpdateFactors([[maybe_unused]] StdRegions::FactorMap factors,
-                       [[maybe_unused]] int coll_phys_offset) override
     {
         ASSERTL0(false, "Not valid for this operator.");
     }
@@ -771,12 +729,6 @@ public:
                     [[maybe_unused]] const Array<OneD, const NekDouble> &input,
                     [[maybe_unused]] Array<OneD, NekDouble> &output,
                     [[maybe_unused]] Array<OneD, NekDouble> &wsp) final
-    {
-        ASSERTL0(false, "Not valid for this operator.");
-    }
-
-    void UpdateFactors([[maybe_unused]] StdRegions::FactorMap factors,
-                       [[maybe_unused]] int coll_phys_offset) override
     {
         ASSERTL0(false, "Not valid for this operator.");
     }
@@ -943,12 +895,6 @@ public:
         ASSERTL0(false, "Not valid for this operator.");
     }
 
-    void UpdateFactors([[maybe_unused]] StdRegions::FactorMap factors,
-                       [[maybe_unused]] int coll_phys_offset) override
-    {
-        ASSERTL0(false, "Not valid for this operator.");
-    }
-
 protected:
     const int m_nquad0;
     const int m_nquad1;
@@ -1082,12 +1028,6 @@ public:
                     [[maybe_unused]] const Array<OneD, const NekDouble> &input,
                     [[maybe_unused]] Array<OneD, NekDouble> &output,
                     [[maybe_unused]] Array<OneD, NekDouble> &wsp) final
-    {
-        ASSERTL0(false, "Not valid for this operator.");
-    }
-
-    void UpdateFactors([[maybe_unused]] StdRegions::FactorMap factors,
-                       [[maybe_unused]] int coll_phys_offset) override
     {
         ASSERTL0(false, "Not valid for this operator.");
     }
@@ -1244,12 +1184,6 @@ public:
                     [[maybe_unused]] const Array<OneD, const NekDouble> &input,
                     [[maybe_unused]] Array<OneD, NekDouble> &output,
                     [[maybe_unused]] Array<OneD, NekDouble> &wsp) final
-    {
-        ASSERTL0(false, "Not valid for this operator.");
-    }
-
-    void UpdateFactors([[maybe_unused]] StdRegions::FactorMap factors,
-                       [[maybe_unused]] int coll_phys_offset) override
     {
         ASSERTL0(false, "Not valid for this operator.");
     }

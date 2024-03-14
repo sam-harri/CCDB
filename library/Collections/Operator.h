@@ -151,10 +151,15 @@ public:
         Array<OneD, NekDouble> &output,
         Array<OneD, NekDouble> &wsp = NullNekDouble1DArray) = 0;
 
-    /// Check the validity of the supplied factor map
-    COLLECTIONS_EXPORT virtual void UpdateFactors(StdRegions::FactorMap factors,
-                                                  int coll_phys_offset) = 0;
+    /// Update the supplied factor map
+    COLLECTIONS_EXPORT virtual void UpdateFactors(
+        [[maybe_unused]] StdRegions::FactorMap factors)
+    {
+        ASSERTL0(false, "This method needs to be re-implemented in derived "
+                        "operator class.");
+    }
 
+    /// Update the supplied variable coefficients
     COLLECTIONS_EXPORT virtual void UpdateVarcoeffs(
         [[maybe_unused]] StdRegions::VarCoeffMap &varcoeffs)
     {

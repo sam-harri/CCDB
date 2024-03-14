@@ -1117,10 +1117,6 @@ protected:
     /// Vector of bools to act as an initialise on first call flag
     std::vector<bool> m_collectionsDoInit;
     /// Offset of elemental data into the array #m_coeffs
-    std::vector<int> m_coll_coeff_offset;
-    /// Offset of elemental data into the array #m_phys
-    std::vector<int> m_coll_phys_offset;
-    /// Offset of elemental data into the array #m_coeffs
     Array<OneD, int> m_coeff_offset;
     /// Offset of elemental data into the array #m_phys
     Array<OneD, int> m_phys_offset;
