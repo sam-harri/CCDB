@@ -2,6 +2,18 @@
 
 [[ $OS_VERSION != "macos" ]] && ccache -s && ccache -M 5G
 
+echo "Running build with:"
+echo "  - BUILD_CC                : $BUILD_CC"
+echo "  - BUILD_CXX               : $BUILD_CXX"
+echo "  - BUILD_FC                : $BUILD_FC"
+echo "  - BUILD_TYPE              : $BUILD_TYPE"
+echo "  - BUILD_SIMD              : $BUILD_SIMD"
+echo "  - DISABLE_MCA             : $DISABLE_MCA"
+echo "  - EXPORT_COMPILE_COMMANDS : $EXPORT_COMPILE_COMMANDS"
+echo "  - NUM_CPUS                : $NUM_CPUS"
+echo "  - OS_VERSION              : $OS_VERSION"
+echo "  - PYTHON_EXECUTABLE       : $PYTHON_EXECUTABLE"
+
 if [[ $BUILD_TYPE == "default" ]]; then
     BUILD_OPTS="-DCMAKE_BUILD_TYPE=Release \
         -DNEKTAR_TEST_ALL=ON \
@@ -60,7 +72,16 @@ if [[ $BUILD_FC != "" ]]; then
    BUILD_OPTS="$BUILD_OPTS -DCMAKE_Fortran_COMPILER=${BUILD_FC}"
 fi
 
+# Custom Python executable
+if [[ $PYTHON_EXECUTABLE != "" ]]; then
+   BUILD_OPTS="$BUILD_OPTS -DPython_EXECUTABLE=${PYTHON_EXECUTABLE}"
+fi
+
 rm -rf build && mkdir -p build && (cd build && cmake -G 'Unix Makefiles' $BUILD_OPTS ..)
+
+if [[ $DISABLE_MCA != "" ]]; then
+    export OMPI_MCA_btl_base_warn_component_unused=0
+fi
 
 if [[ $EXPORT_COMPILE_COMMANDS != "" ]]; then
     # If we are just exporting compile commands for clang-tidy, just build any

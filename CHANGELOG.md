@@ -8,15 +8,17 @@ v5.6.0
 - Fix issue with CMake and zlib versions >= 1.3.0 (!1744)
 - Add 1D demo and test of h-type convergence for a CG projection. (!1738)
 - Add 2D projection demo and tests following 1D added in MR !1738. (!1762)
-- Update NekPy to more modern packaging (!1747)
 - Tidy up tolerance in NekLinSystIter and NekNonlinSysIter solvers (!1722)
 - Enable varcoeffs for Collections (!1701)
 - Fix misplaced " in Nektar++Config.cmake (!1742)
 - Add conditional updating of elemental Mass and Laplacian matrices for LinearADR matrices (!1766)
+- Fix PFASST I/O and pre-initialize coarse preconditioner for Parareal (!1749)
 
 **NekPy**
 - Add binding to NekPy to check of geometry elements are valid (!1755)
-- Fix PFASST I/O and pre-initialize coarse preconditioner for Parareal (!1749)
+- Update NekPy to more modern packaging (!1747)
+- Add wrapper for selected SolverUtils classes, particularly Filter (!1379)
+- Add VTK support for OutputVtk module (!1379)
 
 **NekMesh**
 - Fix optiKind flags in VarOpti for freenodes that are on more than a single curve / surface (!1597)

@@ -1013,7 +1013,10 @@ void OutputVtk::AddFieldDataToVTKLowOrder(
         vtkMesh->GetPointData()->AddArray(fieldData.GetPointer());
     }
 
-    WriteVTK(vtkMesh, filename, vm);
+    if (!m_prohibitWrite)
+    {
+        WriteVTK(vtkMesh, filename, vm);
+    }
 }
 
 void OutputVtk::OutputFromExpLowOrderMultiBlock(po::variables_map &vm,
@@ -1292,7 +1295,10 @@ void OutputVtk::OutputFromExpLowOrderMultiBlock(po::variables_map &vm,
                                             "Other composites");
     }
 
-    WriteVTK(mainBlock.GetPointer(), filename, vm);
+    if (!m_prohibitWrite)
+    {
+        WriteVTK(mainBlock.GetPointer(), filename, vm);
+    }
 }
 
 vtkSmartPointer<vtkUnstructuredGrid> OutputVtk::OutputFromExpHighOrder(
@@ -1452,7 +1458,10 @@ void OutputVtk::AddFieldDataToVTKHighOrder(
         vtkMesh->GetPointData()->AddArray(fieldData.GetPointer());
     }
 
-    WriteVTK(vtkMesh, filename, vm);
+    if (!m_prohibitWrite)
+    {
+        WriteVTK(vtkMesh, filename, vm);
+    }
 }
 
 void OutputVtk::WriteVTK(vtkDataObject *vtkMesh, std::string &filename,
@@ -1632,8 +1641,13 @@ void OutputVtk::v_OutputFromExp(po::variables_map &vm)
         return;
     }
 
+    std::string filename;
+
     // Extract the output filename and extension
-    std::string filename = OutputVtkBase::PrepareOutput(vm);
+    if (!m_prohibitWrite)
+    {
+        filename = OutputVtkBase::PrepareOutput(vm);
+    }
 
     // Save mesh state (if using filter this allows us to only ProcessEquispaced
     // if needed)

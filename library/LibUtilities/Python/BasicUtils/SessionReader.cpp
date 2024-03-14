@@ -55,31 +55,10 @@ CommSharedPtr MPICOMM = CommSharedPtr();
 
 SessionReaderSharedPtr SessionReader_CreateInstance(py::list &ns)
 {
-    int i, argc = py::len(ns), bufSize = 0;
-    char **argv = new char *[argc + 1], *p;
+    CppCommandLine cpp(ns);
 
-    // Create argc, argv to give to the session reader. Note that this needs to
-    // be a contiguous block in memory, otherwise MPI (specifically OpenMPI)
-    // will likely segfault.
-    for (i = 0; i < argc; ++i)
-    {
-        std::string tmp = py::extract<std::string>(ns[i]);
-        bufSize += tmp.size() + 1;
-    }
-
-    std::vector<char> buf(bufSize);
-    for (i = 0, p = &buf[0]; i < argc; ++i)
-    {
-        std::string tmp = py::extract<std::string>(ns[i]);
-        std::copy(tmp.begin(), tmp.end(), p);
-        p[tmp.size()] = '\0';
-        argv[i]       = p;
-        p += tmp.size() + 1;
-    }
-
-    // Also make sure we set argv[argc] = NULL otherwise OpenMPI will also
-    // segfault.
-    argv[argc] = nullptr;
+    int argc    = cpp.GetArgc();
+    char **argv = cpp.GetArgv();
 
 #ifdef NEKTAR_USE_MPI
     // In the case we're using MPI, it may already have been initialised. So to
@@ -93,7 +72,7 @@ SessionReaderSharedPtr SessionReader_CreateInstance(py::list &ns)
     }
 
     std::vector<std::string> filenames(argc - 1);
-    for (i = 1; i < argc; ++i)
+    for (int i = 1; i < argc; ++i)
     {
         filenames[i - 1] = std::string(argv[i]);
     }
@@ -105,9 +84,6 @@ SessionReaderSharedPtr SessionReader_CreateInstance(py::list &ns)
     // Create session reader.
     SessionReaderSharedPtr sr = SessionReader::CreateInstance(argc, argv);
 #endif
-
-    // Clean up.
-    delete[] argv;
 
     return sr;
 }
