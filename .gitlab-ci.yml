@@ -96,8 +96,11 @@ include:
       -e "BUILD_CC=$BUILD_CC"
       -e "BUILD_CXX=$BUILD_CXX"
       -e "BUILD_FC=$BUILD_FC"
+      -e "DISABLE_MCA=$DISABLE_MCA"
       -e "NUM_CPUS=$NUM_CPUS"
       -e "CCACHE_DIR=$CCACHE_DIR"
+      -e "LD_PRELOAD=$LD_PRELOAD"
+      -e "PYTHON_EXECUTABLE=$PYTHON_EXECUTABLE"
       $ENV_IMAGE
       bash -x .gitlab-ci/build-and-test.sh |
       tee log/${OS_VERSION}_${BUILD_TYPE}.log || true
@@ -331,8 +334,11 @@ debian-buster-full-build-and-test:
   <<: *build-and-test-template
   needs: ["debian-buster-full-build-env"]
   variables:
+    DISABLE_MCA: 1
     GIT_SUBMODULE_STRATEGY: recursive
-
+    OS_DISTRO: debian
+    PYTHON_EXECUTABLE: /usr/bin/python3
+    REMOVE_UCX: 0
 
 # COMPILER WARNINGS
 debian-bookworm-default-warnings:
@@ -536,6 +542,10 @@ ubuntu-bionic-default-build-and-test:
 ubuntu-bionic-full-build-and-test:
   <<: *build-and-test-template
   needs: ["ubuntu-bionic-full-build-env"]
+  variables:
+    OS_DISTRO: ubuntu
+    PYTHON_EXECUTABLE: /usr/bin/python3
+    LD_PRELOAD: libmpi.so # required for python-vtk test
 
 
 # COMPILER WARNINGS

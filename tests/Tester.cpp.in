@@ -71,6 +71,20 @@ using namespace Nektar;
 // Define some namespace aliases
 namespace po = boost::program_options;
 
+#ifdef _WIN32
+// Define a setenv function for Windows
+int setenv(const char *name, const char *value, int overwrite)
+{
+    int errcode = 0;
+    if(!overwrite) {
+        size_t envsize = 0;
+        errcode = getenv_s(&envsize, NULL, 0, name);
+        if(errcode || envsize) return errcode;
+    }
+    return _putenv_s(name, value);
+}
+#endif
+
 int main(int argc, char *argv[])
 {
     int status = 0;
@@ -333,19 +347,17 @@ int main(int argc, char *argv[])
 
             // If we're Python, copy script too.
 
+            // Set PYTHONPATH environment variable in case Python is run inside
+            // any of our tests.  For non-Python tests this will do nothing.
+            setenv("PYTHONPATH", "@NEKPY_BASE_DIR@", true);
+
             // Construct test command to run. Output from stdout and stderr are
             // directed to the files output.out and output.err, respectively.
 
-            bool pythonAdded = false, mpiAdded = false;
+            bool mpiAdded = false;
             for (unsigned int j = 0; j < file.GetNumCommands(); ++j)
             {
                 Command cmd = file.GetCommand(j);
-                if (cmd.m_pythonTest && !pythonAdded)
-                {
-                    // Prepend Python to very start of command.
-                    command = "PYTHONPATH=\"@NEKPY_BASE_DIR@\" " + command;
-                    pythonAdded = true;
-                }
 
 #ifdef NEKTAR_TEST_FORCEMPIEXEC
 #else
