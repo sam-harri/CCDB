@@ -110,8 +110,6 @@ ExpList::ExpList(const ExpList &in, const bool DeclareCoeffPhysArrays)
       m_ncoeffs(in.m_ncoeffs), m_npoints(in.m_npoints), m_physState(false),
       m_exp(in.m_exp), m_collections(in.m_collections),
       m_collectionsDoInit(in.m_collectionsDoInit),
-      m_coll_coeff_offset(in.m_coll_coeff_offset),
-      m_coll_phys_offset(in.m_coll_phys_offset),
       m_coeff_offset(in.m_coeff_offset), m_phys_offset(in.m_phys_offset),
       m_blockMat(in.m_blockMat), m_WaveSpace(false),
       m_elmtToExpId(in.m_elmtToExpId)
@@ -2437,20 +2435,21 @@ void ExpList::GeneralMatrixOp(const GlobalMatrixKey &gkey,
         }
 
         // Update factors and varoeffs
+        int cnt{0};
         for (int i = 0; i < m_collections.size(); ++i)
         {
             m_collections[i].UpdateFactors(Collections::eHelmholtz,
-                                           gkey.GetConstFactors(),
-                                           m_coll_phys_offset[i]);
+                                           gkey.GetConstFactors());
 
             // Restrict varcoeffs to collection size and update
             StdRegions::VarCoeffMap varcoeffs;
             if (nvarcoeffs)
             {
                 varcoeffs = StdRegions::RestrictCoeffMap(
-                    gkey.GetVarCoeffs(), m_coll_phys_offset[i],
+                    gkey.GetVarCoeffs(), m_phys_offset[cnt],
                     m_collections[i].GetInputSize(Collections::eHelmholtz,
                                                   false));
+                cnt += m_collections[i].GetNumElmt(Collections::eHelmholtz);
             }
             m_collections[i].UpdateVarcoeffs(Collections::eHelmholtz,
                                              varcoeffs);
@@ -5523,8 +5522,6 @@ void ExpList::CreateCollections(Collections::ImplementationType ImpType)
 
     // clear vectors in case previously called
     m_collections.clear();
-    m_coll_coeff_offset.clear();
-    m_coll_phys_offset.clear();
 
     /*-------------------------------------------------------------------------
       Dividing m_exp into sub groups (collections): original exp order is kept.
@@ -5540,10 +5537,6 @@ void ExpList::CreateCollections(Collections::ImplementationType ImpType)
     vector<StdRegions::StdExpansionSharedPtr> collExp;
     LocalRegions::ExpansionSharedPtr exp = (*m_exp)[0];
     Collections::OperatorImpMap impTypes = colOpt.GetOperatorImpMap(exp);
-    // storing the offset for the modes and quadrature points for the 1st
-    // element in the collection
-    m_coll_coeff_offset.push_back(m_coeff_offset[0]);
-    m_coll_phys_offset.push_back(m_phys_offset[0]);
 
     // add the first element to the collection - initialization
     collExp.push_back(exp);
@@ -5603,9 +5596,6 @@ void ExpList::CreateCollections(Collections::ImplementationType ImpType)
 
             Collections::Collection tmp(collExp, impTypes);
             m_collections.push_back(tmp);
-            // store the offsets of the current element
-            m_coll_coeff_offset.push_back(m_coeff_offset[i]);
-            m_coll_phys_offset.push_back(m_phys_offset[i]);
 
             // for the new collection calling the optimization routine based on
             // its first element
@@ -5706,7 +5696,7 @@ void ExpList::v_PhysInterp1DScaled([[maybe_unused]] const NekDouble scale,
 
     {
         m_collections[i].UpdateFactors(Collections::ePhysInterp1DScaled,
-                                       factors, m_coll_phys_offset[i]);
+                                       factors);
     }
     LIKWID_MARKER_START("v_PhysInterp1DScaled");
     timer.Start();

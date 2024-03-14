@@ -120,8 +120,7 @@ public:
         NEKERROR(ErrorUtil::efatal, "Not valid for this operator.");
     }
 
-    void UpdateFactors(StdRegions::FactorMap factors,
-                       [[maybe_unused]] int coll_phys_offset) override
+    void UpdateFactors(StdRegions::FactorMap factors) override
     {
         m_factors = factors;
     }
@@ -435,10 +434,8 @@ public:
      * @brief Check the validity of supplied constant factors.
      *
      * @param factors Map of factors
-     * @param coll_phys_offset Unused
      */
-    void UpdateFactors(StdRegions::FactorMap factors,
-                       [[maybe_unused]] int coll_phys_offset) override
+    void UpdateFactors(StdRegions::FactorMap factors) override
     {
         // If match previous factors, nothing to do.
         if (m_factors == factors)
@@ -545,7 +542,7 @@ private:
         m_HasVarCoeffDiff = false;
         m_factors         = StdRegions::NullFactorMap;
         m_varcoeffs       = StdRegions::NullVarCoeffMap;
-        this->UpdateFactors(factors, 0);
+        this->UpdateFactors(factors);
     }
 };
 
@@ -624,8 +621,7 @@ public:
     /**
      *
      */
-    void UpdateFactors(StdRegions::FactorMap factors,
-                       [[maybe_unused]] int coll_phys_offset) override
+    void UpdateFactors(StdRegions::FactorMap factors) override
     {
         if (factors == m_factors)
         {
@@ -765,7 +761,7 @@ private:
         // Set factors
         m_factors   = StdRegions::NullFactorMap;
         m_varcoeffs = StdRegions::NullVarCoeffMap;
-        this->UpdateFactors(factors, 0);
+        this->UpdateFactors(factors);
     }
 };
 

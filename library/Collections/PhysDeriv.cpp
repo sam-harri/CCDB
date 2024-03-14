@@ -190,12 +190,6 @@ public:
         }
     }
 
-    void UpdateFactors([[maybe_unused]] StdRegions::FactorMap factors,
-                       [[maybe_unused]] int coll_phys_offset) override
-    {
-        ASSERTL0(false, "Not valid for this operator.");
-    }
-
 protected:
     Array<OneD, DNekMatSharedPtr> m_derivMat;
     Array<TwoD, const NekDouble> m_derivFac;
@@ -336,12 +330,6 @@ public:
             (*m_oper)(input, m_output);
         }
         Vmath::Vcopy(m_nOut, m_output[dir], 1, output, 1);
-    }
-
-    void UpdateFactors([[maybe_unused]] StdRegions::FactorMap factors,
-                       [[maybe_unused]] int coll_phys_offset) override
-    {
-        ASSERTL0(false, "Not valid for this operator.");
     }
 
 private:
@@ -546,12 +534,6 @@ public:
         }
     }
 
-    void UpdateFactors([[maybe_unused]] StdRegions::FactorMap factors,
-                       [[maybe_unused]] int coll_phys_offset) override
-    {
-        ASSERTL0(false, "Not valid for this operator.");
-    }
-
 protected:
     Array<TwoD, const NekDouble> m_derivFac;
     int m_dim;
@@ -675,12 +657,6 @@ public:
             m_expList[i]->PhysDeriv(dir, input + i * nPhys,
                                     tmp = output + i * nPhys);
         }
-    }
-
-    void UpdateFactors([[maybe_unused]] StdRegions::FactorMap factors,
-                       [[maybe_unused]] int coll_phys_offset) override
-    {
-        ASSERTL0(false, "Not valid for this operator.");
     }
 
 protected:
@@ -829,12 +805,6 @@ public:
                             t = output + e * m_nqe, 1);
             }
         }
-    }
-
-    void UpdateFactors([[maybe_unused]] StdRegions::FactorMap factors,
-                       [[maybe_unused]] int coll_phys_offset) override
-    {
-        ASSERTL0(false, "Not valid for this operator.");
     }
 
 protected:
@@ -994,12 +964,6 @@ public:
                              t = output + e * m_nqe, 1);
             }
         }
-    }
-
-    void UpdateFactors([[maybe_unused]] StdRegions::FactorMap factors,
-                       [[maybe_unused]] int coll_phys_offset) override
-    {
-        ASSERTL0(false, "Not valid for this operator.");
     }
 
 protected:
@@ -1181,12 +1145,6 @@ public:
                              t = output + e * m_nqe, 1);
             }
         }
-    }
-
-    void UpdateFactors([[maybe_unused]] StdRegions::FactorMap factors,
-                       [[maybe_unused]] int coll_phys_offset) override
-    {
-        ASSERTL0(false, "Not valid for this operator.");
     }
 
 protected:
@@ -1397,12 +1355,6 @@ public:
                 }
             }
         }
-    }
-
-    void UpdateFactors([[maybe_unused]] StdRegions::FactorMap factors,
-                       [[maybe_unused]] int coll_phys_offset) override
-    {
-        ASSERTL0(false, "Not valid for this operator.");
     }
 
 protected:
@@ -1649,12 +1601,6 @@ public:
         }
     }
 
-    void UpdateFactors([[maybe_unused]] StdRegions::FactorMap factors,
-                       [[maybe_unused]] int coll_phys_offset) override
-    {
-        ASSERTL0(false, "Not valid for this operator.");
-    }
-
 protected:
     Array<TwoD, const NekDouble> m_derivFac;
     int m_coordim;
@@ -1899,12 +1845,6 @@ public:
                 }
             }
         }
-    }
-
-    void UpdateFactors([[maybe_unused]] StdRegions::FactorMap factors,
-                       [[maybe_unused]] int coll_phys_offset) override
-    {
-        ASSERTL0(false, "Not valid for this operator.");
     }
 
 protected:
@@ -2155,12 +2095,6 @@ public:
                 }
             }
         }
-    }
-
-    void UpdateFactors([[maybe_unused]] StdRegions::FactorMap factors,
-                       [[maybe_unused]] int coll_phys_offset) override
-    {
-        ASSERTL0(false, "Not valid for this operator.");
     }
 
 protected:
