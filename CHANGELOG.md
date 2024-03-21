@@ -14,6 +14,7 @@ v5.6.0
 - Add conditional updating of elemental Mass and Laplacian matrices for LinearADR matrices (!1766)
 - Fix PFASST I/O and pre-initialize coarse preconditioner for Parareal (!1749)
 - Remove collection offset arrays since no longer required (!1771)
+- Fix summary output (!1779)
 
 
 **NekPy**

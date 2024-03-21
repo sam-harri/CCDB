@@ -1549,6 +1549,15 @@ void EquationSystem::SessionSummary(SummaryList &s)
             GetAdvectionFactory().GetClassDescription(AdvectionType));
     }
 
+    if (m_session->DefinesSolverInfo("DiffusionType"))
+    {
+        std::string DiffusionType;
+        DiffusionType = m_session->GetSolverInfo("DiffusionType");
+        AddSummaryItem(
+            s, "Diffusion Type",
+            GetDiffusionFactory().GetClassDescription(DiffusionType));
+    }
+
     if (m_projectionType == MultiRegions::eGalerkin)
     {
         AddSummaryItem(s, "Projection Type", "Continuous Galerkin");
@@ -1561,33 +1570,6 @@ void EquationSystem::SessionSummary(SummaryList &s)
     {
         AddSummaryItem(s, "Projection Type",
                        "Mixed Continuous Galerkin and Discontinuous");
-    }
-
-    if (m_session->DefinesSolverInfo("DiffusionType"))
-    {
-        std::string DiffusionType;
-        DiffusionType = m_session->GetSolverInfo("DiffusionType");
-        AddSummaryItem(
-            s, "Diffusion Type",
-            GetDiffusionFactory().GetClassDescription(DiffusionType));
-    }
-    else if (m_projectionType == MultiRegions::eDiscontinuous)
-    {
-        AddSummaryItem(s, "Projection Type", "Discontinuous Galerkin");
-    }
-    else if (m_projectionType == MultiRegions::eMixed_CG_Discontinuous)
-    {
-        AddSummaryItem(s, "Projection Type",
-                       "Mixed Continuous Galerkin and Discontinuous");
-    }
-
-    if (m_session->DefinesSolverInfo("DiffusionType"))
-    {
-        std::string DiffusionType;
-        DiffusionType = m_session->GetSolverInfo("DiffusionType");
-        AddSummaryItem(
-            s, "Diffusion Type",
-            GetDiffusionFactory().GetClassDescription(DiffusionType));
     }
 }
 
