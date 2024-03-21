@@ -290,19 +290,6 @@ v5.3.0
 - Added float and restore avx512 back-end for SimdLib (!1387)
 - Fix namespace pollution which causes boost 1.74+ errors (!1389)
 - Fix missing copy assignment operator warnings in clang 13+ (!1391)
-- Add an integral filter for the time-evolution of integrals on composites,
-  supports dimension equal to or one lower than the mesh dimension (!1323)
-- Overload PhysEvaluate to give first derivatives using barycentric
-  interpolation (!1323)
-- Non-conformal interface support (!1323)
-
-**FieldConvert**
-- Added conditional to select the eNearestNeighbour method for 3D interpolation (!1335)
-- Fixed the output field names of WSS module of FieldConvert
-- Added float to scalar and avx2 back-end, disable avx512, sse2, sve (!1255)
-- Change MPI initialisation to allow MPI_Init call outside Nektar++ (!1376)
-- Added float and restore avx512 back-end for SimdLib (!1387)
-- Fix namespace pollution which causes boost 1.74+ errors (!1389)
 - Added checkpoint file writing start time in the checkpoint filter (!1401)
 - Fix boost 1.77 compatibility errors (!1420)
 - Replaced depricated "sprintf" with "std::to_string" (!1406)
@@ -417,7 +404,6 @@ v5.3.0
 - Fix CWIPI test to use DirectFull for projection of received data (!1502)
 
 **NekMesh**
-- Multi domain input/output for Nekpp and HDF5 file formats (!1323)
 - Replace VTK pointers with VTK smart-pointers to avoid memory leaking, when
 exporting in .vtu format (!1386)
 - Preserve CAD face labels and save in to session file as a "NAME=" tag on the composites (!1396)
