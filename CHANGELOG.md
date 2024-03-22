@@ -1,5 +1,6 @@
 Changelog
 =========
+
 v5.6.0
 ------
 **Library**
@@ -15,7 +16,7 @@ v5.6.0
 - Fix PFASST I/O and pre-initialize coarse preconditioner for Parareal (!1749)
 - Remove collection offset arrays since no longer required (!1771)
 - Fix summary output (!1779)
-
+- Update Docker images to use bookworm (!1775)
 
 **NekPy**
 - Add binding to NekPy to check of geometry elements are valid (!1755)
