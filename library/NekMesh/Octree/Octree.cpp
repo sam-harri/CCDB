@@ -650,7 +650,6 @@ void Octree::PropagateDomain()
                 known.clear();
             }
         }
-
     } while (ct > 0);
 
     for (int i = 0; i < m_octants.size(); i++)
@@ -707,7 +706,6 @@ void Octree::SmoothAllOctants()
                 ct += 1;
             }
         }
-
     } while (ct > 0);
 }
 

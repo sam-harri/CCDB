@@ -129,7 +129,7 @@ void Generator2D::Process()
                 {
                     loc = vertices[0]->GetLoc();
                     t   = m_thickness.Evaluate(m_thickness_ID, loc[0], loc[1],
-                                             loc[2], 0.0);
+                                               loc[2], 0.0);
                     m_curvemeshes[i]->SetOffset(0, t);
                 }
                 // offset needed at second node (or both)
@@ -137,7 +137,7 @@ void Generator2D::Process()
                 {
                     loc = vertices[1]->GetLoc();
                     t   = m_thickness.Evaluate(m_thickness_ID, loc[0], loc[1],
-                                             loc[2], 0.0);
+                                               loc[2], 0.0);
                     m_curvemeshes[i]->SetOffset(1, t);
                 }
             }

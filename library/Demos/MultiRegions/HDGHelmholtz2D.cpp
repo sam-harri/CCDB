@@ -41,7 +41,7 @@
 #include <MultiRegions/DisContField.h>
 #include <SpatialDomains/MeshGraph.h>
 
-//#define TIMING
+// #define TIMING
 #ifdef TIMING
 #include <time.h>
 #define Timing(s)                                                              \

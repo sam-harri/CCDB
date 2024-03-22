@@ -872,7 +872,7 @@ void PreconditionerLowEnergy::v_BuildPreconditioner()
     {
         nmodes = n_blks[1 + loc];
         gmat   = MemoryManager<DNekMat>::AllocateSharedPtr(nmodes, nmodes, zero,
-                                                         storage);
+                                                           storage);
 
         for (v = 0; v < nmodes; ++v)
         {
@@ -2075,9 +2075,9 @@ void PreconditionerLowEnergy::ReSetPrismMaxRMat(
 
         // Reset vertex to edge mapping from tet.
         const int VETetVert[][2]   = {{0, 0}, {1, 1}, {1, 1},
-                                    {0, 0}, {3, 3}, {3, 3}};
+                                      {0, 0}, {3, 3}, {3, 3}};
         const int VETetEdge[][2]   = {{0, 3}, {0, 4}, {0, 4},
-                                    {0, 3}, {3, 4}, {4, 3}};
+                                      {0, 3}, {3, 4}, {4, 3}};
         const int VEPrismEdge[][2] = {{0, 4}, {0, 5}, {2, 6},
                                       {2, 7}, {4, 5}, {6, 7}};
 
@@ -2116,9 +2116,9 @@ void PreconditionerLowEnergy::ReSetPrismMaxRMat(
         // followed by the hex edge to use for each prism edge
         // in the vert-edge map (VEEdge)
         const int VEHexVert[][3]   = {{0, 0, 0}, {1, 1, 1}, {2, 2, 2},
-                                    {3, 3, 3}, {4, 5, 5}, {6, 7, 7}};
+                                      {3, 3, 3}, {4, 5, 5}, {6, 7, 7}};
         const int VEHexEdge[][3]   = {{0, 3, 4}, {0, 1, 5}, {1, 2, 6},
-                                    {2, 3, 7}, {4, 5, 9}, {6, 7, 11}};
+                                      {2, 3, 7}, {4, 5, 9}, {6, 7, 11}};
         const int VEPrismEdge[][3] = {{0, 3, 4}, {0, 1, 5}, {1, 2, 6},
                                       {2, 3, 7}, {4, 5, 8}, {6, 7, 8}};
 

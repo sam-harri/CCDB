@@ -128,7 +128,6 @@ void CADSurf::OrientateEdges(CADSurfSharedPtr surf,
                 ct += 1;
             }
         }
-
     } while (ct > 0);
 
     // only need center points for inner loops

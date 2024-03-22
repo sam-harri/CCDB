@@ -250,8 +250,8 @@ public:
     }
 
     /// Get trace normal
-    SOLVER_UTILS_EXPORT const Array<OneD, const Array<OneD, NekDouble>>
-        &GetTraceNormal()
+    SOLVER_UTILS_EXPORT const Array<OneD, const Array<OneD, NekDouble>> &
+    GetTraceNormal()
     {
         return v_GetTraceNormal();
     }
@@ -416,8 +416,9 @@ protected:
         return tmp;
     }
 
-    SOLVER_UTILS_EXPORT virtual const Array<OneD, const Array<OneD, NekDouble>>
-        &v_GetTraceNormal();
+    SOLVER_UTILS_EXPORT virtual const Array<OneD,
+                                            const Array<OneD, NekDouble>> &
+    v_GetTraceNormal();
 };
 
 } // namespace Nektar::SolverUtils

@@ -65,7 +65,7 @@ NekLinSysIterGMRESLoc::NekLinSysIterGMRESLoc(
     m_KrylovMaxHessMatBand = pKey.m_KrylovMaxHessMatBand;
 
     m_maxrestart       = ceil(NekDouble(m_NekLinSysMaxIterations) /
-                        NekDouble(m_LinSysMaxStorage));
+                              NekDouble(m_LinSysMaxStorage));
     m_LinSysMaxStorage = min(m_NekLinSysMaxIterations, m_LinSysMaxStorage);
 
     m_DifferenceFlag0 = pKey.m_DifferenceFlag0;
