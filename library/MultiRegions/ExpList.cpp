@@ -3716,8 +3716,8 @@ void ExpList::v_UnsetGlobalLinSys([[maybe_unused]] GlobalLinSysKey key,
              "UnsetGlobalLinSys not implemented for ExpList.");
 }
 
-LibUtilities::NekManager<GlobalLinSysKey, GlobalLinSys>
-    &ExpList::v_GetGlobalLinSysManager(void)
+LibUtilities::NekManager<GlobalLinSysKey, GlobalLinSys> &ExpList::
+    v_GetGlobalLinSysManager(void)
 {
     NEKERROR(ErrorUtil::efatal,
              "GetGlobalLinSysManager not implemented for ExpList.");
@@ -4183,8 +4183,8 @@ void ExpList::GenerateElementVector(const int ElementID,
     }
 }
 
-const Array<OneD, const std::shared_ptr<ExpList>>
-    &ExpList::v_GetBndCondExpansions(void)
+const Array<OneD, const std::shared_ptr<ExpList>> &ExpList::
+    v_GetBndCondExpansions(void)
 {
     NEKERROR(ErrorUtil::efatal,
              "This method is not defined or valid for this class type");
@@ -5403,8 +5403,8 @@ void ExpList::v_PeriodicBwdCopy(
 
 /**
  */
-const Array<OneD, const SpatialDomains::BoundaryConditionShPtr>
-    &ExpList::v_GetBndConditions(void)
+const Array<OneD, const SpatialDomains::BoundaryConditionShPtr> &ExpList::
+    v_GetBndConditions(void)
 {
     NEKERROR(ErrorUtil::efatal,
              "This method is not defined or valid for this class type");
@@ -5414,8 +5414,8 @@ const Array<OneD, const SpatialDomains::BoundaryConditionShPtr>
 
 /**
  */
-Array<OneD, SpatialDomains::BoundaryConditionShPtr>
-    &ExpList::v_UpdateBndConditions()
+Array<OneD, SpatialDomains::BoundaryConditionShPtr> &ExpList::
+    v_UpdateBndConditions()
 {
     NEKERROR(ErrorUtil::efatal,
              "This method is not defined or valid for this class type");
@@ -5662,8 +5662,8 @@ void ExpList::UnsetGlobalLinSys(GlobalLinSysKey key, bool clearLocalMatrices)
     v_UnsetGlobalLinSys(key, clearLocalMatrices);
 }
 
-LibUtilities::NekManager<GlobalLinSysKey, GlobalLinSys>
-    &ExpList::GetGlobalLinSysManager(void)
+LibUtilities::NekManager<GlobalLinSysKey, GlobalLinSys> &ExpList::
+    GetGlobalLinSysManager(void)
 {
     return v_GetGlobalLinSysManager();
 }

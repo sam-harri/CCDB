@@ -742,7 +742,7 @@ void ForcingMovingBody::InitialiseCableModel(
         m_session->LoadParameter("Strip_Z", nstrips);
         m_lhom = nstrips * DistStrip;
         m_FFT  = LibUtilities::GetNektarFFTFactory().CreateInstance("NekFFTW",
-                                                                   nstrips);
+                                                                    nstrips);
     }
 
     // load the structural dynamic parameters from xml file

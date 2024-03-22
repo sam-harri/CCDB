@@ -1433,7 +1433,7 @@ void MeshGraphHDF5::WriteGeometryMap(std::map<int, std::shared_ptr<T>> &geomMap,
     }
 
     vector<hsize_t> dims     = {static_cast<hsize_t>(nGeom),
-                            static_cast<hsize_t>(nGeomData)};
+                                static_cast<hsize_t>(nGeomData)};
     H5::DataTypeSharedPtr tp = H5::DataType::OfObject(data[0]);
     H5::DataSpaceSharedPtr ds =
         std::shared_ptr<H5::DataSpace>(new H5::DataSpace(dims));

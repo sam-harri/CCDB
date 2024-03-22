@@ -648,8 +648,8 @@ std::vector<long long> hexTensorNodeOrdering(
                            {n * n * n - 1, -1},
                            {n * n * (n - 1) + n * (n - 1), -n}};
     int hexFaces[6][3]  = {{0, 1, n},         {0, 1, n * n},
-                          {n - 1, n, n * n}, {n * (n - 1), 1, n * n},
-                          {0, n, n * n},     {n * n * (n - 1), 1, n}};
+                           {n - 1, n, n * n}, {n * (n - 1), 1, n * n},
+                           {0, n, n * n},     {n * n * (n - 1), 1, n}};
 
     int gmshToNekEdge[12] = {0, 1, -2, -3, 8, 9, -10, -11, 4, 5, 6, 7};
 

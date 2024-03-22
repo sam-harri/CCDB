@@ -2832,14 +2832,14 @@ std::vector<bool> &DisContField::v_GetLeftAdjacentTraces(void)
     return m_leftAdjacentTraces;
 }
 
-const Array<OneD, const MultiRegions::ExpListSharedPtr>
-    &DisContField::v_GetBndCondExpansions()
+const Array<OneD, const MultiRegions::ExpListSharedPtr> &DisContField::
+    v_GetBndCondExpansions()
 {
     return m_bndCondExpansions;
 }
 
-const Array<OneD, const SpatialDomains::BoundaryConditionShPtr>
-    &DisContField::v_GetBndConditions()
+const Array<OneD, const SpatialDomains::BoundaryConditionShPtr> &DisContField::
+    v_GetBndConditions()
 {
     return m_bndConditions;
 }
@@ -2849,8 +2849,8 @@ MultiRegions::ExpListSharedPtr &DisContField::v_UpdateBndCondExpansion(int i)
     return m_bndCondExpansions[i];
 }
 
-Array<OneD, SpatialDomains::BoundaryConditionShPtr>
-    &DisContField::v_UpdateBndConditions()
+Array<OneD, SpatialDomains::BoundaryConditionShPtr> &DisContField::
+    v_UpdateBndConditions()
 {
     return m_bndConditions;
 }

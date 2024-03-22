@@ -38,7 +38,7 @@
 #include <iomanip>
 #include <iostream>
 
-//#include <sstream>
+// #include <sstream>
 #include <LibUtilities/BasicConst/NektarUnivTypeDefs.hpp>
 #include <LibUtilities/LinearAlgebra/Lapack.hpp>
 #include <LocalRegions/QuadExp.h>
@@ -674,7 +674,7 @@ int main(int argc, char *argv[])
 
     /////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
-    //££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££
+    // ££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££
     //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
     //@todo set Delta0 from session file
     NekDouble Delta0;
@@ -688,7 +688,7 @@ int main(int argc, char *argv[])
     }
 
     //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-    //££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££
+    // ££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££
     ////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////
     // save the coords of the old vertices
@@ -2284,7 +2284,7 @@ void GenerateAddPointsNewtonIt(NekDouble xi, NekDouble yi, NekDouble &xout,
         U = function->GetExp(elmtid)->PhysEvaluate(coords, function->GetPhys() +
                                                                offset);
         dU        = function->GetExp(elmtid)->PhysEvaluate(coords,
-                                                    derfunction + offset);
+                                                           derfunction + offset);
         coords[1] = coords[1] - (U - cr) / dU;
         cout << cr << "U-cr=" << U - cr << "  tmp result y:" << coords[1]
              << "  dU=" << dU << endl;
@@ -2591,8 +2591,8 @@ void MappingEVids([[maybe_unused]] Array<OneD, NekDouble> xoldup,
                         Utmp     = streak->GetExp(elmtid)->PhysEvaluate(
                             coord, streak->GetPhys() + offset);
                         diffarray[e]  = abs((xtmp * xbef + ytmp * ybef) /
-                                               (normtmp * normbef) -
-                                           1);
+                                                (normtmp * normbef) -
+                                            1);
                         diffUarray[e] = abs(Ubef - Utmp);
                         cout << "   normtmp=" << normtmp << endl;
                         cout << "   Utmpcc=" << Utmp << endl;
@@ -2611,8 +2611,8 @@ void MappingEVids([[maybe_unused]] Array<OneD, NekDouble> xoldup,
                             Eids_lay[m][g]     = edgestmp[e];
                             Vids_lay[m][g + 1] = V2[edgestmp[e]];
                             diff     = abs((xtmp * xbef + ytmp * ybef) /
-                                           (normtmp * normbef) -
-                                       1);
+                                               (normtmp * normbef) -
+                                           1);
                             normnext = normtmp;
                             ynext    = ytmp;
                             xnext    = xtmp;
@@ -2631,8 +2631,8 @@ void MappingEVids([[maybe_unused]] Array<OneD, NekDouble> xoldup,
                         Utmp     = streak->GetExp(elmtid)->PhysEvaluate(
                             coord, streak->GetPhys() + offset);
                         diffarray[e]  = abs((xtmp * xbef + ytmp * ybef) /
-                                               (normtmp * normbef) -
-                                           1);
+                                                (normtmp * normbef) -
+                                            1);
                         diffUarray[e] = abs(Ubef - Utmp);
                         cout << "   normtmp=" << normtmp << endl;
                         cout << "   Utmpcc=" << Utmp << endl;
@@ -2650,8 +2650,8 @@ void MappingEVids([[maybe_unused]] Array<OneD, NekDouble> xoldup,
                             Eids_lay[m][g]     = edgestmp[e];
                             Vids_lay[m][g + 1] = V1[edgestmp[e]];
                             diff     = abs((xtmp * xbef + ytmp * ybef) /
-                                           (normtmp * normbef) -
-                                       1);
+                                               (normtmp * normbef) -
+                                           1);
                             normnext = normtmp;
                             ynext    = ytmp;
                             xnext    = xtmp;

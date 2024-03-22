@@ -62,8 +62,8 @@ namespace boost::python::detail
 {
 template <class Functor> struct functor_signature
 {
-    typedef decltype(
-        get_signature(&Functor::operator())) member_function_signature;
+    typedef decltype(get_signature(
+        &Functor::operator())) member_function_signature;
     typedef typename mpl::advance<
         typename mpl::begin<member_function_signature>::type,
         mpl::int_<1>>::type instance_argument_iterator;

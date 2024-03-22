@@ -405,8 +405,8 @@ public:
     {
         return m_hexGeoms;
     }
-    SPATIAL_DOMAINS_EXPORT std::unordered_map<int, GeometryLinkSharedPtr>
-        &GetAllFaceToElMap()
+    SPATIAL_DOMAINS_EXPORT std::unordered_map<int, GeometryLinkSharedPtr> &
+    GetAllFaceToElMap()
     {
         return m_faceToElMap;
     }

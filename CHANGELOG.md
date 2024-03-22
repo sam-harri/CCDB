@@ -17,6 +17,7 @@ v5.6.0
 - Remove collection offset arrays since no longer required (!1771)
 - Fix summary output (!1779)
 - Update Docker images to use bookworm (!1775)
+- Update `clang-tidy` and `clang-format` to v16 (!1777)
 - Add coverage metric capturing (!1776)
 
 **NekPy**

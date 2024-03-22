@@ -1267,7 +1267,7 @@ DNekMatSharedPtr StdQuadExp::v_GenMatrix(const StdMatrixKey &mkey)
             {
                 for (i = 0; i < order1; ++i)
                 {
-                    (*Mat)(order0 * i + 1, i * order0 + 1) = 1.0;
+                    (*Mat)(order0 *i + 1, i * order0 + 1) = 1.0;
                 }
             }
 

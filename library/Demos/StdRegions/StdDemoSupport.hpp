@@ -264,9 +264,9 @@ public:
         // check basis selection is permitted for chosen shape
         map<ShapeType, vector<vector<BasisType>>> allowableBasis;
         allowableBasis[ePoint]    = {{eOrtho_A, eModified_A, eFourier,
-                                   eGLL_Lagrange, eGauss_Lagrange, eLegendre,
-                                   eChebyshev, eMonomial, eFourierSingleMode,
-                                   eFourierHalfModeRe, eFourierHalfModeIm}};
+                                      eGLL_Lagrange, eGauss_Lagrange, eLegendre,
+                                      eChebyshev, eMonomial, eFourierSingleMode,
+                                      eFourierHalfModeRe, eFourierHalfModeIm}};
         allowableBasis[eSegment]  = {allowableBasis[ePoint][0]};
         allowableBasis[eTriangle] = {
             {eOrtho_A, eModified_A, eGLL_Lagrange, eGauss_Lagrange},

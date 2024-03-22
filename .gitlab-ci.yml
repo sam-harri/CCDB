@@ -146,10 +146,10 @@ include:
 
 .clang-format-template: &clang-format-template
   <<: *execution-conditions
-  image: debian:11-slim
+  image: debian:12-slim
   stage: quality-checks
   variables:
-    CL_F_VER: 11
+    CL_F_VER: 16
     TARGETS: library solvers templates tests utilities
   before_script:
     - apt-get update && apt-get install -y clang-format-$CL_F_VER git-core
@@ -165,8 +165,8 @@ include:
   stage: quality-checks
   variables:
     NUM_CPUS: 8
-    CL_T_VER: 14
-    CL_F_VER: 11
+    CL_T_VER: 16
+    CL_F_VER: 16
     TARGETS: library solvers templates tests utilities
   before_script:
     - git config --global --add safe.directory "$CI_PROJECT_DIR"
@@ -397,6 +397,12 @@ debian-bullseye-clang-format:
   <<: *clang-format-template
   needs: []
 
+## CLANG-TIDY
+debian-bullseye-clang-tidy:
+  <<: *clang-tidy-template
+  image: $CI_REGISTRY_IMAGE:env-debian-bullseye-full
+  needs: ["debian-bullseye-full-build-env"]
+
 debian-bullseye-header-format:
   <<: *header-format-template
   needs: []
@@ -599,12 +605,6 @@ ubuntu-bionic-default-warnings:
 ubuntu-bionic-full-warnings:
   <<: *compiler-warning-template
   needs: ["ubuntu-bionic-full-build-and-test"]
-
-## CLANG-TIDY
-ubuntu-jammy-clang-tidy:
-  <<: *clang-tidy-template
-  image: $CI_REGISTRY_IMAGE:env-ubuntu-jammy-full
-  needs: ["ubuntu-jammy-full-build-env"]
 
 ## UNCOMPILED FILES
 ubuntu-jammy-uncompiled-files:

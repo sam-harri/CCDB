@@ -647,11 +647,11 @@ void ProcessBL::BoundaryLayer3D()
     int splitedgehex0[4]           = {4, 5, 6, 7};
     int splitHex0EdgeVert[4][2]    = {{0, 4}, {1, 5}, {2, 6}, {3, 7}};
     int splitMapConnHex0[8][2]     = {{0, 0}, {1, 0}, {2, 0}, {3, 0},
-                                  {0, 1}, {1, 1}, {2, 1}, {3, 1}};
+                                      {0, 1}, {1, 1}, {2, 1}, {3, 1}};
     int splitedgestocurvehex0[8]   = {0, 1, 2, 3, 8, 9, 10, 11};
     int splithex0gll[8][3]         = {{-1, -1, -1}, {1, -1, -1}, {1, 1, -1},
-                              {-1, 1, -1},  {-1, -1, 1}, {1, -1, 1},
-                              {1, 1, 1},    {-1, 1, 1}};
+                                      {-1, 1, -1},  {-1, -1, 1}, {1, -1, 1},
+                                      {1, 1, 1},    {-1, 1, 1}};
     int splitHex0IntEdgeFace[4][2] = {{0, 1}, {1, 2}, {2, 3}, {3, 4}};
     int splitHex0ExtEdgeFace[4][2] = {{8, 1}, {9, 2}, {10, 3}, {11, 4}};
 
@@ -673,7 +673,7 @@ void ProcessBL::BoundaryLayer3D()
 
     splitMap[LibUtilities::eHexahedron][0] = splitHex0;
     int splitMapConnHex0rev[8][2]          = {{0, 1}, {1, 1}, {2, 1}, {3, 1},
-                                     {0, 0}, {1, 0}, {2, 0}, {3, 0}};
+                                              {0, 0}, {1, 0}, {2, 0}, {3, 0}};
 
     SplitMapHelper splitHex5;
     splitHex5.size                         = 8;
@@ -702,7 +702,7 @@ void ProcessBL::BoundaryLayer3D()
     int splitedgehex1[4]           = {11, 9, 1, 3};
     int splitHex1EdgeVert[4][2]    = {{4, 7}, {5, 6}, {1, 2}, {0, 3}};
     int splitMapConnHex1[8][2]     = {{3, 0}, {2, 0}, {2, 1}, {3, 1},
-                                  {0, 0}, {1, 0}, {1, 1}, {0, 1}};
+                                      {0, 0}, {1, 0}, {1, 1}, {0, 1}};
     int splitedgestocurvehex1[8]   = {4, 8, 5, 0, 7, 10, 6, 2};
     int splitHex1IntEdgeFace[4][2] = {{0, 0}, {4, 4}, {5, 2}, {8, 5}};
     int splitHex1ExtEdgeFace[4][2] = {{2, 0}, {6, 2}, {7, 4}, {10, 5}};
@@ -754,7 +754,7 @@ void ProcessBL::BoundaryLayer3D()
     int splitedgehex4[4]           = {8, 0, 2, 10};
     int splitHex4EdgeVert[4][2]    = {{4, 5}, {0, 1}, {3, 2}, {7, 6}};
     int splitMapConnHex4[8][2]     = {{1, 0}, {1, 1}, {2, 1}, {2, 0},
-                                  {0, 0}, {0, 1}, {3, 1}, {3, 0}};
+                                      {0, 0}, {0, 1}, {3, 1}, {3, 0}};
     int splitedgestocurvehex4[8]   = {4, 11, 7, 3, 5, 9, 6, 1};
     int splitHex4IntEdgeFace[4][2] = {{3, 0}, {4, 1}, {7, 3}, {11, 5}};
     int splitHex4ExtEdgeFace[4][2] = {{1, 0}, {5, 1}, {6, 3}, {9, 5}};
@@ -806,10 +806,10 @@ void ProcessBL::BoundaryLayer3D()
     int splitedgeprism1[3]           = {3, 1, 8};
     int splitPrism1EdgeVert[3][2]    = {{0, 3}, {1, 2}, {4, 5}};
     int splitMapConnPrism1[6][2]     = {{0, 0}, {1, 0}, {1, 1},
-                                    {0, 1}, {2, 0}, {2, 1}};
+                                        {0, 1}, {2, 0}, {2, 1}};
     int splitedgestocurveprism1[6]   = {0, 4, 5, 2, 6, 7};
     int splitprism1gll[6][3]         = {{-1, -1, -1}, {1, -1, -1}, {1, 1, -1},
-                                {-1, 1, -1},  {-1, -1, 1}, {-1, 1, 1}};
+                                        {-1, 1, -1},  {-1, -1, 1}, {-1, 1, 1}};
     int splitPrism1IntEdgeFace[3][2] = {{0, 0}, {4, 4}, {5, 2}};
     int splitPrism1ExtEdgeFace[3][2] = {{2, 0}, {6, 2}, {7, 4}};
 
@@ -832,7 +832,7 @@ void ProcessBL::BoundaryLayer3D()
 
     SplitMapHelper splitprism3;
     int splitMapConnPrism1rev[6][2]   = {{0, 1}, {1, 1}, {1, 0},
-                                       {0, 0}, {2, 1}, {2, 0}};
+                                         {0, 0}, {2, 1}, {2, 0}};
     splitprism3.size                  = 6;
     splitprism3.dir                   = 1;
     splitprism3.oppositeFace          = 1;

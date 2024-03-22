@@ -177,7 +177,7 @@ void Driver::v_InitObject(ostream &out)
                 LinNSFilename.push_back(LinNSCondFile);
 
                 char *argv[]  = {const_cast<char *>("IncNavierStokesSolver"),
-                                nullptr};
+                                 nullptr};
                 session_LinNS = LibUtilities::SessionReader::CreateInstance(
                     1, argv, LinNSFilename, m_comm);
 

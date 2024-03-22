@@ -79,8 +79,8 @@ public:
         return m_gridVelocity;
     }
 
-    SOLVER_UTILS_EXPORT const Array<OneD, const Array<OneD, NekDouble>>
-        &GetGridVelocityTrace();
+    SOLVER_UTILS_EXPORT const Array<OneD, const Array<OneD, NekDouble>> &
+    GetGridVelocityTrace();
     SOLVER_UTILS_EXPORT void ExtraFldOutputGridVelocity(
         std::vector<Array<OneD, NekDouble>> &fieldcoeffs,
         std::vector<std::string> &variables);

@@ -261,11 +261,11 @@ protected:
 
     std::map<int, RobinBCInfoSharedPtr> v_GetRobinBCInfo() override;
 
-    const Array<OneD, const MultiRegions::ExpListSharedPtr>
-        &v_GetBndCondExpansions() override;
+    const Array<OneD, const MultiRegions::ExpListSharedPtr> &
+    v_GetBndCondExpansions() override;
 
-    const Array<OneD, const SpatialDomains::BoundaryConditionShPtr>
-        &v_GetBndConditions() override;
+    const Array<OneD, const SpatialDomains::BoundaryConditionShPtr> &
+    v_GetBndConditions() override;
 
     MultiRegions::ExpListSharedPtr &v_UpdateBndCondExpansion(int i) override;
 
