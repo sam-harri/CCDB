@@ -1488,7 +1488,10 @@ void EquationSystem::ImportFld(const std::string &infile,
  */
 void EquationSystem::SessionSummary(SummaryList &s)
 {
-    AddSummaryItem(s, "EquationType", m_session->GetSolverInfo("EQTYPE"));
+    if (m_session->DefinesSolverInfo("EQTYPE"))
+    {
+        AddSummaryItem(s, "EquationType", m_session->GetSolverInfo("EQTYPE"));
+    }
     AddSummaryItem(s, "Session Name", m_sessionName);
     AddSummaryItem(s, "Spatial Dim.", m_spacedim);
     AddSummaryItem(s, "Max SEM Exp. Order",

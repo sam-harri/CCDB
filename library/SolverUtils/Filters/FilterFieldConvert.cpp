@@ -47,7 +47,7 @@ std::string FilterFieldConvert::className =
 
 FilterFieldConvert::FilterFieldConvert(
     const LibUtilities::SessionReaderSharedPtr &pSession,
-    const std::weak_ptr<EquationSystem> &pEquation, const ParamMap &pParams)
+    const std::shared_ptr<EquationSystem> &pEquation, const ParamMap &pParams)
     : Filter(pSession, pEquation)
 {
     m_dt = m_session->GetParameter("TimeStep");

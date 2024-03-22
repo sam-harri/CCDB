@@ -36,21 +36,7 @@ import sys, io, os, unittest, argparse
 from NekPy.LibUtilities import SessionReader, NekError
 from NekPy.SpatialDomains import MeshGraph
 from NekPy.SolverUtils import EquationSystem, Filter
-
-class SuppressStream(object): 
-    def __init__(self, stream=sys.stderr):
-        self.orig_stream_fileno = stream.fileno()
-
-    def __enter__(self):
-        self.orig_stream_dup = os.dup(self.orig_stream_fileno)
-        self.devnull = open(os.devnull, 'w')
-        os.dup2(self.devnull.fileno(), self.orig_stream_fileno)
-
-    def __exit__(self, type, value, traceback):
-        os.close(self.orig_stream_fileno)
-        os.dup2(self.orig_stream_dup, self.orig_stream_fileno)
-        os.close(self.orig_stream_dup)
-        self.devnull.close()
+from UnitTestUtils import SuppressStream
 
 # Create a filter class to test registration of classes from Python.
 class TestingFilter(Filter):

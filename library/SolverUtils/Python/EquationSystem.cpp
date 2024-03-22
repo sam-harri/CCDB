@@ -32,8 +32,11 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
+#include <LibUtilities/Python/BasicUtils/NekFactory.hpp>
 #include <LibUtilities/Python/NekPyConfig.hpp>
+
 #include <SolverUtils/EquationSystem.h>
+#include <SolverUtils/Python/EquationSystem.h>
 
 using namespace Nektar;
 using namespace Nektar::SolverUtils;
@@ -104,33 +107,116 @@ EquationSystemSharedPtr EquationSystem_Create(
     std::string eqnSysName, LibUtilities::SessionReaderSharedPtr session,
     SpatialDomains::MeshGraphSharedPtr mesh)
 {
-    return GetEquationSystemFactory().CreateInstance(eqnSysName, session, mesh);
+    EquationSystemSharedPtr ret =
+        GetEquationSystemFactory().CreateInstance(eqnSysName, session, mesh);
+    return ret;
 }
 
-py::list EquationSystem_GetFields(EquationSystemSharedPtr eqSys)
+Array<OneD, MultiRegions::ExpListSharedPtr> EquationSystem_GetFields(
+    EquationSystemSharedPtr eqSys)
 {
-    py::list expLists;
-    auto &fields = eqSys->UpdateFields();
+    return eqSys->UpdateFields();
+}
 
-    for (int i = 0; i < fields.size(); ++i)
-    {
-        expLists.append(py::object(fields[i]));
-    }
+void EquationSystem_PrintSummary(EquationSystemSharedPtr eqSys)
+{
+    eqSys->PrintSummary(std::cout);
+}
 
-    return expLists;
+std::shared_ptr<SessionFunction> EquationSystem_GetFunction1(
+    EquationSystemSharedPtr eqSys, std::string name)
+{
+    return eqSys->GetFunction(name);
+}
+
+std::shared_ptr<SessionFunction> EquationSystem_GetFunction2(
+    EquationSystemSharedPtr eqSys, std::string name,
+    MultiRegions::ExpListSharedPtr field)
+{
+    return eqSys->GetFunction(name, field);
+}
+
+void EquationSystem_WriteFld(EquationSystemSharedPtr eqSys, std::string name)
+{
+    eqSys->WriteFld(name);
+}
+
+void EquationSystem_Checkpoint_Output(EquationSystemSharedPtr eqSys, int n)
+{
+    eqSys->Checkpoint_Output(n);
 }
 
 void export_EquationSystem()
 {
-    py::class_<EquationSystem, std::shared_ptr<EquationSystem>,
-               boost::noncopyable>("EquationSystem", py::no_init)
-        .def("InitObject", &EquationSystem::InitObject)
-        .def("DoInitialise", &EquationSystem::DoInitialise)
-        .def("DoSolve", &EquationSystem::DoSolve)
+    using EqSysWrap = EquationSystemWrap<EquationSystem>;
 
+    static NekFactory_Register<EquationSystemFactory> fac(
+        GetEquationSystemFactory());
+
+    py::class_<EqSysWrap, std::shared_ptr<EqSysWrap>, boost::noncopyable>(
+        "EquationSystem", py::init<LibUtilities::SessionReaderSharedPtr,
+                                   SpatialDomains::MeshGraphSharedPtr>())
+
+        // Virtual functions that can be optionally overridden
+        .def("InitObject", &EquationSystem::InitObject,
+             &EqSysWrap::Default_v_InitObject)
+        .def("DoInitialise", &EquationSystem::DoInitialise,
+             &EqSysWrap::Default_v_DoInitialise)
+        .def("DoSolve", &EquationSystem::DoSolve, &EqSysWrap::Default_v_DoSolve)
+        .def("SetInitialConditions", &EquationSystem::SetInitialConditions,
+             &EqSysWrap::Default_v_SetInitialConditions)
+        .def("EvaluateExactSolution", &EqSysWrap::v_EvaluateExactSolution,
+             &EqSysWrap::Default_v_EvaluateExactSolution)
+        .def("LinfError", &EqSysWrap::v_LinfError,
+             &EqSysWrap::Default_v_LinfError)
+        .def("L2Error", &EqSysWrap::v_L2Error, &EqSysWrap::Default_v_L2Error)
+
+        // Fields accessors (read-only)
         .def("GetFields", &EquationSystem_GetFields)
+        .add_property("fields", &EquationSystem_GetFields)
+
+        // Various utility functions
+        .def("GetNvariables", &EquationSystem::GetNvariables)
+        .def("GetVariable", &EquationSystem::GetVariable)
+        .def("GetNpoints", &EquationSystem::GetNpoints)
+        .def("SetInitialStep", &EquationSystem::SetInitialStep)
+        .def("ZeroPhysFields", &EquationSystem::ZeroPhysFields)
+
+        // Time accessors/properties
+        .def("GetTime", &EquationSystem::GetTime)
+        .def("SetTime", &EquationSystem::SetTime)
+        .add_property("time", &EquationSystem::GetTime,
+                      &EquationSystem::SetTime)
+
+        // Timestep accessors/properties
+        .def("GetTimeStep", &EquationSystem::GetTimeStep)
+        .def("SetTimeStep", &EquationSystem::SetTimeStep)
+        .add_property("timestep", &EquationSystem::GetTimeStep,
+                      &EquationSystem::SetTimeStep)
+
+        // Steps accessors/properties
+        .def("GetSteps", &EquationSystem::GetSteps)
+        .def("SetSteps", &EquationSystem::SetSteps)
+        .add_property("steps", &EquationSystem::GetSteps,
+                      &EquationSystem::SetSteps)
+
+        // Print a summary
+        .def("PrintSummary", &EquationSystem_PrintSummary)
+
+        // Access functions from the session file
+        .def("GetFunction", &EquationSystem_GetFunction1)
+        .def("GetFunction", &EquationSystem_GetFunction2)
+
+        // I/O utility functions
+        .def("WriteFld", &EquationSystem_WriteFld)
+        .def("Checkpoint_Output", &EquationSystem_Checkpoint_Output)
 
         // Factory functions.
         .def("Create", &EquationSystem_Create)
-        .staticmethod("Create");
+        .staticmethod("Create")
+        .def("Register", [](std::string const &filterName,
+                            py::object &obj) { fac(filterName, obj); })
+        .staticmethod("Register");
+
+    WrapConverter<EquationSystem>();
 }

@@ -99,7 +99,7 @@ protected:
     }
 
     bool m_requireEquiSpaced;
-    bool m_prohibitWrite;
+    bool m_prohibitWrite   = false;
     bool m_equispacedSetup = false;
 
 private:

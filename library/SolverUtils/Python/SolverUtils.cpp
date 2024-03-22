@@ -36,6 +36,8 @@
 
 void export_EquationSystem();
 void export_Filter();
+void export_SessionFunction();
+void export_UnsteadySystem();
 
 BOOST_PYTHON_MODULE(_SolverUtils)
 {
@@ -43,4 +45,6 @@ BOOST_PYTHON_MODULE(_SolverUtils)
 
     export_EquationSystem();
     export_Filter();
+    export_SessionFunction();
+    export_UnsteadySystem();
 }

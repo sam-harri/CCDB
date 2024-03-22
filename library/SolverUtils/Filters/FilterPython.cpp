@@ -137,7 +137,7 @@ std::string FilterPython::className =
     GetFilterFactory().RegisterCreatorFunction("Python", FilterPython::create);
 
 FilterPython::FilterPython(const LibUtilities::SessionReaderSharedPtr &pSession,
-                           const std::weak_ptr<EquationSystem> &pEquation,
+                           const std::shared_ptr<EquationSystem> &pEquation,
                            const ParamMap &pParams)
     : Filter(pSession, pEquation)
 {
