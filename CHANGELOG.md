@@ -17,6 +17,7 @@ v5.6.0
 - Remove collection offset arrays since no longer required (!1771)
 - Fix summary output (!1779)
 - Update Docker images to use bookworm (!1775)
+- Add coverage metric capturing (!1776)
 
 **NekPy**
 - Add binding to NekPy to check of geometry elements are valid (!1755)

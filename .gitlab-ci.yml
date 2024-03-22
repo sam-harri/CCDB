@@ -97,6 +97,7 @@ include:
       -e "BUILD_CXX=$BUILD_CXX"
       -e "BUILD_FC=$BUILD_FC"
       -e "DISABLE_MCA=$DISABLE_MCA"
+      -e "DO_COVERAGE=$DO_COVERAGE"
       -e "NUM_CPUS=$NUM_CPUS"
       -e "CCACHE_DIR=$CCACHE_DIR"
       -e "LD_PRELOAD=$LD_PRELOAD"
@@ -107,6 +108,7 @@ include:
     - exit_code=$(docker wait $CONTAINER_NAME)
     - >
         echo "Container exit code: $exit_code"
+    - if [[ $DO_COVERAGE != "" ]]; then docker cp ${CONTAINER_NAME}:/home/nektar/nektar/coverage coverage; fi
     - if [ $exit_code -ne 0 ];
       then
         export FAIL_IMAGE=$CI_REGISTRY_IMAGE:pipeline_${CI_PIPELINE_ID}_${OS_VERSION}_${BUILD_TYPE};
@@ -457,8 +459,6 @@ tutorials-build:
     paths:
       - build/docs/tutorial/
 
-
-
 ################################################
 ###################  UBUNTU  ###################
 ################################################
@@ -526,6 +526,21 @@ ubuntu-jammy-full-clang14-avx512-build-and-test:
     BUILD_SIMD: avx512
   tags:
     - avx512
+
+ubuntu-jammy-full-avx512-coverage:
+  <<: *build-and-test-template
+  needs: ["ubuntu-jammy-full-build-env"]
+  coverage: /^\s*lines\.+:\s*(\d+\.\d+\%)/
+  variables:
+    BUILD_SIMD: avx512
+    DO_COVERAGE: 1
+  tags:
+    - avx512
+  artifacts:
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage/cobertura-*.xml
 
 ubuntu-focal-default-build-and-test:
   <<: *build-and-test-template

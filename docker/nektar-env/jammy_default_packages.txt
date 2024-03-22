@@ -6,6 +6,7 @@ clang-format-11
 cmake
 g++
 git-core
+lcov
 libboost-filesystem-dev
 libboost-iostreams-dev
 libboost-program-options-dev
