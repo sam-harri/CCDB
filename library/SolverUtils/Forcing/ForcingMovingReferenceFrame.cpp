@@ -1004,7 +1004,7 @@ void ForcingMovingReferenceFrame::InitialiseFilter(
     ASSERTL0(param, "Body surface should be assigned");
     vParams["Boundary"] = param->GetText();
     m_aeroforceFilter   = MemoryManager<FilterAeroForces>::AllocateSharedPtr(
-        pSession, m_equ, vParams);
+        pSession, m_equ.lock(), vParams);
     m_aeroforceFilter->Initialise(pFields, 0.0);
 }
 

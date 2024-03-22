@@ -22,3 +22,5 @@ ThirdParty
 *.sublime-workspace
 # CLion build directories
 cmake-build-*
+# Any python cache directories
+__pycache__

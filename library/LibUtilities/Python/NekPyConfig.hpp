@@ -47,6 +47,8 @@
 #include "ShPtrFixes.hpp"
 #endif
 
+#include "FunctorSignature.hpp"
+
 #ifdef BOOST_HAS_NUMPY
 
 #include <boost/python.hpp>
@@ -272,6 +274,22 @@ private:
     int m_argc = 0;
     /// Buffer for storage of the argument strings.
     std::vector<char> m_buf;
+};
+
+/**
+ * @brief A helper class that for factory-based classes allows
+ * std::shared_ptr<T> as something that boost::python recognises, otherwise
+ * modules constructed from the factory will not work from Python.
+ */
+template <typename T> struct WrapConverter
+{
+    WrapConverter()
+    {
+        py::objects::class_value_wrapper<
+            std::shared_ptr<T>,
+            py::objects::make_ptr_instance<
+                T, py::objects::pointer_holder<std::shared_ptr<T>, T>>>();
+    }
 };
 
 #endif

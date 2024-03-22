@@ -100,6 +100,28 @@ void SessionReader_SetParameterDouble(SessionReaderSharedPtr session,
     session->SetParameter(paramName, paramValue);
 }
 
+py::list SessionReader_GetVariables(SessionReaderSharedPtr session)
+{
+    py::list ret;
+    for (auto &var : session->GetVariables())
+    {
+        ret.append(var);
+    }
+    return ret;
+}
+
+EquationSharedPtr SessionReader_GetFunction1(SessionReaderSharedPtr session,
+                                             std::string func, int var)
+{
+    return session->GetFunction(func, var);
+}
+
+EquationSharedPtr SessionReader_GetFunction2(SessionReaderSharedPtr session,
+                                             std::string func, std::string var)
+{
+    return session->GetFunction(func, var);
+}
+
 /**
  * @brief SessionReader exports.
  *
@@ -129,8 +151,17 @@ void export_SessionReader()
         .def("SetParameter", SessionReader_SetParameterInt)
         .def("SetParameter", SessionReader_SetParameterDouble)
 
+        .def("DefinesSolverInfo", &SessionReader::DefinesSolverInfo)
+        .def("GetSolverInfo", &SessionReader::GetSolverInfo,
+             py::return_value_policy<py::copy_const_reference>())
+        .def("SetSolverInfo", &SessionReader::SetSolverInfo)
+
         .def("GetVariable", &SessionReader::GetVariable,
              py::return_value_policy<py::copy_const_reference>())
+        .def("GetVariables", SessionReader_GetVariables)
+
+        .def("GetFunction", SessionReader_GetFunction1)
+        .def("GetFunction", SessionReader_GetFunction2)
 
         .def("GetComm", &SessionReader::GetComm)
 

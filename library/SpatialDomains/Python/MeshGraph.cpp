@@ -140,6 +140,7 @@ void export_MeshGraph()
               py::arg("metadata") = LibUtilities::NullFieldMetaDataMap))
 
         .def("GetMeshDimension", &MeshGraph::GetMeshDimension)
+        .def("GetSpaceDimension", &MeshGraph::GetSpaceDimension)
         .def("GetAllPointGeoms", &MeshGraph::GetAllPointGeoms,
              py::return_internal_reference<>())
         .def("GetAllSegGeoms", &MeshGraph::GetAllSegGeoms,
