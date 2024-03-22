@@ -1,8 +1,8 @@
-FROM debian:bullseye-slim
+FROM debian:bookworm-slim
 
 LABEL maintainer="Nektar++ Development Team <nektar-users@imperial.ac.uk>"
 
-RUN DEBIAN_RELEASE=bullseye && \
+RUN DEBIAN_RELEASE=bookworm && \
     echo "deb http://deb.debian.org/debian ${DEBIAN_RELEASE} non-free" > \
         /etc/apt/sources.list.d/debian-non-free.list && \
     apt-get update && \
