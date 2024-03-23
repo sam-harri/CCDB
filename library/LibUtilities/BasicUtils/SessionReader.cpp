@@ -808,6 +808,15 @@ const NekDouble &SessionReader::GetParameter(const std::string &pName) const
 }
 
 /**
+ * Getter for the session's parameters
+ * @returns A reference to the parameter map
+ */
+const ParameterMap &SessionReader::GetParameters()
+{
+    return m_parameters;
+}
+
+/**
  *
  */
 void SessionReader::LoadParameter(const std::string &pName, int &pVar) const

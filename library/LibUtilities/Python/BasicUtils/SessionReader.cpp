@@ -32,6 +32,7 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
+#include "../NekPyConvertors.hpp"
 #include <LibUtilities/BasicUtils/SessionReader.h>
 #include <LibUtilities/Python/NekPyConfig.hpp>
 
@@ -100,16 +101,6 @@ void SessionReader_SetParameterDouble(SessionReaderSharedPtr session,
     session->SetParameter(paramName, paramValue);
 }
 
-py::list SessionReader_GetVariables(SessionReaderSharedPtr session)
-{
-    py::list ret;
-    for (auto &var : session->GetVariables())
-    {
-        ret.append(var);
-    }
-    return ret;
-}
-
 EquationSharedPtr SessionReader_GetFunction1(SessionReaderSharedPtr session,
                                              std::string func, int var)
 {
@@ -120,6 +111,27 @@ EquationSharedPtr SessionReader_GetFunction2(SessionReaderSharedPtr session,
                                              std::string func, std::string var)
 {
     return session->GetFunction(func, var);
+}
+
+/**
+ * @brief Function to wrap SessionReader::GetParameters
+ *
+ * Returns a Python dict containing (parameter name)-> (parameter value)
+ * entries.
+ */
+py::dict SessionReader_GetParameters(SessionReaderSharedPtr s)
+{
+    return MapToPyDict(s->GetParameters());
+}
+
+/**
+ * @brief Function to wrap SessionReader::GetVariables
+ *
+ * Returns a Python list containing variable names.
+ */
+py::list SessionReader_GetVariables(SessionReaderSharedPtr s)
+{
+    return VectorToPyList(s->GetVariables());
 }
 
 /**
@@ -147,6 +159,7 @@ void export_SessionReader()
         .def("DefinesParameter", &SessionReader::DefinesParameter)
         .def("GetParameter", &SessionReader::GetParameter,
              py::return_value_policy<py::return_by_value>())
+        .def("GetParameters", &SessionReader_GetParameters)
 
         .def("SetParameter", SessionReader_SetParameterInt)
         .def("SetParameter", SessionReader_SetParameterDouble)

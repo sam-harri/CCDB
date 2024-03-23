@@ -26,6 +26,7 @@ v5.6.0
 - Add wrapper for selected SolverUtils classes, particularly Filter (!1379)
 - Add VTK support for OutputVtk module (!1379)
 - Add bindings for SolverUtils::EquationSystem and UnsteadySystem (!1752)
+- Return native Python types when getting session variables and parameters (!1380)
 
 **NekMesh**
 - Fix optiKind flags in VarOpti for freenodes that are on more than a single curve / surface (!1597)
