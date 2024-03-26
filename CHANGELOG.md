@@ -15,6 +15,8 @@ v5.6.0
 - Fix PFASST I/O and pre-initialize coarse preconditioner for Parareal (!1749)
 - Remove collection offset arrays since no longer required (!1771)
 
+**ShallowWaterSolver**
+- Refractoring to reduce code duplication (!1782)
 
 **NekPy**
 - Add binding to NekPy to check of geometry elements are valid (!1755)
