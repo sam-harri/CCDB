@@ -20,6 +20,9 @@ v5.6.0
 - Update `clang-tidy` and `clang-format` to v16 (!1777)
 - Add coverage metric capturing (!1776)
 
+**ShallowWaterSolver**
+- Refractoring to reduce code duplication (!1782)
+
 **NekPy**
 - Add binding to NekPy to check of geometry elements are valid (!1755)
 - Update NekPy to more modern packaging (!1747)

@@ -63,7 +63,7 @@ public:
     static std::string className;
 
     /// Destructor
-    ~ShallowWaterSystem() override;
+    ~ShallowWaterSystem() override = default;
 
 protected:
     SolverUtils::RiemannSolverSharedPtr m_riemannSolver;
@@ -94,17 +94,26 @@ protected:
 
     void v_InitObject(bool DeclareFields = true) override;
 
-    void PrimitiveToConservative()
-    {
-        v_PrimitiveToConservative();
-    }
-    virtual void v_PrimitiveToConservative();
+    void DoOdeProjection(
+        const Array<OneD, const Array<OneD, NekDouble>> &inarray,
+        Array<OneD, Array<OneD, NekDouble>> &outarray, const NekDouble time);
 
-    void ConservativeToPrimitive()
-    {
-        v_ConservativeToPrimitive();
-    }
-    virtual void v_ConservativeToPrimitive();
+    void SetBoundaryConditions(Array<OneD, Array<OneD, NekDouble>> &physarray,
+                               NekDouble time);
+
+    void WallBoundary2D(int bcRegion, int cnt,
+                        Array<OneD, Array<OneD, NekDouble>> &Fwd);
+
+    void WallBoundary(int bcRegion, int cnt,
+                      Array<OneD, Array<OneD, NekDouble>> &Fwd,
+                      Array<OneD, Array<OneD, NekDouble>> &physarray);
+
+    void AddCoriolis(const Array<OneD, const Array<OneD, NekDouble>> &physarray,
+                     Array<OneD, Array<OneD, NekDouble>> &outarray);
+
+    void PrimitiveToConservative();
+
+    void ConservativeToPrimitive();
 
     NekDouble GetGravity()
     {
