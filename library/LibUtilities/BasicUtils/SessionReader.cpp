@@ -445,13 +445,16 @@ std::vector<std::string> SessionReader::ParseCommandLineArguments(int argc,
 
     // clang-format off
     desc.add_options()
-        ("verbose,v",    "be verbose")
-        ("version,V",    "print version information")
+        ("force-output,f","disables backups files and forces output to be "
+                          "written without any checks")
         ("help,h",       "print this help message")
         ("solverinfo,I", po::value<vector<std::string>>(),
                          "override a SOLVERINFO property")
         ("parameter,P",  po::value<vector<std::string>>(),
                          "override a parameter")
+        ("verbose,v",    "be verbose")
+        ("version,V",    "print version information")
+        ("no-exp-opt",   "Do not use expansion optimisation for collections")
         ("npx",          po::value<int>(),
                          "number of procs in X-dir")
         ("npy",          po::value<int>(),
@@ -467,8 +470,6 @@ std::vector<std::string> SessionReader::ParseCommandLineArguments(int argc,
         ("part-only-overlapping",    po::value<int>(),
                          "only partition mesh into N overlapping partitions.")
         ("part-info",    "output partition information")
-        ("force-output,f","disables backups files and forces output to be "
-                          "written without any checks")
         ("write-opt-file","write an optimisation file")
         ("use-opt-file", po::value<std::string>(),
                          "use an optimisation file");

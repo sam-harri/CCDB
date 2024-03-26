@@ -13,6 +13,8 @@ v5.6.0
 - Enable varcoeffs for Collections (!1701)
 - Fix misplaced " in Nektar++Config.cmake (!1742)
 - Add conditional updating of elemental Mass and Laplacian matrices for LinearADR matrices (!1766)
+- Added routine to order expansion in an optimal manner for MatrixFree/Collection ops (!1770)
+
 - Fix PFASST I/O and pre-initialize coarse preconditioner for Parareal (!1749)
 - Remove collection offset arrays since no longer required (!1771)
 - Fix summary output (!1779)
