@@ -12,6 +12,10 @@ v5.6.0
 - Tidy up tolerance in NekLinSystIter and NekNonlinSysIter solvers (!1722)
 - Enable varcoeffs for Collections (!1701)
 - Fix misplaced " in Nektar++Config.cmake (!1742)
+- Further tidy-up in linear solver (!1761)
+
+**CompressibleFlowSolver**
+- Complete second Frechet derivative implementation (!1761)
 - Add conditional updating of elemental Mass and Laplacian matrices for LinearADR matrices (!1766)
 - Added routine to order expansion in an optimal manner for MatrixFree/Collection ops (!1770)
 
