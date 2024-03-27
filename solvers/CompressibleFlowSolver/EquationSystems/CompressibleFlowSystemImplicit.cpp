@@ -60,7 +60,8 @@ void CFSImplicit::v_InitObject(bool DeclareFields)
     m_session->MatchSolverInfo("FLAGIMPLICITITSSTATISTICS", "True",
                                m_flagImplicitItsStatistics, false);
 
-    m_session->LoadParameter("JacobiFreeEps", m_jacobiFreeEps, 5.0E-8);
+    m_session->LoadParameter("JacobiFreeEps", m_jacobiFreeEps,
+                             sqrt(NekConstants::kNekMachineEpsilon));
 
     m_session->LoadParameter("nPadding", m_nPadding, 4);
 
@@ -106,6 +107,10 @@ void CFSImplicit::InitialiseNonlinSysSolver()
                                key.m_NekLinSysLeftPrecon, false);
     m_session->MatchSolverInfo("GMRESRightPrecon", "True",
                                key.m_NekLinSysRightPrecon, true);
+    int GMRESCentralDifference = 0;
+    m_session->LoadParameter("GMRESCentralDifference", GMRESCentralDifference,
+                             0);
+    key.m_GMRESCentralDifference = (bool)GMRESCentralDifference;
     // Load required NonLinSys parameters:
     m_session->LoadParameter("NekNonlinSysMaxIterations",
                              key.m_NekNonlinSysMaxIterations, 10);
@@ -119,25 +124,7 @@ void CFSImplicit::InitialiseNonlinSysSolver()
     m_session->LoadSolverInfo("LinSysIterSolverTypeInNonlin",
                               key.m_LinSysIterSolverTypeInNonlin, "GMRES");
 
-    int GMRESCentralDifference = 0;
-    m_session->LoadParameter("GMRESCentralDifference", GMRESCentralDifference,
-                             0);
-    switch (GMRESCentralDifference)
-    {
-        case 1:
-            key.m_DifferenceFlag0 = true;
-            key.m_DifferenceFlag1 = false;
-            break;
-        case 2:
-            key.m_DifferenceFlag0 = true;
-            key.m_DifferenceFlag1 = true;
-            break;
-        default:
-            key.m_DifferenceFlag0 = false;
-            key.m_DifferenceFlag1 = false;
-            break;
-    }
-
+    // Initialize operator
     LibUtilities::NekSysOperators nekSysOp;
     nekSysOp.DefineNekSysResEval(&CFSImplicit::NonlinSysEvaluatorCoeff1D, this);
     nekSysOp.DefineNekSysLhsEval(&CFSImplicit::MatrixMultiplyMatrixFreeCoeff,
@@ -207,29 +194,29 @@ void CFSImplicit::v_PrintSummaryStatistics(const NekDouble intTime)
 
 void CFSImplicit::NonlinSysEvaluatorCoeff1D(
     const Array<OneD, const NekDouble> &inarray, Array<OneD, NekDouble> &out,
-    [[maybe_unused]] const bool &flag)
+    const bool &flag)
 {
     LibUtilities::Timer timer;
     unsigned int nvariables = m_fields.size();
-    unsigned int npoints    = m_fields[0]->GetNcoeffs();
+    unsigned int ncoeffs    = m_fields[0]->GetNcoeffs();
     Array<OneD, Array<OneD, NekDouble>> in2D(nvariables);
     Array<OneD, Array<OneD, NekDouble>> out2D(nvariables);
     for (int i = 0; i < nvariables; ++i)
     {
-        int offset = i * npoints;
+        int offset = i * ncoeffs;
         in2D[i]    = inarray + offset;
         out2D[i]   = out + offset;
     }
 
     timer.Start();
-    NonlinSysEvaluatorCoeff(in2D, out2D);
+    NonlinSysEvaluatorCoeff(in2D, out2D, flag);
     timer.Stop();
     timer.AccumulateRegion("CFSImplicit::NonlinSysEvaluatorCoeff1D");
 }
 
 void CFSImplicit::NonlinSysEvaluatorCoeff(
     const Array<OneD, const Array<OneD, NekDouble>> &inarray,
-    Array<OneD, Array<OneD, NekDouble>> &out)
+    Array<OneD, Array<OneD, NekDouble>> &out, const bool &flag)
 {
     LibUtilities::Timer timer;
     unsigned int nvariable = inarray.size();
@@ -258,8 +245,12 @@ void CFSImplicit::NonlinSysEvaluatorCoeff(
     {
         Vmath::Svtvp(ncoeffs, -m_TimeIntegLambda, out[i], 1, inarray[i], 1,
                      out[i], 1);
-        Vmath::Vsub(ncoeffs, out[i], 1,
-                    m_nonlinsol->GetRefSourceVec() + i * ncoeffs, 1, out[i], 1);
+        if (flag)
+        {
+            Vmath::Vsub(ncoeffs, out[i], 1,
+                        m_nonlinsol->GetRefSourceVec() + i * ncoeffs, 1, out[i],
+                        1);
+        }
     }
 }
 
@@ -291,6 +282,10 @@ void CFSImplicit::DoOdeRhsCoeff(
     const Array<OneD, const Array<OneD, NekDouble>> &inarray,
     Array<OneD, Array<OneD, NekDouble>> &outarray, const NekDouble time)
 {
+    ASSERTL0(
+        !m_useLocalTimeStep,
+        "Do not use Local Time-Stepping with implicit time-discretization");
+
     LibUtilities::Timer timer;
 
     int nvariables = inarray.size();
@@ -340,30 +335,6 @@ void CFSImplicit::DoOdeRhsCoeff(
     for (auto &x : m_forcing)
     {
         x->ApplyCoeff(m_fields, inarray, outarray, time);
-    }
-
-    if (m_useLocalTimeStep)
-    {
-        int nElements = m_fields[0]->GetExpSize();
-        int nq, offset;
-        NekDouble fac;
-        Array<OneD, NekDouble> tmp;
-
-        Array<OneD, NekDouble> tstep(nElements, 0.0);
-        GetElmtTimeStep(inarray, tstep);
-
-        // Loop over elements
-        for (int n = 0; n < nElements; ++n)
-        {
-            nq     = m_fields[0]->GetExp(n)->GetNcoeffs();
-            offset = m_fields[0]->GetCoeff_Offset(n);
-            fac    = tstep[n] / m_timestep;
-            for (int i = 0; i < nvariables; ++i)
-            {
-                Vmath::Smul(nq, fac, outarray[i] + offset, 1,
-                            tmp = outarray[i] + offset, 1);
-            }
-        }
     }
 }
 
@@ -446,11 +417,11 @@ void CFSImplicit::DoImplicitSolveCoeff(
     if (m_inArrayNorm < 0.0)
     {
         CalcRefValues(inarray);
+
+        m_nonlinsol->SetRhsMagnitude(m_inArrayNorm);
     }
 
-    m_nonlinsol->SetRhsMagnitude(m_inArrayNorm);
-
-    m_TotNewtonIts += m_nonlinsol->SolveSystem(ntotal, inarray, out, 0);
+    m_TotNewtonIts += m_nonlinsol->SolveSystem(ntotal, inarray, out);
 
     m_TotLinIts += m_nonlinsol->GetNtotLinSysIts();
 
@@ -513,10 +484,9 @@ void CFSImplicit::CalcRefValues(const Array<OneD, const NekDouble> &inarray)
 
 void CFSImplicit::MatrixMultiplyMatrixFreeCoeff(
     const Array<OneD, const NekDouble> &inarray, Array<OneD, NekDouble> &out,
-    [[maybe_unused]] const bool &flag)
+    const bool &centralDifferenceFlag)
 {
     const Array<OneD, const NekDouble> solref = m_nonlinsol->GetRefSolution();
-    const Array<OneD, const NekDouble> resref = m_nonlinsol->GetRefResidual();
 
     unsigned int ntotal   = inarray.size();
     NekDouble magninarray = Vmath::Dot(ntotal, inarray, inarray);
@@ -527,11 +497,26 @@ void CFSImplicit::MatrixMultiplyMatrixFreeCoeff(
 
     Array<OneD, NekDouble> solplus{ntotal};
     Array<OneD, NekDouble> resplus{ntotal};
-
     Vmath::Svtvp(ntotal, eps, inarray, 1, solref, 1, solplus, 1);
-    NonlinSysEvaluatorCoeff1D(solplus, resplus, flag);
-    Vmath::Vsub(ntotal, resplus, 1, resref, 1, out, 1);
-    Vmath::Smul(ntotal, 1.0 / eps, out, 1, out, 1);
+    NonlinSysEvaluatorCoeff1D(solplus, resplus, !centralDifferenceFlag);
+
+    if (centralDifferenceFlag)
+    {
+        Array<OneD, NekDouble> solminus{ntotal};
+        Array<OneD, NekDouble> resminus{ntotal};
+        Vmath::Svtvp(ntotal, -1.0 * eps, inarray, 1, solref, 1, solminus, 1);
+        NonlinSysEvaluatorCoeff1D(solminus, resminus, false);
+        Vmath::Vsub(ntotal, resplus, 1, resminus, 1, out, 1);
+        Vmath::Smul(ntotal, 0.5 / eps, out, 1, out, 1);
+    }
+    else
+    {
+        const Array<OneD, const NekDouble> resref =
+            m_nonlinsol->GetRefResidual();
+
+        Vmath::Vsub(ntotal, resplus, 1, resref, 1, out, 1);
+        Vmath::Smul(ntotal, 1.0 / eps, out, 1, out, 1);
+    }
 }
 
 void CFSImplicit::PreconCoeff(const Array<OneD, NekDouble> &inarray,

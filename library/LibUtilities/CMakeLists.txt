@@ -229,7 +229,7 @@ SET(LinearAlgebraHeaders
 )
 
 SET(LinearAlgebraSources
-./LinearAlgebra/blas.cpp
+./LinearAlgebra/Blas.cpp
 ./LinearAlgebra/BlockMatrix.cpp
 ./LinearAlgebra/MatrixBase.cpp
 ./LinearAlgebra/MatrixFuncs.cpp

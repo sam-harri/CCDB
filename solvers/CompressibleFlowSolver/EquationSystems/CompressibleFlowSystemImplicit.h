@@ -103,11 +103,11 @@ protected:
 
     void NonlinSysEvaluatorCoeff1D(const Array<OneD, const NekDouble> &inarray,
                                    Array<OneD, NekDouble> &out,
-                                   const bool &flag = true);
+                                   const bool &flag);
 
     void NonlinSysEvaluatorCoeff(
         const Array<OneD, const Array<OneD, NekDouble>> &inarray,
-        Array<OneD, Array<OneD, NekDouble>> &out);
+        Array<OneD, Array<OneD, NekDouble>> &out, const bool &flag);
 
     void DoOdeImplicitRhs(
         const Array<OneD, const Array<OneD, NekDouble>> &inarray,
@@ -142,7 +142,7 @@ protected:
 
     void MatrixMultiplyMatrixFreeCoeff(
         const Array<OneD, const NekDouble> &inarray,
-        Array<OneD, NekDouble> &out, const bool &flag = false);
+        Array<OneD, NekDouble> &out, const bool &centralDifferenceFlag);
 
     void CalcRefValues(const Array<OneD, const NekDouble> &inarray);
 
