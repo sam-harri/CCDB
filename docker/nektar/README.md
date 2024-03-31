@@ -1,5 +1,13 @@
 # `nektar` image
 
+
+This is an image containing all of the Nektar++ solvers, pre- and
+post-processing tools, and Python bindings for Nektar++. The code is compiled
+with virtually all options enabled, including HDF5, MPI and OpenCascade for mesh
+generation. Note that to limit this image's size, it does _not_ contain
+developer headers or associated packages: for this you can instead use the
+`nektarpp/nektar-dev` image.
+
 This image provides a full installation of Nektar++ with the following options
 enabled:
 
@@ -11,6 +19,11 @@ enabled:
 - `NEKTAR_USE_PETSC`
 - `NEKTAR_USE_CCM`
 - `NEKTAR_USE_VTK`
+
+This image is based on either:
+
+- Debian 12 for `latest`;
+- Debian 11 for `v5.5.0` and all prior tags.
 
 ## Building
 
@@ -46,3 +59,14 @@ files, you should instead only build up to the end of the build stage using
 ```sh
 docker build --target build -t nektar-build -f Dockerfile ~/nektar++
 ```
+
+## About Nektar++
+
+Nektar++ is an open-source framework, distributed under the MIT license, for the
+spectral/hp element method. These images contain useful environments for users
+and developers, and are built automatically with new tags, and commits to the
+main branch.
+
+For more information on Nektar++, [see our website](https://www.nektar.info) and
+[source code released on our GitLab
+instance](https://gitlab.nektar.info/nektar/nektar).
