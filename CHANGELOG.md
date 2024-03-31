@@ -43,6 +43,7 @@ v5.6.0
 - Add feature for r-adaption on user-defined CAD curves (!1349)
 - Add feature for r-adaption on user-defined CAD curves (!1349)
 - Add unit testing infrustructure and initial example (!1753)
+- Added a custom cmake cache file to load defaults for building only NekMesh without the solvers (!1641)
 
 v5.5.0
 ------
@@ -288,6 +289,7 @@ v5.4.0
 
 **CI**
 - Add testing and packaging for Debian bookworm (!1638)
+- Added a NekMesh docker image and added the image to the CI (!1641)
 **NekPy**
 - Add bindings for Movement-related classes (!1600)
 - Add bindings for various helpful methods in the SpatialDomains
