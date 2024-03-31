@@ -914,7 +914,17 @@ dockerhub-build-nektar:
     args: --build-arg ENV_IMAGE=$CI_REGISTRY_IMAGE/nektar-env:$CI_COMMIT_SHORT_SHA
     GIT_SUBMODULE_STRATEGY: normal
 
-# nektarpp/nektar image
+# nektarpp/nekmesh image
+dockerhub-build-nekmesh:
+  <<: *dockerhub_build_template
+  stage: package-build
+  needs: [ "dockerhub-build-env" ]
+  variables:
+    image_name: nekmesh
+    dockerfile: docker/nekmesh/Dockerfile
+    args: --build-arg ENV_IMAGE=$CI_REGISTRY_IMAGE/nektar-env:$CI_COMMIT_SHORT_SHA
+
+# nektarpp/nektar-workbook image
 dockerhub-build-workbook:
   <<: *dockerhub_build_template
   stage: package-build
@@ -948,6 +958,16 @@ dockerhub-test-nektar-dev:
   script:
     - cd $CI_PROJECT_DIR/templates/executable
     - ./test.sh /usr/local/lib64/nektar++/cmake 3 /usr/bin/cmake
+
+# For NekMesh, test that a simple conversion works
+dockerhub-test-nekmesh:
+  <<: *execution-conditions
+  needs: [ "dockerhub-build-nekmesh" ]
+  image: ${CI_REGISTRY_IMAGE}/nekmesh:$CI_COMMIT_SHORT_SHA
+  stage: package-test
+  script:
+    - cd $CI_PROJECT_DIR/utilities/NekMesh/Tests/MeshGen/STEP
+    - NekMesh -v -m jac:list 3d_bl_cyl.mcf 3d_bl_cyl-out.xml
 
 dockerhub-test-workbook:
   <<: *dockerhub_test_template
@@ -1003,3 +1023,15 @@ dockerhub-pushrm-nektar-workbook:
   variables:
     image_name: nektar-workbook
     short_description: Nektar++ Jupyter workbook image based on scipy-workbook.
+
+dockerhub-deploy-nekmesh:
+  <<: *dockerhub_deploy_template
+  needs: [ "dockerhub-build-nekmesh" ]
+  variables:
+    image_name: nekmesh
+dockerhub-pushrm-nekmesh:
+  extends: .dockerhub-pushrm-template
+  needs: [ "dockerhub-deploy-nekmesh" ]
+  variables:
+    image_name: nekmesh
+    short_description: Image for the high-order mesh generator NekMesh.

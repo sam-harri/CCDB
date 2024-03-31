@@ -1,6 +1,5 @@
 # `nektar` image
 
-
 This is an image containing all of the Nektar++ solvers, pre- and
 post-processing tools, and Python bindings for Nektar++. The code is compiled
 with virtually all options enabled, including HDF5, MPI and OpenCascade for mesh
@@ -51,7 +50,7 @@ docker build -t nektarpp/nektar -f Dockerfile ~/nektar++
 
 Note that this is a multi-stage build: after the initial build phase is
 completed, the build tree is erased along with development headers, and the
-libraries/executables installed into a fresh Debian 10 container (with
+libraries/executables installed into a fresh Debian 12 container (with
 appropriate packages for runtime libraries). If you want to keep the build
 files, you should instead only build up to the end of the build stage using
 `--target build`:
