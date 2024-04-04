@@ -102,13 +102,16 @@ if [[ $EXPORT_COMPILE_COMMANDS != "" ]]; then
     # If we are just exporting compile commands for clang-tidy, just build any
     # third-party dependencies that we need.
     make -C build -j $NUM_CPUS thirdparty 2>&1
+    exit_code=$?
 else
     # Otherwise build and test the code.
     make -C build -j $NUM_CPUS all 2>&1 && make -C build -j $NUM_CPUS install && \
         (cd build && ctest -j $TEST_JOBS --output-on-failure)
+    exit_code=$?
 
     # Build coverage
-    if [[ $DO_COVERAGE != "" ]]; then
+    if [[ $DO_COVERAGE != "" && $exit_code -eq 0 ]]; then
+        set -e
         $HOME/.local/bin/fastcov --exclude '/usr' --lcov -o coverage.info
         lcov --summary coverage.info
         python3 cmake/python/lcov_cobertura.py coverage.info
@@ -118,7 +121,6 @@ else
     fi
 fi
 
-exit_code=$?
 if [[ $exit_code -ne 0 ]]; then
     [[ $OS_VERSION != "macos" ]] && rm -rf build/dist
     exit $exit_code
