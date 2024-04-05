@@ -13,6 +13,7 @@ v5.6.0
 - Enable varcoeffs for Collections (!1701)
 - Fix misplaced " in Nektar++Config.cmake (!1742)
 - Further tidy-up in linear solver (!1761)
+- Use FwdTrans in UnsteadySystem when using Parareal (!1785)
 - Automate deployment of README.md to dockerhub (!1786)
 
 **CompressibleFlowSolver**
