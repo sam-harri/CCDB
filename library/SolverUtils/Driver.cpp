@@ -80,14 +80,6 @@ Driver::Driver(const LibUtilities::SessionReaderSharedPtr pSession,
 /**
  *
  */
-Driver::~Driver()
-
-{
-}
-
-/**
- *
- */
 void Driver::v_InitObject(ostream &out)
 {
     try

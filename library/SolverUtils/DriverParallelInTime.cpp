@@ -643,12 +643,6 @@ void DriverParallelInTime::Interpolate(
         // If different polynomial orders, interpolate solution.
         else
         {
-            // Assign memory for coefficient space.
-            Array<OneD, NekDouble> incoeff(infield[n]->GetNcoeffs());
-
-            // Transform solution from physical to coefficient space.
-            infield[n]->FwdTransLocalElmt(inphys, incoeff);
-
             for (size_t i = 0; i < infield[n]->GetExpSize(); ++i)
             {
                 // Get the elements.
@@ -656,11 +650,14 @@ void DriverParallelInTime::Interpolate(
                 auto outElmt = outfield[n]->GetExp(i);
 
                 // Get the offset of elements in the storage arrays.
-                size_t inoffset  = infield[n]->GetCoeff_Offset(i);
+                size_t inoffset  = infield[n]->GetPhys_Offset(i);
                 size_t outoffset = outfield[n]->GetPhys_Offset(i);
 
+                // Transform solution from physical to coefficient space.
+                Array<OneD, NekDouble> incoeff(inElmt->GetNcoeffs());
+                inElmt->FwdTrans(inphys + inoffset, incoeff);
+
                 // Interpolate elements.
-                Array<OneD, NekDouble> tmp;
                 StdRegions::StdExpansionSharedPtr expPtr;
                 if (inElmt->DetShapeType() == LibUtilities::Seg)
                 {
@@ -758,7 +755,10 @@ void DriverParallelInTime::Interpolate(
                             inElmt->GetBasis(2)->GetNumModes(),
                             outElmt->GetBasis(2)->GetPointsKey()));
                 }
-                expPtr->BwdTrans(incoeff + inoffset, tmp = outphys + outoffset);
+
+                // Transform solution from coefficient to physical space.
+                Array<OneD, NekDouble> tmp = outphys + outoffset;
+                expPtr->BwdTrans(incoeff, tmp);
             }
         }
     }

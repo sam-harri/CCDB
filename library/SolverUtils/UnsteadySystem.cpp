@@ -384,9 +384,18 @@ void UnsteadySystem::v_DoSolve()
                 fields[i] = m_fields[m_intVariables[i]]->UpdatePhys();
                 if (v_RequireFwdTrans())
                 {
-                    m_fields[m_intVariables[i]]->FwdTransLocalElmt(
-                        m_fields[m_intVariables[i]]->GetPhys(),
-                        m_fields[m_intVariables[i]]->UpdateCoeffs());
+                    if (m_comm->IsParallelInTime())
+                    {
+                        m_fields[m_intVariables[i]]->FwdTrans(
+                            m_fields[m_intVariables[i]]->GetPhys(),
+                            m_fields[m_intVariables[i]]->UpdateCoeffs());
+                    }
+                    else
+                    {
+                        m_fields[m_intVariables[i]]->FwdTransLocalElmt(
+                            m_fields[m_intVariables[i]]->GetPhys(),
+                            m_fields[m_intVariables[i]]->UpdateCoeffs());
+                    }
                 }
                 m_fields[m_intVariables[i]]->SetPhysState(false);
             }
