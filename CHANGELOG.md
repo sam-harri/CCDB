@@ -45,6 +45,10 @@ v5.6.0
 - Add unit testing infrustructure and initial example (!1753)
 - Added a custom cmake cache file to load defaults for building only NekMesh without the solvers (!1641)
 
+
+**IncNavierStokesSolver**
+- Matrix-Free LinearADR operator for VCSImplicit and others (!1627)
+
 v5.5.0
 ------
 **Library**

@@ -2698,26 +2698,30 @@ void ExpList::GeneralMatrixOp(const GlobalMatrixKey &gkey,
 {
     int nvarcoeffs = gkey.GetNVarCoeffs();
 
-    if (gkey.GetMatrixType() == StdRegions::eHelmholtz)
+    if (gkey.GetMatrixType() == StdRegions::eHelmholtz ||
+        gkey.GetMatrixType() == StdRegions::eLinearAdvectionDiffusionReaction)
     {
+        // Map operator type based on matrix type
+        Collections::OperatorType opType =
+            (gkey.GetMatrixType() == StdRegions::eHelmholtz)
+                ? Collections::eHelmholtz
+                : Collections::eLinearAdvectionDiffusionReaction;
+
         // initialise if required
-        if (m_collections.size() &&
-            m_collectionsDoInit[Collections::eHelmholtz])
+        if (m_collections.size() && m_collectionsDoInit[opType])
         {
             for (int i = 0; i < m_collections.size(); ++i)
             {
-                m_collections[i].Initialise(Collections::eHelmholtz,
-                                            gkey.GetConstFactors());
+                m_collections[i].Initialise(opType, gkey.GetConstFactors());
             }
-            m_collectionsDoInit[Collections::eHelmholtz] = false;
+            m_collectionsDoInit[opType] = false;
         }
 
         // Update factors and varoeffs
         int cnt{0};
         for (int i = 0; i < m_collections.size(); ++i)
         {
-            m_collections[i].UpdateFactors(Collections::eHelmholtz,
-                                           gkey.GetConstFactors());
+            m_collections[i].UpdateFactors(opType, gkey.GetConstFactors());
 
             // Restrict varcoeffs to collection size and update
             StdRegions::VarCoeffMap varcoeffs;
@@ -2725,12 +2729,10 @@ void ExpList::GeneralMatrixOp(const GlobalMatrixKey &gkey,
             {
                 varcoeffs = StdRegions::RestrictCoeffMap(
                     gkey.GetVarCoeffs(), m_phys_offset[cnt],
-                    m_collections[i].GetInputSize(Collections::eHelmholtz,
-                                                  false));
-                cnt += m_collections[i].GetNumElmt(Collections::eHelmholtz);
+                    m_collections[i].GetInputSize(opType, false));
+                cnt += m_collections[i].GetNumElmt(opType);
             }
-            m_collections[i].UpdateVarcoeffs(Collections::eHelmholtz,
-                                             varcoeffs);
+            m_collections[i].UpdateVarcoeffs(opType, varcoeffs);
         }
 
         Array<OneD, NekDouble> tmp;
@@ -2739,14 +2741,11 @@ void ExpList::GeneralMatrixOp(const GlobalMatrixKey &gkey,
         for (int i = 0; i < m_collections.size(); ++i)
         {
             // the input_offset is equal to the output_offset - this is
-            // happenning inside the Helmholtz_Helper class
-            m_collections[i].ApplyOperator(Collections::eHelmholtz,
-                                           inarray + input_offset,
+            // happenning inside the Helmholtz_Helper or LinearADR_Helper class
+            m_collections[i].ApplyOperator(opType, inarray + input_offset,
                                            tmp = outarray + output_offset);
-            input_offset +=
-                m_collections[i].GetInputSize(Collections::eHelmholtz);
-            output_offset +=
-                m_collections[i].GetOutputSize(Collections::eHelmholtz);
+            input_offset += m_collections[i].GetInputSize(opType);
+            output_offset += m_collections[i].GetOutputSize(opType);
         }
     }
     else

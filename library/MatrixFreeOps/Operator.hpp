@@ -335,6 +335,137 @@ protected:
     Array<OneD, NekDouble> m_varD22;
 };
 
+// Base class for the LinearAdvectionDiffusionReaction base operator.
+class LinearAdvectionDiffusionReaction : virtual public Operator
+{
+public:
+    LinearAdvectionDiffusionReaction(
+        std::vector<LibUtilities::BasisSharedPtr> basis, int nElmt)
+        : m_basis(basis), m_nElmt(nElmt), m_lambda(1.0),
+          m_isConstVarDiff(false), m_isVarDiff(false)
+    {
+        int n          = m_basis.size();
+        m_constVarDiff = Array<OneD, NekDouble>(n * (n + 1) / 2);
+        int tp         = 1;
+        for (int bn = 0; bn < n; ++bn)
+        {
+            tp *= m_basis[bn]->GetNumPoints();
+        }
+
+        switch (n)
+        {
+            case 2:
+                m_varD00 = Array<OneD, NekDouble>(tp);
+                m_varD01 = Array<OneD, NekDouble>(tp);
+                m_varD11 = Array<OneD, NekDouble>(tp);
+                break;
+            case 3:
+                m_varD00 = Array<OneD, NekDouble>(tp);
+                m_varD01 = Array<OneD, NekDouble>(tp);
+                m_varD11 = Array<OneD, NekDouble>(tp);
+                m_varD02 = Array<OneD, NekDouble>(tp);
+                m_varD12 = Array<OneD, NekDouble>(tp);
+                m_varD22 = Array<OneD, NekDouble>(tp);
+                break;
+            default:
+                break;
+        }
+    }
+
+    ~LinearAdvectionDiffusionReaction() override = default;
+
+    bool NeedsDF() final
+    {
+        return true;
+    }
+
+    bool NeedsJac() final
+    {
+        return true;
+    }
+
+    MATRIXFREE_EXPORT virtual void operator()(
+        const Array<OneD, const NekDouble> &input,
+        Array<OneD, NekDouble> &output) = 0;
+
+    NEK_FORCE_INLINE void SetLambda(NekDouble lambda)
+    {
+        m_lambda = lambda;
+    }
+
+    NEK_FORCE_INLINE void SetConstVarDiffusion(Array<OneD, NekDouble> diff)
+    {
+        m_isConstVarDiff = true;
+
+        int n = m_basis.size();
+
+        for (int i = 0; i < n * (n + 1) / 2; ++i)
+        {
+            m_constVarDiff[i] = diff[i];
+        }
+    }
+
+    NEK_FORCE_INLINE void SetVarDiffusion(
+        [[maybe_unused]] Array<OneD, NekDouble> diff)
+    {
+        m_isVarDiff      = true;
+        m_isConstVarDiff = false;
+
+        int n  = m_basis.size();
+        int tp = 1;
+
+        for (int bn = 0; bn < n; ++bn)
+        {
+            tp *= m_basis[bn]->GetNumPoints();
+        }
+
+        // fixed values for testing!
+        for (int i = 0; i < tp; ++i)
+        {
+            switch (n)
+            {
+                case 2:
+                    m_varD00[i] = diff[0];
+                    m_varD01[i] = diff[1];
+                    m_varD11[i] = diff[2];
+                    break;
+                case 3:
+                    m_varD00[i] = diff[0];
+                    m_varD01[i] = diff[1];
+                    m_varD11[i] = diff[2];
+                    m_varD02[i] = diff[3];
+                    m_varD12[i] = diff[4];
+                    m_varD22[i] = diff[5];
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    NEK_FORCE_INLINE void SetAdvectionVelocities(
+        const std::shared_ptr<std::vector<vec_t, tinysimd::allocator<vec_t>>>
+            &advVel)
+    {
+        m_advVel = advVel;
+    }
+
+protected:
+    std::vector<LibUtilities::BasisSharedPtr> m_basis;
+    int m_nElmt;
+    NekDouble m_lambda;
+    bool m_isConstVarDiff;
+    Array<OneD, NekDouble> m_constVarDiff;
+    bool m_isVarDiff;
+    Array<OneD, NekDouble> m_varD00;
+    Array<OneD, NekDouble> m_varD01;
+    Array<OneD, NekDouble> m_varD11;
+    Array<OneD, NekDouble> m_varD02;
+    Array<OneD, NekDouble> m_varD12;
+    Array<OneD, NekDouble> m_varD22;
+    std::shared_ptr<std::vector<vec_t, tinysimd::allocator<vec_t>>> m_advVel;
+};
+
 template <int DIM, bool DEFORMED = false> class Helper : virtual public Operator
 {
 protected:

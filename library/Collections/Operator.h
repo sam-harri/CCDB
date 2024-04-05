@@ -63,6 +63,7 @@ enum OperatorType
 {
     eBwdTrans,
     eHelmholtz,
+    eLinearAdvectionDiffusionReaction,
     eIProductWRTBase,
     eIProductWRTDerivBase,
     ePhysDeriv,
@@ -70,13 +71,17 @@ enum OperatorType
     SIZE_OperatorType
 };
 
-const char *const OperatorTypeMap[] = {
-    "BwdTrans",  "Helmholtz",         "IProductWRTBase", "IProductWRTDerivBase",
-    "PhysDeriv", "PhysInterp1DScaled"};
+const char *const OperatorTypeMap[] = {"BwdTrans",
+                                       "Helmholtz",
+                                       "LinearAdvectionDiffusionReaction",
+                                       "IProductWRTBase",
+                                       "IProductWRTDerivBase",
+                                       "PhysDeriv",
+                                       "PhysInterp1DScaled"};
 
-const char *const OperatorTypeMap1[] = {"BwdTrans",  "Helmholtz",
-                                        "IPWrtBase", "IPWrtDBase",
-                                        "PhysDeriv", "PhysInterp1DScaled"};
+const char *const OperatorTypeMap1[] = {
+    "BwdTrans",   "Helmholtz", "LinearADR",         "IPWrtBase",
+    "IPWrtDBase", "PhysDeriv", "PhysInterp1DScaled"};
 
 enum ImplementationType
 {
