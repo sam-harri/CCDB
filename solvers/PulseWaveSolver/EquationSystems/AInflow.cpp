@@ -54,13 +54,11 @@ AInflow::~AInflow()
 
 void AInflow::v_DoBoundary(
     const Array<OneD, const Array<OneD, NekDouble>> &inarray,
-    Array<OneD, Array<OneD, NekDouble>> &A_0,
-    Array<OneD, Array<OneD, NekDouble>> &beta,
-    Array<OneD, Array<OneD, NekDouble>> &alpha, const NekDouble time, int omega,
-    int offset, int n)
+    [[maybe_unused]] Array<OneD, Array<OneD, NekDouble>> &A_0,
+    [[maybe_unused]] Array<OneD, Array<OneD, NekDouble>> &beta,
+    [[maybe_unused]] Array<OneD, Array<OneD, NekDouble>> &alpha,
+    const NekDouble time, int omega, int offset, int n)
 {
-    boost::ignore_unused(A_0, beta, alpha);
-
     NekDouble A;
     NekDouble A_r;
     NekDouble u_r;

@@ -38,9 +38,7 @@
 #include "../Module.h"
 #include <tinyxml.h>
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 /// Converter from fld to vtk.
@@ -48,23 +46,23 @@ class OutputFileBase : public OutputModule
 {
 public:
     OutputFileBase(FieldSharedPtr f);
-    virtual ~OutputFileBase();
+    ~OutputFileBase() override;
 
 protected:
     /// Write fld to output file.
-    virtual void v_Process(po::variables_map &vm) override;
+    void v_Process(po::variables_map &vm) override;
 
-    virtual std::string v_GetModuleName() override
+    std::string v_GetModuleName() override
     {
         return "OutputFileBase";
     }
 
-    virtual std::string v_GetModuleDescription() override
+    std::string v_GetModuleDescription() override
     {
         return "Writing file";
     }
 
-    virtual ModulePriority v_GetModulePriority() override
+    ModulePriority v_GetModulePriority() override
     {
         return eOutput;
     }
@@ -78,9 +76,9 @@ protected:
     /// Write from data to output file.
     virtual void v_OutputFromData(po::variables_map &vm) = 0;
 
-    virtual fs::path v_GetPath(std::string &filename, po::variables_map &vm)
+    virtual fs::path v_GetPath([[maybe_unused]] std::string &filename,
+                               [[maybe_unused]] po::variables_map &vm)
     {
-        boost::ignore_unused(filename, vm);
         NEKERROR(ErrorUtil::efatal, "v_GetPath not coded");
         return fs::path();
     }
@@ -89,10 +87,9 @@ protected:
         return v_GetPath(filename, vm);
     }
 
-    virtual fs::path v_GetFullOutName(std::string &filename,
-                                      po::variables_map &vm)
+    virtual fs::path v_GetFullOutName([[maybe_unused]] std::string &filename,
+                                      [[maybe_unused]] po::variables_map &vm)
     {
-        boost::ignore_unused(filename, vm);
         NEKERROR(ErrorUtil::efatal, "v_OutputFromExp not coded");
         return fs::path();
     }
@@ -102,6 +99,8 @@ protected:
     }
 
     bool m_requireEquiSpaced;
+    bool m_prohibitWrite   = false;
+    bool m_equispacedSetup = false;
 
 private:
     bool WriteFile(std::string &filename, po::variables_map &vm);
@@ -112,7 +111,6 @@ private:
 
     void PrintErrorFromExp();
 };
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils
 
 #endif

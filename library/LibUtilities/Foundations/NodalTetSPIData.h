@@ -35,9 +35,7 @@
 #ifndef NODALTETSPIDATA_H
 #define NODALTETSPIDATA_H
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 const size_t NodalTetSPIAvailable                         = 10;
 static const size_t NodalTetSPINPTS[NodalTetSPIAvailable] = {
@@ -1082,7 +1080,6 @@ static const NekDouble NodalTetSPIData[][4] = {
     {-0.4957371056118361, -0.9462404191356018, -0.7971636934427455,
      0.01470390638751603}};
 
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities
 
 #endif

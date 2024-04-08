@@ -58,18 +58,27 @@ public:
         AllocateInitMatrix();
 
         std::string LinSysIterSolverType = "FixedpointJacobi";
-        if (pSession->DefinesSolverInfo("LinSysIterSolver"))
+        if (m_session->DefinesSolverInfo("LinSysIterSolver"))
         {
-            LinSysIterSolverType = pSession->GetSolverInfo("LinSysIterSolver");
+            LinSysIterSolverType = m_session->GetSolverInfo("LinSysIterSolver");
         }
 
         ASSERTL0(LibUtilities::GetNekLinSysIterFactory().ModuleExists(
                      LinSysIterSolverType),
                  "NekLinSysIter '" + LinSysIterSolverType +
                      "' is not defined.\n");
+
+        // Create the key to hold solver settings
+        auto sysKey = LibUtilities::NekSysKey();
+        // Load required LinSys parameters:
+        m_session->LoadParameter("NekLinSysMaxIterations",
+                                 sysKey.m_NekLinSysMaxIterations, 5000);
+        m_session->LoadParameter("LinSysMaxStorage", sysKey.m_LinSysMaxStorage,
+                                 100);
+        m_session->LoadParameter("IterativeSolverTolerance",
+                                 sysKey.m_NekLinSysTolerance, 1.0E-09);
         m_linsol = LibUtilities::GetNekLinSysIterFactory().CreateInstance(
-            LinSysIterSolverType, m_session, m_comm, m_matDim,
-            LibUtilities::NekSysKey());
+            LinSysIterSolverType, m_session, m_comm, m_matDim, sysKey);
 
         m_NekSysOp.DefineNekSysLhsEval(&LinSysDemo::DoLhs, this);
         m_NekSysOp.DefineNekSysFixPointIte(&LinSysDemo::DoFixedPoint, this);
@@ -85,8 +94,7 @@ public:
     {
         Array<OneD, NekDouble> pOutput(m_matDim, 0.0);
 
-        int ntmpIts =
-            m_linsol->SolveSystem(m_matDim, m_SysRhs, pOutput, 0, 1.0E-9);
+        int ntmpIts = m_linsol->SolveSystem(m_matDim, m_SysRhs, pOutput);
         // The number of sigificant digits
         int ndigits = 6;
         // Extra width to place -, E, and power
@@ -136,10 +144,9 @@ public:
     }
 
     void DoFixedPoint(InArrayType &rhs, InArrayType &inarray,
-                      OutArrayType &outarray, const bool &flag = false)
+                      OutArrayType &outarray,
+                      [[maybe_unused]] const bool &flag = false)
     {
-        boost::ignore_unused(flag);
-
         ASSERTL1(m_matDim == inarray.size(),
                  "CoeffMat dim not equal to NekSys dim in DoFixedPoint");
         NekVector<NekDouble> vecInn(m_matDim, inarray, eWrapper);
@@ -155,9 +162,8 @@ public:
     }
 
     void DoLhs(InArrayType &inarray, OutArrayType &outarray,
-               const bool &flag = false)
+               [[maybe_unused]] const bool &flag = false)
     {
-        boost::ignore_unused(flag);
         ASSERTL1(m_matDim == inarray.size(),
                  "CoeffMat dim not equal to NekSys dim in DoLhs");
         NekVector<NekDouble> vecInn(m_matDim, inarray, eWrapper);

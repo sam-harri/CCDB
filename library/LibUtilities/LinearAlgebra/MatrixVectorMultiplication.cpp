@@ -34,8 +34,6 @@
 
 #include <type_traits>
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/LinearAlgebra/ExplicitInstantiation.h>
 #include <LibUtilities/LinearAlgebra/MatrixOperations.hpp>
 
@@ -84,11 +82,10 @@ template <typename DataType, typename LhsDataType, typename MatrixType>
 void NekMultiplyBandedMatrix(
     DataType *result, const NekMatrix<LhsDataType, MatrixType> &lhs,
     const DataType *rhs,
-    typename std::enable_if<
-        CanGetRawPtr<NekMatrix<LhsDataType, MatrixType>>::value>::type *p = 0)
+    [[maybe_unused]] typename std::enable_if<
+        CanGetRawPtr<NekMatrix<LhsDataType, MatrixType>>::value>::type *p =
+        nullptr)
 {
-    boost::ignore_unused(p);
-
     int m             = lhs.GetRows();
     int n             = lhs.GetColumns();
     int kl            = lhs.GetNumberOfSubDiagonals();
@@ -106,14 +103,13 @@ void NekMultiplyBandedMatrix(
 
 template <typename DataType, typename LhsDataType>
 void NekMultiplyBandedMatrix(
-    DataType *result, const NekMatrix<LhsDataType, BlockMatrixTag> &lhs,
-    const DataType *rhs,
-    typename std::enable_if<
+    [[maybe_unused]] DataType *result,
+    [[maybe_unused]] const NekMatrix<LhsDataType, BlockMatrixTag> &lhs,
+    [[maybe_unused]] const DataType *rhs,
+    [[maybe_unused]] typename std::enable_if<
         !CanGetRawPtr<NekMatrix<LhsDataType, BlockMatrixTag>>::value>::type *p =
-        0)
+        nullptr)
 {
-    boost::ignore_unused(result, lhs, rhs, p);
-
     NEKERROR(ErrorUtil::efatal,
              "Banded block matrix multiplication not yet implemented");
 }
@@ -476,12 +472,10 @@ template <typename DataType, typename InnerMatrixType, typename MatrixTag>
 void NekMultiplySymmetricMatrix(
     DataType *result, const NekMatrix<InnerMatrixType, MatrixTag> &lhs,
     const DataType *rhs,
-    typename std::enable_if<
+    [[maybe_unused]] typename std::enable_if<
         CanGetRawPtr<NekMatrix<InnerMatrixType, MatrixTag>>::value>::type *p =
-        0)
+        nullptr)
 {
-    boost::ignore_unused(p);
-
     const unsigned int *size = lhs.GetSize();
 
     DataType alpha    = lhs.Scale();
@@ -499,12 +493,10 @@ template <typename DataType, typename InnerMatrixType, typename MatrixTag>
 void NekMultiplySymmetricMatrix(
     DataType *result, const NekMatrix<InnerMatrixType, MatrixTag> &lhs,
     const DataType *rhs,
-    typename std::enable_if<
+    [[maybe_unused]] typename std::enable_if<
         !CanGetRawPtr<NekMatrix<InnerMatrixType, MatrixTag>>::value>::type *p =
-        0)
+        nullptr)
 {
-    boost::ignore_unused(p);
-
     NekMultiplyUnspecializedMatrixType(result, lhs, rhs);
 }
 
@@ -512,12 +504,10 @@ template <typename DataType, typename InnerMatrixType, typename MatrixTag>
 void NekMultiplyFullMatrix(
     DataType *result, const NekMatrix<InnerMatrixType, MatrixTag> &lhs,
     const DataType *rhs,
-    typename std::enable_if<
+    [[maybe_unused]] typename std::enable_if<
         CanGetRawPtr<NekMatrix<InnerMatrixType, MatrixTag>>::value>::type *p =
-        0)
+        nullptr)
 {
-    boost::ignore_unused(p);
-
     const unsigned int *size = lhs.GetSize();
 
     char t = lhs.GetTransposeFlag();
@@ -538,12 +528,10 @@ template <typename DataType, typename InnerMatrixType, typename MatrixTag>
 void NekMultiplyFullMatrix(
     DataType *result, const NekMatrix<InnerMatrixType, MatrixTag> &lhs,
     const DataType *rhs,
-    typename std::enable_if<
+    [[maybe_unused]] typename std::enable_if<
         !CanGetRawPtr<NekMatrix<InnerMatrixType, MatrixTag>>::value>::type *p =
-        0)
+        nullptr)
 {
-    boost::ignore_unused(p);
-
     NekMultiplyUnspecializedMatrixType(result, lhs, rhs);
 }
 

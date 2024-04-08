@@ -36,15 +36,11 @@
 #include <string>
 using namespace std;
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/BasicUtils/SharedArray.hpp>
 
 #include "ProcessL2Criterion.h"
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 ModuleKey ProcessL2Criterion::className =
@@ -244,5 +240,4 @@ void ProcessL2Criterion::v_Process(po::variables_map &vm)
                                            m_f->m_exp[fid]->UpdateCoeffs());
     }
 }
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

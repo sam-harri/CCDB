@@ -37,9 +37,8 @@
 #define NEKTAR_LIB_UTILITIES_LINEAR_ALGEBRA_NEK_LINSYS_ITERAT_GMRES_H
 
 #include <LibUtilities/LinearAlgebra/NekLinSysIter.h>
-namespace Nektar
-{
-namespace LibUtilities
+
+namespace Nektar::LibUtilities
 {
 /// A global linear system.
 class NekLinSysIterGMRES;
@@ -61,13 +60,14 @@ public:
         p->InitObject();
         return p;
     }
+
     static std::string className;
 
     LIB_UTILITIES_EXPORT NekLinSysIterGMRES(
         const LibUtilities::SessionReaderSharedPtr &pSession,
         const LibUtilities::CommSharedPtr &vRowComm, const int nDimen,
         const NekSysKey &pKey = NekSysKey());
-    LIB_UTILITIES_EXPORT ~NekLinSysIterGMRES();
+    LIB_UTILITIES_EXPORT ~NekLinSysIterGMRES() override = default;
 
     LIB_UTILITIES_EXPORT int GetMaxLinIte()
     {
@@ -82,24 +82,29 @@ protected:
     // if use truncted Gmres(m)
     int m_KrylovMaxHessMatBand;
 
-    bool m_NekLinSysLeftPrecon  = false;
-    bool m_NekLinSysRightPrecon = true;
+    // This is the maximum number of solution vectors that can be stored
+    // For example, in gmres, it is the max number of Krylov space
+    // search directions can be stored
+    // It determines the max storage usage
+    int m_LinSysMaxStorage;
 
-    bool m_DifferenceFlag0 = false;
-    bool m_DifferenceFlag1 = false;
+    NekDouble m_prec_factor = 1.0;
 
-    virtual void v_InitObject() override;
+    bool m_NekLinSysLeftPrecon    = false;
+    bool m_NekLinSysRightPrecon   = true;
+    bool m_GMRESCentralDifference = false;
 
-    virtual int v_SolveSystem(const int nGlobal,
-                              const Array<OneD, const NekDouble> &pInput,
-                              Array<OneD, NekDouble> &pOutput, const int nDir,
-                              const NekDouble tol,
-                              const NekDouble factor) override;
+    void v_InitObject() override;
+
+    int v_SolveSystem(const int nGlobal,
+                      const Array<OneD, const NekDouble> &pInput,
+                      Array<OneD, NekDouble> &pOutput, const int nDir) override;
 
 private:
     /// Actual iterative solve-GMRES
     int DoGMRES(const int pNumRows, const Array<OneD, const NekDouble> &pInput,
                 Array<OneD, NekDouble> &pOutput, const int pNumDir);
+
     /// Actual iterative gmres solver for one restart
     NekDouble DoGmresRestart(const bool restarted, const bool truncted,
                              const int nGlobal,
@@ -108,31 +113,38 @@ private:
 
     // Arnoldi process
     void DoArnoldi(const int starttem, const int endtem, const int nGlobal,
-                   const int nDir,
-                   // V_total(:,1:nd) total search directions
-                   Array<OneD, Array<OneD, NekDouble>> &V_local,
+                   const int nDir, Array<OneD, NekDouble> &w,
                    // V[nd] current search direction
                    Array<OneD, NekDouble> &Vsingle1,
                    // V[nd+1] new search direction
                    Array<OneD, NekDouble> &Vsingle2,
                    // One line of Hessenburg matrix
                    Array<OneD, NekDouble> &hsingle);
+
     // QR fatorization through Givens rotation
     void DoGivensRotation(const int starttem, const int endtem,
                           const int nGlobal, const int nDir,
                           Array<OneD, NekDouble> &c, Array<OneD, NekDouble> &s,
                           Array<OneD, NekDouble> &hsingle,
                           Array<OneD, NekDouble> &eta);
+
     // Backward calculation to calculate coeficients
     // of least square problem
     // To notice, Hessenburg's columnns and rows are reverse
     void DoBackward(const int number, Array<OneD, Array<OneD, NekDouble>> &A,
                     const Array<OneD, const NekDouble> &b,
                     Array<OneD, NekDouble> &y);
+
     static std::string lookupIds[];
     static std::string def;
+
+    // Hessenburg matrix
+    Array<OneD, Array<OneD, NekDouble>> m_hes;
+    // Hesseburg matrix after rotation
+    Array<OneD, Array<OneD, NekDouble>> m_Upper;
+    // Total search directions
+    Array<OneD, Array<OneD, NekDouble>> m_V_total;
 };
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities
 
 #endif

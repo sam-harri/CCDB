@@ -36,15 +36,14 @@
 #include <FieldUtils/Interpolator.h>
 #include <SolverUtils/Core/SessionFunction.h>
 
+#include <LibUtilities/BasicUtils/Filesystem.hpp>
 #include <LibUtilities/BasicUtils/VmathArray.hpp>
 
 #include <boost/format.hpp>
 
 using namespace std;
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 
 /**
@@ -184,8 +183,8 @@ void SessionFunction::Evaluate(std::string pFieldName,
         std::string filename =
             m_session->GetFunctionFilename(m_name, pFieldName, domain);
 
-        if (boost::filesystem::path(filename).extension() == ".pts" ||
-            boost::filesystem::path(filename).extension() == ".csv")
+        if (fs::path(filename).extension() == ".pts" ||
+            fs::path(filename).extension() == ".csv")
         {
             EvaluatePts(pFieldName, pArray, pTime, domain);
         }
@@ -435,12 +434,12 @@ void SessionFunction::EvaluatePts(string pFieldName,
         m_session->GetFunctionFilename(m_name, pFieldName, domain);
 
     LibUtilities::PtsFieldSharedPtr inPts;
-    if (boost::filesystem::path(filename).extension() == ".pts")
+    if (fs::path(filename).extension() == ".pts")
     {
         LibUtilities::PtsIO ptsIO(m_session->GetComm());
         ptsIO.Import(filename, inPts);
     }
-    else if (boost::filesystem::path(filename).extension() == ".csv")
+    else if (fs::path(filename).extension() == ".csv")
     {
         LibUtilities::CsvIO csvIO(m_session->GetComm());
         csvIO.Import(filename, inPts);
@@ -521,5 +520,4 @@ void SessionFunction::EvaluatePts(string pFieldName,
 }
 
 // end of namespaces
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils

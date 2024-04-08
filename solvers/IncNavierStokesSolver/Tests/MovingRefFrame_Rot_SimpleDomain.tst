@@ -5,18 +5,17 @@
     <parameters>MovingRefFrame_Rot_SimpleDomain.xml</parameters>
     <files>
         <file description="Session File">MovingRefFrame_Rot_SimpleDomain.xml</file>
-        <file description="Restart File">MovingRefFrame_Rot_SimpleDomain.rst</file>
     </files>
     <metrics>
         <metric type="L2" id="1">
-            <value variable="u" tolerance="5e-4">12.2445</value>
-            <value variable="v" tolerance="5e-5">0.267844</value>
-            <value variable="p" tolerance="5e-5">0.0335763</value>
+            <value variable="u" tolerance="5e-4">0</value>
+            <value variable="v" tolerance="5e-4">0</value>
+            <value variable="p" tolerance="5e-2">0</value>
         </metric>
         <metric type="Linf" id="2">
-            <value variable="u" tolerance="5e-4">1.00069</value>
-            <value variable="v" tolerance="5e-4">0.0223664</value>
-            <value variable="p" tolerance="5e-4">0.00944716</value>
+            <value variable="u" tolerance="1e-3">0</value>
+            <value variable="v" tolerance="5e-4">0</value>
+            <value variable="p" tolerance="1e-2">0</value>
         </metric>
     </metrics>
 </test>

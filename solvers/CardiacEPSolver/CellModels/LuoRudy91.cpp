@@ -46,7 +46,7 @@
 
 #include <iostream>
 #include <string>
-//#inc lude <LibUtilities/BasicUtils/Vmath.hpp>
+// #inc lude <LibUtilities/BasicUtils/Vmath.hpp>
 #include <CardiacEPSolver/CellModels/LuoRudy91.h>
 
 namespace Nektar
@@ -76,10 +76,9 @@ LuoRudy91::LuoRudy91(const LibUtilities::SessionReaderSharedPtr &pSession,
 
 void LuoRudy91::v_Update(
     const Array<OneD, const Array<OneD, NekDouble>> &inarray,
-    Array<OneD, Array<OneD, NekDouble>> &outarray, const NekDouble time)
+    Array<OneD, Array<OneD, NekDouble>> &outarray,
+    [[maybe_unused]] const NekDouble time)
 {
-    boost::ignore_unused(time);
-
     for (size_t i = 0; i < m_nq; ++i)
     {
         // Inputs:

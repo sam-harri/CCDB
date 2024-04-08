@@ -34,14 +34,11 @@
 
 #include <ADRSolver/EquationSystems/Poisson.h>
 
-using namespace std;
-
 namespace Nektar
 {
-string Poisson::className1 = GetEquationSystemFactory().RegisterCreatorFunction(
-    "Poisson", Poisson::create);
-string Poisson::className2 = GetEquationSystemFactory().RegisterCreatorFunction(
-    "SteadyDiffusion", Poisson::create);
+std::string Poisson::className =
+    GetEquationSystemFactory().RegisterCreatorFunction("Poisson",
+                                                       Poisson::create);
 
 Poisson::Poisson(const LibUtilities::SessionReaderSharedPtr &pSession,
                  const SpatialDomains::MeshGraphSharedPtr &pGraph)
@@ -56,16 +53,12 @@ void Poisson::v_InitObject(bool DeclareFields)
     GetFunction("Forcing")->Evaluate(m_session->GetVariables(), m_fields);
 }
 
-Poisson::~Poisson()
-{
-}
-
 void Poisson::v_GenerateSummary(SolverUtils::SummaryList &s)
 {
     Laplace::v_GenerateSummary(s);
     for (int i = 0; i < m_fields.size(); ++i)
     {
-        stringstream name;
+        std::stringstream name;
         name << "Forcing func [" << i << "]";
         SolverUtils::AddSummaryItem(
             s, name.str(),

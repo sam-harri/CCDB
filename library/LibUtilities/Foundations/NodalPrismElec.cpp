@@ -32,14 +32,10 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/Foundations/NodalPrismElec.h>
 #include <vector>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 bool NodalPrismElec::initPointsManager[] = {PointsManager().RegisterCreator(
@@ -59,9 +55,9 @@ bool isEdge_01(size_t t, size_t y, size_t npts)
     return y == 0 && t > 2 && t <= npts;
 }
 
-bool isEdge_12(size_t t, size_t y, size_t npts)
+bool isEdge_12(size_t t, [[maybe_unused]] size_t y,
+               [[maybe_unused]] size_t npts)
 {
-    boost::ignore_unused(y, npts);
     return t == 1;
 }
 
@@ -70,9 +66,9 @@ bool isEdge_23(size_t t, size_t y, size_t npts)
     return y == (npts - 1) && t > 2 && t <= npts;
 }
 
-bool isEdge_30(size_t t, size_t y, size_t npts)
+bool isEdge_30(size_t t, [[maybe_unused]] size_t y,
+               [[maybe_unused]] size_t npts)
 {
-    boost::ignore_unused(y, npts);
     return t == 0;
 }
 
@@ -96,9 +92,9 @@ bool isEdge_35(size_t t, size_t y, size_t npts)
     return y == npts - 1 && t >= 3 + 2 * (npts - 2) && t < 3 + 3 * (npts - 2);
 }
 
-bool isEdge_45(size_t t, size_t y, size_t npts)
+bool isEdge_45(size_t t, [[maybe_unused]] size_t y,
+               [[maybe_unused]] size_t npts)
 {
-    boost::ignore_unused(y, npts);
     return t == 2;
 }
 
@@ -111,33 +107,29 @@ bool isEdge(size_t t, size_t y, size_t npts)
            isEdge_45(t, y, npts);
 }
 
-bool isFace_0123(size_t t, size_t y, size_t npts)
+bool isFace_0123(size_t t, [[maybe_unused]] size_t y, size_t npts)
 {
-    boost::ignore_unused(y);
     return t < 3 + (npts - 2);
 }
 
-bool isFace_014(size_t t, size_t y, size_t npts)
+bool isFace_014([[maybe_unused]] size_t t, size_t y,
+                [[maybe_unused]] size_t npts)
 {
-    boost::ignore_unused(t, npts);
     return y == 0;
 }
 
-bool isFace_1254(size_t t, size_t y, size_t npts)
+bool isFace_1254(size_t t, [[maybe_unused]] size_t y, size_t npts)
 {
-    boost::ignore_unused(y);
     return t < 3 + 2 * (npts - 2) && t >= 3 + (npts - 2);
 }
 
-bool isFace_325(size_t t, size_t y, size_t npts)
+bool isFace_325([[maybe_unused]] size_t t, size_t y, size_t npts)
 {
-    boost::ignore_unused(t);
     return y == (npts - 1);
 }
 
-bool isFace_0354(size_t t, size_t y, size_t npts)
+bool isFace_0354(size_t t, [[maybe_unused]] size_t y, size_t npts)
 {
-    boost::ignore_unused(y);
     return t < 3 + 3 * (npts - 2) && t >= 3 + 2 * (npts - 2);
 }
 
@@ -464,5 +456,4 @@ std::shared_ptr<PointsBaseType> NodalPrismElec::Create(const PointsKey &key)
     return returnval;
 }
 
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities

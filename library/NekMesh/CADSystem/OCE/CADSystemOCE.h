@@ -38,9 +38,7 @@
 #include <NekMesh/CADSystem/CADSystem.h>
 #include <NekMesh/CADSystem/OCE/OpenCascade.h>
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 class CADSystemOCE : public CADSystem
@@ -59,11 +57,11 @@ public:
     CADSystemOCE(std::string name) : CADSystem(name, "oce")
     {
     }
-    ~CADSystemOCE(){};
+    ~CADSystemOCE() override{};
 
-    bool LoadCAD();
+    bool LoadCAD() override;
 
-    Array<OneD, NekDouble> GetBoundingBox();
+    std::array<NekDouble, 6> GetBoundingBox() override;
 
     TopoDS_Shape GetShape()
     {
@@ -87,7 +85,6 @@ private:
 
 typedef std::shared_ptr<CADSystemOCE> CADSystemOCESharedPtr;
 
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh
 
 #endif

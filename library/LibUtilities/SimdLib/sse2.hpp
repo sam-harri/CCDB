@@ -46,10 +46,7 @@
 #include "traits.hpp"
 #include <cstdint>
 
-namespace tinysimd
-{
-
-namespace abi
+namespace tinysimd::abi
 {
 
 template <typename scalarType> struct sse2
@@ -57,9 +54,12 @@ template <typename scalarType> struct sse2
     using type = void;
 };
 
-} // namespace abi
+} // namespace tinysimd::abi
 
 #if defined(__SSE2__) && defined(NEKTAR_ENABLE_SIMD_SSE2)
+
+namespace tinysimd
+{
 
 // forward declaration of concrete types
 template <typename T> struct sse2Int4;
@@ -154,14 +154,14 @@ template <typename T> struct sse2Int4
     // gather/scatter with sse2
     inline void gather(scalarType const *p, const sse2Int4<T> &indices)
     {
-        _data = _mm_i32gather_epi(p, indices._data, 8);
+        _data = _mm_i32gather_epi32(p, indices._data, 8);
     }
 
     inline void scatter(scalarType *out, const sse2Int4<T> &indices) const
     {
-        // no scatter intrinsics for AVX2
+        // no scatter intrinsics for sse2
         alignas(alignment) scalarArray tmp;
-        _mm_store_pd(tmp, _data);
+        _mm_store_epi32(tmp, _data);
 
         out[_mm_extract_epi32(indices._data, 0)] = tmp[0]; // SSE4.1
         out[_mm_extract_epi32(indices._data, 1)] = tmp[1];
@@ -183,7 +183,8 @@ template <typename T> struct sse2Int4
     }
 };
 
+} // namespace tinysimd
+
 #endif // defined(__SSE2__) && defined(NEKTAR_ENABLE_SIMD_SSE2)
 
-} // namespace tinysimd
 #endif

@@ -32,17 +32,13 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/Communication/Transposition.h>
 
 #include <LibUtilities/BasicUtils/ErrorUtil.hpp> // for ASSERTL0, etc
 #include <LibUtilities/BasicUtils/Vmath.hpp>     // for Vcopy
 #include <LibUtilities/Foundations/Basis.h>      // for BasisKey
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 /**
  * Constructor for 1D transform.
@@ -142,13 +138,12 @@ Transposition::Transposition(const LibUtilities::BasisKey &HomoBasis0,
 /**
  * Constructor for 3D transform.
  */
-Transposition::Transposition(const LibUtilities::BasisKey &HomoBasis0,
-                             const LibUtilities::BasisKey &HomoBasis1,
-                             const LibUtilities::BasisKey &HomoBasis2,
-                             LibUtilities::CommSharedPtr hcomm)
+Transposition::Transposition(
+    [[maybe_unused]] const LibUtilities::BasisKey &HomoBasis0,
+    [[maybe_unused]] const LibUtilities::BasisKey &HomoBasis1,
+    [[maybe_unused]] const LibUtilities::BasisKey &HomoBasis2,
+    LibUtilities::CommSharedPtr hcomm)
 {
-    boost::ignore_unused(HomoBasis0, HomoBasis1, HomoBasis2);
-
     m_hcomm                      = hcomm;
     m_num_homogeneous_directions = 3;
 
@@ -565,10 +560,8 @@ void Transposition::TransposeYZtoX(const int npts,
 void Transposition::TransposeYZtoZY(const int npts,
                                     const Array<OneD, const NekDouble> &inarray,
                                     Array<OneD, NekDouble> &outarray,
-                                    bool UseNumMode)
+                                    [[maybe_unused]] bool UseNumMode)
 {
-    boost::ignore_unused(UseNumMode);
-
     if (m_num_processes[0] > 1 || m_num_processes[1] > 1)
     {
         ASSERTL0(false, "Parallel transposition not implemented yet for "
@@ -597,10 +590,8 @@ void Transposition::TransposeYZtoZY(const int npts,
 void Transposition::TransposeZYtoYZ(const int npts,
                                     const Array<OneD, const NekDouble> &inarray,
                                     Array<OneD, NekDouble> &outarray,
-                                    bool UseNumMode)
+                                    [[maybe_unused]] bool UseNumMode)
 {
-    boost::ignore_unused(UseNumMode);
-
     if (m_num_processes[0] > 1 || m_num_processes[1] > 1)
     {
         ASSERTL0(false, "Parallel transposition not implemented yet for "
@@ -623,5 +614,4 @@ void Transposition::TransposeZYtoYZ(const int npts,
     }
 }
 
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities

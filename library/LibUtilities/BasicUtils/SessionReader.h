@@ -51,9 +51,7 @@ class TiXmlElement;
 class TiXmlDocument;
 class TiXmlHandle;
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 typedef std::map<std::string, std::string> SolverInfoMap;
 typedef std::map<std::string, NekDouble> ParameterMap;
@@ -193,6 +191,7 @@ public:
     /// Returns the value of the specified parameter.
     LIB_UTILITIES_EXPORT const NekDouble &GetParameter(
         const std::string &pName) const;
+    LIB_UTILITIES_EXPORT const ParameterMap &GetParameters();
     /// Load an integer parameter
     LIB_UTILITIES_EXPORT void LoadParameter(const std::string &name,
                                             int &var) const;
@@ -639,7 +638,6 @@ TiXmlElement *GetChildElementOrThrow(const std::string &filename,
                                      std::string childElementName,
                                      const TiXmlHandle &docHandle);
 
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities
 
 #endif

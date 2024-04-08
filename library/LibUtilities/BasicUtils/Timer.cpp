@@ -38,9 +38,7 @@
 #include <iostream>
 #include <tuple>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 void Timer::Start()
@@ -163,7 +161,9 @@ void Timer::PrintElapsedRegions(LibUtilities::CommSharedPtr comm,
     {
         // Add a newline between each IO Level group
         if (comm->GetRank() == 0)
+        {
             o << "\n";
+        }
 
         for (auto item = m_elapsedRegion.begin(); item != m_elapsedRegion.end();
              ++item)
@@ -205,5 +205,4 @@ void Timer::PrintElapsedRegions(LibUtilities::CommSharedPtr comm,
 std::map<std::string, std::tuple<Timer::Seconds, size_t, int>>
     Timer::m_elapsedRegion{};
 
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities

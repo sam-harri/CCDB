@@ -41,9 +41,7 @@
 
 #include <functional>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 
 class CouplingCwipi;
@@ -65,7 +63,7 @@ public:
 
     SOLVER_UTILS_EXPORT CouplingCwipi(MultiRegions::ExpListSharedPtr field);
 
-    SOLVER_UTILS_EXPORT virtual ~CouplingCwipi();
+    SOLVER_UTILS_EXPORT ~CouplingCwipi() override;
 
     SOLVER_UTILS_EXPORT void SendCallback(
         Array<OneD, Array<OneD, NekDouble>> &interpField,
@@ -126,19 +124,19 @@ protected:
         FieldUtils::Interpolator<std::vector<MultiRegions::ExpListSharedPtr>>>
         m_extrapInterpolator;
 
-    SOLVER_UTILS_EXPORT virtual void v_Init() override;
+    SOLVER_UTILS_EXPORT void v_Init() override;
 
-    SOLVER_UTILS_EXPORT virtual void v_Send(
+    SOLVER_UTILS_EXPORT void v_Send(
         const int step, const NekDouble time,
         const Array<OneD, const Array<OneD, NekDouble>> &field,
         std::vector<std::string> &varNames) override;
 
-    SOLVER_UTILS_EXPORT virtual void v_Receive(
+    SOLVER_UTILS_EXPORT void v_Receive(
         const int step, const NekDouble time,
         Array<OneD, Array<OneD, NekDouble>> &field,
         std::vector<std::string> &varNames) override;
 
-    SOLVER_UTILS_EXPORT virtual void v_Finalize() override;
+    SOLVER_UTILS_EXPORT void v_Finalize() override;
 
     SOLVER_UTILS_EXPORT NekDouble GetSendField(const int i, const int j) const
     {
@@ -182,7 +180,6 @@ typedef std::function<void(Array<OneD, Array<OneD, NekDouble>> &interpField,
     SendCallbackType;
 
 static std::map<std::string, SendCallbackType> SendCallbackMap;
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils
 
 #endif

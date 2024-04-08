@@ -38,9 +38,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 /**
  * @class GlobalLinSysIterativeCG
@@ -77,13 +75,6 @@ GlobalLinSysIterativeFull::GlobalLinSysIterativeFull(
 }
 
 /**
- *
- */
-GlobalLinSysIterativeFull::~GlobalLinSysIterativeFull()
-{
-}
-
-/**
  * Solve a global linear system with Dirichlet forcing using a
  * conjugate gradient method. This routine performs handling of the
  * Dirichlet forcing terms and wraps the underlying iterative solver
@@ -107,77 +98,68 @@ void GlobalLinSysIterativeFull::v_Solve(
     const AssemblyMapSharedPtr &pLocToGloMap,
     const Array<OneD, const NekDouble> &pDirForcing)
 {
-    std::shared_ptr<MultiRegions::ExpList> expList = m_expList.lock();
-    bool vCG                                       = false;
-    m_locToGloMap                                  = pLocToGloMap;
-
-    if (std::dynamic_pointer_cast<AssemblyMapCG>(pLocToGloMap))
-    {
-        vCG = true;
-    }
-    else if (std::dynamic_pointer_cast<AssemblyMapDG>(pLocToGloMap))
-    {
-        vCG = false;
-    }
-    else
-    {
-        NEKERROR(ErrorUtil::efatal, "Unknown map type");
-    }
+    m_locToGloMap = pLocToGloMap;
 
     bool dirForcCalculated = (bool)pDirForcing.size();
     int nDirDofs           = pLocToGloMap->GetNumGlobalDirBndCoeffs();
     int nGlobDofs          = pLocToGloMap->GetNumGlobalCoeffs();
     int nLocDofs           = pLocToGloMap->GetNumLocalCoeffs();
 
-    int nDirTotal = nDirDofs;
+    int nDirTotal                                  = nDirDofs;
+    std::shared_ptr<MultiRegions::ExpList> expList = m_expList.lock();
     expList->GetComm()->GetRowComm()->AllReduce(nDirTotal,
                                                 LibUtilities::ReduceSum);
 
-    Array<OneD, NekDouble> tmp(nLocDofs);
-    Array<OneD, NekDouble> tmp1(nLocDofs);
-
     if (nDirTotal)
     {
-        // calculate the Dirichlet forcing
+        Array<OneD, NekDouble> rhs(nLocDofs);
+
+        // Calculate the Dirichlet forcing
         if (dirForcCalculated)
         {
-            Vmath::Vsub(nLocDofs, pLocInput, 1, pDirForcing, 1, tmp1, 1);
+            // Assume pDirForcing is in local space
+            ASSERTL0(
+                pDirForcing.size() >= nLocDofs,
+                "DirForcing is not of sufficient size. Is it in local space?");
+            Vmath::Vsub(nLocDofs, pLocInput, 1, pDirForcing, 1, rhs, 1);
         }
         else
         {
-            // Calculate the dirichlet forcing B_b (== X_b) and
-            // substract it from the rhs
-            expList->GeneralMatrixOp(m_linSysKey, pLocOutput, tmp);
+            // Calculate initial condition and Dirichlet forcing and subtract it
+            // from the rhs
+            expList->GeneralMatrixOp(m_linSysKey, pLocOutput, rhs);
 
             // Iterate over all the elements computing Robin BCs where
             // necessary
             for (auto &r : m_robinBCInfo) // add robin mass matrix
             {
                 RobinBCInfoSharedPtr rBC;
-                Array<OneD, NekDouble> tmploc;
+                Array<OneD, NekDouble> rhsloc;
 
                 int n      = r.first;
                 int offset = expList->GetCoeff_Offset(n);
 
                 LocalRegions::ExpansionSharedPtr vExp = expList->GetExp(n);
-                // add local matrix contribution
+                // Add local matrix contribution
                 for (rBC = r.second; rBC; rBC = rBC->next)
                 {
                     vExp->AddRobinTraceContribution(
                         rBC->m_robinID, rBC->m_robinPrimitiveCoeffs,
-                        pLocOutput + offset, tmploc = tmp + offset);
+                        pLocOutput + offset, rhsloc = rhs + offset);
                 }
             }
-
-            Vmath::Vsub(nLocDofs, pLocInput, 1, tmp, 1, tmp1, 1);
+            Vmath::Vsub(nLocDofs, pLocInput, 1, rhs, 1, rhs, 1);
         }
-        if (vCG)
-        {
-            // solve for perturbation from initial guess in pOutput
-            SolveLinearSystem(nGlobDofs, tmp1, tmp, pLocToGloMap, nDirDofs);
 
-            // Add back initial condition
-            Vmath::Vadd(nLocDofs, tmp, 1, pLocOutput, 1, pLocOutput, 1);
+        if (std::dynamic_pointer_cast<AssemblyMapCG>(pLocToGloMap))
+        {
+            Array<OneD, NekDouble> diff(nLocDofs);
+
+            // Solve for perturbation from initial guess in pOutput
+            SolveLinearSystem(nGlobDofs, rhs, diff, pLocToGloMap, nDirDofs);
+
+            // Add back initial and boundary condition
+            Vmath::Vadd(nLocDofs, diff, 1, pLocOutput, 1, pLocOutput, 1);
         }
         else
         {
@@ -280,9 +262,76 @@ void GlobalLinSysIterativeFull::v_SolveLinearSystem(
                      m_linSysIterSolver),
                  "NekLinSysIter '" + m_linSysIterSolver +
                      "' is not defined.\n");
+
+        // Create the key to hold solver settings
+        auto sysKey     = LibUtilities::NekSysKey();
+        string variable = plocToGloMap->GetVariable();
+
+        // Either get the solnInfo from <GlobalSysSolInfo> or from
+        // <Parameters>
+        if (pSession->DefinesGlobalSysSolnInfo(variable,
+                                               "IterativeSolverTolerance"))
+        {
+            sysKey.m_NekLinSysTolerance = boost::lexical_cast<double>(
+                pSession
+                    ->GetGlobalSysSolnInfo(variable, "IterativeSolverTolerance")
+                    .c_str());
+        }
+        else
+        {
+            pSession->LoadParameter("IterativeSolverTolerance",
+                                    sysKey.m_NekLinSysTolerance,
+                                    NekConstants::kNekIterativeTol);
+        }
+
+        if (pSession->DefinesGlobalSysSolnInfo(variable,
+                                               "NekLinSysMaxIterations"))
+        {
+            sysKey.m_NekLinSysMaxIterations = boost::lexical_cast<int>(
+                pSession
+                    ->GetGlobalSysSolnInfo(variable, "NekLinSysMaxIterations")
+                    .c_str());
+        }
+        else
+        {
+            pSession->LoadParameter("NekLinSysMaxIterations",
+                                    sysKey.m_NekLinSysMaxIterations, 5000);
+        }
+
+        if (pSession->DefinesGlobalSysSolnInfo(variable, "LinSysMaxStorage"))
+        {
+            sysKey.m_LinSysMaxStorage = boost::lexical_cast<int>(
+                pSession->GetGlobalSysSolnInfo(variable, "LinSysMaxStorage")
+                    .c_str());
+        }
+        else
+        {
+            pSession->LoadParameter("LinSysMaxStorage",
+                                    sysKey.m_LinSysMaxStorage, 100);
+        }
+
+        if (pSession->DefinesGlobalSysSolnInfo(variable, "GMRESMaxHessMatBand"))
+        {
+            sysKey.m_KrylovMaxHessMatBand = boost::lexical_cast<int>(
+                pSession->GetGlobalSysSolnInfo(variable, "GMRESMaxHessMatBand")
+                    .c_str());
+        }
+        else
+        {
+            pSession->LoadParameter("GMRESMaxHessMatBand",
+                                    sysKey.m_KrylovMaxHessMatBand,
+                                    sysKey.m_LinSysMaxStorage + 1);
+        }
+
+        // The following settings have no correponding tests and are rarely
+        // used.
+        pSession->MatchSolverInfo("GMRESLeftPrecon", "True",
+                                  sysKey.m_NekLinSysLeftPrecon, false);
+        pSession->MatchSolverInfo("GMRESRightPrecon", "True",
+                                  sysKey.m_NekLinSysRightPrecon, true);
+
         m_linsol = LibUtilities::GetNekLinSysIterFactory().CreateInstance(
-            m_linSysIterSolver, pSession, vRowComm, nGlobal - nDir,
-            LibUtilities::NekSysKey());
+            m_linSysIterSolver, pSession, vRowComm, nGlobal - nDir, sysKey);
 
         m_linsol->SetSysOperators(m_NekSysOp);
         v_UniqueMap();
@@ -295,14 +344,14 @@ void GlobalLinSysIterativeFull::v_SolveLinearSystem(
         m_precon->BuildPreconditioner();
     }
 
-    m_linsol->setRhsMagnitude(m_rhs_magnitude);
+    m_linsol->SetRhsMagnitude(m_isAbsoluteTolerance ? 1.0 : m_rhs_magnitude);
 
     if (m_useProjection)
     {
         Array<OneD, NekDouble> gloIn(nGlobal);
         Array<OneD, NekDouble> gloOut(nGlobal, 0.0);
         plocToGloMap->Assemble(pInput, gloIn);
-        DoProjection(nGlobal, gloIn, gloOut, nDir, m_tolerance, m_isAconjugate);
+        DoProjection(nGlobal, gloIn, gloOut, nDir, m_isAconjugate);
         plocToGloMap->GlobalToLocal(gloOut, pOutput);
     }
     else
@@ -311,17 +360,17 @@ void GlobalLinSysIterativeFull::v_SolveLinearSystem(
         {
             int nLocDofs = plocToGloMap->GetNumLocalCoeffs();
             Vmath::Zero(nLocDofs, pOutput, 1);
-            m_linsol->SolveSystem(nLocDofs, pInput, pOutput, nDir, m_tolerance);
+            m_linsol->SolveSystem(nLocDofs, pInput, pOutput, nDir);
         }
         else
         {
             Array<OneD, NekDouble> gloIn(nGlobal);
             Array<OneD, NekDouble> gloOut(nGlobal, 0.0);
             plocToGloMap->Assemble(pInput, gloIn);
-            m_linsol->SolveSystem(nGlobal, gloIn, gloOut, nDir, m_tolerance);
+            m_linsol->SolveSystem(nGlobal, gloIn, gloOut, nDir);
             plocToGloMap->GlobalToLocal(gloOut, pOutput);
         }
     }
 }
-} // namespace MultiRegions
-} // namespace Nektar
+
+} // namespace Nektar::MultiRegions

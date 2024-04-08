@@ -37,9 +37,7 @@
 
 #include <NekMesh/Module/Module.h>
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 /**
@@ -59,9 +57,9 @@ public:
     static NekMesh::ModuleKey className;
 
     ProcessBL(NekMesh::MeshSharedPtr m);
-    virtual ~ProcessBL();
+    ~ProcessBL() override;
 
-    virtual std::string GetModuleName()
+    std::string GetModuleName() override
     {
         return "ProcessBL";
     }
@@ -71,9 +69,8 @@ public:
     // Create the boundary layer in 3D
     void BoundaryLayer3D();
     /// Write mesh to output file.
-    virtual void Process();
+    void Process() override;
 };
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh
 
 #endif

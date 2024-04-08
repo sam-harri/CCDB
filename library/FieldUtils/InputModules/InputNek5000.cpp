@@ -39,13 +39,10 @@
 using namespace std;
 
 #include <boost/algorithm/string.hpp>
-#include <boost/core/ignore_unused.hpp>
 
 #include "InputNek5000.h"
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 ModuleKey InputNek5000::m_className[1] = {
@@ -80,10 +77,8 @@ InputNek5000::~InputNek5000()
  * This module is adapted from the VisIt visualisation software, which supports
  * a number of Nek5000 inputs.
  */
-void InputNek5000::v_Process(po::variables_map &vm)
+void InputNek5000::v_Process([[maybe_unused]] po::variables_map &vm)
 {
-    boost::ignore_unused(vm);
-
     ifstream file(m_config["infile"].as<string>().c_str(), ios::binary);
 
     // Header: 132 bytes for binary.
@@ -273,5 +268,4 @@ void InputNek5000::v_Process(po::variables_map &vm)
     // save field names
     m_f->m_variables = m_f->m_fielddef[0]->m_fields;
 }
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

@@ -1,6 +1,55 @@
 Changelog
 =========
 
+v5.6.0
+------
+**Library**
+- Clean-up Set_Rhs_Magnitude function in NekLinSysIter (!1729)
+- Consistently use template parameters in VmathArray (!1748)
+- Fix issue with CMake and zlib versions >= 1.3.0 (!1744)
+- Add 1D demo and test of h-type convergence for a CG projection. (!1738)
+- Add 2D projection demo and tests following 1D added in MR !1738. (!1762)
+- Tidy up tolerance in NekLinSystIter and NekNonlinSysIter solvers (!1722)
+- Enable varcoeffs for Collections (!1701)
+- Fix misplaced " in Nektar++Config.cmake (!1742)
+- Further tidy-up in linear solver (!1761)
+- Use FwdTrans in UnsteadySystem when using Parareal (!1785)
+- Automate deployment of README.md to dockerhub (!1786)
+
+**CompressibleFlowSolver**
+- Complete second Frechet derivative implementation (!1761)
+- Add conditional updating of elemental Mass and Laplacian matrices for LinearADR matrices (!1766)
+- Added routine to order expansion in an optimal manner for MatrixFree/Collection ops (!1770)
+- Fix PFASST I/O and pre-initialize coarse preconditioner for Parareal (!1749)
+- Remove collection offset arrays since no longer required (!1771)
+- Fix summary output (!1779)
+- Update Docker images to use bookworm (!1775)
+- Update `clang-tidy` and `clang-format` to v16 (!1777)
+- Add coverage metric capturing (!1776)
+
+**ShallowWaterSolver**
+- Refractoring to reduce code duplication (!1782)
+
+**NekPy**
+- Add binding to NekPy to check of geometry elements are valid (!1755)
+- Update NekPy to more modern packaging (!1747)
+- Add wrapper for selected SolverUtils classes, particularly Filter (!1379)
+- Add VTK support for OutputVtk module (!1379)
+- Add bindings for SolverUtils::EquationSystem and UnsteadySystem (!1752)
+- Return native Python types when getting session variables and parameters (!1380)
+
+**NekMesh**
+- Fix optiKind flags in VarOpti for freenodes that are on more than a single curve / surface (!1597)
+- Fix VarOpti Surface Node Sliding on the CAD in 2D  (!1569)
+- Add feature for r-adaption on user-defined CAD curves (!1349)
+- Add feature for r-adaption on user-defined CAD curves (!1349)
+- Add unit testing infrustructure and initial example (!1753)
+- Added a custom cmake cache file to load defaults for building only NekMesh without the solvers (!1641)
+
+
+**IncNavierStokesSolver**
+- Matrix-Free LinearADR operator for VCSImplicit and others (!1627)
+
 v5.5.0
 ------
 **Library**
@@ -13,6 +62,51 @@ v5.5.0
 - Update AssemblyMap to reduce verbosity when using parallel-in-time (!1651)
 - Tidy-up of Collection library (!1622)
 - Tidy-up of I/O in BasicUtils (!1623)
+- Fix local implementation of CG with Null preconditioner (!1658)
+- Update to use C++17 nested namespaces (!1556, !1670)
+- Fix a minor bug in ProcessWallNormalData (!1663)
+- Fix Explist::v_GetNormals and GetElmtNormalLength (!1625)
+- Replace `boost::random` with `std::random` (!1673)
+- Add a new feature of Lagrangian points tracking in parallel (!1666)
+- Add Robin BC to xxt full solver (!1679)
+- Update Parareal file output and tidy-up Parareal/PFASST interpolation (!1678)
+- Move from `boost::filesystem` to `std::filesystem` (!1674)
+- Use `[[deprecated]]` attribute (!1682)
+- Fix QuadExp::v_ComputeTraceNormals(!1685)
+- Replace `boost::thread` with `std::thread` (!1687)
+- Replace `boost::math::tgamma` by `std::tgamma`(!1686)
+- Remove `#include <boost/math/special_functions/fpclassify.hpp>` header (!1686)
+- Replace `boost::regex` with `std::regex` (!1676)
+- Update SDC scheme for implicit PFASST (!1659)
+- Pre-allocate memory for GMRES (!1668)
+- Update hdf5 read to only read in selected elements to reduce memory overhead (!1351)
+- Remove arbitrary factor in  `GlobalLinSysIterative.cpp` (!1694)
+- Some tidy-up in LinearAlgebra (!1699)
+- Some further tidy-up in LinearAlgebra (!1700)
+- Updated hdf5 to 1.12.3 (!1696)
+- Remove redundant tolerance limiter in GMRES (!1707)
+- Remove unused tolerance parameter in NekSys class and subclasses (1708)
+- Avoid repeatly operator assignment in NekNonlinSysNewton class (!1709)
+- Add an exact solution for GetLocCoords of straight-edge quad elements (!1704)
+- Add sliding mesh capability (!1605)
+- Remove MaxIterations parameter from AssemblyMap (!1710)
+- Consistently use relative tolerance for GMRES (!1706)
+- Fix use of absolute tolerance for iterative solvers (!1711)
+- Move solver info loading form NekSys (and its derived classes) to the callers (!1716)
+- Tidy physderiv and helmholtz in MatrixFreeOps (!1653)
+- Remove time estimation for Parareal and PFASST drivers (!1691)
+- Tidy and clarify implementation of Dirichlet boundary condition in GlobalLinSys (!1724)
+- Remove unused file NekLinAlgAlgorithms.hpp (!1728)
+
+**ADRSolver**
+- Add support for spatially-constant, but variable direction, diffusion to
+  ADRSolver. (!1669)
+- Inline Vmath library (!1667)
+- Refactor UnsteadyReactionDiffusion as a subclass of UnsteadyDiffusion (!1713)
+- Tidy-up ADRSolver (!1715)
+- Refactor UnsteadyAdvectionDiffusion as a subclass of UnsteadyAdvection (!1720)
+- Update UnsteadyReactionDiffusion solver for explicit time-stepping (!1731)
+- Refactor UnsteadyViscousBurgers as a subclass of UnsteadyInviscidBurgers solver (!1718)
 
 **CardiacEPSolver**
 - Fix cell model history point filter output after base class change (!1342)
@@ -23,23 +117,62 @@ v5.5.0
 - Save BndElmtExpansion and avoid re-building (!1648)
 - Add Simo-advection and a switch for Simo-/Dong-advection to VCSImplicit (!1630)
 - Add synthetic turbulence generation for the incompressible solver (!1664) 
+- Add a new feature of elasticaly mounted object using the moving reference frame (!1495)
+- Some tidy-up (!1693)
+- Fix memory leak in VCSImplicit due to matrix updating (!1688)
+- Rename Simo-/Dong-advection to Extrapolated/Updated respectively for VCSImplicit (!1717)
+- Update test for SuccessiveRHS parameter (!1727)
+- Fix segmentation error in IncNavierStokesSolver when AeroForces filter is used (!1726)
+- Added Examples in solvers/IncNavierStokesSolver/Examples, matching with the user-guide (!1723)
+- Extend support for IO timer levels to IncNavierStokesSolver (!1732)
+- Fixed issue with substepping when using mixed BCs (!1639)
+
+**CompressibleFlowSolver**
+- Add three subsonic inflow boundary conditions: EnforceEntropyPresure, EnforceEntropyVelocity, and EnforceEntropyTotalEnthalpy (!1398)
+- Update implicit solver for implicit PFASST (!1659)
+- Some tidy-up in the compressible flow solver (!1698)
+- Fix ESDIRK scheme for compressible flow solver (!1690)
+- Some further tidy-up in compressible flow solver (!1700)
+
+**Documentation**
+- Update instructions for VS2022 (!1714)
+- Update ADRSolver user guide (!1730)
+
+**ShallowWaterSolver**
+- Reduce memory footprint of the Peregrine solver(!1680)
+- Fix Peregrine solver for Parareal output(!1689)
 
 **FieldConvert**
 - Fix typo in user-guide and fix but for parallel-in-time FieldConvert (!1645)
 - Fixed FieldConvert -m addfld (!1500)
+- Add a new FieldConvert module to zero a plane in wavespace (!1632)
 - Fix tecplot output for line and plane points (!1497)
 
 **CI**
 - Disable macOS Intel runner (!1655)
 - Upgrade Win10 runners (!1656)
+- Add `clang-tidy` support to CI for static analysis (!1556)
+- Remove some uncompiled files and add quality step to check (!1672)
+- Add `clang-15` tester (!1671)
+- Update performance tests to use minimum execution time (!1733)
+- Fix missing dependencies for clang-tidy and uncompiled-files jobs (!1736)
 
 **NekMesh**
 - Replace deprecated boost::filesystem functions (!1654)
 - Remove deprecated AddTraceIntegral interface from ExpList.h (!1646)
 
+**Packaging**
+- Remove unnecessary Boost dependencies after C++17 migration (!1734)
+
 **Miscellaneous**
 - Add a particle tracker utilitiy using equation system infrastructure (!1310)
 - Remove deprecated fs::copy_directory function call (!1662)
+- Added a sample python script for wallnormaldata module (!1663)
+- Replace boost::lexical_cast with std::to_string for integer variable (!1677)
+- Use `[[maybe_unused]]` attribute in solvers (!1683)
+- Use `[[maybe_unused]]` attribute in library (!1684)
+- Fix sse2 SIMD bug (!1559)
+- Improved the Incompressible NS section of User-guide (!1719)
 
 v5.4.0
 ------
@@ -80,6 +213,7 @@ v5.4.0
 - Added a local space version of GMRES and ConjugateGradient (!1575)
 - Added a jacobi preconditioner building on diagonal impelemtation (!1575)
 - Add a priori convergence and null-input check to GMRES (!1590)
+- Some tidy-up in StdRegions (!1595)
 - Tidy-up/removed unused Lapack function definition (!1573)
 - Some Tidy-up in MatrixFreeOps (!1599)
 - Accelerate interpolation for regular and straight-edge elements (!1283)
@@ -95,6 +229,8 @@ v5.4.0
 - Rename communicator in LinearAlgebra (!1612)
 - Add IProductWRTDerivBase operator for 3DH1D problems (!1483)
 - Full support of mixed-order elements in DG (!1606)
+- Refactoring collections for allowing variable output size inside the collections' operators, introduced PhysInterp1DScaled in Collections (!1620)
+
 - Use default keyword for destructor in Driver (!1624)
 - Add additional test for SDC time-integration(!1621)
 - Fix to compiler flags for MSVC (!1604)
@@ -150,13 +286,16 @@ v5.4.0
 
 **NekMesh**
 - Changed CMake to set NEKTAR_USE_THREAD_SAFETY to ON when MeshGen is set to ON (!1546)
+- Fix VarOpti Tolerances (!1569)
 - Fixed a bug where MeshElement/Tetrahedron did not assign edge IDs in the constructor (!1596)
+- Reduce VarOpti memory usage by removing the storage for GetFunctional in NodeOpti (!1633)
 
 **Documentation**
 - Fix missing Tikz external package requires for bookworm (!1638)
 
 **CI**
 - Add testing and packaging for Debian bookworm (!1638)
+- Added a NekMesh docker image and added the image to the CI (!1641)
 **NekPy**
 - Add bindings for Movement-related classes (!1600)
 - Add bindings for various helpful methods in the SpatialDomains

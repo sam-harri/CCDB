@@ -40,9 +40,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 /**
  * Registers the class with the Factory.
@@ -97,50 +95,21 @@ void PreconditionerDiagonal::DiagonalPreconditionerSum()
     std::shared_ptr<MultiRegions::ExpList> expList =
         ((m_linsys.lock())->GetLocMat()).lock();
 
-    LocalRegions::ExpansionSharedPtr locExpansion;
-
     auto asmMap = m_locToGloMap.lock();
-
-    int i, j, n, cnt, gid1, gid2;
-    NekDouble sign1, sign2, value;
     int nGlobal = asmMap->GetNumGlobalCoeffs();
     int nDir    = asmMap->GetNumGlobalDirBndCoeffs();
     int nInt    = nGlobal - nDir;
+    int nElmt   = expList->GetNumElmts();
 
-    // fill global matrix
-    DNekScalMatSharedPtr loc_mat;
     Array<OneD, NekDouble> vOutput(nGlobal, 0.0);
-
-    int loc_row;
-    int nElmt = expList->GetNumElmts();
-    for (n = cnt = 0; n < nElmt; ++n)
+    for (int n = 0, cnt = 0; n < nElmt; ++n)
     {
-        loc_mat = (m_linsys.lock())->GetBlock(n);
-        loc_row = loc_mat->GetRows();
-
-        for (i = 0; i < loc_row; ++i)
+        auto loc_mat = (m_linsys.lock())->GetBlock(n);
+        int loc_row  = loc_mat->GetRows();
+        for (int i = 0; i < loc_row; ++i)
         {
-            gid1  = asmMap->GetLocalToGlobalMap(cnt + i) - nDir;
-            sign1 = asmMap->GetLocalToGlobalSign(cnt + i);
-
-            if (gid1 >= 0)
-            {
-                for (j = 0; j < loc_row; ++j)
-                {
-                    gid2  = asmMap->GetLocalToGlobalMap(cnt + j) - nDir;
-                    sign2 = asmMap->GetLocalToGlobalSign(cnt + j);
-                    if (gid2 == gid1)
-                    {
-                        // When global matrix is symmetric,
-                        // only add the value for the upper
-                        // triangular part in order to avoid
-                        // entries to be entered twice
-                        value = vOutput[gid1 + nDir] +
-                                sign1 * sign2 * (*loc_mat)(i, j);
-                        vOutput[gid1 + nDir] = value;
-                    }
-                }
-            }
+            int gid1 = asmMap->GetLocalToGlobalMap(cnt + i);
+            vOutput[gid1] += (*loc_mat)(i, i);
         }
         cnt += loc_row;
     }
@@ -255,8 +224,29 @@ void PreconditionerNull::v_DoPreconditioner(
     const bool &isLocal)
 
 {
-    boost::ignore_unused(isLocal);
-    Vmath::Vcopy(pInput.size(), pInput, 1, pOutput, 1);
+    auto asmMap = m_locToGloMap.lock();
+
+    GlobalSysSolnType solvertype = asmMap->GetGlobalSysSolnType();
+
+    bool isFull = solvertype == eIterativeFull ? true : false;
+
+    int nGlobal = (isFull) ? asmMap->GetNumGlobalCoeffs()
+                           : asmMap->GetNumGlobalBndCoeffs();
+    int nDir    = asmMap->GetNumGlobalDirBndCoeffs();
+
+    if (isLocal)
+    {
+        Array<OneD, NekDouble> wk(nGlobal);
+        (isFull) ? asmMap->Assemble(pInput, wk)
+                 : asmMap->AssembleBnd(pInput, wk);
+        Vmath::Zero(nDir, wk, 1);
+        (isFull) ? asmMap->GlobalToLocal(wk, pOutput)
+                 : asmMap->GlobalToLocalBnd(wk, pOutput);
+    }
+    else
+    {
+        Vmath::Vcopy(pInput.size(), pInput, 1, pOutput, 1);
+    }
 }
 
 /**
@@ -377,5 +367,4 @@ void PreconditionerJacobi::v_DoPreconditioner(
     }
 }
 
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions

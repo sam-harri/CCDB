@@ -37,9 +37,7 @@
 
 #include <NekMesh/Module/Module.h>
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 /**
@@ -59,12 +57,12 @@ public:
     static NekMesh::ModuleKey className;
 
     ProcessDetectSurf(NekMesh::MeshSharedPtr m);
-    virtual ~ProcessDetectSurf();
+    ~ProcessDetectSurf() override;
 
     /// Write mesh to output file.
-    virtual void Process();
+    void Process() override;
 
-    virtual std::string GetModuleName()
+    std::string GetModuleName() override
     {
         return "ProcessDetectSurf";
     }
@@ -74,7 +72,6 @@ private:
                                std::set<int> &doneIds,
                                std::vector<NekMesh::ElementSharedPtr> &block);
 };
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh
 
 #endif

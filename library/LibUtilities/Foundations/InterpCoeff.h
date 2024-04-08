@@ -44,9 +44,7 @@ namespace Nektar
 template <typename Dim, typename DataType> class Array;
 }
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 // Coefficient Space Interpolation methods
 
@@ -78,7 +76,6 @@ LIB_UTILITIES_EXPORT void InterpCoeff3D(
     const BasisKey &fbasis0, const BasisKey &fbasis1, const BasisKey &fbasis2,
     const NekDouble *from, const BasisKey &tbasis0, const BasisKey &tbasis1,
     const BasisKey &tbasis2, NekDouble *to);
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities
 
 #endif

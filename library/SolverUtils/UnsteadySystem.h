@@ -36,19 +36,18 @@
 #define NEKTAR_SOLVERUTILS_UNSTEADYSYSTEM_H
 
 #include <LibUtilities/TimeIntegration/TimeIntegrationScheme.h>
+#include <SolverUtils/ALEHelper.h>
 #include <SolverUtils/EquationSystem.h>
 #include <SolverUtils/Filters/Filter.h>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 /// Base class for unsteady solvers.
-class UnsteadySystem : public EquationSystem
+class UnsteadySystem : public EquationSystem, public SolverUtils::ALEHelper
 {
 public:
     /// Destructor
-    SOLVER_UTILS_EXPORT virtual ~UnsteadySystem();
+    SOLVER_UTILS_EXPORT ~UnsteadySystem() override;
 
     /// Calculate the larger time-step mantaining the problem stable.
     SOLVER_UTILS_EXPORT NekDouble
@@ -136,11 +135,10 @@ protected:
         const SpatialDomains::MeshGraphSharedPtr &pGraph);
 
     /// Init object for UnsteadySystem class.
-    SOLVER_UTILS_EXPORT virtual void v_InitObject(
-        bool DeclareField = true) override;
+    SOLVER_UTILS_EXPORT void v_InitObject(bool DeclareField = true) override;
 
     /// Solves an unsteady problem.
-    SOLVER_UTILS_EXPORT virtual void v_DoSolve() override;
+    SOLVER_UTILS_EXPORT void v_DoSolve() override;
 
     /// Print Status Information
     SOLVER_UTILS_EXPORT virtual void v_PrintStatusInformation(
@@ -151,11 +149,11 @@ protected:
         const NekDouble intTime);
 
     /// Sets up initial conditions.
-    SOLVER_UTILS_EXPORT virtual void v_DoInitialise(
+    SOLVER_UTILS_EXPORT void v_DoInitialise(
         bool dumpInitialConditions = true) override;
 
     /// Print a summary of time stepping parameters.
-    SOLVER_UTILS_EXPORT virtual void v_GenerateSummary(SummaryList &s) override;
+    SOLVER_UTILS_EXPORT void v_GenerateSummary(SummaryList &s) override;
 
     SOLVER_UTILS_EXPORT virtual NekDouble v_GetTimeStep(
         const Array<OneD, const Array<OneD, NekDouble>> &inarray);
@@ -197,7 +195,6 @@ private:
     bool CheckSteadyState(int step, const NekDouble &totCPUTime = 0.0);
 };
 
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils
 
 #endif

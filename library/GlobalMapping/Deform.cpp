@@ -46,9 +46,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace GlobalMapping
+namespace Nektar::GlobalMapping
 {
 
 /**
@@ -237,7 +235,9 @@ void UpdateGeometry(SpatialDomains::MeshGraphSharedPtr graph,
                 // points.
                 int nq = max(nq0, nq1);
                 if (!modal)
+                {
                     nq--;
+                }
 
                 LibUtilities::PointsKey edgePts(
                     nq, LibUtilities::eGaussLobattoLegendre);
@@ -405,5 +405,4 @@ void UpdateGeometry(SpatialDomains::MeshGraphSharedPtr graph,
         fields[i]->Reset();
     }
 }
-} // namespace GlobalMapping
-} // namespace Nektar
+} // namespace Nektar::GlobalMapping

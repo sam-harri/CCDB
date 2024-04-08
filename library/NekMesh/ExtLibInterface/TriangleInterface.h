@@ -37,7 +37,6 @@
 
 #include <memory>
 
-#include <LibUtilities/BasicUtils/SharedArray.hpp>
 #include <LibUtilities/Memory/NekMemoryManager.hpp>
 #include <NekMesh/MeshElements/Node.h>
 
@@ -49,9 +48,7 @@ extern "C"
 #include <triangle.h>
 }
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 /**
@@ -71,7 +68,7 @@ public:
      * @brief assign meshing paramters
      */
     void Assign(std::vector<std::vector<NodeSharedPtr>> &boundingloops,
-                std::vector<Array<OneD, NekDouble>> &centers, int i,
+                std::vector<std::array<NekDouble, 2>> &centers, int i,
                 NekDouble str = 1.0)
     {
         m_boundingloops = boundingloops;
@@ -106,7 +103,7 @@ private:
     public:
         void Run(char *cmd)
         {
-            triangulate(cmd, &in, &out, NULL);
+            triangulate(cmd, &in, &out, nullptr);
         }
         struct triangulateio in, out;
     };
@@ -116,7 +113,7 @@ private:
     /// List of additional nodes
     std::vector<NodeSharedPtr> m_stienerpoints;
     /// Coordinates of the centers of the loops
-    std::vector<Array<OneD, NekDouble>> m_centers;
+    std::vector<std::array<NekDouble, 2>> m_centers;
     /// Map from NekMesh id to triangle id
     std::map<int, NodeSharedPtr> nodemap;
     /// ID of the surface
@@ -128,7 +125,6 @@ private:
 };
 
 typedef std::shared_ptr<TriangleInterface> TriangleInterfaceSharedPtr;
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh
 
 #endif

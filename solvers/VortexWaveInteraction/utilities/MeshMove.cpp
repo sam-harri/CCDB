@@ -38,9 +38,7 @@
 #include <iomanip>
 #include <iostream>
 
-#include <boost/core/ignore_unused.hpp>
-
-//#include <sstream>
+// #include <sstream>
 #include <LibUtilities/BasicConst/NektarUnivTypeDefs.hpp>
 #include <LibUtilities/LinearAlgebra/Lapack.hpp>
 #include <LocalRegions/QuadExp.h>
@@ -676,7 +674,7 @@ int main(int argc, char *argv[])
 
     /////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
-    //££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££
+    // ££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££
     //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
     //@todo set Delta0 from session file
     NekDouble Delta0;
@@ -690,7 +688,7 @@ int main(int argc, char *argv[])
     }
 
     //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-    //££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££
+    // ££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££
     ////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////
     // save the coords of the old vertices
@@ -2101,16 +2099,17 @@ void OrderVertices(int nedges, SpatialDomains::MeshGraphSharedPtr graphShPt,
     }
 }
 
-void Computestreakpositions(
-    int npoints, MultiRegions::ExpListSharedPtr streak,
-    Array<OneD, NekDouble> xold_up, Array<OneD, NekDouble> yold_up,
-    Array<OneD, NekDouble> xold_low, Array<OneD, NekDouble> yold_low,
-    Array<OneD, NekDouble> xold_c, Array<OneD, NekDouble> yold_c,
-    Array<OneD, NekDouble> &xc, Array<OneD, NekDouble> &yc, NekDouble cr,
-    bool verts)
+void Computestreakpositions(int npoints, MultiRegions::ExpListSharedPtr streak,
+                            [[maybe_unused]] Array<OneD, NekDouble> xold_up,
+                            Array<OneD, NekDouble> yold_up,
+                            [[maybe_unused]] Array<OneD, NekDouble> xold_low,
+                            Array<OneD, NekDouble> yold_low,
+                            Array<OneD, NekDouble> xold_c,
+                            Array<OneD, NekDouble> yold_c,
+                            Array<OneD, NekDouble> &xc,
+                            Array<OneD, NekDouble> &yc, NekDouble cr,
+                            bool verts)
 {
-    boost::ignore_unused(xold_up, xold_low);
-
     cout << "Computestreakpositions" << endl;
     int nq = streak->GetTotPoints();
     Array<OneD, NekDouble> coord(2);
@@ -2285,7 +2284,7 @@ void GenerateAddPointsNewtonIt(NekDouble xi, NekDouble yi, NekDouble &xout,
         U = function->GetExp(elmtid)->PhysEvaluate(coords, function->GetPhys() +
                                                                offset);
         dU        = function->GetExp(elmtid)->PhysEvaluate(coords,
-                                                    derfunction + offset);
+                                                           derfunction + offset);
         coords[1] = coords[1] - (U - cr) / dU;
         cout << cr << "U-cr=" << U - cr << "  tmp result y:" << coords[1]
              << "  dU=" << dU << endl;
@@ -2380,8 +2379,9 @@ void GenerateMapEidsv1v2(MultiRegions::ExpListSharedPtr field,
     }
 }
 
-void MappingEVids(Array<OneD, NekDouble> xoldup, Array<OneD, NekDouble> yoldup,
-                  Array<OneD, NekDouble> xolddown,
+void MappingEVids([[maybe_unused]] Array<OneD, NekDouble> xoldup,
+                  Array<OneD, NekDouble> yoldup,
+                  [[maybe_unused]] Array<OneD, NekDouble> xolddown,
                   Array<OneD, NekDouble> yolddown, Array<OneD, NekDouble> xcold,
                   Array<OneD, NekDouble> ycold, Array<OneD, int> Vids_c,
                   SpatialDomains::MeshGraphSharedPtr mesh,
@@ -2390,8 +2390,6 @@ void MappingEVids(Array<OneD, NekDouble> xoldup, Array<OneD, NekDouble> yoldup,
                   Array<OneD, Array<OneD, int>> &Eids_lay,
                   Array<OneD, Array<OneD, int>> &Vids_lay)
 {
-    boost::ignore_unused(xoldup, xolddown);
-
     int nlay_Eids = xcold.size() - 1;
     int nlay_Vids = xcold.size();
 
@@ -2593,8 +2591,8 @@ void MappingEVids(Array<OneD, NekDouble> xoldup, Array<OneD, NekDouble> yoldup,
                         Utmp     = streak->GetExp(elmtid)->PhysEvaluate(
                             coord, streak->GetPhys() + offset);
                         diffarray[e]  = abs((xtmp * xbef + ytmp * ybef) /
-                                               (normtmp * normbef) -
-                                           1);
+                                                (normtmp * normbef) -
+                                            1);
                         diffUarray[e] = abs(Ubef - Utmp);
                         cout << "   normtmp=" << normtmp << endl;
                         cout << "   Utmpcc=" << Utmp << endl;
@@ -2613,8 +2611,8 @@ void MappingEVids(Array<OneD, NekDouble> xoldup, Array<OneD, NekDouble> yoldup,
                             Eids_lay[m][g]     = edgestmp[e];
                             Vids_lay[m][g + 1] = V2[edgestmp[e]];
                             diff     = abs((xtmp * xbef + ytmp * ybef) /
-                                           (normtmp * normbef) -
-                                       1);
+                                               (normtmp * normbef) -
+                                           1);
                             normnext = normtmp;
                             ynext    = ytmp;
                             xnext    = xtmp;
@@ -2633,8 +2631,8 @@ void MappingEVids(Array<OneD, NekDouble> xoldup, Array<OneD, NekDouble> yoldup,
                         Utmp     = streak->GetExp(elmtid)->PhysEvaluate(
                             coord, streak->GetPhys() + offset);
                         diffarray[e]  = abs((xtmp * xbef + ytmp * ybef) /
-                                               (normtmp * normbef) -
-                                           1);
+                                                (normtmp * normbef) -
+                                            1);
                         diffUarray[e] = abs(Ubef - Utmp);
                         cout << "   normtmp=" << normtmp << endl;
                         cout << "   Utmpcc=" << Utmp << endl;
@@ -2652,8 +2650,8 @@ void MappingEVids(Array<OneD, NekDouble> xoldup, Array<OneD, NekDouble> yoldup,
                             Eids_lay[m][g]     = edgestmp[e];
                             Vids_lay[m][g + 1] = V1[edgestmp[e]];
                             diff     = abs((xtmp * xbef + ytmp * ybef) /
-                                           (normtmp * normbef) -
-                                       1);
+                                               (normtmp * normbef) -
+                                           1);
                             normnext = normtmp;
                             ynext    = ytmp;
                             xnext    = xtmp;
@@ -2974,15 +2972,14 @@ void PolyInterp(Array<OneD, NekDouble> xpol, Array<OneD, NekDouble> ypol,
     if (info < 0)
     {
         std::string message =
-            "ERROR: The " + boost::lexical_cast<std::string>(-info) +
+            "ERROR: The " + std::to_string(-info) +
             "th parameter had an illegal parameter for dgetrf";
         ASSERTL0(false, message.c_str());
     }
     else if (info > 0)
     {
-        std::string message =
-            "ERROR: Element u_" + boost::lexical_cast<std::string>(info) +
-            boost::lexical_cast<std::string>(info) + " is 0 from dgetrf";
+        std::string message = "ERROR: Element u_" + std::to_string(info) +
+                              std::to_string(info) + " is 0 from dgetrf";
         ASSERTL0(false, message.c_str());
     }
 
@@ -2993,15 +2990,14 @@ void PolyInterp(Array<OneD, NekDouble> xpol, Array<OneD, NekDouble> ypol,
     if (info < 0)
     {
         std::string message =
-            "ERROR: The " + boost::lexical_cast<std::string>(-info) +
+            "ERROR: The " + std::to_string(-info) +
             "th parameter had an illegal parameter for dgetrf";
         ASSERTL0(false, message.c_str());
     }
     else if (info > 0)
     {
-        std::string message =
-            "ERROR: Element u_" + boost::lexical_cast<std::string>(info) +
-            boost::lexical_cast<std::string>(info) + " is 0 from dgetrf";
+        std::string message = "ERROR: Element u_" + std::to_string(info) +
+                              std::to_string(info) + " is 0 from dgetrf";
         ASSERTL0(false, message.c_str());
     }
     /*
@@ -3076,15 +3072,14 @@ void PolyFit(int polyorder, int npoints, Array<OneD, NekDouble> xin,
     if (info < 0)
     {
         std::string message =
-            "ERROR: The " + boost::lexical_cast<std::string>(-info) +
+            "ERROR: The " + std::to_string(-info) +
             "th parameter had an illegal parameter for dgetrf";
         ASSERTL0(false, message.c_str());
     }
     else if (info > 0)
     {
-        std::string message =
-            "ERROR: Element u_" + boost::lexical_cast<std::string>(info) +
-            boost::lexical_cast<std::string>(info) + " is 0 from dgetrf";
+        std::string message = "ERROR: Element u_" + std::to_string(info) +
+                              std::to_string(info) + " is 0 from dgetrf";
         ASSERTL0(false, message.c_str());
     }
     // N means no transponse (direct matrix)
@@ -3094,15 +3089,14 @@ void PolyFit(int polyorder, int npoints, Array<OneD, NekDouble> xin,
     if (info < 0)
     {
         std::string message =
-            "ERROR: The " + boost::lexical_cast<std::string>(-info) +
+            "ERROR: The " + std::to_string(-info) +
             "th parameter had an illegal parameter for dgetrf";
         ASSERTL0(false, message.c_str());
     }
     else if (info > 0)
     {
-        std::string message =
-            "ERROR: Element u_" + boost::lexical_cast<std::string>(info) +
-            boost::lexical_cast<std::string>(info) + " is 0 from dgetrf";
+        std::string message = "ERROR: Element u_" + std::to_string(info) +
+                              std::to_string(info) + " is 0 from dgetrf";
         ASSERTL0(false, message.c_str());
     }
 
@@ -3376,13 +3370,13 @@ void MoveLayerNnormpos(int nvertl, int npedge, Array<OneD, NekDouble> xcPhys,
 void MoveOutsidePointsfixedxpos(
     int npedge, SpatialDomains::MeshGraphSharedPtr mesh,
     Array<OneD, NekDouble> xcold, Array<OneD, NekDouble> ycold,
-    Array<OneD, NekDouble> xolddown, Array<OneD, NekDouble> yolddown,
-    Array<OneD, NekDouble> xoldup, Array<OneD, NekDouble> yoldup,
-    Array<OneD, NekDouble> ylaydown, Array<OneD, NekDouble> ylayup,
-    Array<OneD, NekDouble> &xnew, Array<OneD, NekDouble> &ynew)
+    [[maybe_unused]] Array<OneD, NekDouble> xolddown,
+    Array<OneD, NekDouble> yolddown,
+    [[maybe_unused]] Array<OneD, NekDouble> xoldup,
+    Array<OneD, NekDouble> yoldup, Array<OneD, NekDouble> ylaydown,
+    Array<OneD, NekDouble> ylayup, Array<OneD, NekDouble> &xnew,
+    Array<OneD, NekDouble> &ynew)
 {
-    boost::ignore_unused(xolddown, xoldup);
-
     // update vertices coords outside layers region
     int nvertl   = ycold.size();
     int nVertTot = mesh->GetNvertices();
@@ -3440,7 +3434,8 @@ void MoveOutsidePointsfixedxpos(
 
 void MoveOutsidePointsNnormpos(
     int npedge, SpatialDomains::MeshGraphSharedPtr mesh,
-    Array<OneD, NekDouble> xcold, Array<OneD, NekDouble> ycold,
+    [[maybe_unused]] Array<OneD, NekDouble> xcold,
+    [[maybe_unused]] Array<OneD, NekDouble> ycold,
     Array<OneD, NekDouble> xolddown, Array<OneD, NekDouble> yolddown,
     Array<OneD, NekDouble> xoldup, Array<OneD, NekDouble> yoldup,
     Array<OneD, NekDouble> xlaydown, Array<OneD, NekDouble> ylaydown,
@@ -3448,21 +3443,6 @@ void MoveOutsidePointsNnormpos(
     Array<OneD, NekDouble> nxPhys, Array<OneD, NekDouble> nyPhys,
     Array<OneD, NekDouble> &xnew, Array<OneD, NekDouble> &ynew)
 {
-    boost::ignore_unused(xcold, ycold);
-    /*
-         int nq1D =bndfieldup->GetTotPoints();
-         Array<OneD, NekDouble> xlayoldup(nq1D);
-         Array<OneD, NekDouble> xlayolddown(nq1D);
-         Array<OneD, NekDouble> ylayoldup(nq1D);
-         Array<OneD, NekDouble> ylayolddown(nq1D);
-         Array<OneD, NekDouble> zlayoldup(nq1D);
-         Array<OneD, NekDouble> zlayolddown(nq1D);
-         bndfielddown->GetCoords( xlayolddown,  ylayolddown,zlayolddown);
-         bndfieldup->GetCoords( xlayoldup,  ylayoldup,zlayoldup);
-
-         NekDouble xmax = Vmath::Vmax(nq1D, xlayoldup,1);
-         NekDouble xmin = Vmath::Vmin(nq1D, xlayoldup,1);
-    */
     // determine the new verts up/down pos:
     int nvertl = xoldup.size();
     int nedges = nvertl - 1;
@@ -3948,11 +3928,11 @@ void Replacevertices(string filename, Array<OneD, NekDouble> newx,
     ASSERTL0(loadOkaynew, errstr.c_str());
 
     TiXmlHandle docHandlenew(&docnew);
-    TiXmlElement *meshnew   = NULL;
-    TiXmlElement *masternew = NULL;
-    TiXmlElement *condnew   = NULL;
-    TiXmlElement *Parsnew   = NULL;
-    TiXmlElement *parnew    = NULL;
+    TiXmlElement *meshnew   = nullptr;
+    TiXmlElement *masternew = nullptr;
+    TiXmlElement *condnew   = nullptr;
+    TiXmlElement *Parsnew   = nullptr;
+    TiXmlElement *parnew    = nullptr;
 
     // Master tag within which all data is contained.
 
@@ -3979,13 +3959,19 @@ void Replacevertices(string filename, Array<OneD, NekDouble> newx,
             int end = line.find_first_of("=");
             // Check for no parameter name
             if (beg == end)
+            {
                 throw 1;
+            }
             // Check for no parameter value
             if (end != line.find_last_of("="))
+            {
                 throw 1;
+            }
             // Check for no equals sign
             if (end == std::string::npos)
+            {
                 throw 1;
+            }
             lhs = line.substr(line.find_first_not_of(" "), end - beg);
             lhs = lhs.substr(0, lhs.find_last_not_of(" ") + 1);
 

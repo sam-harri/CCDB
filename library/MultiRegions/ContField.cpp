@@ -39,9 +39,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 /**
  * @class ContField
@@ -963,13 +961,6 @@ GlobalLinSysKey ContField::v_LinearAdvectionDiffusionReactionSolve(
         Array<OneD, NekDouble> phys(m_npoints), tmp;
         BwdTrans(outarray, phys);
         NekDouble scale = -1.0 * factors.find(StdRegions::eFactorGJP)->second;
-        /*
-        Array<OneD, NekDouble> tmp;
-        tmp = pvarcoeff.count(StdRegions::eVarCoeffGJPNormVel)
-                             ? pvarcoeff.find(StdRegions::eVarCoeffGJPNormVel)
-                                   ->second.GetValue()
-                             : NullNekDouble1DArray;
-        */
 
         m_GJPData->Apply(phys, wsp,
                          pvarcoeff.count(StdRegions::eVarCoeffGJPNormVel)
@@ -982,7 +973,7 @@ GlobalLinSysKey ContField::v_LinearAdvectionDiffusionReactionSolve(
     }
 
     // Solve the system
-    GlobalLinSysKey key(mtype, m_locToGloMap, factors, pvarcoeff, varfactors);
+    GlobalLinSysKey key(mtype, m_locToGloMap, factors, varcoeff, varfactors);
 
     GlobalSolve(key, wsp, outarray, dirForcing);
 
@@ -1061,5 +1052,4 @@ void ContField::v_UnsetGlobalLinSys(GlobalLinSysKey key,
     m_globalLinSysManager.DeleteObject(key);
 }
 
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions

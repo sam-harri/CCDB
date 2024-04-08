@@ -38,9 +38,8 @@
 
 #include <LibUtilities/BasicUtils/NekFactory.hpp>
 #include <LibUtilities/LinearAlgebra/NekSys.h>
-namespace Nektar
-{
-namespace LibUtilities
+
+namespace Nektar::LibUtilities
 {
 
 class NekLinSysIter;
@@ -69,31 +68,29 @@ public:
                                                             nDimen, pKey);
         return p;
     }
+
     LIB_UTILITIES_EXPORT NekLinSysIter(
         const LibUtilities::SessionReaderSharedPtr &pSession,
         const LibUtilities::CommSharedPtr &vRowComm, const int nDimen,
         const NekSysKey &pKey);
-    LIB_UTILITIES_EXPORT virtual ~NekLinSysIter();
+    LIB_UTILITIES_EXPORT ~NekLinSysIter() override = default;
 
     LIB_UTILITIES_EXPORT void SetUniversalUniqueMap(
         const Array<OneD, const int> &map);
-    LIB_UTILITIES_EXPORT void setRhsMagnitude(const NekDouble mag)
-    {
-        m_rhs_magnitude = mag;
-    }
+
     LIB_UTILITIES_EXPORT void SetNekLinSysTolerance(const NekDouble in)
     {
-        m_tolerance = in;
+        m_NekLinSysTolerance = fmax(1.0E-16, in);
     }
 
     LIB_UTILITIES_EXPORT void SetNekLinSysMaxIterations(const unsigned int in)
     {
-        m_maxiter = in;
+        m_NekLinSysMaxIterations = in;
     }
 
-    LIB_UTILITIES_EXPORT void SetLinSysMaxStorage(const unsigned int in)
+    LIB_UTILITIES_EXPORT int GetNekLinSysTolerance()
     {
-        m_LinSysMaxStorage = in;
+        return m_NekLinSysTolerance;
     }
 
     LIB_UTILITIES_EXPORT bool IsLocal()
@@ -105,32 +102,24 @@ protected:
     /// Global to universal unique map
     Array<OneD, int> m_map;
 
-    /// Dot product of rhs to normalise stopping criterion
-    NekDouble m_rhs_magnitude = NekConstants::kNekUnsetDouble;
-
-    int m_totalIterations  = 0;
-    NekDouble m_rhs_mag_sm = 0.9;
-
-    NekDouble m_prec_factor = 1.0;
-
-    // This is the maximum number of solution vectors that can be stored
-    // For example, in gmres, it is the max number of Krylov space
-    // search directions can be stored
-    // It determines the max storage usage
-    int m_LinSysMaxStorage;
+    NekDouble m_NekLinSysTolerance;
+    int m_NekLinSysMaxIterations;
+    int m_totalIterations = 0;
 
     // Boolean to identify if iteration acts on local storage
     bool m_isLocal;
 
-    void Set_Rhs_Magnitude(const NekVector<NekDouble> &pIn);
-    void Set_Rhs_Magnitude(const Array<OneD, NekDouble> &pIn);
+    void v_InitObject() override;
+
     void SetUniversalUniqueMap();
 
-    virtual void v_InitObject() override;
+    void Set_Rhs_Magnitude(const Array<OneD, NekDouble> &pIn);
+
+    void ConvergenceCheck(const Array<OneD, const NekDouble> &Residual);
 
 private:
 };
-} // namespace LibUtilities
-} // namespace Nektar
+
+} // namespace Nektar::LibUtilities
 
 #endif

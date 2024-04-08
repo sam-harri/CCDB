@@ -40,9 +40,7 @@
 #include <LibUtilities/TimeIntegration/TimeIntegrationScheme.h>
 #include <LibUtilities/TimeIntegration/TimeIntegrationSolutionGLM.h>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 /**
@@ -65,54 +63,52 @@ public:
 
 protected:
     // Values stored by each integration phase.
-    LUE virtual std::string v_GetVariant() const override;
-    LUE virtual size_t v_GetOrder() const override;
-    LUE virtual std::vector<NekDouble> v_GetFreeParams() const override;
-    LUE virtual TimeIntegrationSchemeType v_GetIntegrationSchemeType()
-        const override;
-    LUE virtual size_t v_GetNumIntegrationPhases() const override;
+    LUE std::string v_GetVariant() const override;
+    LUE size_t v_GetOrder() const override;
+    LUE std::vector<NekDouble> v_GetFreeParams() const override;
+    LUE TimeIntegrationSchemeType v_GetIntegrationSchemeType() const override;
+    LUE size_t v_GetNumIntegrationPhases() const override;
 
     // Gets the solution Vector
-    LUE virtual const TripleArray &v_GetSolutionVector() const override
+    LUE const TripleArray &v_GetSolutionVector() const override
     {
         return m_solVector->GetSolutionVector();
     }
 
-    LUE virtual TripleArray &v_UpdateSolutionVector() override
+    LUE TripleArray &v_UpdateSolutionVector() override
     {
         return m_solVector->UpdateSolutionVector();
     }
 
     // Sets the solution Vector
-    LUE virtual void v_SetSolutionVector(const size_t Offset,
-                                         const DoubleArray &y) override
+    LUE void v_SetSolutionVector(const size_t Offset,
+                                 const DoubleArray &y) override
     {
         m_solVector->SetSolutionVector(Offset, y);
     }
 
     // The worker methods
-    LUE virtual void v_InitializeScheme(
+    LUE void v_InitializeScheme(
         const NekDouble deltaT, ConstDoubleArray &y_0, const NekDouble time,
         const TimeIntegrationSchemeOperators &op) override;
 
-    LUE virtual ConstDoubleArray &v_TimeIntegrate(
-        const size_t timestep, const NekDouble delta_t) override;
+    LUE ConstDoubleArray &v_TimeIntegrate(const size_t timestep,
+                                          const NekDouble delta_t) override;
 
     LUE virtual void v_InitializeSecondaryData(
         TimeIntegrationAlgorithmGLM *phase, NekDouble deltaT) const;
 
-    LUE virtual void v_print(std::ostream &os) const override;
-    LUE virtual void v_printFull(std::ostream &os) const override;
+    LUE void v_print(std::ostream &os) const override;
+    LUE void v_printFull(std::ostream &os) const override;
 
     // These methods should never be used directly, only used by child classes.
     LUE TimeIntegrationSchemeGLM(std::string variant, size_t order,
                                  std::vector<NekDouble> freeParams)
         : TimeIntegrationScheme(variant, order, freeParams)
     {
-        boost::ignore_unused(variant, order, freeParams);
     }
 
-    virtual ~TimeIntegrationSchemeGLM()
+    ~TimeIntegrationSchemeGLM() override
     {
     }
 
@@ -127,7 +123,6 @@ LUE std::ostream &operator<<(std::ostream &os,
 LUE std::ostream &operator<<(std::ostream &os,
                              const TimeIntegrationSchemeGLMSharedPtr &rhs);
 
-} // end of namespace LibUtilities
-} // end of namespace Nektar
+} // namespace Nektar::LibUtilities
 
 #endif

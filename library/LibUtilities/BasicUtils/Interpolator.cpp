@@ -41,9 +41,7 @@ using namespace std;
 namespace bg  = boost::geometry;
 namespace bgi = boost::geometry::index;
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 /**
@@ -715,5 +713,4 @@ void Interpolator::FindNeighbours(const PtsPoint &searchPt,
 
     sort(neighbourPts.begin(), neighbourPts.end());
 }
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities

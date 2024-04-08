@@ -58,7 +58,7 @@ std::string FilterBenchmark::className =
  */
 FilterBenchmark::FilterBenchmark(
     const LibUtilities::SessionReaderSharedPtr &pSession,
-    const std::weak_ptr<SolverUtils::EquationSystem> &pEquation,
+    const std::shared_ptr<SolverUtils::EquationSystem> &pEquation,
     const ParamMap &pParams)
     : Filter(pSession, pEquation)
 {
@@ -105,10 +105,8 @@ FilterBenchmark::~FilterBenchmark()
  */
 void FilterBenchmark::v_Initialise(
     const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
-    const NekDouble &time)
+    [[maybe_unused]] const NekDouble &time)
 {
-    boost::ignore_unused(time);
-
     m_threshold.push_back(
         Array<OneD, NekDouble>(pFields[0]->GetNpoints(), m_initialValue));
 
@@ -176,10 +174,8 @@ void FilterBenchmark::v_Update(
  */
 void FilterBenchmark::v_Finalise(
     const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
-    const NekDouble &time)
+    [[maybe_unused]] const NekDouble &time)
 {
-    boost::ignore_unused(time);
-
     for (size_t j = 0; j < m_threshold.size() - 1; ++j)
     {
         std::stringstream vOutputFilename;

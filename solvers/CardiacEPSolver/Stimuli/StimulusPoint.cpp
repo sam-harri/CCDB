@@ -98,8 +98,8 @@ void StimulusPoint::v_Update(Array<OneD, Array<OneD, NekDouble>> &outarray,
 /**
  *
  */
-void StimulusPoint::v_GenerateSummary(SolverUtils::SummaryList &s)
+void StimulusPoint::v_GenerateSummary(
+    [[maybe_unused]] SolverUtils::SummaryList &s)
 {
-    boost::ignore_unused(s);
 }
 } // namespace Nektar

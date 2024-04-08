@@ -39,9 +39,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 LibUtilities::ShapeType Hexahedron::m_type =
@@ -267,11 +265,16 @@ unsigned int Hexahedron::GetNumNodes(ElmtConfig pConf)
 {
     int n = pConf.m_order;
     if (pConf.m_faceNodes && pConf.m_volumeNodes)
+    {
         return (n + 1) * (n + 1) * (n + 1);
+    }
     else if (pConf.m_faceNodes && !pConf.m_volumeNodes)
+    {
         return 6 * (n + 1) * (n + 1) - 12 * (n + 1) + 8;
+    }
     else
+    {
         return 12 * (n + 1) - 16;
+    }
 }
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh

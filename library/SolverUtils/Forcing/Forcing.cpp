@@ -37,9 +37,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 ForcingFactory &GetForcingFactory()
 {
@@ -82,11 +80,11 @@ void Forcing::PreApply(
 }
 
 void Forcing::v_PreApply(
-    const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
+    [[maybe_unused]] const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
     const Array<OneD, Array<OneD, NekDouble>> &inarray,
-    Array<OneD, Array<OneD, NekDouble>> &outarray, const NekDouble &time)
+    Array<OneD, Array<OneD, NekDouble>> &outarray,
+    [[maybe_unused]] const NekDouble &time)
 {
-    boost::ignore_unused(fields, time);
     if (&inarray != &outarray)
     {
         int nvar = std::min(inarray.size(), outarray.size());
@@ -217,12 +215,11 @@ SessionFunctionSharedPtr Forcing::GetFunction(
 }
 
 void Forcing::v_ApplyCoeff(
-    const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
-    const Array<OneD, Array<OneD, NekDouble>> &inarray,
-    Array<OneD, Array<OneD, NekDouble>> &outarray, const NekDouble &time)
+    [[maybe_unused]] const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
+    [[maybe_unused]] const Array<OneD, Array<OneD, NekDouble>> &inarray,
+    [[maybe_unused]] Array<OneD, Array<OneD, NekDouble>> &outarray,
+    [[maybe_unused]] const NekDouble &time)
 {
-    boost::ignore_unused(fields, inarray, outarray, time);
     ASSERTL0(false, "v_ApplyCoeff not defined");
 }
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils

@@ -41,9 +41,7 @@
 
 #include <cwipi.h>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 std::string CommCwipi::className = GetCommFactory().RegisterCreatorFunction(
@@ -93,5 +91,4 @@ void CommCwipi::v_Finalise()
     cwipi_finalize();
     CommMpi::v_Finalise();
 }
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities

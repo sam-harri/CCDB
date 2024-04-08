@@ -36,15 +36,11 @@
 #include <string>
 using namespace std;
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/BasicUtils/SharedArray.hpp>
 
 #include "ProcessJacobianEnergy.h"
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 ModuleKey ProcessJacobianEnergy::className =
@@ -133,5 +129,4 @@ void ProcessJacobianEnergy::v_Process(po::variables_map &vm)
     }
     exp->BwdTrans(coeffs, phys);
 }
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

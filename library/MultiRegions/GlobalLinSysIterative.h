@@ -39,9 +39,7 @@
 #include <MultiRegions/MultiRegionsDeclspec.h>
 #include <MultiRegions/Preconditioner.h>
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 // Forward declarations
 class ExpList;
@@ -55,7 +53,7 @@ public:
         const GlobalLinSysKey &pKey, const std::weak_ptr<ExpList> &pExpList,
         const std::shared_ptr<AssemblyMap> &pLocToGloMap);
 
-    MULTI_REGIONS_EXPORT virtual ~GlobalLinSysIterative();
+    MULTI_REGIONS_EXPORT ~GlobalLinSysIterative() override;
 
     void DoMatrixMultiply(const Array<OneD, NekDouble> &pInput,
                           Array<OneD, NekDouble> &pOutput)
@@ -66,12 +64,6 @@ public:
 protected:
     /// Global to universal unique map
     Array<OneD, int> m_map;
-
-    /// maximum iterations
-    int m_maxiter;
-
-    /// Tolerance of iterative solver.
-    NekDouble m_tolerance;
 
     /// dot product of rhs to normalise stopping criterion
     NekDouble m_rhs_magnitude;
@@ -118,9 +110,7 @@ protected:
     void DoProjection(const int pNumRows,
                       const Array<OneD, const NekDouble> &pInput,
                       Array<OneD, NekDouble> &pOutput, const int pNumDir,
-                      const NekDouble tol, const bool isAconjugate);
-
-    void Set_Rhs_Magnitude(const NekVector<NekDouble> &pIn);
+                      const bool isAconjugate);
 
     virtual void v_UniqueMap() = 0;
 
@@ -144,10 +134,8 @@ private:
 
     void DoMatrixMultiplyFlag(const Array<OneD, NekDouble> &pInput,
                               Array<OneD, NekDouble> &pOutput,
-                              const bool &controlFlag)
+                              [[maybe_unused]] const bool &controlFlag)
     {
-        boost::ignore_unused(controlFlag);
-
         v_DoMatrixMultiply(pInput, pOutput);
     }
 
@@ -157,7 +145,6 @@ private:
         m_precon->DoAssembleLoc(pInput, pOutput, ZeroDir);
     }
 };
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions
 
 #endif

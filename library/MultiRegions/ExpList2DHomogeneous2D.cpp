@@ -33,15 +33,11 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <MultiRegions/ExpList2DHomogeneous2D.h>
 
 using namespace std;
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 // Forward declaration for typedefs
 ExpList2DHomogeneous2D::ExpList2DHomogeneous2D() : ExpListHomogeneous2D(eNoType)
@@ -129,13 +125,11 @@ void ExpList2DHomogeneous2D::SetCoeffPhys(void)
     }
 }
 
-void ExpList2DHomogeneous2D::v_GetCoords(const int eid,
+void ExpList2DHomogeneous2D::v_GetCoords([[maybe_unused]] const int eid,
                                          Array<OneD, NekDouble> &xc0,
                                          Array<OneD, NekDouble> &xc1,
                                          Array<OneD, NekDouble> &xc2)
 {
-    boost::ignore_unused(eid);
-
     int n, m, j;
     Array<OneD, NekDouble> tmp_xc;
     int nylines = m_homogeneousBasis_y->GetNumPoints();
@@ -312,10 +306,9 @@ void ExpList2DHomogeneous2D::v_WriteTecplotZone(std::ostream &outfile,
 }
 
 void ExpList2DHomogeneous2D::v_WriteVtkPieceHeader(std::ostream &outfile,
-                                                   int expansion, int istrip)
+                                                   int expansion,
+                                                   [[maybe_unused]] int istrip)
 {
-    boost::ignore_unused(istrip);
-
     int i, j;
 
     int nquad0 = 1;
@@ -335,7 +328,7 @@ void ExpList2DHomogeneous2D::v_WriteVtkPieceHeader(std::ostream &outfile,
             << ntotminus << "\">" << endl;
     outfile << "      <Points>" << endl;
     outfile << "        <DataArray type=\"Float32\" "
-            << "NumberOfComponents=\"3\" format=\"ascii\">" << endl;
+            << R"(NumberOfComponents="3" format="ascii">)" << endl;
     outfile << "          ";
     for (i = 0; i < ntot; ++i)
     {
@@ -350,7 +343,7 @@ void ExpList2DHomogeneous2D::v_WriteVtkPieceHeader(std::ostream &outfile,
     outfile << "      </Points>" << endl;
     outfile << "      <Cells>" << endl;
     outfile << "        <DataArray type=\"Int32\" "
-            << "Name=\"connectivity\" format=\"ascii\">" << endl;
+            << R"(Name="connectivity" format="ascii">)" << endl;
     for (i = 0; i < nquad0; ++i)
     {
         for (j = 0; j < nquad1 - 1; ++j)
@@ -363,7 +356,7 @@ void ExpList2DHomogeneous2D::v_WriteVtkPieceHeader(std::ostream &outfile,
     outfile << endl;
     outfile << "        </DataArray>" << endl;
     outfile << "        <DataArray type=\"Int32\" "
-            << "Name=\"offsets\" format=\"ascii\">" << endl;
+            << R"(Name="offsets" format="ascii">)" << endl;
     for (i = 0; i < ntotminus; ++i)
     {
         outfile << i * 4 + 4 << " ";
@@ -371,7 +364,7 @@ void ExpList2DHomogeneous2D::v_WriteVtkPieceHeader(std::ostream &outfile,
     outfile << endl;
     outfile << "        </DataArray>" << endl;
     outfile << "        <DataArray type=\"UInt8\" "
-            << "Name=\"types\" format=\"ascii\">" << endl;
+            << R"(Name="types" format="ascii">)" << endl;
     for (i = 0; i < ntotminus; ++i)
     {
         outfile << "9 ";
@@ -382,5 +375,4 @@ void ExpList2DHomogeneous2D::v_WriteVtkPieceHeader(std::ostream &outfile,
     outfile << "      <PointData>" << endl;
 }
 
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions

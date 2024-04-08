@@ -37,9 +37,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace Collections
+namespace Nektar::Collections
 {
 
 /**
@@ -53,11 +51,16 @@ Collection::Collection(vector<StdRegions::StdExpansionSharedPtr> pCollExp,
     m_geomData = MemoryManager<CoalescedGeomData>::AllocateSharedPtr();
 }
 
-void Collection::CheckFactors(const OperatorType opType,
-                              StdRegions::FactorMap factors,
-                              int coll_phys_offset)
+void Collection::UpdateFactors(const OperatorType opType,
+                               StdRegions::FactorMap factors)
 {
-    m_ops[opType]->CheckFactors(factors, coll_phys_offset);
+    m_ops[opType]->UpdateFactors(factors);
+}
+
+void Collection::UpdateVarcoeffs(const OperatorType opType,
+                                 StdRegions::VarCoeffMap &varcoeffs)
+{
+    m_ops[opType]->UpdateVarcoeffs(varcoeffs);
 }
 
 void Collection::Initialise(const OperatorType opType,
@@ -90,5 +93,4 @@ void Collection::Initialise(const OperatorType opType,
         }
     }
 }
-} // namespace Collections
-} // namespace Nektar
+} // namespace Nektar::Collections

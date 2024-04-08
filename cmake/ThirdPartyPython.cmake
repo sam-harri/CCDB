@@ -14,7 +14,7 @@ IF (NEKTAR_BUILD_PYTHON)
     # If someone is using a newer variable name (from FindPython.cmake), set
     # this instead to the older variable name from PythonInterp.
     IF (DEFINED Python_EXECUTABLE)
-        SET(PYTHON_EXECUTABLE ${Python_EXECUTABLE})
+        SET(PYTHON_EXECUTABLE ${Python_EXECUTABLE} CACHE INTERNAL "")
     ENDIF()
 
     IF (NOT PYTHON_EXECUTABLE STREQUAL NEKTAR_PYTHON_EXECUTABLE)
@@ -149,20 +149,33 @@ IF (NEKTAR_BUILD_PYTHON)
         ADD_DEFINITIONS(-DBOOST_HAS_NUMPY)
     ENDIF()
     
-    CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/cmake/python/setup.py.in ${CMAKE_BINARY_DIR}/setup.py)
+    ADD_DEPENDENCIES(thirdparty boost-numpy)
+
+    # Build directory for binary installations
+    SET(NEKPY_BASE_DIR "${CMAKE_BINARY_DIR}/python" CACHE INTERNAL "")
+    FILE(MAKE_DIRECTORY ${NEKPY_BASE_DIR})
+    FILE(MAKE_DIRECTORY ${NEKPY_BASE_DIR}/NekPy)
+
+    CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/cmake/python/setup.py.in ${NEKPY_BASE_DIR}/setup.py)
+    CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/cmake/python/setup.cfg.in ${NEKPY_BASE_DIR}/setup.cfg)
+    CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/cmake/python/pyproject.toml.in ${NEKPY_BASE_DIR}/pyproject.toml)
 
     ADD_CUSTOM_TARGET(nekpy-install-user
         DEPENDS _MultiRegions
-        COMMAND ${PYTHON_EXECUTABLE} setup.py install --user
-        WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+        COMMAND ${PYTHON_EXECUTABLE} -m pip install --user .
+        WORKING_DIRECTORY ${NEKPY_BASE_DIR})
+
+    ADD_CUSTOM_TARGET(nekpy-install-dev
+        DEPENDS _MultiRegions
+        COMMAND ${PYTHON_EXECUTABLE} -m pip install --user -e .
+        WORKING_DIRECTORY ${NEKPY_BASE_DIR})
 
     ADD_CUSTOM_TARGET(nekpy-install-system
         DEPENDS _MultiRegions
-        COMMAND ${PYTHON_EXECUTABLE} setup.py install
-        WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+        COMMAND ${PYTHON_EXECUTABLE} -m pip install .
+        WORKING_DIRECTORY ${NEKPY_BASE_DIR})
 
-    FILE(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/NekPy)
-    FILE(WRITE ${CMAKE_BINARY_DIR}/NekPy/__init__.py "# Adjust dlopen flags to avoid OpenMPI issues
+    FILE(WRITE ${NEKPY_BASE_DIR}/NekPy/__init__.py "# Adjust dlopen flags to avoid OpenMPI issues
 try:
     import DLFCN as dl
     import sys

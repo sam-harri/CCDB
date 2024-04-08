@@ -41,9 +41,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 /**
  * @class GlobalLinSysIterativeStaticCond
@@ -199,9 +197,8 @@ DNekScalBlkMatSharedPtr GlobalLinSysIterativeStaticCond::v_GetStaticCondBlock(
  * @param   locToGloMap Local to global mapping information.
  */
 void GlobalLinSysIterativeStaticCond::v_AssembleSchurComplement(
-    const AssemblyMapSharedPtr pLocToGloMap)
+    [[maybe_unused]] const AssemblyMapSharedPtr pLocToGloMap)
 {
-    boost::ignore_unused(pLocToGloMap);
     // Set up unique map
     v_UniqueMap();
 
@@ -250,7 +247,7 @@ void GlobalLinSysIterativeStaticCond::PrepareLocalSchurComplement()
             // Assemble dense storage blocks.
             DNekScalMatSharedPtr loc_mat;
             m_denseBlocks.resize(nBlk);
-            double *ptr = 0;
+            double *ptr = nullptr;
 
             if (MultiRegions::eContiguous == storageStrategy)
             {
@@ -300,7 +297,7 @@ void GlobalLinSysIterativeStaticCond::PrepareLocalSchurComplement()
                 loc_lda = loc_mat->GetRows();
 
                 ASSERTL1(loc_lda >= 0,
-                         boost::lexical_cast<std::string>(n) +
+                         std::to_string(n) +
                              "-th "
                              "matrix block in Schur complement has "
                              "rank 0!");
@@ -332,7 +329,7 @@ void GlobalLinSysIterativeStaticCond::PrepareLocalSchurComplement()
                     loc_lda = loc_mat->GetRows();
 
                     ASSERTL1(loc_lda == partitions[part].second,
-                             boost::lexical_cast<std::string>(n) +
+                             std::to_string(n) +
                                  "-th"
                                  " matrix block in Schur complement has "
                                  "unexpected rank");
@@ -438,6 +435,12 @@ void GlobalLinSysIterativeStaticCond::v_UniqueMap()
 void GlobalLinSysIterativeStaticCond::v_PreSolve(int scLevel,
                                                  Array<OneD, NekDouble> &F_bnd)
 {
+    if (m_isAbsoluteTolerance)
+    {
+        m_rhs_magnitude = 1.0;
+        return;
+    }
+
     if (scLevel == 0)
     {
         // When matrices are supplied to the constructor at the top
@@ -448,31 +451,26 @@ void GlobalLinSysIterativeStaticCond::v_PreSolve(int scLevel,
             m_precon->BuildPreconditioner();
         }
 
-#if 1 // to be consistent with original
-
         int nGloBndDofs = m_locToGloMap.lock()->GetNumGlobalBndCoeffs();
         Array<OneD, NekDouble> F_gloBnd(nGloBndDofs);
         NekVector<NekDouble> F_GloBnd(nGloBndDofs, F_gloBnd, eWrapper);
-
         m_locToGloMap.lock()->AssembleBnd(F_bnd, F_gloBnd);
-        Set_Rhs_Magnitude(F_GloBnd);
 
-#else
-        int nLocBndDofs = m_locToGloMap.lock()->GetNumLocalBndCoeffs();
+        NekDouble vExchange(0.0);
+        if (m_map.size() > 0)
+        {
+            vExchange = Vmath::Dot2(F_GloBnd.GetDimension(), &F_GloBnd[0],
+                                    &F_GloBnd[0], &m_map[0]);
+        }
 
-        // Set_Rhs_Magnitude - version using local array
-
-        Array<OneD, NekDouble> vExchange(1, 0.0);
-
-        vExchange[0] += Blas::Ddot(nLocBndDofs, F_bnd, 1, F_bnd, 1);
         m_expList.lock()->GetComm()->GetRowComm()->AllReduce(
             vExchange, Nektar::LibUtilities::ReduceSum);
 
         // To ensure that very different rhs values are not being
-        // used in subsequent solvers such as the velocit solve in
+        // used in subsequent solvers such as the velocity solve in
         // INC NS. If this works we then need to work out a better
         // way to control this.
-        NekDouble new_rhs_mag = (vExchange[0] > 1e-6) ? vExchange[0] : 1.0;
+        NekDouble new_rhs_mag = (vExchange > 1e-6) ? vExchange : 1.0;
 
         if (m_rhs_magnitude == NekConstants::kNekUnsetDouble)
         {
@@ -483,7 +481,6 @@ void GlobalLinSysIterativeStaticCond::v_PreSolve(int scLevel,
             m_rhs_magnitude = (m_rhs_mag_sm * (m_rhs_magnitude) +
                                (1.0 - m_rhs_mag_sm) * new_rhs_mag);
         }
-#endif
     }
     else
     {
@@ -524,6 +521,7 @@ GlobalLinSysStaticCondSharedPtr GlobalLinSysIterativeStaticCond::v_Recurse(
     sys->Initialise(l2gMap);
     return sys;
 }
+
 /**
  *
  */
@@ -545,9 +543,76 @@ void GlobalLinSysIterativeStaticCond::v_SolveLinearSystem(
                      m_linSysIterSolver),
                  "NekLinSysIter '" + m_linSysIterSolver +
                      "' is not defined.\n");
+
+        // Create the key to hold solver settings
+        auto sysKey     = LibUtilities::NekSysKey();
+        string variable = plocToGloMap->GetVariable();
+
+        // Either get the solnInfo from <GlobalSysSolInfo> or from
+        // <Parameters>
+        if (pSession->DefinesGlobalSysSolnInfo(variable,
+                                               "IterativeSolverTolerance"))
+        {
+            sysKey.m_NekLinSysTolerance = boost::lexical_cast<double>(
+                pSession
+                    ->GetGlobalSysSolnInfo(variable, "IterativeSolverTolerance")
+                    .c_str());
+        }
+        else
+        {
+            pSession->LoadParameter("IterativeSolverTolerance",
+                                    sysKey.m_NekLinSysTolerance,
+                                    NekConstants::kNekIterativeTol);
+        }
+
+        if (pSession->DefinesGlobalSysSolnInfo(variable,
+                                               "NekLinSysMaxIterations"))
+        {
+            sysKey.m_NekLinSysMaxIterations = boost::lexical_cast<int>(
+                pSession
+                    ->GetGlobalSysSolnInfo(variable, "NekLinSysMaxIterations")
+                    .c_str());
+        }
+        else
+        {
+            pSession->LoadParameter("NekLinSysMaxIterations",
+                                    sysKey.m_NekLinSysMaxIterations, 5000);
+        }
+
+        if (pSession->DefinesGlobalSysSolnInfo(variable, "LinSysMaxStorage"))
+        {
+            sysKey.m_LinSysMaxStorage = boost::lexical_cast<int>(
+                pSession->GetGlobalSysSolnInfo(variable, "LinSysMaxStorage")
+                    .c_str());
+        }
+        else
+        {
+            pSession->LoadParameter("LinSysMaxStorage",
+                                    sysKey.m_LinSysMaxStorage, 100);
+        }
+
+        if (pSession->DefinesGlobalSysSolnInfo(variable, "GMRESMaxHessMatBand"))
+        {
+            sysKey.m_KrylovMaxHessMatBand = boost::lexical_cast<int>(
+                pSession->GetGlobalSysSolnInfo(variable, "GMRESMaxHessMatBand")
+                    .c_str());
+        }
+        else
+        {
+            pSession->LoadParameter("GMRESMaxHessMatBand",
+                                    sysKey.m_KrylovMaxHessMatBand,
+                                    sysKey.m_LinSysMaxStorage + 1);
+        }
+
+        // The following settings have no correponding tests and are rarely
+        // used.
+        pSession->MatchSolverInfo("GMRESLeftPrecon", "True",
+                                  sysKey.m_NekLinSysLeftPrecon, false);
+        pSession->MatchSolverInfo("GMRESRightPrecon", "True",
+                                  sysKey.m_NekLinSysRightPrecon, true);
+
         m_linsol = LibUtilities::GetNekLinSysIterFactory().CreateInstance(
-            m_linSysIterSolver, pSession, vRowComm, nGlobal - nDir,
-            LibUtilities::NekSysKey());
+            m_linSysIterSolver, pSession, vRowComm, nGlobal - nDir, sysKey);
 
         m_linsol->SetSysOperators(m_NekSysOp);
         v_UniqueMap();
@@ -560,14 +625,14 @@ void GlobalLinSysIterativeStaticCond::v_SolveLinearSystem(
         m_precon->BuildPreconditioner();
     }
 
-    m_linsol->setRhsMagnitude(m_rhs_magnitude);
+    m_linsol->SetRhsMagnitude(m_rhs_magnitude);
 
     if (m_useProjection)
     {
         Array<OneD, NekDouble> gloIn(nGlobal);
         Array<OneD, NekDouble> gloOut(nGlobal, 0.0);
         plocToGloMap->AssembleBnd(pInput, gloIn);
-        DoProjection(nGlobal, gloIn, gloOut, nDir, m_tolerance, m_isAconjugate);
+        DoProjection(nGlobal, gloIn, gloOut, nDir, m_isAconjugate);
         plocToGloMap->GlobalToLocalBnd(gloOut, pOutput);
     }
     else
@@ -576,17 +641,17 @@ void GlobalLinSysIterativeStaticCond::v_SolveLinearSystem(
         {
             int nLocDofs = plocToGloMap->GetNumLocalBndCoeffs();
             Vmath::Zero(nLocDofs, pOutput, 1);
-            m_linsol->SolveSystem(nLocDofs, pInput, pOutput, nDir, m_tolerance);
+            m_linsol->SolveSystem(nLocDofs, pInput, pOutput, nDir);
         }
         else
         {
             Array<OneD, NekDouble> gloIn(nGlobal);
             Array<OneD, NekDouble> gloOut(nGlobal, 0.0);
             plocToGloMap->AssembleBnd(pInput, gloIn);
-            m_linsol->SolveSystem(nGlobal, gloIn, gloOut, nDir, m_tolerance);
+            m_linsol->SolveSystem(nGlobal, gloIn, gloOut, nDir);
             plocToGloMap->GlobalToLocalBnd(gloOut, pOutput);
         }
     }
 }
-} // namespace MultiRegions
-} // namespace Nektar
+
+} // namespace Nektar::MultiRegions

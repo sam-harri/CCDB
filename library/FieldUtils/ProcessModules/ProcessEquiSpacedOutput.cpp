@@ -35,9 +35,6 @@
 #include <string>
 using namespace std;
 
-#include <boost/core/ignore_unused.hpp>
-#include <boost/math/special_functions/fpclassify.hpp>
-
 #include <LibUtilities/BasicUtils/SharedArray.hpp>
 #include <LibUtilities/Foundations/Interp.h>
 #include <StdRegions/StdQuadExp.h>
@@ -45,9 +42,7 @@ using namespace std;
 
 #include "ProcessEquiSpacedOutput.h"
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 ModuleKey ProcessEquiSpacedOutput::className =
@@ -871,5 +866,4 @@ void ProcessEquiSpacedOutput::GenOrthoModes(
             break;
     }
 }
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

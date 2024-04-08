@@ -37,9 +37,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace Collections
+namespace Nektar::Collections
 {
 
 /**
@@ -586,5 +584,4 @@ void TetIProduct(bool sortTopEdge, int numElmt, int nquad0, int nquad1,
     }
 }
 
-} // namespace Collections
-} // namespace Nektar
+} // namespace Nektar::Collections

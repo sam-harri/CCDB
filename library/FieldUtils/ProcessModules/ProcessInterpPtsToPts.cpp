@@ -36,9 +36,7 @@
 #include <string>
 using namespace std;
 
-#include <boost/core/ignore_unused.hpp>
 #include <boost/lexical_cast.hpp>
-#include <boost/math/special_functions/fpclassify.hpp>
 
 #include <FieldUtils/Interpolator.h>
 #include <LibUtilities/BasicUtils/CsvIO.h>
@@ -49,9 +47,7 @@ using namespace std;
 
 #include "ProcessInterpPtsToPts.h"
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 ModuleKey ProcessInterpPtsToPts::className =
@@ -130,10 +126,9 @@ void ProcessInterpPtsToPts::v_Process(po::variables_map &vm)
     }
 }
 
-void ProcessInterpPtsToPts::CreateFieldPts(po::variables_map &vm)
+void ProcessInterpPtsToPts::CreateFieldPts(
+    [[maybe_unused]] po::variables_map &vm)
 {
-    boost::ignore_unused(vm);
-
     int rank   = m_f->m_comm->GetSpaceComm()->GetRank();
     int nprocs = m_f->m_comm->GetSpaceComm()->GetSize();
     // Check for command line point specification
@@ -141,7 +136,7 @@ void ProcessInterpPtsToPts::CreateFieldPts(po::variables_map &vm)
     {
         string inFile = m_config["topts"].as<string>();
 
-        if (boost::filesystem::path(inFile).extension() == ".pts")
+        if (fs::path(inFile).extension() == ".pts")
         {
             LibUtilities::PtsIOSharedPtr ptsIO =
                 MemoryManager<LibUtilities::PtsIO>::AllocateSharedPtr(
@@ -149,7 +144,7 @@ void ProcessInterpPtsToPts::CreateFieldPts(po::variables_map &vm)
 
             ptsIO->Import(inFile, m_f->m_fieldPts);
         }
-        else if (boost::filesystem::path(inFile).extension() == ".csv")
+        else if (fs::path(inFile).extension() == ".csv")
         {
             LibUtilities::CsvIOSharedPtr csvIO =
                 MemoryManager<LibUtilities::CsvIO>::AllocateSharedPtr(
@@ -358,10 +353,8 @@ void ProcessInterpPtsToPts::CreateFieldPts(po::variables_map &vm)
 void ProcessInterpPtsToPts::InterpolatePtsToPts(
     LibUtilities::PtsFieldSharedPtr &fromPts,
     LibUtilities::PtsFieldSharedPtr &toPts, NekDouble clamp_low,
-    NekDouble clamp_up, NekDouble def_value)
+    NekDouble clamp_up, [[maybe_unused]] NekDouble def_value)
 {
-    boost::ignore_unused(def_value);
-
     ASSERTL0(toPts->GetNFields() >= fromPts->GetNFields(),
              "ptField has too few fields");
 
@@ -487,5 +480,4 @@ void ProcessInterpPtsToPts::PrintProgressbar(const int position,
 {
     LibUtilities::PrintProgressbar(position, goal, "Interpolating");
 }
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

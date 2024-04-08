@@ -36,14 +36,12 @@
 #include <NekMesh/VolumeMeshing/TetMeshing/TetMesh.h>
 
 using namespace std;
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 void TetMesh::Mesh()
 {
-    vector<Array<OneD, NekDouble>> voidPts = m_mesh->m_cad->GetVoidPoints();
+    vector<std::array<NekDouble, 3>> voidPts = m_mesh->m_cad->GetVoidPoints();
     tetgen = MemoryManager<TetGenInterface>::AllocateSharedPtr(voidPts);
 
     map<int, NodeSharedPtr> IdToNode;
@@ -52,7 +50,7 @@ void TetMesh::Mesh()
     // build sequentially ordered maps of nodes that exist and there delta value
     // in the octree
     map<int, NekDouble> IdToDelta;
-    vector<Array<OneD, int>> surfacetris;
+    vector<std::array<int, 3>> surfacetris;
     NodeSet alreadyInSurface;
 
     if (m_surface.size() == 0)
@@ -64,7 +62,7 @@ void TetMesh::Mesh()
     for (int i = 0; i < m_surface.size(); i++)
     {
         vector<NodeSharedPtr> n = m_surface[i]->GetVertexList();
-        Array<OneD, int> tri(3);
+        std::array<int, 3> tri;
         for (int j = 0; j < n.size(); j++)
         {
             pair<NodeSet::iterator, bool> testIns =
@@ -90,7 +88,7 @@ void TetMesh::Mesh()
 
     tetgen->InitialMesh(IdToNode, surfacetris);
 
-    vector<Array<OneD, NekDouble>> newp;
+    vector<std::array<NekDouble, 3>> newp;
     int ctbefore = IdToNode.size();
     int newpb;
     do
@@ -121,11 +119,9 @@ void TetMesh::Mesh()
     // create tets
     for (int i = 0; i < m_tetconnect.size(); i++)
     {
-        vector<NodeSharedPtr> n;
-        n.push_back(IdToNode[m_tetconnect[i][0]]);
-        n.push_back(IdToNode[m_tetconnect[i][1]]);
-        n.push_back(IdToNode[m_tetconnect[i][2]]);
-        n.push_back(IdToNode[m_tetconnect[i][3]]);
+        vector<NodeSharedPtr> n = {
+            IdToNode[m_tetconnect[i][0]], IdToNode[m_tetconnect[i][1]],
+            IdToNode[m_tetconnect[i][2]], IdToNode[m_tetconnect[i][3]]};
         ElmtConfig conf(LibUtilities::eTetrahedron, 1, false, false);
         vector<int> tags;
         tags.push_back(m_id);
@@ -138,5 +134,4 @@ void TetMesh::Mesh()
     m_log(VERBOSE) << "  Volume meshing complete: " << m_tetconnect.size()
                    << " tetrahedra generated." << endl;
 }
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh

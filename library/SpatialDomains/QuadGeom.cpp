@@ -43,9 +43,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace SpatialDomains
+namespace Nektar::SpatialDomains
 {
 
 QuadGeom::QuadGeom()
@@ -279,12 +277,12 @@ void QuadGeom::v_GenGeomFactors()
 
         // Check to see if expansions are linear
         // If not linear => deformed geometry
-        m_straightEdge = true;
+        m_straightEdge = 1;
         if ((m_xmap->GetBasisNumModes(0) != 2) ||
             (m_xmap->GetBasisNumModes(1) != 2))
         {
             Gtype          = eDeformed;
-            m_straightEdge = false;
+            m_straightEdge = 0;
         }
 
         // For linear expansions, the mapping from standard to local
@@ -370,6 +368,10 @@ void QuadGeom::v_GenGeomFactors()
         if (Gtype == eRegular)
         {
             v_CalculateInverseIsoParam();
+        }
+        else if (m_straightEdge)
+        {
+            PreSolveStraightEdge();
         }
 
         m_geomFactors = MemoryManager<GeomFactors>::AllocateSharedPtr(
@@ -458,10 +460,57 @@ void QuadGeom::v_FillGeom()
     }
 }
 
-int QuadGeom::v_GetDir(const int i, const int j) const
+void QuadGeom::PreSolveStraightEdge()
 {
-    boost::ignore_unused(j); // required in 3D shapes
+    int i0, i1, j1, j2;
+    if (fabs(m_isoParameter[0][3]) >= fabs(m_isoParameter[1][3]))
+    {
+        i0 = 0;
+        i1 = 1;
+    }
+    else
+    {
+        i1 = 0;
+        i0 = 1;
+        m_straightEdge |= 2;
+    }
+    NekDouble gamma = m_isoParameter[i1][3] / m_isoParameter[i0][3];
+    std::vector<NekDouble> c(3);
+    for (int i = 0; i < 3; ++i)
+    {
+        c[i] = m_isoParameter[i1][i] - gamma * m_isoParameter[i0][i];
+    }
+    if (fabs(c[1]) >= fabs(c[2]))
+    {
+        j1 = 1;
+        j2 = 2;
+    }
+    else
+    {
+        j1 = 2;
+        j2 = 1;
+        m_straightEdge |= 4;
+    }
+    NekDouble beta = c[j2] / c[j1];
+    if (i0 == 1)
+    {
+        Vmath::Vcopy(4, m_isoParameter[1], 1, m_isoParameter[0], 1);
+    }
+    if (j1 == 2)
+    {
+        NekDouble temp        = m_isoParameter[0][j1];
+        m_isoParameter[0][j1] = m_isoParameter[0][j2];
+        m_isoParameter[0][j2] = temp;
+    }
+    m_isoParameter[0][2] -= m_isoParameter[0][1] * beta;
+    m_isoParameter[1][0] = c[0];
+    m_isoParameter[1][1] = 1. / c[j1];
+    m_isoParameter[1][2] = beta;
+    m_isoParameter[1][3] = gamma;
+}
 
+int QuadGeom::v_GetDir(const int i, [[maybe_unused]] const int j) const
+{
     return i % 2;
 }
 
@@ -498,5 +547,4 @@ void QuadGeom::v_Setup()
     }
 }
 
-} // namespace SpatialDomains
-} // namespace Nektar
+} // namespace Nektar::SpatialDomains

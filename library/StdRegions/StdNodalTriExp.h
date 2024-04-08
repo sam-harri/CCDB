@@ -36,23 +36,19 @@
 #ifndef STDNODALTRIEXP_H
 #define STDNODALTRIEXP_H
 
-#include <StdRegions/StdRegions.hpp>
-#include <StdRegions/StdRegionsDeclspec.h>
 #include <StdRegions/StdTriExp.h>
 
-namespace Nektar
-{
-namespace StdRegions
+namespace Nektar::StdRegions
 {
 class StdNodalTriExp : virtual public StdTriExp
 {
 public:
-    STD_REGIONS_EXPORT StdNodalTriExp() = default;
     STD_REGIONS_EXPORT StdNodalTriExp(const LibUtilities::BasisKey &Ba,
                                       const LibUtilities::BasisKey &Bb,
                                       const LibUtilities::PointsType Ntype);
-    STD_REGIONS_EXPORT StdNodalTriExp(const StdNodalTriExp &T);
-    STD_REGIONS_EXPORT ~StdNodalTriExp() override = default;
+    StdNodalTriExp()                        = default;
+    StdNodalTriExp(const StdNodalTriExp &T) = default;
+    ~StdNodalTriExp() override              = default;
 
     //-------------------------------
     // Nodal basis specific routines
@@ -127,17 +123,14 @@ protected:
     //--------------------------
     STD_REGIONS_EXPORT int v_GetVertexMap(
         int localVertexId, bool useCoeffPacking = false) override;
-
     STD_REGIONS_EXPORT void v_GetTraceToElementMap(
         const int eid, Array<OneD, unsigned int> &maparray,
         Array<OneD, int> &signarray, Orientation edgeOrient = eForwards,
         int P = -1, int Q = -1) override;
-
     STD_REGIONS_EXPORT void v_GetTraceInteriorToElementMap(
         const int eid, Array<OneD, unsigned int> &maparray,
         Array<OneD, int> &signarray,
         const Orientation edgeOrient = eForwards) override;
-
     STD_REGIONS_EXPORT void v_GetInteriorMap(
         Array<OneD, unsigned int> &outarray) override;
     STD_REGIONS_EXPORT void v_GetBoundaryMap(
@@ -172,7 +165,6 @@ protected:
 };
 
 typedef std::shared_ptr<StdNodalTriExp> StdNodalTriExpSharedPtr;
-} // namespace StdRegions
-} // namespace Nektar
+} // namespace Nektar::StdRegions
 
 #endif // STDNODALTRIEXP_H

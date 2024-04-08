@@ -36,16 +36,12 @@
 #include <string>
 using namespace std;
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <GlobalMapping/Deform.h>
 #include <MultiRegions/ExpList.h>
 
 #include "ProcessDeform.h"
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 ModuleKey ProcessDeform::className = GetModuleFactory().RegisterCreatorFunction(
     ModuleKey(eProcessModule, "deform"), ProcessDeform::create,
@@ -79,5 +75,4 @@ void ProcessDeform::v_Process(po::variables_map &vm)
 
     GlobalMapping::UpdateGeometry(m_f->m_graph, exp, phys, false);
 }
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

@@ -39,12 +39,9 @@ using namespace std;
 #include <LibUtilities/Memory/NekMemoryManager.hpp>
 #include <MultiRegions/ExpList3DHomogeneous1D.h>
 #include <SolverUtils/Filters/FilterHistoryPoints.h>
-#include <boost/core/ignore_unused.hpp>
 #include <boost/format.hpp>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 std::string FilterHistoryPoints::className =
     GetFilterFactory().RegisterCreatorFunction("HistoryPoints",
@@ -55,7 +52,7 @@ std::string FilterHistoryPoints::className =
  */
 FilterHistoryPoints::FilterHistoryPoints(
     const LibUtilities::SessionReaderSharedPtr &pSession,
-    const std::weak_ptr<EquationSystem> &pEquation, const ParamMap &pParams)
+    const std::shared_ptr<EquationSystem> &pEquation, const ParamMap &pParams)
     : Filter(pSession, pEquation)
 {
     // OutputFile
@@ -687,10 +684,8 @@ void FilterHistoryPoints::v_WriteData(const int &rank,
  */
 void FilterHistoryPoints::v_Finalise(
     const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
-    const NekDouble &time)
+    [[maybe_unused]] const NekDouble &time)
 {
-    boost::ignore_unused(time);
-
     if (pFields[0]->GetComm()->GetRank() == 0 && m_outputOneFile)
     {
         m_outputStream.close();
@@ -704,5 +699,4 @@ bool FilterHistoryPoints::v_IsTimeDependent()
 {
     return true;
 }
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils

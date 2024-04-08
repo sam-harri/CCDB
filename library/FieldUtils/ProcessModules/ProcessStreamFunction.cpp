@@ -32,15 +32,11 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include "ProcessStreamFunction.h"
 
 using namespace std;
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 ModuleKey ProcessStreamFunction::className =
@@ -108,5 +104,4 @@ void ProcessStreamFunction::v_Process(po::variables_map &vm)
                             m_f->m_exp[nfields]->UpdatePhys());
 }
 
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

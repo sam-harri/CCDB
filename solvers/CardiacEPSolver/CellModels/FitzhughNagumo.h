@@ -59,19 +59,18 @@ public:
         const LibUtilities::SessionReaderSharedPtr &pSession,
         const MultiRegions::ExpListSharedPtr &pField);
 
-    virtual ~CellModelFitzHughNagumo()
+    ~CellModelFitzHughNagumo() override
     {
     }
 
 protected:
-    virtual void v_Update(
-        const Array<OneD, const Array<OneD, NekDouble>> &inarray,
-        Array<OneD, Array<OneD, NekDouble>> &outarray,
-        const NekDouble time) override;
+    void v_Update(const Array<OneD, const Array<OneD, NekDouble>> &inarray,
+                  Array<OneD, Array<OneD, NekDouble>> &outarray,
+                  const NekDouble time) override;
 
-    virtual void v_GenerateSummary(SummaryList &s) override;
+    void v_GenerateSummary(SummaryList &s) override;
 
-    virtual void v_SetInitialConditions() override;
+    void v_SetInitialConditions() override;
 
 private:
     NekDouble m_beta;

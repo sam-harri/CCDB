@@ -41,9 +41,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace SpatialDomains
+namespace Nektar::SpatialDomains
 {
 
 const unsigned int HexGeom::VertexEdgeConnectivity[8][3] = {
@@ -101,13 +99,13 @@ void HexGeom::v_GenGeomFactors()
         v_FillGeom();
 
         // check to see if expansions are linear
-        m_straightEdge = true;
+        m_straightEdge = 1;
         if (m_xmap->GetBasisNumModes(0) != 2 ||
             m_xmap->GetBasisNumModes(1) != 2 ||
             m_xmap->GetBasisNumModes(2) != 2)
         {
             Gtype          = eDeformed;
-            m_straightEdge = false;
+            m_straightEdge = 0;
         }
 
         // check to see if all faces are parallelograms
@@ -828,5 +826,4 @@ void HexGeom::SetUpXmap()
     m_xmap = MemoryManager<StdRegions::StdHexExp>::AllocateSharedPtr(A, B, C);
 }
 
-} // namespace SpatialDomains
-} // namespace Nektar
+} // namespace Nektar::SpatialDomains

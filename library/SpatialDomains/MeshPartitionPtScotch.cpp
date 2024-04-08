@@ -32,8 +32,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/Communication/CommMpi.h>
 #include <SpatialDomains/MeshPartitionPtScotch.h>
 
@@ -46,9 +44,7 @@
                      std::string(#scotchFunc));                                \
     }
 
-namespace Nektar
-{
-namespace SpatialDomains
+namespace Nektar::SpatialDomains
 {
 
 std::string MeshPartitionPtScotch::className =
@@ -74,13 +70,12 @@ MeshPartitionPtScotch::~MeshPartitionPtScotch()
 }
 
 void MeshPartitionPtScotch::v_PartitionGraphImpl(
-    int &nVerts, int &nVertConds, Array<OneD, int> &xadj,
+    int &nVerts, [[maybe_unused]] int &nVertConds, Array<OneD, int> &xadj,
     Array<OneD, int> &adjcy, Array<OneD, int> &vertWgt,
-    Array<OneD, int> &vertSize, Array<OneD, int> &edgeWgt, int &nparts,
-    int &volume, Array<OneD, int> &part)
+    [[maybe_unused]] Array<OneD, int> &vertSize,
+    [[maybe_unused]] Array<OneD, int> &edgeWgt, int &nparts,
+    [[maybe_unused]] int &volume, Array<OneD, int> &part)
 {
-    boost::ignore_unused(nVertConds, vertSize, edgeWgt, volume);
-
     LibUtilities::CommMpiSharedPtr mpiComm =
         std::dynamic_pointer_cast<LibUtilities::CommMpi>(
             m_comm->GetSpaceComm());
@@ -91,7 +86,8 @@ void MeshPartitionPtScotch::v_PartitionGraphImpl(
     SCOTCH_CALL(SCOTCH_dgraphInit, (&scGraph, mpiComm->GetComm()));
     SCOTCH_CALL(SCOTCH_dgraphBuild,
                 (&scGraph, 0, nVerts, nVerts, &xadj[0], &xadj[1], &vertWgt[0],
-                 NULL, adjcy.size(), adjcy.size(), &adjcy[0], NULL, NULL));
+                 nullptr, adjcy.size(), adjcy.size(), &adjcy[0], nullptr,
+                 nullptr));
     SCOTCH_CALL(SCOTCH_dgraphCheck, (&scGraph));
 
     SCOTCH_Strat strat;
@@ -102,5 +98,4 @@ void MeshPartitionPtScotch::v_PartitionGraphImpl(
     SCOTCH_CALL(SCOTCH_dgraphPart, (&scGraph, nparts, &strat, &part[0]));
 }
 
-} // namespace SpatialDomains
-} // namespace Nektar
+} // namespace Nektar::SpatialDomains

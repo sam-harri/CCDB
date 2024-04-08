@@ -32,21 +32,13 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/BasicUtils/ShapeType.hpp>
 #include <StdRegions/StdPrismExp.h>
 
 using namespace std;
 
-namespace Nektar
+namespace Nektar::StdRegions
 {
-namespace StdRegions
-{
-
-StdPrismExp::StdPrismExp()
-{
-}
 
 StdPrismExp::StdPrismExp(const LibUtilities::BasisKey &Ba,
                          const LibUtilities::BasisKey &Bb,
@@ -60,16 +52,6 @@ StdPrismExp::StdPrismExp(const LibUtilities::BasisKey &Ba,
 {
     ASSERTL0(Ba.GetNumModes() <= Bc.GetNumModes(),
              "order in 'a' direction is higher than order in 'c' direction");
-}
-
-StdPrismExp::StdPrismExp(const StdPrismExp &T)
-    : StdExpansion(T), StdExpansion3D(T)
-{
-}
-
-// Destructor
-StdPrismExp::~StdPrismExp()
-{
 }
 
 //---------------------------------------
@@ -281,10 +263,10 @@ void StdPrismExp::v_BwdTrans_SumFacKernel(
     const Array<OneD, const NekDouble> &base2,
     const Array<OneD, const NekDouble> &inarray,
     Array<OneD, NekDouble> &outarray, Array<OneD, NekDouble> &wsp,
-    bool doCheckCollDir0, bool doCheckCollDir1, bool doCheckCollDir2)
+    [[maybe_unused]] bool doCheckCollDir0,
+    [[maybe_unused]] bool doCheckCollDir1,
+    [[maybe_unused]] bool doCheckCollDir2)
 {
-    boost::ignore_unused(doCheckCollDir0, doCheckCollDir1, doCheckCollDir2);
-
     int i, mode;
     int nquad0                  = m_base[0]->GetNumPoints();
     int nquad1                  = m_base[1]->GetNumPoints();
@@ -438,10 +420,10 @@ void StdPrismExp::v_IProductWRTBase_SumFacKernel(
     const Array<OneD, const NekDouble> &base2,
     const Array<OneD, const NekDouble> &inarray,
     Array<OneD, NekDouble> &outarray, Array<OneD, NekDouble> &wsp,
-    bool doCheckCollDir0, bool doCheckCollDir1, bool doCheckCollDir2)
+    [[maybe_unused]] bool doCheckCollDir0,
+    [[maybe_unused]] bool doCheckCollDir1,
+    [[maybe_unused]] bool doCheckCollDir2)
 {
-    boost::ignore_unused(doCheckCollDir0, doCheckCollDir1, doCheckCollDir2);
-
     // Interior prism implementation based on Spen's book page
     // 119. and 608.
     const int nquad0 = m_base[0]->GetNumPoints();
@@ -660,6 +642,8 @@ NekDouble StdPrismExp::v_PhysEvaluate(
     LocCoordToLocCollapsed(coord, coll);
 
     // If near singularity do the old interpolation matrix method
+    // @TODO: Dave thinks there might be a way in the Barycentric to
+    //        mathematically remove this singularity?
     if ((1 - coll[2]) < 1e-5)
     {
         int totPoints = GetTotPoints();
@@ -1775,7 +1759,9 @@ void StdPrismExp::v_GetTraceInteriorToElementMap(
     // Triangular faces are processed in the above switch loop; for
     // remaining quad faces, set up orientation if necessary.
     if (fid == 1 || fid == 3)
+    {
         return;
+    }
 
     if (faceOrient == eDir1FwdDir1_Dir2BwdDir2 ||
         faceOrient == eDir1BwdDir1_Dir2BwdDir2 ||
@@ -2207,5 +2193,4 @@ void StdPrismExp::v_ReduceOrderCoeffs(
     OrthoPrismExp->BwdTrans(coeff_tmp1, phys_tmp);
     StdPrismExp::FwdTrans(phys_tmp, outarray);
 }
-} // namespace StdRegions
-} // namespace Nektar
+} // namespace Nektar::StdRegions

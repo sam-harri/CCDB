@@ -42,15 +42,12 @@
 
 #include <MultiRegions/ContField.h>
 
-#include <boost/core/ignore_unused.hpp>
 #include <boost/format.hpp>
 #include <boost/functional/hash.hpp>
 
 #define OUTPUT_FREQ 0
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 
 using namespace std;
@@ -60,29 +57,24 @@ std::string CouplingCwipi::className =
                                                  "Cwipi Coupling");
 
 void CouplingCwipi::InterpCallback(
-    const int entities_dim, const int n_local_vertex, const int n_local_element,
-    const int n_local_polyhedra, const int n_distant_point,
-    const double local_coordinates[], const int local_connectivity_index[],
-    const int local_connectivity[], const int local_polyhedra_face_index[],
-    const int local_polyhedra_cell_to_face_connectivity[],
-    const int local_polyhedra_face_connectivity_index[],
-    const int local_polyhedra_face_connectivity[],
+    const int entities_dim, const int n_local_vertex,
+    [[maybe_unused]] const int n_local_element,
+    [[maybe_unused]] const int n_local_polyhedra, const int n_distant_point,
+    [[maybe_unused]] const double local_coordinates[],
+    [[maybe_unused]] const int local_connectivity_index[],
+    [[maybe_unused]] const int local_connectivity[],
+    [[maybe_unused]] const int local_polyhedra_face_index[],
+    [[maybe_unused]] const int local_polyhedra_cell_to_face_connectivity[],
+    [[maybe_unused]] const int local_polyhedra_face_connectivity_index[],
+    [[maybe_unused]] const int local_polyhedra_face_connectivity[],
     const double distant_points_coordinates[],
-    const int distant_points_location[], const float distant_points_distance[],
-    const int distant_points_barycentric_coordinates_index[],
-    const double distant_points_barycentric_coordinates[], const int stride,
-    const cwipi_solver_type_t solver_type, const void *local_field,
-    void *distant_field)
+    [[maybe_unused]] const int distant_points_location[],
+    [[maybe_unused]] const float distant_points_distance[],
+    [[maybe_unused]] const int distant_points_barycentric_coordinates_index[],
+    [[maybe_unused]] const double distant_points_barycentric_coordinates[],
+    const int stride, [[maybe_unused]] const cwipi_solver_type_t solver_type,
+    [[maybe_unused]] const void *local_field, void *distant_field)
 {
-    boost::ignore_unused(
-        n_local_element, n_local_polyhedra, local_coordinates,
-        local_connectivity_index, local_connectivity,
-        local_polyhedra_face_index, local_polyhedra_cell_to_face_connectivity,
-        local_polyhedra_face_connectivity_index,
-        local_polyhedra_face_connectivity, distant_points_location,
-        distant_points_distance, distant_points_barycentric_coordinates_index,
-        distant_points_barycentric_coordinates, solver_type, local_field);
-
     Array<OneD, Array<OneD, NekDouble>> interpField(stride);
 
     Array<OneD, Array<OneD, NekDouble>> distCoords(n_distant_point);
@@ -113,8 +105,9 @@ void CouplingCwipi::InterpCallback(
 
 CouplingCwipi::CouplingCwipi(MultiRegions::ExpListSharedPtr field)
     : Coupling(field), m_sendHandle(-1), m_recvHandle(-1), m_lastSend(-1E6),
-      m_lastReceive(-1E6), m_points(NULL), m_coords(NULL), m_connecIdx(NULL),
-      m_connec(NULL), m_rValsInterl(NULL), m_sValsInterl(NULL)
+      m_lastReceive(-1E6), m_points(nullptr), m_coords(nullptr),
+      m_connecIdx(nullptr), m_connec(nullptr), m_rValsInterl(nullptr),
+      m_sValsInterl(nullptr)
 {
     // defaults
     m_config["GEOMTOL"]      = "0.1";
@@ -270,7 +263,7 @@ void CouplingCwipi::SetupReceive()
     m_recvField->GetCoords(coords[0], coords[1], coords[2]);
 
     m_points = (double *)malloc(sizeof(double) * 3 * m_nPoints);
-    ASSERTL1(m_points != NULL, "malloc failed for m_points");
+    ASSERTL1(m_points != nullptr, "malloc failed for m_points");
 
     for (int i = 0; i < m_nPoints; ++i)
     {
@@ -298,7 +291,7 @@ void CouplingCwipi::SetupReceive()
     cwipi_set_points_to_locate(m_couplingName.c_str(), m_nPoints, m_points);
 
     m_rValsInterl = (double *)malloc(sizeof(double) * m_nPoints * m_nRecvVars);
-    ASSERTL1(m_rValsInterl != NULL, "malloc failed for m_rValsInterl");
+    ASSERTL1(m_rValsInterl != nullptr, "malloc failed for m_rValsInterl");
 }
 
 void CouplingCwipi::SetupSend()
@@ -306,7 +299,7 @@ void CouplingCwipi::SetupSend()
     // this array is never used because of our send callback method
     m_sValsInterl = (double *)malloc(
         sizeof(double) * m_evalField->GetGraph()->GetNvertices() * m_nSendVars);
-    ASSERTL1(m_sValsInterl != NULL, "malloc failed for m_sValsInterl");
+    ASSERTL1(m_sValsInterl != nullptr, "malloc failed for m_sValsInterl");
     for (int i = 0; i < m_evalField->GetGraph()->GetNvertices() * m_nSendVars;
          ++i)
     {
@@ -449,14 +442,14 @@ void CouplingCwipi::AnnounceMesh()
 
     // allocate CWIPI arrays
     m_coords = (double *)malloc(sizeof(double) * 3 * nVerts);
-    ASSERTL1(m_coords != NULL, "malloc failed for m_coords");
+    ASSERTL1(m_coords != nullptr, "malloc failed for m_coords");
     int tmp = 2 * seggeom.size() + 3 * trigeom.size() + 4 * quadgeom.size() +
               4 * tetgeom.size() + 5 * pyrgeom.size() + 6 * prismgeom.size() +
               8 * hexgeom.size();
     m_connec = (int *)malloc(sizeof(int) * tmp);
-    ASSERTL1(m_connec != NULL, "malloc failed for m_connec");
+    ASSERTL1(m_connec != nullptr, "malloc failed for m_connec");
     m_connecIdx = (int *)malloc(sizeof(int) * (nElts + 1));
-    ASSERTL1(m_connecIdx != NULL, "malloc failed for m_connecIdx");
+    ASSERTL1(m_connecIdx != nullptr, "malloc failed for m_connecIdx");
 
     m_connecIdx[0] = 0;
     int coordsPos  = 0;
@@ -1066,5 +1059,4 @@ void CouplingCwipi::DumpRawFields(const NekDouble time,
         cout << "DumpRawFields total time: " << timer1.TimePerTest(1) << endl;
     }
 }
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils

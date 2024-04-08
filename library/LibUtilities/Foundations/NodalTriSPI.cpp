@@ -35,9 +35,7 @@
 #include <LibUtilities/Foundations/NodalTriSPI.h>
 #include <LibUtilities/Foundations/NodalTriSPIData.h>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 bool NodalTriSPI::initPointsManager[] = {PointsManager().RegisterCreator(
@@ -102,5 +100,4 @@ std::shared_ptr<PointsBaseType> NodalTriSPI::Create(const PointsKey &key)
     return returnval;
 }
 
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities

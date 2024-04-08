@@ -32,15 +32,15 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
+#include <regex>
 #include <vector>
 
 #include <boost/algorithm/string.hpp>
 #include <boost/core/ignore_unused.hpp>
-#include <boost/regex.hpp>
 
 #include <MetricFileExists.h>
 
-using namespace boost::filesystem;
+#include <LibUtilities/BasicUtils/Filesystem.hpp>
 
 namespace Nektar
 {
@@ -85,20 +85,21 @@ bool MetricFileExists::v_Test(std::istream &pStdout, std::istream &pStderr)
     boost::ignore_unused(pStdout, pStderr);
 
     bool success = true;
-    auto pwd     = boost::filesystem::current_path();
+    auto pwd     = fs::current_path();
 
     // Check each pattern in turn
     for (auto it = m_fileCounts.begin(); it != m_fileCounts.end(); ++it)
     {
         int cnt = 0;
-        boost::regex r(it->first.c_str());
+        std::regex r(it->first.c_str());
 
         // Examine each file in the current path and check if it matches the
         // pattern provided. Count the number of files which match.
-        for (auto &e : boost::make_iterator_range(directory_iterator(pwd), {}))
+        for (auto &e : fs::directory_iterator(pwd))
         {
-            boost::cmatch matches;
-            if (boost::regex_match(e.path().string().c_str(), matches, r))
+            std::smatch matches;
+            std::string filename = e.path().string();
+            if (std::regex_match(filename, matches, r))
             {
                 if (matches.size() == 1)
                 {
@@ -125,16 +126,17 @@ void MetricFileExists::v_Generate(std::istream &pStdout, std::istream &pStderr)
     boost::ignore_unused(pStdout, pStderr);
 
     // Update File counts.
-    auto pwd = boost::filesystem::current_path();
+    auto pwd = fs::current_path();
 
     for (auto it = m_fileCounts.begin(); it != m_fileCounts.end(); ++it)
     {
         int cnt = 0;
-        boost::regex r(it->first.c_str());
-        for (auto &e : boost::make_iterator_range(directory_iterator(pwd), {}))
+        std::regex r(it->first.c_str());
+        for (auto &e : fs::directory_iterator(pwd))
         {
-            boost::cmatch matches;
-            if (boost::regex_match(e.path().string().c_str(), matches, r))
+            std::smatch matches;
+            std::string filename = e.path().string();
+            if (std::regex_match(filename, matches, r))
             {
                 if (matches.size() == 1)
                 {

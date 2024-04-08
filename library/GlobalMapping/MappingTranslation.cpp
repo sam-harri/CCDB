@@ -32,14 +32,10 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <GlobalMapping/MappingTranslation.h>
 #include <MultiRegions/ExpList.h>
 
-namespace Nektar
-{
-namespace GlobalMapping
+namespace Nektar::GlobalMapping
 {
 
 std::string MappingTranslation::className =
@@ -158,11 +154,9 @@ void MappingTranslation::v_GetJacobian(Array<OneD, NekDouble> &outarray)
 }
 
 void MappingTranslation::v_DotGradJacobian(
-    const Array<OneD, Array<OneD, NekDouble>> &inarray,
+    [[maybe_unused]] const Array<OneD, Array<OneD, NekDouble>> &inarray,
     Array<OneD, NekDouble> &outarray)
 {
-    boost::ignore_unused(inarray);
-
     int physTot = m_fields[0]->GetTotPoints();
 
     Vmath::Zero(physTot, outarray, 1);
@@ -241,11 +235,9 @@ void MappingTranslation::v_LowerIndex(
 }
 
 void MappingTranslation::v_ApplyChristoffelContravar(
-    const Array<OneD, Array<OneD, NekDouble>> &inarray,
+    [[maybe_unused]] const Array<OneD, Array<OneD, NekDouble>> &inarray,
     Array<OneD, Array<OneD, NekDouble>> &outarray)
 {
-    boost::ignore_unused(inarray);
-
     int physTot = m_fields[0]->GetTotPoints();
     int nvel    = m_nConvectiveFields;
 
@@ -259,11 +251,9 @@ void MappingTranslation::v_ApplyChristoffelContravar(
 }
 
 void MappingTranslation::v_ApplyChristoffelCovar(
-    const Array<OneD, Array<OneD, NekDouble>> &inarray,
+    [[maybe_unused]] const Array<OneD, Array<OneD, NekDouble>> &inarray,
     Array<OneD, Array<OneD, NekDouble>> &outarray)
 {
-    boost::ignore_unused(inarray);
-
     int physTot = m_fields[0]->GetTotPoints();
     int nvel    = m_nConvectiveFields;
 
@@ -280,5 +270,4 @@ void MappingTranslation::v_UpdateGeomInfo()
 {
 }
 
-} // namespace GlobalMapping
-} // namespace Nektar
+} // namespace Nektar::GlobalMapping

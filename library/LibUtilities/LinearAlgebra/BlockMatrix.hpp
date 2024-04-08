@@ -200,13 +200,13 @@ public:
         const std::shared_ptr<ThisType> &rhs);
 
 protected:
-    LIB_UTILITIES_EXPORT virtual
-        typename boost::call_traits<NumberType>::value_type
-        v_GetValue(unsigned int row, unsigned int column) const override;
+    LIB_UTILITIES_EXPORT
+    typename boost::call_traits<NumberType>::value_type v_GetValue(
+        unsigned int row, unsigned int column) const override;
 
-    LIB_UTILITIES_EXPORT virtual unsigned int v_GetStorageSize() const override;
+    LIB_UTILITIES_EXPORT unsigned int v_GetStorageSize() const override;
 
-    LIB_UTILITIES_EXPORT virtual void v_Transpose() override;
+    LIB_UTILITIES_EXPORT void v_Transpose() override;
 
 private:
     LIB_UTILITIES_EXPORT static unsigned int GetNumberOfElementsInBlock(

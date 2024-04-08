@@ -40,9 +40,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 /**
@@ -62,7 +60,9 @@ unsigned int Mesh::GetNumBndryElements()
     unsigned int i, nElmt = 0;
 
     for (i = 0; i < m_expDim; ++i)
+    {
         nElmt += m_element[i].size();
+    }
 
     return nElmt;
 }
@@ -380,5 +380,4 @@ void Mesh::PrintStats(Logger &log)
     }
 }
 
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh

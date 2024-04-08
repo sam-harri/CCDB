@@ -44,10 +44,7 @@
 #include <array>
 #include <unordered_map>
 
-namespace Nektar
-{
-
-namespace SpatialDomains
+namespace Nektar::SpatialDomains
 {
 
 class Geometry; // Forward declaration for typedef.
@@ -175,7 +172,13 @@ public:
 
     SPATIAL_DOMAINS_EXPORT inline void Reset(CurveMap &curvedEdges,
                                              CurveMap &curvedFaces);
+    SPATIAL_DOMAINS_EXPORT inline void ResetNonRecursive(CurveMap &curvedEdges,
+                                                         CurveMap &curvedFaces);
+
     SPATIAL_DOMAINS_EXPORT inline void Setup();
+
+    /// Handles generation of geometry factors.
+    void GenGeomFactors();
 
 protected:
     SPATIAL_DOMAINS_EXPORT static GeomFactorsSharedPtr ValidateRegGeomFactor(
@@ -206,10 +209,7 @@ protected:
     Array<OneD, NekDouble> m_boundingBox;
     Array<OneD, Array<OneD, NekDouble>> m_isoParameter;
     Array<OneD, Array<OneD, NekDouble>> m_invIsoParam;
-    bool m_straightEdge;
-
-    /// Handles generation of geometry factors.
-    void GenGeomFactors();
+    int m_straightEdge;
 
     //---------------------------------------
     // Helper functions
@@ -668,6 +668,17 @@ inline void Geometry::Reset(CurveMap &curvedEdges, CurveMap &curvedFaces)
 {
     v_Reset(curvedEdges, curvedFaces);
 }
+
+/**
+ * @brief Reset this geometry object non-recursively: unset the current state,
+ * zero Geometry::m_coeffs and remove allocated GeomFactors.
+ */
+inline void Geometry::ResetNonRecursive(CurveMap &curvedEdges,
+                                        CurveMap &curvedFaces)
+{
+    Geometry::v_Reset(curvedEdges, curvedFaces);
+}
+
 inline void Geometry::Setup()
 {
     v_Setup();
@@ -697,7 +708,6 @@ inline void Geometry::SetUpCoeffs(const int nCoeffs)
     }
 }
 
-} // namespace SpatialDomains
-} // namespace Nektar
+} // namespace Nektar::SpatialDomains
 
 #endif // NEKTAR_SPATIALDOMAINS_GEOMETRY_H

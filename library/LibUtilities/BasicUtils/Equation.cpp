@@ -37,9 +37,7 @@
 
 #include <boost/algorithm/string/trim.hpp>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 Equation::Equation(InterpreterSharedPtr evaluator, const std::string &expr,
@@ -229,5 +227,4 @@ NekDouble Equation::GetTime() const
     return m_evaluator->GetTime();
 }
 
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities

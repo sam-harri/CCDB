@@ -32,8 +32,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include "PressureInflowFileBC.h"
 
 using namespace std;
@@ -50,8 +48,10 @@ PressureInflowFileBC::PressureInflowFileBC(
     const LibUtilities::SessionReaderSharedPtr &pSession,
     const Array<OneD, MultiRegions::ExpListSharedPtr> &pFields,
     const Array<OneD, Array<OneD, NekDouble>> &pTraceNormals,
+    const Array<OneD, Array<OneD, NekDouble>> &pGridVelocity,
     const int pSpaceDim, const int bcRegion, const int cnt)
-    : CFSBndCond(pSession, pFields, pTraceNormals, pSpaceDim, bcRegion, cnt)
+    : CFSBndCond(pSession, pFields, pTraceNormals, pGridVelocity, pSpaceDim,
+                 bcRegion, cnt)
 {
     int nvariables = m_fields.size();
     // Loop over Boundary Regions for PressureInflowFileBC
@@ -70,10 +70,9 @@ PressureInflowFileBC::PressureInflowFileBC(
 
 void PressureInflowFileBC::v_Apply(
     Array<OneD, Array<OneD, NekDouble>> &Fwd,
-    Array<OneD, Array<OneD, NekDouble>> &physarray, const NekDouble &time)
+    Array<OneD, Array<OneD, NekDouble>> &physarray,
+    [[maybe_unused]] const NekDouble &time)
 {
-    boost::ignore_unused(time);
-
     int i, j;
     int nTracePts   = m_fields[0]->GetTrace()->GetNpoints();
     int nVariables  = physarray.size();

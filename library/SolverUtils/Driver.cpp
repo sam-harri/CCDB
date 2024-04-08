@@ -36,9 +36,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 
 std::string Driver::evolutionOperatorLookupIds[6] = {
@@ -76,14 +74,6 @@ DriverFactory &GetDriverFactory()
 Driver::Driver(const LibUtilities::SessionReaderSharedPtr pSession,
                const SpatialDomains::MeshGraphSharedPtr pGraph)
     : m_comm(pSession->GetComm()), m_session(pSession), m_graph(pGraph)
-{
-}
-
-/**
- *
- */
-Driver::~Driver()
-
 {
 }
 
@@ -179,7 +169,7 @@ void Driver::v_InitObject(ostream &out)
                 LinNSFilename.push_back(LinNSCondFile);
 
                 char *argv[]  = {const_cast<char *>("IncNavierStokesSolver"),
-                                nullptr};
+                                 nullptr};
                 session_LinNS = LibUtilities::SessionReader::CreateInstance(
                     1, argv, LinNSFilename, m_comm);
 
@@ -208,5 +198,4 @@ void Driver::v_InitObject(ostream &out)
     }
 }
 
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils

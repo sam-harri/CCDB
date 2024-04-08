@@ -38,17 +38,13 @@
 #include <string>
 using namespace std;
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <GlobalMapping/Mapping.h>
 #include <LibUtilities/BasicUtils/SharedArray.hpp>
 
 #include "ProcessCFL.h"
 #include "ProcessMapping.h"
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 ModuleKey ProcessCFL::className = GetModuleFactory().RegisterCreatorFunction(
@@ -275,5 +271,4 @@ Array<OneD, NekDouble> ProcessCFL::GetMaxStdVelocity(
 
     return maxV;
 }
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

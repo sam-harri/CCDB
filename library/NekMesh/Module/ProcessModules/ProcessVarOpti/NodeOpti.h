@@ -44,9 +44,7 @@
 #include "Evaluator.hxx"
 #include "ProcessVarOpti.h"
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 class NodeOptiJob;
@@ -61,7 +59,7 @@ public:
     NodeOpti(NodeSharedPtr n, std::vector<ElUtilSharedPtr> e,
              ResidualSharedPtr r,
              std::map<LibUtilities::ShapeType, DerivUtilSharedPtr> d,
-             optiType o, int dim)
+             optiType o, [[maybe_unused]] int dim)
         : m_node(n), m_res(r), m_derivUtils(d), m_opti(o)
     {
         // filter element types within d vector
@@ -69,26 +67,6 @@ public:
         {
             m_data[e[i]->GetEl()->GetShapeType()].push_back(e[i]);
         }
-
-        // Set up storage for GetFunctional to avoid reallocation on each call.
-        size_t storageCount = 0;
-
-        // Count total storage needed.
-        for (auto &typeIt : m_data)
-        {
-            const int pts   = m_derivUtils[typeIt.first]->pts;
-            const int nElmt = typeIt.second.size();
-
-            storageCount = std::max(storageCount,
-                                    dim * m_derivUtils[typeIt.first]->ptsStd *
-                                        typeIt.second.size());
-
-            m_derivs.insert(std::make_pair(
-                typeIt.first,
-                DerivArray(boost::extents[dim][nElmt][dim][pts])));
-        }
-
-        m_tmpStore.resize(storageCount);
     }
 
     virtual ~NodeOpti(){};
@@ -108,8 +86,6 @@ protected:
     std::mutex mtx;
     std::map<LibUtilities::ShapeType, std::vector<ElUtilSharedPtr>> m_data;
     std::vector<NekDouble> m_grad;
-    std::vector<NekDouble> m_tmpStore;
-    std::unordered_map<LibUtilities::ShapeType, DerivArray, EnumHash> m_derivs;
 
     template <int DIM> int IsIndefinite();
 
@@ -124,7 +100,7 @@ protected:
     }
     static NekDouble gradTol()
     {
-        return 1e-8;
+        return 1e-20;
     }
     static NekDouble alphaTol()
     {
@@ -152,9 +128,9 @@ public:
     {
     }
 
-    ~NodeOpti3D3D(){};
+    ~NodeOpti3D3D() override{};
 
-    void Optimise();
+    void Optimise() override;
 
     static int m_type;
     static NodeOptiSharedPtr create(
@@ -178,9 +154,9 @@ public:
     {
     }
 
-    ~NodeOpti2D2D(){};
+    ~NodeOpti2D2D() override{};
 
-    void Optimise();
+    void Optimise() override;
 
     static int m_type;
     static NodeOptiSharedPtr create(
@@ -200,7 +176,7 @@ public:
     {
     }
 
-    void Run()
+    void Run() override
     {
         node->Optimise();
     }
@@ -217,13 +193,15 @@ private:
 template <int DIM>
 NekDouble NodeOpti::GetFunctional(NekDouble &minJacNew, bool gradient)
 {
+    std::map<LibUtilities::ShapeType, DerivArray> derivs;
+
     for (auto &typeIt : m_data)
     {
         const int ptsStd = m_derivUtils[typeIt.first]->ptsStd;
         const int pts    = m_derivUtils[typeIt.first]->pts;
         const int nElmt  = typeIt.second.size();
-
-        NekDouble *X = &m_tmpStore[0];
+        const int totpts = m_derivUtils[typeIt.first]->ptsStd * nElmt;
+        std::vector<NekDouble> X(DIM * totpts);
 
         // Store x/y components of each element sequentially in memory
         for (int i = 0, cnt = 0; i < nElmt; ++i)
@@ -243,13 +221,18 @@ NekDouble NodeOpti::GetFunctional(NekDouble &minJacNew, bool gradient)
         //   - number of elements
         //   - cartesian coordinate direction
         //   - quadrature points
+        derivs.insert(std::make_pair(
+            typeIt.first,
+            DerivArray(boost::extents[DIM][nElmt][DIM]
+                                     [m_derivUtils[typeIt.first]->pts])));
 
         // Calculate x- and y-gradients
         for (int d = 0; d < DIM; ++d)
         {
             Blas::Dgemm('N', 'N', pts, DIM * nElmt, ptsStd, 1.0,
-                        m_derivUtils[typeIt.first]->VdmD[d].GetRawPtr(), pts, X,
-                        ptsStd, 0.0, &m_derivs[typeIt.first][d][0][0][0], pts);
+                        m_derivUtils[typeIt.first]->VdmD[d].GetRawPtr(), pts,
+                        &X[0], ptsStd, 0.0, &derivs[typeIt.first][d][0][0][0],
+                        pts);
         }
     }
 
@@ -264,7 +247,7 @@ NekDouble NodeOpti::GetFunctional(NekDouble &minJacNew, bool gradient)
     {
         case eLinEl:
         {
-            const NekDouble nu = 0.4;
+            const NekDouble nu = 0.49;
             const NekDouble mu = 1.0 / 2.0 / (1.0 + nu);
             const NekDouble K  = 1.0 / 3.0 / (1.0 - 2.0 * nu);
 
@@ -284,7 +267,7 @@ NekDouble NodeOpti::GetFunctional(NekDouble &minJacNew, bool gradient)
                         {
                             for (int n = 0; n < DIM; ++n)
                             {
-                                phiM[n][l] = m_derivs[typeIt.first][l][i][n][k];
+                                phiM[n][l] = derivs[typeIt.first][l][i][n][k];
                             }
                         }
 
@@ -459,7 +442,7 @@ NekDouble NodeOpti::GetFunctional(NekDouble &minJacNew, bool gradient)
 
         case eHypEl:
         {
-            const NekDouble nu = 0.4;
+            const NekDouble nu = 0.49;
             const NekDouble mu = 1.0 / 2.0 / (1.0 + nu);
             const NekDouble K  = 1.0 / 3.0 / (1.0 - 2.0 * nu);
 
@@ -479,7 +462,7 @@ NekDouble NodeOpti::GetFunctional(NekDouble &minJacNew, bool gradient)
                         {
                             for (int n = 0; n < DIM; ++n)
                             {
-                                phiM[n][l] = m_derivs[typeIt.first][l][i][n][k];
+                                phiM[n][l] = derivs[typeIt.first][l][i][n][k];
                             }
                         }
                         // begin CalcIdealJac
@@ -654,7 +637,7 @@ NekDouble NodeOpti::GetFunctional(NekDouble &minJacNew, bool gradient)
                         {
                             for (int n = 0; n < DIM; ++n)
                             {
-                                phiM[n][l] = m_derivs[typeIt.first][l][i][n][k];
+                                phiM[n][l] = derivs[typeIt.first][l][i][n][k];
                             }
                         }
                         // begin CalcIdealJac
@@ -827,7 +810,7 @@ NekDouble NodeOpti::GetFunctional(NekDouble &minJacNew, bool gradient)
                         {
                             for (int n = 0; n < DIM; ++n)
                             {
-                                phiM[n][l] = m_derivs[typeIt.first][l][i][n][k];
+                                phiM[n][l] = derivs[typeIt.first][l][i][n][k];
                             }
                         }
                         // begin CalcIdealJac
@@ -986,7 +969,6 @@ NekDouble NodeOpti::GetFunctional(NekDouble &minJacNew, bool gradient)
     return integral;
     // return sqrt(m_grad[0]*m_grad[0] + m_grad[1]*m_grad[1]);
 }
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh
 
 #endif

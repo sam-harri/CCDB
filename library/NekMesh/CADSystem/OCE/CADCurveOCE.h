@@ -38,9 +38,7 @@
 #include <NekMesh/CADSystem/CADCurve.h>
 #include <NekMesh/CADSystem/OCE/OpenCascade.h>
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 class CADCurveOCE : public CADCurve
@@ -57,22 +55,22 @@ public:
     {
     }
 
-    ~CADCurveOCE()
+    ~CADCurveOCE() override
     {
     }
 
-    virtual Array<OneD, NekDouble> GetBounds();
-    virtual void GetBounds(NekDouble &tmin, NekDouble &tmax);
-    virtual NekDouble Length(NekDouble ti, NekDouble tf);
-    virtual Array<OneD, NekDouble> P(NekDouble t);
-    virtual void P(NekDouble t, NekDouble &x, NekDouble &y, NekDouble &z);
-    virtual Array<OneD, NekDouble> D2(NekDouble t);
-    virtual NekDouble tAtArcLength(NekDouble s);
-    virtual Array<OneD, NekDouble> GetMinMax();
-    virtual NekDouble loct(Array<OneD, NekDouble> xyz, NekDouble &t);
-    virtual NekDouble GetMinDistance(Array<OneD, NekDouble> &xyz);
-    virtual NekDouble Curvature(NekDouble t);
-    virtual Array<OneD, NekDouble> N(NekDouble t);
+    std::array<NekDouble, 2> GetBounds() override;
+    void GetBounds(NekDouble &tmin, NekDouble &tmax) override;
+    NekDouble Length(NekDouble ti, NekDouble tf) override;
+    std::array<NekDouble, 3> P(NekDouble t) override;
+    void P(NekDouble t, NekDouble &x, NekDouble &y, NekDouble &z) override;
+    std::array<NekDouble, 9> D2(NekDouble t) override;
+    NekDouble tAtArcLength(NekDouble s) override;
+    std::array<NekDouble, 6> GetMinMax() override;
+    NekDouble loct(std::array<NekDouble, 3> xyz, NekDouble &t) override;
+    NekDouble GetMinDistance(std::array<NekDouble, 3> &xyz) override;
+    NekDouble Curvature(NekDouble t) override;
+    std::array<NekDouble, 3> N(NekDouble t) override;
 
     void Initialise(int i, TopoDS_Shape in);
 
@@ -82,9 +80,8 @@ private:
     /// object used for reverse lookups
     Handle(Geom_Curve) m_c;
     /// store the parametric bounds of the curve
-    Array<OneD, NekDouble> m_b;
+    std::array<NekDouble, 2> m_b;
 };
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh
 
 #endif

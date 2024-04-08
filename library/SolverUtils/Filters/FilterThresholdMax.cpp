@@ -32,15 +32,11 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <SolverUtils/Filters/FilterThresholdMax.h>
 
 using namespace std;
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 
 std::string FilterThresholdMax::className =
@@ -49,7 +45,7 @@ std::string FilterThresholdMax::className =
 
 FilterThresholdMax::FilterThresholdMax(
     const LibUtilities::SessionReaderSharedPtr &pSession,
-    const std::weak_ptr<EquationSystem> &pEquation, const ParamMap &pParams)
+    const std::shared_ptr<EquationSystem> &pEquation, const ParamMap &pParams)
     : Filter(pSession, pEquation)
 {
     // ThresholdValue
@@ -104,10 +100,8 @@ FilterThresholdMax::~FilterThresholdMax()
 
 void FilterThresholdMax::v_Initialise(
     const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
-    const NekDouble &time)
+    [[maybe_unused]] const NekDouble &time)
 {
-    boost::ignore_unused(time);
-
     m_threshold = Array<OneD, NekDouble>(pFields[m_thresholdVar]->GetNpoints(),
                                          m_initialValue);
 }
@@ -137,10 +131,8 @@ void FilterThresholdMax::v_Update(
 
 void FilterThresholdMax::v_Finalise(
     const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
-    const NekDouble &time)
+    [[maybe_unused]] const NekDouble &time)
 {
-    boost::ignore_unused(time);
-
     std::vector<LibUtilities::FieldDefinitionsSharedPtr> FieldDef =
         pFields[m_thresholdVar]->GetFieldDefinitions();
     std::vector<std::vector<NekDouble>> FieldData(FieldDef.size());
@@ -164,5 +156,4 @@ bool FilterThresholdMax::v_IsTimeDependent()
 {
     return true;
 }
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils

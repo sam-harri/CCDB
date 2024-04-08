@@ -36,7 +36,8 @@
 #define NEKTAR_TESTS_METRICNOWARNING_H
 
 #include <Metric.h>
-#include <boost/regex.hpp>
+
+#include <regex>
 #include <vector>
 
 namespace Nektar
@@ -44,7 +45,7 @@ namespace Nektar
 class MetricNoWarning : public Metric
 {
 public:
-    virtual ~MetricNoWarning(){};
+    ~MetricNoWarning() override{};
 
     static MetricSharedPtr create(TiXmlElement *metric, bool generate)
     {
@@ -55,7 +56,7 @@ public:
 
 protected:
     // Regex expression that should match warning message
-    boost::regex m_regexWarning{".*WARNING.*"};
+    std::regex m_regexWarning{".*WARNING.*"};
 
     // Vector of (optional) groups
     std::vector<std::vector<std::string>> m_matches;
@@ -63,8 +64,8 @@ protected:
     // Constructor
     MetricNoWarning(TiXmlElement *metric, bool generate);
 
-    virtual bool v_Test(std::istream &pStdout, std::istream &pStderr);
-    virtual void v_Generate(std::istream &pStdout, std::istream &pStderr);
+    bool v_Test(std::istream &pStdout, std::istream &pStderr) override;
+    void v_Generate(std::istream &pStdout, std::istream &pStderr) override;
 };
 
 } // namespace Nektar

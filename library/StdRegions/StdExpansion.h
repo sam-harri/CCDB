@@ -40,25 +40,19 @@
 #include <memory>
 #include <vector>
 
-#include <boost/core/ignore_unused.hpp>
 #include <set>
 
 #include <LibUtilities/LinearAlgebra/NekTypeDefs.hpp>
 #include <StdRegions/StdMatrixKey.h>
 #include <StdRegions/StdRegions.hpp>
 #include <StdRegions/StdRegionsDeclspec.h>
-namespace Nektar
-{
-namespace LocalRegions
+namespace Nektar::LocalRegions
 {
 class MatrixKey;
 class Expansion;
-} // namespace LocalRegions
-} // namespace Nektar
+} // namespace Nektar::LocalRegions
 
-namespace Nektar
-{
-namespace StdRegions
+namespace Nektar::StdRegions
 {
 
 /** \brief The base class for all shapes
@@ -1309,10 +1303,9 @@ protected:
         const Array<OneD, const NekDouble> &Lcoord,
         const Array<OneD, const NekDouble> &physvals);
 
-    STD_REGIONS_EXPORT virtual void v_GenStdMatBwdDeriv(const int dir,
-                                                        DNekMatSharedPtr &mat)
+    STD_REGIONS_EXPORT virtual void v_GenStdMatBwdDeriv(
+        [[maybe_unused]] const int dir, [[maybe_unused]] DNekMatSharedPtr &mat)
     {
-        boost::ignore_unused(dir, mat);
         NEKERROR(ErrorUtil::efatal, "not defined");
     }
 
@@ -1547,11 +1540,11 @@ private:
         Array<OneD, NekDouble> &outarray) = 0;
 
     STD_REGIONS_EXPORT virtual void v_IProductWRTBase(
-        const Array<OneD, const NekDouble> &base,
-        const Array<OneD, const NekDouble> &inarray,
-        Array<OneD, NekDouble> &outarray, int coll_check)
+        [[maybe_unused]] const Array<OneD, const NekDouble> &base,
+        [[maybe_unused]] const Array<OneD, const NekDouble> &inarray,
+        [[maybe_unused]] Array<OneD, NekDouble> &outarray,
+        [[maybe_unused]] int coll_check)
     {
-        boost::ignore_unused(base, inarray, outarray, coll_check);
         NEKERROR(ErrorUtil::efatal, "StdExpansion::v_IProductWRTBase has no "
                                     "(and should have no) implementation");
     }
@@ -1809,7 +1802,6 @@ inline void StdExpansion::FwdTrans(const Array<OneD, const NekDouble> &inarray,
     v_FwdTrans(inarray, outarray);
 }
 
-} // namespace StdRegions
-} // namespace Nektar
+} // namespace Nektar::StdRegions
 
 #endif // STANDARDDEXPANSION_H

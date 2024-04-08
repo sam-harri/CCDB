@@ -32,19 +32,11 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/Foundations/ManagerAccess.h> // for PointsManager, etc
 #include <StdRegions/StdNodalPrismExp.h>
 
-namespace Nektar
+namespace Nektar::StdRegions
 {
-namespace StdRegions
-{
-
-StdNodalPrismExp::StdNodalPrismExp()
-{
-}
 
 StdNodalPrismExp::StdNodalPrismExp(const LibUtilities::BasisKey &Ba,
                                    const LibUtilities::BasisKey &Bb,
@@ -61,17 +53,6 @@ StdNodalPrismExp::StdNodalPrismExp(const LibUtilities::BasisKey &Ba,
     ASSERTL0(Ba.GetNumModes() <= Bc.GetNumModes(),
              "order in 'a' direction is higher than order "
              "in 'c' direction");
-}
-
-StdNodalPrismExp::StdNodalPrismExp(const StdNodalPrismExp &T)
-    : StdExpansion(T), StdExpansion3D(T), StdPrismExp(T),
-      m_nodalPointsKey(T.m_nodalPointsKey)
-{
-}
-
-// Destructor
-StdNodalPrismExp::~StdNodalPrismExp()
-{
 }
 
 bool StdNodalPrismExp::v_IsNodalNonTensorialExp()
@@ -254,79 +235,9 @@ void StdNodalPrismExp::v_FillMode(const int mode,
 // Mapping functions
 //---------------------------------------
 
-/*
-void StdNodalTriExp::v_GetFaceToElementMap(
-    const int                  fid,
-    const FaceOrientation      faceOrient,
-    Array<OneD, unsigned int> &maparray,
-    Array<OneD,          int> &signarray,
-    int                        nummodesA,
-    int                        nummodesB)
-{
-    int P, Q, i, j, k, idx = 0, nFaceCoeffs = 0;
-
-    ASSERTL0(fid >= 0 && fid <= 3,
-             "Local face ID must be between 0 and 3");
-
-    if (nummodesA == -1)
-    {
-        switch(fid)
-        {
-            case 0:
-                nummodesA = m_base[0]->GetNumModes();
-                nummodesB = m_base[1]->GetNumModes();
-                break;
-            case 1:
-                nummodesA = m_base[0]->GetNumModes();
-                nummodesB = m_base[2]->GetNumModes();
-                break;
-            case 2:
-            case 3:
-                nummodesA = m_base[1]->GetNumModes();
-                nummodesB = m_base[2]->GetNumModes();
-                break;
-        }
-    }
-
-    P           = nummodesA;
-    Q           = nummodesB;
-    nFaceCoeffs = Q + ((P-1)*(1 + 2*(Q-1) - (P-1)))/2;
-
-    if (maparray.size() != nFaceCoeffs)
-    {
-        maparray = Array<OneD, unsigned int>(nFaceCoeffs);
-    }
-
-    if (signarray.size() != nFaceCoeffs)
-    {
-        signarray = Array<OneD, int>(nFaceCoeffs,1);
-    }
-    else
-    {
-        fill(signarray.get(), signarray.get()+nFaceCoeffs, 1);
-    }
-
-    switch(fid)
-    {
-        case 0:
-            // Add vertices.
-            maparray[idx++] = 0;
-            maparray[idx++] = 1;
-            maparray[idx++] = 2;
-
-            // Add edges.
-            for (i = 2; i < P; ++i)
-            {
-                maparray[idx++] = ;
-            }
-    }
-}
-*/
-
 int StdNodalPrismExp::v_GetVertexMap(const int localVertexId,
-                                     bool useCoeffPacking)
+                                     [[maybe_unused]] bool useCoeffPacking)
 {
-    boost::ignore_unused(useCoeffPacking);
     ASSERTL0(false, "Needs setting up");
     return localVertexId;
 }
@@ -388,5 +299,4 @@ DNekMatSharedPtr StdNodalPrismExp::v_CreateStdMatrix(const StdMatrixKey &mkey)
 {
     return StdNodalPrismExp::v_GenMatrix(mkey);
 }
-} // namespace StdRegions
-} // namespace Nektar
+} // namespace Nektar::StdRegions

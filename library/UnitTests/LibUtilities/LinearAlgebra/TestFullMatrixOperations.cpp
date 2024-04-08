@@ -37,24 +37,20 @@
 #include <LibUtilities/LinearAlgebra/NekMatrix.hpp>
 #include <UnitTests/CountedObject.h>
 
-#include <boost/core/ignore_unused.hpp>
 #include <boost/test/tools/floating_point_comparison.hpp>
 #include <boost/test/unit_test.hpp>
 
-namespace Nektar
-{
-namespace FullMatrixOperationsUnitTests
+namespace Nektar::FullMatrixOperationsUnitTests
 {
 template <typename DataType, typename MatrixType>
-int foo(NekMatrix<DataType, MatrixType> &d)
+int foo([[maybe_unused]] NekMatrix<DataType, MatrixType> &d)
 {
-    boost::ignore_unused(d);
     return 1;
 }
 
-template <typename DataType> int foo(NekMatrix<DataType, BlockMatrixTag> &d)
+template <typename DataType>
+int foo([[maybe_unused]] NekMatrix<DataType, BlockMatrixTag> &d)
 {
-    boost::ignore_unused(d);
     return 2;
 }
 
@@ -249,5 +245,4 @@ BOOST_AUTO_TEST_CASE(TestThreeWrappedMatrixMultiplicationWithTranspose)
     BOOST_CHECK_EQUAL(result(0, 1), 625.0);
     BOOST_CHECK_EQUAL(result(1, 1), 926.0);
 }
-} // namespace FullMatrixOperationsUnitTests
-} // namespace Nektar
+} // namespace Nektar::FullMatrixOperationsUnitTests

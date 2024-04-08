@@ -65,9 +65,7 @@ using std::max;
     }
 #endif
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 PatchMap::PatchMap(void)
 {
@@ -703,13 +701,13 @@ void CuthillMckeeReordering(const BoostGraph &graph, Array<OneD, int> &perm,
 }
 
 void MultiLevelBisectionReordering(
-    const BoostGraph &graph, Array<OneD, int> &perm, Array<OneD, int> &iperm,
-    BottomUpSubStructuredGraphSharedPtr &substructgraph,
-    std::set<int> partVerts, int mdswitch)
+    [[maybe_unused]] const BoostGraph &graph,
+    [[maybe_unused]] Array<OneD, int> &perm,
+    [[maybe_unused]] Array<OneD, int> &iperm,
+    [[maybe_unused]] BottomUpSubStructuredGraphSharedPtr &substructgraph,
+    [[maybe_unused]] std::set<int> partVerts, [[maybe_unused]] int mdswitch)
 {
 #ifndef NEKTAR_USE_SCOTCH
-    boost::ignore_unused(graph, perm, iperm, substructgraph, partVerts,
-                         mdswitch);
     ASSERTL0(false, "Multi-level static condensation requires Nektar++"
                     " to be built with SCOTCH.");
 #else
@@ -1025,5 +1023,4 @@ void NoReordering(const BoostGraph &graph, Array<OneD, int> &perm,
         iperm[i] = i;
     }
 }
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions

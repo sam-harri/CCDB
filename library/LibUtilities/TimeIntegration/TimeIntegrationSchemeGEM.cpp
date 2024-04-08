@@ -34,9 +34,7 @@
 
 #include <LibUtilities/TimeIntegration/TimeIntegrationSchemeGEM.h>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 std::string TimeIntegrationSchemeGEM::v_GetName() const
@@ -95,12 +93,10 @@ void TimeIntegrationSchemeGEM::v_SetSolutionVector(const size_t Offset,
  * @brief Worker method to initialize the integration scheme.
  */
 void TimeIntegrationSchemeGEM::v_InitializeScheme(
-    const NekDouble deltaT, ConstDoubleArray &y_0, const NekDouble time,
-    const TimeIntegrationSchemeOperators &op)
+    [[maybe_unused]] const NekDouble deltaT, ConstDoubleArray &y_0,
+    const NekDouble time, const TimeIntegrationSchemeOperators &op)
 
 {
-    boost::ignore_unused(deltaT);
-
     if (m_initialized)
     {
         m_time = time;
@@ -181,11 +177,8 @@ void TimeIntegrationSchemeGEM::v_InitializeScheme(
  * @brief Worker method that performs the time integration.
  */
 ConstDoubleArray &TimeIntegrationSchemeGEM::v_TimeIntegrate(
-    const size_t timestep, const NekDouble delta_t)
+    [[maybe_unused]] const size_t timestep, const NekDouble delta_t)
 {
-
-    boost::ignore_unused(timestep);
-
     // Compute initial residual
     if (m_variant == "" || m_variant == "ExplicitEuler" ||
         m_variant == "ExplicitMidpoint" || m_variant == "IMEXEuler")
@@ -446,5 +439,4 @@ std::ostream &operator<<(std::ostream &os,
 
     return os;
 }
-} // end namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities

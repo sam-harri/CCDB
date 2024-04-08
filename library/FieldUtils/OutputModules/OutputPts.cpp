@@ -37,17 +37,13 @@
 #include <string>
 using namespace std;
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/BasicUtils/CsvIO.h>
-#include <LibUtilities/BasicUtils/FileSystem.h>
+#include <LibUtilities/BasicUtils/Filesystem.hpp>
 #include <LibUtilities/BasicUtils/PtsIO.h>
 
 #include "OutputPts.h"
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 ModuleKey OutputPts::m_className[5] = {
@@ -67,14 +63,12 @@ OutputPts::~OutputPts()
 {
 }
 
-void OutputPts::v_OutputFromPts(po::variables_map &vm)
+void OutputPts::v_OutputFromPts([[maybe_unused]] po::variables_map &vm)
 {
-    boost::ignore_unused(vm);
-
     // Extract the output filename and extension
     string filename = m_config["outfile"].as<string>();
 
-    if (boost::filesystem::path(filename).extension() == ".csv")
+    if (fs::path(filename).extension() == ".csv")
     {
         LibUtilities::CsvIO csvIO(m_f->m_comm);
         csvIO.Write(filename, m_f->m_fieldPts);
@@ -122,24 +116,21 @@ void OutputPts::v_OutputFromExp(po::variables_map &vm)
     v_OutputFromPts(vm);
 }
 
-void OutputPts::v_OutputFromData(po::variables_map &vm)
+void OutputPts::v_OutputFromData([[maybe_unused]] po::variables_map &vm)
 {
-    boost::ignore_unused(vm);
     NEKERROR(ErrorUtil::efatal, "OutputPts can't write using only FieldData.");
 }
 
-fs::path OutputPts::v_GetPath(std::string &filename, po::variables_map &vm)
+fs::path OutputPts::v_GetPath(std::string &filename,
+                              [[maybe_unused]] po::variables_map &vm)
 {
-    boost::ignore_unused(vm);
     return fs::path(filename);
 }
 
 fs::path OutputPts::v_GetFullOutName(std::string &filename,
-                                     po::variables_map &vm)
+                                     [[maybe_unused]] po::variables_map &vm)
 {
-    boost::ignore_unused(vm);
     return fs::path(filename);
 }
 
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

@@ -33,15 +33,12 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include <boost/algorithm/string.hpp>
-#include <boost/core/ignore_unused.hpp>
 
 #include <MultiRegions/AssemblyMap/AssemblyMap.h>
 
 using namespace std;
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 /**
  * @class AssemblyMap
@@ -84,7 +81,7 @@ AssemblyMap::AssemblyMap()
       m_numGlobalBndCoeffs(0), m_numLocalDirBndCoeffs(0),
       m_numGlobalDirBndCoeffs(0), m_solnType(eNoSolnType),
       m_bndSystemBandWidth(0), m_successiveRHS(0),
-      m_linSysIterSolver("ConjugateGradient"), m_gsh(0), m_bndGsh(0)
+      m_linSysIterSolver("ConjugateGradient"), m_gsh(nullptr), m_bndGsh(nullptr)
 {
 }
 
@@ -95,7 +92,7 @@ AssemblyMap::AssemblyMap(const LibUtilities::SessionReaderSharedPtr &pSession,
       m_numLocalBndCoeffs(0), m_numGlobalBndCoeffs(0),
       m_numLocalDirBndCoeffs(0), m_numGlobalDirBndCoeffs(0),
       m_bndSystemBandWidth(0), m_successiveRHS(0),
-      m_linSysIterSolver("ConjugateGradient"), m_gsh(0), m_bndGsh(0)
+      m_linSysIterSolver("ConjugateGradient"), m_gsh(nullptr), m_bndGsh(nullptr)
 {
     // Default value from Solver Info
     m_solnType =
@@ -127,20 +124,6 @@ AssemblyMap::AssemblyMap(const LibUtilities::SessionReaderSharedPtr &pSession,
         m_preconType = "Diagonal";
     }
 
-    if (pSession->DefinesGlobalSysSolnInfo(variable,
-                                           "IterativeSolverTolerance"))
-    {
-        m_iterativeTolerance = boost::lexical_cast<NekDouble>(
-            pSession->GetGlobalSysSolnInfo(variable, "IterativeSolverTolerance")
-                .c_str());
-    }
-    else
-    {
-        pSession->LoadParameter("IterativeSolverTolerance",
-                                m_iterativeTolerance,
-                                NekConstants::kNekIterativeTol);
-    }
-
     if (pSession->DefinesGlobalSysSolnInfo(variable, "AbsoluteTolerance"))
     {
         std::string abstol =
@@ -151,16 +134,6 @@ AssemblyMap::AssemblyMap(const LibUtilities::SessionReaderSharedPtr &pSession,
     else
     {
         m_isAbsoluteTolerance = false;
-    }
-
-    if (pSession->DefinesGlobalSysSolnInfo(variable, "MaxIterations"))
-    {
-        m_maxIterations = boost::lexical_cast<int>(
-            pSession->GetGlobalSysSolnInfo(variable, "MaxIterations").c_str());
-    }
-    else
-    {
-        pSession->LoadParameter("MaxIterations", m_maxIterations, 5000);
     }
 
     if (pSession->DefinesGlobalSysSolnInfo(variable, "SuccessiveRHS"))
@@ -198,8 +171,6 @@ AssemblyMap::AssemblyMap(
     : m_session(oldLevelMap->m_session), m_comm(oldLevelMap->GetComm()),
       m_hash(0), m_solnType(oldLevelMap->m_solnType),
       m_preconType(oldLevelMap->m_preconType),
-      m_maxIterations(oldLevelMap->m_maxIterations),
-      m_iterativeTolerance(oldLevelMap->m_iterativeTolerance),
       m_successiveRHS(oldLevelMap->m_successiveRHS),
       m_linSysIterSolver(oldLevelMap->m_linSysIterSolver),
       m_gsh(oldLevelMap->m_gsh), m_bndGsh(oldLevelMap->m_bndGsh),
@@ -550,23 +521,21 @@ void AssemblyMap::CalculateBndSystemBandWidth()
     m_bndSystemBandWidth = bwidth;
 }
 
-int AssemblyMap::v_GetLocalToGlobalMap(const int i) const
+int AssemblyMap::v_GetLocalToGlobalMap([[maybe_unused]] const int i) const
 {
-    boost::ignore_unused(i);
     NEKERROR(ErrorUtil::efatal, "Not defined for this type of mapping.");
     return 0;
 }
 
-int AssemblyMap::v_GetGlobalToUniversalMap(const int i) const
+int AssemblyMap::v_GetGlobalToUniversalMap([[maybe_unused]] const int i) const
 {
-    boost::ignore_unused(i);
     NEKERROR(ErrorUtil::efatal, "Not defined for this type of mapping.");
     return 0;
 }
 
-int AssemblyMap::v_GetGlobalToUniversalMapUnique(const int i) const
+int AssemblyMap::v_GetGlobalToUniversalMapUnique(
+    [[maybe_unused]] const int i) const
 {
-    boost::ignore_unused(i);
     NEKERROR(ErrorUtil::efatal, "Not defined for this type of mapping.");
     return 0;
 }
@@ -592,9 +561,9 @@ const Array<OneD, const int> &AssemblyMap::v_GetGlobalToUniversalMapUnique()
     return result;
 }
 
-NekDouble AssemblyMap::v_GetLocalToGlobalSign(const int i) const
+NekDouble AssemblyMap::v_GetLocalToGlobalSign(
+    [[maybe_unused]] const int i) const
 {
-    boost::ignore_unused(i);
     NEKERROR(ErrorUtil::efatal, "Not defined for this type of mapping.");
     return 0.0;
 }
@@ -606,68 +575,68 @@ const Array<OneD, NekDouble> &AssemblyMap::v_GetLocalToGlobalSign() const
     return result;
 }
 
-void AssemblyMap::v_LocalToGlobal(const Array<OneD, const NekDouble> &loc,
-                                  Array<OneD, NekDouble> &global,
-                                  bool useComm) const
+void AssemblyMap::v_LocalToGlobal(
+    [[maybe_unused]] const Array<OneD, const NekDouble> &loc,
+    [[maybe_unused]] Array<OneD, NekDouble> &global,
+    [[maybe_unused]] bool useComm) const
 {
-    boost::ignore_unused(loc, global, useComm);
     NEKERROR(ErrorUtil::efatal, "Not defined for this type of mapping.");
 }
 
-void AssemblyMap::v_LocalToGlobal(const NekVector<NekDouble> &loc,
-                                  NekVector<NekDouble> &global,
-                                  bool useComm) const
+void AssemblyMap::v_LocalToGlobal(
+    [[maybe_unused]] const NekVector<NekDouble> &loc,
+    [[maybe_unused]] NekVector<NekDouble> &global,
+    [[maybe_unused]] bool useComm) const
 {
-    boost::ignore_unused(loc, global, useComm);
     NEKERROR(ErrorUtil::efatal, "Not defined for this type of mapping.");
 }
 
-void AssemblyMap::v_GlobalToLocal(const Array<OneD, const NekDouble> &global,
-                                  Array<OneD, NekDouble> &loc) const
+void AssemblyMap::v_GlobalToLocal(
+    [[maybe_unused]] const Array<OneD, const NekDouble> &global,
+    [[maybe_unused]] Array<OneD, NekDouble> &loc) const
 {
-    boost::ignore_unused(loc, global);
     NEKERROR(ErrorUtil::efatal, "Not defined for this type of mapping.");
 }
 
-void AssemblyMap::v_GlobalToLocal(const NekVector<NekDouble> &global,
-                                  NekVector<NekDouble> &loc) const
+void AssemblyMap::v_GlobalToLocal(
+    [[maybe_unused]] const NekVector<NekDouble> &global,
+    [[maybe_unused]] NekVector<NekDouble> &loc) const
 {
-    boost::ignore_unused(loc, global);
     NEKERROR(ErrorUtil::efatal, "Not defined for this type of mapping.");
 }
 
-void AssemblyMap::v_Assemble(const Array<OneD, const NekDouble> &loc,
-                             Array<OneD, NekDouble> &global) const
+void AssemblyMap::v_Assemble(
+    [[maybe_unused]] const Array<OneD, const NekDouble> &loc,
+    [[maybe_unused]] Array<OneD, NekDouble> &global) const
 {
-    boost::ignore_unused(loc, global);
     NEKERROR(ErrorUtil::efatal, "Not defined for this type of mapping.");
 }
 
-void AssemblyMap::v_Assemble(const NekVector<NekDouble> &loc,
-                             NekVector<NekDouble> &global) const
+void AssemblyMap::v_Assemble(
+    [[maybe_unused]] const NekVector<NekDouble> &loc,
+    [[maybe_unused]] NekVector<NekDouble> &global) const
 {
-    boost::ignore_unused(loc, global);
     NEKERROR(ErrorUtil::efatal, "Not defined for this type of mapping.");
 }
 
-void AssemblyMap::v_UniversalAssemble(Array<OneD, NekDouble> &pGlobal) const
+void AssemblyMap::v_UniversalAssemble(
+    [[maybe_unused]] Array<OneD, NekDouble> &pGlobal) const
 {
-    boost::ignore_unused(pGlobal);
     // Do nothing here since multi-level static condensation uses a
     // AssemblyMap and thus will call this routine in serial.
 }
 
-void AssemblyMap::v_UniversalAssemble(NekVector<NekDouble> &pGlobal) const
+void AssemblyMap::v_UniversalAssemble(
+    [[maybe_unused]] NekVector<NekDouble> &pGlobal) const
 {
-    boost::ignore_unused(pGlobal);
     // Do nothing here since multi-level static condensation uses a
     // AssemblyMap and thus will call this routine in serial.
 }
 
-void AssemblyMap::v_UniversalAssemble(Array<OneD, NekDouble> &pGlobal,
-                                      int offset) const
+void AssemblyMap::v_UniversalAssemble(
+    [[maybe_unused]] Array<OneD, NekDouble> &pGlobal,
+    [[maybe_unused]] int offset) const
 {
-    boost::ignore_unused(pGlobal, offset);
     // Do nothing here since multi-level static condensation uses a
     // AssemblyMap and thus will call this routine in serial.
 }
@@ -728,9 +697,9 @@ const Array<OneD, const int> &AssemblyMap::v_GetExtraDirEdges()
 }
 
 std::shared_ptr<AssemblyMap> AssemblyMap::v_LinearSpaceMap(
-    const ExpList &locexp, GlobalSysSolnType solnType)
+    [[maybe_unused]] const ExpList &locexp,
+    [[maybe_unused]] GlobalSysSolnType solnType)
 {
-    boost::ignore_unused(locexp, solnType);
     NEKERROR(ErrorUtil::efatal, "Not defined for this type of mapping.");
     static std::shared_ptr<AssemblyMap> result;
     return result;
@@ -1311,10 +1280,14 @@ void AssemblyMap::UniversalAssembleBnd(Array<OneD, NekDouble> &pGlobal,
 {
     Array<OneD, NekDouble> tmp(offset);
     if (offset > 0)
+    {
         Vmath::Vcopy(offset, pGlobal, 1, tmp, 1);
+    }
     UniversalAssembleBnd(pGlobal);
     if (offset > 0)
+    {
         Vmath::Vcopy(offset, tmp, 1, pGlobal, 1);
+    }
 }
 
 void AssemblyMap::UniversalAbsMaxBnd(Array<OneD, NekDouble> &bndvals)
@@ -1337,14 +1310,14 @@ int AssemblyMap::GetNumPatches() const
     return m_numPatches;
 }
 
-const Array<OneD, const unsigned int>
-    &AssemblyMap::GetNumLocalBndCoeffsPerPatch()
+const Array<OneD, const unsigned int> &AssemblyMap::
+    GetNumLocalBndCoeffsPerPatch()
 {
     return m_numLocalBndCoeffsPerPatch;
 }
 
-const Array<OneD, const unsigned int>
-    &AssemblyMap::GetNumLocalIntCoeffsPerPatch()
+const Array<OneD, const unsigned int> &AssemblyMap::
+    GetNumLocalIntCoeffsPerPatch()
 {
     return m_numLocalIntCoeffsPerPatch;
 }
@@ -1374,19 +1347,9 @@ std::string AssemblyMap::GetPreconType() const
     return m_preconType;
 }
 
-NekDouble AssemblyMap::GetIterativeTolerance() const
-{
-    return m_iterativeTolerance;
-}
-
 bool AssemblyMap::IsAbsoluteTolerance() const
 {
     return m_isAbsoluteTolerance;
-}
-
-int AssemblyMap::GetMaxIterations() const
-{
-    return m_maxIterations;
 }
 
 int AssemblyMap::GetSuccessiveRHS() const
@@ -1635,5 +1598,4 @@ void AssemblyMap::PrintStats(std::ostream &out, std::string variable,
     }
     tmp->PrintStats(out, variable, false);
 }
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions

@@ -42,14 +42,11 @@
 #include <SolverUtils/Filters/FilterAeroForces.h>
 #include <SolverUtils/Filters/FilterInterfaces.hpp>
 #include <boost/algorithm/string.hpp>
-#include <boost/core/ignore_unused.hpp>
 #include <iomanip>
 
 using namespace std;
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 std::string FilterAeroForces::className =
     GetFilterFactory().RegisterCreatorFunction("AeroForces",
@@ -60,7 +57,7 @@ std::string FilterAeroForces::className =
  */
 FilterAeroForces::FilterAeroForces(
     const LibUtilities::SessionReaderSharedPtr &pSession,
-    const std::weak_ptr<EquationSystem> &pEquation, const ParamMap &pParams)
+    const std::shared_ptr<EquationSystem> &pEquation, const ParamMap &pParams)
     : Filter(pSession, pEquation)
 {
     // OutputFile
@@ -645,10 +642,8 @@ void FilterAeroForces::v_Update(
  */
 void FilterAeroForces::v_Finalise(
     const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
-    const NekDouble &time)
+    [[maybe_unused]] const NekDouble &time)
 {
-    boost::ignore_unused(time);
-
     if (pFields[0]->GetComm()->GetRank() == 0)
     {
         m_outputStream.close();
@@ -675,6 +670,10 @@ void FilterAeroForces::GetForces(
     if (time > m_lastTime)
     {
         CalculateForces(pFields, time);
+    }
+    if (Aeroforces == NullNekDouble1DArray || Aeroforces.size() == 0)
+    {
+        return;
     }
     // Get information to write result
     Array<OneD, unsigned int> ZIDs = pFields[0]->GetZIDs();
@@ -1181,6 +1180,24 @@ void FilterAeroForces::CalculateForces(
         colComm->AllReduce(m_Mvplane[i], LibUtilities::ReduceSum);
     }
 
+    // Pass force (computatonal frame) to FluidInterface (required for
+    // MovingReferenceFrame)
+    Array<OneD, NekDouble> aeroforces(6, 0.);
+    for (size_t i = 0; i < m_Ft.size(); ++i)
+    {
+        aeroforces[i] = (Vmath::Vsum(m_nPlanes, m_Fpplane[i], 1) +
+                         Vmath::Vsum(m_nPlanes, m_Fvplane[i], 1)) /
+                        m_nPlanes;
+    }
+    for (size_t i = 0; i < m_Mt.size(); ++i)
+    {
+        int j             = m_Mt.size() - 1 - i;
+        aeroforces[5 - i] = (Vmath::Vsum(m_nPlanes, m_Mpplane[j], 1) +
+                             Vmath::Vsum(m_nPlanes, m_Mvplane[j], 1)) /
+                            m_nPlanes;
+    }
+    fluidEqu->SetAeroForce(aeroforces);
+
     // Project results to new directions
     for (int plane = 0; plane < m_nPlanes; plane++)
     {
@@ -1277,10 +1294,8 @@ void FilterAeroForces::CalculateForces(
  */
 void FilterAeroForces::CalculateForcesMapping(
     const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
-    const NekDouble &time)
+    [[maybe_unused]] const NekDouble &time)
 {
-    boost::ignore_unused(time);
-
     int cnt, elmtid, offset, boundary;
     // Get number of quadrature points and dimensions
     int physTot = pFields[0]->GetNpoints();
@@ -1953,5 +1968,4 @@ void FilterAeroForces::CalculateForcesMapping(
     }
 }
 
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils

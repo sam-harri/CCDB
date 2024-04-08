@@ -34,11 +34,9 @@
 
 #include <ADRSolver/EquationSystems/SteadyAdvectionDiffusionReaction.h>
 
-using namespace std;
-
 namespace Nektar
 {
-string SteadyAdvectionDiffusionReaction::className =
+std::string SteadyAdvectionDiffusionReaction::className =
     GetEquationSystemFactory().RegisterCreatorFunction(
         "SteadyAdvectionDiffusionReaction",
         SteadyAdvectionDiffusionReaction::create);
@@ -60,13 +58,10 @@ void SteadyAdvectionDiffusionReaction::v_InitObject(bool DeclareFields)
     }
 }
 
-SteadyAdvectionDiffusionReaction::~SteadyAdvectionDiffusionReaction()
-{
-}
-
 void SteadyAdvectionDiffusionReaction::v_GenerateSummary(
     SolverUtils::SummaryList &s)
 {
     SteadyAdvectionDiffusion::v_GenerateSummary(s);
+    SolverUtils::AddSummaryItem(s, "Lambda", m_lambda);
 }
 } // namespace Nektar

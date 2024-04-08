@@ -33,16 +33,12 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <MultiRegions/ExpList.h>
 #include <MultiRegions/ExpList3DHomogeneous2D.h>
 
 using namespace std;
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 // Forward declaration for typedefs
 ExpList3DHomogeneous2D::ExpList3DHomogeneous2D() : ExpListHomogeneous2D(e3DH2D)
@@ -54,11 +50,10 @@ ExpList3DHomogeneous2D::ExpList3DHomogeneous2D(
     const LibUtilities::BasisKey &HomoBasis_y,
     const LibUtilities::BasisKey &HomoBasis_z, const NekDouble lhom_y,
     const NekDouble lhom_z, const bool useFFT, const bool dealiasing,
-    const Collections::ImplementationType ImpType)
+    [[maybe_unused]] const Collections::ImplementationType ImpType)
     : ExpListHomogeneous2D(e3DH2D, pSession, HomoBasis_y, HomoBasis_z, lhom_y,
                            lhom_z, useFFT, dealiasing)
 {
-    boost::ignore_unused(ImpType);
 }
 
 // Constructor for ExpList3DHomogeneous2D to act as a Explist field
@@ -376,7 +371,7 @@ void ExpList3DHomogeneous2D::v_WriteVtkPieceHeader(std::ostream &outfile,
             << ntotminus << "\">" << endl;
     outfile << "      <Points>" << endl;
     outfile << "        <DataArray type=\"Float64\" "
-            << "NumberOfComponents=\"3\" format=\"ascii\">" << endl;
+            << R"(NumberOfComponents="3" format="ascii">)" << endl;
     outfile << "          ";
     for (i = 0; i < ntot; ++i)
     {
@@ -391,7 +386,7 @@ void ExpList3DHomogeneous2D::v_WriteVtkPieceHeader(std::ostream &outfile,
     outfile << "      </Points>" << endl;
     outfile << "      <Cells>" << endl;
     outfile << "        <DataArray type=\"Int32\" "
-            << "Name=\"connectivity\" format=\"ascii\">" << endl;
+            << R"(Name="connectivity" format="ascii">)" << endl;
     for (i = 0; i < nquad0 - 1; ++i)
     {
         for (j = 0; j < nquad1 - 1; ++j)
@@ -414,7 +409,7 @@ void ExpList3DHomogeneous2D::v_WriteVtkPieceHeader(std::ostream &outfile,
     outfile << endl;
     outfile << "        </DataArray>" << endl;
     outfile << "        <DataArray type=\"Int32\" "
-            << "Name=\"offsets\" format=\"ascii\">" << endl;
+            << R"(Name="offsets" format="ascii">)" << endl;
     for (i = 0; i < ntotminus; ++i)
     {
         outfile << i * 8 + 8 << " ";
@@ -422,7 +417,7 @@ void ExpList3DHomogeneous2D::v_WriteVtkPieceHeader(std::ostream &outfile,
     outfile << endl;
     outfile << "        </DataArray>" << endl;
     outfile << "        <DataArray type=\"UInt8\" "
-            << "Name=\"types\" format=\"ascii\">" << endl;
+            << R"(Name="types" format="ascii">)" << endl;
     for (i = 0; i < ntotminus; ++i)
     {
         outfile << "12 ";
@@ -458,5 +453,4 @@ NekDouble ExpList3DHomogeneous2D::v_L2(
 
     return sqrt(err);
 }
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions

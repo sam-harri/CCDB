@@ -37,9 +37,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace LocalRegions
+namespace Nektar::LocalRegions
 {
 
 PyrExp::PyrExp(const LibUtilities::BasisKey &Ba,
@@ -1627,5 +1625,4 @@ void PyrExp::v_NormalTraceDerivFactors(
     }
 }
 
-} // namespace LocalRegions
-} // namespace Nektar
+} // namespace Nektar::LocalRegions

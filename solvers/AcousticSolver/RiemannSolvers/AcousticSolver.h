@@ -49,10 +49,10 @@ class AcousticSolver : public RiemannSolver
 protected:
     AcousticSolver(const LibUtilities::SessionReaderSharedPtr &pSession);
 
-    virtual void v_Solve(const int nDim,
-                         const Array<OneD, const Array<OneD, NekDouble>> &Fwd,
-                         const Array<OneD, const Array<OneD, NekDouble>> &Bwd,
-                         Array<OneD, Array<OneD, NekDouble>> &flux) override;
+    void v_Solve(const int nDim,
+                 const Array<OneD, const Array<OneD, NekDouble>> &Fwd,
+                 const Array<OneD, const Array<OneD, NekDouble>> &Bwd,
+                 Array<OneD, Array<OneD, NekDouble>> &flux) override;
 
     virtual void v_PointSolve(NekDouble pL, NekDouble rhoL, NekDouble uL,
                               NekDouble vL, NekDouble wL, NekDouble pR,

@@ -41,9 +41,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 /**
  * @class GlobalLinSysStaticCond
@@ -101,9 +99,8 @@ void GlobalLinSysStaticCond::v_Solve(
     const Array<OneD, const NekDouble> &pLocInput,
     Array<OneD, NekDouble> &pLocOutput,
     const AssemblyMapSharedPtr &pLocToGloMap,
-    const Array<OneD, const NekDouble> &dirForcing)
+    [[maybe_unused]] const Array<OneD, const NekDouble> &dirForcing)
 {
-    boost::ignore_unused(dirForcing);
     ASSERTL1(dirForcing.size() == 0,
              "GlobalLinSysStaticCond: Not setup for dirForcing");
 
@@ -584,5 +581,4 @@ void GlobalLinSysStaticCond::ConstructNextLevelCondensedSystem(
         v_Recurse(m_linSysKey, m_expList, blkMatrices[0], blkMatrices[1],
                   blkMatrices[2], blkMatrices[3], pLocToGloMap);
 }
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions

@@ -46,9 +46,7 @@
 using namespace std;
 using namespace Nektar::NekMesh;
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 ModuleKey ProcessCyl::className = GetModuleFactory().RegisterCreatorFunction(
@@ -106,5 +104,4 @@ void ProcessCyl::v_GenerateEdgeNodes(EdgeSharedPtr edge)
     }
     edge->m_curveType = LibUtilities::ePolyEvenlySpaced;
 }
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh

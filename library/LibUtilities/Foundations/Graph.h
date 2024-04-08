@@ -39,9 +39,7 @@
 #include <LibUtilities/LibUtilitiesDeclspec.h>
 #include <list>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 class GraphVertexObject
 {
@@ -105,6 +103,5 @@ protected:
     std::list<GraphEdgeObject *> m_edgeset;
 };
 
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities
 #endif // GRAPH_H

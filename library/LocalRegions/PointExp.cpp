@@ -34,9 +34,7 @@
 
 #include <LocalRegions/PointExp.h>
 
-namespace Nektar
-{
-namespace LocalRegions
+namespace Nektar::LocalRegions
 {
 
 PointExp::PointExp(const SpatialDomains::PointGeomSharedPtr &geom)
@@ -82,5 +80,4 @@ void PointExp::v_NormVectorIProductWRTBase(
     outarray[0] = Fx[0] * normals[0][0];
 }
 
-} // namespace LocalRegions
-} // namespace Nektar
+} // namespace Nektar::LocalRegions

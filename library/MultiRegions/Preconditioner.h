@@ -44,9 +44,7 @@
 
 #include <memory>
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 class AssemblyMap;
 typedef std::shared_ptr<AssemblyMap> AssemblyMapSharedPtr;
@@ -242,7 +240,6 @@ inline void Preconditioner::BuildPreconditioner()
 {
     v_BuildPreconditioner();
 }
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions
 
 #endif

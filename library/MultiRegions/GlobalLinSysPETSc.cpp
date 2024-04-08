@@ -40,9 +40,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 std::string GlobalLinSysPETSc::matMult =
     LibUtilities::SessionReader::RegisterDefaultSolverInfo("PETScMatMult",
@@ -525,5 +523,4 @@ void GlobalLinSysPETSc::SetUpSolver(NekDouble tolerance)
         KSPSetPC(m_ksp, m_pc);
     }
 }
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions

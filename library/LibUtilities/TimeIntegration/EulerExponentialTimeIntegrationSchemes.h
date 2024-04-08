@@ -91,7 +91,7 @@ public:
         }
     }
 
-    virtual ~EulerExponentialTimeIntegrationScheme()
+    ~EulerExponentialTimeIntegrationScheme() override
     {
     }
 
@@ -205,23 +205,23 @@ public:
     }
 
 protected:
-    LUE virtual std::string v_GetName() const override
+    LUE std::string v_GetName() const override
     {
         return std::string("EulerExponential");
     }
 
-    LUE virtual std::string v_GetFullName() const override
+    LUE std::string v_GetFullName() const override
     {
         return GetVariant() + GetName() + "Order" + std::to_string(GetOrder());
     }
 
-    LUE virtual NekDouble v_GetTimeStability() const override
+    LUE NekDouble v_GetTimeStability() const override
     {
         return 1.0;
     }
 
-    virtual void v_InitializeSecondaryData(TimeIntegrationAlgorithmGLM *phase,
-                                           NekDouble deltaT) const override
+    void v_InitializeSecondaryData(TimeIntegrationAlgorithmGLM *phase,
+                                   NekDouble deltaT) const override
     {
         /**
          * \brief Lambda Matrix Assumption, member variable phase->m_L
@@ -396,7 +396,9 @@ protected:
 
             // B evaluation value shuffling second row first column.
             if (phase->m_order > 1)
+            {
                 phase->m_B_phi[k][1][0] = 1.0; // constant 1
+            }
 
             // U Curent time step evaluation first row first column.
             phase->m_U_phi[k][0][0] = 1.0; // constant 1

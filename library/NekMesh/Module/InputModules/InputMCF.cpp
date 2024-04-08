@@ -32,11 +32,12 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
+#include <thread>
+
 #include <LibUtilities/BasicUtils/SessionReader.h>
 #include <NekMesh/CADSystem/CADCurve.h>
 
 #include <boost/algorithm/string.hpp>
-#include <boost/thread.hpp>
 
 #include <tinyxml.h>
 
@@ -45,9 +46,7 @@
 using namespace std;
 using namespace Nektar::NekMesh;
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 ModuleKey InputMCF::className = GetModuleFactory().RegisterCreatorFunction(
@@ -662,7 +661,7 @@ void InputMCF::Process()
     ////*** VARIATIONAL OPTIMISATION ****////
     if (m_varopti)
     {
-        unsigned int np = boost::thread::physical_concurrency();
+        unsigned int np = std::thread::hardware_concurrency();
 
         m_log(VERBOSE) << "Detecting " << np << " cores, will attempt to run "
                        << "in parallel" << endl;
@@ -760,5 +759,4 @@ void InputMCF::Process()
 
     m_log(VERBOSE) << "Input mesh generation complete." << endl;
 }
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh

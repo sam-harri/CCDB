@@ -38,9 +38,7 @@
 using namespace std;
 using namespace Nektar::NekMesh;
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 ModuleKey ProcessJac::className = GetModuleFactory().RegisterCreatorFunction(
@@ -169,5 +167,4 @@ void ProcessJac::Process()
                        << endl;
     }
 }
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh

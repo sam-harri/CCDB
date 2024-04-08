@@ -32,8 +32,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/Foundations/Interp.h>
 #include <LibUtilities/Foundations/InterpCoeff.h>
 #include <LocalRegions/Expansion2D.h>
@@ -45,9 +43,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace LocalRegions
+namespace Nektar::LocalRegions
 {
 //  evaluate additional terms in HDG face. Note that this assumes that
 // edges are unpacked into local cartesian order.
@@ -323,14 +319,11 @@ void Expansion3D::AddNormTraceInt(
 /**
  * For a given face add the \tilde{F}_1j contributions
  */
-void Expansion3D::AddFaceBoundaryInt(const int face,
-                                     ExpansionSharedPtr &FaceExp,
-                                     Array<OneD, NekDouble> &facePhys,
-                                     Array<OneD, NekDouble> &outarray,
-                                     const StdRegions::VarCoeffMap &varcoeffs)
+void Expansion3D::AddFaceBoundaryInt(
+    const int face, ExpansionSharedPtr &FaceExp,
+    Array<OneD, NekDouble> &facePhys, Array<OneD, NekDouble> &outarray,
+    [[maybe_unused]] const StdRegions::VarCoeffMap &varcoeffs)
 {
-    boost::ignore_unused(varcoeffs);
-
     int i;
     int order_f = FaceExp->GetNcoeffs();
     Array<OneD, NekDouble> coeff(order_f);
@@ -339,20 +332,6 @@ void Expansion3D::AddFaceBoundaryInt(const int face,
                      GetBasisNumModes(1), GetBasisNumModes(2), face,
                      GetTraceOrient(face));
     IndexMapValuesSharedPtr map = GetIndexMap(ikey);
-
-    //            StdRegions::VarCoeffType VarCoeff[3] =
-    //            {StdRegions::eVarCoeffD00,
-    //                                                    StdRegions::eVarCoeffD11,
-    //                                                    StdRegions::eVarCoeffD22};
-    //            StdRegions::VarCoeffMap::const_iterator x;
-    //            Array<OneD, NekDouble> varcoeff_work(nquad_e);
-    //
-    ///// @TODO Variable coeffs
-    //            if ((x = varcoeffs.find(VarCoeff[0])) != varcoeffs.end())
-    //            {
-    //                GetPhysEdgeVarCoeffsFromElement(edge,EdgeExp,x->second,varcoeff_work);
-    //                Vmath::Vmul(nquad_e,varcoeff_work,1,EdgeExp->GetPhys(),1,EdgeExp->UpdatePhys(),1);
-    //            }
 
     FaceExp->IProductWRTBase(facePhys, coeff);
 
@@ -399,7 +378,9 @@ void Expansion3D::SetFaceToGeomOrientation(const int face,
                 inout[k] = f_in[j];
                 // checking if sign is changing
                 if ((*map1)[j].sign != (*map2)[k].sign)
+                {
                     inout[k] *= -1.0;
+                }
                 break;
             }
         }
@@ -493,11 +474,17 @@ DNekScalMatSharedPtr Expansion3D::CreateMatrix(const MatrixKey &mkey)
                     m_metricinfo->GetDerivFactors(ptsKeys);
                 int dir = 0;
                 if (mkey.GetMatrixType() == StdRegions::eWeakDeriv0)
+                {
                     dir = 0;
+                }
                 if (mkey.GetMatrixType() == StdRegions::eWeakDeriv1)
+                {
                     dir = 1;
+                }
                 if (mkey.GetMatrixType() == StdRegions::eWeakDeriv2)
+                {
                     dir = 2;
+                }
 
                 MatrixKey deriv0key(StdRegions::eWeakDeriv0,
                                     mkey.GetShapeType(), *this);
@@ -692,22 +679,13 @@ DNekScalMatSharedPtr Expansion3D::CreateMatrix(const MatrixKey &mkey)
 
             returnval = MemoryManager<DNekScalMat>::AllocateSharedPtr(one, adr);
 
-            // Clear memory (Repeat varcoeff checks)
+            // Clear memory for time-dependent matrices
             DropLocMatrix(advkey);
-            if (mkey.HasVarCoeff(StdRegions::eVarCoeffMass))
+            if (!massVarcoeffs.empty())
             {
                 DropLocMatrix(masskey);
             }
-            if ((mkey.HasVarCoeff(StdRegions::eVarCoeffLaplacian)) ||
-                (mkey.HasVarCoeff(StdRegions::eVarCoeffD00)) ||
-                (mkey.HasVarCoeff(StdRegions::eVarCoeffD01)) ||
-                (mkey.HasVarCoeff(StdRegions::eVarCoeffD10)) ||
-                (mkey.HasVarCoeff(StdRegions::eVarCoeffD02)) ||
-                (mkey.HasVarCoeff(StdRegions::eVarCoeffD20)) ||
-                (mkey.HasVarCoeff(StdRegions::eVarCoeffD11)) ||
-                (mkey.HasVarCoeff(StdRegions::eVarCoeffD12)) ||
-                (mkey.HasVarCoeff(StdRegions::eVarCoeffD21)) ||
-                (mkey.HasVarCoeff(StdRegions::eVarCoeffD22)))
+            if (!lapVarcoeffs.empty())
             {
                 DropLocMatrix(lapkey);
             }
@@ -720,16 +698,18 @@ DNekScalMatSharedPtr Expansion3D::CreateMatrix(const MatrixKey &mkey)
             NekDouble lambda = mkey.GetConstFactor(StdRegions::eFactorLambda);
 
             // Construct mass matrix (Check for varcoeffs)
-            MatrixKey masskey(StdRegions::eMass, mkey.GetShapeType(), *this);
+            StdRegions::VarCoeffMap massVarcoeffs = StdRegions::NullVarCoeffMap;
             if (mkey.HasVarCoeff(StdRegions::eVarCoeffMass))
             {
-                masskey = MatrixKey(mkey, StdRegions::eMass);
+                massVarcoeffs[StdRegions::eVarCoeffMass] =
+                    mkey.GetVarCoeff(StdRegions::eVarCoeffMass);
             }
+            MatrixKey masskey(StdRegions::eMass, mkey.GetShapeType(), *this,
+                              mkey.GetConstFactors(), massVarcoeffs);
             DNekScalMat &MassMat = *GetLocMatrix(masskey);
 
             // Construct laplacian matrix (Check for varcoeffs)
-            MatrixKey lapkey(StdRegions::eLaplacian, mkey.GetShapeType(), *this,
-                             mkey.GetConstFactors());
+            StdRegions::VarCoeffMap lapVarcoeffs = StdRegions::NullVarCoeffMap;
             if ((mkey.HasVarCoeff(StdRegions::eVarCoeffLaplacian)) ||
                 (mkey.HasVarCoeff(StdRegions::eVarCoeffD00)) ||
                 (mkey.HasVarCoeff(StdRegions::eVarCoeffD01)) ||
@@ -741,8 +721,10 @@ DNekScalMatSharedPtr Expansion3D::CreateMatrix(const MatrixKey &mkey)
                 (mkey.HasVarCoeff(StdRegions::eVarCoeffD21)) ||
                 (mkey.HasVarCoeff(StdRegions::eVarCoeffD22)))
             {
-                lapkey = MatrixKey(mkey, StdRegions::eLaplacian);
+                lapVarcoeffs = mkey.GetVarCoeffs();
             }
+            MatrixKey lapkey(StdRegions::eLaplacian, mkey.GetShapeType(), *this,
+                             mkey.GetConstFactors(), lapVarcoeffs);
             DNekScalMat &LapMat = *GetLocMatrix(lapkey);
 
             // Construct advection matrix
@@ -775,23 +757,9 @@ DNekScalMatSharedPtr Expansion3D::CreateMatrix(const MatrixKey &mkey)
 
             // Clear memory
             DropLocMatrix(advkey);
-            if (mkey.HasVarCoeff(StdRegions::eVarCoeffMass))
-            {
-                DropLocMatrix(masskey);
-            }
-            if ((mkey.HasVarCoeff(StdRegions::eVarCoeffLaplacian)) ||
-                (mkey.HasVarCoeff(StdRegions::eVarCoeffD00)) ||
-                (mkey.HasVarCoeff(StdRegions::eVarCoeffD01)) ||
-                (mkey.HasVarCoeff(StdRegions::eVarCoeffD10)) ||
-                (mkey.HasVarCoeff(StdRegions::eVarCoeffD02)) ||
-                (mkey.HasVarCoeff(StdRegions::eVarCoeffD20)) ||
-                (mkey.HasVarCoeff(StdRegions::eVarCoeffD11)) ||
-                (mkey.HasVarCoeff(StdRegions::eVarCoeffD12)) ||
-                (mkey.HasVarCoeff(StdRegions::eVarCoeffD21)) ||
-                (mkey.HasVarCoeff(StdRegions::eVarCoeffD22)))
-            {
-                DropLocMatrix(lapkey);
-            }
+            DropLocMatrix(masskey);
+            DropLocMatrix(lapkey);
+            DropLocMatrix(gjpkey);
         }
         break;
         case StdRegions::eNormDerivOnTrace:
@@ -3069,5 +3037,4 @@ void Expansion3D::v_TraceNormLen(const int traceid, NekDouble &h, NekDouble &p)
     }
     p = (NekDouble)(GetBasisNumModes(dirn) - 1);
 }
-} // namespace LocalRegions
-} // namespace Nektar
+} // namespace Nektar::LocalRegions

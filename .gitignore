@@ -3,6 +3,7 @@
 !.gitlab-ci.yml
 !.gitattributes
 !.clang-format
+!.clang-tidy
 !.dockerignore
 !.gitlab-ci
 # Ignore builds and ThirdParty directories
@@ -21,3 +22,5 @@ ThirdParty
 *.sublime-workspace
 # CLion build directories
 cmake-build-*
+# Any python cache directories
+__pycache__

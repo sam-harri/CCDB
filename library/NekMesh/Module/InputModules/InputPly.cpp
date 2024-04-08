@@ -39,9 +39,7 @@
 using namespace std;
 using namespace Nektar::NekMesh;
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 ModuleKey InputPly::className = GetModuleFactory().RegisterCreatorFunction(
@@ -202,5 +200,4 @@ void InputPly::ReadPly(io::filtering_istream &mshFile, NekDouble scale)
         }
     }
 }
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh

@@ -36,11 +36,8 @@
 #define NEKTAR_LIBRARY_COLLECTIONS_MATRIXFREEBASE_H
 
 #include <StdRegions/StdExpansion.h>
-#include <boost/core/ignore_unused.hpp>
 
-namespace Nektar
-{
-namespace Collections
+namespace Nektar::Collections
 {
 
 class MatrixFreeBase
@@ -182,6 +179,5 @@ protected:
     Array<OneD, NekDouble> m_input;
     Array<OneD, Array<OneD, NekDouble>> m_output;
 };
-} // namespace Collections
-} // namespace Nektar
+} // namespace Nektar::Collections
 #endif // NEKTAR_LIBRARY_COLLECTIONS_MATRIXFREEBASE_H

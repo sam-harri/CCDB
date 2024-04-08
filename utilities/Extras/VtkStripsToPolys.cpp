@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
     vtkIdType npts;
 #if VTK_MAJOR_VERSION >= 9 ||                                                  \
     (VTK_MAJOR_VERSION >= 8 && VTK_MINOR_VERSION >= 90)
-    const vtkIdType *pts = 0;
+    const vtkIdType *pts = nullptr;
 #else
     vtkIdType *pts = 0;
 #endif
@@ -76,7 +76,7 @@ int main(int argc, char *argv[])
 
     // Generate the polygons from the triangle strips
     vtkStrips->InitTraversal();
-    for (int i = 0; vtkStrips->GetNextCell(npts, pts); ++i)
+    while (vtkStrips->GetNextCell(npts, pts))
     {
         for (int j = 0; j < npts - 2; ++j)
         {

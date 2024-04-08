@@ -36,9 +36,7 @@
 #include <boost/test/tools/floating_point_comparison.hpp>
 #include <boost/test/unit_test.hpp>
 
-namespace Nektar
-{
-namespace LinearSystemUnitTests
+namespace Nektar::LinearSystemUnitTests
 {
 BOOST_AUTO_TEST_CASE(TestLinearSystemSolveWithReturnValue)
 {
@@ -319,5 +317,4 @@ BOOST_AUTO_TEST_CASE(TestSymmetricMatrix)
     BOOST_CHECK_CLOSE(xt[1], 4.0, epsilon);
     BOOST_CHECK_CLOSE(xt[2], -5.0, epsilon);
 }
-} // namespace LinearSystemUnitTests
-} // namespace Nektar
+} // namespace Nektar::LinearSystemUnitTests

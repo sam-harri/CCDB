@@ -34,9 +34,7 @@
 
 #include <LibUtilities/Foundations/Points.h>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 /**
  * @class PointsKey
@@ -107,5 +105,4 @@ std::ostream &operator<<(std::ostream &os, const PointsKey &rhs)
  * allocated from the memory pool if in use.
  */
 
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities

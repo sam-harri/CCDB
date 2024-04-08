@@ -38,9 +38,7 @@
 #include <MultiRegions/ExpList.h>
 #include <SpatialDomains/Movement/Movement.h>
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 
 /**
@@ -77,13 +75,16 @@ public:
     }
 
     /// Calculates what coordinates on the interface are missing locally
-    void CalcLocalMissing();
+    void CalcLocalMissing(SpatialDomains::MovementSharedPtr movement);
     /// Fills the Bwd trace by interpolating from the Fwd for local interfaces
     void FillLocalBwdTrace(Array<OneD, NekDouble> &Fwd,
                            Array<OneD, NekDouble> &Bwd);
     /// Fills the Bwd trace from partitioned trace
     void FillRankBwdTrace(Array<OneD, NekDouble> &trace,
                           Array<OneD, NekDouble> &Bwd);
+    /// Check whether the coordiniates in the original domain
+    void DomainCheck(Array<OneD, NekDouble> &gloCoord,
+                     SpatialDomains::MovementSharedPtr movement);
 
 private:
     /// Trace expansion list
@@ -209,7 +210,9 @@ private:
      *  map of integer rank to a map of integer missing coordinate location to a
      *  pair of local edge ID and found local coordinate
      */
-    std::map<int, std::map<int, std::pair<int, Array<OneD, NekDouble>>>>
+    std::map<
+        int,
+        std::map<int, std::pair<std::pair<int, int>, Array<OneD, NekDouble>>>>
         m_foundRankCoords;
 };
 
@@ -268,7 +271,6 @@ private:
 
 typedef std::shared_ptr<InterfaceMapDG> InterfaceMapDGSharedPtr;
 
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions
 
 #endif

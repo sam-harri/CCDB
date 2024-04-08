@@ -33,20 +33,12 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <StdRegions/StdTetExp.h>
 
 using namespace std;
 
-namespace Nektar
+namespace Nektar::StdRegions
 {
-namespace StdRegions
-{
-StdTetExp::StdTetExp()
-{
-}
-
 StdTetExp::StdTetExp(const LibUtilities::BasisKey &Ba,
                      const LibUtilities::BasisKey &Bb,
                      const LibUtilities::BasisKey &Bc)
@@ -66,14 +58,6 @@ StdTetExp::StdTetExp(const LibUtilities::BasisKey &Ba,
     ASSERTL0(Bb.GetNumModes() <= Bc.GetNumModes(),
              "order in 'b' direction is higher than order "
              "in 'c' direction");
-}
-
-StdTetExp::StdTetExp(const StdTetExp &T) : StdExpansion(T), StdExpansion3D(T)
-{
-}
-
-StdTetExp::~StdTetExp()
-{
 }
 
 //----------------------------
@@ -341,10 +325,10 @@ void StdTetExp::v_BwdTrans_SumFacKernel(
     const Array<OneD, const NekDouble> &base2,
     const Array<OneD, const NekDouble> &inarray,
     Array<OneD, NekDouble> &outarray, Array<OneD, NekDouble> &wsp,
-    bool doCheckCollDir0, bool doCheckCollDir1, bool doCheckCollDir2)
+    [[maybe_unused]] bool doCheckCollDir0,
+    [[maybe_unused]] bool doCheckCollDir1,
+    [[maybe_unused]] bool doCheckCollDir2)
 {
-    boost::ignore_unused(doCheckCollDir0, doCheckCollDir1, doCheckCollDir2);
-
     int nquad0 = m_base[0]->GetNumPoints();
     int nquad1 = m_base[1]->GetNumPoints();
     int nquad2 = m_base[2]->GetNumPoints();
@@ -542,10 +526,10 @@ void StdTetExp::v_IProductWRTBase_SumFacKernel(
     const Array<OneD, const NekDouble> &base2,
     const Array<OneD, const NekDouble> &inarray,
     Array<OneD, NekDouble> &outarray, Array<OneD, NekDouble> &wsp,
-    bool doCheckCollDir0, bool doCheckCollDir1, bool doCheckCollDir2)
+    [[maybe_unused]] bool doCheckCollDir0,
+    [[maybe_unused]] bool doCheckCollDir1,
+    [[maybe_unused]] bool doCheckCollDir2)
 {
-    boost::ignore_unused(doCheckCollDir0, doCheckCollDir1, doCheckCollDir2);
-
     int nquad0 = m_base[0]->GetNumPoints();
     int nquad1 = m_base[1]->GetNumPoints();
     int nquad2 = m_base[2]->GetNumPoints();
@@ -934,13 +918,10 @@ NekDouble StdTetExp::v_PhysEvaluate(const Array<OneD, NekDouble> &coord,
     return val;
 }
 
-void StdTetExp::v_GetTraceNumModes(const int fid,
-
-                                   int &numModes0, int &numModes1,
-                                   Orientation faceOrient)
+void StdTetExp::v_GetTraceNumModes(const int fid, int &numModes0,
+                                   int &numModes1,
+                                   [[maybe_unused]] Orientation faceOrient)
 {
-    boost::ignore_unused(faceOrient);
-
     int nummodes[3] = {m_base[0]->GetNumModes(), m_base[1]->GetNumModes(),
                        m_base[2]->GetNumModes()};
     switch (fid)
@@ -988,7 +969,7 @@ int StdTetExp::v_GetNtraces() const
 
 LibUtilities::ShapeType StdTetExp::v_DetShapeType() const
 {
-    return DetShapeType();
+    return LibUtilities::eTetrahedron;
 }
 
 int StdTetExp::v_NumBndryCoeffs() const
@@ -2238,11 +2219,9 @@ void StdTetExp::v_ReduceOrderCoeffs(int numMin,
     FwdTrans(phys_tmp, outarray);
 }
 
-void StdTetExp::v_GetSimplexEquiSpacedConnectivity(Array<OneD, int> &conn,
-                                                   bool standard)
+void StdTetExp::v_GetSimplexEquiSpacedConnectivity(
+    Array<OneD, int> &conn, [[maybe_unused]] bool standard)
 {
-    boost::ignore_unused(standard);
-
     int np0 = m_base[0]->GetNumPoints();
     int np1 = m_base[1]->GetNumPoints();
     int np2 = m_base[2]->GetNumPoints();
@@ -2316,5 +2295,4 @@ void StdTetExp::v_GetSimplexEquiSpacedConnectivity(Array<OneD, int> &conn,
     }
 }
 
-} // namespace StdRegions
-} // namespace Nektar
+} // namespace Nektar::StdRegions

@@ -36,9 +36,7 @@
 #include <MultiRegions/ContField.h>
 #include <MultiRegions/ContField3DHomogeneous2D.h>
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 
 ContField3DHomogeneous2D::ContField3DHomogeneous2D(void)
@@ -216,5 +214,4 @@ void ContField3DHomogeneous2D::v_ClearGlobalLinSysManager(void)
     }
 }
 
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions

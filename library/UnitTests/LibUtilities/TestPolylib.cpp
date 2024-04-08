@@ -41,9 +41,7 @@
 #include <tuple>
 #include <vector>
 
-namespace Nektar
-{
-namespace UnitTests
+namespace Nektar::UnitTests
 {
 
 /// Lower range of number of quadrature points to use for unit tests.
@@ -94,7 +92,7 @@ inline void TestIntegral(
                 func(&z[0], &w[0], np, alpha, beta);
                 for (int n = 2; n < 2 * np - 1 - o; ++n)
                 {
-                    Polylib::jacobfd(np, &z[0], &p[0], NULL, n, alpha, beta);
+                    Polylib::jacobfd(np, &z[0], &p[0], nullptr, n, alpha, beta);
                     double sum = ddot(np, &w[0], 1, &p[0], 1);
                     BOOST_CHECK_SMALL(sum, EPS);
                 }
@@ -373,5 +371,4 @@ BOOST_AUTO_TEST_CASE(TestGammaFraction)
     }
 }
 
-} // namespace UnitTests
-} // namespace Nektar
+} // namespace Nektar::UnitTests

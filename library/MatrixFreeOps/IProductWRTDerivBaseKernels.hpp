@@ -35,9 +35,7 @@
 #ifndef NEKTAR_LIBRARY_MF_IPRODUCTWRTDERIVBASE_KERNELS_H
 #define NEKTAR_LIBRARY_MF_IPRODUCTWRTDERIVBASE_KERNELS_H
 
-namespace Nektar
-{
-namespace MatrixFree
+namespace Nektar::MatrixFree
 {
 
 // The dimension and shape kernels. NOTE: They are NOT duplicate
@@ -59,7 +57,9 @@ NEK_FORCE_INLINE static void IProductWRTDerivBaseSegKernel(
     if (!DEFORMED)
     {
         for (int d = 0; d < ndf; ++d)
+        {
             df_tmp[d] = df_ptr[d];
+        }
     }
 
     for (int i = 0; i < nq0; ++i)
@@ -67,12 +67,16 @@ NEK_FORCE_INLINE static void IProductWRTDerivBaseSegKernel(
         if (DEFORMED)
         {
             for (int d = 0; d < ndf; ++d)
+            {
                 df_tmp[d] = df_ptr[i * ndf + d];
+            }
         }
 
         tmp0[i] = df_tmp[0] * tmpIn[0][i];
         for (int d = 1; d < ndf; ++d)
+        {
             tmp0[i] += (df_tmp[d] * tmpIn[d][i]);
+        }
     }
 }
 
@@ -516,8 +520,9 @@ NEK_FORCE_INLINE static void IProductWRTDerivBase1DKernel(
 template <LibUtilities::ShapeType SHAPE_TYPE, bool DEFORMED>
 NEK_FORCE_INLINE static void IProductWRTDerivBase2DKernel(
     const size_t nq0, const size_t nq1, const size_t indim, const vec_t *df_ptr,
-    vec_t *df_tmp, const std::vector<vec_t, allocator<vec_t>> &Z0,
-    const std::vector<vec_t, allocator<vec_t>> &Z1,
+    vec_t *df_tmp,
+    [[maybe_unused]] const std::vector<vec_t, allocator<vec_t>> &Z0,
+    [[maybe_unused]] const std::vector<vec_t, allocator<vec_t>> &Z1,
     const std::vector<vec_t, allocator<vec_t>> *tmpIn,
     std::vector<vec_t, allocator<vec_t>> &tmp0,
     std::vector<vec_t, allocator<vec_t>> &tmp1)
@@ -526,7 +531,6 @@ NEK_FORCE_INLINE static void IProductWRTDerivBase2DKernel(
     IProductWRTDerivBaseTriKernel<DEFORMED>(nq0, nq1, indim, df_ptr, df_tmp, Z0,
                                             Z1, tmpIn, tmp0, tmp1);
 #elif defined(SHAPE_TYPE_QUAD)
-    boost::ignore_unused(Z0, Z1);
     IProductWRTDerivBaseQuadKernel<DEFORMED>(nq0, nq1, indim, df_ptr, df_tmp,
                                              tmpIn, tmp0, tmp1);
 #endif
@@ -537,9 +541,9 @@ NEK_FORCE_INLINE static void IProductWRTDerivBase2DKernel(
 template <LibUtilities::ShapeType SHAPE_TYPE, bool DEFORMED>
 NEK_FORCE_INLINE static void IProductWRTDerivBase3DKernel(
     const size_t nq0, const size_t nq1, const size_t nq2, const vec_t *df_ptr,
-    const std::vector<vec_t, allocator<vec_t>> &Z0,
-    const std::vector<vec_t, allocator<vec_t>> &Z1,
-    const std::vector<vec_t, allocator<vec_t>> &Z2,
+    [[maybe_unused]] const std::vector<vec_t, allocator<vec_t>> &Z0,
+    [[maybe_unused]] const std::vector<vec_t, allocator<vec_t>> &Z1,
+    [[maybe_unused]] const std::vector<vec_t, allocator<vec_t>> &Z2,
     const std::vector<vec_t, allocator<vec_t>> &tmpIn0,
     const std::vector<vec_t, allocator<vec_t>> &tmpIn1,
     const std::vector<vec_t, allocator<vec_t>> &tmpIn2,
@@ -548,7 +552,6 @@ NEK_FORCE_INLINE static void IProductWRTDerivBase3DKernel(
     std::vector<vec_t, allocator<vec_t>> &tmp2)
 {
 #if defined(SHAPE_TYPE_HEX)
-    boost::ignore_unused(Z0, Z1, Z2);
     IProductWRTDerivBaseHexKernel<DEFORMED>(nq0, nq1, nq2, df_ptr, tmpIn0,
                                             tmpIn1, tmpIn2, tmp0, tmp1, tmp2);
 #elif defined(SHAPE_TYPE_TET)
@@ -556,7 +559,6 @@ NEK_FORCE_INLINE static void IProductWRTDerivBase3DKernel(
                                             tmpIn0, tmpIn1, tmpIn2, tmp0, tmp1,
                                             tmp2);
 #elif defined(SHAPE_TYPE_PRISM)
-    boost::ignore_unused(Z1);
     IProductWRTDerivBasePrismKernel<DEFORMED>(nq0, nq1, nq2, df_ptr, Z0, Z2,
                                               tmpIn0, tmpIn1, tmpIn2, tmp0,
                                               tmp1, tmp2);
@@ -569,7 +571,6 @@ NEK_FORCE_INLINE static void IProductWRTDerivBase3DKernel(
 
 #endif // SHAPE_DIMENSION
 
-} // namespace MatrixFree
-} // namespace Nektar
+} // namespace Nektar::MatrixFree
 
 #endif

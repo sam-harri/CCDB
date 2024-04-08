@@ -39,9 +39,7 @@
 #include <MultiRegions/DisContField3DHomogeneous1D.h>
 #include <MultiRegions/MultiRegionsDeclspec.h>
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 class ContField3DHomogeneous1D : public DisContField3DHomogeneous1D
 {
@@ -67,44 +65,40 @@ public:
         const std::string &variable);
 
     /// Destructor.
-    MULTI_REGIONS_EXPORT virtual ~ContField3DHomogeneous1D();
+    MULTI_REGIONS_EXPORT ~ContField3DHomogeneous1D() override;
 
-    MULTI_REGIONS_EXPORT virtual void v_SmoothField(
+    MULTI_REGIONS_EXPORT void v_SmoothField(
         Array<OneD, NekDouble> &field) override;
 
 protected:
-    virtual void v_ImposeDirichletConditions(
-        Array<OneD, NekDouble> &outarray) override;
+    void v_ImposeDirichletConditions(Array<OneD, NekDouble> &outarray) override;
 
-    virtual void v_FillBndCondFromField(
-        const Array<OneD, NekDouble> coeffs) override;
-    virtual void v_FillBndCondFromField(
-        const int nreg, const Array<OneD, NekDouble> coeffs) override;
+    void v_FillBndCondFromField(const Array<OneD, NekDouble> coeffs) override;
+    void v_FillBndCondFromField(const int nreg,
+                                const Array<OneD, NekDouble> coeffs) override;
 
     /// Template method virtual forwarded for LocalToGlobal()
-    virtual void v_LocalToGlobal(bool useComm) override;
+    void v_LocalToGlobal(bool useComm) override;
 
     /// Template method virtual forwarded for GlobalToLocal()
-    virtual void v_GlobalToLocal(void) override;
+    void v_GlobalToLocal(void) override;
 
     /// Solves the three-dimensional Helmholtz equation, subject to the
     /// boundary conditions specified.
-    virtual GlobalLinSysKey v_HelmSolve(
-        const Array<OneD, const NekDouble> &inarray,
-        Array<OneD, NekDouble> &outarray,
-        const StdRegions::ConstFactorMap &factors,
-        const StdRegions::VarCoeffMap &varcoeff,
-        const MultiRegions::VarFactorsMap &varfactors,
-        const Array<OneD, const NekDouble> &dirForcing,
-        const bool PhysSpaceForcing) override;
+    GlobalLinSysKey v_HelmSolve(const Array<OneD, const NekDouble> &inarray,
+                                Array<OneD, NekDouble> &outarray,
+                                const StdRegions::ConstFactorMap &factors,
+                                const StdRegions::VarCoeffMap &varcoeff,
+                                const MultiRegions::VarFactorsMap &varfactors,
+                                const Array<OneD, const NekDouble> &dirForcing,
+                                const bool PhysSpaceForcing) override;
 
-    virtual void v_ClearGlobalLinSysManager(void) override;
+    void v_ClearGlobalLinSysManager(void) override;
 };
 
 typedef std::shared_ptr<ContField3DHomogeneous1D>
     ContField3DHomogeneous1DSharedPtr;
 
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions
 
 #endif // MULTIERGIONS_CONTFIELD3DHOMO1D_H

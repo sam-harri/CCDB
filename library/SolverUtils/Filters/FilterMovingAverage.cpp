@@ -33,13 +33,9 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <SolverUtils/Filters/FilterMovingAverage.h>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 std::string FilterMovingAverage::className =
     GetFilterFactory().RegisterCreatorFunction("MovingAverage",
@@ -47,7 +43,7 @@ std::string FilterMovingAverage::className =
 
 FilterMovingAverage::FilterMovingAverage(
     const LibUtilities::SessionReaderSharedPtr &pSession,
-    const std::weak_ptr<EquationSystem> &pEquation, const ParamMap &pParams)
+    const std::shared_ptr<EquationSystem> &pEquation, const ParamMap &pParams)
     : FilterFieldConvert(pSession, pEquation, pParams)
 {
     // Load sampling frequency
@@ -105,11 +101,11 @@ FilterMovingAverage::~FilterMovingAverage()
 }
 
 void FilterMovingAverage::v_ProcessSample(
-    const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
-    std::vector<Array<OneD, NekDouble>> &fieldcoeffs, const NekDouble &time)
+    [[maybe_unused]] const Array<OneD, const MultiRegions::ExpListSharedPtr>
+        &pFields,
+    std::vector<Array<OneD, NekDouble>> &fieldcoeffs,
+    [[maybe_unused]] const NekDouble &time)
 {
-    boost::ignore_unused(pFields, time);
-
     // Take first sample as initial vector
     NekDouble alpha = m_alpha;
     if (m_numSamples == 1)
@@ -125,5 +121,4 @@ void FilterMovingAverage::v_ProcessSample(
     }
 }
 
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils

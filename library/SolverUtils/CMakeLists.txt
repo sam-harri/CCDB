@@ -4,6 +4,7 @@ SET(SOLVER_UTILS_SOURCES
   Core/Misc.cpp
   Core/SessionFunction.cpp
   AdvectionSystem.cpp
+  ALEHelper.cpp
   Advection/Advection.cpp
   Advection/Advection3DHomogeneous1D.cpp
   Advection/AdvectionFR.cpp
@@ -28,6 +29,8 @@ SET(SOLVER_UTILS_SOURCES
   Filters/Filter.cpp
   Filters/FilterAeroForces.cpp
   Filters/FilterAverageFields.cpp
+  Filters/EvaluatePoints.cpp
+  Filters/FilterLagrangianPoints.cpp
   Filters/FilterMaxMinFields.cpp
   Filters/FilterCheckpoint.cpp
   Filters/FilterEnergy1D.cpp
@@ -60,6 +63,7 @@ SET(SOLVER_UTILS_HEADERS
   Core/Misc.h
   Core/SessionFunction.h
   AdvectionSystem.h
+  ALEHelper.h
   Advection/Advection.h
   Advection/AdvectionFR.h
   Advection/Advection3DHomogeneous1D.h
@@ -84,6 +88,8 @@ SET(SOLVER_UTILS_HEADERS
   Filters/Filter.h
   Filters/FilterAeroForces.h
   Filters/FilterAverageFields.h
+  Filters/EvaluatePoints.h
+  Filters/FilterLagrangianPoints.h
   Filters/FilterMaxMinFields.h
   Filters/FilterCheckpoint.h
   Filters/FilterEnergy1D.h
@@ -128,12 +134,29 @@ ENDIF (NEKTAR_USE_CWIPI)
 
 ADD_DEFINITIONS(-DSOLVER_UTILS_EXPORTS)
 
+IF (NEKTAR_BUILD_PYTHON)
+    SUBDIRS(Python)
+
+    SET(SOLVER_UTILS_SOURCES ${SOLVER_UTILS_SOURCES}
+        Filters/FilterPython.cpp)
+    SET(SOLVER_UTILS_HEADERS ${SOLVER_UTILS_HEADERS}
+        Filters/FilterPython.h)
+ENDIF()
+
 ADD_NEKTAR_LIBRARY(SolverUtils
     SOURCES ${SOLVER_UTILS_SOURCES}
     HEADERS ${SOLVER_UTILS_HEADERS}
     DEPENDS FieldUtils
     SUMMARY "Nektar++ SolverUtils library"
     DESCRIPTION "This library provides support classes and routines for constructing complete spectral/hp element solvers.")
+
+IF (NEKTAR_BUILD_PYTHON)
+    TARGET_LINK_LIBRARIES(SolverUtils LINK_PRIVATE
+        ${Boost_SYSTEM_LIBRARY}
+        ${BOOST_PYTHON_LIB}
+        ${BOOST_NUMPY_LIB}
+        ${PYTHON_LIBRARIES})
+ENDIF()
 
 IF (NEKTAR_USE_VTK)
     IF (VTK_MAJOR_VERSION LESS 6)

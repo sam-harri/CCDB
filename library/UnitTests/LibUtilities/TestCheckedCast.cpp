@@ -39,11 +39,7 @@
 
 #include <iostream>
 
-namespace Nektar
-{
-namespace LibUtilities
-{
-namespace CheckCastUnitTest
+namespace Nektar::LibUtilities::CheckCastUnitTest
 {
 
 BOOST_AUTO_TEST_CASE(TestDoubleToInt)
@@ -86,6 +82,4 @@ BOOST_AUTO_TEST_CASE(TestDoubleToInt)
     }
 }
 
-} // namespace CheckCastUnitTest
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities::CheckCastUnitTest

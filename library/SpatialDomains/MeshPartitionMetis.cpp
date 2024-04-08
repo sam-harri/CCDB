@@ -35,9 +35,7 @@
 #include <LibUtilities/BasicUtils/Metis.hpp>
 #include <SpatialDomains/MeshPartitionMetis.h>
 
-namespace Nektar
-{
-namespace SpatialDomains
+namespace Nektar::SpatialDomains
 {
 
 std::string MeshPartitionMetis::className =
@@ -72,5 +70,4 @@ void MeshPartitionMetis::v_PartitionGraphImpl(
     Metis::PartGraphVKway(nVerts, nVertConds, xadj, adjcy, vertWgt, vertSize,
                           edgeWgt, nparts, volume, part);
 }
-} // namespace SpatialDomains
-} // namespace Nektar
+} // namespace Nektar::SpatialDomains

@@ -40,9 +40,7 @@
 #include <StdRegions/StdRegions.hpp>
 #include <StdRegions/StdRegionsDeclspec.h>
 
-namespace Nektar
-{
-namespace StdRegions
+namespace Nektar::StdRegions
 {
 
 class StdExpansion;
@@ -63,9 +61,7 @@ public:
 
     STD_REGIONS_EXPORT StdMatrixKey(const StdMatrixKey &rhs);
 
-    virtual ~StdMatrixKey()
-    {
-    }
+    virtual ~StdMatrixKey() = default;
 
     /// Used to lookup the create function in NekManager.
     struct opLess
@@ -202,7 +198,6 @@ STD_REGIONS_EXPORT std::ostream &operator<<(std::ostream &os,
 
 typedef std::shared_ptr<StdMatrixKey> StdMatrixKeySharedPtr;
 
-} // namespace StdRegions
-} // namespace Nektar
+} // namespace Nektar::StdRegions
 
 #endif

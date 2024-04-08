@@ -34,13 +34,10 @@
 
 #include <LibUtilities/BasicUtils/SharedArray.hpp>
 
-#include <boost/core/ignore_unused.hpp>
 #include <boost/test/tools/floating_point_comparison.hpp>
 #include <boost/test/unit_test.hpp>
 
-namespace Nektar
-{
-namespace SharedArrayUnitTests
+namespace Nektar::SharedArrayUnitTests
 {
 BOOST_AUTO_TEST_CASE(TestArrayConstructionFromConstantArray)
 {
@@ -75,5 +72,4 @@ BOOST_AUTO_TEST_CASE(TestRowPointers)
     CheckAddresses(array_1[0], array_1.data());
     CheckAddresses(array_1[1], array_1.data() + 7);
 }
-} // namespace SharedArrayUnitTests
-} // namespace Nektar
+} // namespace Nektar::SharedArrayUnitTests

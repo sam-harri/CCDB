@@ -51,13 +51,13 @@ MetricEigenvalue::MetricEigenvalue(TiXmlElement *metric, bool generate)
     m_unordered = true;
 
     // Regex for FP numbers of forms: 120, -23, 4.345, 2.4563e-01, -nan
-    std::string fp = "-?\\d+\\.?\\d*(?:e[+-]\\d+)?|-?nan";
+    std::string fp = R"(-?\d+\.?\d*(?:e[+-]\d+)?|-?nan)";
 
     // Set up the regular expression. This matches lines beginning with EV:
     // followed by an eigenvalue index and then at least 2 floating-point
     // values comprising real and imaginary components of complex evals.
     // Comparison is made only on the captured eigenvalue components.
-    m_regex = "^EV:\\s+\\d+\\s+(" + fp + ")\\s+(" + fp + ").*";
+    m_regex = R"(^EV:\s+\d+\s+()" + fp + ")\\s+(" + fp + ").*";
 
     // Find the number of iterations to match against.
     TiXmlElement *value = metric->FirstChildElement("value");

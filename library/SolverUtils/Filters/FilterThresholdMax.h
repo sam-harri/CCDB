@@ -37,9 +37,7 @@
 
 #include <SolverUtils/Filters/Filter.h>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 
 class FilterThresholdMax : public Filter
@@ -50,7 +48,7 @@ public:
     /// Creates an instance of this class
     static FilterSharedPtr create(
         const LibUtilities::SessionReaderSharedPtr &pSession,
-        const std::weak_ptr<EquationSystem> &pEquation,
+        const std::shared_ptr<EquationSystem> &pEquation,
         const std::map<std::string, std::string> &pParams)
     {
         FilterSharedPtr p =
@@ -64,25 +62,25 @@ public:
 
     SOLVER_UTILS_EXPORT FilterThresholdMax(
         const LibUtilities::SessionReaderSharedPtr &pSession,
-        const std::weak_ptr<EquationSystem> &pEquation,
+        const std::shared_ptr<EquationSystem> &pEquation,
         const ParamMap &pParams);
-    SOLVER_UTILS_EXPORT virtual ~FilterThresholdMax();
+    SOLVER_UTILS_EXPORT ~FilterThresholdMax() override;
 
 protected:
     /// Initialises the filter.
-    virtual void v_Initialise(
+    void v_Initialise(
         const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
         const NekDouble &time) override;
     /// For each point in domain test if solution is above threshold.
-    virtual void v_Update(
+    void v_Update(
         const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
         const NekDouble &time) override;
     /// Finalise the filter and write out data.
-    virtual void v_Finalise(
+    void v_Finalise(
         const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
         const NekDouble &time) override;
     /// Indicate that this filter is time dependent.
-    virtual bool v_IsTimeDependent() override;
+    bool v_IsTimeDependent() override;
 
 private:
     /// Storage for recording when each point in domain rises above threshold.
@@ -100,7 +98,6 @@ private:
     /// FieldIO object for writing data.
     LibUtilities::FieldIOSharedPtr m_fld;
 };
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils
 
 #endif /* FILTERTHRESHOLDMAX_H_ */

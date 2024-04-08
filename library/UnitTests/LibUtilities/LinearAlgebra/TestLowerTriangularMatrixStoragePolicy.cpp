@@ -40,9 +40,7 @@
 #include <boost/test/tools/floating_point_comparison.hpp>
 #include <boost/test/unit_test.hpp>
 
-namespace Nektar
-{
-namespace LowerTriangularStoragePolicyUnitTests
+namespace Nektar::LowerTriangularStoragePolicyUnitTests
 {
 typedef LowerTriangularMatrixFuncs Policy;
 
@@ -115,5 +113,4 @@ BOOST_AUTO_TEST_CASE(TestAdvanceLowerTriangular)
         BOOST_CHECK_EQUAL(std::numeric_limits<unsigned int>::max(), curColumn);
     }
 }
-} // namespace LowerTriangularStoragePolicyUnitTests
-} // namespace Nektar
+} // namespace Nektar::LowerTriangularStoragePolicyUnitTests

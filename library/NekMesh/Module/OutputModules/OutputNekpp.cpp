@@ -34,19 +34,20 @@
 
 #include <set>
 #include <string>
+#include <thread>
+
 using namespace std;
 
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/algorithm/string/split.hpp>
-#include <boost/core/ignore_unused.hpp>
-#include <boost/filesystem.hpp>
 #include <boost/iostreams/copy.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
 #include <boost/iostreams/filtering_streambuf.hpp>
-#include <boost/thread.hpp>
+
 namespace io = boost::iostreams;
 
+#include <LibUtilities/BasicUtils/Filesystem.hpp>
 #include <NekMesh/MeshElements/Element.h>
 #include <SpatialDomains/MeshGraph.h>
 #include <SpatialDomains/PointGeom.h>
@@ -57,9 +58,7 @@ namespace io = boost::iostreams;
 using namespace Nektar::NekMesh;
 using namespace Nektar::SpatialDomains;
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 ModuleKey OutputNekpp::className1 = GetModuleFactory().RegisterCreatorFunction(
     ModuleKey(eOutputModule, "xml"), OutputNekpp::create,
@@ -90,11 +89,9 @@ OutputNekpp::~OutputNekpp()
 
 template <typename T>
 void TestElmts(const std::map<int, std::shared_ptr<T>> &geomMap,
-               SpatialDomains::MeshGraphSharedPtr &graph,
+               [[maybe_unused]] SpatialDomains::MeshGraphSharedPtr &graph,
                LibUtilities::Interpreter &strEval, int exprId, Logger &log)
 {
-    boost::ignore_unused(graph);
-
     for (auto &geomIt : geomMap)
     {
         SpatialDomains::GeometrySharedPtr geom = geomIt.second;
@@ -171,7 +168,7 @@ void OutputNekpp::Process()
     // Useful when doing r-adaptation
     if (m_config["varopti"].beenSet)
     {
-        unsigned int np        = boost::thread::physical_concurrency();
+        unsigned int np        = std::thread::hardware_concurrency();
         ModuleSharedPtr module = GetModuleFactory().CreateInstance(
             ModuleKey(eProcessModule, "varopti"), m_mesh);
         module->RegisterConfig("hyperelastic", "");
@@ -202,12 +199,12 @@ void OutputNekpp::Process()
     std::string type = "XmlCompressed";
 
     // Compress output and append .gz extension
-    if (boost::filesystem::path(filename).extension() == ".xml" &&
+    if (fs::path(filename).extension() == ".xml" &&
         m_config["uncompress"].beenSet)
     {
         type = "Xml";
     }
-    else if (boost::filesystem::path(filename).extension() == ".nekg")
+    else if (fs::path(filename).extension() == ".nekg")
     {
         type = "HDF5";
     }
@@ -597,8 +594,6 @@ void OutputNekpp::TransferComposites(MeshGraphSharedPtr graph)
     SpatialDomains::CompositeMap &comps = graph->GetComposites();
     map<int, string> &compLabels        = graph->GetCompositesLabels();
 
-    int j = 0;
-
     for (auto &it : m_mesh->m_composite)
     {
         if (it.second->m_items.size() > 0)
@@ -721,7 +716,6 @@ void OutputNekpp::TransferComposites(MeshGraphSharedPtr graph)
 
             comps[indx] = curVector;
         }
-        j++;
     }
 
     if (m_config["chkbndcomp"].beenSet)
@@ -783,6 +777,10 @@ void OutputNekpp::TransferComposites(MeshGraphSharedPtr graph)
     }
 }
 
+// @TODO: We currently lose domain information from input file here. This
+// assumes
+//        every composite that is of expansion dimension is a separate domain
+//        and sequentially numbered. So junks multi-composite domains & IDs.
 void OutputNekpp::TransferDomain(MeshGraphSharedPtr graph)
 {
     std::map<int, SpatialDomains::CompositeMap> &domain = graph->GetDomain();
@@ -807,5 +805,4 @@ void OutputNekpp::TransferDomain(MeshGraphSharedPtr graph)
     }
 }
 
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh

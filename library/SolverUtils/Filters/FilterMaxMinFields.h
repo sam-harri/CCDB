@@ -37,9 +37,7 @@
 
 #include <SolverUtils/Filters/FilterFieldConvert.h>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 
 enum ProblemType
@@ -57,7 +55,7 @@ public:
     /// Creates an instance of this class
     static FilterSharedPtr create(
         const LibUtilities::SessionReaderSharedPtr &pSession,
-        const std::weak_ptr<EquationSystem> &pEquation,
+        const std::shared_ptr<EquationSystem> &pEquation,
         const std::map<std::string, std::string> &pParams)
     {
         FilterSharedPtr p =
@@ -71,9 +69,9 @@ public:
 
     SOLVER_UTILS_EXPORT FilterMaxMinFields(
         const LibUtilities::SessionReaderSharedPtr &pSession,
-        const std::weak_ptr<EquationSystem> &pEquation,
+        const std::shared_ptr<EquationSystem> &pEquation,
         const ParamMap &pParams);
-    SOLVER_UTILS_EXPORT virtual ~FilterMaxMinFields();
+    SOLVER_UTILS_EXPORT ~FilterMaxMinFields() override;
 
 protected:
     bool m_isMax;
@@ -81,24 +79,24 @@ protected:
     std::vector<Array<OneD, NekDouble>> m_curFieldsPhys;
     std::vector<Array<OneD, NekDouble>> m_outFieldsPhys;
 
-    virtual void v_Initialise(
+    void v_Initialise(
         const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
         const NekDouble &time) override;
-    virtual void v_FillVariablesName(
+    void v_FillVariablesName(
         const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields)
         override
     {
         FilterFieldConvert::v_FillVariablesName(pFields);
     }
-    virtual void v_ProcessSample(
+    void v_ProcessSample(
         const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
         std::vector<Array<OneD, NekDouble>> &fieldcoeffs,
         const NekDouble &time) override;
-    virtual void v_PrepareOutput(
+    void v_PrepareOutput(
         const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
         const NekDouble &time) override;
-    virtual NekDouble v_GetScale() override;
-    virtual std::string v_GetFileSuffix() override
+    NekDouble v_GetScale() override;
+    std::string v_GetFileSuffix() override
     {
         if (m_isMax)
         {
@@ -113,7 +111,6 @@ protected:
 private:
     bool m_initialized;
 };
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils
 
 #endif /* NEKTAR_SOLVERUTILS_FILTERS_FILTERCHECKPOINT_H */

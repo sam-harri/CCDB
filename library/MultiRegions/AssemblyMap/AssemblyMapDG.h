@@ -40,9 +40,7 @@
 #include <MultiRegions/ExpList.h>
 #include <MultiRegions/MultiRegionsDeclspec.h>
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 class AssemblyMapDG;
 typedef std::shared_ptr<AssemblyMapDG> AssemblyMapDGSharedPtr;
@@ -66,18 +64,17 @@ public:
         const std::string variable = "DefaultVar");
 
     /// Destructor.
-    MULTI_REGIONS_EXPORT virtual ~AssemblyMapDG();
+    MULTI_REGIONS_EXPORT ~AssemblyMapDG() override;
 
     /// Return the number of boundary segments on which Dirichlet
     /// boundary conditions are imposed.
     MULTI_REGIONS_EXPORT int GetNumDirichletBndPhys();
 
-    MULTI_REGIONS_EXPORT Array<OneD, LocalRegions::ExpansionSharedPtr>
-        &GetElmtToTrace(const int i);
+    MULTI_REGIONS_EXPORT Array<OneD, LocalRegions::ExpansionSharedPtr> &
+    GetElmtToTrace(const int i);
 
     MULTI_REGIONS_EXPORT
-    Array<OneD, Array<OneD, LocalRegions::ExpansionSharedPtr>>
-        &GetElmtToTrace();
+    Array<OneD, Array<OneD, LocalRegions::ExpansionSharedPtr>> &GetElmtToTrace();
 
     /**
      * Changes toAlign quadrature point order, where the realignment is
@@ -106,47 +103,43 @@ protected:
 
     void SetUpUniversalDGMap(const ExpList &locExp);
 
-    virtual int v_GetLocalToGlobalMap(const int i) const override;
+    int v_GetLocalToGlobalMap(const int i) const override;
 
-    virtual int v_GetGlobalToUniversalMap(const int i) const override;
+    int v_GetGlobalToUniversalMap(const int i) const override;
 
-    virtual int v_GetGlobalToUniversalMapUnique(const int i) const override;
+    int v_GetGlobalToUniversalMapUnique(const int i) const override;
 
-    virtual const Array<OneD, const int> &v_GetLocalToGlobalMap() override;
+    const Array<OneD, const int> &v_GetLocalToGlobalMap() override;
 
-    virtual const Array<OneD, const int> &v_GetGlobalToUniversalMap() override;
+    const Array<OneD, const int> &v_GetGlobalToUniversalMap() override;
 
-    virtual const Array<OneD, const int> &v_GetGlobalToUniversalMapUnique()
-        override;
+    const Array<OneD, const int> &v_GetGlobalToUniversalMapUnique() override;
 
-    virtual NekDouble v_GetLocalToGlobalSign(const int i) const override;
+    NekDouble v_GetLocalToGlobalSign(const int i) const override;
 
-    virtual void v_LocalToGlobal(const Array<OneD, const NekDouble> &loc,
-                                 Array<OneD, NekDouble> &global,
-                                 bool useComm = false) const override;
+    void v_LocalToGlobal(const Array<OneD, const NekDouble> &loc,
+                         Array<OneD, NekDouble> &global,
+                         bool useComm = false) const override;
 
-    virtual void v_GlobalToLocal(const Array<OneD, const NekDouble> &global,
-                                 Array<OneD, NekDouble> &loc) const override;
+    void v_GlobalToLocal(const Array<OneD, const NekDouble> &global,
+                         Array<OneD, NekDouble> &loc) const override;
 
-    virtual void v_GlobalToLocal(const NekVector<NekDouble> &global,
-                                 NekVector<NekDouble> &loc) const override;
+    void v_GlobalToLocal(const NekVector<NekDouble> &global,
+                         NekVector<NekDouble> &loc) const override;
 
-    virtual void v_Assemble(const Array<OneD, const NekDouble> &loc,
-                            Array<OneD, NekDouble> &global) const override;
+    void v_Assemble(const Array<OneD, const NekDouble> &loc,
+                    Array<OneD, NekDouble> &global) const override;
 
-    virtual void v_Assemble(const NekVector<NekDouble> &loc,
-                            NekVector<NekDouble> &global) const override;
+    void v_Assemble(const NekVector<NekDouble> &loc,
+                    NekVector<NekDouble> &global) const override;
 
-    virtual void v_UniversalAssemble(
-        Array<OneD, NekDouble> &pGlobal) const override;
+    void v_UniversalAssemble(Array<OneD, NekDouble> &pGlobal) const override;
 
-    virtual void v_UniversalAssemble(
-        NekVector<NekDouble> &pGlobal) const override;
+    void v_UniversalAssemble(NekVector<NekDouble> &pGlobal) const override;
 
-    virtual int v_GetFullSystemBandWidth() const override;
+    int v_GetFullSystemBandWidth() const override;
 }; // class
 
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions
 
 #endif // MULTIREGIONS_ASSEMBLY_MAP_DG_H

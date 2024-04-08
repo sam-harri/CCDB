@@ -46,9 +46,7 @@
 #include "IProductKernels.hpp"
 #include "PhysDerivKernels.hpp"
 
-namespace Nektar
-{
-namespace MatrixFree
+namespace Nektar::MatrixFree
 {
 
 // As each opertor has seven shapes over three dimension to get to the
@@ -141,23 +139,17 @@ struct HelmholtzTemplate
 #if defined(SHAPE_DIMENSION_1D)
 
     // Non-size based operator.
-    void operator1D(const Array<OneD, const NekDouble> &input,
-                    Array<OneD, NekDouble> &output)
+    void operator1D([[maybe_unused]] const Array<OneD, const NekDouble> &input,
+                    [[maybe_unused]] Array<OneD, NekDouble> &output)
     {
-        boost::ignore_unused(input);
-        boost::ignore_unused(output);
-
         ASSERTL0(false, "HelmholtzTemplate::operator1D: Not Impelented.");
     }
 
     // Size based template version.
     template <int nm0, int nq0>
-    void operator1D(const Array<OneD, const NekDouble> &input,
-                    Array<OneD, NekDouble> &output)
+    void operator1D([[maybe_unused]] const Array<OneD, const NekDouble> &input,
+                    [[maybe_unused]] Array<OneD, NekDouble> &output)
     {
-        boost::ignore_unused(input);
-        boost::ignore_unused(output);
-
         ASSERTL0(false, "HelmholtzTemplate::operator1D: Not Impelented.");
     }
 
@@ -195,8 +187,8 @@ struct HelmholtzTemplate
         std::vector<vec_t, allocator<vec_t>> bwd(nqTot), deriv0(nqTot),
             deriv1(nqTot);
 
-        const vec_t *jac_ptr;
-        const vec_t *df_ptr;
+        const vec_t *jac_ptr = {};
+        const vec_t *df_ptr  = {};
 
         // Get size of derivative factor block
         auto dfSize = ndf;
@@ -239,17 +231,16 @@ struct HelmholtzTemplate
             DiffusionCoeff2DKernel<SHAPE_TYPE, DEFORMED>(
                 nq0, nq1, this->m_isConstVarDiff, this->m_constVarDiff,
                 this->m_isVarDiff, this->m_varD00, this->m_varD01,
-                this->m_varD11, df_ptr, this->m_h0, this->m_h1, bwd, deriv0,
-                deriv1);
+                this->m_varD11, df_ptr, this->m_h0, this->m_h1, deriv0, deriv1);
 
             // Step 4: Apply Laplacian metrics & inner product
             IProduct2DKernel<SHAPE_TYPE, false, true, DEFORMED>(
-                nm0, nm1, nq0, nq1, correct, bwd, this->m_dbdata[0],
+                nm0, nm1, nq0, nq1, correct, deriv0, this->m_dbdata[0],
                 this->m_bdata[1], this->m_w[0], this->m_w[1], jac_ptr, wsp0,
                 tmpOut);
 
             IProduct2DKernel<SHAPE_TYPE, false, true, DEFORMED>(
-                nm0, nm1, nq0, nq1, correct, deriv0, this->m_bdata[0],
+                nm0, nm1, nq0, nq1, correct, deriv1, this->m_bdata[0],
                 this->m_dbdata[1], this->m_w[0], this->m_w[1], jac_ptr, wsp0,
                 tmpOut);
 
@@ -288,8 +279,8 @@ struct HelmholtzTemplate
         std::vector<vec_t, allocator<vec_t>> bwd(nqTot), deriv0(nqTot),
             deriv1(nqTot);
 
-        const vec_t *jac_ptr;
-        const vec_t *df_ptr;
+        const vec_t *jac_ptr = {};
+        const vec_t *df_ptr  = {};
 
         // Get size of derivative factor block
         auto dfSize = ndf;
@@ -332,17 +323,16 @@ struct HelmholtzTemplate
             DiffusionCoeff2DKernel<SHAPE_TYPE, DEFORMED>(
                 nq0, nq1, this->m_isConstVarDiff, this->m_constVarDiff,
                 this->m_isVarDiff, this->m_varD00, this->m_varD01,
-                this->m_varD11, df_ptr, this->m_h0, this->m_h1, bwd, deriv0,
-                deriv1);
+                this->m_varD11, df_ptr, this->m_h0, this->m_h1, deriv0, deriv1);
 
             // Step 4: Apply Laplacian metrics & inner product
             IProduct2DKernel<SHAPE_TYPE, false, true, DEFORMED>(
-                nm0, nm1, nq0, nq1, correct, bwd, this->m_dbdata[0],
+                nm0, nm1, nq0, nq1, correct, deriv0, this->m_dbdata[0],
                 this->m_bdata[1], this->m_w[0], this->m_w[1], jac_ptr, wsp0,
                 tmpOut);
 
             IProduct2DKernel<SHAPE_TYPE, false, true, DEFORMED>(
-                nm0, nm1, nq0, nq1, correct, deriv0, this->m_bdata[0],
+                nm0, nm1, nq0, nq1, correct, deriv1, this->m_bdata[0],
                 this->m_dbdata[1], this->m_w[0], this->m_w[1], jac_ptr, wsp0,
                 tmpOut);
 
@@ -393,8 +383,8 @@ struct HelmholtzTemplate
         std::vector<vec_t, allocator<vec_t>> deriv0(nqTot), deriv1(nqTot),
             deriv2(nqTot);
 
-        const vec_t *jac_ptr;
-        const vec_t *df_ptr;
+        const vec_t *jac_ptr = {};
+        const vec_t *df_ptr  = {};
 
         // Get size of derivative factor block
         auto dfSize = ndf;
@@ -497,8 +487,8 @@ struct HelmholtzTemplate
         std::vector<vec_t, allocator<vec_t>> deriv0(nqTot), deriv1(nqTot),
             deriv2(nqTot);
 
-        const vec_t *jac_ptr;
-        const vec_t *df_ptr;
+        const vec_t *jac_ptr = {};
+        const vec_t *df_ptr  = {};
 
         // Get size of derivative factor block
         auto dfSize = ndf;
@@ -579,7 +569,6 @@ private:
     std::vector<vec_t, allocator<vec_t>> m_h0, m_h1, m_h2, m_h3;
 };
 
-} // namespace MatrixFree
-} // namespace Nektar
+} // namespace Nektar::MatrixFree
 
 #endif

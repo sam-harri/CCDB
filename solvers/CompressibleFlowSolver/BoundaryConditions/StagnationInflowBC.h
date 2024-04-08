@@ -54,11 +54,13 @@ public:
         const LibUtilities::SessionReaderSharedPtr &pSession,
         const Array<OneD, MultiRegions::ExpListSharedPtr> &pFields,
         const Array<OneD, Array<OneD, NekDouble>> &pTraceNormals,
+        const Array<OneD, Array<OneD, NekDouble>> &pGridVelocity,
         const int pSpaceDim, const int bcRegion, const int cnt)
     {
         CFSBndCondSharedPtr p =
             MemoryManager<StagnationInflowBC>::AllocateSharedPtr(
-                pSession, pFields, pTraceNormals, pSpaceDim, bcRegion, cnt);
+                pSession, pFields, pTraceNormals, pGridVelocity, pSpaceDim,
+                bcRegion, cnt);
         return p;
     }
 
@@ -66,18 +68,19 @@ public:
     static std::string className;
 
 protected:
-    virtual void v_Apply(Array<OneD, Array<OneD, NekDouble>> &Fwd,
-                         Array<OneD, Array<OneD, NekDouble>> &physarray,
-                         const NekDouble &time) override;
+    void v_Apply(Array<OneD, Array<OneD, NekDouble>> &Fwd,
+                 Array<OneD, Array<OneD, NekDouble>> &physarray,
+                 const NekDouble &time) override;
 
 private:
     StagnationInflowBC(
         const LibUtilities::SessionReaderSharedPtr &pSession,
         const Array<OneD, MultiRegions::ExpListSharedPtr> &pFields,
         const Array<OneD, Array<OneD, NekDouble>> &pTraceNormals,
+        const Array<OneD, Array<OneD, NekDouble>> &pGridVelocity,
         const int pSpaceDim, const int bcRegion, const int cnt);
 
-    virtual ~StagnationInflowBC(void){};
+    ~StagnationInflowBC(void) override{};
 
     // Field storage for StagnationInflowBC
     Array<OneD, Array<OneD, NekDouble>> m_fieldStorage;

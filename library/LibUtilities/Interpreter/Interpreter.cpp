@@ -36,34 +36,24 @@
 #include <LibUtilities/BasicUtils/Timer.h>
 #include <LibUtilities/Interpreter/Interpreter.h>
 
-#define BOOST_SPIRIT_THREADSAFE
 #include <boost/spirit/include/classic_assign_actor.hpp>
 #include <boost/spirit/include/classic_ast.hpp>
 #include <boost/spirit/include/classic_core.hpp>
 #include <boost/spirit/include/classic_push_back_actor.hpp>
 #include <boost/spirit/include/classic_symbols.hpp>
 
-#include <boost/random/mersenne_twister.hpp>
-#include <boost/random/normal_distribution.hpp>
-#include <boost/random/variate_generator.hpp>
-
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/math/special_functions/bessel.hpp>
 
 namespace bsp = boost::spirit::classic;
 
+#include <cmath>
 #include <map>
+#include <random>
 #include <string>
 #include <vector>
-#if defined(__INTEL_COMPILER)
-#include <mathimf.h>
-#else
-#include <cmath>
-#endif
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 // signum function
@@ -77,10 +67,10 @@ NekDouble sign(NekDouble arg)
 // purposes.
 NekDouble awgn(NekDouble sigma)
 {
-    boost::mt19937 rng;
-    boost::variate_generator<boost::mt19937 &, boost::normal_distribution<>>
-        _normal(rng, boost::normal_distribution<>(0, sigma));
-    return _normal();
+
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    return std::normal_distribution<>(0, sigma)(gen);
 }
 
 static NekDouble rad(NekDouble x, NekDouble y)
@@ -349,7 +339,7 @@ public:
     NekDouble GetConstant(std::string const &name)
     {
         NekDouble *value = find(m_constantsParser, name.c_str());
-        ASSERTL1(value != NULL, "Constant variable not found: " + name);
+        ASSERTL1(value != nullptr, "Constant variable not found: " + name);
         return *value;
     }
 
@@ -1152,7 +1142,7 @@ public:
         // constants_p.
         ~AnalyticExpression()
         {
-            constants_p = NULL;
+            constants_p = nullptr;
         }
 
         template <typename ScannerT> struct definition
@@ -1316,7 +1306,7 @@ private:
     Timer m_timer;
     NekDouble m_total_eval_time;
 
-    boost::mt19937 m_generator;
+    std::mt19937 m_generator;
 
     // ======================================================
     //  A map of (external) mathematical functions
@@ -1335,7 +1325,7 @@ private:
     typedef std::vector<NekDouble> &vr;
     typedef const std::vector<NekDouble> &cvr;
     typedef const int ci;
-    typedef boost::mt19937 &rgt;
+    typedef std::mt19937 &rgt;
 
     ///  Factory method which makes code little less messy
     template <typename StepType>
@@ -1413,12 +1403,14 @@ private:
             : EvaluationStep(rn, i, l, r, s, c, p, v)
         {
         }
-        virtual void run_many(ci n)
+        void run_many(ci n) override
         {
             for (int i = 0; i < n; i++)
+            {
                 state[storeIdx * n + i] = state[argIdx1];
+            }
         }
-        virtual void run_once()
+        void run_once() override
         {
             state[storeIdx] = state[argIdx1];
         }
@@ -1429,12 +1421,14 @@ private:
             : EvaluationStep(rn, i, l, r, s, c, p, v)
         {
         }
-        virtual void run_many(ci n)
+        void run_many(ci n) override
         {
             for (int i = 0; i < n; i++)
+            {
                 state[storeIdx * n + i] = consts[argIdx1];
+            }
         }
-        virtual void run_once()
+        void run_once() override
         {
             state[storeIdx] = consts[argIdx1];
         }
@@ -1445,12 +1439,14 @@ private:
             : EvaluationStep(rn, i, l, r, s, c, p, v)
         {
         }
-        virtual void run_many(ci n)
+        void run_many(ci n) override
         {
             for (int i = 0; i < n; i++)
+            {
                 state[storeIdx * n + i] = vars[argIdx1 * n + i];
+            }
         }
-        virtual void run_once()
+        void run_once() override
         {
             state[storeIdx] = vars[argIdx1];
         }
@@ -1461,12 +1457,14 @@ private:
             : EvaluationStep(rn, i, l, r, s, c, p, v)
         {
         }
-        virtual void run_many(ci n)
+        void run_many(ci n) override
         {
             for (int i = 0; i < n; i++)
+            {
                 state[storeIdx * n + i] = params[argIdx1];
+            }
         }
-        virtual void run_once()
+        void run_once() override
         {
             state[storeIdx] = params[argIdx1];
         }
@@ -1477,13 +1475,15 @@ private:
             : EvaluationStep(rn, i, l, r, s, c, p, v)
         {
         }
-        virtual void run_many(ci n)
+        void run_many(ci n) override
         {
             for (int i = 0; i < n; i++)
+            {
                 state[storeIdx * n + i] =
                     state[argIdx1 * n + i] + state[argIdx2 * n + i];
+            }
         }
-        virtual void run_once()
+        void run_once() override
         {
             state[storeIdx] = state[argIdx1] + state[argIdx2];
         }
@@ -1494,13 +1494,15 @@ private:
             : EvaluationStep(rn, i, l, r, s, c, p, v)
         {
         }
-        virtual void run_many(ci n)
+        void run_many(ci n) override
         {
             for (int i = 0; i < n; i++)
+            {
                 state[storeIdx * n + i] =
                     state[argIdx1 * n + i] - state[argIdx2 * n + i];
+            }
         }
-        virtual void run_once()
+        void run_once() override
         {
             state[storeIdx] = state[argIdx1] - state[argIdx2];
         }
@@ -1511,13 +1513,15 @@ private:
             : EvaluationStep(rn, i, l, r, s, c, p, v)
         {
         }
-        virtual void run_many(ci n)
+        void run_many(ci n) override
         {
             for (int i = 0; i < n; i++)
+            {
                 state[storeIdx * n + i] =
                     state[argIdx1 * n + i] * state[argIdx2 * n + i];
+            }
         }
-        virtual void run_once()
+        void run_once() override
         {
             state[storeIdx] = state[argIdx1] * state[argIdx2];
         }
@@ -1528,13 +1532,15 @@ private:
             : EvaluationStep(rn, i, l, r, s, c, p, v)
         {
         }
-        virtual void run_many(ci n)
+        void run_many(ci n) override
         {
             for (int i = 0; i < n; i++)
+            {
                 state[storeIdx * n + i] =
                     state[argIdx1 * n + i] / state[argIdx2 * n + i];
+            }
         }
-        virtual void run_once()
+        void run_once() override
         {
             state[storeIdx] = state[argIdx1] / state[argIdx2];
         }
@@ -1545,13 +1551,15 @@ private:
             : EvaluationStep(rn, i, l, r, s, c, p, v)
         {
         }
-        virtual void run_many(ci n)
+        void run_many(ci n) override
         {
             for (int i = 0; i < n; i++)
+            {
                 state[storeIdx * n + i] =
                     std::pow(state[argIdx1 * n + i], state[argIdx2 * n + i]);
+            }
         }
-        virtual void run_once()
+        void run_once() override
         {
             state[storeIdx] = std::pow(state[argIdx1], state[argIdx2]);
         }
@@ -1562,12 +1570,14 @@ private:
             : EvaluationStep(rn, i, l, r, s, c, p, v)
         {
         }
-        virtual void run_many(ci n)
+        void run_many(ci n) override
         {
             for (int i = 0; i < n; i++)
+            {
                 state[storeIdx * n + i] = -state[argIdx1 * n + i];
+            }
         }
-        virtual void run_once()
+        void run_once() override
         {
             state[storeIdx] = -state[argIdx1];
         }
@@ -1578,13 +1588,15 @@ private:
             : EvaluationStep(rn, i, l, r, s, c, p, v)
         {
         }
-        virtual void run_many(ci n)
+        void run_many(ci n) override
         {
             for (int i = 0; i < n; i++)
+            {
                 state[storeIdx * n + i] =
                     (state[argIdx1 * n + i] == state[argIdx2 * n + i]);
+            }
         }
-        virtual void run_once()
+        void run_once() override
         {
             state[storeIdx] = (state[argIdx1] == state[argIdx2]);
         }
@@ -1595,13 +1607,15 @@ private:
             : EvaluationStep(rn, i, l, r, s, c, p, v)
         {
         }
-        virtual void run_many(ci n)
+        void run_many(ci n) override
         {
             for (int i = 0; i < n; i++)
+            {
                 state[storeIdx * n + i] =
                     (state[argIdx1 * n + i] <= state[argIdx2 * n + i]);
+            }
         }
-        virtual void run_once()
+        void run_once() override
         {
             state[storeIdx] = (state[argIdx1] <= state[argIdx2]);
         }
@@ -1612,13 +1626,15 @@ private:
             : EvaluationStep(rn, i, l, r, s, c, p, v)
         {
         }
-        virtual void run_many(ci n)
+        void run_many(ci n) override
         {
             for (int i = 0; i < n; i++)
+            {
                 state[storeIdx * n + i] =
                     (state[argIdx1 * n + i] < state[argIdx2 * n + i]);
+            }
         }
-        virtual void run_once()
+        void run_once() override
         {
             state[storeIdx] = (state[argIdx1] < state[argIdx2]);
         }
@@ -1629,13 +1645,15 @@ private:
             : EvaluationStep(rn, i, l, r, s, c, p, v)
         {
         }
-        virtual void run_many(ci n)
+        void run_many(ci n) override
         {
             for (int i = 0; i < n; i++)
+            {
                 state[storeIdx * n + i] =
                     (state[argIdx1 * n + i] >= state[argIdx2 * n + i]);
+            }
         }
-        virtual void run_once()
+        void run_once() override
         {
             state[storeIdx] = (state[argIdx1] >= state[argIdx2]);
         }
@@ -1646,13 +1664,15 @@ private:
             : EvaluationStep(rn, i, l, r, s, c, p, v)
         {
         }
-        virtual void run_many(ci n)
+        void run_many(ci n) override
         {
             for (int i = 0; i < n; i++)
+            {
                 state[storeIdx * n + i] =
                     (state[argIdx1 * n + i] > state[argIdx2 * n + i]);
+            }
         }
-        virtual void run_once()
+        void run_once() override
         {
             state[storeIdx] = (state[argIdx1] > state[argIdx2]);
         }
@@ -1663,13 +1683,15 @@ private:
             : EvaluationStep(rn, i, l, r, s, c, p, v)
         {
         }
-        virtual void run_many(ci n)
+        void run_many(ci n) override
         {
             for (int i = 0; i < n; i++)
+            {
                 state[storeIdx * n + i] =
                     std::fmod(state[argIdx1 * n + i], state[argIdx2 * n + i]);
+            }
         }
-        virtual void run_once()
+        void run_once() override
         {
             state[storeIdx] = std::fmod(state[argIdx1], state[argIdx2]);
         }
@@ -1680,12 +1702,14 @@ private:
             : EvaluationStep(rn, i, l, r, s, c, p, v)
         {
         }
-        virtual void run_many(ci n)
+        void run_many(ci n) override
         {
             for (int i = 0; i < n; i++)
+            {
                 state[storeIdx * n + i] = std::abs(state[argIdx1 * n + i]);
+            }
         }
-        virtual void run_once()
+        void run_once() override
         {
             state[storeIdx] = std::abs(state[argIdx1]);
         }
@@ -1696,13 +1720,15 @@ private:
             : EvaluationStep(rn, i, l, r, s, c, p, v)
         {
         }
-        virtual void run_many(ci n)
+        void run_many(ci n) override
         {
             for (int i = 0; i < n; i++)
+            {
                 state[storeIdx * n + i] = ((state[argIdx1 * n + i] > 0.0) -
                                            (state[argIdx1 * n + i] < 0.0));
+            }
         }
-        virtual void run_once()
+        void run_once() override
         {
             state[storeIdx] = ((state[argIdx1] > 0.0) - (state[argIdx1] < 0.0));
         }
@@ -1713,12 +1739,14 @@ private:
             : EvaluationStep(rn, i, l, r, s, c, p, v)
         {
         }
-        virtual void run_many(ci n)
+        void run_many(ci n) override
         {
             for (int i = 0; i < n; i++)
+            {
                 state[storeIdx * n + i] = std::asin(state[argIdx1 * n + i]);
+            }
         }
-        virtual void run_once()
+        void run_once() override
         {
             state[storeIdx] = std::asin(state[argIdx1]);
         }
@@ -1729,12 +1757,14 @@ private:
             : EvaluationStep(rn, i, l, r, s, c, p, v)
         {
         }
-        virtual void run_many(ci n)
+        void run_many(ci n) override
         {
             for (int i = 0; i < n; i++)
+            {
                 state[storeIdx * n + i] = std::acos(state[argIdx1 * n + i]);
+            }
         }
-        virtual void run_once()
+        void run_once() override
         {
             state[storeIdx] = std::acos(state[argIdx1]);
         }
@@ -1745,12 +1775,14 @@ private:
             : EvaluationStep(rn, i, l, r, s, c, p, v)
         {
         }
-        virtual void run_many(ci n)
+        void run_many(ci n) override
         {
             for (int i = 0; i < n; i++)
+            {
                 state[storeIdx * n + i] = std::atan(state[argIdx1 * n + i]);
+            }
         }
-        virtual void run_once()
+        void run_once() override
         {
             state[storeIdx] = std::atan(state[argIdx1]);
         }
@@ -1761,13 +1793,15 @@ private:
             : EvaluationStep(rn, i, l, r, s, c, p, v)
         {
         }
-        virtual void run_many(ci n)
+        void run_many(ci n) override
         {
             for (int i = 0; i < n; i++)
+            {
                 state[storeIdx * n + i] =
                     std::atan2(state[argIdx1 * n + i], state[argIdx2 * n + i]);
+            }
         }
-        virtual void run_once()
+        void run_once() override
         {
             state[storeIdx] = std::atan2(state[argIdx1], state[argIdx2]);
         }
@@ -1778,13 +1812,15 @@ private:
             : EvaluationStep(rn, i, l, r, s, c, p, v)
         {
         }
-        virtual void run_many(ci n)
+        void run_many(ci n) override
         {
             for (int i = 0; i < n; i++)
+            {
                 state[storeIdx * n + i] =
                     ang(state[argIdx1 * n + i], state[argIdx2 * n + i]);
+            }
         }
-        virtual void run_once()
+        void run_once() override
         {
             state[storeIdx] = ang(state[argIdx1], state[argIdx2]);
         }
@@ -1795,13 +1831,15 @@ private:
             : EvaluationStep(rn, i, l, r, s, c, p, v)
         {
         }
-        virtual void run_many(ci n)
+        void run_many(ci n) override
         {
             for (int i = 0; i < n; i++)
+            {
                 state[storeIdx * n + i] = boost::math::cyl_bessel_j(
                     state[argIdx1 * n + i], state[argIdx2 * n + i]);
+            }
         }
-        virtual void run_once()
+        void run_once() override
         {
             state[storeIdx] =
                 boost::math::cyl_bessel_j(state[argIdx1], state[argIdx2]);
@@ -1813,12 +1851,14 @@ private:
             : EvaluationStep(rn, i, l, r, s, c, p, v)
         {
         }
-        virtual void run_many(ci n)
+        void run_many(ci n) override
         {
             for (int i = 0; i < n; i++)
+            {
                 state[storeIdx * n + i] = std::ceil(state[argIdx1 * n + i]);
+            }
         }
-        virtual void run_once()
+        void run_once() override
         {
             state[storeIdx] = std::ceil(state[argIdx1]);
         }
@@ -1829,12 +1869,14 @@ private:
             : EvaluationStep(rn, i, l, r, s, c, p, v)
         {
         }
-        virtual void run_many(ci n)
+        void run_many(ci n) override
         {
             for (int i = 0; i < n; i++)
+            {
                 state[storeIdx * n + i] = std::cos(state[argIdx1 * n + i]);
+            }
         }
-        virtual void run_once()
+        void run_once() override
         {
             state[storeIdx] = std::cos(state[argIdx1]);
         }
@@ -1845,12 +1887,14 @@ private:
             : EvaluationStep(rn, i, l, r, s, c, p, v)
         {
         }
-        virtual void run_many(ci n)
+        void run_many(ci n) override
         {
             for (int i = 0; i < n; i++)
+            {
                 state[storeIdx * n + i] = std::cosh(state[argIdx1 * n + i]);
+            }
         }
-        virtual void run_once()
+        void run_once() override
         {
             state[storeIdx] = std::cosh(state[argIdx1]);
         }
@@ -1861,12 +1905,14 @@ private:
             : EvaluationStep(rn, i, l, r, s, c, p, v)
         {
         }
-        virtual void run_many(ci n)
+        void run_many(ci n) override
         {
             for (int i = 0; i < n; i++)
+            {
                 state[storeIdx * n + i] = std::exp(state[argIdx1 * n + i]);
+            }
         }
-        virtual void run_once()
+        void run_once() override
         {
             state[storeIdx] = std::exp(state[argIdx1]);
         }
@@ -1877,12 +1923,14 @@ private:
             : EvaluationStep(rn, i, l, r, s, c, p, v)
         {
         }
-        virtual void run_many(ci n)
+        void run_many(ci n) override
         {
             for (int i = 0; i < n; i++)
+            {
                 state[storeIdx * n + i] = std::fabs(state[argIdx1 * n + i]);
+            }
         }
-        virtual void run_once()
+        void run_once() override
         {
             state[storeIdx] = std::fabs(state[argIdx1]);
         }
@@ -1893,12 +1941,14 @@ private:
             : EvaluationStep(rn, i, l, r, s, c, p, v)
         {
         }
-        virtual void run_many(ci n)
+        void run_many(ci n) override
         {
             for (int i = 0; i < n; i++)
+            {
                 state[storeIdx * n + i] = std::floor(state[argIdx1 * n + i]);
+            }
         }
-        virtual void run_once()
+        void run_once() override
         {
             state[storeIdx] = std::floor(state[argIdx1]);
         }
@@ -1909,13 +1959,15 @@ private:
             : EvaluationStep(rn, i, l, r, s, c, p, v)
         {
         }
-        virtual void run_many(ci n)
+        void run_many(ci n) override
         {
             for (int i = 0; i < n; i++)
+            {
                 state[storeIdx * n + i] =
                     fmod(state[argIdx1 * n + i], state[argIdx2 * n + i]);
+            }
         }
-        virtual void run_once()
+        void run_once() override
         {
             state[storeIdx] = fmod(state[argIdx1], state[argIdx2]);
         }
@@ -1926,12 +1978,14 @@ private:
             : EvaluationStep(rn, i, l, r, s, c, p, v)
         {
         }
-        virtual void run_many(ci n)
+        void run_many(ci n) override
         {
             for (int i = 0; i < n; i++)
+            {
                 state[storeIdx * n + i] = std::log(state[argIdx1 * n + i]);
+            }
         }
-        virtual void run_once()
+        void run_once() override
         {
             state[storeIdx] = std::log(state[argIdx1]);
         }
@@ -1942,12 +1996,14 @@ private:
             : EvaluationStep(rn, i, l, r, s, c, p, v)
         {
         }
-        virtual void run_many(ci n)
+        void run_many(ci n) override
         {
             for (int i = 0; i < n; i++)
+            {
                 state[storeIdx * n + i] = std::log10(state[argIdx1 * n + i]);
+            }
         }
-        virtual void run_once()
+        void run_once() override
         {
             state[storeIdx] = std::log10(state[argIdx1]);
         }
@@ -1958,13 +2014,15 @@ private:
             : EvaluationStep(rn, i, l, r, s, c, p, v)
         {
         }
-        virtual void run_many(ci n)
+        void run_many(ci n) override
         {
             for (int i = 0; i < n; i++)
+            {
                 state[storeIdx * n + i] =
                     fmax(state[argIdx1 * n + i], state[argIdx2 * n + i]);
+            }
         }
-        virtual void run_once()
+        void run_once() override
         {
             state[storeIdx] = fmax(state[argIdx1], state[argIdx2]);
         }
@@ -1975,13 +2033,15 @@ private:
             : EvaluationStep(rn, i, l, r, s, c, p, v)
         {
         }
-        virtual void run_many(ci n)
+        void run_many(ci n) override
         {
             for (int i = 0; i < n; i++)
+            {
                 state[storeIdx * n + i] =
                     fmin(state[argIdx1 * n + i], state[argIdx2 * n + i]);
+            }
         }
-        virtual void run_once()
+        void run_once() override
         {
             state[storeIdx] = fmin(state[argIdx1], state[argIdx2]);
         }
@@ -1992,13 +2052,15 @@ private:
             : EvaluationStep(rn, i, l, r, s, c, p, v)
         {
         }
-        virtual void run_many(ci n)
+        void run_many(ci n) override
         {
             for (int i = 0; i < n; i++)
+            {
                 state[storeIdx * n + i] =
                     rad(state[argIdx1 * n + i], state[argIdx2 * n + i]);
+            }
         }
-        virtual void run_once()
+        void run_once() override
         {
             state[storeIdx] = rad(state[argIdx1], state[argIdx2]);
         }
@@ -2009,12 +2071,14 @@ private:
             : EvaluationStep(rn, i, l, r, s, c, p, v)
         {
         }
-        virtual void run_many(ci n)
+        void run_many(ci n) override
         {
             for (int i = 0; i < n; i++)
+            {
                 state[storeIdx * n + i] = std::sin(state[argIdx1 * n + i]);
+            }
         }
-        virtual void run_once()
+        void run_once() override
         {
             state[storeIdx] = std::sin(state[argIdx1]);
         }
@@ -2025,12 +2089,14 @@ private:
             : EvaluationStep(rn, i, l, r, s, c, p, v)
         {
         }
-        virtual void run_many(ci n)
+        void run_many(ci n) override
         {
             for (int i = 0; i < n; i++)
+            {
                 state[storeIdx * n + i] = std::sinh(state[argIdx1 * n + i]);
+            }
         }
-        virtual void run_once()
+        void run_once() override
         {
             state[storeIdx] = std::sinh(state[argIdx1]);
         }
@@ -2041,12 +2107,14 @@ private:
             : EvaluationStep(rn, i, l, r, s, c, p, v)
         {
         }
-        virtual void run_many(ci n)
+        void run_many(ci n) override
         {
             for (int i = 0; i < n; i++)
+            {
                 state[storeIdx * n + i] = std::sqrt(state[argIdx1 * n + i]);
+            }
         }
-        virtual void run_once()
+        void run_once() override
         {
             state[storeIdx] = std::sqrt(state[argIdx1]);
         }
@@ -2057,12 +2125,14 @@ private:
             : EvaluationStep(rn, i, l, r, s, c, p, v)
         {
         }
-        virtual void run_many(ci n)
+        void run_many(ci n) override
         {
             for (int i = 0; i < n; i++)
+            {
                 state[storeIdx * n + i] = std::tan(state[argIdx1 * n + i]);
+            }
         }
-        virtual void run_once()
+        void run_once() override
         {
             state[storeIdx] = std::tan(state[argIdx1]);
         }
@@ -2073,12 +2143,14 @@ private:
             : EvaluationStep(rn, i, l, r, s, c, p, v)
         {
         }
-        virtual void run_many(ci n)
+        void run_many(ci n) override
         {
             for (int i = 0; i < n; i++)
+            {
                 state[storeIdx * n + i] = std::tanh(state[argIdx1 * n + i]);
+            }
         }
-        virtual void run_once()
+        void run_once() override
         {
             state[storeIdx] = std::tanh(state[argIdx1]);
         }
@@ -2089,25 +2161,20 @@ private:
             : EvaluationStep(rn, i, l, r, s, c, p, v)
         {
         }
-        virtual void run_many(ci n)
+        void run_many(ci n) override
         {
             // assuming the argument to AWGN does not depend on spatial
             // variables =>
-            boost::variate_generator<boost::mt19937 &,
-                                     boost::normal_distribution<>>
-                _normal(rng,
-                        boost::normal_distribution<>(0, state[storeIdx * n]));
+            std::normal_distribution<> _normal(0, state[storeIdx * n]);
             for (int i = 0; i < n; i++)
             {
-                state[storeIdx * n + i] = _normal();
+                state[storeIdx * n + i] = _normal(rng);
             }
         }
-        virtual void run_once()
+        void run_once() override
         {
-            boost::variate_generator<boost::mt19937 &,
-                                     boost::normal_distribution<>>
-                _normal(rng, boost::normal_distribution<>(0, state[storeIdx]));
-            state[storeIdx] = _normal();
+            std::normal_distribution<> _normal(0, state[storeIdx]);
+            state[storeIdx] = _normal(rng);
         }
     };
 };
@@ -2214,5 +2281,4 @@ void Interpreter::Evaluate(
     m_impl->Evaluate(expression_id, points, result);
 }
 
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities

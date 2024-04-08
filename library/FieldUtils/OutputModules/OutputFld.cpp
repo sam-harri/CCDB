@@ -36,16 +36,13 @@
 #include <string>
 using namespace std;
 
-#include <boost/core/ignore_unused.hpp>
 #include <boost/format.hpp>
 
-#include <LibUtilities/BasicUtils/FileSystem.h>
+#include <LibUtilities/BasicUtils/Filesystem.hpp>
 
 #include "OutputFld.h"
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 ModuleKey OutputFld::m_className[2] = {
@@ -67,15 +64,13 @@ OutputFld::~OutputFld()
 {
 }
 
-void OutputFld::v_OutputFromPts(po::variables_map &vm)
+void OutputFld::v_OutputFromPts([[maybe_unused]] po::variables_map &vm)
 {
-    boost::ignore_unused(vm);
     NEKERROR(ErrorUtil::efatal, "OutputFld can't write using Pts information.");
 }
 
-void OutputFld::v_OutputFromExp(po::variables_map &vm)
+void OutputFld::v_OutputFromExp([[maybe_unused]] po::variables_map &vm)
 {
-    boost::ignore_unused(vm);
     ASSERTL0(m_f->m_variables.size(), "OutputFld: need input data.")
 
     // Extract the output filename and extension
@@ -124,10 +119,8 @@ void OutputFld::v_OutputFromExp(po::variables_map &vm)
     }
 }
 
-void OutputFld::v_OutputFromData(po::variables_map &vm)
+void OutputFld::v_OutputFromData([[maybe_unused]] po::variables_map &vm)
 {
-    boost::ignore_unused(vm);
-
     // Extract the output filename and extension
     string filename = m_config["outfile"].as<string>();
     // Set up FieldIO object.
@@ -138,17 +131,15 @@ void OutputFld::v_OutputFromData(po::variables_map &vm)
     fld->Write(filename, m_f->m_fielddef, m_f->m_data, m_f->m_fieldMetaDataMap);
 }
 
-fs::path OutputFld::v_GetPath(std::string &filename, po::variables_map &vm)
+fs::path OutputFld::v_GetPath(std::string &filename,
+                              [[maybe_unused]] po::variables_map &vm)
 {
-    boost::ignore_unused(vm);
     return fs::path(filename);
 }
 
 fs::path OutputFld::v_GetFullOutName(std::string &filename,
-                                     po::variables_map &vm)
+                                     [[maybe_unused]] po::variables_map &vm)
 {
-    boost::ignore_unused(vm);
-
     int nprocs = m_f->m_comm->GetSpaceComm()->GetSize();
     fs::path specPath(filename), fulloutname;
     if (nprocs == 1)
@@ -190,5 +181,4 @@ std::string OutputFld::GetIOFormat()
     return iofmt;
 }
 
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

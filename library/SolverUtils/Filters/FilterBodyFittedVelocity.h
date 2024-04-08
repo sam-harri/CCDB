@@ -39,9 +39,7 @@
 
 #include <SolverUtils/Filters/FilterFieldConvert.h>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 class FilterBodyFittedVelocity : public FilterFieldConvert
 {
@@ -51,7 +49,7 @@ public:
     /// Creates an instance of this class
     static FilterSharedPtr create(
         const LibUtilities::SessionReaderSharedPtr &pSession,
-        const std::weak_ptr<EquationSystem> &pEquation,
+        const std::shared_ptr<EquationSystem> &pEquation,
         const std::map<std::string, std::string> &pParams)
     {
         FilterSharedPtr p =
@@ -65,9 +63,9 @@ public:
 
     SOLVER_UTILS_EXPORT FilterBodyFittedVelocity(
         const LibUtilities::SessionReaderSharedPtr &pSession,
-        const std::weak_ptr<EquationSystem> &pEquation,
+        const std::shared_ptr<EquationSystem> &pEquation,
         const ParamMap &pParams);
-    SOLVER_UTILS_EXPORT virtual ~FilterBodyFittedVelocity();
+    SOLVER_UTILS_EXPORT ~FilterBodyFittedVelocity() override;
 
 protected:
     // Enumerate types as flags
@@ -103,20 +101,21 @@ protected:
     std::vector<Array<OneD, NekDouble>> m_curFieldsThermalVars;
     std::vector<Array<OneD, NekDouble>> m_outFieldsThermalVars;
 
-    virtual void v_Initialise(
+    void v_Initialise(
         const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
-        const NekDouble &time);
-    virtual void v_FillVariablesName(
-        const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields);
-    virtual void v_ProcessSample(
+        const NekDouble &time) override;
+    void v_FillVariablesName(
+        const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields)
+        override;
+    void v_ProcessSample(
         const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
         std::vector<Array<OneD, NekDouble>> &fieldcoeffs,
-        const NekDouble &time);
-    virtual void v_PrepareOutput(
+        const NekDouble &time) override;
+    void v_PrepareOutput(
         const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
-        const NekDouble &time);
-    virtual NekDouble v_GetScale();
-    virtual std::string v_GetFileSuffix()
+        const NekDouble &time) override;
+    NekDouble v_GetScale() override;
+    std::string v_GetFileSuffix() override
     {
         if (m_filterType == eMax)
         {
@@ -135,7 +134,6 @@ protected:
 private:
     bool m_initialized;
 };
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils
 
 #endif /* NEKTAR_SOLVERUTILS_FILTERS_FILTERCHECKPOINT_H */

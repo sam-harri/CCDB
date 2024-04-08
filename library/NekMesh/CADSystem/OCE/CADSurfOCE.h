@@ -38,9 +38,7 @@
 #include <NekMesh/CADSystem/CADSurf.h>
 #include <NekMesh/CADSystem/OCE/OpenCascade.h>
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 class CADSurfOCE : public CADSurf
@@ -57,34 +55,34 @@ public:
     {
     }
 
-    ~CADSurfOCE()
+    ~CADSurfOCE() override
     {
     }
 
     void Initialise(int i, TopoDS_Shape in);
 
-    virtual Array<OneD, NekDouble> GetBounds();
-    virtual void GetBounds(NekDouble &umin, NekDouble &umax, NekDouble &vmin,
-                           NekDouble &vmax);
-    virtual Array<OneD, NekDouble> N(Array<OneD, NekDouble> uv);
-    virtual Array<OneD, NekDouble> D1(Array<OneD, NekDouble> uv);
-    virtual Array<OneD, NekDouble> D2(Array<OneD, NekDouble> uv);
-    virtual Array<OneD, NekDouble> P(Array<OneD, NekDouble> uv);
-    virtual void P(Array<OneD, NekDouble> uv, NekDouble &x, NekDouble &y,
-                   NekDouble &z);
-    virtual Array<OneD, NekDouble> locuv(Array<OneD, NekDouble> p,
-                                         NekDouble &dist);
-    virtual NekDouble Curvature(Array<OneD, NekDouble> uv);
-    virtual Array<OneD, NekDouble> BoundingBox();
-    virtual bool IsPlanar();
+    std::array<NekDouble, 4> GetBounds() override;
+    void GetBounds(NekDouble &umin, NekDouble &umax, NekDouble &vmin,
+                   NekDouble &vmax) override;
+    std::array<NekDouble, 3> N(std::array<NekDouble, 2> uv) override;
+    std::array<NekDouble, 9> D1(std::array<NekDouble, 2> uv) override;
+    std::array<NekDouble, 18> D2(std::array<NekDouble, 2> uv) override;
+    std::array<NekDouble, 3> P(std::array<NekDouble, 2> uv) override;
+    void P(std::array<NekDouble, 2> uv, NekDouble &x, NekDouble &y,
+           NekDouble &z) override;
+    std::array<NekDouble, 2> locuv(std::array<NekDouble, 3> p,
+                                   NekDouble &dist) override;
+    NekDouble Curvature(std::array<NekDouble, 2> uv) override;
+    std::array<NekDouble, 6> BoundingBox() override;
+    bool IsPlanar() override;
 
 private:
     /// Function which tests the the value of uv used is within the surface
-    void Test(Array<OneD, NekDouble> uv);
+    void Test(std::array<NekDouble, 2> uv) override;
     /// OpenCascade object for surface.
     Handle(Geom_Surface) m_s;
     /// parametric bounds
-    Array<OneD, NekDouble> m_bounds;
+    std::array<NekDouble, 4> m_bounds;
     /// locuv object (stored because it gets faster with stored information)
     ShapeAnalysis_Surface *m_sas;
     /// original shape
@@ -95,7 +93,6 @@ private:
     bool m_isTransfiniteSurf;
 };
 
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh
 
 #endif

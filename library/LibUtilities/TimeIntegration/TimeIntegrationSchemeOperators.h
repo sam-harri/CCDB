@@ -37,8 +37,6 @@
 
 #include <string>
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/BasicConst/NektarUnivTypeDefs.hpp>
 #include <LibUtilities/BasicUtils/ErrorUtil.hpp>
 #include <LibUtilities/BasicUtils/NekFactory.hpp>
@@ -49,9 +47,7 @@
 
 #define LUE LIB_UTILITIES_EXPORT
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 class TimeIntegrationSchemeOperators;
@@ -140,7 +136,6 @@ protected:
 private:
 };
 
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities
 
 #endif

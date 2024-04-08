@@ -34,23 +34,19 @@
 
 #include <iomanip>
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <SolverUtils/Filters/FilterEnergy.h>
 #include <SolverUtils/Filters/FilterInterfaces.hpp>
 
 using namespace std;
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 std::string FilterEnergy::className =
     SolverUtils::GetFilterFactory().RegisterCreatorFunction(
         "Energy", FilterEnergy::create);
 
 FilterEnergy::FilterEnergy(const LibUtilities::SessionReaderSharedPtr &pSession,
-                           const std::weak_ptr<EquationSystem> &pEquation,
+                           const std::shared_ptr<EquationSystem> &pEquation,
                            const ParamMap &pParams)
     : Filter(pSession, pEquation), m_index(-1), m_homogeneous(false), m_planes()
 {
@@ -263,10 +259,10 @@ void FilterEnergy::v_Update(
 }
 
 void FilterEnergy::v_Finalise(
-    const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
-    const NekDouble &time)
+    [[maybe_unused]] const Array<OneD, const MultiRegions::ExpListSharedPtr>
+        &pFields,
+    [[maybe_unused]] const NekDouble &time)
 {
-    boost::ignore_unused(pFields, time);
     m_outFile.close();
 }
 
@@ -275,5 +271,4 @@ bool FilterEnergy::v_IsTimeDependent()
     return true;
 }
 
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils

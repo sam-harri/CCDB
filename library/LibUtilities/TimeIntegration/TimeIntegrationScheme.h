@@ -40,8 +40,6 @@
 
 #include <string>
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/BasicConst/NektarUnivTypeDefs.hpp>
 #include <LibUtilities/BasicUtils/ErrorUtil.hpp>
 #include <LibUtilities/BasicUtils/NekFactory.hpp>
@@ -53,9 +51,7 @@
 
 #define LUE LIB_UTILITIES_EXPORT
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 /// Datatype of the NekFactory used to instantiate classes derived from the
@@ -209,16 +205,10 @@ protected:
 
     // These methods should never be used directly, only used by child classes.
     LUE TimeIntegrationScheme(std::string variant, size_t order,
-                              std::vector<NekDouble> freeParams)
-    {
-        boost::ignore_unused(variant, order, freeParams);
-    }
+                              std::vector<NekDouble> freeParams);
 
     LUE TimeIntegrationScheme(const TimeIntegrationScheme &in) = delete;
-
-    virtual ~TimeIntegrationScheme()
-    {
-    }
+    virtual ~TimeIntegrationScheme()                           = default;
 
 }; // end class TimeIntegrationScheme
 
@@ -227,7 +217,6 @@ LUE std::ostream &operator<<(std::ostream &os,
 LUE std::ostream &operator<<(std::ostream &os,
                              const TimeIntegrationSchemeSharedPtr &rhs);
 
-} // end of namespace LibUtilities
-} // end of namespace Nektar
+} // namespace Nektar::LibUtilities
 
 #endif

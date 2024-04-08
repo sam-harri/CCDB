@@ -32,13 +32,9 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <SolverUtils/Advection/AdvectionNonConservative.h>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 std::string AdvectionNonConservative::type =
     GetAdvectionFactory().RegisterCreatorFunction(
@@ -71,12 +67,11 @@ void AdvectionNonConservative::v_Advect(
     const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
     const Array<OneD, Array<OneD, NekDouble>> &advVel,
     const Array<OneD, Array<OneD, NekDouble>> &inarray,
-    Array<OneD, Array<OneD, NekDouble>> &outarray, const NekDouble &time,
-    const Array<OneD, Array<OneD, NekDouble>> &pFwd,
-    const Array<OneD, Array<OneD, NekDouble>> &pBwd)
+    Array<OneD, Array<OneD, NekDouble>> &outarray,
+    [[maybe_unused]] const NekDouble &time,
+    [[maybe_unused]] const Array<OneD, Array<OneD, NekDouble>> &pFwd,
+    [[maybe_unused]] const Array<OneD, Array<OneD, NekDouble>> &pBwd)
 {
-    boost::ignore_unused(time, pFwd, pBwd);
-
     int nDim       = advVel.size();
     int nPointsTot = fields[0]->GetNpoints();
     Array<OneD, NekDouble> grad0, grad1, grad2;
@@ -130,5 +125,4 @@ void AdvectionNonConservative::v_Advect(
         }
     }
 }
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils

@@ -33,14 +33,11 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <LibUtilities/BasicUtils/Timer.h>
 #include <LibUtilities/LinearAlgebra/NekLinSysIterCG.h>
 
 using namespace std;
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 /**
  * @class  NekLinSysIterCG
@@ -65,22 +62,14 @@ void NekLinSysIterCG::v_InitObject()
     NekLinSysIter::v_InitObject();
 }
 
-NekLinSysIterCG::~NekLinSysIterCG()
-{
-}
-
 /**
  *
  */
 int NekLinSysIterCG::v_SolveSystem(const int nGlobal,
                                    const Array<OneD, const NekDouble> &pInput,
                                    Array<OneD, NekDouble> &pOutput,
-                                   const int nDir, const NekDouble tol,
-                                   const NekDouble factor)
+                                   const int nDir)
 {
-    m_tolerance   = max(tol, 1.0E-16);
-    m_prec_factor = factor;
-
     DoConjugateGradient(nGlobal, pInput, pOutput, nDir);
 
     return m_totalIterations;
@@ -139,19 +128,18 @@ void NekLinSysIterCG::DoConjugateGradient(
 
     if (m_rhs_magnitude == NekConstants::kNekUnsetDouble)
     {
-        NekVector<NekDouble> inGlob(nGlobal, pInput, eWrapper);
-        Set_Rhs_Magnitude(inGlob);
+        Set_Rhs_Magnitude(pInput);
     }
 
     m_totalIterations = 0;
 
     // If input residual is less than tolerance skip solve.
-    if (eps < m_tolerance * m_tolerance * m_rhs_magnitude)
+    if (eps < m_NekLinSysTolerance * m_NekLinSysTolerance * m_rhs_magnitude)
     {
         if (m_verbose && m_root)
         {
             cout << "CG iterations made = " << m_totalIterations
-                 << " using tolerance of " << m_tolerance
+                 << " using tolerance of " << m_NekLinSysTolerance
                  << " (error = " << sqrt(eps / m_rhs_magnitude)
                  << ", rhs_mag = " << sqrt(m_rhs_magnitude) << ")" << endl;
         }
@@ -159,11 +147,9 @@ void NekLinSysIterCG::DoConjugateGradient(
     }
 
     m_operator.DoNekSysPrecon(r_A, tmp = w_A + nDir);
-
     m_operator.DoNekSysLhsEval(w_A, s_A);
 
     vExchange[0] = Vmath::Dot2(nNonDir, r_A, w_A + nDir, m_map + nDir);
-
     vExchange[1] = Vmath::Dot2(nNonDir, s_A + nDir, w_A + nDir, m_map + nDir);
 
     m_rowComm->AllReduce(vExchange, Nektar::LibUtilities::ReduceSum);
@@ -177,12 +163,12 @@ void NekLinSysIterCG::DoConjugateGradient(
     // Continue until convergence
     while (true)
     {
-        if (m_totalIterations > m_maxiter)
+        if (m_totalIterations > m_NekLinSysMaxIterations)
         {
             if (m_root)
             {
                 cout << "CG iterations made = " << m_totalIterations
-                     << " using tolerance of " << m_tolerance
+                     << " using tolerance of " << m_NekLinSysTolerance
                      << " (error = " << sqrt(eps / m_rhs_magnitude)
                      << ", rhs_mag = " << sqrt(m_rhs_magnitude) << ")" << endl;
             }
@@ -227,12 +213,12 @@ void NekLinSysIterCG::DoConjugateGradient(
         m_totalIterations++;
 
         // Test if norm is within tolerance
-        if (eps < m_tolerance * m_tolerance * m_rhs_magnitude)
+        if (eps < m_NekLinSysTolerance * m_NekLinSysTolerance * m_rhs_magnitude)
         {
             if (m_verbose && m_root)
             {
                 cout << "CG iterations made = " << m_totalIterations
-                     << " using tolerance of " << m_tolerance
+                     << " using tolerance of " << m_NekLinSysTolerance
                      << " (error = " << sqrt(eps / m_rhs_magnitude)
                      << ", rhs_mag = " << sqrt(m_rhs_magnitude) << ")" << endl;
             }
@@ -245,5 +231,4 @@ void NekLinSysIterCG::DoConjugateGradient(
         rho   = rho_new;
     }
 }
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities

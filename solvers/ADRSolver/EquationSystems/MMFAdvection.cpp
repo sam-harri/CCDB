@@ -36,7 +36,6 @@
 #include <iostream>
 
 #include <boost/algorithm/string.hpp>
-#include <boost/core/ignore_unused.hpp>
 
 #include <ADRSolver/EquationSystems/MMFAdvection.h>
 #include <LibUtilities/BasicUtils/Timer.h>
@@ -53,7 +52,6 @@ MMFAdvection::MMFAdvection(const LibUtilities::SessionReaderSharedPtr &pSession,
     : UnsteadySystem(pSession, pGraph), MMFSystem(pSession, pGraph),
       AdvectionSystem(pSession, pGraph)
 {
-    m_planeNumber = 0;
 }
 
 /**
@@ -195,16 +193,9 @@ void MMFAdvection::v_InitObject(bool DeclareFields)
     }
 }
 
-/**
- * @brief Unsteady linear advection equation destructor.
- */
-MMFAdvection::~MMFAdvection()
-{
-}
-
 void MMFAdvection::v_DoSolve()
 {
-    ASSERTL0(m_intScheme != 0, "No time integration scheme.");
+    ASSERTL0(m_intScheme != nullptr, "No time integration scheme.");
 
     int i, nchk = 1;
     int nvariables = 0;
@@ -392,10 +383,9 @@ Array<OneD, NekDouble> &MMFAdvection::GetNormalVelocity()
  */
 void MMFAdvection::DoOdeRhs(
     const Array<OneD, const Array<OneD, NekDouble>> &inarray,
-    Array<OneD, Array<OneD, NekDouble>> &outarray, const NekDouble time)
+    Array<OneD, Array<OneD, NekDouble>> &outarray,
+    [[maybe_unused]] const NekDouble time)
 {
-    boost::ignore_unused(time);
-
     int i;
     int nvariables = inarray.size();
     int npoints    = GetNpoints();
@@ -821,10 +811,8 @@ NekDouble MMFAdvection::ComputeCirculatingArclength(const NekDouble zlevel,
 
 void MMFAdvection::v_SetInitialConditions(const NekDouble initialtime,
                                           bool dumpInitialConditions,
-                                          const int domain)
+                                          [[maybe_unused]] const int domain)
 {
-    boost::ignore_unused(domain);
-
     int nq = m_fields[0]->GetNpoints();
 
     Array<OneD, NekDouble> u(nq);
@@ -983,7 +971,7 @@ void MMFAdvection::AdvectionBellSphere(Array<OneD, NekDouble> &outfield)
 
         cosdiff = cos_varphi * cos(m_varphi_c) + sin_varphi * sin(m_varphi_c);
         dist    = radius * acos(sin(m_theta_c) * sin_theta +
-                             cos(m_theta_c) * cos_theta * cosdiff);
+                                cos(m_theta_c) * cos_theta * cosdiff);
 
         if (dist < m_radius_limit)
         {
@@ -1122,12 +1110,10 @@ void MMFAdvection::ComputeveldotMF(
     }
 }
 
-void MMFAdvection::v_EvaluateExactSolution(unsigned int field,
+void MMFAdvection::v_EvaluateExactSolution([[maybe_unused]] unsigned int field,
                                            Array<OneD, NekDouble> &outfield,
                                            const NekDouble time)
 {
-    boost::ignore_unused(field);
-
     switch (m_TestType)
     {
         case eAdvectionBell:

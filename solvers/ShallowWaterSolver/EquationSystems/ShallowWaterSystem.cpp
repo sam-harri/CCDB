@@ -90,9 +90,6 @@ void ShallowWaterSystem::v_InitObject(bool DeclareFields)
         m_vecLocs[0][i] = 1 + i;
     }
 
-    // Load generic input parameters
-    m_session->LoadParameter("IO_InfoSteps", m_infosteps, 0);
-
     // Load acceleration of gravity
     m_session->LoadParameter("Gravity", m_g, 9.81);
 
@@ -129,13 +126,6 @@ void ShallowWaterSystem::v_InitObject(bool DeclareFields)
     EvaluateCoriolis();
 }
 
-/**
- *
- */
-ShallowWaterSystem::~ShallowWaterSystem()
-{
-}
-
 void ShallowWaterSystem::v_GenerateSummary(SolverUtils::SummaryList &s)
 {
     UnsteadySystem::v_GenerateSummary(s);
@@ -149,14 +139,315 @@ void ShallowWaterSystem::v_GenerateSummary(SolverUtils::SummaryList &s)
     }
 }
 
-void ShallowWaterSystem::v_PrimitiveToConservative()
+void ShallowWaterSystem::DoOdeProjection(
+    const Array<OneD, const Array<OneD, NekDouble>> &inarray,
+    Array<OneD, Array<OneD, NekDouble>> &outarray, const NekDouble time)
 {
-    ASSERTL0(false, "This function is not implemented for this equation.");
+    int i;
+    int nvariables = inarray.size();
+
+    switch (m_projectionType)
+    {
+        case MultiRegions::eDiscontinuous:
+        {
+
+            // Just copy over array
+            if (inarray != outarray)
+            {
+                int npoints = GetNpoints();
+
+                for (i = 0; i < nvariables; ++i)
+                {
+                    Vmath::Vcopy(npoints, inarray[i], 1, outarray[i], 1);
+                }
+            }
+
+            SetBoundaryConditions(outarray, time);
+            break;
+        }
+        case MultiRegions::eGalerkin:
+        case MultiRegions::eMixed_CG_Discontinuous:
+        {
+
+            EquationSystem::SetBoundaryConditions(time);
+            Array<OneD, NekDouble> coeffs(m_fields[0]->GetNcoeffs(), 0.0);
+
+            for (i = 0; i < nvariables; ++i)
+            {
+                m_fields[i]->FwdTrans(inarray[i], coeffs);
+                m_fields[i]->BwdTrans(coeffs, outarray[i]);
+            }
+            break;
+        }
+        default:
+            ASSERTL0(false, "Unknown projection scheme");
+            break;
+    }
 }
 
-void ShallowWaterSystem::v_ConservativeToPrimitive()
+//----------------------------------------------------
+void ShallowWaterSystem::SetBoundaryConditions(
+    Array<OneD, Array<OneD, NekDouble>> &inarray, NekDouble time)
 {
-    ASSERTL0(false, "This function is not implemented for this equation.");
+    std::string varName;
+    int nvariables = 3;
+    int cnt        = 0;
+    int nTracePts  = GetTraceTotPoints();
+
+    // Extract trace for boundaries. Needs to be done on all processors to avoid
+    // deadlock.
+    Array<OneD, Array<OneD, NekDouble>> Fwd(nvariables);
+    for (int i = 0; i < nvariables; ++i)
+    {
+        Fwd[i] = Array<OneD, NekDouble>(nTracePts);
+        m_fields[i]->ExtractTracePhys(inarray[i], Fwd[i]);
+    }
+
+    // Loop over Boundary Regions
+    for (int n = 0; n < m_fields[0]->GetBndConditions().size(); ++n)
+    {
+        if (m_fields[0]->GetBndConditions()[n]->GetBoundaryConditionType() ==
+            SpatialDomains::ePeriodic)
+        {
+            continue;
+        }
+
+        // Wall Boundary Condition
+        if (boost::iequals(m_fields[0]->GetBndConditions()[n]->GetUserDefined(),
+                           "Wall"))
+        {
+            WallBoundary2D(n, cnt, Fwd);
+        }
+
+        // Time Dependent Boundary Condition (specified in meshfile)
+        if (m_fields[0]->GetBndConditions()[n]->IsTimeDependent())
+        {
+            for (int i = 0; i < nvariables; ++i)
+            {
+                varName = m_session->GetVariable(i);
+                m_fields[i]->EvaluateBoundaryConditions(time, varName);
+            }
+        }
+        cnt += m_fields[0]->GetBndCondExpansions()[n]->GetExpSize();
+    }
+}
+
+void ShallowWaterSystem::WallBoundary2D(
+    int bcRegion, int cnt, Array<OneD, Array<OneD, NekDouble>> &Fwd)
+{
+    int i;
+    int nvariables = 3;
+
+    // Adjust the physical values of the trace to take
+    // user defined boundaries into account
+    int e, id1, id2, npts;
+
+    for (e = 0; e < m_fields[0]->GetBndCondExpansions()[bcRegion]->GetExpSize();
+         ++e)
+    {
+        npts = m_fields[0]
+                   ->GetBndCondExpansions()[bcRegion]
+                   ->GetExp(e)
+                   ->GetNumPoints(0);
+        id1 = m_fields[0]->GetBndCondExpansions()[bcRegion]->GetPhys_Offset(e);
+        id2 = m_fields[0]->GetTrace()->GetPhys_Offset(
+            m_fields[0]->GetTraceMap()->GetBndCondIDToGlobalTraceID(cnt + e));
+
+        switch (m_expdim)
+        {
+            case 1:
+            {
+                // negate the forward flux
+                Vmath::Neg(npts, &Fwd[1][id2], 1);
+            }
+            break;
+            case 2:
+            {
+                Array<OneD, NekDouble> tmp_n(npts);
+                Array<OneD, NekDouble> tmp_t(npts);
+
+                Vmath::Vmul(npts, &Fwd[1][id2], 1, &m_traceNormals[0][id2], 1,
+                            &tmp_n[0], 1);
+                Vmath::Vvtvp(npts, &Fwd[2][id2], 1, &m_traceNormals[1][id2], 1,
+                             &tmp_n[0], 1, &tmp_n[0], 1);
+
+                Vmath::Vmul(npts, &Fwd[1][id2], 1, &m_traceNormals[1][id2], 1,
+                            &tmp_t[0], 1);
+                Vmath::Vvtvm(npts, &Fwd[2][id2], 1, &m_traceNormals[0][id2], 1,
+                             &tmp_t[0], 1, &tmp_t[0], 1);
+
+                // negate the normal flux
+                Vmath::Neg(npts, tmp_n, 1);
+
+                // rotate back to Cartesian
+                Vmath::Vmul(npts, &tmp_t[0], 1, &m_traceNormals[1][id2], 1,
+                            &Fwd[1][id2], 1);
+                Vmath::Vvtvm(npts, &tmp_n[0], 1, &m_traceNormals[0][id2], 1,
+                             &Fwd[1][id2], 1, &Fwd[1][id2], 1);
+
+                Vmath::Vmul(npts, &tmp_t[0], 1, &m_traceNormals[0][id2], 1,
+                            &Fwd[2][id2], 1);
+                Vmath::Vvtvp(npts, &tmp_n[0], 1, &m_traceNormals[1][id2], 1,
+                             &Fwd[2][id2], 1, &Fwd[2][id2], 1);
+            }
+            break;
+            case 3:
+                ASSERTL0(false,
+                         "3D not implemented for Shallow Water Equations");
+                break;
+            default:
+                ASSERTL0(false, "Illegal expansion dimension");
+        }
+
+        // copy boundary adjusted values into the boundary expansion
+        for (i = 0; i < nvariables; ++i)
+        {
+            Vmath::Vcopy(npts, &Fwd[i][id2], 1,
+                         &(m_fields[i]
+                               ->GetBndCondExpansions()[bcRegion]
+                               ->UpdatePhys())[id1],
+                         1);
+        }
+    }
+}
+
+void ShallowWaterSystem::WallBoundary(
+    int bcRegion, int cnt, Array<OneD, Array<OneD, NekDouble>> &Fwd,
+    Array<OneD, Array<OneD, NekDouble>> &physarray)
+{
+    int i;
+    int nvariables = physarray.size();
+
+    // Adjust the physical values of the trace to take
+    // user defined boundaries into account
+    int e, id1, id2, npts;
+
+    for (e = 0; e < m_fields[0]->GetBndCondExpansions()[bcRegion]->GetExpSize();
+         ++e)
+    {
+        npts = m_fields[0]
+                   ->GetBndCondExpansions()[bcRegion]
+                   ->GetExp(e)
+                   ->GetTotPoints();
+        id1 = m_fields[0]->GetBndCondExpansions()[bcRegion]->GetPhys_Offset(e);
+        id2 = m_fields[0]->GetTrace()->GetPhys_Offset(
+            m_fields[0]->GetTraceMap()->GetBndCondIDToGlobalTraceID(cnt + e));
+
+        // For 2D/3D, define: v* = v - 2(v.n)n
+        Array<OneD, NekDouble> tmp(npts, 0.0);
+
+        // Calculate (v.n)
+        for (i = 0; i < m_spacedim; ++i)
+        {
+            Vmath::Vvtvp(npts, &Fwd[1 + i][id2], 1, &m_traceNormals[i][id2], 1,
+                         &tmp[0], 1, &tmp[0], 1);
+        }
+
+        // Calculate 2.0(v.n)
+        Vmath::Smul(npts, -2.0, &tmp[0], 1, &tmp[0], 1);
+
+        // Calculate v* = v - 2.0(v.n)n
+        for (i = 0; i < m_spacedim; ++i)
+        {
+            Vmath::Vvtvp(npts, &tmp[0], 1, &m_traceNormals[i][id2], 1,
+                         &Fwd[1 + i][id2], 1, &Fwd[1 + i][id2], 1);
+        }
+
+        // copy boundary adjusted values into the boundary expansion
+        for (i = 0; i < nvariables; ++i)
+        {
+            Vmath::Vcopy(npts, &Fwd[i][id2], 1,
+                         &(m_fields[i]
+                               ->GetBndCondExpansions()[bcRegion]
+                               ->UpdatePhys())[id1],
+                         1);
+        }
+    }
+}
+
+// physarray contains the conservative variables
+void ShallowWaterSystem::AddCoriolis(
+    const Array<OneD, const Array<OneD, NekDouble>> &physarray,
+    Array<OneD, Array<OneD, NekDouble>> &outarray)
+{
+
+    int ncoeffs = GetNcoeffs();
+    int nq      = GetTotPoints();
+
+    Array<OneD, NekDouble> tmp(nq);
+    Array<OneD, NekDouble> mod(ncoeffs);
+
+    switch (m_projectionType)
+    {
+        case MultiRegions::eDiscontinuous:
+        {
+            // add to u equation
+            Vmath::Vmul(nq, m_coriolis, 1, physarray[2], 1, tmp, 1);
+            m_fields[0]->IProductWRTBase(tmp, mod);
+            m_fields[0]->MultiplyByElmtInvMass(mod, mod);
+            m_fields[0]->BwdTrans(mod, tmp);
+            Vmath::Vadd(nq, tmp, 1, outarray[1], 1, outarray[1], 1);
+
+            // add to v equation
+            Vmath::Vmul(nq, m_coriolis, 1, physarray[1], 1, tmp, 1);
+            Vmath::Neg(nq, tmp, 1);
+            m_fields[0]->IProductWRTBase(tmp, mod);
+            m_fields[0]->MultiplyByElmtInvMass(mod, mod);
+            m_fields[0]->BwdTrans(mod, tmp);
+            Vmath::Vadd(nq, tmp, 1, outarray[2], 1, outarray[2], 1);
+        }
+        break;
+        case MultiRegions::eGalerkin:
+        case MultiRegions::eMixed_CG_Discontinuous:
+        {
+            // add to u equation
+            Vmath::Vmul(nq, m_coriolis, 1, physarray[2], 1, tmp, 1);
+            Vmath::Vadd(nq, tmp, 1, outarray[1], 1, outarray[1], 1);
+
+            // add to v equation
+            Vmath::Vmul(nq, m_coriolis, 1, physarray[1], 1, tmp, 1);
+            Vmath::Neg(nq, tmp, 1);
+            Vmath::Vadd(nq, tmp, 1, outarray[2], 1, outarray[2], 1);
+        }
+        break;
+        default:
+            ASSERTL0(false, "Unknown projection scheme for the NonlinearSWE");
+            break;
+    }
+}
+
+void ShallowWaterSystem::ConservativeToPrimitive()
+{
+    int nq = GetTotPoints();
+
+    // u = hu/h
+    Vmath::Vdiv(nq, m_fields[1]->GetPhys(), 1, m_fields[0]->GetPhys(), 1,
+                m_fields[1]->UpdatePhys(), 1);
+
+    // v = hv/ v
+    Vmath::Vdiv(nq, m_fields[2]->GetPhys(), 1, m_fields[0]->GetPhys(), 1,
+                m_fields[2]->UpdatePhys(), 1);
+
+    // \eta = h - d
+    Vmath::Vsub(nq, m_fields[0]->GetPhys(), 1, m_depth, 1,
+                m_fields[0]->UpdatePhys(), 1);
+}
+
+void ShallowWaterSystem::PrimitiveToConservative()
+{
+    int nq = GetTotPoints();
+
+    // h = \eta + d
+    Vmath::Vadd(nq, m_fields[0]->GetPhys(), 1, m_depth, 1,
+                m_fields[0]->UpdatePhys(), 1);
+
+    // hu = h * u
+    Vmath::Vmul(nq, m_fields[0]->GetPhys(), 1, m_fields[1]->GetPhys(), 1,
+                m_fields[1]->UpdatePhys(), 1);
+
+    // hv = h * v
+    Vmath::Vmul(nq, m_fields[0]->GetPhys(), 1, m_fields[2]->GetPhys(), 1,
+                m_fields[2]->UpdatePhys(), 1);
 }
 
 void ShallowWaterSystem::EvaluateWaterDepth(void)

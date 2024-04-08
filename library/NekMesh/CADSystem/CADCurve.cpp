@@ -32,23 +32,18 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include "CADCurve.h"
 #include "CADSurf.h"
 
 using namespace std;
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
-Array<OneD, NekDouble> CADCurve::NormalWRT(NekDouble t, int surf)
+std::array<NekDouble, 3> CADCurve::NormalWRT(NekDouble t,
+                                             [[maybe_unused]] int surf)
 {
-    boost::ignore_unused(surf);
-
-    Array<OneD, NekDouble> p = P(t);
+    auto p = P(t);
     pair<weak_ptr<CADSurf>, CADOrientation::Orientation> surface;
 
     if (m_adjSurfs.size() != 1)
@@ -59,8 +54,8 @@ Array<OneD, NekDouble> CADCurve::NormalWRT(NekDouble t, int surf)
 
     surface = m_adjSurfs[0];
 
-    Array<OneD, NekDouble> uv = surface.first.lock()->locuv(p);
-    Array<OneD, NekDouble> d1 = surface.first.lock()->D1(uv);
+    auto uv = surface.first.lock()->locuv(p);
+    auto d1 = surface.first.lock()->D1(uv);
 
     NekDouble t1 = t - 1e-8;
     NekDouble t2 = t + 1e-8;
@@ -70,16 +65,15 @@ Array<OneD, NekDouble> CADCurve::NormalWRT(NekDouble t, int surf)
         swap(t1, t2);
     }
 
-    Array<OneD, NekDouble> uv1 = surface.first.lock()->locuv(P(t1));
-    Array<OneD, NekDouble> uv2 = surface.first.lock()->locuv(P(t2));
+    auto uv1 = surface.first.lock()->locuv(P(t1));
+    auto uv2 = surface.first.lock()->locuv(P(t2));
 
     NekDouble du = uv2[1] - uv1[1];
     NekDouble dv = -1.0 * (uv2[0] - uv1[0]);
 
-    Array<OneD, NekDouble> N(3, 0.0);
-    N[0] = (d1[3] * du + d1[6] * dv) / 2.0;
-    N[1] = (d1[4] * du + d1[7] * dv) / 2.0;
-    N[2] = (d1[5] * du + d1[8] * dv) / 2.0;
+    std::array<NekDouble, 3> N = {(d1[3] * du + d1[6] * dv) / 2.0,
+                                  (d1[4] * du + d1[7] * dv) / 2.0,
+                                  (d1[5] * du + d1[8] * dv) / 2.0};
 
     NekDouble mag = sqrt(N[0] * N[0] + N[1] * N[1] + N[2] * N[2]);
     N[0] /= mag;
@@ -102,5 +96,4 @@ CADOrientation::Orientation CADCurve::GetOrienationWRT(int surf)
     m_log(FATAL) << "Unable to find surface in adjacency list." << endl;
     return CADOrientation::eUnknown;
 }
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh

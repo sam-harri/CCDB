@@ -39,9 +39,7 @@
 
 #include <LibUtilities/BasicConst/NektarUnivTypeDefs.hpp>
 
-namespace Nektar
-{
-namespace NekConstants
+namespace Nektar::NekConstants
 {
 static const NekDouble kNekUnsetDouble = -9999;
 
@@ -64,7 +62,6 @@ static const unsigned int kNekFloatCompFact = 4;
 // Constants for minimisation functions
 static const NekDouble kFindDistanceMin     = 5e-05;
 static const unsigned int kNewtonIterations = 51;
-} // namespace NekConstants
-} // namespace Nektar
+} // namespace Nektar::NekConstants
 
 #endif

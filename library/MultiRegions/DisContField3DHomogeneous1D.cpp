@@ -33,16 +33,12 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LocalRegions/Expansion1D.h>
 #include <MultiRegions/DisContField.h>
 #include <MultiRegions/DisContField3DHomogeneous1D.h>
 #include <MultiRegions/ExpList2DHomogeneous1D.h>
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 
 DisContField3DHomogeneous1D::DisContField3DHomogeneous1D(void)
@@ -602,10 +598,10 @@ std::map<int, RobinBCInfoSharedPtr> DisContField3DHomogeneous1D::
 }
 
 void DisContField3DHomogeneous1D::v_EvaluateBoundaryConditions(
-    const NekDouble time, const std::string varName, const NekDouble x2_in,
-    const NekDouble x3_in)
+    const NekDouble time, const std::string varName,
+    [[maybe_unused]] const NekDouble x2_in,
+    [[maybe_unused]] const NekDouble x3_in)
 {
-    boost::ignore_unused(x2_in, x3_in);
     int i;
     int npoints;
     int nbnd = m_bndCondExpansions.size();
@@ -740,14 +736,14 @@ void DisContField3DHomogeneous1D::v_EvaluateBoundaryConditions(
     }
 }
 
-const Array<OneD, const MultiRegions::ExpListSharedPtr>
-    &DisContField3DHomogeneous1D::v_GetBndCondExpansions(void)
+const Array<OneD, const MultiRegions::ExpListSharedPtr> &
+DisContField3DHomogeneous1D::v_GetBndCondExpansions(void)
 {
     return m_bndCondExpansions;
 }
 
-const Array<OneD, const SpatialDomains::BoundaryConditionShPtr>
-    &DisContField3DHomogeneous1D::v_GetBndConditions()
+const Array<OneD, const SpatialDomains::BoundaryConditionShPtr> &
+DisContField3DHomogeneous1D::v_GetBndConditions()
 {
     return m_bndConditions;
 }
@@ -758,8 +754,8 @@ std::shared_ptr<ExpList> &DisContField3DHomogeneous1D::v_UpdateBndCondExpansion(
     return m_bndCondExpansions[i];
 }
 
-Array<OneD, SpatialDomains::BoundaryConditionShPtr>
-    &DisContField3DHomogeneous1D::v_UpdateBndConditions()
+Array<OneD, SpatialDomains::BoundaryConditionShPtr> &DisContField3DHomogeneous1D::
+    v_UpdateBndConditions()
 {
     return m_bndConditions;
 }
@@ -769,5 +765,4 @@ void DisContField3DHomogeneous1D::v_SetBndCondBwdWeight(const int index,
 {
     m_bndCondBndWeight[index] = value;
 }
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions

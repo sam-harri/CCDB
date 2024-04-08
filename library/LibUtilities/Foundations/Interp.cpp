@@ -38,9 +38,7 @@
 #include <LibUtilities/Foundations/Points.h>
 #include <LibUtilities/LinearAlgebra/NekTypeDefs.hpp>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 // Physical Space Interpolation methods
@@ -217,5 +215,4 @@ void Interp3D(const PointsKey &fpoints0, const PointsKey &fpoints1,
                 I2->GetPtr().get(), tnp2, 0.0, to, tnp0 * tnp1);
 }
 
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities

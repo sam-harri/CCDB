@@ -64,7 +64,7 @@ public:
     // Name of class
     static std::string className;
 
-    virtual ~NavierStokesCFE();
+    ~NavierStokesCFE() override = default;
 
 protected:
     std::string m_ViscosityType;
@@ -122,9 +122,9 @@ protected:
 
     void InitObject_Explicit();
 
-    virtual void v_InitObject(bool DeclareField = true) override;
+    void v_InitObject(bool DeclareField = true) override;
 
-    virtual void v_DoDiffusion(
+    void v_DoDiffusion(
         const Array<OneD, Array<OneD, NekDouble>> &inarray,
         Array<OneD, Array<OneD, NekDouble>> &outarray,
         const Array<OneD, Array<OneD, NekDouble>> &pFwd,
@@ -166,9 +166,8 @@ protected:
                              Array<OneD, NekDouble> &div,
                              Array<OneD, NekDouble> &curlSquare);
 
-    virtual void v_ExtraFldOutput(
-        std::vector<Array<OneD, NekDouble>> &fieldcoeffs,
-        std::vector<std::string> &variables) override;
+    void v_ExtraFldOutput(std::vector<Array<OneD, NekDouble>> &fieldcoeffs,
+                          std::vector<std::string> &variables) override;
 
     template <class T, typename = typename std::enable_if<
                            std::is_floating_point<T>::value ||
@@ -561,7 +560,7 @@ protected:
         }
     }
 
-    virtual bool v_SupportsShockCaptType(const std::string type) const override;
+    bool v_SupportsShockCaptType(const std::string type) const override;
 };
 
 } // namespace Nektar

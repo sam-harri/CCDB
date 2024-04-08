@@ -12,6 +12,8 @@ libtriangle-dev
 libvtk7-dev
 mpi-default-dev
 petsc-dev
-python-dev
-python-numpy
+python3-dev
+python3-numpy
+python3-pip
+python3-setuptools
 rsh-client

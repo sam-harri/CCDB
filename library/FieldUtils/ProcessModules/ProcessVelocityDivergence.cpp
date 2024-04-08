@@ -36,17 +36,13 @@
 #include <string>
 using namespace std;
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <GlobalMapping/Mapping.h>
 #include <LibUtilities/BasicUtils/SharedArray.hpp>
 
 #include "ProcessMapping.h"
 #include "ProcessVelocityDivergence.h"
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 ModuleKey ProcessVelocityDivergence::className =
@@ -231,5 +227,4 @@ void ProcessVelocityDivergence::GetVelocity(
     }
 }
 
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

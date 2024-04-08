@@ -731,11 +731,9 @@ void VelocityCorrectionScheme::v_EvaluateAdvection_SetPressureBCs(
  */
 void VelocityCorrectionScheme::v_SolveUnsteadyStokesSystem(
     const Array<OneD, const Array<OneD, NekDouble>> &inarray,
-    Array<OneD, Array<OneD, NekDouble>> &outarray, const NekDouble time,
-    const NekDouble aii_Dt)
+    Array<OneD, Array<OneD, NekDouble>> &outarray,
+    [[maybe_unused]] const NekDouble time, const NekDouble aii_Dt)
 {
-    boost::ignore_unused(time);
-
     // Set up flowrate if we're starting for the first time or the value of
     // aii_Dt has changed.
     if (m_flowrate > 0.0 && (aii_Dt != m_flowrateAiidt))

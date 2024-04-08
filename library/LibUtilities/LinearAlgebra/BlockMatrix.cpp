@@ -32,8 +32,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/LinearAlgebra/BlockMatrix.hpp>
 #include <LibUtilities/LinearAlgebra/ScaledMatrix.hpp>
 #include <LibUtilities/LinearAlgebra/StandardMatrix.hpp>
@@ -190,7 +188,7 @@ NekMatrix<NekMatrix<DataType, InnerMatrixType>, BlockMatrixTag>::GetBlockPtr(
     int x = CalculateBlockIndex(row, column);
     if (x == -1)
     {
-        return 0;
+        return nullptr;
     }
     else
     {
@@ -229,9 +227,9 @@ NekMatrix<NekMatrix<DataType, InnerMatrixType>, BlockMatrixTag>::GetBlock(
 
 template <typename DataType, typename InnerMatrixType>
 std::shared_ptr<typename NekMatrix<NekMatrix<DataType, InnerMatrixType>,
-                                   BlockMatrixTag>::InnerType>
-    &NekMatrix<NekMatrix<DataType, InnerMatrixType>, BlockMatrixTag>::GetBlock(
-        unsigned int row, unsigned int column)
+                                   BlockMatrixTag>::InnerType> &
+NekMatrix<NekMatrix<DataType, InnerMatrixType>, BlockMatrixTag>::GetBlock(
+    unsigned int row, unsigned int column)
 {
     ASSERTL2(
         this->GetTransposeFlag() == 'N' ? row < m_numberOfBlockRows
@@ -465,10 +463,10 @@ NekMatrix<NekMatrix<DataType, InnerMatrixType>, BlockMatrixTag>::CreateWrapper(
 
 template <typename DataType, typename InnerMatrixType>
 unsigned int NekMatrix<NekMatrix<DataType, InnerMatrixType>, BlockMatrixTag>::
-    GetNumberOfElementsInBlock(unsigned int block, unsigned int totalBlocks,
+    GetNumberOfElementsInBlock(unsigned int block,
+                               [[maybe_unused]] unsigned int totalBlocks,
                                const Array<OneD, unsigned int> &sizes)
 {
-    boost::ignore_unused(totalBlocks);
     ASSERTL2(block < totalBlocks,
              std::string("Block Element ") + std::to_string(block) +
                  std::string(" requested in a matrix with a maximum of ") +
@@ -530,7 +528,7 @@ void NekMatrix<NekMatrix<DataType, InnerMatrixType>,
 {
     for (auto &ptr : m_data)
     {
-        if (ptr.get() != 0)
+        if (ptr.get() != nullptr)
         {
             ptr->Transpose();
         }

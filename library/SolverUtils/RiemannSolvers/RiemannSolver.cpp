@@ -32,8 +32,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/BasicUtils/VmathArray.hpp>
 #include <SolverUtils/RiemannSolvers/RiemannSolver.h>
 
@@ -57,9 +55,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 /**
  * Retrieves the singleton instance of the Riemann solver factory.
@@ -82,10 +78,9 @@ RiemannSolver::RiemannSolver() : m_requiresRotation(false), m_rotStorage(3)
 }
 
 RiemannSolver::RiemannSolver(
-    const LibUtilities::SessionReaderSharedPtr &pSession)
+    [[maybe_unused]] const LibUtilities::SessionReaderSharedPtr &pSession)
     : m_requiresRotation(false), m_rotStorage(3)
 {
-    boost::ignore_unused(pSession);
 }
 
 /**
@@ -136,8 +131,24 @@ void RiemannSolver::Solve(const int nDim,
 
         rotateToNormal(Fwd, normals, vecLocs, m_rotStorage[0]);
         rotateToNormal(Bwd, normals, vecLocs, m_rotStorage[1]);
+
         v_Solve(nDim, m_rotStorage[0], m_rotStorage[1], m_rotStorage[2]);
         rotateFromNormal(m_rotStorage[2], normals, vecLocs, flux);
+
+        // Attempt to subtract (\vec{U}\vec{vg})\dot n for ALE
+        if (m_ALESolver)
+        {
+            auto vgt = m_vectors["vgt"]();
+            auto N   = m_vectors["N"]();
+            for (int i = 0; i < flux.size(); ++i)
+            {
+                for (int j = 0; j < flux[i].size(); ++j)
+                {
+                    flux[i][j] -= 0.5 * (Fwd[i][j] + Bwd[i][j]) *
+                                  (N[0][j] * vgt[0][j] + N[1][j] * vgt[1][j]);
+                }
+            }
+        }
     }
     else
     {
@@ -544,14 +555,14 @@ void RiemannSolver::CalcFluxJacobian(
 }
 
 void RiemannSolver::v_CalcFluxJacobian(
-    const int nDim, const Array<OneD, const Array<OneD, NekDouble>> &Fwd,
-    const Array<OneD, const Array<OneD, NekDouble>> &Bwd,
-    const Array<OneD, const Array<OneD, NekDouble>> &normals,
-    DNekBlkMatSharedPtr &FJac, DNekBlkMatSharedPtr &BJac)
+    [[maybe_unused]] const int nDim,
+    [[maybe_unused]] const Array<OneD, const Array<OneD, NekDouble>> &Fwd,
+    [[maybe_unused]] const Array<OneD, const Array<OneD, NekDouble>> &Bwd,
+    [[maybe_unused]] const Array<OneD, const Array<OneD, NekDouble>> &normals,
+    [[maybe_unused]] DNekBlkMatSharedPtr &FJac,
+    [[maybe_unused]] DNekBlkMatSharedPtr &BJac)
 {
-    boost::ignore_unused(nDim, Fwd, Bwd, normals, FJac, BJac);
     NEKERROR(ErrorUtil::efatal, "v_CalcFluxJacobian not specified.");
 }
 
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils

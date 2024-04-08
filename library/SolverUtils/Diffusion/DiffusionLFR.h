@@ -37,9 +37,7 @@
 
 #include <SolverUtils/Diffusion/Diffusion.h>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 class DiffusionLFR : public Diffusion
 {
@@ -56,17 +54,16 @@ protected:
 
     std::string m_diffType;
 
-    virtual void v_InitObject(
+    void v_InitObject(
         LibUtilities::SessionReaderSharedPtr pSession,
         Array<OneD, MultiRegions::ExpListSharedPtr> pFields) override;
 
-    virtual void v_Diffuse(
-        const size_t nConvectiveFields,
-        const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
-        const Array<OneD, Array<OneD, NekDouble>> &inarray,
-        Array<OneD, Array<OneD, NekDouble>> &outarray,
-        const Array<OneD, Array<OneD, NekDouble>> &pFwd,
-        const Array<OneD, Array<OneD, NekDouble>> &pBwd) override;
+    void v_Diffuse(const size_t nConvectiveFields,
+                   const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
+                   const Array<OneD, Array<OneD, NekDouble>> &inarray,
+                   Array<OneD, Array<OneD, NekDouble>> &outarray,
+                   const Array<OneD, Array<OneD, NekDouble>> &pFwd,
+                   const Array<OneD, Array<OneD, NekDouble>> &pBwd) override;
 
 private:
     Array<OneD, Array<OneD, NekDouble>> m_traceNormals;
@@ -158,7 +155,6 @@ private:
         const Array<OneD, const NekDouble> &numericalFlux,
         Array<OneD, NekDouble> &divCFlux);
 };
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils
 
 #endif

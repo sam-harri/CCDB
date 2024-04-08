@@ -44,9 +44,7 @@
 #include "IProductKernels.hpp"
 #include "IProductWRTDerivBaseKernels.hpp"
 
-namespace Nektar
-{
-namespace MatrixFree
+namespace Nektar::MatrixFree
 {
 
 // As each opertor has seven shapes over three dimension to get to the
@@ -173,7 +171,9 @@ struct IProductWRTDerivBaseTemplate
 
             // Load and transpose data
             for (int d = 0; d < ndf; ++d)
+            {
                 load_interleave(inptr[d], nqTot, tmpIn[d]);
+            }
 
             IProductWRTDerivBase1DKernel<SHAPE_TYPE, DEFORMED>(
                 nqTot, ndf, df_ptr, df_tmp, tmpIn, tmp0);
@@ -187,7 +187,9 @@ struct IProductWRTDerivBaseTemplate
             deinterleave_store(tmpOut, m_nmTot, outptr);
 
             for (int d = 0; d < ndf; ++d)
+            {
                 inptr[d] += nqBlocks;
+            }
 
             outptr += nmBlocks;
         }
@@ -250,7 +252,9 @@ struct IProductWRTDerivBaseTemplate
 
             // Load and transpose data
             for (int d = 0; d < ndf; ++d)
+            {
                 load_interleave(inptr[d], nqTot, tmpIn[d]);
+            }
 
             IProductWRTDerivBase1DKernel<SHAPE_TYPE, DEFORMED>(
                 nqTot, ndf, df_ptr, df_tmp, tmpIn, tmp0);
@@ -264,7 +268,9 @@ struct IProductWRTDerivBaseTemplate
             deinterleave_store(tmpOut, m_nmTot, outptr);
 
             for (int d = 0; d < ndf; ++d)
+            {
                 inptr[d] += nqBlocks;
+            }
 
             outptr += nmBlocks;
         }
@@ -678,7 +684,6 @@ private:
     int m_nmTot;
 };
 
-} // namespace MatrixFree
-} // namespace Nektar
+} // namespace Nektar::MatrixFree
 
 #endif

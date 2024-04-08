@@ -68,7 +68,7 @@ public:
     PreconCfsBRJ(const Array<OneD, MultiRegions::ExpListSharedPtr> &pFields,
                  const LibUtilities::SessionReaderSharedPtr &pSession,
                  const LibUtilities::CommSharedPtr &vComm);
-    ~PreconCfsBRJ(){};
+    ~PreconCfsBRJ() override = default;
 
 protected:
     int m_PreconItsStep;
@@ -89,22 +89,20 @@ protected:
     Array<OneD, Array<OneD, NekSingle>> m_TraceJacDerivSignSingle;
     TensorOfArray5D<NekSingle> m_TraceIPSymJacArraySingle;
 
-    PrecType m_PreconMatStorage;
+    void v_InitObject() override;
 
-    virtual void v_InitObject() override;
-
-    virtual void v_DoPreconCfs(
+    void v_DoPreconCfs(
         const Array<OneD, MultiRegions::ExpListSharedPtr> &pFields,
         const Array<OneD, NekDouble> &pInput, Array<OneD, NekDouble> &pOutput,
         const bool &flag) override;
 
-    virtual void v_BuildPreconCfs(
+    void v_BuildPreconCfs(
         const Array<OneD, MultiRegions::ExpListSharedPtr> &pFields,
         const Array<OneD, const Array<OneD, NekDouble>> &intmp,
         const NekDouble time, const NekDouble lambda) override;
 
-    virtual bool v_UpdatePreconMatCheck(const Array<OneD, const NekDouble> &res,
-                                        const NekDouble dtLambda) override;
+    bool v_UpdatePreconMatCheck(const Array<OneD, const NekDouble> &res,
+                                const NekDouble dtLambda) override;
 
 private:
     void DoNullPrecon(const Array<OneD, NekDouble> &pInput,
@@ -120,16 +118,10 @@ private:
         const Array<OneD, MultiRegions::ExpListSharedPtr> &pFields,
         const size_t nvariables, const size_t nCoeffs,
         const Array<OneD, const Array<OneD, NekDouble>> &inarray,
-        Array<OneD, Array<OneD, NekDouble>> &outarray, bool flagUpdateDervFlux,
-        Array<OneD, Array<OneD, NekDouble>> &FwdFluxDeriv,
-        Array<OneD, Array<OneD, NekDouble>> &BwdFluxDeriv,
-        TensorOfArray3D<NekDouble> &qfield,
+        Array<OneD, Array<OneD, NekDouble>> &outarray,
         TensorOfArray3D<NekDouble> &wspTrace,
         Array<OneD, Array<OneD, DataType>> &wspTraceDataType,
-        const TensorOfArray4D<DataType> &TraceJacArray,
-        const TensorOfArray4D<DataType> &TraceJacDerivArray,
-        const Array<OneD, const Array<OneD, DataType>> &TraceJacDerivSign,
-        const TensorOfArray5D<DataType> &TraceIPSymJacArray);
+        const TensorOfArray4D<DataType> &TraceJacArray);
 
     template <typename TypeNekBlkMatSharedPtr>
     void AllocatePreconBlkDiagCoeff(

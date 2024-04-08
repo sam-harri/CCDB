@@ -39,9 +39,7 @@
 
 #include <SolverUtils/Diffusion/DiffusionLDG.h>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 std::string DiffusionLDG::type = GetDiffusionFactory().RegisterCreatorFunction(
     "LDG", DiffusionLDG::create, "Local Discontinuous Galkerin");
@@ -106,12 +104,16 @@ void DiffusionLDG::v_DiffuseCoeffs(
     const Array<OneD, Array<OneD, NekDouble>> &pFwd,
     const Array<OneD, Array<OneD, NekDouble>> &pBwd)
 {
+    if (fields[0]->GetGraph()->GetMovement()->GetMoveFlag()) // i.e. if
+                                                             // m_ALESolver
+    {
+        fields[0]->GetTrace()->GetNormals(m_traceNormals);
+    }
+
     std::size_t nDim      = fields[0]->GetCoordim(0);
     std::size_t nPts      = fields[0]->GetTotPoints();
     std::size_t nCoeffs   = fields[0]->GetNcoeffs();
     std::size_t nTracePts = fields[0]->GetTrace()->GetTotPoints();
-
-    Array<OneD, NekDouble> tmp{nCoeffs};
 
     TensorOfArray3D<NekDouble> qfield{nDim};
     for (std::size_t j = 0; j < nDim; ++j)
@@ -146,19 +148,26 @@ void DiffusionLDG::v_DiffuseCoeffs(
                      pBwd);
 
     Array<OneD, Array<OneD, NekDouble>> qdbase{nDim};
-
     for (std::size_t i = 0; i < nConvectiveFields; ++i)
     {
         for (std::size_t j = 0; j < nDim; ++j)
         {
             qdbase[j] = viscTensor[j][i];
         }
-        fields[i]->IProductWRTDerivBase(qdbase, tmp);
+        fields[i]->IProductWRTDerivBase(qdbase, outarray[i]);
 
-        Vmath::Neg(nCoeffs, tmp, 1);
-        fields[i]->AddTraceIntegral(traceflux[i], tmp);
+        Vmath::Neg(nCoeffs, outarray[i], 1);
+        fields[i]->AddTraceIntegral(traceflux[i], outarray[i]);
         fields[i]->SetPhysState(false);
-        fields[i]->MultiplyByElmtInvMass(tmp, outarray[i]);
+    }
+
+    if (!fields[0]->GetGraph()->GetMovement()->GetMoveFlag()) // i.e. if
+                                                              // m_ALESolver
+    {
+        for (std::size_t i = 0; i < nConvectiveFields; ++i)
+        {
+            fields[i]->MultiplyByElmtInvMass(outarray[i], outarray[i]);
+        }
     }
 }
 
@@ -202,25 +211,24 @@ void DiffusionLDG::v_DiffuseCalcDerivative(
 }
 
 void DiffusionLDG::v_DiffuseVolumeFlux(
-    const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
+    [[maybe_unused]] const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
     const Array<OneD, Array<OneD, NekDouble>> &inarray,
     TensorOfArray3D<NekDouble> &qfield, TensorOfArray3D<NekDouble> &viscTensor,
-    Array<OneD, int> &nonZeroIndex)
+    [[maybe_unused]] Array<OneD, int> &nonZeroIndex)
 {
-    boost::ignore_unused(fields, nonZeroIndex);
     m_fluxVector(inarray, qfield, viscTensor);
 }
 
 void DiffusionLDG::v_DiffuseTraceFlux(
     const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
     const Array<OneD, Array<OneD, NekDouble>> &inarray,
-    TensorOfArray3D<NekDouble> &qfield, TensorOfArray3D<NekDouble> &viscTensor,
+    [[maybe_unused]] TensorOfArray3D<NekDouble> &qfield,
+    TensorOfArray3D<NekDouble> &viscTensor,
     Array<OneD, Array<OneD, NekDouble>> &TraceFlux,
-    const Array<OneD, Array<OneD, NekDouble>> &pFwd,
-    const Array<OneD, Array<OneD, NekDouble>> &pBwd,
-    Array<OneD, int> &nonZeroIndex)
+    [[maybe_unused]] const Array<OneD, Array<OneD, NekDouble>> &pFwd,
+    [[maybe_unused]] const Array<OneD, Array<OneD, NekDouble>> &pBwd,
+    [[maybe_unused]] Array<OneD, int> &nonZeroIndex)
 {
-    boost::ignore_unused(qfield, pFwd, pBwd, nonZeroIndex);
     NumFluxforVector(fields, inarray, viscTensor, TraceFlux);
 }
 
@@ -275,12 +283,12 @@ void DiffusionLDG::NumFluxforScalar(
 
 void DiffusionLDG::ApplyScalarBCs(
     const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
-    const std::size_t var, const Array<OneD, const NekDouble> &ufield,
+    const std::size_t var,
+    [[maybe_unused]] const Array<OneD, const NekDouble> &ufield,
     const Array<OneD, const NekDouble> &Fwd,
-    const Array<OneD, const NekDouble> &Bwd,
+    [[maybe_unused]] const Array<OneD, const NekDouble> &Bwd,
     Array<OneD, NekDouble> &penaltyflux)
 {
-    boost::ignore_unused(ufield, Bwd);
     // Number of boundary regions
     std::size_t nBndRegions = fields[var]->GetBndCondExpansions().size();
     std::size_t cnt         = 0;
@@ -322,7 +330,10 @@ void DiffusionLDG::ApplyScalarBCs(
                     "WallViscous") ||
                 boost::iequals(
                     fields[var]->GetBndConditions()[i]->GetUserDefined(),
-                    "WallAdiabatic"))
+                    "WallAdiabatic") ||
+                boost::iequals(
+                    fields[var]->GetBndConditions()[i]->GetUserDefined(),
+                    "WallRotational"))
             {
                 Vmath::Vcopy(nBndEdgePts, &Fwd[id2], 1, &penaltyflux[id2], 1);
             }
@@ -416,13 +427,11 @@ void DiffusionLDG::NumFluxforVector(
 void DiffusionLDG::ApplyVectorBCs(
     const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
     const std::size_t var, const std::size_t dir,
-    const Array<OneD, const NekDouble> &qfield,
+    [[maybe_unused]] const Array<OneD, const NekDouble> &qfield,
     const Array<OneD, const NekDouble> &qFwd,
-    const Array<OneD, const NekDouble> &qBwd,
+    [[maybe_unused]] const Array<OneD, const NekDouble> &qBwd,
     Array<OneD, NekDouble> &penaltyflux)
 {
-    boost::ignore_unused(qfield, qBwd);
-
     std::size_t nBndRegions = fields[var]->GetBndCondExpansions().size();
     std::size_t cnt         = 0;
 
@@ -462,7 +471,10 @@ void DiffusionLDG::ApplyVectorBCs(
                     "WallViscous") ||
                 boost::iequals(
                     fields[var]->GetBndConditions()[i]->GetUserDefined(),
-                    "WallAdiabatic"))
+                    "WallAdiabatic") ||
+                boost::iequals(
+                    fields[var]->GetBndConditions()[i]->GetUserDefined(),
+                    "WallRotational"))
             {
                 Vmath::Zero(nBndEdgePts, &penaltyflux[id2], 1);
             }
@@ -490,5 +502,4 @@ void DiffusionLDG::ApplyVectorBCs(
     }
 }
 
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils

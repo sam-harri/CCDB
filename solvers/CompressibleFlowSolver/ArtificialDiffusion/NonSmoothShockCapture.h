@@ -65,7 +65,7 @@ public:
     static std::string className;
 
 protected:
-    virtual void v_GetArtificialViscosity(
+    void v_GetArtificialViscosity(
         const Array<OneD, Array<OneD, NekDouble>> &physfield,
         Array<OneD, NekDouble> &mu) override;
 
@@ -75,7 +75,7 @@ private:
         const Array<OneD, MultiRegions::ExpListSharedPtr> &pFields,
         const int spacedim);
 
-    virtual ~NonSmoothShockCapture(void){};
+    ~NonSmoothShockCapture(void) override{};
 
     /// Parameters
     int m_offset;

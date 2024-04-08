@@ -1,3 +1,4 @@
+clang-15
 libarpack2-dev
 libboost-numpy-dev
 libboost-python-dev
@@ -16,3 +17,5 @@ petsc-dev
 python3-dev
 python3.11-dev
 python3-numpy
+python3-pip
+python3-setuptools

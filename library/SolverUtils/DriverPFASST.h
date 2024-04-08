@@ -39,9 +39,7 @@
 #include <SolverUtils/DriverParallelInTime.h>
 #include <SolverUtils/UnsteadySystem.h>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 
 typedef Array<OneD, Array<OneD, Array<OneD, NekDouble>>> SDCarray;
@@ -73,15 +71,14 @@ protected:
         const SpatialDomains::MeshGraphSharedPtr pGraph);
 
     /// Destructor
-    SOLVER_UTILS_EXPORT virtual ~DriverPFASST() = default;
+    SOLVER_UTILS_EXPORT ~DriverPFASST() override = default;
 
     /// Virtual function for initialisation implementation.
-    SOLVER_UTILS_EXPORT virtual void v_InitObject(
+    SOLVER_UTILS_EXPORT void v_InitObject(
         std::ostream &out = std::cout) override;
 
     /// Virtual function for solve implementation.
-    SOLVER_UTILS_EXPORT virtual void v_Execute(
-        std::ostream &out = std::cout) override;
+    SOLVER_UTILS_EXPORT void v_Execute(std::ostream &out = std::cout) override;
 
     static std::string driverLookupId;
 
@@ -108,6 +105,8 @@ private:
     void ResidualEval(const NekDouble time, const size_t timeLevel);
 
     void IntegratedResidualEval(const size_t timeLevel);
+
+    using DriverParallelInTime::Interpolate;
 
     void Interpolate(const size_t coarseLevel, const SDCarray &in,
                      const size_t fineLevel, SDCarray &out, bool forced);
@@ -148,27 +147,6 @@ private:
 
     void WriteOutput(const size_t step, const NekDouble time);
 
-    void SpeedUpAnalysis();
-
-    void PrintSpeedUp(NekDouble fineSolveTime, NekDouble coarseSolveTime,
-                      NekDouble fasTime, NekDouble commTime,
-                      NekDouble predictorTime, NekDouble overheadTime);
-
-    NekDouble ComputeSpeedUp(const size_t iter, NekDouble fineSolveTime,
-                             NekDouble coarseSolveTime, NekDouble fastTime,
-                             NekDouble commTime, NekDouble predictorTime,
-                             NekDouble overheadTime);
-
-    NekDouble EstimateCommunicationTime(void);
-
-    NekDouble EstimateFASCorrectionTime(void);
-
-    NekDouble EstimateSolverTime(const size_t timeLevel);
-
-    NekDouble EstimatePredictorTime(void);
-
-    NekDouble EstimateOverheadTime(void);
-
     // Storage of PFASST
     Array<OneD, size_t> m_QuadPts;
     Array<OneD, Array<OneD, NekDouble>> m_ImatFtoC;
@@ -184,7 +162,6 @@ private:
     bool m_updateResidual = false;
 };
 
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils
 
 #endif // NEKTAR_SOLVERUTILS_DRIVERPFASST_H

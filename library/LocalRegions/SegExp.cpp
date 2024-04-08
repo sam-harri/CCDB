@@ -32,17 +32,13 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/Foundations/Interp.h>
 #include <LocalRegions/Expansion2D.h>
 #include <LocalRegions/SegExp.h>
 
 using namespace std;
 
-namespace Nektar
-{
-namespace LocalRegions
+namespace Nektar::LocalRegions
 {
 
 /**
@@ -686,12 +682,12 @@ void SegExp::v_GetVertexPhysVals(const int vertex,
 
 // Get vertex value from the 1D Phys space.
 void SegExp::v_GetTracePhysVals(
-    const int edge, const StdRegions::StdExpansionSharedPtr &EdgeExp,
+    const int edge,
+    [[maybe_unused]] const StdRegions::StdExpansionSharedPtr &EdgeExp,
     const Array<OneD, const NekDouble> &inarray,
-    Array<OneD, NekDouble> &outarray, StdRegions::Orientation orient)
+    Array<OneD, NekDouble> &outarray,
+    [[maybe_unused]] StdRegions::Orientation orient)
 {
-    boost::ignore_unused(EdgeExp, orient);
-
     NekDouble result;
     v_GetVertexPhysVals(edge, inarray, result);
     outarray[0] = result;
@@ -767,10 +763,8 @@ int SegExp::v_NumDGBndryCoeffs() const
 void SegExp::v_ExtractDataToCoeffs(
     const NekDouble *data, const std::vector<unsigned int> &nummodes,
     const int mode_offset, NekDouble *coeffs,
-    std::vector<LibUtilities::BasisType> &fromType)
+    [[maybe_unused]] std::vector<LibUtilities::BasisType> &fromType)
 {
-    boost::ignore_unused(fromType);
-
     switch (m_base[0]->GetBasisType())
     {
         case LibUtilities::eModified_A:
@@ -876,12 +870,11 @@ void SegExp::v_ComputeTraceNormal(const int vertex)
 // Operator creation functions
 //-----------------------------
 
-void SegExp::v_LaplacianMatrixOp(const Array<OneD, const NekDouble> &inarray,
-                                 Array<OneD, NekDouble> &outarray,
-                                 const StdRegions::StdMatrixKey &mkey)
+void SegExp::v_LaplacianMatrixOp(
+    const Array<OneD, const NekDouble> &inarray,
+    Array<OneD, NekDouble> &outarray,
+    [[maybe_unused]] const StdRegions::StdMatrixKey &mkey)
 {
-    boost::ignore_unused(mkey);
-
     int nquad = m_base[0]->GetNumPoints();
     const Array<TwoD, const NekDouble> &gmat =
         m_metricinfo->GetDerivFactors(GetPointsKeys());
@@ -1380,5 +1373,4 @@ void SegExp::MultiplyByElmtInvMass(const Array<OneD, const NekDouble> &inarray,
     out = (*matsys) * in;
 }
 
-} // namespace LocalRegions
-} // namespace Nektar
+} // namespace Nektar::LocalRegions

@@ -40,9 +40,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace SpatialDomains
+namespace Nektar::SpatialDomains
 {
 /**
  * Constructor - collective on the session's communicator.
@@ -96,7 +94,9 @@ std::set<int> ShareAllBoundaryIDs(
     auto it = boundaryRegions.begin(), end = boundaryRegions.end();
     int i = 0;
     for (; it != end; ++it, ++i)
+    {
         ids.insert(it->first);
+    }
 
     int np = comm->GetSize();
     int ip = comm->GetRank();
@@ -151,16 +151,22 @@ std::set<int> ShareAllBoundaryIDs(
     // Bcast the size
     int nIds;
     if (ip == 0)
+    {
         nIds = ids.size();
+    }
 
     comm->Bcast(nIds, 0);
 
     // Bcast the data
     Array<OneD, int> idsArray;
     if (ip == 0)
+    {
         idsArray = ToArray(ids);
+    }
     else
+    {
         idsArray = Array<OneD, int>(nIds);
+    }
 
     comm->Bcast(idsArray, 0);
 
@@ -350,8 +356,7 @@ void BoundaryConditions::ReadBoundaryConditions(TiXmlElement *conditions)
                  "Error reading boundary region reference.");
 
         ASSERTL0(m_boundaryConditions.count(boundaryRegionID) == 0,
-                 "Boundary region '" +
-                     boost::lexical_cast<std::string>(boundaryRegionID) +
+                 "Boundary region '" + std::to_string(boundaryRegionID) +
                      "' appears multiple times.");
 
         // Find the boundary region corresponding to this ID.
@@ -805,5 +810,4 @@ void BoundaryConditions::ReadBoundaryConditions(TiXmlElement *conditions)
         regionElement = regionElement->NextSiblingElement("REGION");
     }
 }
-} // namespace SpatialDomains
-} // namespace Nektar
+} // namespace Nektar::SpatialDomains

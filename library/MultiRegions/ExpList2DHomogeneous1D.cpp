@@ -38,9 +38,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 // Forward declaration for typedefs
 ExpList2DHomogeneous1D::ExpList2DHomogeneous1D() : ExpListHomogeneous1D(e2DH1D)
@@ -343,10 +341,9 @@ void ExpList2DHomogeneous1D::v_WriteTecplotZone(std::ostream &outfile,
 }
 
 void ExpList2DHomogeneous1D::v_WriteVtkPieceHeader(std::ostream &outfile,
-                                                   int expansion, int istrip)
+                                                   int expansion,
+                                                   [[maybe_unused]] int istrip)
 {
-    boost::ignore_unused(istrip);
-
     // If there is only one plane (e.g. HalfMode), we write a 2D plane.
     if (m_planes.size() == 1)
     {
@@ -392,7 +389,7 @@ void ExpList2DHomogeneous1D::v_WriteVtkPieceHeader(std::ostream &outfile,
             << ntotminus << "\">" << endl;
     outfile << "      <Points>" << endl;
     outfile << "        <DataArray type=\"Float64\" "
-            << "NumberOfComponents=\"3\" format=\"ascii\">" << endl;
+            << R"(NumberOfComponents="3" format="ascii">)" << endl;
     outfile << "          ";
     for (i = 0; i < ntot; ++i)
     {
@@ -407,7 +404,7 @@ void ExpList2DHomogeneous1D::v_WriteVtkPieceHeader(std::ostream &outfile,
     outfile << "      </Points>" << endl;
     outfile << "      <Cells>" << endl;
     outfile << "        <DataArray type=\"Int32\" "
-            << "Name=\"connectivity\" format=\"ascii\">" << endl;
+            << R"(Name="connectivity" format="ascii">)" << endl;
     for (i = 0; i < nquad0 - 1; ++i)
     {
         for (j = 0; j < nquad1 - 1; ++j)
@@ -420,7 +417,7 @@ void ExpList2DHomogeneous1D::v_WriteVtkPieceHeader(std::ostream &outfile,
     outfile << endl;
     outfile << "        </DataArray>" << endl;
     outfile << "        <DataArray type=\"Int32\" "
-            << "Name=\"offsets\" format=\"ascii\">" << endl;
+            << R"(Name="offsets" format="ascii">)" << endl;
     for (i = 0; i < ntotminus; ++i)
     {
         outfile << i * 4 + 4 << " ";
@@ -428,7 +425,7 @@ void ExpList2DHomogeneous1D::v_WriteVtkPieceHeader(std::ostream &outfile,
     outfile << endl;
     outfile << "        </DataArray>" << endl;
     outfile << "        <DataArray type=\"UInt8\" "
-            << "Name=\"types\" format=\"ascii\">" << endl;
+            << R"(Name="types" format="ascii">)" << endl;
     for (i = 0; i < ntotminus; ++i)
     {
         outfile << "9 ";
@@ -466,5 +463,4 @@ void ExpList2DHomogeneous1D::v_GetNormals(
         }
     }
 }
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions

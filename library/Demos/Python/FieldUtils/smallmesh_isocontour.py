@@ -2,7 +2,7 @@
 import sys
 from NekPy.FieldUtils import *
 
-field = Field(sys.argv, forceoutput=True, error=True, output_points=6)
+field = Field(sys.argv, force_output=True, error=True, output_points=6)
 
 print("input modules")
 InputModule.Create("xml", field, "smallmesh.xml").Run()

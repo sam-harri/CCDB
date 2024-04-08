@@ -38,9 +38,7 @@
 #include <MultiRegions/MultiRegions.hpp>
 #include <MultiRegions/MultiRegionsDeclspec.h>
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 
 typedef std::map<StdRegions::ConstFactorType, Array<OneD, NekDouble>>
@@ -63,7 +61,7 @@ public:
     MULTI_REGIONS_EXPORT GlobalLinSysKey(const GlobalLinSysKey &key);
 
     /// Destructor.
-    MULTI_REGIONS_EXPORT virtual ~GlobalLinSysKey();
+    MULTI_REGIONS_EXPORT ~GlobalLinSysKey() override;
 
     /// Less-than operator for GlobalLinSysKey comparison.
     MULTI_REGIONS_EXPORT friend bool operator<(const GlobalLinSysKey &lhs,
@@ -116,7 +114,6 @@ inline const VarFactorsMap &GlobalLinSysKey::GetVarFactors() const
 {
     return m_varFactors;
 }
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions
 
 #endif

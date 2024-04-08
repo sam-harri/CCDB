@@ -38,11 +38,7 @@
 #include <functional>
 #include <unordered_set>
 
-namespace berrc = boost::system::errc;
-
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 namespace H5
 {
@@ -982,14 +978,13 @@ void FieldIOHdf5::v_Import(const std::string &infilename,
     decomps_dset->Read(decomps, decomps_fspace, readPL);
 
     size_t nDecomps = decomps.size() / MAX_DCMPS;
-    size_t cnt = 0, cnt2 = 0;
 
     // Mapping from each decomposition to offsets in the data array.
     std::vector<OffsetHelper> decompsToOffsets(nDecomps);
 
-    // Mapping from each group's hash to a vector of element IDs. Note this has
+    // Mapping from each decomposition to a vector of element IDs. Note this has
     // to be unsigned int, since that's what we use in FieldDefinitions.
-    std::map<uint64_t, std::vector<unsigned int>> groupsToElmts;
+    std::map<uint64_t, std::vector<unsigned int>> decompsToElmts;
 
     // Mapping from each group's hash to each of the decompositions.
     std::map<uint64_t, std::set<uint64_t>> groupsToDecomps;
@@ -1000,13 +995,15 @@ void FieldIOHdf5::v_Import(const std::string &infilename,
     // Counters for data offsets
     OffsetHelper running;
 
-    for (size_t i = 0; i < nDecomps; ++i, cnt += MAX_DCMPS)
+    for (size_t i = 0, cnt = 0, cnt2 = 0; i < nDecomps; ++i, cnt += MAX_DCMPS)
     {
         uint64_t nElmt     = decomps[cnt + ELEM_DCMP_IDX];
         uint64_t groupHash = decomps[cnt + HASH_DCMP_IDX];
 
-        std::vector<uint64_t> tmp;
+        // Number of elements in this decomposition that this process needs
+        uint64_t nElmtSelective = 0;
 
+        // Check if we should keep any elements in this decomposition
         if (selective)
         {
             for (size_t j = 0; j < nElmt; ++j)
@@ -1014,16 +1011,21 @@ void FieldIOHdf5::v_Import(const std::string &infilename,
                 uint64_t elmtId = ids[cnt2 + j];
                 if (toread.find(elmtId) != toread.end())
                 {
-                    tmp.push_back(elmtId);
+                    nElmtSelective += 1;
                 }
             }
         }
         else
         {
-            tmp.insert(tmp.begin(), ids.begin() + cnt2,
-                       ids.begin() + cnt2 + nElmt);
+            nElmtSelective = nElmt;
         }
 
+        if (nElmtSelective > 0)
+        {
+            groupsToDecomps[groupHash].insert(i);
+        }
+
+        // All element IDs in this decomposition
         std::vector<unsigned int> tmp2(nElmt);
         for (size_t j = 0; j < nElmt; ++j)
         {
@@ -1032,14 +1034,13 @@ void FieldIOHdf5::v_Import(const std::string &infilename,
 
         cnt2 += nElmt;
 
-        if (tmp.size() > 0)
-        {
-            groupsToDecomps[groupHash].insert(i);
-        }
-
-        groupsToElmts[i]    = tmp2;
+        decompsToElmts[i]   = tmp2;
         decompsToOffsets[i] = running;
 
+        //
+        // TODO: Will this update the OffsetHelper in decompsToOffsets? (copy
+        // constructor?)
+        //
         running.data += decomps[cnt + VAL_DCMP_IDX];
         running.order += decomps[cnt + ORDER_DCMP_IDX];
         running.homy += decomps[cnt + HOMY_DCMP_IDX];
@@ -1052,24 +1053,125 @@ void FieldIOHdf5::v_Import(const std::string &infilename,
         // Select region from dataset for this decomposition.
         for (auto &sIt : gIt.second)
         {
-            std::stringstream fieldNameStream;
-            fieldNameStream << gIt.first;
+            // Convert group name to string
+            auto groupName = std::to_string(gIt.first);
 
             FieldDefinitionsSharedPtr fielddef =
                 MemoryManager<FieldDefinitions>::AllocateSharedPtr();
             ImportFieldDef(readPLInd, root, decomps, sIt, decompsToOffsets[sIt],
-                           fieldNameStream.str(), fielddef);
+                           groupName, fielddef);
 
-            fielddef->m_elementIDs = groupsToElmts[sIt];
+            fielddef->m_elementIDs = decompsToElmts[sIt];
+            //
+            // TODO: Fix the case with 0 elements!
+            //
             fielddefs.push_back(fielddef);
 
             if (fielddata != NullVectorNekDoubleVector)
             {
-                std::vector<NekDouble> decompFieldData;
-                ImportFieldData(readPLInd, data_dset, data_fspace,
-                                decompsToOffsets[sIt].data, decomps, sIt,
-                                fielddef, decompFieldData);
-                fielddata.push_back(decompFieldData);
+                if (selective)
+                {
+                    // Determine number of modes (coefficients) per element
+                    std::vector<unsigned int> coeffsPerElmt{
+                        GetNumberOfCoeffsPerElement(fielddef)};
+
+                    // Selected element IDs
+                    std::vector<unsigned int> newElementIDs;
+                    std::vector<unsigned int> newNumModes;
+                    std::vector<hsize_t> dataIdxToRead;
+
+                    {
+                        size_t offset   = 0;
+                        size_t numbasis = fielddef->m_basis.size();
+
+                        // Loop through all elements in this decomposition
+
+                        for (size_t i = 0; i < fielddef->m_elementIDs.size();
+                             ++i)
+                        {
+                            // Check if we need data for this element
+                            if (toread.find(fielddef->m_elementIDs[i]) !=
+                                toread.end())
+                            {
+                                newElementIDs.push_back(
+                                    fielddef->m_elementIDs[i]);
+
+                                for (size_t j = 0; j < coeffsPerElmt[i]; ++j)
+                                {
+                                    dataIdxToRead.push_back(
+                                        decompsToOffsets[sIt].data + offset +
+                                        j);
+                                }
+
+                                if (fielddef->m_uniOrder == false)
+                                {
+                                    for (size_t j = 0; j < numbasis; ++j)
+                                    {
+                                        newNumModes.push_back(
+                                            fielddef
+                                                ->m_numModes[i * numbasis + j]);
+                                    }
+                                }
+                            }
+
+                            offset += coeffsPerElmt[i];
+                        }
+
+                        // Add indices for all remaining fields (variables)
+                        // We assume that all fields are stored with the same
+                        // polynomial order
+                        const size_t nDataPoints = dataIdxToRead.size();
+
+                        for (size_t i = 1; i < fielddef->m_fields.size(); ++i)
+                        {
+                            for (size_t j = 0; j < nDataPoints; ++j)
+                            {
+                                dataIdxToRead.push_back(dataIdxToRead[j] +
+                                                        i * offset);
+                            }
+                        }
+                    }
+
+                    fielddef->m_elementIDs = newElementIDs;
+                    if (fielddef->m_uniOrder == false)
+                    {
+                        fielddef->m_numModes = newNumModes;
+                    }
+
+                    std::vector<NekDouble> decompFieldData;
+
+                    data_fspace->ClearRange();
+                    data_fspace->SetSelection(dataIdxToRead.size(),
+                                              dataIdxToRead);
+
+                    data_dset->Read(decompFieldData, data_fspace, readPLInd);
+                    ASSERTL0(decompFieldData.size() ==
+                                 CheckFieldDefinition(fielddef) *
+                                     fielddef->m_fields.size(),
+                             "FieldIOHdf5: input data is not the same length "
+                             "as header information.");
+                    fielddata.push_back(decompFieldData);
+                }
+                else
+                {
+                    std::vector<NekDouble> decompFieldData;
+
+                    uint64_t nElemVals =
+                        decomps[sIt * MAX_DCMPS + VAL_DCMP_IDX];
+                    uint64_t nFieldVals = nElemVals;
+
+                    data_fspace->ClearRange();
+                    data_fspace->SelectRange(decompsToOffsets[sIt].data,
+                                             nFieldVals);
+
+                    data_dset->Read(decompFieldData, data_fspace, readPLInd);
+                    ASSERTL0(decompFieldData.size() ==
+                                 CheckFieldDefinition(fielddef) *
+                                     fielddef->m_fields.size(),
+                             "FieldIOHdf5: input data is not the same length "
+                             "as header information.");
+                    fielddata.push_back(decompFieldData);
+                }
             }
         }
     }
@@ -1278,38 +1380,6 @@ void FieldIOHdf5::ImportFieldDef(H5::PListSharedPtr readPL,
 }
 
 /**
- * @brief Import the field data from the HDF5 document.
- *
- * @param readPL       Reading parameter list.
- * @param data_dset    Pointer to the `DATA` dataset.
- * @param data_fspace  Pointer to the `DATA` data space.
- * @param data_i       Index in the `DATA` dataset to start reading from.
- * @param decomps      Information from the `DECOMPOSITION` dataset.
- * @param decomp       Index of the decomposition.
- * @param fielddef     Field definitions for this file
- * @param fielddata    On return contains resulting field data.
- */
-void FieldIOHdf5::ImportFieldData(
-    H5::PListSharedPtr readPL, H5::DataSetSharedPtr data_dset,
-    H5::DataSpaceSharedPtr data_fspace, uint64_t data_i,
-    std::vector<uint64_t> &decomps, uint64_t decomp,
-    const FieldDefinitionsSharedPtr fielddef, std::vector<NekDouble> &fielddata)
-{
-    std::stringstream prfx;
-    prfx << m_comm->GetRank() << ": FieldIOHdf5::ImportFieldData(): ";
-
-    uint64_t nElemVals  = decomps[decomp * MAX_DCMPS + VAL_DCMP_IDX];
-    uint64_t nFieldVals = nElemVals;
-
-    data_fspace->SelectRange(data_i, nFieldVals);
-    data_dset->Read(fielddata, data_fspace, readPL);
-    int datasize = CheckFieldDefinition(fielddef);
-    ASSERTL0(fielddata.size() == datasize * fielddef->m_fields.size(),
-             prfx.str() +
-                 "input data is not the same length as header information.");
-}
-
-/**
  * @brief Import field metadata from @p filename and return the data source
  * which wraps @p filename.
  *
@@ -1362,5 +1432,4 @@ void FieldIOHdf5::ImportHDF5FieldMetaData(DataSourceSharedPtr dataSource,
     }
 }
 
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities

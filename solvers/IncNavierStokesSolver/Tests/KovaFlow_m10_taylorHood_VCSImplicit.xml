@@ -19,14 +19,14 @@
 
         <GLOBALSYSSOLNINFO>
             <V VAR="u,v">
-                <I PROPERTY="GlobalSysSoln"	            VALUE="DirectFull" />
+                <I PROPERTY="GlobalSysSoln"	        VALUE="DirectFull" />
                 <I PROPERTY="Preconditioner"	        VALUE="Null"/>
                 <I PROPERTY="IterativeSolverTolerance"  VALUE="1e-14"/>
                 <I PROPERTY="LinSysIterSolver"          VALUE="GMRES"/>
             </V>
 
             <V VAR="p">
-                <I PROPERTY="GlobalSysSoln"	            VALUE="DirectFull" />
+                <I PROPERTY="GlobalSysSoln"	        VALUE="DirectFull" />
                 <I PROPERTY="Preconditioner"	        VALUE="Null"/>
                 <I PROPERTY="IterativeSolverTolerance"  VALUE="1e-14"/>
                 <I PROPERTY="LinSysIterSolver"          VALUE="ConjugateGradient"/>

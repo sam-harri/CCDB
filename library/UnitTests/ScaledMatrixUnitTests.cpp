@@ -37,9 +37,7 @@
 #include <boost/test/unit_test.hpp>
 #include <iostream>
 
-namespace Nektar
-{
-namespace ScaledMatrixUnitTests
+namespace Nektar::ScaledMatrixUnitTests
 {
 BOOST_AUTO_TEST_CASE(TestConstruction)
 {
@@ -147,5 +145,4 @@ BOOST_AUTO_TEST_CASE(TestGetStorageType)
     BOOST_CHECK_EQUAL(m2->GetStorageType(), eFULL);
     BOOST_CHECK_EQUAL(m3->GetStorageType(), eFULL);
 }
-} // namespace ScaledMatrixUnitTests
-} // namespace Nektar
+} // namespace Nektar::ScaledMatrixUnitTests

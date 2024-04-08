@@ -155,16 +155,16 @@
             <I PROPERTY="AdvectionForm" VALUE="Convective" />
             <I PROPERTY="Projection" VALUE="Galerkin" />
             <I PROPERTY="TimeIntegrationMethod" VALUE="IMEXOrder1" />
-            <I PROPERTY="SuccessiveRHS"  VALUE="5" />
             <I PROPERTY="GlobalSysSoln"  VALUE="IterativeStaticCond"/>
         </SOLVERINFO>
 
         <PARAMETERS>
             <P> TimeStep      = 0.001 </P>
-            <P> NumSteps      = 10 </P>
+            <P> NumSteps      = 10    </P>
             <P> IO_CheckSteps = 10    </P>
             <P> IO_InfoSteps  = 10    </P>
-            <P> Kinvis        = 1   </P>
+            <P> Kinvis        = 1     </P>
+            <P> SuccessiveRHS = 5     </P>
         </PARAMETERS>
 
         <VARIABLES>
@@ -223,12 +223,6 @@
         </BOUNDARYCONDITIONS>
 
         <FUNCTION NAME="ExactSolution">
-            <E VAR="u" VALUE="0" />
-            <E VAR="v" VALUE="0" />
-            <E VAR="w" VALUE="y*(1-y)" />
-            <E VAR="p" VALUE="-2*Kinvis*(z-1)" />
-        </FUNCTION>
-        <FUNCTION NAME="InitialConditions">
             <E VAR="u" VALUE="0" />
             <E VAR="v" VALUE="0" />
             <E VAR="w" VALUE="y*(1-y)" />

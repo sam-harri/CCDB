@@ -34,23 +34,19 @@
 
 #include <iomanip>
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <SolverUtils/Filters/FilterInterfaces.hpp>
 #include <SolverUtils/Filters/FilterMean.h>
 
 using namespace std;
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 std::string FilterMean::className =
     SolverUtils::GetFilterFactory().RegisterCreatorFunction("Mean",
                                                             FilterMean::create);
 
 FilterMean::FilterMean(const LibUtilities::SessionReaderSharedPtr &pSession,
-                       const std::weak_ptr<EquationSystem> &pEquation,
+                       const std::shared_ptr<EquationSystem> &pEquation,
                        const ParamMap &pParams)
     : Filter(pSession, pEquation), m_index(-1), m_homogeneous(false), m_planes()
 {
@@ -136,7 +132,9 @@ void FilterMean::v_Initialise(
         m_outputStream.setf(ios::scientific, ios::floatfield);
         m_outputStream << "# Time";
         for (int i = 0; i < pFields.size(); ++i)
+        {
             m_outputStream << setw(22) << equ->GetVariable(i);
+        }
         m_outputStream << setw(22) << volname[spacedim - 1] << " " << m_area;
         m_outputStream << endl;
     }
@@ -169,33 +167,40 @@ void FilterMean::v_Update(
     if (m_homogeneous)
     {
         for (i = 0; i < pFields.size(); ++i)
+        {
             avg[i] = pFields[0]->GetPlane(0)->Integral(pFields[i]->GetPhys()) *
                      m_homogeneousLength;
+        }
     }
     else
     {
         for (i = 0; i < pFields.size(); ++i)
+        {
             avg[i] = pFields[0]->Integral(pFields[i]->GetPhys());
+        }
     }
 
     for (i = 0; i < pFields.size(); ++i)
+    {
         avg[i] /= m_area;
+    }
 
     if (vComm->GetRank() == 0)
     {
         m_outputStream << setw(17) << setprecision(8) << time;
         for (int i = 0; i < pFields.size(); ++i)
+        {
             m_outputStream << setw(22) << setprecision(11) << avg[i];
+        }
         m_outputStream << endl;
     }
 }
 
 void FilterMean::v_Finalise(
-    const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
-    const NekDouble &time)
+    [[maybe_unused]] const Array<OneD, const MultiRegions::ExpListSharedPtr>
+        &pFields,
+    [[maybe_unused]] const NekDouble &time)
 {
-    boost::ignore_unused(pFields, time);
-
     if (pFields[0]->GetComm()->GetRank() == 0)
     {
         m_outputStream.close();
@@ -207,5 +212,4 @@ bool FilterMean::v_IsTimeDependent()
     return true;
 }
 
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils

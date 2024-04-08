@@ -61,10 +61,8 @@ void PowerPressureArea::v_GetPressure(NekDouble &P, const NekDouble &beta,
                                       const NekDouble &A, const NekDouble &A0,
                                       const NekDouble &dAUdx,
                                       const NekDouble &gamma,
-                                      const NekDouble &alpha)
+                                      [[maybe_unused]] const NekDouble &alpha)
 {
-    boost::ignore_unused(alpha);
-
     NekDouble c0 = 0.0;
     GetC0(c0, beta, A0);
 
@@ -79,10 +77,8 @@ void PowerPressureArea::v_GetPressure(NekDouble &P, const NekDouble &beta,
 
 void PowerPressureArea::v_GetC(NekDouble &c, const NekDouble &beta,
                                const NekDouble &A, const NekDouble &A0,
-                               const NekDouble &alpha)
+                               [[maybe_unused]] const NekDouble &alpha)
 {
-    boost::ignore_unused(alpha);
-
     NekDouble c0 = 0.0;
     GetC0(c0, beta, A0);
 
@@ -116,10 +112,8 @@ void PowerPressureArea::v_GetAFromChars(NekDouble &A, const NekDouble &W1,
                                         const NekDouble &W2,
                                         const NekDouble &beta,
                                         const NekDouble &A0,
-                                        const NekDouble &alpha)
+                                        [[maybe_unused]] const NekDouble &alpha)
 {
-    boost::ignore_unused(alpha);
-
     NekDouble c0 = 0.0;
     GetC0(c0, beta, A0);
 
@@ -135,13 +129,10 @@ void PowerPressureArea::v_GetUFromChars(NekDouble &u, const NekDouble &W1,
     u = (W1 + W2) / 2;
 }
 
-void PowerPressureArea::v_GetCharIntegral(NekDouble &I, const NekDouble &beta,
-                                          const NekDouble &A,
-                                          const NekDouble &A0,
-                                          const NekDouble &alpha)
+void PowerPressureArea::v_GetCharIntegral(
+    NekDouble &I, const NekDouble &beta, const NekDouble &A,
+    const NekDouble &A0, [[maybe_unused]] const NekDouble &alpha)
 {
-    boost::ignore_unused(alpha);
-
     NekDouble c  = 0.0;
     NekDouble c0 = 0.0;
 

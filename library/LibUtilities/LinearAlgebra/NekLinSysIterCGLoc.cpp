@@ -33,14 +33,11 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <LibUtilities/BasicUtils/Timer.h>
 #include <LibUtilities/LinearAlgebra/NekLinSysIterCGLoc.h>
 
 using namespace std;
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 /**
  * @class  NekLinSysIterCGLoc
@@ -66,23 +63,13 @@ void NekLinSysIterCGLoc::v_InitObject()
     NekLinSysIter::v_InitObject();
 }
 
-NekLinSysIterCGLoc::~NekLinSysIterCGLoc()
-{
-}
-
 /**
  *
  */
 int NekLinSysIterCGLoc::v_SolveSystem(
     const int nLocal, const Array<OneD, const NekDouble> &pInput,
-    Array<OneD, NekDouble> &pOutput, const int nDir, const NekDouble tol,
-    const NekDouble factor)
+    Array<OneD, NekDouble> &pOutput, [[maybe_unused]] const int nDir)
 {
-    boost::ignore_unused(tol, nDir);
-
-    m_tolerance   = max(tol, 1.0E-16);
-    m_prec_factor = factor;
-
     DoConjugateGradient(nLocal, pInput, pOutput);
 
     return m_totalIterations;
@@ -113,14 +100,12 @@ void NekLinSysIterCGLoc::DoConjugateGradient(
     Array<OneD, NekDouble> q_A(nLocal, 0.0);
     Array<OneD, NekDouble> wk(nLocal, 0.0);
 
-    int k;
     NekDouble alpha;
     NekDouble beta;
     NekDouble rho;
     NekDouble rho_new;
     NekDouble mu;
     NekDouble eps;
-    NekDouble min_resid;
     Array<OneD, NekDouble> vExchange(3, 0.0);
 
     // Copy initial residual from input
@@ -134,6 +119,7 @@ void NekLinSysIterCGLoc::DoConjugateGradient(
     // evaluate initial residual error for exit check
     m_operator.DoAssembleLoc(r_A, wk, true);
     vExchange[2] = Vmath::Dot(nLocal, wk, r_A);
+
     m_rowComm->AllReduce(vExchange, Nektar::LibUtilities::ReduceSum);
 
     eps = vExchange[2];
@@ -146,12 +132,12 @@ void NekLinSysIterCGLoc::DoConjugateGradient(
     m_totalIterations = 0;
 
     // If input residual is less than tolerance skip solve.
-    if (eps < m_tolerance * m_tolerance * m_rhs_magnitude)
+    if (eps < m_NekLinSysTolerance * m_NekLinSysTolerance * m_rhs_magnitude)
     {
         if (m_verbose && m_root)
         {
             cout << "CG iterations made = " << m_totalIterations
-                 << " using tolerance of " << m_tolerance
+                 << " using tolerance of " << m_NekLinSysTolerance
                  << " (error = " << sqrt(eps / m_rhs_magnitude)
                  << ", rhs_mag = " << sqrt(m_rhs_magnitude) << ")" << endl;
         }
@@ -161,15 +147,13 @@ void NekLinSysIterCGLoc::DoConjugateGradient(
     m_operator.DoNekSysPrecon(r_A, w_A, true);
     m_operator.DoNekSysLhsEval(w_A, s_A);
 
-    k = 0;
-
     vExchange[0] = Vmath::Dot(nLocal, r_A, w_A);
     vExchange[1] = Vmath::Dot(nLocal, s_A, w_A);
+
     m_rowComm->AllReduce(vExchange, Nektar::LibUtilities::ReduceSum);
 
     rho               = vExchange[0];
     mu                = vExchange[1];
-    min_resid         = m_rhs_magnitude;
     beta              = 0.0;
     alpha             = rho / mu;
     m_totalIterations = 1;
@@ -177,12 +161,12 @@ void NekLinSysIterCGLoc::DoConjugateGradient(
     // Continue until convergence
     while (true)
     {
-        if (k >= m_maxiter)
+        if (m_totalIterations > m_NekLinSysMaxIterations)
         {
             if (m_root)
             {
                 cout << "CG iterations made = " << m_totalIterations
-                     << " using tolerance of " << m_tolerance
+                     << " using tolerance of " << m_NekLinSysTolerance
                      << " (error = " << sqrt(eps / m_rhs_magnitude)
                      << ", rhs_mag = " << sqrt(m_rhs_magnitude) << ")" << endl;
             }
@@ -208,8 +192,10 @@ void NekLinSysIterCGLoc::DoConjugateGradient(
 
         // <r_{k+1}, w_{k+1}>
         vExchange[0] = Vmath::Dot(nLocal, r_A, w_A);
+
         // <s_{k+1}, w_{k+1}>
         vExchange[1] = Vmath::Dot(nLocal, s_A, w_A);
+
         // <r_{k+1}, r_{k+1}>
         m_operator.DoAssembleLoc(r_A, wk, true);
         vExchange[2] = Vmath::Dot(nLocal, wk, r_A);
@@ -224,25 +210,22 @@ void NekLinSysIterCGLoc::DoConjugateGradient(
         m_totalIterations++;
 
         // Test if norm is within tolerance
-        if (eps < m_tolerance * m_tolerance * m_rhs_magnitude)
+        if (eps < m_NekLinSysTolerance * m_NekLinSysTolerance * m_rhs_magnitude)
         {
             if (m_verbose && m_root)
             {
                 cout << "CG iterations made = " << m_totalIterations
-                     << " using tolerance of " << m_tolerance
+                     << " using tolerance of " << m_NekLinSysTolerance
                      << " (error = " << sqrt(eps / m_rhs_magnitude)
                      << ", rhs_mag = " << sqrt(m_rhs_magnitude) << ")" << endl;
             }
             break;
         }
-        min_resid = min(min_resid, eps);
 
         // Compute search direction and solution coefficients
         beta  = rho_new / rho;
         alpha = rho_new / (mu - rho_new * beta / alpha);
         rho   = rho_new;
-        k++;
     }
 }
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities

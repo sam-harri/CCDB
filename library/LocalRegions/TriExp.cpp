@@ -31,8 +31,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/Foundations/Interp.h>
 #include <LibUtilities/Foundations/InterpCoeff.h>
 #include <LocalRegions/Expansion3D.h>
@@ -42,9 +40,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace LocalRegions
+namespace Nektar::LocalRegions
 {
 TriExp::TriExp(const LibUtilities::BasisKey &Ba,
                const LibUtilities::BasisKey &Bb,
@@ -777,10 +773,10 @@ void TriExp::v_GetTracePhysVals(
     }
 }
 
-void TriExp::v_GetTraceQFactors(const int edge,
-                                Array<OneD, NekDouble> &outarray)
+void TriExp::v_GetTraceQFactors(
+    [[maybe_unused]] const int edge,
+    [[maybe_unused]] Array<OneD, NekDouble> &outarray)
 {
-    boost::ignore_unused(edge, outarray);
     ASSERTL0(false, "Routine not implemented for triangular elements");
 }
 
@@ -1012,10 +1008,8 @@ void TriExp::v_ComputeTraceNormal(const int edge)
 void TriExp::v_ExtractDataToCoeffs(
     const NekDouble *data, const std::vector<unsigned int> &nummodes,
     const int mode_offset, NekDouble *coeffs,
-    std::vector<LibUtilities::BasisType> &fromType)
+    [[maybe_unused]] std::vector<LibUtilities::BasisType> &fromType)
 {
-    boost::ignore_unused(fromType);
-
     int data_order0 = nummodes[mode_offset];
     int fillorder0  = min(m_base[0]->GetNumModes(), data_order0);
     int data_order1 = nummodes[mode_offset + 1];
@@ -1460,9 +1454,8 @@ void TriExp::v_SVVLaplacianFilter(Array<OneD, NekDouble> &array,
 void TriExp::v_NormalTraceDerivFactors(
     Array<OneD, Array<OneD, NekDouble>> &d0factors,
     Array<OneD, Array<OneD, NekDouble>> &d1factors,
-    Array<OneD, Array<OneD, NekDouble>> &d2factors)
+    [[maybe_unused]] Array<OneD, Array<OneD, NekDouble>> &d2factors)
 {
-    boost::ignore_unused(d2factors); // for 3D shapes
     int nquad0 = GetNumPoints(0);
     int nquad1 = GetNumPoints(1);
 
@@ -1633,5 +1626,4 @@ void TriExp::v_NormalTraceDerivFactors(
         }
     }
 }
-} // namespace LocalRegions
-} // namespace Nektar
+} // namespace Nektar::LocalRegions

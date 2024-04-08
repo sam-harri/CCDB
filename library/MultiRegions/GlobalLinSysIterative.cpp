@@ -36,9 +36,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 std::string GlobalLinSysIterative::IteratSolverlookupIds[4] = {
     LibUtilities::SessionReader::RegisterEnumValue(
@@ -72,9 +70,7 @@ GlobalLinSysIterative::GlobalLinSysIterative(
       m_precon(NullPreconditionerSharedPtr), m_totalIterations(0),
       m_useProjection(false), m_numPrevSols(0)
 {
-    m_tolerance           = pLocToGloMap->GetIterativeTolerance();
     m_isAbsoluteTolerance = pLocToGloMap->IsAbsoluteTolerance();
-    m_maxiter             = pLocToGloMap->GetMaxIterations();
     m_linSysIterSolver    = pLocToGloMap->GetLinSysIterSolver();
 
     LibUtilities::CommSharedPtr vComm =
@@ -131,15 +127,13 @@ GlobalLinSysIterative::~GlobalLinSysIterative()
  */
 void GlobalLinSysIterative::DoProjection(
     const int nGlobal, const Array<OneD, const NekDouble> &pInput,
-    Array<OneD, NekDouble> &pOutput, const int nDir, const NekDouble tol,
-    const bool isAconjugate)
+    Array<OneD, NekDouble> &pOutput, const int nDir, const bool isAconjugate)
 {
     int numIterations = 0;
-    if (0 == m_numPrevSols)
+    if (m_numPrevSols == 0)
     {
         // no previous solutions found
-        numIterations =
-            m_linsol->SolveSystem(nGlobal, pInput, pOutput, nDir, tol);
+        numIterations = m_linsol->SolveSystem(nGlobal, pInput, pOutput, nDir);
     }
     else
     {
@@ -158,6 +152,7 @@ void GlobalLinSysIterative::DoProjection(
 
         vComm->AllReduce(rhsNorm, Nektar::LibUtilities::ReduceSum);
 
+        NekDouble tol = m_linsol->GetNekLinSysTolerance();
         if (rhsNorm < tol * tol * m_rhs_magnitude)
         {
             Vmath::Zero(nNonDir, tmp = pOutput + nDir, 1);
@@ -223,18 +218,22 @@ void GlobalLinSysIterative::DoProjection(
         if (m_verbose)
         {
             if (m_root)
+            {
                 cout << "SuccessiveRHS: " << m_prevBasis.size()
                      << "-bases projection reduces L2-norm of RHS from "
                      << std::sqrt(rhsNorm) << " to ";
+            }
             NekDouble tmprhsNorm =
                 Vmath::Dot2(nNonDir, pb_s + nDir, pb_s + nDir, m_map + nDir);
             vComm->AllReduce(tmprhsNorm, Nektar::LibUtilities::ReduceSum);
             if (m_root)
+            {
                 cout << std::sqrt(tmprhsNorm) << endl;
+            }
         }
 
         // solve the system with projected rhs
-        numIterations = m_linsol->SolveSystem(nGlobal, pb_s, tmpx_s, nDir, tol);
+        numIterations = m_linsol->SolveSystem(nGlobal, pb_s, tmpx_s, nDir);
 
         // remainder solution + projection of previous solutions
         x = tmpx + px;
@@ -302,7 +301,7 @@ void GlobalLinSysIterative::UpdateKnownSolutions(
         Vmath::Dot2(nNonDir, newBasis, tmpAx_s + nDir, m_map + nDir);
     vComm->AllReduce(solNorm, Nektar::LibUtilities::ReduceSum);
 
-    if (solNorm < 22.2 * NekConstants::kNekSparseNonZeroTol)
+    if (solNorm < NekConstants::kNekSparseNonZeroTol)
     {
         return;
     }
@@ -314,7 +313,9 @@ void GlobalLinSysIterative::UpdateKnownSolutions(
     for (int i = 0; i < m_prevBasis.size(); ++i)
     {
         if (i == insertLocation)
+        {
             continue;
+        }
         int skip = i > insertLocation;
         y_s[i - skip] =
             Vmath::Dot2(nNonDir, m_prevBasis[i], tmpAx_s + nDir, m_map + nDir);
@@ -330,12 +331,16 @@ void GlobalLinSysIterative::UpdateKnownSolutions(
         for (int i = 0; i < m_numSuccessiveRHS; ++i)
         {
             if (i == insertLocation)
+            {
                 continue;
+            }
             int iskip = i > insertLocation;
             for (int j = i; j < m_numSuccessiveRHS; ++j)
             {
                 if (j == insertLocation)
+                {
                     continue;
+                }
                 int jskip = j > insertLocation;
                 tilCoeffMatrix->SetValue(i - iskip, j - jskip,
                                          m_coeffMatrix->GetValue(i, j));
@@ -381,11 +386,15 @@ void GlobalLinSysIterative::UpdateKnownSolutions(
         residual -= y_s[i] * invMy_s[i];
     }
     if (m_verbose && m_root)
+    {
         cout << "SuccessiveRHS: residual " << residual;
+    }
     if (residual < epsilon)
     {
         if (m_verbose && m_root)
+        {
             cout << " < " << epsilon << ", reject" << endl;
+        }
         return;
     }
 
@@ -401,7 +410,9 @@ void GlobalLinSysIterative::UpdateKnownSolutions(
         for (int i = 0; i < m_numSuccessiveRHS; ++i)
         {
             if (i == insertLocation)
+            {
                 continue;
+            }
             int iskip = i > insertLocation;
             newCoeffMatrix->SetValue(insertLocation, i, y_s[i - iskip]);
         }
@@ -428,11 +439,15 @@ void GlobalLinSysIterative::UpdateKnownSolutions(
     if (info3)
     {
         if (m_verbose && m_root)
+        {
             cout << " >= " << epsilon << ", reject (Dsptrf fails)" << endl;
+        }
         return;
     }
     if (m_verbose && m_root)
+    {
         cout << " >= " << epsilon << ", accept" << endl;
+    }
 
     // if success, update basis, rhs, coefficient matrix, and its factor
     if (m_prevBasis.size() < m_numSuccessiveRHS)
@@ -460,40 +475,4 @@ void GlobalLinSysIterative::UpdateKnownSolutions(
     ++m_numPrevSols;
 }
 
-void GlobalLinSysIterative::Set_Rhs_Magnitude(const NekVector<NekDouble> &pIn)
-{
-    if (m_isAbsoluteTolerance)
-    {
-        m_rhs_magnitude = 1.0;
-        return;
-    }
-
-    NekDouble vExchange(0.0);
-    if (m_map.size() > 0)
-    {
-        vExchange =
-            Vmath::Dot2(pIn.GetDimension(), &pIn[0], &pIn[0], &m_map[0]);
-    }
-
-    m_expList.lock()->GetComm()->GetRowComm()->AllReduce(
-        vExchange, Nektar::LibUtilities::ReduceSum);
-
-    // To ensure that very different rhs values are not being
-    // used in subsequent solvers such as the velocit solve in
-    // INC NS. If this works we then need to work out a better
-    // way to control this.
-    NekDouble new_rhs_mag = (vExchange > 1e-6) ? vExchange : 1.0;
-
-    if (m_rhs_magnitude == NekConstants::kNekUnsetDouble)
-    {
-        m_rhs_magnitude = new_rhs_mag;
-    }
-    else
-    {
-        m_rhs_magnitude = (m_rhs_mag_sm * (m_rhs_magnitude) +
-                           (1.0 - m_rhs_mag_sm) * new_rhs_mag);
-    }
-}
-
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions

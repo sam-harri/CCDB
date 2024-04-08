@@ -43,9 +43,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace SpatialDomains
+namespace Nektar::SpatialDomains
 {
 
 Geometry3D::Geometry3D()
@@ -188,9 +186,9 @@ void Geometry3D::NewtonIterationForLocCoord(
     }
 }
 
-int Geometry3D::v_AllLeftCheck(const Array<OneD, const NekDouble> &gloCoord)
+int Geometry3D::v_AllLeftCheck(
+    [[maybe_unused]] const Array<OneD, const NekDouble> &gloCoord)
 {
-    boost::ignore_unused(gloCoord);
     // todo: check only plane surfaces
     return 0;
 }
@@ -593,5 +591,4 @@ void Geometry3D::v_CalculateInverseIsoParam()
     }
 }
 
-} // namespace SpatialDomains
-} // namespace Nektar
+} // namespace Nektar::SpatialDomains

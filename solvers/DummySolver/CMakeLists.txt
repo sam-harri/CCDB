@@ -10,6 +10,10 @@ IF( NEKTAR_SOLVER_DUMMY )
 
     ADD_SOLVER_EXECUTABLE(DummySolver SOURCES ${DummySolverSource})
 
+    IF(NEKTAR_BUILD_SOLVER_LIBS)
+        MESSAGE(WARNING, "Solver library build not set up for DummySolver - skipping.")
+    ENDIF()
+
 #     ADD_NEKTAR_TEST(Dummy_3DCubeFile)
     ADD_NEKTAR_TEST(Dummy_3DCubeFileSingle)
 

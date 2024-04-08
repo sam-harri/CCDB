@@ -55,9 +55,7 @@
 
 namespace po = boost::program_options;
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 /**
  * Denotes different types of mesh converter modules: so far only
@@ -243,9 +241,8 @@ public:
 protected:
     Module(){};
 
-    virtual void v_Process(po::variables_map &vm)
+    virtual void v_Process([[maybe_unused]] po::variables_map &vm)
     {
-        boost::ignore_unused(vm);
         NEKERROR(ErrorUtil::efatal, "v_Process not coded");
     }
 
@@ -335,7 +332,6 @@ typedef LibUtilities::NekFactory<ModuleKey, Module, FieldSharedPtr>
 
 FIELD_UTILS_EXPORT ModuleFactory &GetModuleFactory();
 
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils
 
 #endif

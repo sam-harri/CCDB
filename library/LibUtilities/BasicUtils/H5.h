@@ -41,16 +41,10 @@
 #include <string>
 #include <vector>
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/BasicUtils/ErrorUtil.hpp>
 #include <LibUtilities/Communication/Comm.h>
 
-namespace Nektar
-{
-namespace LibUtilities
-{
-namespace H5
+namespace Nektar::LibUtilities::H5
 {
 
 #define H5_CONSTRUCT(ans, func, args)                                          \
@@ -164,7 +158,7 @@ public:
     static PListSharedPtr LinkAccess();
 
     PList();
-    ~PList();
+    ~PList() override;
     void SetChunk(const std::vector<hsize_t> &dims);
     void SetDeflate(const unsigned level = 1);
     void SetMpio(CommSharedPtr comm);
@@ -172,7 +166,7 @@ public:
     void SetDxMpioIndependent();
 
 protected:
-    virtual void v_Close() override;
+    void v_Close() override;
 
 private:
     PList(hid_t cls);
@@ -323,7 +317,7 @@ public:
     DataSpace(const std::vector<hsize_t> &dims);
     DataSpace(const std::vector<hsize_t> &dims,
               const std::vector<hsize_t> &max_dims);
-    ~DataSpace();
+    ~DataSpace() override;
 
     void SelectRange(const hsize_t start, const hsize_t count);
     void AppendRange(const hsize_t start, const hsize_t count);
@@ -342,7 +336,7 @@ public:
     std::vector<hsize_t> GetDims();
 
 protected:
-    virtual void v_Close() override;
+    void v_Close() override;
 
 private:
     DataSpace(hid_t id);
@@ -399,15 +393,15 @@ class DataType : public Object
 {
 public:
     static DataTypeSharedPtr String(size_t len = 0);
-    template <class T> static DataTypeSharedPtr OfObject(const T &obj)
+    template <class T>
+    static DataTypeSharedPtr OfObject([[maybe_unused]] const T &obj)
     {
-        boost::ignore_unused(obj);
         return DataTypeTraits<T>::GetType();
     }
     DataTypeSharedPtr Copy() const;
 
 protected:
-    virtual void v_Close() override;
+    void v_Close() override;
     DataType(hid_t id);
 };
 
@@ -428,7 +422,7 @@ public:
     }
 
 protected:
-    virtual void v_Close() override;
+    void v_Close() override;
 
 private:
     CompoundDataType(hid_t);
@@ -442,7 +436,7 @@ public:
     static DataTypeSharedPtr CS1();
 
 protected:
-    virtual void v_Close() override;
+    void v_Close() override;
 
 private:
     PredefinedDataType(hid_t);
@@ -452,11 +446,11 @@ private:
 class Attribute : public Object
 {
 public:
-    ~Attribute();
+    ~Attribute() override;
     DataSpaceSharedPtr GetSpace() const;
 
 protected:
-    virtual void v_Close() override;
+    void v_Close() override;
 
 private:
     Attribute(hid_t id) : Object(id)
@@ -478,11 +472,11 @@ public:
                                 PListSharedPtr accessPL = PList::Default());
     static FileSharedPtr Open(const std::string &filename, unsigned mode,
                               PListSharedPtr accessPL = PList::Default());
-    ~File();
+    ~File() override;
 
 protected:
-    virtual void v_Close() override;
-    virtual hsize_t v_GetNumElements() override;
+    void v_Close() override;
+    hsize_t v_GetNumElements() override;
 
 private:
     File(hid_t id);
@@ -492,14 +486,14 @@ private:
 class Group : public CanHaveAttributes, public CanHaveGroupsDataSets
 {
 public:
-    ~Group();
+    ~Group() override;
     std::vector<std::string> GetElementNames();
     CanHaveAttributesSharedPtr operator[](hsize_t idx);
     CanHaveAttributesSharedPtr operator[](const std::string &key);
 
 protected:
-    virtual void v_Close() override;
-    virtual hsize_t v_GetNumElements() override;
+    void v_Close() override;
+    hsize_t v_GetNumElements() override;
 
 private:
     Group(hid_t id);
@@ -509,7 +503,7 @@ private:
 class DataSet : public CanHaveAttributes
 {
 public:
-    ~DataSet();
+    ~DataSet() override;
     DataSpaceSharedPtr GetSpace() const;
 
     template <class T> void Write(const std::vector<T> &data)
@@ -643,7 +637,7 @@ public:
     }
 
 protected:
-    virtual void v_Close() override;
+    void v_Close() override;
 
 private:
     DataSet(hid_t id);
@@ -746,7 +740,7 @@ void CanHaveAttributes::SetAttribute(const std::string &name,
     DataSpaceSharedPtr space = DataSpace::OneD(value.size());
     AttributeSharedPtr attr  = CreateAttribute(name, type, space);
 
-    const void *converted_buf = NULL;
+    const void *converted_buf = nullptr;
     if (DataTypeConversionPolicy<T>::MustConvert)
     {
         converted_vals.resize(value.size());
@@ -795,7 +789,7 @@ void CanHaveAttributes::GetAttribute(const std::string &name,
     H5Sget_simple_extent_dims(space->GetId(), &len, &maxdim);
 
     value.resize(len);
-    void *converted_buf = NULL;
+    void *converted_buf = nullptr;
     if (DataTypeConversionPolicy<T>::MustConvert)
     {
         converted_vals.resize(len);
@@ -832,8 +826,6 @@ DataSetSharedPtr CanHaveGroupsDataSets::CreateWriteDataSet(
     dataset->Write(data);
     return dataset;
 }
-} // namespace H5
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities::H5
 
 #endif

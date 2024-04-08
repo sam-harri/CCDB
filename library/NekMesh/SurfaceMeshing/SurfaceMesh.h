@@ -39,9 +39,7 @@
 #include <NekMesh/SurfaceMeshing/CurveMesh.h>
 #include <NekMesh/SurfaceMeshing/FaceMesh.h>
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 /**
@@ -58,11 +56,11 @@ public:
     static ModuleKey className;
 
     SurfaceMesh(MeshSharedPtr m);
-    virtual ~SurfaceMesh();
+    ~SurfaceMesh() override;
 
-    virtual void Process();
+    void Process() override;
 
-    std::string GetModuleName()
+    std::string GetModuleName() override
     {
         return "SurfaceMesh";
     }
@@ -75,7 +73,6 @@ private:
     std::map<int, CurveMeshSharedPtr> m_curvemeshes;
 };
 
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh
 
 #endif

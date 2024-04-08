@@ -52,9 +52,7 @@
 #define ISSTDERRTTY isatty(fileno(stderr))
 #endif
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 /**
@@ -158,7 +156,7 @@ public:
     }
 
     /// Default destructor.
-    virtual ~StreamOutput() = default;
+    ~StreamOutput() override = default;
 
     /**
      * @brief Writes a log message to @p m_os.
@@ -564,7 +562,6 @@ private:
     }
 };
 
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh
 
 #endif

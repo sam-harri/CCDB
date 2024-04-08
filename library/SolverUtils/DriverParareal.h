@@ -37,9 +37,7 @@
 
 #include <SolverUtils/DriverParallelInTime.h>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 
 /// Base class for the development of solvers.
@@ -69,15 +67,14 @@ protected:
         const SpatialDomains::MeshGraphSharedPtr pGraph);
 
     /// Destructor
-    SOLVER_UTILS_EXPORT virtual ~DriverParareal() = default;
+    SOLVER_UTILS_EXPORT ~DriverParareal() override = default;
 
     /// Virtual function for initialisation implementation.
-    SOLVER_UTILS_EXPORT virtual void v_InitObject(
+    SOLVER_UTILS_EXPORT void v_InitObject(
         std::ostream &out = std::cout) override;
 
     /// Virtual function for solve implementation.
-    SOLVER_UTILS_EXPORT virtual void v_Execute(
-        std::ostream &out = std::cout) override;
+    SOLVER_UTILS_EXPORT void v_Execute(std::ostream &out = std::cout) override;
 
     static std::string driverLookupId;
 
@@ -91,8 +88,7 @@ private:
     void UpdateSolverInitialCondition(const size_t timeLevel);
 
     void UpdateSolution(const size_t timeLevel, const NekDouble time,
-                        const size_t nstep, const size_t wd = 0,
-                        const size_t iter = 0);
+                        const size_t nstep, const size_t wd, const size_t iter);
 
     void CorrectionWithOldCoarseSolution(void);
 
@@ -106,27 +102,6 @@ private:
 
     void WriteTimeChunkOuput(void);
 
-    void SpeedUpAnalysis();
-
-    void PrintSpeedUp(NekDouble fineSolveTime, NekDouble coarseSolveTime,
-                      NekDouble restTime, NekDouble interTime,
-                      NekDouble commTime, NekDouble predictorTime);
-
-    NekDouble ComputeSpeedUp(const size_t iter, NekDouble fineSolveTime,
-                             NekDouble coarseSolveTime, NekDouble restTime,
-                             NekDouble interTime, NekDouble commTime,
-                             NekDouble predictorTime);
-
-    NekDouble EstimateCommunicationTime(void);
-
-    NekDouble EstimateRestrictionTime(void);
-
-    NekDouble EstimateInterpolationTime(void);
-
-    NekDouble EstimateSolverTime(const size_t timeLevel, const size_t nstep);
-
-    NekDouble EstimatePredictorTime(void);
-
     static constexpr size_t m_fineLevel   = 0;
     static constexpr size_t m_coarseLevel = 1;
     Array<OneD, Array<OneD, NekDouble>> m_initialCondition;
@@ -134,7 +109,6 @@ private:
     Array<OneD, Array<OneD, NekDouble>> m_coarseSolution;
 };
 
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils
 
 #endif // NEKTAR_SOLVERUTILS_DRIVERPARAREAL_H

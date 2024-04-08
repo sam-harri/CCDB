@@ -37,14 +37,12 @@
 
 #include <LibUtilities/Foundations/Points.h>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 class GaussPoints : public Points<NekDouble>
 {
 public:
-    virtual ~GaussPoints()
+    ~GaussPoints() override
     {
     }
 
@@ -183,13 +181,13 @@ public:
     }
 
 protected:
-    LIB_UTILITIES_EXPORT virtual const std::shared_ptr<NekMatrix<NekDouble>> v_GetI(
+    LIB_UTILITIES_EXPORT const std::shared_ptr<NekMatrix<NekDouble>> v_GetI(
         const PointsKey &pkey) override;
-    LIB_UTILITIES_EXPORT virtual const std::shared_ptr<NekMatrix<NekDouble>> v_GetI(
+    LIB_UTILITIES_EXPORT const std::shared_ptr<NekMatrix<NekDouble>> v_GetI(
         const Array<OneD, const NekDouble> &x) override;
-    LIB_UTILITIES_EXPORT virtual const std::shared_ptr<NekMatrix<NekDouble>> v_GetI(
+    LIB_UTILITIES_EXPORT const std::shared_ptr<NekMatrix<NekDouble>> v_GetI(
         size_t numpoints, const Array<OneD, const NekDouble> &x) override;
-    LIB_UTILITIES_EXPORT virtual const std::shared_ptr<NekMatrix<NekDouble>>
+    LIB_UTILITIES_EXPORT const std::shared_ptr<NekMatrix<NekDouble>>
     v_GetGalerkinProjection(const PointsKey &pkey) override;
 
 private:
@@ -198,9 +196,9 @@ private:
     GaussPoints()                          = delete;
     GaussPoints(const GaussPoints &points) = delete;
 
-    virtual void v_CalculatePoints() override final;
-    virtual void v_CalculateWeights() override final;
-    virtual void v_CalculateDerivMatrix() override final;
+    void v_CalculatePoints() final;
+    void v_CalculateWeights() final;
+    void v_CalculateDerivMatrix() final;
 
     void CalculateInterpMatrix(size_t npts,
                                const Array<OneD, const NekDouble> &xpoints,
@@ -210,7 +208,6 @@ private:
         const PointsKey &pkey);
 
 }; // class GaussPoints
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities
 
 #endif // GAUSSPOINTS_H

@@ -53,12 +53,10 @@ public:
 protected:
     AUSM3Solver(const LibUtilities::SessionReaderSharedPtr &pSession);
 
-    virtual void v_PointSolve(double rhoL, double rhouL, double rhovL,
-                              double rhowL, double EL, double rhoR,
-                              double rhouR, double rhovR, double rhowR,
-                              double ER, double &rhof, double &rhouf,
-                              double &rhovf, double &rhowf,
-                              double &Ef) override;
+    void v_PointSolve(double rhoL, double rhouL, double rhovL, double rhowL,
+                      double EL, double rhoR, double rhouR, double rhovR,
+                      double rhowR, double ER, double &rhof, double &rhouf,
+                      double &rhovf, double &rhowf, double &Ef) override;
 
     NekDouble m_Mco;
 };

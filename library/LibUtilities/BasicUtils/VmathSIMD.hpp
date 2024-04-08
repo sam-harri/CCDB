@@ -39,9 +39,7 @@
 
 #include <LibUtilities/SimdLib/tinysimd.hpp>
 
-namespace Vmath
-{
-namespace SIMD
+namespace Vmath::SIMD
 {
 /// \brief Add vector z = x + y
 template <class T, typename = typename std::enable_if<
@@ -562,6 +560,5 @@ void Gathr(const I n, const T *x, const I *y, T *z)
     }
 }
 
-} // namespace SIMD
-} // namespace Vmath
+} // namespace Vmath::SIMD
 #endif

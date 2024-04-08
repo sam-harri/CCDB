@@ -44,9 +44,7 @@
 #include <MultiRegions/ExpList3DHomogeneous1D.h>
 #include <MultiRegions/ExpList3DHomogeneous2D.h>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 class FilterModalEnergy : public Filter
 {
@@ -56,7 +54,8 @@ public:
     // Creates an instance of this class
     static FilterSharedPtr create(
         const LibUtilities::SessionReaderSharedPtr &pSession,
-        const std::weak_ptr<EquationSystem> &pEquation, const ParamMap &pParams)
+        const std::shared_ptr<EquationSystem> &pEquation,
+        const ParamMap &pParams)
     {
         FilterSharedPtr p = MemoryManager<FilterModalEnergy>::AllocateSharedPtr(
             pSession, pEquation, pParams);
@@ -68,21 +67,21 @@ public:
 
     SOLVER_UTILS_EXPORT FilterModalEnergy(
         const LibUtilities::SessionReaderSharedPtr &pSession,
-        const std::weak_ptr<EquationSystem> &pEquation,
+        const std::shared_ptr<EquationSystem> &pEquation,
         const ParamMap &pParams);
-    SOLVER_UTILS_EXPORT virtual ~FilterModalEnergy();
+    SOLVER_UTILS_EXPORT ~FilterModalEnergy() override;
 
 protected:
-    virtual void v_Initialise(
+    void v_Initialise(
         const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
         const NekDouble &time) override;
-    virtual void v_Update(
+    void v_Update(
         const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
         const NekDouble &time) override;
-    virtual void v_Finalise(
+    void v_Finalise(
         const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
         const NekDouble &time) override;
-    virtual bool v_IsTimeDependent() override;
+    bool v_IsTimeDependent() override;
     NekDouble L2Error(
         const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
         unsigned int field, const NekDouble &time);
@@ -124,7 +123,6 @@ private:
     bool m_homogen_dealiasing;
 };
 
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils
 
 #endif

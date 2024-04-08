@@ -435,6 +435,8 @@ The following parameters are supported:
     Prefix of the output filename to which the errors are written.\\
     \inltt{OutputFrequency} & \xmark   & 1 &
     Number of timesteps after which output is written.\\
+    \inltt{ConsoleOutput} & \xmark   & 0 &
+    Also output error in the console when writing to file.\\
     \bottomrule
   \end{tabularx}
 \end{center}
@@ -445,6 +447,49 @@ An example syntax is given below:
   <FILTER TYPE="Error">
       <PARAM NAME="OutputFile">ErrorFile</PARAM>
       <PARAM NAME="OutputFrequency">10</PARAM>
+      <PARAM NAME="ConsoleOutput">1</PARAM>
+  </FILTER>
+\end{lstlisting}
+
+\subsection{Integral}\label{filters:Integral}
+
+This filter produces a file containing the time-evolution of the integral of
+the solver variables on user defined composites. By default this file is called
+\inltt{session.int} where \inltt{session} is the session name.
+
+The following parameters are supported:
+
+\begin{center}
+    \begin{tabularx}{0.99\textwidth}{lllX}
+        \toprule
+        \textbf{Option name} & \textbf{Required} & \textbf{Default} &
+        \textbf{Description} \\
+        \midrule
+        \inltt{OutputFile}      & \xmark   & \inltt{session} &
+        Prefix of the output filename to which the integrals are written.\\
+        \inltt{OutputFrequency} & \xmark   & 1 &
+        Number of timesteps after which output is written.\\
+        \inltt{OutputPrecision} & \xmark   & 7 &
+        Decimal precision with which the output is written.\\
+        \inltt{Composites} & \cmark   & - &
+        Composites on which to calculate the integral.\\
+        \bottomrule
+    \end{tabularx}
+\end{center}
+
+Multiple composites can be defined together by using ranges with each composite
+grouping producing a summed output for each variable in the \inltt{OutputFile}.
+For example \inltt{C[1,3,5-7]} would produce a single integral output for each
+variable whilst \inltt{C[1-3], C[4]} would produce two.
+
+An example syntax is given below:
+
+\begin{lstlisting}[style=XMLStyle,gobble=2]
+  <FILTER TYPE="Integral">
+      <PARAM NAME="OutputFile">IntegralFile</PARAM>
+      <PARAM NAME="OutputFrequency">10</PARAM>
+      <PARAM NAME="OutputPrecision"> 12 </PARAM>
+      <PARAM NAME="Composites"> C[1], C[2-4,6]</PARAM>
   </FILTER>
 \end{lstlisting}
 
@@ -979,6 +1024,108 @@ An example is given below:
   </FILTERS>
 \end{lstlisting}
 
+\subsection{Python script}\label{filters:MaxMinFields}
+
+\begin{notebox}
+  This feature is only supported if Python support is enabled with the
+  \inltt{NEKTAR\_BUILD\_PYTHON} flag enabled at configuration time.
+\end{notebox}
+
+The aim of this filter is to permit the execution of a Python script to
+implement more complex programmatic filters, but with the ease-of-use of the
+Python environment. Python filters mimic the action of C++ filters, and thus
+have three separate phases that should be implemented:
+\begin{itemize}
+  \item an initialisation phase, which is called when the filter is constructed;
+  \item an update phase, which is called typically at the end of a timestep;
+  \item a finalise phase, which is called at the end of the simulation.
+\end{itemize}
+
+Given a Python file as input, the filter can operate in one of two ways:
+
+\begin{itemize}
+  \item If only the Python file is supplied, then \nekpp will try to call three
+  Python functions: \inltt{filter\_initialise}, \inltt{filter\_update} and
+  \inltt{filter\_finalise}. Each function is passed a list of the
+  \inltt{ExpList} fields, and the value of the solver time $t$.
+  \item If, in addition to the Python file, a filter name is supplied, then
+  \nekpp assumes that your Python file creates a subclass of the \inltt{Filter}
+  class which has been registered with the \inltt{Filter} factory.
+\end{itemize}
+
+The following parameters are supported:
+
+\begin{center}
+  \begin{tabularx}{0.99\textwidth}{lllX}
+    \toprule
+    \textbf{Option name} & \textbf{Required} & \textbf{Default} &
+    \textbf{Description} \\
+    \midrule
+    \inltt{PythonFile} & \cmark   & - &
+    Name of the Python file to load.\\
+    \inltt{FilterName} & \xmark   & - &
+    Optional name of filter if Python subclass is implemented.\\
+    \bottomrule
+  \end{tabularx}
+\end{center}
+
+An example is given below:
+
+\begin{lstlisting}[style=XMLStyle]
+  <FILTERS>
+    <!-- Python filter with function approach -->
+    <FILTER TYPE="Python">
+      <PARAM NAME="PythonFile"> FilterPython_Function.py </PARAM>
+    </FILTER>
+    <!-- Python filter with class approach -->
+    <FILTER TYPE="Python">
+      <PARAM NAME="PythonFile"> FilterPython_Class.py </PARAM>
+      <PARAM NAME="FilterName"> TestFilter </PARAM>
+    </FILTER>
+  </FILTERS>
+\end{lstlisting}
+
+For the first example, a sample Python script may look something like:
+
+\begin{lstlisting}[style=PythonStyle]
+def filter_initialise(fields, time):
+    pass
+
+def filter_update(fields, time):
+    pass  
+
+def filter_finalise(fields, time):
+    pass
+\end{lstlisting}
+
+For the second example, we might expect something like:
+
+\begin{lstlisting}[style=PythonStyle]
+from NekPy.SolverUtils import Filter
+
+class TestFilter(Filter):
+    def __init__(self, session, eqsys, params):
+        # Call super's constructor.
+        super().__init__(session, eqsys)
+        # Counter which is incremented at each timestep.
+        self.num = 0
+
+    def Initialise(self, fields, time):
+        pass
+
+    def Update(self, fields, time):
+        self.num += 1
+
+    def Finalise(self, fields, time):
+        # Print for testing purposes
+        print(self.num)
+
+    def IsTimeDependent(self):
+        return True
+
+# Register filter with factory.
+Filter.Register("TestFilter", TestFilter)
+\end{lstlisting}
 
 \subsection{Body-fitted velocity fields}\label{filters:BodyFittedVelocity}
 
@@ -1015,12 +1162,11 @@ The following parameters are supported:
     \inltt{SampleFrequency} & \xmark   & 1 &
     Number of timesteps after which the fields are used to compute 
     original/max/min.\\
-    \bottomrule
   \end{tabularx}
 \end{center}
 
 An example is given below:
-
+        
 \begin{lstlisting}[style=XMLStyle]
   <FILTERS>
     <FILTER TYPE="BodyFittedVelocity">
@@ -1030,6 +1176,44 @@ An example is given below:
       <PARAM NAME="OutputFile">vel_bfc</PARAM>
       <PARAM NAME="OutputFrequency">100</PARAM>
       <PARAM NAME="SampleFrequency">1</PARAM>
+    </FILTER>
+  </FILTERS>
+\end{lstlisting}
+
+\subsection{Lagrangian points Tracking}\label{filters:LagrangianPoints}
+
+The \inltt{FilterLagrangianPoints} filter tracks Lagrangian points in parallel. The following parameters are supported:
+\begin{center}
+    \begin{tabularx}{0.99\textwidth}{lllX}
+        \toprule
+        \textbf{Option name} & \textbf{Required} & \textbf{Default} &
+        \textbf{Description} \\
+        \midrule
+        \inltt{OutputFile}   & \xmark   & Session name &
+        OutputFile\_R\%05d\_T\%010.6lf.plt is output file name for the Lagrangian points. R is followed by the thread number and T is followed by the instantaneous time.\\
+        \inltt{OutputFrequency}                & \xmark   & 1 &
+        Output frequency of the Lagrangian points.  \\
+        \inltt{Box\_n}        & \cmark   & N/A &
+        Box\_n = Nx,Ny,Nz, xmin,xmax, ymin,ymax, zmin,zmax. Points defined by a box that initially owned by the thread n. At least one box needs to be assigned\\
+        \inltt{RootOutputL2Norm}      & \xmark   & 0 &
+        Root thread outputs the L2 norm of the physics values over the points if RootOutputL2Norm is 1.\\
+        \inltt{FrameVelocity}      & \xmark   & 0 &
+        The frame velocity which will be subtracted from the points' velocity.\\
+        \inltt{IntOrder}      & \xmark   & 1 &
+        Time integration order for points tracking. The points will be set as stationary if IntOrder is 0.\\
+        \bottomrule
+    \end{tabularx}
+\end{center}
+
+An example is given below:
+\begin{lstlisting}[style=XMLStyle]
+  <FILTERS>
+    <FILTER TYPE="LagrangianPoints">
+      <PARAM NAME="OutputFile">Points</PARAM>
+      <PARAM NAME="OutputFrequency">10</PARAM>
+      <PARAM NAME="Box_0">0, 1,32,0.3,0.6,0.0,0.49</PARAM>
+      <PARAM NAME="Box_1">32, 1,32,0.3,0.6,0.51,1.0</PARAM>
+      <PARAM NAME="RootOutputL2Norm">1</PARAM>
     </FILTER>
   </FILTERS>
 \end{lstlisting}

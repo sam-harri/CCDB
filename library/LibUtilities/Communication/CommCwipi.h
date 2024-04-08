@@ -41,9 +41,7 @@
 #include <LibUtilities/Communication/CommMpi.h>
 #include <LibUtilities/Memory/NekMemoryManager.hpp>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 // Forward declarations
 class CommCwipi;
@@ -67,12 +65,11 @@ public:
 
     CommCwipi(int narg, char *arg[]);
 
-    virtual ~CommCwipi();
+    ~CommCwipi() override;
 
 protected:
-    virtual void v_Finalise();
+    void v_Finalise() override;
 };
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities
 
 #endif

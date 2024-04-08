@@ -36,9 +36,7 @@
 
 #include <string>
 
-namespace Nektar
-{
-namespace LocalRegions
+namespace Nektar::LocalRegions
 {
 enum GeomState
 {
@@ -91,7 +89,6 @@ const char *const IndexMapTypeMap[] = {"EdgeToElement", "FaceToElement",
                                        "EdgeInterior",  "FaceInterior",
                                        "Boundary",      "Vertex"};
 
-} // namespace LocalRegions
-} // namespace Nektar
+} // namespace Nektar::LocalRegions
 
 #endif // LOCALREGIONS_H

@@ -43,7 +43,7 @@ std::string FilterHilbertFFTPhase::className =
 
 FilterHilbertFFTPhase::FilterHilbertFFTPhase(
     const LibUtilities::SessionReaderSharedPtr &pSession,
-    const std::weak_ptr<SolverUtils::EquationSystem> &pEquation,
+    const std::shared_ptr<SolverUtils::EquationSystem> &pEquation,
     const ParamMap &pParams)
     : Filter(pSession, pEquation)
 {
@@ -106,10 +106,8 @@ FilterHilbertFFTPhase::~FilterHilbertFFTPhase()
 
 void FilterHilbertFFTPhase::v_Initialise(
     const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
-    const NekDouble &time)
+    [[maybe_unused]] const NekDouble &time)
 {
-    boost::ignore_unused(time);
-
     m_index       = 0;
     m_outputIndex = 0;
     vCounter      = 0;
@@ -144,10 +142,8 @@ void FilterHilbertFFTPhase::v_Initialise(
 
 void FilterHilbertFFTPhase::v_Update(
     const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
-    const NekDouble &time)
+    [[maybe_unused]] const NekDouble &time)
 {
-    boost::ignore_unused(time);
-
     if (m_index++ % m_outputFrequency > 0)
     {
         return;
@@ -295,10 +291,10 @@ void FilterHilbertFFTPhase::v_Update(
 }
 
 void FilterHilbertFFTPhase::v_Finalise(
-    const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
-    const NekDouble &time)
+    [[maybe_unused]] const Array<OneD, const MultiRegions::ExpListSharedPtr>
+        &pFields,
+    [[maybe_unused]] const NekDouble &time)
 {
-    boost::ignore_unused(pFields, time);
 }
 
 bool FilterHilbertFFTPhase::v_IsTimeDependent()

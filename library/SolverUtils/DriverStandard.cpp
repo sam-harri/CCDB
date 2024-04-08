@@ -39,9 +39,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 string DriverStandard::className = GetDriverFactory().RegisterCreatorFunction(
     "Standard", DriverStandard::create);
@@ -118,5 +116,4 @@ void DriverStandard::v_Execute(ostream &out)
         }
     }
 }
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils

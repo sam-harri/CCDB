@@ -40,11 +40,6 @@
 namespace Nektar
 {
 
-/**
- *
- *
- **/
-
 class NonlinearSWE : public ShallowWaterSystem
 {
 public:
@@ -63,66 +58,30 @@ public:
     /// Name of class
     static std::string className;
 
-    virtual ~NonlinearSWE();
+    ~NonlinearSWE() override = default;
 
 protected:
     NonlinearSWE(const LibUtilities::SessionReaderSharedPtr &pSession,
                  const SpatialDomains::MeshGraphSharedPtr &pGraph);
 
-    virtual void v_InitObject(bool DeclareFields = true) override;
+    void v_InitObject(bool DeclareFields = true) override;
+
+    void v_GenerateSummary(SolverUtils::SummaryList &s) override;
 
     void DoOdeRhs(const Array<OneD, const Array<OneD, NekDouble>> &inarray,
                   Array<OneD, Array<OneD, NekDouble>> &outarray,
                   const NekDouble time);
 
-    void DoOdeProjection(
-        const Array<OneD, const Array<OneD, NekDouble>> &inarray,
-        Array<OneD, Array<OneD, NekDouble>> &outarray, const NekDouble time);
-
     void GetFluxVector(
         const Array<OneD, const Array<OneD, NekDouble>> &physfield,
         Array<OneD, Array<OneD, Array<OneD, NekDouble>>> &flux);
 
-    virtual void v_GenerateSummary(SolverUtils::SummaryList &s) override;
-
-    virtual void v_PrimitiveToConservative() override;
-
-    virtual void v_ConservativeToPrimitive() override;
-
-private:
-    void NumericalFlux1D(Array<OneD, Array<OneD, NekDouble>> &physfield,
-                         Array<OneD, Array<OneD, NekDouble>> &numfluxX);
-
-    void NumericalFlux2D(Array<OneD, Array<OneD, NekDouble>> &physfield,
-                         Array<OneD, Array<OneD, NekDouble>> &numfluxX,
-                         Array<OneD, Array<OneD, NekDouble>> &numfluxY);
-
-    void SetBoundaryConditions(Array<OneD, Array<OneD, NekDouble>> &physarray,
-                               NekDouble time);
-
-    void WallBoundary2D(int bcRegion, int cnt,
-                        Array<OneD, Array<OneD, NekDouble>> &Fwd,
-                        Array<OneD, Array<OneD, NekDouble>> &physarray);
-    void WallBoundary(int bcRegion, int cnt,
-                      Array<OneD, Array<OneD, NekDouble>> &Fwd,
-                      Array<OneD, Array<OneD, NekDouble>> &physarray);
-
-    void AddCoriolis(const Array<OneD, const Array<OneD, NekDouble>> &physarray,
-                     Array<OneD, Array<OneD, NekDouble>> &outarray);
+    void GetVelocityVector(const Array<OneD, Array<OneD, NekDouble>> &physfield,
+                           Array<OneD, Array<OneD, NekDouble>> &velocity);
 
     void AddVariableDepth(
         const Array<OneD, const Array<OneD, NekDouble>> &physarray,
         Array<OneD, Array<OneD, NekDouble>> &outarray);
-
-    void ConservativeToPrimitive(
-        const Array<OneD, const Array<OneD, NekDouble>> &physin,
-        Array<OneD, Array<OneD, NekDouble>> &physout);
-    void PrimitiveToConservative(
-        const Array<OneD, const Array<OneD, NekDouble>> &physin,
-        Array<OneD, Array<OneD, NekDouble>> &physout);
-
-    void GetVelocityVector(const Array<OneD, Array<OneD, NekDouble>> &physfield,
-                           Array<OneD, Array<OneD, NekDouble>> &velocity);
 };
 
 } // namespace Nektar

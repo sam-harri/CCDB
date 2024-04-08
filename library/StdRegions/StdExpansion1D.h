@@ -38,22 +38,17 @@
 #define STDEXP1D_H
 
 #include <StdRegions/StdExpansion.h>
-#include <StdRegions/StdRegionsDeclspec.h>
 
-namespace Nektar
+namespace Nektar::StdRegions
 {
-namespace StdRegions
-{
-
 class StdExpansion1D : virtual public StdExpansion
 {
-
 public:
-    STD_REGIONS_EXPORT StdExpansion1D();
     STD_REGIONS_EXPORT StdExpansion1D(int numcoeffs,
                                       const LibUtilities::BasisKey &Ba);
-    STD_REGIONS_EXPORT StdExpansion1D(const StdExpansion1D &T);
-    STD_REGIONS_EXPORT virtual ~StdExpansion1D() override;
+    STD_REGIONS_EXPORT StdExpansion1D()                        = default;
+    STD_REGIONS_EXPORT StdExpansion1D(const StdExpansion1D &T) = default;
+    STD_REGIONS_EXPORT ~StdExpansion1D() override              = default;
 
     /** \brief Evaluate the derivative \f$ d/d{\xi_1} \f$ at the
      *  physical quadrature points given by \a inarray and return in
@@ -91,25 +86,23 @@ public:
     }
 
 protected:
-    STD_REGIONS_EXPORT virtual NekDouble v_PhysEvaluate(
-        const Array<OneD, const NekDouble> &coords,
-        const Array<OneD, const NekDouble> &physvals) override;
+    STD_REGIONS_EXPORT NekDouble
+    v_PhysEvaluate(const Array<OneD, const NekDouble> &coords,
+                   const Array<OneD, const NekDouble> &physvals) override;
 
-    STD_REGIONS_EXPORT virtual NekDouble v_PhysEvaluate(
-        const Array<OneD, NekDouble> &coord,
-        const Array<OneD, const NekDouble> &inarray,
-        std::array<NekDouble, 3> &firstOrderDerivs) override;
+    STD_REGIONS_EXPORT NekDouble
+    v_PhysEvaluate(const Array<OneD, NekDouble> &coord,
+                   const Array<OneD, const NekDouble> &inarray,
+                   std::array<NekDouble, 3> &firstOrderDerivs) override;
 
-    STD_REGIONS_EXPORT virtual NekDouble v_PhysEvaluate(
-        const Array<OneD, NekDouble> &coord,
-        const Array<OneD, const NekDouble> &inarray,
-        std::array<NekDouble, 3> &firstOrderDerivs,
-        std::array<NekDouble, 6> &secondOrderDerivs) override;
+    STD_REGIONS_EXPORT NekDouble
+    v_PhysEvaluate(const Array<OneD, NekDouble> &coord,
+                   const Array<OneD, const NekDouble> &inarray,
+                   std::array<NekDouble, 3> &firstOrderDerivs,
+                   std::array<NekDouble, 6> &secondOrderDerivs) override;
 
 private:
-    // Virtual Functions ----------------------------------------
-
-    virtual int v_GetShapeDimension() const final override
+    int v_GetShapeDimension() const final
     {
         return 1;
     }
@@ -117,7 +110,6 @@ private:
 
 typedef std::shared_ptr<StdExpansion1D> StdExpansion1DSharedPtr;
 
-} // namespace StdRegions
-} // namespace Nektar
+} // namespace Nektar::StdRegions
 
 #endif // STDEXP1D_H

@@ -37,9 +37,7 @@
 #include <boost/test/tools/floating_point_comparison.hpp>
 #include <boost/test/unit_test.hpp>
 
-namespace Nektar
-{
-namespace UnitTests
+namespace Nektar::UnitTests
 {
 class PointTestClass
 {
@@ -133,5 +131,4 @@ BOOST_AUTO_TEST_CASE(testNekPointConstruction)
     }
 }
 
-} // namespace UnitTests
-} // namespace Nektar
+} // namespace Nektar::UnitTests

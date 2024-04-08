@@ -38,7 +38,6 @@
 #include <SolverUtils/AdvectionSystem.h>
 #include <SolverUtils/Diffusion/Diffusion.h>
 #include <SolverUtils/RiemannSolvers/RiemannSolver.h>
-#include <SolverUtils/UnsteadySystem.h>
 
 namespace Nektar
 {
@@ -54,19 +53,20 @@ public:
         const LibUtilities::SessionReaderSharedPtr &pSession,
         const SpatialDomains::MeshGraphSharedPtr &pGraph)
     {
-        return MemoryManager<ShallowWaterSystem>::AllocateSharedPtr(pSession,
-                                                                    pGraph);
+        SolverUtils::EquationSystemSharedPtr p =
+            MemoryManager<ShallowWaterSystem>::AllocateSharedPtr(pSession,
+                                                                 pGraph);
+        p->InitObject();
+        return p;
     }
-
     /// Name of class
     static std::string className;
 
     /// Destructor
-    virtual ~ShallowWaterSystem();
+    ~ShallowWaterSystem() override = default;
 
 protected:
     SolverUtils::RiemannSolverSharedPtr m_riemannSolver;
-    SolverUtils::RiemannSolverSharedPtr m_riemannSolverLDG;
     SolverUtils::AdvectionSharedPtr m_advection;
     SolverUtils::DiffusionSharedPtr m_diffusion;
 
@@ -84,26 +84,36 @@ protected:
     Array<OneD, NekDouble> m_coriolis;
     // Location of velocity vector.
     Array<OneD, Array<OneD, NekDouble>> m_vecLocs;
+
     /// Initialises UnsteadySystem class members.
     ShallowWaterSystem(const LibUtilities::SessionReaderSharedPtr &pSession,
                        const SpatialDomains::MeshGraphSharedPtr &pGraph);
 
-    virtual void v_InitObject(bool DeclareFields = true) override;
-
     /// Print a summary of time stepping parameters.
-    virtual void v_GenerateSummary(SolverUtils::SummaryList &s) override;
+    void v_GenerateSummary(SolverUtils::SummaryList &s) override;
 
-    void PrimitiveToConservative()
-    {
-        v_PrimitiveToConservative();
-    }
-    virtual void v_PrimitiveToConservative();
+    void v_InitObject(bool DeclareFields = true) override;
 
-    void ConservativeToPrimitive()
-    {
-        v_ConservativeToPrimitive();
-    }
-    virtual void v_ConservativeToPrimitive();
+    void DoOdeProjection(
+        const Array<OneD, const Array<OneD, NekDouble>> &inarray,
+        Array<OneD, Array<OneD, NekDouble>> &outarray, const NekDouble time);
+
+    void SetBoundaryConditions(Array<OneD, Array<OneD, NekDouble>> &physarray,
+                               NekDouble time);
+
+    void WallBoundary2D(int bcRegion, int cnt,
+                        Array<OneD, Array<OneD, NekDouble>> &Fwd);
+
+    void WallBoundary(int bcRegion, int cnt,
+                      Array<OneD, Array<OneD, NekDouble>> &Fwd,
+                      Array<OneD, Array<OneD, NekDouble>> &physarray);
+
+    void AddCoriolis(const Array<OneD, const Array<OneD, NekDouble>> &physarray,
+                     Array<OneD, Array<OneD, NekDouble>> &outarray);
+
+    void PrimitiveToConservative();
+
+    void ConservativeToPrimitive();
 
     NekDouble GetGravity()
     {

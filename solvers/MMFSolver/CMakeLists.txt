@@ -7,5 +7,9 @@ IF( NEKTAR_SOLVER_MMF )
        ./MMFSolver.cpp
        ./EquationSystems/MMFMaxwell.cpp)
 
+    IF(NEKTAR_BUILD_SOLVER_LIBS)
+        MESSAGE(WARNING, "Solver library build not set up for MMFSolver - skipping.")
+    ENDIF()
+
     ADD_NEKTAR_TEST        (TestMaxwellSphere)
 ENDIF( NEKTAR_SOLVER_MMF )

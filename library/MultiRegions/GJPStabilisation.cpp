@@ -34,9 +34,7 @@
 
 #include <MultiRegions/GJPStabilisation.h>
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 std::string GJPStabilisation::GJPStabilisationLookupIds[2] = {
     LibUtilities::SessionReader::RegisterEnumValue(
@@ -117,9 +115,8 @@ GJPStabilisation::GJPStabilisation(ExpListSharedPtr pField)
             NekDouble jumpScal;
             elmt->TraceNormLen(n, h, p);
             ASSERTL0(boost::math::isnan(h) == false,
-                     "h has a nan value when e = " +
-                         boost::lexical_cast<std::string>(e) +
-                         " n =" + boost::lexical_cast<std::string>(n));
+                     "h has a nan value when e = " + std::to_string(e) +
+                         " n =" + std::to_string(n));
 
             if (p == 1)
             {
@@ -399,5 +396,4 @@ void GJPStabilisation::MultiplyByStdDerivBaseOnTraceMat(
         cnt1 += rows * it.first;
     }
 }
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions

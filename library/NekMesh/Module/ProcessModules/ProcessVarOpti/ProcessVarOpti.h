@@ -39,9 +39,7 @@
 
 #include "ElUtil.h"
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 struct DerivUtil
@@ -90,11 +88,11 @@ public:
     static ModuleKey className;
 
     ProcessVarOpti(MeshSharedPtr m);
-    virtual ~ProcessVarOpti();
+    ~ProcessVarOpti() override;
 
-    virtual void Process();
+    void Process() override;
 
-    virtual std::string GetModuleName()
+    std::string GetModuleName() override
     {
         return "ProcessVarOpti";
     }
@@ -121,11 +119,13 @@ private:
 
     NodeElMap m_nodeElMap;
     std::vector<ElUtilSharedPtr> m_dataSet;
+    std::vector<std::pair<CADCurveSharedPtr, std::pair<Node, Node>>>
+        m_adaptCurves;
+    bool m_radaptCAD;
 
     ResidualSharedPtr m_res;
     optiType m_opti;
 };
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh
 
 #endif

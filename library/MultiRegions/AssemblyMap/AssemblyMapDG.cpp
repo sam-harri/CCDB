@@ -42,14 +42,11 @@
 #include <MultiRegions/ExpList.h>
 
 #include <boost/config.hpp>
-#include <boost/core/ignore_unused.hpp>
 #include <boost/graph/adjacency_list.hpp>
 
 using namespace std;
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 AssemblyMapDG::AssemblyMapDG() : m_numDirichletBndPhys(0)
 {
@@ -61,15 +58,13 @@ AssemblyMapDG::~AssemblyMapDG()
 
 AssemblyMapDG::AssemblyMapDG(
     const LibUtilities::SessionReaderSharedPtr &pSession,
-    const SpatialDomains::MeshGraphSharedPtr &graph,
+    [[maybe_unused]] const SpatialDomains::MeshGraphSharedPtr &graph,
     const ExpListSharedPtr &trace, const ExpList &locExp,
     const Array<OneD, const MultiRegions::ExpListSharedPtr> &bndCondExp,
     const Array<OneD, const SpatialDomains::BoundaryConditionShPtr> &bndCond,
     const PeriodicMap &periodicTrace, const std::string variable)
     : AssemblyMap(pSession, locExp.GetComm(), variable)
 {
-    boost::ignore_unused(graph);
-
     int i, j, k, cnt, id, id1, gid;
     int order_e   = 0;
     int nTraceExp = trace->GetExpSize();
@@ -904,8 +899,8 @@ Array<OneD, LocalRegions::ExpansionSharedPtr> &AssemblyMapDG::GetElmtToTrace(
     return m_elmtToTrace[i];
 }
 
-Array<OneD, Array<OneD, LocalRegions::ExpansionSharedPtr>>
-    &AssemblyMapDG::GetElmtToTrace()
+Array<OneD, Array<OneD, LocalRegions::ExpansionSharedPtr>> &AssemblyMapDG::
+    GetElmtToTrace()
 {
     return m_elmtToTrace;
 }
@@ -915,5 +910,4 @@ AssemblyCommDGSharedPtr AssemblyMapDG::GetAssemblyCommDG()
     return m_assemblyComm;
 }
 
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions

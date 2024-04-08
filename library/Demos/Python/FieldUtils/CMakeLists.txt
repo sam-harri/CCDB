@@ -36,6 +36,10 @@ ADD_NEKPY_EXECUTABLE(Tet_channel_npart_wss.py Tet_channel_npart_wss.py)
 ADD_NEKPY_EXECUTABLE(taylor_vortex_2D_div.py taylor_vortex_2D_div.py)
 ADD_NEKPY_EXECUTABLE(wss_3D_periodic.py wss_3D_periodic.py)
 
+IF (NEKTAR_USE_VTK)
+    ADD_NEKPY_EXECUTABLE(python_vtk.py python_vtk.py)
+ENDIF()
+
 IF (NEKTAR_BUILD_TESTS)
     ADD_NEKPY_TEST(bfs_probe)
     ADD_NEKPY_TEST(bfs_tec)
@@ -71,6 +75,10 @@ IF (NEKTAR_BUILD_TESTS)
     ADD_NEKPY_TEST(smallmesh_isocontour)
     ADD_NEKPY_TEST(taylor_vortex_2D_div)
     ADD_NEKPY_TEST(wss_3D_periodic)
+
+    IF (NEKTAR_USE_VTK)
+        ADD_NEKPY_TEST(python_vtk)
+    ENDIF()
 
     IF (NEKTAR_USE_METIS OR NEKTAR_USE_SCOTCH)
         ADD_NEKPY_TEST(chan3D_part_only)

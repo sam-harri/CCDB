@@ -40,9 +40,7 @@
 #include <SpatialDomains/Geometry1D.h>
 #include <StdRegions/StdExpansion1D.h>
 
-namespace Nektar
-{
-namespace LocalRegions
+namespace Nektar::LocalRegions
 {
 class Expansion2D;
 typedef std::shared_ptr<Expansion2D> Expansion2DSharedPtr;
@@ -62,7 +60,7 @@ public:
     {
     }
 
-    LOCAL_REGIONS_EXPORT virtual ~Expansion1D() override = default;
+    LOCAL_REGIONS_EXPORT ~Expansion1D() override = default;
 
     LOCAL_REGIONS_EXPORT void AddNormTraceInt(
         const int dir, Array<OneD, const NekDouble> &inarray,
@@ -75,32 +73,30 @@ public:
     inline SpatialDomains::Geometry1DSharedPtr GetGeom1D() const;
 
 protected:
-    virtual DNekMatSharedPtr v_GenMatrix(
-        const StdRegions::StdMatrixKey &mkey) override;
+    DNekMatSharedPtr v_GenMatrix(const StdRegions::StdMatrixKey &mkey) override;
 
-    virtual void v_AddRobinMassMatrix(
-        const int vert, const Array<OneD, const NekDouble> &primCoeffs,
-        DNekMatSharedPtr &inoutmat) override;
+    void v_AddRobinMassMatrix(const int vert,
+                              const Array<OneD, const NekDouble> &primCoeffs,
+                              DNekMatSharedPtr &inoutmat) override;
 
-    virtual void v_AddRobinTraceContribution(
+    void v_AddRobinTraceContribution(
         const int vert, const Array<OneD, const NekDouble> &primCoeffs,
         const Array<OneD, NekDouble> &incoeffs,
         Array<OneD, NekDouble> &coeffs) override;
 
-    virtual NekDouble v_VectorFlux(
+    NekDouble v_VectorFlux(
         const Array<OneD, Array<OneD, NekDouble>> &vec) override;
 
-    virtual void v_NormalTraceDerivFactors(
+    void v_NormalTraceDerivFactors(
         Array<OneD, Array<OneD, NekDouble>> &factors,
         Array<OneD, Array<OneD, NekDouble>> &d0factors,
         Array<OneD, Array<OneD, NekDouble>> &d1factors) override;
 
-    virtual void v_ReOrientTracePhysMap(const StdRegions::Orientation orient,
-                                        Array<OneD, int> &idmap, const int nq0,
-                                        const int nq1) override;
+    void v_ReOrientTracePhysMap(const StdRegions::Orientation orient,
+                                Array<OneD, int> &idmap, const int nq0,
+                                const int nq1) override;
 
-    virtual void v_TraceNormLen(const int traceid, NekDouble &h,
-                                NekDouble &p) override;
+    void v_TraceNormLen(const int traceid, NekDouble &h, NekDouble &p) override;
 
 private:
 };
@@ -109,7 +105,6 @@ inline SpatialDomains::Geometry1DSharedPtr Expansion1D ::GetGeom1D() const
 {
     return std::dynamic_pointer_cast<SpatialDomains ::Geometry1D>(m_geom);
 }
-} // namespace LocalRegions
-} // namespace Nektar
+} // namespace Nektar::LocalRegions
 
 #endif

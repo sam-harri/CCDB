@@ -93,12 +93,12 @@ public:
     static std::string className;
 
     /// Initialise the object
-    virtual void v_InitObject(bool DeclareFields = true) override;
+    void v_InitObject(bool DeclareFields = true) override;
 
-    virtual void v_DoSolve() override;
+    void v_DoSolve() override;
 
     /// Destructor
-    virtual ~MMFMaxwell();
+    ~MMFMaxwell() override;
 
 protected:
     int m_ElemtGroup0;
@@ -239,15 +239,15 @@ protected:
     Array<OneD, NekDouble> ComputeRadCloak(const int Nlayer = 5);
 
     /// Print Summary
-    virtual void v_GenerateSummary(SolverUtils::SummaryList &s) override;
+    void v_GenerateSummary(SolverUtils::SummaryList &s) override;
 
-    virtual void v_SetInitialConditions(const NekDouble initialtime,
-                                        bool dumpInitialConditions,
-                                        const int domain) override;
+    void v_SetInitialConditions(const NekDouble initialtime,
+                                bool dumpInitialConditions,
+                                const int domain) override;
 
-    virtual void v_EvaluateExactSolution(unsigned int field,
-                                         Array<OneD, NekDouble> &outfield,
-                                         const NekDouble time) override;
+    void v_EvaluateExactSolution(unsigned int field,
+                                 Array<OneD, NekDouble> &outfield,
+                                 const NekDouble time) override;
     void print_MMF(Array<OneD, Array<OneD, NekDouble>> &inarray);
 
 private:

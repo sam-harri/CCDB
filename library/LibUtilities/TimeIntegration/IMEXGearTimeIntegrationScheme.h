@@ -42,13 +42,12 @@
 
 #define LUE LIB_UTILITIES_EXPORT
 
-#include <LibUtilities/TimeIntegration/TimeIntegrationSchemeGLM.h>
+#include <boost/core/ignore_unused.hpp>
 
 #include <LibUtilities/TimeIntegration/IMEXdirkTimeIntegrationSchemes.h>
+#include <LibUtilities/TimeIntegration/TimeIntegrationSchemeGLM.h>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 class IMEXGearTimeIntegrationScheme : public TimeIntegrationSchemeGLM
@@ -58,8 +57,7 @@ public:
                                   std::vector<NekDouble> freeParams)
         : TimeIntegrationSchemeGLM("", 2, freeParams)
     {
-        boost::ignore_unused(order);
-        boost::ignore_unused(variant);
+        boost::ignore_unused(variant, order);
 
         m_integration_phases    = TimeIntegrationAlgorithmGLMVector(2);
         m_integration_phases[0] = TimeIntegrationAlgorithmGLMSharedPtr(
@@ -72,15 +70,14 @@ public:
         IMEXGearTimeIntegrationScheme::SetupSchemeData(m_integration_phases[1]);
     }
 
-    virtual ~IMEXGearTimeIntegrationScheme()
+    ~IMEXGearTimeIntegrationScheme() override
     {
     }
 
     static TimeIntegrationSchemeSharedPtr create(
-        std::string variant, size_t order, std::vector<NekDouble> freeParams)
+        [[maybe_unused]] std::string variant, [[maybe_unused]] size_t order,
+        std::vector<NekDouble> freeParams)
     {
-        boost::ignore_unused(order);
-        boost::ignore_unused(variant);
 
         TimeIntegrationSchemeSharedPtr p =
             MemoryManager<IMEXGearTimeIntegrationScheme>::AllocateSharedPtr(
@@ -147,12 +144,12 @@ public:
     }
 
 protected:
-    LUE virtual std::string v_GetName() const override
+    LUE std::string v_GetName() const override
     {
         return std::string("IMEX");
     }
 
-    LUE virtual NekDouble v_GetTimeStability() const override
+    LUE NekDouble v_GetTimeStability() const override
     {
         return 1.0;
     }
@@ -161,7 +158,6 @@ protected:
 
 }; // end class IMEXGearTimeIntegrationScheme
 
-} // end namespace LibUtilities
-} // end namespace Nektar
+} // namespace Nektar::LibUtilities
 
 #endif

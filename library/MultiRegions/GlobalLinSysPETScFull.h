@@ -39,9 +39,7 @@
 #include <MultiRegions/GlobalLinSysPETSc.h>
 #include <MultiRegions/MultiRegionsDeclspec.h>
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 // Forward declarations
 
@@ -71,24 +69,23 @@ public:
         const std::weak_ptr<ExpList> &pExpList,
         const std::shared_ptr<AssemblyMap> &pLocToGloMap);
 
-    MULTI_REGIONS_EXPORT virtual ~GlobalLinSysPETScFull();
+    MULTI_REGIONS_EXPORT ~GlobalLinSysPETScFull() override = default;
 
 protected:
     /// Solve the linear system for given input and output vectors
     /// using a specified local to global map.
-    virtual void v_Solve(const Array<OneD, const NekDouble> &in,
-                         Array<OneD, NekDouble> &out,
-                         const AssemblyMapSharedPtr &locToGloMap,
-                         const Array<OneD, const NekDouble> &dirForcing =
-                             NullNekDouble1DArray) override;
-    virtual void v_DoMatrixMultiply(const Array<OneD, const NekDouble> &input,
-                                    Array<OneD, NekDouble> &output) override;
+    void v_Solve(const Array<OneD, const NekDouble> &in,
+                 Array<OneD, NekDouble> &out,
+                 const AssemblyMapSharedPtr &locToGloMap,
+                 const Array<OneD, const NekDouble> &dirForcing =
+                     NullNekDouble1DArray) override;
+    void v_DoMatrixMultiply(const Array<OneD, const NekDouble> &input,
+                            Array<OneD, NekDouble> &output) override;
 
 private:
     // Local to global map.
     std::shared_ptr<AssemblyMap> m_locToGloMap;
 };
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions
 
 #endif

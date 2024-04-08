@@ -37,9 +37,7 @@
 
 #include <NekMesh/Module/Module.h>
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 /// Converter for VTK files.
@@ -54,17 +52,16 @@ public:
     static NekMesh::ModuleKey className;
 
     InputVtk(NekMesh::MeshSharedPtr m);
-    virtual ~InputVtk();
+    ~InputVtk() override;
 
     /// Populate and validate required data structures.
-    virtual void Process();
+    void Process() override;
 
-    virtual std::string GetModuleName()
+    std::string GetModuleName() override
     {
         return "InputVtk";
     }
 };
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh
 
 #endif

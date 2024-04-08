@@ -32,9 +32,7 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 static const size_t perm3A_2d[3][3] = {
     {0, 1, 2}, {2, 0, 1}, {0, 2, 1}}; // Works for aab
@@ -43,8 +41,8 @@ static const size_t perm3B_2d[3][3] = {
 static const size_t perm3C_2d[3][3] = {
     {0, 1, 2}, {2, 0, 1}, {1, 2, 0}}; // Works for aab and abb
 static const size_t perm6_2d[6][3]   = {{0, 1, 2}, {1, 0, 2},
-                                      {2, 0, 1}, {2, 1, 0},
-                                      {0, 2, 1}, {1, 2, 0}}; // Works for abc
+                                        {2, 0, 1}, {2, 1, 0},
+                                        {0, 2, 1}, {1, 2, 0}}; // Works for abc
 const size_t NodalTriFeketeAvailable = 16;
 static const size_t NodalTriFeketeNPTS[NodalTriFeketeAvailable] = {
     1, 2, 3, 4, 5, 7, 8, 10, 12, 14, 16, 19, 21, 24, 27, 30};
@@ -269,5 +267,4 @@ static const NekDouble NodalTriFeketeData[][6] = {
     {0, 0, 1, 0.5481915845, 0.4347608890, 0.0170475265},
     {0, 0, 1, 0.5160516828, 0.3894384191, 0.0945098981},
     {0, 0, 1, 0.5043443688, 0.3260983223, 0.1695573088}};
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities

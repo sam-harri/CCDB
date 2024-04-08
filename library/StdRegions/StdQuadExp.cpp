@@ -32,23 +32,14 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/Foundations/InterpCoeff.h>
 #include <LibUtilities/Foundations/ManagerAccess.h>
 #include <StdRegions/StdQuadExp.h>
-#include <StdRegions/StdSegExp.h>
 
 using namespace std;
 
-namespace Nektar
+namespace Nektar::StdRegions
 {
-namespace StdRegions
-{
-
-StdQuadExp::StdQuadExp()
-{
-}
 
 /** \brief Constructor using BasisKey class for quadrature
  *  points and order definition
@@ -57,16 +48,6 @@ StdQuadExp::StdQuadExp(const LibUtilities::BasisKey &Ba,
                        const LibUtilities::BasisKey &Bb)
     : StdExpansion(Ba.GetNumModes() * Bb.GetNumModes(), 2, Ba, Bb),
       StdExpansion2D(Ba.GetNumModes() * Bb.GetNumModes(), Ba, Bb)
-{
-}
-
-/** \brief Copy Constructor */
-StdQuadExp::StdQuadExp(const StdQuadExp &T) : StdExpansion(T), StdExpansion2D(T)
-{
-}
-
-/** \brief Destructor */
-StdQuadExp::~StdQuadExp()
 {
 }
 
@@ -95,9 +76,8 @@ NekDouble StdQuadExp::v_Integral(const Array<OneD, const NekDouble> &inarray)
 void StdQuadExp::v_PhysDeriv(const Array<OneD, const NekDouble> &inarray,
                              Array<OneD, NekDouble> &out_d0,
                              Array<OneD, NekDouble> &out_d1,
-                             Array<OneD, NekDouble> &out_d2)
+                             [[maybe_unused]] Array<OneD, NekDouble> &out_d2)
 {
-    boost::ignore_unused(out_d2);
     PhysTensorDeriv(inarray, out_d0, out_d1);
 }
 
@@ -128,10 +108,8 @@ void StdQuadExp::v_PhysDeriv(const int dir,
 void StdQuadExp::v_StdPhysDeriv(const Array<OneD, const NekDouble> &inarray,
                                 Array<OneD, NekDouble> &out_d0,
                                 Array<OneD, NekDouble> &out_d1,
-                                Array<OneD, NekDouble> &out_d2)
+                                [[maybe_unused]] Array<OneD, NekDouble> &out_d2)
 {
-    boost::ignore_unused(out_d2);
-    // PhysTensorDeriv(inarray, out_d0, out_d1);
     StdQuadExp::v_PhysDeriv(inarray, out_d0, out_d1);
 }
 
@@ -139,7 +117,6 @@ void StdQuadExp::v_StdPhysDeriv(const int dir,
                                 const Array<OneD, const NekDouble> &inarray,
                                 Array<OneD, NekDouble> &outarray)
 {
-    // PhysTensorDeriv(inarray, outarray);
     StdQuadExp::v_PhysDeriv(dir, inarray, outarray);
 }
 
@@ -626,10 +603,9 @@ int StdQuadExp::v_GetTraceNumPoints(const int i) const
     }
 }
 
-const LibUtilities::BasisKey StdQuadExp::v_GetTraceBasisKey(const int i,
-                                                            const int j) const
+const LibUtilities::BasisKey StdQuadExp::v_GetTraceBasisKey(
+    const int i, [[maybe_unused]] const int j) const
 {
-    boost::ignore_unused(j);
     ASSERTL2((i >= 0) && (i <= 3), "edge id is out of range");
 
     if ((i == 0) || (i == 2))
@@ -703,9 +679,8 @@ bool StdQuadExp::v_IsBoundaryInteriorExpansion() const
 
 void StdQuadExp::v_GetCoords(Array<OneD, NekDouble> &coords_0,
                              Array<OneD, NekDouble> &coords_1,
-                             Array<OneD, NekDouble> &coords_2)
+                             [[maybe_unused]] Array<OneD, NekDouble> &coords_2)
 {
-    boost::ignore_unused(coords_2);
     Array<OneD, const NekDouble> z0 = m_base[0]->GetZ();
     Array<OneD, const NekDouble> z1 = m_base[1]->GetZ();
     int nq0                         = GetNumPoints(0);
@@ -1292,7 +1267,7 @@ DNekMatSharedPtr StdQuadExp::v_GenMatrix(const StdMatrixKey &mkey)
             {
                 for (i = 0; i < order1; ++i)
                 {
-                    (*Mat)(order0 * i + 1, i * order0 + 1) = 1.0;
+                    (*Mat)(order0 *i + 1, i * order0 + 1) = 1.0;
                 }
             }
 
@@ -1433,9 +1408,6 @@ void StdQuadExp::v_SVVLaplacianFilter(Array<OneD, NekDouble> &array,
         int cutoff = (int)(mkey.GetConstFactor(eFactorSVVCutoffRatio) *
                            min(nmodes_a, nmodes_b));
 
-        // counters for scanning through orthocoeffs array
-        int cnt = 0;
-
         //------"New" Version August 22nd '13--------------------
         for (int j = 0; j < nmodes_a; ++j)
         {
@@ -1453,7 +1425,6 @@ void StdQuadExp::v_SVVLaplacianFilter(Array<OneD, NekDouble> &array,
                 {
                     orthocoeffs[j * nmodes_b + k] *= 0.0;
                 }
-                cnt++;
             }
         }
     }
@@ -1617,11 +1588,9 @@ void StdQuadExp::v_MultiplyByStdQuadratureMetric(
     }
 }
 
-void StdQuadExp::v_GetSimplexEquiSpacedConnectivity(Array<OneD, int> &conn,
-                                                    bool standard)
+void StdQuadExp::v_GetSimplexEquiSpacedConnectivity(
+    Array<OneD, int> &conn, [[maybe_unused]] bool standard)
 {
-    boost::ignore_unused(standard);
-
     int np1 = m_base[0]->GetNumPoints();
     int np2 = m_base[1]->GetNumPoints();
     int np  = max(np1, np2);
@@ -1648,5 +1617,4 @@ void StdQuadExp::v_GetSimplexEquiSpacedConnectivity(Array<OneD, int> &conn,
     }
 }
 
-} // namespace StdRegions
-} // namespace Nektar
+} // namespace Nektar::StdRegions

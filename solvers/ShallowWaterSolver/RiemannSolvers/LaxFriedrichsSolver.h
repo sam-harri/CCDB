@@ -53,10 +53,9 @@ public:
 protected:
     LaxFriedrichsSolver(const LibUtilities::SessionReaderSharedPtr &pSession);
 
-    virtual void v_PointSolve(NekDouble hL, NekDouble huL, NekDouble hvL,
-                              NekDouble hR, NekDouble huR, NekDouble hvR,
-                              NekDouble &hf, NekDouble &huf,
-                              NekDouble &hvf) override;
+    void v_PointSolve(NekDouble hL, NekDouble huL, NekDouble hvL, NekDouble hR,
+                      NekDouble huR, NekDouble hvR, NekDouble &hf,
+                      NekDouble &huf, NekDouble &hvf) override;
 };
 } // namespace Nektar
 

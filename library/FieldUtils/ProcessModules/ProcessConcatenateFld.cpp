@@ -36,15 +36,11 @@
 #include <string>
 using namespace std;
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/BasicUtils/SharedArray.hpp>
 
 #include "ProcessConcatenateFld.h"
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 ModuleKey ProcessConcatenateFld::className =
@@ -61,15 +57,12 @@ ProcessConcatenateFld::~ProcessConcatenateFld()
 {
 }
 
-void ProcessConcatenateFld::v_Process(po::variables_map &vm)
+void ProcessConcatenateFld::v_Process([[maybe_unused]] po::variables_map &vm)
 {
-    boost::ignore_unused(vm);
-
     if (m_f->m_comm->TreatAsRankZero())
     {
         cout << "Concatenate module is not needed. Instead, use " << endl
              << "\tFieldConvert file1.fld file2.fld file-conc.fld" << endl;
     }
 }
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

@@ -44,22 +44,22 @@
 #include "traits.hpp"
 #include <vector>
 
-namespace tinysimd
+namespace tinysimd::abi
 {
-
-namespace abi
-{
-
 template <typename scalarType, int width = 0> struct sve
 {
     using type = void;
 };
 
-} // namespace abi
+} // namespace tinysimd::abi
 
 // requires clang >= 12.0.0 or gcc >= 10
 // requires -msve-vector-bits=<length>
 #if __ARM_FEATURE_SVE_BITS > 0 && defined(NEKTAR_ENABLE_SIMD_SVE)
+
+namespace tinysimd
+{
+
 // from VLA to VLST
 // C++ does not allow for incomplete class member types
 // to get around that we force a known size at compile time
@@ -992,7 +992,8 @@ inline bool operator&&(sveMask32 lhs, bool rhs)
     return tmp && rhs;
 }
 
+} // namespace tinysimd
+
 #endif // defined(__ARM_FEATURE_SVE_BITS)
 
-} // namespace tinysimd
 #endif

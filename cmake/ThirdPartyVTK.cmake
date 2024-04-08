@@ -32,6 +32,7 @@ IF( NEKTAR_USE_VTK )
         SET(VTK_FOUND 1)
         SET(VTK_USE_FILE ${VTK_DIR}/UseVTK.cmake)
         INCLUDE (${VTK_DIR}/VTKConfig.cmake)
+        ADD_DEPENDENCIES(thirdparty vtk-5.10.1)
     ELSE()
 	# VTK9 uses modified component names - VTK9 can still be discovered with
 	# the old names but these are deprecated and produce a number of warnings.

@@ -36,10 +36,9 @@
 #include <LibUtilities/Foundations/PolyEPoints.h>
 #include <LibUtilities/Polylib/Polylib.h>
 
-namespace Nektar
+namespace Nektar::LibUtilities
 {
-namespace LibUtilities
-{
+
 bool PolyEPoints::initPointsManager[] = {PointsManager().RegisterCreator(
     PointsKey(0, ePolyEvenlySpaced), PolyEPoints::Create)};
 
@@ -172,5 +171,4 @@ const std::shared_ptr<NekMatrix<NekDouble>> PolyEPoints::v_GetI(
     return returnval;
 }
 
-} // end of namespace LibUtilities
-} // end of namespace Nektar
+} // namespace Nektar::LibUtilities

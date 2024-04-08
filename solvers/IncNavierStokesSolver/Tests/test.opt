@@ -46,5 +46,14 @@
             <ELEMENT TYPE="R" ORDER="*" IMPTYPE="NoCollection" />
             <ELEMENT TYPE="H" ORDER="*" IMPTYPE="NoCollection" />
         </OPERATOR>
+         <OPERATOR TYPE="PhysInterp1DScaled">
+            <ELEMENT TYPE="S" ORDER="*" IMPTYPE="NoCollection" />
+            <ELEMENT TYPE="T" ORDER="*" IMPTYPE="NoCollection" />
+            <ELEMENT TYPE="Q" ORDER="*" IMPTYPE="NoCollection" />
+            <ELEMENT TYPE="A" ORDER="*" IMPTYPE="NoCollection" />
+            <ELEMENT TYPE="P" ORDER="*" IMPTYPE="NoCollection" />
+            <ELEMENT TYPE="R" ORDER="*" IMPTYPE="NoCollection" />
+            <ELEMENT TYPE="H" ORDER="*" IMPTYPE="NoCollection" />
+        </OPERATOR>
     </COLLECTIONS>
 </NEKTAR>

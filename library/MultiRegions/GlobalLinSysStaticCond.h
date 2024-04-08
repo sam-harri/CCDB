@@ -35,15 +35,11 @@
 #ifndef NEKTAR_LIB_MULTIREGIONS_GLOBALLINSYSSTATICCOND_H
 #define NEKTAR_LIB_MULTIREGIONS_GLOBALLINSYSSTATICCOND_H
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/LinearAlgebra/SparseMatrixFwd.hpp>
 #include <MultiRegions/GlobalLinSysIterative.h>
 #include <MultiRegions/GlobalMatrix.h>
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 // Forward declarations
 class ExpList;
@@ -60,37 +56,36 @@ public:
                            const std::weak_ptr<ExpList> &pExpList,
                            const std::shared_ptr<AssemblyMap> &locToGloMap);
 
-    virtual ~GlobalLinSysStaticCond();
+    ~GlobalLinSysStaticCond() override;
 
 protected:
-    virtual void v_PreSolve(int scLevel, Array<OneD, NekDouble> &F_bnd)
+    virtual void v_PreSolve([[maybe_unused]] int scLevel,
+                            [[maybe_unused]] Array<OneD, NekDouble> &F_bnd)
     {
-        boost::ignore_unused(scLevel, F_bnd);
     }
 
-    virtual void v_BasisFwdTransform(Array<OneD, NekDouble> &pInOut)
+    virtual void v_BasisFwdTransform(
+        [[maybe_unused]] Array<OneD, NekDouble> &pInOut)
     {
-        boost::ignore_unused(pInOut);
     }
 
-    virtual void v_CoeffsBwdTransform(Array<OneD, NekDouble> &pInOut)
+    virtual void v_CoeffsBwdTransform(
+        [[maybe_unused]] Array<OneD, NekDouble> &pInOut)
     {
-        boost::ignore_unused(pInOut);
     }
 
-    virtual void v_CoeffsFwdTransform(const Array<OneD, NekDouble> &pInput,
-                                      Array<OneD, NekDouble> &pOutput)
+    virtual void v_CoeffsFwdTransform(
+        [[maybe_unused]] const Array<OneD, NekDouble> &pInput,
+        [[maybe_unused]] Array<OneD, NekDouble> &pOutput)
     {
-        boost::ignore_unused(pInput, pOutput);
     }
 
     virtual void v_AssembleSchurComplement(
-        std::shared_ptr<AssemblyMap> pLoctoGloMap)
+        [[maybe_unused]] std::shared_ptr<AssemblyMap> pLoctoGloMap)
     {
-        boost::ignore_unused(pLoctoGloMap);
     }
 
-    virtual int v_GetNumBlocks() override;
+    int v_GetNumBlocks() override;
 
     virtual GlobalLinSysStaticCondSharedPtr v_Recurse(
         const GlobalLinSysKey &mkey, const std::weak_ptr<ExpList> &pExpList,
@@ -118,17 +113,16 @@ protected:
 
     /// Solve the linear system for given input and output vectors
     /// using a specified local to global map.
-    virtual void v_Solve(const Array<OneD, const NekDouble> &in,
-                         Array<OneD, NekDouble> &out,
-                         const AssemblyMapSharedPtr &locToGloMap,
-                         const Array<OneD, const NekDouble> &dirForcing =
-                             NullNekDouble1DArray) override;
+    void v_Solve(const Array<OneD, const NekDouble> &in,
+                 Array<OneD, NekDouble> &out,
+                 const AssemblyMapSharedPtr &locToGloMap,
+                 const Array<OneD, const NekDouble> &dirForcing =
+                     NullNekDouble1DArray) override;
 
-    virtual void v_InitObject() override;
+    void v_InitObject() override;
 
     /// Initialise this object
-    virtual void v_Initialise(
-        const std::shared_ptr<AssemblyMap> &locToGloMap) override;
+    void v_Initialise(const std::shared_ptr<AssemblyMap> &locToGloMap) override;
 
     /// Set up the storage for the Schur complement or the top level
     /// of the multi-level Schur complement.
@@ -138,7 +132,6 @@ protected:
     void ConstructNextLevelCondensedSystem(
         const std::shared_ptr<AssemblyMap> &locToGloMap);
 };
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions
 
 #endif

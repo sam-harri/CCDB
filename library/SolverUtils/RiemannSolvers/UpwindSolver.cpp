@@ -32,13 +32,9 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <SolverUtils/RiemannSolvers/UpwindSolver.h>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 std::string UpwindSolver::solverName =
     GetRiemannSolverFactory().RegisterCreatorFunction(
@@ -83,13 +79,11 @@ UpwindSolver::UpwindSolver(const LibUtilities::SessionReaderSharedPtr &pSession)
  * @param Bwd   Backwards trace space.
  * @param flux  Resulting flux.
  */
-void UpwindSolver::v_Solve(const int nDim,
+void UpwindSolver::v_Solve([[maybe_unused]] const int nDim,
                            const Array<OneD, const Array<OneD, NekDouble>> &Fwd,
                            const Array<OneD, const Array<OneD, NekDouble>> &Bwd,
                            Array<OneD, Array<OneD, NekDouble>> &flux)
 {
-    boost::ignore_unused(nDim);
-
     ASSERTL1(CheckScalars("Vn"), "Vn not defined.");
     const Array<OneD, NekDouble> &traceVel = m_scalars["Vn"]();
 
@@ -103,5 +97,4 @@ void UpwindSolver::v_Solve(const int nDim,
         }
     }
 }
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils

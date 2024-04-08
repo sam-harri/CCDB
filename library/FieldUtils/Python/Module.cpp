@@ -37,6 +37,11 @@
 #include <boost/program_options.hpp>
 #include <boost/python/raw_function.hpp>
 
+#ifdef NEKTAR_USING_VTK
+#include <FieldUtils/OutputModules/OutputVtk.h>
+#include <FieldUtils/Python/VtkWrapper.hpp>
+#endif
+
 using namespace Nektar;
 using namespace Nektar::FieldUtils;
 
@@ -59,9 +64,8 @@ struct ModuleWrap : public MODTYPE, public py::wrapper<MODTYPE>
     /**
      * @brief Concrete implementation of the Module::Process function.
      */
-    void v_Process(po::variables_map &vm) override
+    void v_Process([[maybe_unused]] po::variables_map &vm) override
     {
-        boost::ignore_unused(vm);
         this->get_override("Process")();
     }
 
@@ -152,6 +156,30 @@ template <> struct ModuleTypeProxy<OutputModule>
 const ModuleType ModuleTypeProxy<InputModule>::value;
 const ModuleType ModuleTypeProxy<ProcessModule>::value;
 const ModuleType ModuleTypeProxy<OutputModule>::value;
+
+#ifdef NEKTAR_USING_VTK
+vtkUnstructuredGrid *Module_GetVtkGrid(std::shared_ptr<Module> mod)
+{
+    std::shared_ptr<OutputVtk> vtkModule =
+        std::dynamic_pointer_cast<OutputVtk>(mod);
+
+    using NekError = ErrorUtil::NekError;
+
+    if (!vtkModule)
+    {
+        throw NekError("This module is not the OutputVtk module, cannot get"
+                       "VTK data.");
+    }
+
+    return vtkModule->GetVtkGrid();
+}
+#else
+void Module_GetVtkGrid(std::shared_ptr<Module> mod)
+{
+    using NekError = ErrorUtil::NekError;
+    throw NekError("Nektar++ has not been compiled with VTK support.");
+}
+#endif
 
 /**
  * @brief Lightweight wrapper for Module factory creation function.
@@ -307,7 +335,7 @@ void ModuleCapsuleDestructor(void *ptr)
 void ModuleCapsuleDestructor(PyObject *ptr)
 {
     ModuleRegisterHelper *tmp =
-        (ModuleRegisterHelper *)PyCapsule_GetPointer(ptr, 0);
+        (ModuleRegisterHelper *)PyCapsule_GetPointer(ptr, nullptr);
     delete tmp;
 }
 #endif
@@ -358,7 +386,7 @@ void Module_Register(ModuleType const &modType, std::string const &modName,
         py::handle<>(PyCObject_FromVoidPtr(helper, ModuleCapsuleDestructor)));
 #else
     py::object capsule(
-        py::handle<>(PyCapsule_New(helper, 0, ModuleCapsuleDestructor)));
+        py::handle<>(PyCapsule_New(helper, nullptr, ModuleCapsuleDestructor)));
 #endif
 
     // Embed this in __main__.
@@ -411,6 +439,10 @@ void export_Module()
     // Export ModuleType enum.
     NEKPY_WRAP_ENUM_STRING(ModuleType, ModuleTypeMap);
 
+#ifdef NEKTAR_USING_VTK
+    VTK_PYTHON_CONVERSION(vtkUnstructuredGrid);
+#endif
+
     // Define ModuleWrap to be implicitly convertible to a Module, since it
     // seems that doesn't sometimes get picked up.
     py::implicitly_convertible<std::shared_ptr<ModuleWrap<Module>>,
@@ -446,6 +478,8 @@ void export_Module()
         .def("AddConfigOption", ModuleWrap_AddConfigOption<Module>,
              (py::arg("key"), py::arg("defValue"), py::arg("desc"),
               py::arg("isBool") = false))
+        .def("GetVtkGrid", Module_GetVtkGrid,
+             py::return_value_policy<py::return_by_value>())
 
         // Allow direct access to field object through a property.
         .def_readwrite("field", &ModuleWrap<Module>::m_f)

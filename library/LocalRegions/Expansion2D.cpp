@@ -32,8 +32,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/Foundations/Interp.h>
 #include <LibUtilities/Foundations/InterpCoeff.h>
 #include <LibUtilities/Foundations/ManagerAccess.h>
@@ -47,9 +45,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace LocalRegions
+namespace Nektar::LocalRegions
 {
 Expansion2D::Expansion2D(SpatialDomains::Geometry2DSharedPtr pGeom)
     : StdExpansion(), Expansion(pGeom), StdExpansion2D()
@@ -162,11 +158,17 @@ DNekScalMatSharedPtr Expansion2D::CreateMatrix(const MatrixKey &mkey)
                     m_metricinfo->GetDerivFactors(ptsKeys);
                 int dir = 0;
                 if (mkey.GetMatrixType() == StdRegions::eWeakDeriv0)
+                {
                     dir = 0;
+                }
                 if (mkey.GetMatrixType() == StdRegions::eWeakDeriv1)
+                {
                     dir = 1;
+                }
                 if (mkey.GetMatrixType() == StdRegions::eWeakDeriv2)
+                {
                     dir = 2;
+                }
 
                 MatrixKey deriv0key(StdRegions::eWeakDeriv0,
                                     mkey.GetShapeType(), *this);
@@ -438,22 +440,13 @@ DNekScalMatSharedPtr Expansion2D::CreateMatrix(const MatrixKey &mkey)
 
             returnval = MemoryManager<DNekScalMat>::AllocateSharedPtr(one, adr);
 
-            // Clear memory (Repeat varcoeff checks)
+            // Clear memory for time-dependent matrices
             DropLocMatrix(advkey);
-            if (mkey.HasVarCoeff(StdRegions::eVarCoeffMass))
+            if (!massVarcoeffs.empty())
             {
                 DropLocMatrix(masskey);
             }
-            if ((mkey.HasVarCoeff(StdRegions::eVarCoeffLaplacian)) ||
-                (mkey.HasVarCoeff(StdRegions::eVarCoeffD00)) ||
-                (mkey.HasVarCoeff(StdRegions::eVarCoeffD01)) ||
-                (mkey.HasVarCoeff(StdRegions::eVarCoeffD10)) ||
-                (mkey.HasVarCoeff(StdRegions::eVarCoeffD02)) ||
-                (mkey.HasVarCoeff(StdRegions::eVarCoeffD20)) ||
-                (mkey.HasVarCoeff(StdRegions::eVarCoeffD11)) ||
-                (mkey.HasVarCoeff(StdRegions::eVarCoeffD12)) ||
-                (mkey.HasVarCoeff(StdRegions::eVarCoeffD21)) ||
-                (mkey.HasVarCoeff(StdRegions::eVarCoeffD22)))
+            if (!lapVarcoeffs.empty())
             {
                 DropLocMatrix(lapkey);
             }
@@ -466,16 +459,18 @@ DNekScalMatSharedPtr Expansion2D::CreateMatrix(const MatrixKey &mkey)
             NekDouble lambda = mkey.GetConstFactor(StdRegions::eFactorLambda);
 
             // Construct mass matrix (Check for varcoeffs)
-            MatrixKey masskey(StdRegions::eMass, mkey.GetShapeType(), *this);
+            StdRegions::VarCoeffMap massVarcoeffs = StdRegions::NullVarCoeffMap;
             if (mkey.HasVarCoeff(StdRegions::eVarCoeffMass))
             {
-                masskey = MatrixKey(mkey, StdRegions::eMass);
+                massVarcoeffs[StdRegions::eVarCoeffMass] =
+                    mkey.GetVarCoeff(StdRegions::eVarCoeffMass);
             }
+            MatrixKey masskey(StdRegions::eMass, mkey.GetShapeType(), *this,
+                              mkey.GetConstFactors(), massVarcoeffs);
             DNekScalMat &MassMat = *GetLocMatrix(masskey);
 
             // Construct laplacian matrix (Check for varcoeffs)
-            MatrixKey lapkey(StdRegions::eLaplacian, mkey.GetShapeType(), *this,
-                             mkey.GetConstFactors());
+            StdRegions::VarCoeffMap lapVarcoeffs = StdRegions::NullVarCoeffMap;
             if ((mkey.HasVarCoeff(StdRegions::eVarCoeffLaplacian)) ||
                 (mkey.HasVarCoeff(StdRegions::eVarCoeffD00)) ||
                 (mkey.HasVarCoeff(StdRegions::eVarCoeffD01)) ||
@@ -487,8 +482,10 @@ DNekScalMatSharedPtr Expansion2D::CreateMatrix(const MatrixKey &mkey)
                 (mkey.HasVarCoeff(StdRegions::eVarCoeffD21)) ||
                 (mkey.HasVarCoeff(StdRegions::eVarCoeffD22)))
             {
-                lapkey = MatrixKey(mkey, StdRegions::eLaplacian);
+                lapVarcoeffs = mkey.GetVarCoeffs();
             }
+            MatrixKey lapkey(StdRegions::eLaplacian, mkey.GetShapeType(), *this,
+                             mkey.GetConstFactors(), lapVarcoeffs);
             DNekScalMat &LapMat = *GetLocMatrix(lapkey);
 
             // Construct advection matrix
@@ -521,23 +518,8 @@ DNekScalMatSharedPtr Expansion2D::CreateMatrix(const MatrixKey &mkey)
 
             // Clear memory
             DropLocMatrix(advkey);
-            if (mkey.HasVarCoeff(StdRegions::eVarCoeffMass))
-            {
-                DropLocMatrix(masskey);
-            }
-            if ((mkey.HasVarCoeff(StdRegions::eVarCoeffLaplacian)) ||
-                (mkey.HasVarCoeff(StdRegions::eVarCoeffD00)) ||
-                (mkey.HasVarCoeff(StdRegions::eVarCoeffD01)) ||
-                (mkey.HasVarCoeff(StdRegions::eVarCoeffD10)) ||
-                (mkey.HasVarCoeff(StdRegions::eVarCoeffD02)) ||
-                (mkey.HasVarCoeff(StdRegions::eVarCoeffD20)) ||
-                (mkey.HasVarCoeff(StdRegions::eVarCoeffD11)) ||
-                (mkey.HasVarCoeff(StdRegions::eVarCoeffD12)) ||
-                (mkey.HasVarCoeff(StdRegions::eVarCoeffD21)) ||
-                (mkey.HasVarCoeff(StdRegions::eVarCoeffD22)))
-            {
-                DropLocMatrix(lapkey);
-            }
+            DropLocMatrix(masskey);
+            DropLocMatrix(lapkey);
         }
         break;
         case StdRegions::eNormDerivOnTrace:
@@ -588,11 +570,17 @@ DNekScalMatSharedPtr Expansion2D::CreateMatrix(const MatrixKey &mkey)
                     m_metricinfo->GetDerivFactors(ptsKeys);
                 int dir = 0;
                 if (mkey.GetMatrixType() == StdRegions::eIProductWRTDerivBase0)
+                {
                     dir = 0;
+                }
                 if (mkey.GetMatrixType() == StdRegions::eIProductWRTDerivBase1)
+                {
                     dir = 1;
+                }
                 if (mkey.GetMatrixType() == StdRegions::eIProductWRTDerivBase2)
+                {
                     dir = 2;
+                }
 
                 MatrixKey iProdDeriv0Key(StdRegions::eIProductWRTDerivBase0,
                                          mkey.GetShapeType(), *this);
@@ -2244,10 +2232,8 @@ void Expansion2D::v_SetUpPhysNormals(const int edge)
 
 void Expansion2D::v_ReOrientTracePhysMap(const StdRegions::Orientation orient,
                                          Array<OneD, int> &idmap, const int nq0,
-                                         const int nq1)
+                                         [[maybe_unused]] const int nq1)
 {
-    boost::ignore_unused(nq1);
-
     if (idmap.size() != nq0)
     {
         idmap = Array<OneD, int>(nq0);
@@ -2371,5 +2357,4 @@ void Expansion2D::v_TraceNormLen(const int traceid, NekDouble &h, NekDouble &p)
 
     p = (NekDouble)(GetBasisNumModes(dirn) - 1);
 }
-} // namespace LocalRegions
-} // namespace Nektar
+} // namespace Nektar::LocalRegions

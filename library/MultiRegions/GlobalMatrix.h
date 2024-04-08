@@ -37,9 +37,7 @@
 #include <MultiRegions/GlobalMatrixKey.h>
 #include <MultiRegions/MultiRegionsDeclspec.h>
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 
 /// Represents a matrix of all degrees of freedom.
@@ -89,7 +87,6 @@ typedef std::map<GlobalMatrixKey, GlobalMatrixSharedPtr> GlobalMatrixMap;
 /// Shared pointer to a global matrix map.
 typedef std::shared_ptr<GlobalMatrixMap> GlobalMatrixMapShPtr;
 
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions
 
 #endif

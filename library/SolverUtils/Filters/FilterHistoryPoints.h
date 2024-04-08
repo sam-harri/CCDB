@@ -39,9 +39,7 @@
 #include "LibUtilities/BasicUtils/SharedArray.hpp"
 #include <SolverUtils/Filters/Filter.h>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 
 class FilterHistoryPoints : public Filter
@@ -52,7 +50,7 @@ public:
     /// Creates an instance of this class
     static FilterSharedPtr create(
         const LibUtilities::SessionReaderSharedPtr &pSession,
-        const std::weak_ptr<EquationSystem> &pEquation,
+        const std::shared_ptr<EquationSystem> &pEquation,
         const std::map<std::string, std::string> &pParams)
     {
         FilterSharedPtr p =
@@ -66,21 +64,21 @@ public:
 
     SOLVER_UTILS_EXPORT FilterHistoryPoints(
         const LibUtilities::SessionReaderSharedPtr &pSession,
-        const std::weak_ptr<EquationSystem> &pEquation,
+        const std::shared_ptr<EquationSystem> &pEquation,
         const ParamMap &pParams);
-    SOLVER_UTILS_EXPORT ~FilterHistoryPoints();
+    SOLVER_UTILS_EXPORT ~FilterHistoryPoints() override;
 
 protected:
-    SOLVER_UTILS_EXPORT virtual void v_Initialise(
+    SOLVER_UTILS_EXPORT void v_Initialise(
         const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
         const NekDouble &time) override;
-    SOLVER_UTILS_EXPORT virtual void v_Update(
+    SOLVER_UTILS_EXPORT void v_Update(
         const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
         const NekDouble &time) override;
-    SOLVER_UTILS_EXPORT virtual void v_Finalise(
+    SOLVER_UTILS_EXPORT void v_Finalise(
         const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
         const NekDouble &time) override;
-    SOLVER_UTILS_EXPORT virtual bool v_IsTimeDependent() override;
+    SOLVER_UTILS_EXPORT bool v_IsTimeDependent() override;
     bool GetPoint(Array<OneD, NekDouble> gloCoord, int I);
     SOLVER_UTILS_EXPORT void v_WriteData(const int &rank,
                                          const Array<OneD, NekDouble> &data,
@@ -116,7 +114,6 @@ protected:
     bool m_adaptive;
 };
 
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils
 
 #endif /* NEKTAR_SOLVERUTILS_FILTERS_FILTERCHECKPOINT_H */

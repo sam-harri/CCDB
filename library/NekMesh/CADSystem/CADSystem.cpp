@@ -36,9 +36,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 EngineFactory &GetEngineFactory()
@@ -65,8 +63,8 @@ CADSurfFactory &GetCADSurfFactory()
     return instance;
 }
 
-Array<OneD, NekDouble> CADSystem::GetPeriodicTranslationVector(int first,
-                                                               int second)
+std::array<NekDouble, 3> CADSystem::GetPeriodicTranslationVector(int first,
+                                                                 int second)
 {
     if (GetNumSurf() != 1)
     {
@@ -85,9 +83,9 @@ Array<OneD, NekDouble> CADSystem::GetPeriodicTranslationVector(int first,
     }
 
     vector<CADVertSharedPtr> v1 = c1->GetVertex();
-    Array<OneD, NekDouble> p1   = v1[0]->GetLoc();
+    auto p1                     = v1[0]->GetLoc();
 
-    Array<OneD, NekDouble> p2;
+    std::array<NekDouble, 3> p2;
     vector<CADVertSharedPtr> v2 = c2->GetVertex();
     if (c1->GetOrienationWRT(1) == c2->GetOrienationWRT(1))
     {
@@ -98,13 +96,7 @@ Array<OneD, NekDouble> CADSystem::GetPeriodicTranslationVector(int first,
         p2 = v2[0]->GetLoc();
     }
 
-    Array<OneD, NekDouble> ret(3);
-    ret[0] = p2[0] - p1[0];
-    ret[1] = p2[1] - p1[1];
-    ret[2] = p2[2] - p1[2];
-
-    return ret;
+    return {p2[0] - p1[0], p2[1] - p1[1], p2[2] - p1[2]};
 }
 
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh

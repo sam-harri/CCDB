@@ -32,8 +32,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <MultiRegions/GlobalLinSysPETScStaticCond.h>
 
 #include <petscksp.h>
@@ -42,9 +40,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 /**
  * @class GlobalLinSysPETSc
@@ -202,7 +198,23 @@ void GlobalLinSysPETScStaticCond::v_AssembleSchurComplement(
     SetUpScatter();
 
     // CONSTRUCT KSP OBJECT
-    SetUpSolver(pLocToGloMap->GetIterativeTolerance());
+    LibUtilities::SessionReaderSharedPtr pSession =
+        m_expList.lock()->GetSession();
+    string variable                    = pLocToGloMap->GetVariable();
+    NekDouble IterativeSolverTolerance = NekConstants::kNekIterativeTol;
+    if (pSession->DefinesGlobalSysSolnInfo(variable,
+                                           "IterativeSolverTolerance"))
+    {
+        IterativeSolverTolerance = boost::lexical_cast<double>(
+            pSession->GetGlobalSysSolnInfo(variable, "IterativeSolverTolerance")
+                .c_str());
+    }
+    else if (pSession->DefinesParameter("IterativeSolverTolerance"))
+    {
+        IterativeSolverTolerance =
+            pSession->GetParameter("IterativeSolverTolerance");
+    }
+    SetUpSolver(IterativeSolverTolerance);
 
     // If we are using the matrix multiplication shell don't try to
     // populate the matrix.
@@ -263,11 +275,9 @@ DNekScalBlkMatSharedPtr GlobalLinSysPETScStaticCond::v_GetStaticCondBlock(
     return schurComplBlock;
 }
 
-void GlobalLinSysPETScStaticCond::v_PreSolve(int scLevel,
-                                             Array<OneD, NekDouble> &F_bnd)
+void GlobalLinSysPETScStaticCond::v_PreSolve(
+    int scLevel, [[maybe_unused]] Array<OneD, NekDouble> &F_bnd)
 {
-    boost::ignore_unused(F_bnd);
-
     if (scLevel == 0)
     {
         // When matrices are supplied to the constructor at the top
@@ -391,5 +401,4 @@ GlobalLinSysStaticCondSharedPtr GlobalLinSysPETScStaticCond::v_Recurse(
     sys->Initialise(l2gMap);
     return sys;
 }
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions

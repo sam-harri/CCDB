@@ -45,9 +45,7 @@
 #include <SolverUtils/UnsteadySystem.h>
 #include <complex>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 class FileFieldInterpolator;
 typedef std::shared_ptr<FileFieldInterpolator> FileFieldInterpolatorSharedPtr;
@@ -127,27 +125,28 @@ public:
     static std::string className;
 
     /// Destructor
-    virtual ~FileSolution();
+    ~FileSolution() override;
 
-    virtual void v_GetVelocity(
+protected:
+    void v_GetVelocity(
         const Array<OneD, const Array<OneD, NekDouble>> &physfield,
         Array<OneD, Array<OneD, NekDouble>> &velocity) override;
 
-    virtual void v_GetPressure(
+    void v_GetPressure(
         const Array<OneD, const Array<OneD, NekDouble>> &physfield,
         Array<OneD, NekDouble> &pressure) override;
 
-    virtual void v_GetDensity(
+    using SolverUtils::EquationSystem::v_GetPressure;
+
+    void v_GetDensity(
         const Array<OneD, const Array<OneD, NekDouble>> &physfield,
         Array<OneD, NekDouble> &density) override;
 
-    virtual bool v_HasConstantDensity() override;
+    bool v_HasConstantDensity() override;
 
-protected:
     /// Session reader
-    SOLVER_UTILS_EXPORT FileSolution(
-        const LibUtilities::SessionReaderSharedPtr &pSession,
-        const SpatialDomains::MeshGraphSharedPtr &pGraph);
+    FileSolution(const LibUtilities::SessionReaderSharedPtr &pSession,
+                 const SpatialDomains::MeshGraphSharedPtr &pGraph);
 
     /// Compute the RHS
     void DoOdeRhs(const Array<OneD, const Array<OneD, NekDouble>> &inarray,
@@ -165,26 +164,22 @@ protected:
         NekDouble lambda);
 
     /// Initialise the object
-    SOLVER_UTILS_EXPORT virtual void v_InitObject(
-        bool DeclareField = true) override;
+    void v_InitObject(bool DeclareField = true) override;
 
-    SOLVER_UTILS_EXPORT virtual bool v_PostIntegrate(int step) override;
+    bool v_PostIntegrate(int step) override;
 
-    SOLVER_UTILS_EXPORT virtual bool v_RequireFwdTrans() override;
+    bool v_RequireFwdTrans() override;
 
-    SOLVER_UTILS_EXPORT virtual void v_DoInitialise(
-        bool dumpInitialConditions) override;
+    void v_DoInitialise(bool dumpInitialConditions) override;
 
     void UpdateField(NekDouble time);
 
+private:
     FileFieldInterpolatorSharedPtr m_solutionFile;
     std::set<std::string> m_variableFile;
     Array<OneD, Array<OneD, NekDouble>> m_coord;
     std::map<std::string, LibUtilities::EquationSharedPtr> m_solutionFunction;
-
-private:
 };
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils
 
 #endif // NEKTAR_SOLVERS_INCNAVIERSTOKES_H

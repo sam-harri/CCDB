@@ -36,9 +36,7 @@
 
 #include <boost/test/unit_test.hpp>
 
-namespace Nektar
-{
-namespace RealComparisonUnitTests
+namespace Nektar::RealComparisonUnitTests
 {
 BOOST_AUTO_TEST_CASE(TestRealComparisonSmall)
 {
@@ -176,5 +174,4 @@ BOOST_AUTO_TEST_CASE(TestRealComparisonNoThrow)
 //     BOOST_CHECK_THROW(LibUtilities::IsRealEqual(ad1, ad2, 0),
 //         std::runtime_error);
 // }
-} // namespace RealComparisonUnitTests
-} // namespace Nektar
+} // namespace Nektar::RealComparisonUnitTests

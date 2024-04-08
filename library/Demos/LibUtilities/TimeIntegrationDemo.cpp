@@ -90,7 +90,6 @@
 #include <iostream>
 
 #include <boost/algorithm/string.hpp>
-#include <boost/core/ignore_unused.hpp>
 #include <boost/program_options.hpp>
 
 #include <LibUtilities/BasicUtils/SharedArray.hpp>
@@ -113,7 +112,8 @@ class DemoSolver
 public:
     // -----------------------------------------------------------------
     // Constructor based upon the discretisation details
-    DemoSolver(int nVars, int nPoints, int nTimeSteps, bool test)
+    DemoSolver(int nVars, int nPoints, int nTimeSteps,
+               [[maybe_unused]] bool test)
         : m_nVars(nVars),
 
           m_x0(0.0), m_xend(1.0), m_nPoints(nPoints),
@@ -122,8 +122,6 @@ public:
           m_t0(0.0), m_tend(1.0), m_nTimeSteps(nTimeSteps),
           m_dt((m_tend - m_t0) / (double)m_nTimeSteps)
     {
-        boost::ignore_unused(test);
-
         m_minValue = +std::numeric_limits<double>::max();
         m_maxValue = -std::numeric_limits<double>::max();
 
@@ -242,7 +240,7 @@ public:
     {
         m_fileName = std::string("OneDFiniteDiffAdvDiffSolver");
         m_title    = std::string("Finite Difference Solution to the 1D "
-                              "advection-diffusion equation");
+                                    "advection-diffusion equation");
     }
 
     // -----------------------------------------------------------------
@@ -259,7 +257,7 @@ public:
 
     // -----------------------------------------------------------------
     void EvaluateExactSolution(Array<OneD, Array<OneD, double>> &outarray,
-                               const NekDouble time) const;
+                               const NekDouble time) const override;
 
     // -----------------------------------------------------------------
 
@@ -305,9 +303,13 @@ public:
 
         // Initialize a random seed using the time.
         if (test)
+        {
             srand(0);
+        }
         else
-            srand(time(NULL));
+        {
+            srand(time(nullptr));
+        }
 
         // Randomly generate the jacobian in a way that essentially
         // ensures diagonalizability with real eigenvalues and
@@ -369,7 +371,7 @@ public:
 
     // -----------------------------------------------------------------
     void EvaluateExactSolution(Array<OneD, Array<OneD, double>> &outarray,
-                               const NekDouble time) const;
+                               const NekDouble time) const override;
     // -----------------------------------------------------------------
 
     Array<OneD, std::complex<NekDouble>> &GetLambda()
@@ -405,9 +407,13 @@ public:
         m_alpha = alpha;
 
         if (test)
+        {
             srand(0);
+        }
         else
-            srand(time(NULL));
+        {
+            srand(time(nullptr));
+        }
 
         // Initial values set to zero
         m_u0 = Array<OneD, Array<OneD, NekDouble>>(m_nVars);
@@ -433,7 +439,7 @@ public:
 
     // -----------------------------------------------------------------
     void EvaluateExactSolution(Array<OneD, Array<OneD, double>> &outarray,
-                               const NekDouble time) const;
+                               const NekDouble time) const override;
     // -----------------------------------------------------------------
 
 private:
@@ -798,8 +804,10 @@ int main(int argc, char *argv[])
 
     // Write the time step and time
     if (printS || L2)
+    {
         std::cout << "Time step: " << timeStep << "  "
                   << "Time: " << time << std::endl;
+    }
 
     solverSharedPtr->GetMinMaxValues(exactSol, approxSol, printS);
 
@@ -877,10 +885,8 @@ int main(int argc, char *argv[])
 ///////////////////////////////////////////////////////////////////////////////
 void DemoSolver::Project(const Array<OneD, const Array<OneD, double>> &inarray,
                          Array<OneD, Array<OneD, double>> &outarray,
-                         const NekDouble time) const
+                         [[maybe_unused]] const NekDouble time) const
 {
-    boost::ignore_unused(time);
-
     // This is simply the identity operator.
     for (int k = 0; k < m_nVars; k++)
     {
@@ -1169,26 +1175,34 @@ void DemoSolver::GenerateGnuplotScript(const std::string &method) const
             outfile << "set title 'Approximate vs exact solution using method ";
 
             if (m_nVars > 1)
+            {
                 outfile << method << "'" << std::endl
                         << "set xlabel 'variable'" << std::endl
                         << "set ylabel 'u'" << std::endl;
+            }
             else
+            {
                 outfile << method << "'" << std::endl
                         << "set xlabel 'x'" << std::endl
                         << "set ylabel 'u'" << std::endl;
+            }
         }
         else if (j == 0)
         {
             outfile << "set title 'Error using method ";
 
             if (m_nVars > 1)
+            {
                 outfile << method << "'" << std::endl
                         << "set xlabel 'variable'" << std::endl
                         << "set ylabel 'u'" << std::endl;
+            }
             else
+            {
                 outfile << method << "'" << std::endl
                         << "set xlabel 'x'" << std::endl
                         << "set ylabel 'u'" << std::endl;
+            }
         }
         else if (j == 1)
         {
@@ -1282,11 +1296,9 @@ void DemoSolver::GenerateGnuplotScript(const std::string &method) const
 ///////////////////////////////////////////////////////////////////////////////
 void OneDFiniteDiffAdvDiffSolver::HelmSolve(
     const Array<OneD, const Array<OneD, double>> &inarray,
-    Array<OneD, Array<OneD, double>> &outarray, const NekDouble time,
-    const NekDouble lambda) const
+    Array<OneD, Array<OneD, double>> &outarray,
+    [[maybe_unused]] const NekDouble time, const NekDouble lambda) const
 {
-    boost::ignore_unused(time);
-
     // This function implements a 1D finite difference helmholtz solver.
     // The 1D Helmholtz equation leads to a cyclic triadiagonal matrix to be
     // solved.
@@ -1333,12 +1345,10 @@ void OneDFiniteDiffAdvDiffSolver::HelmSolve(
 
 void OneDFiniteDiffAdvDiffSolver::EvaluateAdvectionTerm(
     const Array<OneD, const Array<OneD, double>> &inarray,
-    Array<OneD, Array<OneD, double>> &outarray, const NekDouble time) const
+    Array<OneD, Array<OneD, double>> &outarray,
+    [[maybe_unused]] const NekDouble time) const
 {
-    bool centraldiff = true;
-    boost::ignore_unused(time);
-    boost::ignore_unused(centraldiff);
-
+    [[maybe_unused]] bool centraldiff = true;
     if (m_advection)
     {
         for (int k = 0; k < m_nVars; k++)
@@ -1464,11 +1474,9 @@ void OneDFiniteDiffAdvDiffSolver::EvaluateExactSolution(
 
 ///////////////////////////////////////////////////////////////////////////////
 void OneDSinusoidSolver::EvaluateSinusoidTerm(
-    const Array<OneD, const Array<OneD, double>> &inarray,
+    [[maybe_unused]] const Array<OneD, const Array<OneD, double>> &inarray,
     Array<OneD, Array<OneD, double>> &outarray, const NekDouble time) const
 {
-    boost::ignore_unused(inarray);
-
     for (int k = 0; k < m_nVars; k++)
     {
         for (int i = 0; i < m_nPoints; i++)
@@ -1538,18 +1546,17 @@ void OneDSinusoidSolver::EvaluateExactSolution(
 
 ///////////////////////////////////////////////////////////////////////////////
 void OneDFDESolver::EvaluateFDETerm(
-    const Array<OneD, const Array<OneD, double>> &inarray,
-    Array<OneD, Array<OneD, double>> &outarray, const NekDouble time) const
+    [[maybe_unused]] const Array<OneD, const Array<OneD, double>> &inarray,
+    Array<OneD, Array<OneD, double>> &outarray,
+    [[maybe_unused]] const NekDouble time) const
 {
-    boost::ignore_unused(inarray, time);
-
     for (int i = 0; i < m_nVars; i++)
     {
         NekDouble w = (NekDouble)(m_nVars - i) / (NekDouble)(m_nVars);
 
         for (int j = 0; j < m_nPoints; j++)
         {
-            outarray[i][j] = w * tgamma(m_alpha + 1.0);
+            outarray[i][j] = w * std::tgamma(m_alpha + 1.0);
         }
     }
 }

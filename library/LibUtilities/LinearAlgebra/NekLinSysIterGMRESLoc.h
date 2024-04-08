@@ -37,9 +37,8 @@
 #define NEKTAR_LIB_UTILITIES_LINEAR_ALGEBRA_NEK_LINSYS_ITERAT_GMRESLoc_H
 
 #include <LibUtilities/LinearAlgebra/NekLinSysIter.h>
-namespace Nektar
-{
-namespace LibUtilities
+
+namespace Nektar::LibUtilities
 {
 /// A global linear system.
 class NekLinSysIterGMRESLoc;
@@ -61,13 +60,14 @@ public:
         p->InitObject();
         return p;
     }
+
     static std::string className;
 
     LIB_UTILITIES_EXPORT NekLinSysIterGMRESLoc(
         const LibUtilities::SessionReaderSharedPtr &pSession,
         const LibUtilities::CommSharedPtr &vRowComm, const int nDimen,
         const NekSysKey &pKey = NekSysKey());
-    LIB_UTILITIES_EXPORT ~NekLinSysIterGMRESLoc();
+    LIB_UTILITIES_EXPORT ~NekLinSysIterGMRESLoc() override = default;
 
     LIB_UTILITIES_EXPORT int GetMaxLinIte()
     {
@@ -82,19 +82,23 @@ protected:
     // if use truncted Gmres(m)
     int m_KrylovMaxHessMatBand;
 
-    bool m_NekLinSysLeftPrecon  = false;
-    bool m_NekLinSysRightPrecon = true;
+    // This is the maximum number of solution vectors that can be stored
+    // For example, in gmres, it is the max number of Krylov space
+    // search directions can be stored
+    // It determines the max storage usage
+    int m_LinSysMaxStorage;
 
-    bool m_DifferenceFlag0 = false;
-    bool m_DifferenceFlag1 = false;
+    NekDouble m_prec_factor = 1.0;
 
-    virtual void v_InitObject() override;
+    bool m_NekLinSysLeftPrecon    = false;
+    bool m_NekLinSysRightPrecon   = true;
+    bool m_GMRESCentralDifference = false;
 
-    virtual int v_SolveSystem(const int nLocal,
-                              const Array<OneD, const NekDouble> &pInput,
-                              Array<OneD, NekDouble> &pOutput, const int nDir,
-                              const NekDouble tol,
-                              const NekDouble factor) override;
+    void v_InitObject() override;
+
+    int v_SolveSystem(const int nLocal,
+                      const Array<OneD, const NekDouble> &pInput,
+                      Array<OneD, NekDouble> &pOutput, const int nDir) override;
 
 private:
     /// Actual iterative solve-GMRES
@@ -109,8 +113,7 @@ private:
 
     // Arnoldi process
     void DoArnoldi(const int starttem, const int endtem, const int nLocal,
-                   // V_total(:,1:nd) total search directions
-                   Array<OneD, Array<OneD, NekDouble>> &V_local,
+                   Array<OneD, NekDouble> &w, Array<OneD, NekDouble> &wk,
                    // V[nd] current search direction
                    Array<OneD, NekDouble> &V1,
                    // V[nd+1] new search direction
@@ -133,8 +136,14 @@ private:
 
     static std::string lookupIds[];
     static std::string def;
+
+    // Hessenburg matrix
+    Array<OneD, Array<OneD, NekDouble>> m_hes;
+    // Hesseburg matrix after rotation
+    Array<OneD, Array<OneD, NekDouble>> m_Upper;
+    // Total search directions
+    Array<OneD, Array<OneD, NekDouble>> m_V_total;
 };
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities
 
 #endif

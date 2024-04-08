@@ -38,11 +38,9 @@
 #include <boost/algorithm/string/predicate.hpp>
 
 #include <LibUtilities/BasicUtils/FieldIO.h>
-#include <LibUtilities/BasicUtils/FileSystem.h>
+#include <LibUtilities/BasicUtils/Filesystem.hpp>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 /**
@@ -123,7 +121,7 @@ public:
 
 protected:
     /// Add a child node.
-    virtual TagWriterSharedPtr v_AddChild(const std::string &name) override
+    TagWriterSharedPtr v_AddChild(const std::string &name) override
     {
         TiXmlElement *child = new TiXmlElement(name.c_str());
         m_El->LinkEndChild(child);
@@ -131,8 +129,7 @@ protected:
     }
 
     /// Set an attribute key/value pair on this tag.
-    virtual void v_SetAttr(const std::string &key,
-                           const std::string &val) override
+    void v_SetAttr(const std::string &key, const std::string &val) override
     {
         if (boost::starts_with(key, "XML_"))
         {
@@ -221,7 +218,7 @@ public:
     LIB_UTILITIES_EXPORT FieldIOXml(LibUtilities::CommSharedPtr pComm,
                                     bool sharedFilesystem);
 
-    LIB_UTILITIES_EXPORT virtual ~FieldIOXml()
+    LIB_UTILITIES_EXPORT ~FieldIOXml() override
     {
     }
 
@@ -250,7 +247,7 @@ public:
         FieldMetaDataMap &fieldmetadatamap);
 
 protected:
-    LIB_UTILITIES_EXPORT virtual void v_Write(
+    LIB_UTILITIES_EXPORT void v_Write(
         const std::string &outFile,
         std::vector<FieldDefinitionsSharedPtr> &fielddefs,
         std::vector<std::vector<NekDouble>> &fielddata,
@@ -265,13 +262,12 @@ protected:
         FieldMetaDataMap &fieldinfomap     = NullFieldMetaDataMap,
         const Array<OneD, int> &ElementIDs = NullInt1DArray) override;
 
-    LIB_UTILITIES_EXPORT virtual DataSourceSharedPtr v_ImportFieldMetaData(
-        const std::string &filename,
-        FieldMetaDataMap &fieldmetadatamap) override;
+    LIB_UTILITIES_EXPORT DataSourceSharedPtr
+    v_ImportFieldMetaData(const std::string &filename,
+                          FieldMetaDataMap &fieldmetadatamap) override;
 
-    virtual const std::string &v_GetClassName() const override;
+    const std::string &v_GetClassName() const override;
 };
 
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities
 #endif

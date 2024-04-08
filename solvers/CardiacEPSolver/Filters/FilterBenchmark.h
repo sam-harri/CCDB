@@ -49,7 +49,7 @@ public:
     /// Creates an instance of this class
     static SolverUtils::FilterSharedPtr create(
         const LibUtilities::SessionReaderSharedPtr &pSession,
-        const std::weak_ptr<SolverUtils::EquationSystem> &pEquation,
+        const std::shared_ptr<SolverUtils::EquationSystem> &pEquation,
         const ParamMap &pParams)
     {
         SolverUtils::FilterSharedPtr p =
@@ -62,28 +62,29 @@ public:
     static std::string className;
 
     /// Construct the benchmark filter.
-    FilterBenchmark(const LibUtilities::SessionReaderSharedPtr &pSession,
-                    const std::weak_ptr<SolverUtils::EquationSystem> &pEquation,
-                    const ParamMap &pParams);
+    FilterBenchmark(
+        const LibUtilities::SessionReaderSharedPtr &pSession,
+        const std::shared_ptr<SolverUtils::EquationSystem> &pEquation,
+        const ParamMap &pParams);
 
     /// Destructor for the benchmark filter.
-    virtual ~FilterBenchmark();
+    ~FilterBenchmark() override;
 
 protected:
     /// Initialises the benchmark filter and allocates storage.
-    virtual void v_Initialise(
+    void v_Initialise(
         const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
         const NekDouble &time) override;
     /// Update recorded times.
-    virtual void v_Update(
+    void v_Update(
         const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
         const NekDouble &time) override;
     /// Finalises the benchmark filter and write out recorded data.
-    virtual void v_Finalise(
+    void v_Finalise(
         const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
         const NekDouble &time) override;
     /// Identifies that the benchmark filter is time dependent.
-    virtual bool v_IsTimeDependent() override;
+    bool v_IsTimeDependent() override;
 
 private:
     /// Storage for activation and repolarisation times.

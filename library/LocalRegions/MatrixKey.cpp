@@ -35,9 +35,7 @@
 #include <LocalRegions/Expansion.h>
 #include <LocalRegions/MatrixKey.h>
 
-namespace Nektar
-{
-namespace LocalRegions
+namespace Nektar::LocalRegions
 {
 MatrixKey::MatrixKey(const StdRegions::MatrixType matrixType,
                      const LibUtilities::ShapeType shapeType,
@@ -88,5 +86,4 @@ bool operator<(const MatrixKey &lhs, const MatrixKey &rhs)
             *dynamic_cast<const StdRegions::StdMatrixKey *>(&rhs));
 }
 
-} // namespace LocalRegions
-} // namespace Nektar
+} // namespace Nektar::LocalRegions

@@ -38,9 +38,7 @@
 #include <SpatialDomains/Geometry3D.h>
 #include <SpatialDomains/SpatialDomainsDeclspec.h>
 
-namespace Nektar
-{
-namespace SpatialDomains
+namespace Nektar::SpatialDomains
 {
 
 class QuadGeom;
@@ -51,7 +49,7 @@ class HexGeom : public Geometry3D
 public:
     SPATIAL_DOMAINS_EXPORT HexGeom();
     SPATIAL_DOMAINS_EXPORT HexGeom(int id, const QuadGeomSharedPtr faces[]);
-    SPATIAL_DOMAINS_EXPORT ~HexGeom();
+    SPATIAL_DOMAINS_EXPORT ~HexGeom() override;
 
     SPATIAL_DOMAINS_EXPORT static const int kNverts  = 8;
     SPATIAL_DOMAINS_EXPORT static const int kNedges  = 12;
@@ -61,15 +59,14 @@ public:
     SPATIAL_DOMAINS_EXPORT static const std::string XMLElementType;
 
 protected:
-    virtual void v_GenGeomFactors() override;
-    virtual int v_GetVertexEdgeMap(const int i, const int j) const override;
-    virtual int v_GetVertexFaceMap(const int i, const int j) const override;
-    virtual int v_GetEdgeFaceMap(const int i, const int j) const override;
-    virtual int v_GetEdgeNormalToFaceVert(const int i,
-                                          const int j) const override;
-    virtual int v_GetDir(const int faceidx, const int facedir) const override;
-    virtual void v_Reset(CurveMap &curvedEdges, CurveMap &curvedFaces) override;
-    virtual void v_Setup() override;
+    void v_GenGeomFactors() override;
+    int v_GetVertexEdgeMap(const int i, const int j) const override;
+    int v_GetVertexFaceMap(const int i, const int j) const override;
+    int v_GetEdgeFaceMap(const int i, const int j) const override;
+    int v_GetEdgeNormalToFaceVert(const int i, const int j) const override;
+    int v_GetDir(const int faceidx, const int facedir) const override;
+    void v_Reset(CurveMap &curvedEdges, CurveMap &curvedFaces) override;
+    void v_Setup() override;
 
 private:
     void SetUpLocalEdges();
@@ -86,7 +83,6 @@ private:
 
 typedef std::shared_ptr<HexGeom> HexGeomSharedPtr;
 typedef std::map<int, HexGeomSharedPtr> HexGeomMap;
-} // namespace SpatialDomains
-} // namespace Nektar
+} // namespace Nektar::SpatialDomains
 
 #endif

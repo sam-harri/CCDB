@@ -43,9 +43,7 @@
 #include <SolverUtils/Core/SessionFunction.h>
 #include <SolverUtils/SolverUtilsDeclspec.h>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 //  Forward declaration
 class Forcing;
@@ -107,8 +105,8 @@ public:
         const Array<OneD, MultiRegions::ExpListSharedPtr> &pFields,
         const unsigned int &pNumForcingFields = 0);
 
-    SOLVER_UTILS_EXPORT const Array<OneD, const Array<OneD, NekDouble>>
-        &GetForces();
+    SOLVER_UTILS_EXPORT const Array<OneD, const Array<OneD, NekDouble>> &
+    GetForces();
 
     SOLVER_UTILS_EXPORT Array<OneD, Array<OneD, NekDouble>> &UpdateForces();
 
@@ -165,7 +163,6 @@ protected:
         const NekDouble pTime, const LibUtilities::EquationSharedPtr &pEqn,
         Array<OneD, NekDouble> &pArray);
 };
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils
 
 #endif

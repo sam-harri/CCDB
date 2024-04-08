@@ -35,21 +35,16 @@
 #ifndef NEKTAR_LIB_UTILITIES_COMMDATATYPE_H
 #define NEKTAR_LIB_UTILITIES_COMMDATATYPE_H
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/BasicConst/NektarUnivTypeDefs.hpp>
 #include <vector>
 
 #ifdef NEKTAR_USE_MPI
 #include <mpi.h>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 typedef MPI_Datatype CommDataType;
-}
-} // namespace Nektar
+} // namespace Nektar::LibUtilities
 
 #elif NEKTAR_USING_PETSC
 
@@ -133,9 +128,8 @@ public:
     {
         return &val;
     }
-    static int GetCount(const T &val)
+    static int GetCount([[maybe_unused]] const T &val)
     {
-        boost::ignore_unused(val);
         return 1;
     }
 

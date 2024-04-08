@@ -40,7 +40,7 @@
 #include <SpatialDomains/Movement/Movement.h>
 
 #include <LibUtilities/BasicUtils/FieldIOXml.h>
-#include <LibUtilities/BasicUtils/FileSystem.h>
+#include <LibUtilities/BasicUtils/Filesystem.hpp>
 #include <LibUtilities/BasicUtils/ParseUtils.h>
 #include <LibUtilities/Interpreter/Interpreter.h>
 
@@ -50,9 +50,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace SpatialDomains
+namespace Nektar::SpatialDomains
 {
 
 std::string MeshGraphXml::className =
@@ -103,13 +101,17 @@ void MeshGraphXml::v_PartitionMesh(
     }
     else
     {
-        // Default partitioner to use is Metis. Use Scotch as default if it is
-        // installed. Override default with command-line flags if they are set.
-        string partitionerName = "Metis";
-        if (GetMeshPartitionFactory().ModuleExists("Scotch"))
+        // Default partitioner to use is Scotch, if it is installed.
+        bool haveScotch = GetMeshPartitionFactory().ModuleExists("Scotch");
+        bool haveMetis  = GetMeshPartitionFactory().ModuleExists("Metis");
+
+        string partitionerName = "Scotch";
+        if (!haveScotch && haveMetis)
         {
-            partitionerName = "Scotch";
+            partitionerName = "Metis";
         }
+
+        // Override default with command-line flags if they are set.
         if (session->DefinesCmdLineArgument("use-metis"))
         {
             partitionerName = "Metis";
@@ -179,6 +181,10 @@ void MeshGraphXml::v_PartitionMesh(
 
         if (commMesh->GetSize() > 1)
         {
+            ASSERTL0(haveScotch || haveMetis,
+                     "Valid partitioner not found! Either Scotch or METIS "
+                     "should be used.");
+
             int nParts = commMesh->GetSize();
 
             if (session->GetSharedFilesystem())
@@ -557,12 +563,9 @@ void MeshGraphXml::v_ReadVertices()
     TiXmlElement *vertex = element->FirstChildElement("V");
 
     int indx;
-    int nextVertexNumber = -1;
 
     while (vertex)
     {
-        nextVertexNumber++;
-
         TiXmlAttribute *vertexAttr = vertex->FirstAttribute();
         std::string attrName(vertexAttr->Name());
 
@@ -731,13 +734,9 @@ void MeshGraphXml::v_ReadCurves()
     TiXmlElement *edgelement = field->FirstChildElement("E");
 
     int edgeindx, edgeid;
-    int nextEdgeNumber = -1;
 
     while (edgelement)
     {
-        /// These should be ordered.
-        nextEdgeNumber++;
-
         std::string edge(edgelement->ValueStr());
         ASSERTL0(edge == "E",
                  (std::string("Unknown 3D curve type:") + edge).c_str());
@@ -949,7 +948,7 @@ void MeshGraphXml::v_ReadCurves()
 
 void MeshGraphXml::ReadDomain()
 {
-    TiXmlElement *domain = NULL;
+    TiXmlElement *domain = nullptr;
     /// Look for data in DOMAIN block.
     domain = m_xmlGeom->FirstChildElement("DOMAIN");
 
@@ -1287,7 +1286,7 @@ void MeshGraphXml::ReadElements()
 
 void MeshGraphXml::v_ReadElements1D()
 {
-    TiXmlElement *field = NULL;
+    TiXmlElement *field = nullptr;
 
     /// Look for elements in ELEMENT block.
     field = m_xmlGeom->FirstChildElement("ELEMENT");
@@ -1858,7 +1857,7 @@ void MeshGraphXml::v_ReadElements3D()
 
 void MeshGraphXml::ReadComposites()
 {
-    TiXmlElement *field = NULL;
+    TiXmlElement *field = nullptr;
 
     /// Look for elements in ELEMENT block.
     field = m_xmlGeom->FirstChildElement("COMPOSITE");
@@ -2803,7 +2802,9 @@ void MeshGraphXml::v_WriteGeometry(
     }
 
     if (m_movement)
+    {
         m_movement->WriteMovement(root);
+    }
 
     // Save file.
     doc.SaveFile(outfilename);
@@ -2823,11 +2824,11 @@ void MeshGraphXml::WriteXMLGeometry(std::string outname,
     // this is xml so we are going to write a directory with lots of
     // xml files
     string dirname = outname + "_xml";
-    boost::filesystem::path pdirname(dirname);
+    fs::path pdirname(dirname);
 
-    if (!boost::filesystem::is_directory(dirname))
+    if (!fs::is_directory(dirname))
     {
-        boost::filesystem::create_directory(dirname);
+        fs::create_directory(dirname);
     }
 
     ASSERTL0(elements.size() == partitions.size(),
@@ -3256,9 +3257,9 @@ void MeshGraphXml::WriteXMLGeometry(std::string outname,
 
         boost::format pad("P%1$07d.xml");
         pad % partitions[i];
-        boost::filesystem::path pFilename(pad.str());
+        fs::path pFilename(pad.str());
 
-        boost::filesystem::path fullpath = pdirname / pFilename;
+        fs::path fullpath = pdirname / pFilename;
         doc.SaveFile(LibUtilities::PortablePath(fullpath));
     }
 }
@@ -3291,5 +3292,4 @@ CompositeOrdering MeshGraphXml::CreateCompositeOrdering()
     return ret;
 }
 
-} // namespace SpatialDomains
-} // namespace Nektar
+} // namespace Nektar::SpatialDomains

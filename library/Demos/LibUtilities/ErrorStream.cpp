@@ -38,14 +38,10 @@
 #include <sstream>
 #include <vector>
 
-#include <boost/core/ignore_unused.hpp>
-
 using namespace Nektar;
 
-int main(int argc, char *argv[])
+int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 {
-    boost::ignore_unused(argc, argv);
-
     // Set up a stringstream to catch any error output.
     std::stringstream ss;
     ErrorUtil::SetErrorStream(ss);
@@ -60,7 +56,7 @@ int main(int argc, char *argv[])
     try
     {
         char *fake_argv[3] = {(char *)"ErrorStream", (char *)"missing.xml",
-                              NULL};
+                              nullptr};
         LibUtilities::SessionReaderSharedPtr session =
             LibUtilities::SessionReader::CreateInstance(2, fake_argv);
         session->InitSession();

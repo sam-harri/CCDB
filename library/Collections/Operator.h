@@ -35,8 +35,6 @@
 #ifndef NEKTAR_LIBRARY_COLLECTIONS_OPERATOR_H
 #define NEKTAR_LIBRARY_COLLECTIONS_OPERATOR_H
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <Collections/CollectionsDeclspec.h>
 #include <LibUtilities/BasicUtils/NekFactory.hpp>
 #include <SpatialDomains/Geometry.h>
@@ -55,9 +53,7 @@
                                                        factors);               \
     }
 
-namespace Nektar
-{
-namespace Collections
+namespace Nektar::Collections
 {
 
 class CoalescedGeomData;
@@ -67,18 +63,25 @@ enum OperatorType
 {
     eBwdTrans,
     eHelmholtz,
+    eLinearAdvectionDiffusionReaction,
     eIProductWRTBase,
     eIProductWRTDerivBase,
     ePhysDeriv,
+    ePhysInterp1DScaled,
     SIZE_OperatorType
 };
 
-const char *const OperatorTypeMap[] = {"BwdTrans", "Helmholtz",
+const char *const OperatorTypeMap[] = {"BwdTrans",
+                                       "Helmholtz",
+                                       "LinearAdvectionDiffusionReaction",
                                        "IProductWRTBase",
-                                       "IProductWRTDerivBase", "PhysDeriv"};
+                                       "IProductWRTDerivBase",
+                                       "PhysDeriv",
+                                       "PhysInterp1DScaled"};
 
-const char *const OperatorTypeMap1[] = {"BwdTrans", "Helmholtz", "IPWrtBase",
-                                        "IPWrtDBase", "PhysDeriv "};
+const char *const OperatorTypeMap1[] = {
+    "BwdTrans",   "Helmholtz", "LinearADR",         "IPWrtBase",
+    "IPWrtDBase", "PhysDeriv", "PhysInterp1DScaled"};
 
 enum ImplementationType
 {
@@ -153,9 +156,23 @@ public:
         Array<OneD, NekDouble> &output,
         Array<OneD, NekDouble> &wsp = NullNekDouble1DArray) = 0;
 
-    /// Check the validity of the supplied factor map
-    COLLECTIONS_EXPORT virtual void CheckFactors(StdRegions::FactorMap factors,
-                                                 int coll_phys_offset) = 0;
+    /// Update the supplied factor map
+    COLLECTIONS_EXPORT virtual void UpdateFactors(
+        [[maybe_unused]] StdRegions::FactorMap factors)
+    {
+        ASSERTL0(false, "This method needs to be re-implemented in derived "
+                        "operator class.");
+    }
+
+    /// Update the supplied variable coefficients
+    COLLECTIONS_EXPORT virtual void UpdateVarcoeffs(
+        [[maybe_unused]] StdRegions::VarCoeffMap &varcoeffs)
+    {
+        ASSERTL0(false,
+                 "This method needs to be re-implemented in derived "
+                 "operator class. Make sure it is implemented for the operator"
+                 " in the .opt file");
+    }
 
     /// Get the size of the required workspace
     unsigned int GetWspSize()
@@ -175,12 +192,43 @@ public:
         return m_stdExp;
     }
 
+    /*
+     * Return the input size for this collection.
+     * Optionally return the size for the opposite (Phys or Coeff) space.
+     */
+    inline unsigned int GetInputSize(bool defaultIn = true)
+    {
+        return (m_inputSizeOther && !defaultIn) ? m_inputSizeOther
+                                                : m_inputSize;
+    }
+
+    /*
+     * Return the output size for this collection.
+     * Optionally return the size for the opposite (Phys or Coeff) space.
+     */
+    inline unsigned int GetOutputSize(bool defaultOut = true)
+    {
+        return (m_outputSizeOther && !defaultOut) ? m_outputSizeOther
+                                                  : m_outputSize;
+    }
+
 protected:
     bool m_isDeformed;
     StdRegions::StdExpansionSharedPtr m_stdExp;
+    /// number of elements that the operator is applied on
     unsigned int m_numElmt;
     unsigned int m_nqe;
     unsigned int m_wspSize;
+    /// number of modes or quadrature points that are passed as input to an
+    /// operator
+    unsigned int m_inputSize;
+    /// number of modes or quadrature points  that are taken as output from an
+    /// operator
+    unsigned int m_outputSize;
+    /// Number of modes or quadrature points, opposite to m_inputSize
+    unsigned int m_inputSizeOther;
+    /// Number of modes or quadrature points, opposite to m_outputSize
+    unsigned int m_outputSizeOther;
 };
 
 /// Shared pointer to an Operator object
@@ -192,6 +240,6 @@ bool operator<(OperatorKey const &p1, OperatorKey const &p2);
 /// Stream output operator for OperatorKey objects
 std::ostream &operator<<(std::ostream &os, OperatorKey const &p);
 
-} // namespace Collections
-} // namespace Nektar
+} // namespace Nektar::Collections
+
 #endif

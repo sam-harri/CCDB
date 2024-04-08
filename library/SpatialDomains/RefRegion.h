@@ -40,9 +40,7 @@
 #include <SpatialDomains/SpatialDomainsDeclspec.h>
 #include <vector>
 
-namespace Nektar
-{
-namespace SpatialDomains
+namespace Nektar::SpatialDomains
 {
 
 /**
@@ -93,7 +91,6 @@ protected:
     std::vector<unsigned int> m_numPoints;
 };
 
-} // namespace SpatialDomains
-} // namespace Nektar
+} // namespace Nektar::SpatialDomains
 
 #endif // NEKTAR_SPATIALDOMAINS_REFREGION_H

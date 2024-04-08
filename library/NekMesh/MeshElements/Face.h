@@ -35,8 +35,6 @@
 #ifndef NEKMESH_MESHELEMENTS_FACE
 #define NEKMESH_MESHELEMENTS_FACE
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/BasicUtils/HashUtils.hpp>
 #include <SpatialDomains/QuadGeom.h>
 #include <SpatialDomains/TriGeom.h>
@@ -45,9 +43,7 @@
 #include <NekMesh/MeshElements/Node.h>
 #include <NekMesh/NekMeshDeclspec.h>
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 class Element;
@@ -174,7 +170,6 @@ struct FaceHash
 };
 typedef std::unordered_set<FaceSharedPtr, FaceHash> FaceSet;
 
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh
 
 #endif

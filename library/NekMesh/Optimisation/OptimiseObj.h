@@ -35,13 +35,9 @@
 #ifndef NEKTAR_MESHUTILS_OPTIMISATION_OPTIMISEOBJ_H
 #define NEKTAR_MESHUTILS_OPTIMISATION_OPTIMISEOBJ_H
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/LinearAlgebra/NekTypeDefs.hpp>
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 class OptiObj
@@ -55,17 +51,15 @@ public:
     {
     }
 
-    virtual NekDouble F(Array<OneD, NekDouble> xitst)
+    virtual NekDouble F([[maybe_unused]] Array<OneD, NekDouble> xitst)
     {
-        boost::ignore_unused(xitst);
         NEKERROR(ErrorUtil::efatal,
                  "F() should be implemented in inheriting class");
         return 0.0;
     }
 
-    virtual DNekMat dF(Array<OneD, NekDouble> xitst)
+    virtual DNekMat dF([[maybe_unused]] Array<OneD, NekDouble> xitst)
     {
-        boost::ignore_unused(xitst);
         NEKERROR(ErrorUtil::efatal,
                  "dF() should be implemented in inheriting class");
         return DNekMat(1, 1, 0.0);
@@ -92,15 +86,13 @@ public:
         return Array<OneD, NekDouble>();
     }
 
-    virtual void Update(Array<OneD, NekDouble> xinew)
+    virtual void Update([[maybe_unused]] Array<OneD, NekDouble> xinew)
     {
-        boost::ignore_unused(xinew);
         NEKERROR(ErrorUtil::efatal,
                  "Update() should be implemented in inheriting class");
     }
 };
 typedef std::shared_ptr<OptiObj> OptiObjSharedPtr;
 
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh
 #endif

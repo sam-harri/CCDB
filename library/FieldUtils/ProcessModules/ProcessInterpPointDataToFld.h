@@ -40,9 +40,7 @@
 
 #include "../Module.h"
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 /**
@@ -59,23 +57,23 @@ public:
     static ModuleKey className;
 
     ProcessInterpPointDataToFld(FieldSharedPtr f);
-    virtual ~ProcessInterpPointDataToFld();
+    ~ProcessInterpPointDataToFld() override;
 
 protected:
     /// Write mesh to output file.
-    virtual void v_Process(po::variables_map &vm) override;
+    void v_Process(po::variables_map &vm) override;
 
-    virtual std::string v_GetModuleName() override
+    std::string v_GetModuleName() override
     {
         return "ProcessInterpPointDataToFld";
     }
 
-    virtual std::string v_GetModuleDescription() override
+    std::string v_GetModuleDescription() override
     {
         return "Interpolating data to field";
     }
 
-    virtual ModulePriority v_GetModulePriority() override
+    ModulePriority v_GetModulePriority() override
     {
         return eFillExp;
     }
@@ -87,7 +85,6 @@ protected:
 
 private:
 };
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils
 
 #endif

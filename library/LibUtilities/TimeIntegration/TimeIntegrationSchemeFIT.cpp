@@ -39,9 +39,7 @@
 
 #include <LibUtilities/TimeIntegration/TimeIntegrationSchemeFIT.h>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 /**
  * @class FractionalInTimeIntegrationScheme
@@ -144,9 +142,13 @@ void FractionalInTimeIntegrationScheme::v_InitializeScheme(
             {
                 // Store the initial values as the first previous state.
                 if (m == 0)
+                {
                     m_u[m][i][j] = m_u0[i][j];
+                }
                 else
+                {
                     m_u[m][i][j] = 0;
+                }
             }
         }
     }
@@ -169,7 +171,7 @@ void FractionalInTimeIntegrationScheme::v_InitializeScheme(
     // J
     m_J = SingleArray(m_order, 0.0);
 
-    m_J[0] = pow(m_deltaT, m_alpha) / tgamma(m_alpha + 1.);
+    m_J[0] = pow(m_deltaT, m_alpha) / std::tgamma(m_alpha + 1.);
 
     for (size_t m = 1, m_1 = 0; m < m_order; ++m, ++m_1)
     {
@@ -279,10 +281,8 @@ void FractionalInTimeIntegrationScheme::v_InitializeScheme(
  * @brief Worker method that performs the time integration.
  */
 ConstDoubleArray &FractionalInTimeIntegrationScheme::v_TimeIntegrate(
-    const size_t timestep, const NekDouble delta_t)
+    const size_t timestep, [[maybe_unused]] const NekDouble delta_t)
 {
-    boost::ignore_unused(delta_t);
-
     ASSERTL1(delta_t == m_deltaT,
              "Delta T has changed which is not permitted.");
 
@@ -734,12 +734,16 @@ void FractionalInTimeIntegrationScheme::integralClassInitialize(
         for (size_t q = 0; q < m_nQuadPts; ++q)
         {
             if (m == 0)
+            {
                 instance.Eh[0][q] =
                     1. / instance.z[q] * (exp(instance.z[q] * m_deltaT) - 1.0);
+            }
             else
+            {
                 instance.Eh[m][q] = -1. / instance.z[q] +
                                     NekDouble(m) / (instance.z[q] * m_deltaT) *
                                         instance.Eh[m - 1][q];
+            }
         }
     }
 
@@ -937,7 +941,9 @@ void FractionalInTimeIntegrationScheme::timeAdvance(const size_t timeStep,
                 {
                     // y * instance.E
                     if (m == 0)
+                    {
                         y[i][j][q] *= instance.E[q];
+                    }
 
                     // F * instance.AtEh
                     y[i][j][q] += m_F[i][j] * instance.AtEh[m][q];
@@ -1077,5 +1083,4 @@ std::ostream &operator<<(std::ostream &os,
     return os;
 }
 
-} // end namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities

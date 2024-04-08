@@ -32,13 +32,9 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <SolverUtils/Advection/Advection.h>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 
 /**
@@ -324,13 +320,11 @@ void Advection::v_InitObject(
  *
  */
 void Advection::v_SetBaseFlow(
-    const Array<OneD, Array<OneD, NekDouble>> &inarray,
-    const Array<OneD, MultiRegions::ExpListSharedPtr> &fields)
+    [[maybe_unused]] const Array<OneD, Array<OneD, NekDouble>> &inarray,
+    [[maybe_unused]] const Array<OneD, MultiRegions::ExpListSharedPtr> &fields)
 {
-    boost::ignore_unused(inarray, fields);
     NEKERROR(ErrorUtil::efatal,
              "A baseflow is not appropriate for this advection type.");
 }
 
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils

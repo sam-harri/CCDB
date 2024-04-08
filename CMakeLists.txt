@@ -23,8 +23,8 @@ IF (POLICY CMP0074)
     CMAKE_POLICY(SET CMP0074 OLD)
 ENDIF()
 
-# Nektar++ requires C++14.
-SET(CMAKE_CXX_STANDARD 14 CACHE STRING "Default value for CXX_STANDARD property of targets")
+# Nektar++ requires C++17.
+SET(CMAKE_CXX_STANDARD 17 CACHE STRING "Default value for CXX_STANDARD property of targets")
 SET(CMAKE_CXX_STANDARD_REQUIRED ON)
 SET(CMAKE_CXX_EXTENSIONS OFF)
 
@@ -39,6 +39,17 @@ ENDIF()
 
 # Helps organize projects in IDEs.
 SET_PROPERTY(GLOBAL PROPERTY USE_FOLDERS ON)
+
+# Determine support for std::filesystem: older gcc versions support this
+# when using experimental and linking against libstdc++fs library.
+IF (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    IF(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 5.99 AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.0)
+        SET(NEKTAR_FILESYSTEM_LIBRARY "stdc++fs")
+        IF(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 8.0)
+            ADD_DEFINITIONS(-DNEKTAR_USE_GNU_FS_EXPERIMENTAL)
+        ENDIF()
+    ENDIF()
+ENDIF()
 
 # Extract the version number from the VERSION file and set in CMake
 # The format of this file must be X.X.X
@@ -56,6 +67,11 @@ INCLUDE(CMakeParseArguments)
 # Enable CTest.
 ENABLE_TESTING()
 
+IF (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
+    IF (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 14)
+        ADD_DEFINITIONS(-D_LIBCPP_ENABLE_CXX17_REMOVED_UNARY_BINARY_FUNCTION)
+    ENDIF()
+ENDIF()
 
 # Set default install path if not provided on the command-line
 IF (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
@@ -174,6 +190,11 @@ OPTION(NEKTAR_BUILD_TESTS             "Build regression tests."        ON)
 OPTION(NEKTAR_BUILD_PERFORMANCE_TESTS "Build performance tests."       OFF)
 OPTION(NEKTAR_BUILD_PYTHON            "Build Nektar++ Python bindings" OFF)
 
+# Option to build solver libraries. Hidden if NEKTAR_BUILD_SOLVERS=OFF
+CMAKE_DEPENDENT_OPTION(NEKTAR_BUILD_SOLVER_LIBS
+    "Build example solver source files into their own libraries" OFF
+    "NEKTAR_BUILD_SOLVERS" OFF)
+
 OPTION(NEKTAR_TEST_ALL "Include full set of regression tests to this build." OFF)
 OPTION(NEKTAR_TEST_USE_HOSTFILE "Use a hostfile to explicitly specify number of
 slots." OFF)
@@ -241,6 +262,9 @@ ENDIF()
 # Find ThirdParty libraries and headers.
 # --------------------------------------
 
+# Add custom target for third-party compilations.
+ADD_CUSTOM_TARGET(thirdparty)
+
 # Need to find MPI first, as other packages depend on the compiler wrappers
 INCLUDE (ThirdPartyMPI)
 INCLUDE (ThirdPartyTinyxml)
@@ -303,6 +327,11 @@ IF (NEKTAR_BUILD_LIBRARY)
     INCLUDE_DIRECTORIES(library)
 ENDIF()
 
+# Both normal libraries and solver libraries can modify NEKTAR++_LIBRARIES - reset it if we're building either
+if (NEKTAR_BUILD_LIBRARY OR NEKTAR_BUILD_SOLVER_LIBS)
+    SET(NEKTAR++_LIBRARIES "" CACHE INTERNAL "")
+ENDIF()
+
 INCLUDE_DIRECTORIES(utilities)
 ADD_SUBDIRECTORY(utilities)
 
@@ -310,9 +339,6 @@ INCLUDE_DIRECTORIES(solvers)
 ADD_SUBDIRECTORY(solvers)
 
 IF (NEKTAR_BUILD_LIBRARY)
-    # List of Nektar++ libraries will be rebuilt every configuration.
-    SET(NEKTAR++_LIBRARIES "" CACHE INTERNAL "")
-
     ADD_SUBDIRECTORY(library)
     INSTALL(EXPORT Nektar++Libraries DESTINATION ${NEKTAR_CMAKE_DIR} COMPONENT dev)
 ENDIF (NEKTAR_BUILD_LIBRARY)

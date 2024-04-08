@@ -38,9 +38,7 @@
 
 #include <SolverUtils/Filters/FilterFieldConvert.h>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 class FilterMovingAverage : public FilterFieldConvert
 {
@@ -50,7 +48,7 @@ public:
     /// Creates an instance of this class
     static FilterSharedPtr create(
         const LibUtilities::SessionReaderSharedPtr &pSession,
-        const std::weak_ptr<EquationSystem> &pEquation,
+        const std::shared_ptr<EquationSystem> &pEquation,
         const std::map<std::string, std::string> &pParams)
     {
         FilterSharedPtr p =
@@ -64,23 +62,22 @@ public:
 
     SOLVER_UTILS_EXPORT FilterMovingAverage(
         const LibUtilities::SessionReaderSharedPtr &pSession,
-        const std::weak_ptr<EquationSystem> &pEquation,
+        const std::shared_ptr<EquationSystem> &pEquation,
         const ParamMap &pParams);
-    SOLVER_UTILS_EXPORT virtual ~FilterMovingAverage();
+    SOLVER_UTILS_EXPORT ~FilterMovingAverage() override;
 
 protected:
-    virtual void v_ProcessSample(
+    void v_ProcessSample(
         const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
         std::vector<Array<OneD, NekDouble>> &fieldcoeffs,
         const NekDouble &time) override;
-    virtual std::string v_GetFileSuffix() override
+    std::string v_GetFileSuffix() override
     {
         return "_movAvg";
     }
 
     NekDouble m_alpha;
 };
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils
 
 #endif /* NEKTAR_SOLVERUTILS_FILTERS_FILTERMOVINGAVERAGE_H */

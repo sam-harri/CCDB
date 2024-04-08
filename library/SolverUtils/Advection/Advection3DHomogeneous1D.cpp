@@ -32,8 +32,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/Foundations/ManagerAccess.h>
 #include <SolverUtils/Advection/Advection3DHomogeneous1D.h>
 #include <iomanip>
@@ -41,9 +39,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 std::string Advection3DHomogeneous1D::type[] = {
     GetAdvectionFactory().RegisterCreatorFunction(
@@ -190,11 +186,9 @@ void Advection3DHomogeneous1D::v_Advect(
     const Array<OneD, Array<OneD, NekDouble>> &advVel,
     const Array<OneD, Array<OneD, NekDouble>> &inarray,
     Array<OneD, Array<OneD, NekDouble>> &outarray, const NekDouble &time,
-    const Array<OneD, Array<OneD, NekDouble>> &pFwd,
-    const Array<OneD, Array<OneD, NekDouble>> &pBwd)
+    [[maybe_unused]] const Array<OneD, Array<OneD, NekDouble>> &pFwd,
+    [[maybe_unused]] const Array<OneD, Array<OneD, NekDouble>> &pBwd)
 {
-    boost::ignore_unused(pFwd, pBwd);
-
     Array<OneD, NekDouble> tmp(m_numPoints), tmp2;
     int nVel = advVel.size();
 
@@ -243,16 +237,13 @@ void Advection3DHomogeneous1D::v_Advect(
  *
  */
 void Advection3DHomogeneous1D::ModifiedFluxVector(
-    const Array<OneD, Array<OneD, NekDouble>> &inarray,
+    [[maybe_unused]] const Array<OneD, Array<OneD, NekDouble>> &inarray,
     Array<OneD, Array<OneD, Array<OneD, NekDouble>>> &outarray)
 {
-    boost::ignore_unused(inarray);
-
     // Return section of flux vector for this plane.
     outarray = m_fluxVecPlane[m_planeCounter];
 
     // Increment the plane counter.
     m_planeCounter = (m_planeCounter + 1) % m_numPlanes;
 }
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils

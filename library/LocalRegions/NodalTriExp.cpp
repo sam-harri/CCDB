@@ -37,9 +37,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace LocalRegions
+namespace Nektar::LocalRegions
 {
 NodalTriExp::NodalTriExp(const LibUtilities::BasisKey &Ba,
                          const LibUtilities::BasisKey &Bb,
@@ -62,10 +60,9 @@ NodalTriExp::NodalTriExp(const LibUtilities::BasisKey &Ba,
 }
 
 NodalTriExp::NodalTriExp(const NodalTriExp &T)
-    : StdExpansion(T),
-      StdExpansion2D(T), StdRegions::StdTriExp(T), StdRegions::StdNodalTriExp(
-                                                       T),
-      Expansion(T), Expansion2D(T), m_matrixManager(T.m_matrixManager),
+    : StdExpansion(T), StdExpansion2D(T), StdRegions::StdTriExp(T),
+      StdRegions::StdNodalTriExp(T), Expansion(T), Expansion2D(T),
+      m_matrixManager(T.m_matrixManager),
       m_staticCondMatrixManager(T.m_staticCondMatrixManager)
 {
 }
@@ -686,5 +683,4 @@ void NodalTriExp::v_ComputeTraceNormal(const int edge)
     }
 }
 
-} // namespace LocalRegions
-} // namespace Nektar
+} // namespace Nektar::LocalRegions

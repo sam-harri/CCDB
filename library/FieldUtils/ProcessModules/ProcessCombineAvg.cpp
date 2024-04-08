@@ -36,15 +36,11 @@
 #include <string>
 using namespace std;
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/BasicUtils/SharedArray.hpp>
 
 #include "ProcessCombineAvg.h"
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 ModuleKey ProcessCombineAvg::className =
@@ -188,10 +184,9 @@ void ProcessCombineAvg::v_Process(po::variables_map &vm)
     }
 
     // Update metadata
-    m_f->m_fieldMetaDataMap["NumberOfFieldDumps"] =
-        boost::lexical_cast<std::string>(na + nb);
-    NekDouble t0      = -1;
-    NekDouble finTime = -1;
+    m_f->m_fieldMetaDataMap["NumberOfFieldDumps"] = std::to_string(na + nb);
+    NekDouble t0                                  = -1;
+    NekDouble finTime                             = -1;
     if (m_f->m_fieldMetaDataMap.count("InitialTime"))
     {
         string s_t  = m_f->m_fieldMetaDataMap["InitialTime"];
@@ -238,5 +233,4 @@ void ProcessCombineAvg::v_Process(po::variables_map &vm)
             boost::lexical_cast<std::string>(finTime);
     }
 }
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

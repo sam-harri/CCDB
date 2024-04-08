@@ -37,14 +37,11 @@
 using namespace std;
 #include <LibUtilities/BasicUtils/ParseUtils.h>
 #include <LibUtilities/BasicUtils/SharedArray.hpp>
-#include <boost/core/ignore_unused.hpp>
 #include <boost/format.hpp>
 
 #include "ProcessAverageFld.h"
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 ModuleKey ProcessAverageFld::className =
@@ -180,5 +177,4 @@ void ProcessAverageFld::v_Process(po::variables_map &vm)
                                 m_f->m_exp[j]->UpdatePhys());
     }
 }
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

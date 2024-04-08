@@ -58,7 +58,7 @@ public:
 
     friend class MemoryManager<ProtocolS1S2>;
 
-    virtual ~ProtocolS1S2()
+    ~ProtocolS1S2() override
     {
     }
 
@@ -73,9 +73,9 @@ protected:
     NekDouble m_s2cyclelength;
     NekDouble m_s2start;
 
-    virtual NekDouble v_GetAmplitude(const NekDouble time) override;
+    NekDouble v_GetAmplitude(const NekDouble time) override;
 
-    virtual void v_GenerateSummary(SolverUtils::SummaryList &s) override;
+    void v_GenerateSummary(SolverUtils::SummaryList &s) override;
 
     virtual void v_SetInitialConditions();
 

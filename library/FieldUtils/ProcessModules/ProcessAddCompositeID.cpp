@@ -37,15 +37,11 @@
 #include <string>
 using namespace std;
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/BasicUtils/SharedArray.hpp>
 
 #include "ProcessAddCompositeID.h"
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 ModuleKey ProcessAddCompositeID::className =
@@ -125,5 +121,4 @@ void ProcessAddCompositeID::v_Process(po::variables_map &vm)
     // forward transform
     exp->FwdTransLocalElmt(exp->GetPhys(), exp->UpdateCoeffs());
 }
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

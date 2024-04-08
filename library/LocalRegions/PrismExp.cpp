@@ -32,8 +32,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/Foundations/Interp.h>
 #include <LibUtilities/Foundations/InterpCoeff.h>
 #include <LocalRegions/PrismExp.h>
@@ -41,9 +39,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace LocalRegions
+namespace Nektar::LocalRegions
 {
 
 PrismExp::PrismExp(const LibUtilities::BasisKey &Ba,
@@ -549,10 +545,8 @@ NekDouble PrismExp::v_PhysEvaluate(const Array<OneD, NekDouble> &coord,
 void PrismExp::v_ExtractDataToCoeffs(
     const NekDouble *data, const std::vector<unsigned int> &nummodes,
     const int mode_offset, NekDouble *coeffs,
-    std::vector<LibUtilities::BasisType> &fromType)
+    [[maybe_unused]] std::vector<LibUtilities::BasisType> &fromType)
 {
-    boost::ignore_unused(fromType);
-
     int data_order0 = nummodes[mode_offset];
     int fillorder0  = min(m_base[0]->GetNumModes(), data_order0);
     int data_order1 = nummodes[mode_offset + 1];
@@ -1308,11 +1302,9 @@ void PrismExp::v_LaplacianMatrixOp_MatFree_Kernel(
     Vmath::Vadd(m_ncoeffs, wsp2.get(), 1, outarray.get(), 1, outarray.get(), 1);
 }
 
-void PrismExp::v_GetSimplexEquiSpacedConnectivity(Array<OneD, int> &conn,
-                                                  bool oldstandard)
+void PrismExp::v_GetSimplexEquiSpacedConnectivity(
+    Array<OneD, int> &conn, [[maybe_unused]] bool oldstandard)
 {
-    boost::ignore_unused(oldstandard);
-
     int np0 = m_base[0]->GetNumPoints();
     int np1 = m_base[1]->GetNumPoints();
     int np2 = m_base[2]->GetNumPoints();
@@ -1823,5 +1815,4 @@ void PrismExp::v_NormalTraceDerivFactors(
         }
     }
 }
-} // namespace LocalRegions
-} // namespace Nektar
+} // namespace Nektar::LocalRegions

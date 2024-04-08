@@ -42,13 +42,10 @@
 
 #define LUE LIB_UTILITIES_EXPORT
 
+#include <LibUtilities/TimeIntegration/IMEXdirkTimeIntegrationSchemes.h>
 #include <LibUtilities/TimeIntegration/TimeIntegrationSchemeGLM.h>
 
-#include <LibUtilities/TimeIntegration/IMEXdirkTimeIntegrationSchemes.h>
-
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 class CNABTimeIntegrationScheme : public TimeIntegrationSchemeGLM
@@ -58,8 +55,7 @@ public:
                               std::vector<NekDouble> freeParams)
         : TimeIntegrationSchemeGLM("", 2, freeParams)
     {
-        boost::ignore_unused(variant);
-        boost::ignore_unused(order);
+        boost::ignore_unused(variant, order);
 
         m_integration_phases    = TimeIntegrationAlgorithmGLMVector(2);
         m_integration_phases[0] = TimeIntegrationAlgorithmGLMSharedPtr(
@@ -74,16 +70,14 @@ public:
         CNABTimeIntegrationScheme::SetupSchemeData(m_integration_phases[1]);
     }
 
-    virtual ~CNABTimeIntegrationScheme()
+    ~CNABTimeIntegrationScheme() override
     {
     }
 
     static TimeIntegrationSchemeSharedPtr create(
-        std::string variant, size_t order, std::vector<NekDouble> freeParams)
+        [[maybe_unused]] std::string variant, [[maybe_unused]] size_t order,
+        std::vector<NekDouble> freeParams)
     {
-        boost::ignore_unused(variant);
-        boost::ignore_unused(order);
-
         TimeIntegrationSchemeSharedPtr p =
             MemoryManager<CNABTimeIntegrationScheme>::AllocateSharedPtr(
                 "", 2, freeParams);
@@ -152,12 +146,12 @@ public:
     }
 
 protected:
-    LUE virtual std::string v_GetName() const override
+    LUE std::string v_GetName() const override
     {
         return std::string("CNAB");
     }
 
-    LUE virtual NekDouble v_GetTimeStability() const override
+    LUE NekDouble v_GetTimeStability() const override
     {
         return 1.0;
     }
@@ -166,7 +160,6 @@ protected:
 
 }; // end class CNABTimeIntegrationScheme
 
-} // end namespace LibUtilities
-} // end namespace Nektar
+} // namespace Nektar::LibUtilities
 
 #endif

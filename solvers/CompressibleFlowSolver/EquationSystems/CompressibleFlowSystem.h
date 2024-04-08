@@ -35,14 +35,9 @@
 #ifndef NEKTAR_SOLVERS_COMPRESSIBLEFLOWSOLVER_EQUATIONSYSTEMS_COMPRESSIBLEFLOWSYSTEM_H
 #define NEKTAR_SOLVERS_COMPRESSIBLEFLOWSOLVER_EQUATIONSYSTEMS_COMPRESSIBLEFLOWSYSTEM_H
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <CompressibleFlowSolver/ArtificialDiffusion/ArtificialDiffusion.h>
 #include <CompressibleFlowSolver/BoundaryConditions/CFSBndCond.h>
 #include <CompressibleFlowSolver/Misc/VariableConverter.h>
-#include <CompressibleFlowSolver/Preconditioner/PreconCfs.h>
-#include <CompressibleFlowSolver/Preconditioner/PreconCfsOp.h>
-#include <LibUtilities/LinearAlgebra/NekNonlinSys.h>
 #include <LocalRegions/Expansion2D.h>
 #include <LocalRegions/Expansion3D.h>
 #include <MultiRegions/GlobalMatrixKey.h>
@@ -64,7 +59,7 @@ class CompressibleFlowSystem : public SolverUtils::AdvectionSystem,
 public:
     friend class MemoryManager<CompressibleFlowSystem>;
 
-    virtual ~CompressibleFlowSystem();
+    ~CompressibleFlowSystem() override = default;
 
     /// Function to calculate the stability limit for DG/CG.
     NekDouble GetStabilityLimit(int n);
@@ -110,24 +105,28 @@ protected:
     CompressibleFlowSystem(const LibUtilities::SessionReaderSharedPtr &pSession,
                            const SpatialDomains::MeshGraphSharedPtr &pGraph);
 
-    virtual void v_InitObject(bool DeclareFields = true) override;
+    void v_InitObject(bool DeclareFields = true) override;
 
-    virtual void v_GetPressure(
+    void v_GetPressure(
         const Array<OneD, const Array<OneD, NekDouble>> &physfield,
         Array<OneD, NekDouble> &pressure) override;
 
-    virtual void v_GetDensity(
+    void v_GetDensity(
         const Array<OneD, const Array<OneD, NekDouble>> &physfield,
         Array<OneD, NekDouble> &density) override;
 
-    virtual bool v_HasConstantDensity() override
+    bool v_HasConstantDensity() override
     {
         return false;
     }
 
-    virtual void v_GetVelocity(
+    void v_GetVelocity(
         const Array<OneD, const Array<OneD, NekDouble>> &physfield,
         Array<OneD, Array<OneD, NekDouble>> &velocity) override;
+
+    void v_ALEInitObject(
+        int spaceDim,
+        Array<OneD, MultiRegions::ExpListSharedPtr> &fields) override;
 
     void InitialiseParameters();
 
@@ -167,19 +166,19 @@ protected:
         const Array<OneD, const Array<OneD, NekDouble>> &inarray,
         Array<OneD, NekDouble> &tstep);
 
-    virtual NekDouble v_GetTimeStep(
+    NekDouble v_GetTimeStep(
         const Array<OneD, const Array<OneD, NekDouble>> &inarray) override;
 
     /// Print a summary of time stepping parameters.
-    virtual void v_GenerateSummary(SolverUtils::SummaryList &s) override;
+    void v_GenerateSummary(SolverUtils::SummaryList &s) override;
 
-    virtual void v_SetInitialConditions(NekDouble initialtime      = 0.0,
-                                        bool dumpInitialConditions = true,
-                                        const int domain = 0) override;
+    void v_SetInitialConditions(NekDouble initialtime      = 0.0,
+                                bool dumpInitialConditions = true,
+                                const int domain           = 0) override;
 
-    virtual void v_EvaluateExactSolution(unsigned int field,
-                                         Array<OneD, NekDouble> &outfield,
-                                         const NekDouble time = 0.0) override;
+    void v_EvaluateExactSolution(unsigned int field,
+                                 Array<OneD, NekDouble> &outfield,
+                                 const NekDouble time = 0.0) override;
     NekDouble GetGamma()
     {
         return m_gamma;
@@ -195,16 +194,15 @@ protected:
         return m_traceNormals;
     }
 
-    virtual MultiRegions::ExpListSharedPtr v_GetPressure() override
+    MultiRegions::ExpListSharedPtr v_GetPressure() override
     {
         ASSERTL0(false, "This function is not valid for this class");
         MultiRegions::ExpListSharedPtr null;
         return null;
     }
 
-    virtual void v_ExtraFldOutput(
-        std::vector<Array<OneD, NekDouble>> &fieldcoeffs,
-        std::vector<std::string> &variables) override;
+    void v_ExtraFldOutput(std::vector<Array<OneD, NekDouble>> &fieldcoeffs,
+                          std::vector<std::string> &variables) override;
 
     virtual void v_DoDiffusion(
         const Array<OneD, Array<OneD, NekDouble>> &inarray,
@@ -212,11 +210,10 @@ protected:
         const Array<OneD, Array<OneD, NekDouble>> &pFwd,
         const Array<OneD, Array<OneD, NekDouble>> &pBwd) = 0;
 
-    virtual Array<OneD, NekDouble> v_GetMaxStdVelocity(
+    Array<OneD, NekDouble> v_GetMaxStdVelocity(
         const NekDouble SpeedSoundFactor) override;
 
-    virtual void v_SteadyStateResidual(int step,
-                                       Array<OneD, NekDouble> &L2) override;
+    void v_SteadyStateResidual(int step, Array<OneD, NekDouble> &L2) override;
 
     // Virtual function that returns true if derived class supports a given
     // shock capturing method

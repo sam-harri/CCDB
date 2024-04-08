@@ -53,7 +53,7 @@ std::string FilterMovingBody::className =
  */
 FilterMovingBody::FilterMovingBody(
     const LibUtilities::SessionReaderSharedPtr &pSession,
-    const std::weak_ptr<SolverUtils::EquationSystem> &pEquation,
+    const std::shared_ptr<SolverUtils::EquationSystem> &pEquation,
     const ParamMap &pParams)
     : Filter(pSession, pEquation)
 {
@@ -117,10 +117,8 @@ FilterMovingBody::~FilterMovingBody()
  */
 void FilterMovingBody::v_Initialise(
     const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
-    const NekDouble &time)
+    [[maybe_unused]] const NekDouble &time)
 {
-    boost::ignore_unused(time);
-
     m_index_f      = 0;
     m_index_m      = 0;
     m_outputStream = Array<OneD, std::ofstream>(2);
@@ -687,11 +685,10 @@ void FilterMovingBody::UpdateForce(
  */
 void FilterMovingBody::UpdateMotion(
     const LibUtilities::SessionReaderSharedPtr &pSession,
-    const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
+    [[maybe_unused]] const Array<OneD, const MultiRegions::ExpListSharedPtr>
+        &pFields,
     Array<OneD, NekDouble> &MotionVars, const NekDouble &time)
 {
-    boost::ignore_unused(pFields);
-
     // Only output every m_outputFrequency.
     if ((m_index_m++) % m_outputFrequency)
     {
@@ -742,10 +739,8 @@ void FilterMovingBody::UpdateMotion(
  */
 void FilterMovingBody::v_Finalise(
     const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
-    const NekDouble &time)
+    [[maybe_unused]] const NekDouble &time)
 {
-    boost::ignore_unused(time);
-
     if (pFields[0]->GetComm()->GetRank() == 0)
     {
         m_outputStream[0].close();

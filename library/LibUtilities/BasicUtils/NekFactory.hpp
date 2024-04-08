@@ -43,21 +43,20 @@
 #include <string>
 
 #ifdef NEKTAR_USE_THREAD_SAFETY
-#include <boost/thread/locks.hpp>
-#include <boost/thread/shared_mutex.hpp>
+#include <mutex>
+#include <shared_mutex>
+#include <thread>
 #endif
 
 #include <LibUtilities/BasicUtils/ErrorUtil.hpp>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 #ifdef NEKTAR_USE_THREAD_SAFETY
 // Generate parameter typenames with default type of 'none'
-typedef boost::unique_lock<boost::shared_mutex> WriteLock;
-typedef boost::shared_lock<boost::shared_mutex> ReadLock;
+typedef std::unique_lock<std::shared_mutex> WriteLock;
+typedef std::shared_lock<std::shared_mutex> ReadLock;
 #endif
 
 /**
@@ -280,17 +279,16 @@ protected:
     }
 
 private:
-    NekFactory(const NekFactory &rhs) = delete;
+    NekFactory(const NekFactory &rhs)            = delete;
     NekFactory &operator=(const NekFactory &rhs) = delete;
 
     TMapFactory mMapFactory;
 
 #ifdef NEKTAR_USE_THREAD_SAFETY
-    boost::shared_mutex m_mutex;
+    std::shared_mutex m_mutex;
 #endif
 };
 
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities
 
 #endif

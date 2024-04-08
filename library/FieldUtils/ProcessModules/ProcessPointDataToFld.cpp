@@ -36,18 +36,11 @@
 #include <string>
 using namespace std;
 
-#include <boost/core/ignore_unused.hpp>
-#include <boost/math/special_functions/fpclassify.hpp>
-
+#include "ProcessPointDataToFld.h"
+#include <LibUtilities/BasicUtils/CsvIO.h>
 #include <LibUtilities/BasicUtils/SharedArray.hpp>
 
-#include <LibUtilities/BasicUtils/CsvIO.h>
-
-#include "ProcessPointDataToFld.h"
-
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 ModuleKey ProcessPointDataToFld::className =
@@ -96,11 +89,11 @@ void ProcessPointDataToFld::v_Process(po::variables_map &vm)
         LibUtilities::GetCommFactory().CreateInstance("Serial", 0, 0);
 
     // Determine file format from file extension
-    if (boost::filesystem::path(inFile).extension() == ".pts")
+    if (fs::path(inFile).extension() == ".pts")
     {
         LibUtilities::PtsIO(c).Import(inFile, fieldPts);
     }
-    else if (boost::filesystem::path(inFile).extension() == ".csv")
+    else if (fs::path(inFile).extension() == ".csv")
     {
         LibUtilities::CsvIO(c).Import(inFile, fieldPts);
     }
@@ -229,5 +222,4 @@ void ProcessPointDataToFld::v_Process(po::variables_map &vm)
         m_f->m_variables.push_back(fieldPts->GetFieldName(j));
     }
 }
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

@@ -46,9 +46,7 @@ using namespace std;
 
 #include <LibUtilities/TimeIntegration/TimeIntegrationSchemeGLM.h>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -87,7 +85,7 @@ public:
         }
     }
 
-    virtual ~DIRKTimeIntegrationScheme()
+    ~DIRKTimeIntegrationScheme() override
     {
     }
 
@@ -335,12 +333,12 @@ public:
     }
 
 protected:
-    LUE virtual std::string v_GetName() const override
+    LUE std::string v_GetName() const override
     {
         return std::string("DIRK");
     }
 
-    LUE virtual NekDouble v_GetTimeStability() const override
+    LUE NekDouble v_GetTimeStability() const override
     {
         return 1.0;
     }
@@ -356,16 +354,13 @@ public:
                                     std::vector<NekDouble> freeParams)
         : DIRKTimeIntegrationScheme("", 1, freeParams)
     {
-        boost::ignore_unused(variant);
-        boost::ignore_unused(order);
+        boost::ignore_unused(variant, order);
     }
 
     static TimeIntegrationSchemeSharedPtr create(
-        std::string variant, size_t order, std::vector<NekDouble> freeParams)
+        [[maybe_unused]] std::string variant, [[maybe_unused]] size_t order,
+        std::vector<NekDouble> freeParams)
     {
-        boost::ignore_unused(variant);
-        boost::ignore_unused(order);
-
         TimeIntegrationSchemeSharedPtr p =
             MemoryManager<DIRKTimeIntegrationScheme>::AllocateSharedPtr(
                 "", 1, freeParams);
@@ -387,16 +382,13 @@ public:
                                     std::vector<NekDouble> freeParams)
         : DIRKTimeIntegrationScheme("", 2, freeParams)
     {
-        boost::ignore_unused(variant);
-        boost::ignore_unused(order);
+        boost::ignore_unused(variant, order);
     }
 
     static TimeIntegrationSchemeSharedPtr create(
-        std::string variant, size_t order, std::vector<NekDouble> freeParams)
+        [[maybe_unused]] std::string variant, [[maybe_unused]] size_t order,
+        std::vector<NekDouble> freeParams)
     {
-        boost::ignore_unused(variant);
-        boost::ignore_unused(order);
-
         TimeIntegrationSchemeSharedPtr p =
             MemoryManager<DIRKTimeIntegrationScheme>::AllocateSharedPtr(
                 "", 2, freeParams);
@@ -418,16 +410,13 @@ public:
                                     std::vector<NekDouble> freeParams)
         : DIRKTimeIntegrationScheme("", 3, freeParams)
     {
-        boost::ignore_unused(variant);
-        boost::ignore_unused(order);
+        boost::ignore_unused(variant, order);
     }
 
     static TimeIntegrationSchemeSharedPtr create(
-        std::string variant, size_t order, std::vector<NekDouble> freeParams)
+        [[maybe_unused]] std::string variant, [[maybe_unused]] size_t order,
+        std::vector<NekDouble> freeParams)
     {
-        boost::ignore_unused(variant);
-        boost::ignore_unused(order);
-
         TimeIntegrationSchemeSharedPtr p =
             MemoryManager<DIRKTimeIntegrationScheme>::AllocateSharedPtr(
                 "", 3, freeParams);
@@ -449,16 +438,13 @@ public:
                                         std::vector<NekDouble> freeParams)
         : DIRKTimeIntegrationScheme("ES5", 3, freeParams)
     {
-        boost::ignore_unused(variant);
-        boost::ignore_unused(order);
+        boost::ignore_unused(variant, order);
     }
 
     static TimeIntegrationSchemeSharedPtr create(
-        std::string variant, size_t order, std::vector<NekDouble> freeParams)
+        [[maybe_unused]] std::string variant, [[maybe_unused]] size_t order,
+        std::vector<NekDouble> freeParams)
     {
-        boost::ignore_unused(variant);
-        boost::ignore_unused(order);
-
         TimeIntegrationSchemeSharedPtr p =
             MemoryManager<DIRKTimeIntegrationScheme>::AllocateSharedPtr(
                 "ES5", 3, freeParams);
@@ -480,16 +466,13 @@ public:
                                         std::vector<NekDouble> freeParams)
         : DIRKTimeIntegrationScheme("ES6", 4, freeParams)
     {
-        boost::ignore_unused(variant);
-        boost::ignore_unused(order);
+        boost::ignore_unused(variant, order);
     }
 
     static TimeIntegrationSchemeSharedPtr create(
-        std::string variant, size_t order, std::vector<NekDouble> freeParams)
+        [[maybe_unused]] std::string variant, [[maybe_unused]] size_t order,
+        std::vector<NekDouble> freeParams)
     {
-        boost::ignore_unused(variant);
-        boost::ignore_unused(order);
-
         TimeIntegrationSchemeSharedPtr p =
             MemoryManager<DIRKTimeIntegrationScheme>::AllocateSharedPtr(
                 "ES6", 4, freeParams);
@@ -503,7 +486,6 @@ protected:
     static std::string TimeIntegrationMethodLookupId;
 }; // end class DIRKOrder4_ES6TimeIntegrationScheme
 
-} // end namespace LibUtilities
-} // end namespace Nektar
+} // namespace Nektar::LibUtilities
 
 #endif

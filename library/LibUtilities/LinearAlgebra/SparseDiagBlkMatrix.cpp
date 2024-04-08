@@ -178,7 +178,9 @@ NekSparseDiagBlkMatrix<SparseStorageType>::operator()(
     }
     /// \todo double check, might be a bug when local_col > local column
     if (local_col < 0)
+    {
         return defaultReturnValue;
+    }
 
     return m_submatrix[i]->GetValue(local_row, local_col);
 }
@@ -456,9 +458,13 @@ void NekSparseDiagBlkMatrix<SparseStorageType>::
         const IndexType col = entry->first.second;
 
         if (blk_row != row / blockSize)
+        {
             continue;
+        }
         if (blk_col != col / blockSize)
+        {
             continue;
+        }
         grid[row % blockSize][col % blockSize]++;
     }
 
@@ -497,9 +503,13 @@ void NekSparseDiagBlkMatrix<SparseStorageType>::writeBlockSparsityPatternTo(
             const IndexType col = entry->first.second + col_offset;
 
             if (blk_row != row / blockSize)
+            {
                 continue;
+            }
             if (blk_col != col / blockSize)
+            {
                 continue;
+            }
             grid[row % blockSize][col % blockSize]++;
         }
         row_offset += m_submatrix[i]->GetRows();

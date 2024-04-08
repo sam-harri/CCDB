@@ -40,13 +40,7 @@
 #include <LibUtilities/BasicUtils/SharedArray.hpp>
 #include <map>
 
-namespace Nektar
-{
-
-/** \brief The namespace associated with the the StdRegions library
- * (\ref pageStdRegions "StdRegions introduction")
- */
-namespace StdRegions
+namespace Nektar::StdRegions
 {
 enum ElementType
 {
@@ -327,6 +321,35 @@ struct VarCoeffEntry
         return m_hash;
     }
 
+    /*
+     * @brief Create sub-VarCoeffEntry without copying data.
+     *
+     * @param offset Offset from the first entry of the m_coeff array.
+     * @param size   Length of the new sub-set of the original m_coeff array.
+     *
+     * The restrict function returns a VarCoeffEntry that
+     * holds a m_coeff array with a subset of the original
+     * VarCoeffEntry.
+     */
+    VarCoeffEntry restrict(size_t offset, size_t size) const
+    {
+        VarCoeffEntry tmp;
+
+        // This avoids copy of Array
+        tmp.m_coeffs = Array<OneD, NekDouble>(size, m_coeffs + offset);
+
+        // The logic is that since we are using a 'window' into the original
+        // data we should preserve the original hash of that data.
+        // Giving just m_hash will result in the same hash for all collections.
+        // This is sufficient, because if we only need to update once every time
+        // step. For possible future changes, we could combine it with the
+        // offset and size to make it different enough to the original hash, if
+        // necessary.
+        tmp.m_hash = m_hash;
+
+        return tmp;
+    }
+
 protected:
     /**
      * @brief Computes the hash of this entry using #hash_range.
@@ -359,8 +382,7 @@ inline VarCoeffMap RestrictCoeffMap(const VarCoeffMap &m, size_t offset,
 
     for (auto &x : m)
     {
-        ret[x.first] =
-            Array<OneD, NekDouble>(cnt, x.second.GetValue() + offset);
+        ret[x.first] = x.second.restrict(offset, cnt);
     }
 
     return ret;
@@ -489,7 +511,6 @@ const NekDouble kSVVDGFilter[9][11] = {
     {0, 0, 0, 0, 0, 0, 0.0023592, 0.23683, 0.17196, 1, 0},
     {0, 0, 0, 0, 0, 0, 0, 0.0026055, 0.28682, 0.22473, 1}};
 
-} // namespace StdRegions
-} // namespace Nektar
+} // namespace Nektar::StdRegions
 
 #endif // STDREGIONS_H

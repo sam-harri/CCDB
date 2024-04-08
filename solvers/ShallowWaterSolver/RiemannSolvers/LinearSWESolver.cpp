@@ -32,8 +32,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <ShallowWaterSolver/RiemannSolvers/LinearSWESolver.h>
 
 namespace Nektar
@@ -46,12 +44,11 @@ LinearSWESolver::LinearSWESolver(
 }
 
 void LinearSWESolver::v_Solve(
-    const int nDim, const Array<OneD, const Array<OneD, NekDouble>> &Fwd,
+    [[maybe_unused]] const int nDim,
+    const Array<OneD, const Array<OneD, NekDouble>> &Fwd,
     const Array<OneD, const Array<OneD, NekDouble>> &Bwd,
     Array<OneD, Array<OneD, NekDouble>> &flux)
 {
-    boost::ignore_unused(nDim);
-
     // extract the forward and backward trace of the depth
     const Array<OneD, NekDouble> &dFwd = m_scalars["depthFwd"]();
     const Array<OneD, NekDouble> &dBwd = m_scalars["depthBwd"]();

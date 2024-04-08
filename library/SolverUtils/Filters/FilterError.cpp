@@ -32,19 +32,15 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <SolverUtils/Filters/FilterError.h>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 std::string FilterError::className =
     GetFilterFactory().RegisterCreatorFunction("Error", FilterError::create);
 
 FilterError::FilterError(const LibUtilities::SessionReaderSharedPtr &pSession,
-                         const std::weak_ptr<EquationSystem> &pEquation,
+                         const std::shared_ptr<EquationSystem> &pEquation,
                          const ParamMap &pParams)
     : Filter(pSession, pEquation)
 {
@@ -98,6 +94,20 @@ FilterError::FilterError(const LibUtilities::SessionReaderSharedPtr &pSession,
         ASSERTL0(it->second.length() > 0, "Empty parameter 'OutputFrequency'.");
         LibUtilities::Equation equ(m_session->GetInterpreter(), it->second);
         m_outputFrequency = round(equ.Evaluate());
+    }
+
+    // ConsoleOutput
+    it = pParams.find("ConsoleOutput");
+    if (it == pParams.end())
+    {
+        m_consoleOutput = false;
+    }
+    else
+    {
+        ASSERTL0(it->second.length() > 0, "Empty parameter 'ConsoleOutput'.");
+        ASSERTL0(it->second == "0" || it->second == "1",
+                 "Parameter 'ConsoleOutput' can only be '0' or '1'.");
+        m_consoleOutput = boost::lexical_cast<bool>(it->second);
     }
 }
 
@@ -153,6 +163,16 @@ void FilterError::v_Update(
         if (m_comm->GetRank() == 0)
         {
             m_outFile << " " << vL2Error << " " << vLinfError;
+
+            if (m_consoleOutput)
+            {
+                std::cout << "L 2 error (variable "
+                          << equationSys->GetVariable(i) << ") : " << vL2Error
+                          << std::endl;
+                std::cout << "L inf error (variable "
+                          << equationSys->GetVariable(i) << ") : " << vLinfError
+                          << std::endl;
+            }
         }
     }
 
@@ -163,11 +183,10 @@ void FilterError::v_Update(
 }
 
 void FilterError::v_Finalise(
-    const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
-    const NekDouble &time)
+    [[maybe_unused]] const Array<OneD, const MultiRegions::ExpListSharedPtr>
+        &pFields,
+    [[maybe_unused]] const NekDouble &time)
 {
-    boost::ignore_unused(pFields, time);
-
     if (m_comm->GetRank() == 0)
     {
         m_outFile.close();
@@ -178,5 +197,4 @@ bool FilterError::v_IsTimeDependent()
 {
     return true;
 }
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils

@@ -32,13 +32,9 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <SolverUtils/Filters/FilterCheckpoint.h>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 std::string FilterCheckpoint::className =
     GetFilterFactory().RegisterCreatorFunction("Checkpoint",
@@ -46,7 +42,7 @@ std::string FilterCheckpoint::className =
 
 FilterCheckpoint::FilterCheckpoint(
     const LibUtilities::SessionReaderSharedPtr &pSession,
-    const std::weak_ptr<EquationSystem> &pEquation, const ParamMap &pParams)
+    const std::shared_ptr<EquationSystem> &pEquation, const ParamMap &pParams)
     : Filter(pSession, pEquation)
 {
     // OutputFile
@@ -128,15 +124,14 @@ void FilterCheckpoint::v_Update(
 }
 
 void FilterCheckpoint::v_Finalise(
-    const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
-    const NekDouble &time)
+    [[maybe_unused]] const Array<OneD, const MultiRegions::ExpListSharedPtr>
+        &pFields,
+    [[maybe_unused]] const NekDouble &time)
 {
-    boost::ignore_unused(pFields, time);
 }
 
 bool FilterCheckpoint::v_IsTimeDependent()
 {
     return true;
 }
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils

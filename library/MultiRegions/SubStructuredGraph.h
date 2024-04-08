@@ -49,9 +49,7 @@
 #include <set>
 #include <vector>
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 class BottomUpSubStructuredGraph;
 class SubGraph;
@@ -270,7 +268,6 @@ MULTI_REGIONS_EXPORT void MultiLevelBisectionReordering(
 MULTI_REGIONS_EXPORT void NoReordering(const BoostGraph &graph,
                                        Array<OneD, int> &perm,
                                        Array<OneD, int> &iperm);
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions
 
 #endif // MULTIREGIONS_SUBSTRUCTUREDGRAPH_H

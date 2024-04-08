@@ -28,24 +28,19 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 //
-// Description: Unsteady advection-diffusion solve routines
+// Description: Unsteady viscous Burgers solve routines
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef NEKTAR_SOLVERS_ADRSOLVER_EQUATIONSYSTEMS_UNSTEADYADVECTIONDIFFUSION_H
-#define NEKTAR_SOLVERS_ADRSOLVER_EQUATIONSYSTEMS_UNSTEADYADVECTIONDIFFUSION_H
+#ifndef NEKTAR_SOLVERS_ADRSOLVER_EQUATIONSYSTEMS_UNSTEADYVISCOUSBURGERS_H
+#define NEKTAR_SOLVERS_ADRSOLVER_EQUATIONSYSTEMS_UNSTEADYVISCOUSBURGERS_H
 
-#include <SolverUtils/AdvectionSystem.h>
+#include <ADRSolver/EquationSystems/UnsteadyInviscidBurgers.h>
 #include <SolverUtils/Diffusion/Diffusion.h>
-#include <SolverUtils/Forcing/Forcing.h>
-#include <SolverUtils/RiemannSolvers/RiemannSolver.h>
-#include <SolverUtils/UnsteadySystem.h>
-
-using namespace Nektar::SolverUtils;
 
 namespace Nektar
 {
-class UnsteadyViscousBurgers : public SolverUtils::AdvectionSystem
+class UnsteadyViscousBurgers : public UnsteadyInviscidBurgers
 {
 public:
     friend class MemoryManager<UnsteadyViscousBurgers>;
@@ -61,42 +56,29 @@ public:
         p->InitObject();
         return p;
     }
+
     /// Name of class
     static std::string className;
 
     /// Destructor
-    virtual ~UnsteadyViscousBurgers();
+    ~UnsteadyViscousBurgers() override = default;
 
 protected:
-    bool m_useSpecVanVisc;        // Use Spectral Vanishing Viscosity
-    bool m_useSpecVanViscVarDiff; // Use Spectral Vanishing Viscosity with Moura
-                                  // variable diffusion
-    NekDouble
-        m_sVVCutoffRatio; // cut off ratio from which to start decayhing modes
-    NekDouble m_sVVDiffCoeff; // Diffusion coefficient of SVV modes
-    SolverUtils::RiemannSolverSharedPtr m_riemannSolver;
+    // Use Spectral Vanishing Viscosity
+    bool m_useSpecVanVisc;
+    // Use Spectral Vanishing Viscosity with Moura variable diffusion
+    bool m_useSpecVanViscVarDiff;
+    // cut off ratio from which to start decayhing modes
+    NekDouble m_sVVCutoffRatio;
+    // Diffusion coefficient of SVV modes
+    NekDouble m_sVVDiffCoeff;
     SolverUtils::DiffusionSharedPtr m_diffusion;
-    Array<OneD, NekDouble> m_traceVn;
-
     /// Variable Coefficient map for the Laplacian which can be activated as
     /// part of SVV or otherwise
     StdRegions::VarCoeffMap m_varCoeffLap;
 
-    // Plane (used only for Discontinous projection with 3DHomogenoeus1D
-    // expansion)
-    int m_planeNumber;
-
-    /// Forcing terms
-    std::vector<SolverUtils::ForcingSharedPtr> m_forcing;
-
-    /// Session reader
     UnsteadyViscousBurgers(const LibUtilities::SessionReaderSharedPtr &pSession,
                            const SpatialDomains::MeshGraphSharedPtr &pGraph);
-
-    /// Evaluate the flux at each solution point for the advection part
-    void GetFluxVectorAdv(
-        const Array<OneD, Array<OneD, NekDouble>> &physfield,
-        Array<OneD, Array<OneD, Array<OneD, NekDouble>>> &flux);
 
     /// Evaluate the flux at each solution point for the diffusion part
     void GetFluxVectorDiff(
@@ -109,29 +91,19 @@ protected:
                   Array<OneD, Array<OneD, NekDouble>> &outarray,
                   const NekDouble time);
 
-    /// Perform the projection
-    void DoOdeProjection(
-        const Array<OneD, const Array<OneD, NekDouble>> &inarray,
-        Array<OneD, Array<OneD, NekDouble>> &outarray, const NekDouble time);
-
     /// Solve implicitly the diffusion term
     void DoImplicitSolve(
         const Array<OneD, const Array<OneD, NekDouble>> &inarray,
         Array<OneD, Array<OneD, NekDouble>> &outarray, NekDouble time,
         NekDouble lambda);
 
-    /// Get the normal velocity
-    Array<OneD, NekDouble> &GetNormalVelocity(
-        Array<OneD, Array<OneD, NekDouble>> &inarray);
-
     /// Initialise the object
-    virtual void v_InitObject(bool DeclareFields = true) override;
+    void v_InitObject(bool DeclareFields = true) override;
 
     /// Print Summary
-    virtual void v_GenerateSummary(SolverUtils::SummaryList &s) override;
+    void v_GenerateSummary(SolverUtils::SummaryList &s) override;
 
 private:
-    NekDouble m_waveFreq;
     NekDouble m_epsilon;
 };
 } // namespace Nektar

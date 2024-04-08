@@ -37,18 +37,17 @@
 using namespace std;
 
 #include "OutputFileBase.h"
-#include <LibUtilities/BasicUtils/FileSystem.h>
+#include <LibUtilities/BasicUtils/Filesystem.hpp>
 #include <boost/format.hpp>
 #include <iomanip>
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 OutputFileBase::OutputFileBase(FieldSharedPtr f) : OutputModule(f)
 {
     m_requireEquiSpaced            = false;
+    m_prohibitWrite                = false;
     m_config["writemultiplefiles"] = ConfigOption(
         true, "0",
         "Write multiple files in parallel or when using nparts option");
@@ -63,6 +62,11 @@ void OutputFileBase::v_Process(po::variables_map &vm)
     m_f->SetUpExp(vm);
 
     string filename = m_config["outfile"].as<string>();
+
+    if (filename == "")
+    {
+        m_prohibitWrite = true;
+    }
 
     if (m_f->m_fieldPts != LibUtilities::NullPtsField)
     {
@@ -80,8 +84,8 @@ void OutputFileBase::v_Process(po::variables_map &vm)
     else if (m_f->m_exp.size())
     {
         // reset expansion definition to use equispaced points if required.
-        if (m_requireEquiSpaced && (vm.count("noequispaced") == 0) &&
-            m_f->m_exp[0]->GetNumElmts() != 0)
+        if (m_requireEquiSpaced && (vm.count("no-equispaced") == 0) &&
+            m_f->m_exp[0]->GetNumElmts() != 0 && !m_equispacedSetup)
         {
             ConvertExpToEquispaced(vm);
         }
@@ -251,8 +255,13 @@ void OutputFileBase::v_Process(po::variables_map &vm)
 
 bool OutputFileBase::WriteFile(std::string &filename, po::variables_map &vm)
 {
-    // Get path to file. If procid was defined, get the full name
-    //     to avoid checking files from other partitions
+    if (m_prohibitWrite)
+    {
+        return true;
+    }
+
+    // Get path to file. If procid was defined, get the full name to avoid
+    // checking files from other partitions
     fs::path outFile;
     if (vm.count("nparts"))
     {
@@ -277,7 +286,7 @@ bool OutputFileBase::WriteFile(std::string &filename, po::variables_map &vm)
     comm->GetSpaceComm()->AllReduce(count, LibUtilities::ReduceSum);
 
     int writeFile = 1;
-    if (count && (vm.count("forceoutput") == 0))
+    if (count && (vm.count("force-output") == 0))
     {
         if (vm.count("nparts") == 0) // do not do check if --nparts is enabled.
         {
@@ -336,6 +345,7 @@ void OutputFileBase::ConvertExpToEquispaced(po::variables_map &vm)
         m_f->m_exp[i]->BwdTrans(m_f->m_exp[i]->GetCoeffs(),
                                 m_f->m_exp[i]->UpdatePhys());
     }
+
     // Extract boundary expansion if needed
     if (m_f->m_writeBndFld)
     {
@@ -354,7 +364,11 @@ void OutputFileBase::ConvertExpToEquispaced(po::variables_map &vm)
             }
         }
     }
+
     m_f->m_fielddef = std::vector<LibUtilities::FieldDefinitionsSharedPtr>();
+
+    // Make a note so that we know that the fielddefs have now been setup.
+    m_equispacedSetup = true;
 }
 
 void OutputFileBase::PrintErrorFromPts()
@@ -462,5 +476,4 @@ void OutputFileBase::PrintErrorFromExp()
     }
 }
 
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

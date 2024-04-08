@@ -41,9 +41,7 @@
 
 #include <LibUtilities/BasicUtils/SharedArray.hpp>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 /**
@@ -323,7 +321,6 @@ private:
 
 typedef std::shared_ptr<Interpreter> InterpreterSharedPtr;
 
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities
 
 #endif

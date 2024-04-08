@@ -32,8 +32,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <CompressibleFlowSolver/EquationSystems/CompressibleFlowSystemImplicit.h>
 #include <SolverUtils/Advection/AdvectionWeakDG.h>
 
@@ -58,20 +56,24 @@ void CFSImplicit::v_InitObject(bool DeclareFields)
     m_explicitAdvection = false;
     m_explicitDiffusion = false;
 
-    // initialise implicit parameters
+    // Initialise implicit parameters
     m_session->MatchSolverInfo("FLAGIMPLICITITSSTATISTICS", "True",
                                m_flagImplicitItsStatistics, false);
 
-    m_session->LoadParameter("JacobiFreeEps", m_jacobiFreeEps, 5.0E-8);
+    m_session->LoadParameter("JacobiFreeEps", m_jacobiFreeEps,
+                             sqrt(NekConstants::kNekMachineEpsilon));
+
+    m_session->LoadParameter("nPadding", m_nPadding, 4);
 
     int ntmp;
     m_session->LoadParameter("AdvectionJacFlag", ntmp, 1);
-    m_advectionJacFlag = (0 == ntmp) ? false : true;
+    m_advectionJacFlag = (ntmp != 0);
 
     m_session->LoadParameter("ViscousJacFlag", ntmp, 1);
-    m_viscousJacFlag = (0 == ntmp) ? false : true;
+    m_viscousJacFlag = (ntmp != 0);
 
-    // initialise implicit functors
+    // Initialise implicit functors
+    m_ode.DefineOdeRhs(&CFSImplicit::DoOdeImplicitRhs, this);
     m_ode.DefineImplicitSolve(&CFSImplicit::DoImplicitSolve, this);
 
     InitialiseNonlinSysSolver();
@@ -79,36 +81,58 @@ void CFSImplicit::v_InitObject(bool DeclareFields)
 
 void CFSImplicit::InitialiseNonlinSysSolver()
 {
+    int nvariables = m_fields.size();
+    int ntotal     = m_fields[0]->GetNcoeffs() * nvariables;
+
     std::string SolverType = "Newton";
     if (m_session->DefinesSolverInfo("NonlinSysIterSolver"))
     {
         SolverType = m_session->GetSolverInfo("NonlinSysIterSolver");
     }
-    ASSERTL0(LibUtilities::GetNekNonlinSysFactory().ModuleExists(SolverType),
-             "NekNonlinSys '" + SolverType + "' is not defined.\n");
-    int ntotal = m_fields[0]->GetNcoeffs() * m_fields.size();
+    ASSERTL0(
+        LibUtilities::GetNekNonlinSysIterFactory().ModuleExists(SolverType),
+        "NekNonlinSys '" + SolverType + "' is not defined.\n");
 
+    // Create the key to hold settings for nonlin solver
     LibUtilities::NekSysKey key = LibUtilities::NekSysKey();
+    // Load required LinSys parameters:
+    m_session->LoadParameter("NekLinSysMaxIterations",
+                             key.m_NekLinSysMaxIterations, 30);
+    m_session->LoadParameter("LinSysMaxStorage", key.m_LinSysMaxStorage, 30);
+    m_session->LoadParameter("LinSysRelativeTolInNonlin",
+                             key.m_NekLinSysTolerance, 5.0E-2);
+    m_session->LoadParameter("GMRESMaxHessMatBand", key.m_KrylovMaxHessMatBand,
+                             31);
+    m_session->MatchSolverInfo("GMRESLeftPrecon", "True",
+                               key.m_NekLinSysLeftPrecon, false);
+    m_session->MatchSolverInfo("GMRESRightPrecon", "True",
+                               key.m_NekLinSysRightPrecon, true);
+    int GMRESCentralDifference = 0;
+    m_session->LoadParameter("GMRESCentralDifference", GMRESCentralDifference,
+                             0);
+    key.m_GMRESCentralDifference = (bool)GMRESCentralDifference;
+    // Load required NonLinSys parameters:
+    m_session->LoadParameter("NekNonlinSysMaxIterations",
+                             key.m_NekNonlinSysMaxIterations, 10);
+    m_session->LoadParameter("NewtonRelativeIteTol",
+                             key.m_NekNonLinSysTolerance, 1.0E-12);
+    WARNINGL0(!m_session->DefinesParameter("NewtonAbsoluteIteTol"),
+              "Please specify NewtonRelativeIteTol instead of "
+              "NewtonAbsoluteIteTol in XML session file");
+    m_session->LoadParameter("NonlinIterTolRelativeL2",
+                             key.m_NonlinIterTolRelativeL2, 1.0E-3);
+    m_session->LoadSolverInfo("LinSysIterSolverTypeInNonlin",
+                              key.m_LinSysIterSolverTypeInNonlin, "GMRES");
 
-    key.m_NonlinIterTolRelativeL2   = 1.0E-3;
-    key.m_LinSysRelativeTolInNonlin = 5.0E-2;
-    key.m_NekNonlinSysMaxIterations = 10;
-    key.m_NekLinSysMaxIterations    = 30;
-    key.m_LinSysMaxStorage          = 30;
-
-    m_nonlinsol = LibUtilities::GetNekNonlinSysFactory().CreateInstance(
-        SolverType, m_session, m_comm->GetRowComm(), ntotal, key);
-
+    // Initialize operator
     LibUtilities::NekSysOperators nekSysOp;
     nekSysOp.DefineNekSysResEval(&CFSImplicit::NonlinSysEvaluatorCoeff1D, this);
     nekSysOp.DefineNekSysLhsEval(&CFSImplicit::MatrixMultiplyMatrixFreeCoeff,
                                  this);
     nekSysOp.DefineNekSysPrecon(&CFSImplicit::PreconCoeff, this);
 
-    int nvariables = m_fields.size();
-    const MultiRegions::LocTraceToTraceMapSharedPtr locTraceToTraceMap =
-        m_fields[0]->GetLocTraceToTraceMap();
-
+    // Initialize trace
+    const auto locTraceToTraceMap = m_fields[0]->GetLocTraceToTraceMap();
     locTraceToTraceMap->CalcLocTracePhysToTraceIDMap(m_fields[0]->GetTrace(),
                                                      m_spacedim);
     for (int i = 1; i < nvariables; i++)
@@ -117,26 +141,18 @@ void CFSImplicit::InitialiseNonlinSysSolver()
             locTraceToTraceMap->GetLocTracephysToTraceIDMap());
     }
 
+    // Initialize non-linear system
+    m_nonlinsol = LibUtilities::GetNekNonlinSysIterFactory().CreateInstance(
+        "Newton", m_session, m_comm->GetRowComm(), ntotal, key);
+    m_nonlinsol->SetSysOperators(nekSysOp);
+
+    // Initialize preconditioner
+    NekPreconCfsOperators preconOp;
+    preconOp.DefineCalcPreconMatBRJCoeff(&CFSImplicit::CalcPreconMatBRJCoeff,
+                                         this);
     m_preconCfs = GetPreconCfsFactory().CreateInstance("PreconCfsBRJ", m_fields,
                                                        m_session, m_comm);
-    NekPreconCfsOperators tmpPreconOp;
-    tmpPreconOp.DefineCalcPreconMatBRJCoeff(&CFSImplicit::CalcPreconMatBRJCoeff,
-                                            this);
-    m_preconCfs->SetOperators(tmpPreconOp);
-
-    m_session->LoadParameter("NewtonAbsoluteIteTol", m_newtonAbsoluteIteTol,
-                             1.0E-12);
-
-    m_session->LoadParameter("nPadding", m_nPadding, 4);
-
-    m_nonlinsol->SetSysOperators(nekSysOp);
-}
-
-/**
- * @brief Destructor for CFSImplicit class.
- */
-CFSImplicit::~CFSImplicit()
-{
+    m_preconCfs->SetOperators(preconOp);
 }
 
 void CFSImplicit::v_DoSolve()
@@ -144,7 +160,6 @@ void CFSImplicit::v_DoSolve()
     m_TotNewtonIts = 0;
     m_TotLinIts    = 0;
     m_TotImpStages = 0;
-
     UnsteadySystem::v_DoSolve();
 }
 
@@ -154,15 +169,12 @@ void CFSImplicit::v_PrintStatusInformation(const int step,
     UnsteadySystem::v_PrintStatusInformation(step, cpuTime);
 
     if (m_infosteps && m_session->GetComm()->GetSpaceComm()->GetRank() == 0 &&
-        !((step + 1) % m_infosteps))
+        !((step + 1) % m_infosteps) && m_flagImplicitItsStatistics)
     {
-        if (m_flagImplicitItsStatistics)
-        {
-            cout << "       &&"
-                 << " TotImpStages= " << m_TotImpStages
-                 << " TotNewtonIts= " << m_TotNewtonIts
-                 << " TotLinearIts = " << m_TotLinIts << endl;
-        }
+        cout << "       &&"
+             << " TotImpStages= " << m_TotImpStages
+             << " TotNewtonIts= " << m_TotNewtonIts
+             << " TotLinearIts = " << m_TotLinIts << endl;
     }
 }
 
@@ -170,16 +182,13 @@ void CFSImplicit::v_PrintSummaryStatistics(const NekDouble intTime)
 {
     UnsteadySystem::v_PrintSummaryStatistics(intTime);
 
-    if (m_session->GetComm()->GetRank() == 0)
+    if (m_session->GetComm()->GetRank() == 0 && m_flagImplicitItsStatistics)
     {
-        if (m_flagImplicitItsStatistics)
-        {
-            cout << "-------------------------------------------" << endl
-                 << "Total Implicit Stages: " << m_TotImpStages << endl
-                 << "Total Newton Its     : " << m_TotNewtonIts << endl
-                 << "Total Linear Its     : " << m_TotLinIts << endl
-                 << "-------------------------------------------" << endl;
-        }
+        cout << "-------------------------------------------" << endl
+             << "Total Implicit Stages: " << m_TotImpStages << endl
+             << "Total Newton Its     : " << m_TotNewtonIts << endl
+             << "Total Linear Its     : " << m_TotLinIts << endl
+             << "-------------------------------------------" << endl;
     }
 }
 
@@ -187,44 +196,31 @@ void CFSImplicit::NonlinSysEvaluatorCoeff1D(
     const Array<OneD, const NekDouble> &inarray, Array<OneD, NekDouble> &out,
     const bool &flag)
 {
-    const Array<OneD, const NekDouble> refsource =
-        m_nonlinsol->GetRefSourceVec();
-    NonlinSysEvaluatorCoeff(inarray, out, flag, refsource);
-}
-
-void CFSImplicit::NonlinSysEvaluatorCoeff(
-    const Array<OneD, const NekDouble> &inarray, Array<OneD, NekDouble> &out,
-    const bool &flag, const Array<OneD, const NekDouble> &source)
-{
     LibUtilities::Timer timer;
-    boost::ignore_unused(flag);
     unsigned int nvariables = m_fields.size();
-    unsigned int npoints    = m_fields[0]->GetNcoeffs();
+    unsigned int ncoeffs    = m_fields[0]->GetNcoeffs();
     Array<OneD, Array<OneD, NekDouble>> in2D(nvariables);
     Array<OneD, Array<OneD, NekDouble>> out2D(nvariables);
-    Array<OneD, Array<OneD, NekDouble>> source2D(nvariables);
     for (int i = 0; i < nvariables; ++i)
     {
-        int offset  = i * npoints;
-        in2D[i]     = inarray + offset;
-        out2D[i]    = out + offset;
-        source2D[i] = source + offset;
+        int offset = i * ncoeffs;
+        in2D[i]    = inarray + offset;
+        out2D[i]   = out + offset;
     }
 
     timer.Start();
-    NonlinSysEvaluatorCoeff(in2D, out2D, source2D);
+    NonlinSysEvaluatorCoeff(in2D, out2D, flag);
     timer.Stop();
-    timer.AccumulateRegion("CFSImplicit::NonlinSysEvaluatorCoeff");
+    timer.AccumulateRegion("CFSImplicit::NonlinSysEvaluatorCoeff1D");
 }
 
 void CFSImplicit::NonlinSysEvaluatorCoeff(
     const Array<OneD, const Array<OneD, NekDouble>> &inarray,
-    Array<OneD, Array<OneD, NekDouble>> &out,
-    const Array<OneD, const Array<OneD, NekDouble>> &source)
+    Array<OneD, Array<OneD, NekDouble>> &out, const bool &flag)
 {
     LibUtilities::Timer timer;
     unsigned int nvariable = inarray.size();
-    unsigned int ncoeffs   = inarray[nvariable - 1].size();
+    unsigned int ncoeffs   = m_fields[0]->GetNcoeffs();
     unsigned int npoints   = m_fields[0]->GetNpoints();
 
     Array<OneD, Array<OneD, NekDouble>> inpnts(nvariable);
@@ -249,16 +245,34 @@ void CFSImplicit::NonlinSysEvaluatorCoeff(
     {
         Vmath::Svtvp(ncoeffs, -m_TimeIntegLambda, out[i], 1, inarray[i], 1,
                      out[i], 1);
-    }
-
-    if (NullNekDoubleArrayOfArray != source)
-    {
-        for (int i = 0; i < nvariable; ++i)
+        if (flag)
         {
-            Vmath::Vsub(ncoeffs, out[i], 1, source[i], 1, out[i], 1);
+            Vmath::Vsub(ncoeffs, out[i], 1,
+                        m_nonlinsol->GetRefSourceVec() + i * ncoeffs, 1, out[i],
+                        1);
         }
     }
-    return;
+}
+
+void CFSImplicit::DoOdeImplicitRhs(
+    const Array<OneD, const Array<OneD, NekDouble>> &inarray,
+    Array<OneD, Array<OneD, NekDouble>> &outarray, const NekDouble time)
+{
+    int nvariables = inarray.size();
+    int ncoeffs    = m_fields[0]->GetNcoeffs();
+
+    Array<OneD, Array<OneD, NekDouble>> tmpOut(nvariables);
+    for (int i = 0; i < nvariables; ++i)
+    {
+        tmpOut[i] = Array<OneD, NekDouble>(ncoeffs);
+    }
+
+    DoOdeRhsCoeff(inarray, tmpOut, time);
+
+    for (int i = 0; i < nvariables; ++i)
+    {
+        m_fields[i]->BwdTrans(tmpOut[i], outarray[i]);
+    }
 }
 
 /**
@@ -268,11 +282,18 @@ void CFSImplicit::DoOdeRhsCoeff(
     const Array<OneD, const Array<OneD, NekDouble>> &inarray,
     Array<OneD, Array<OneD, NekDouble>> &outarray, const NekDouble time)
 {
+    ASSERTL0(
+        !m_useLocalTimeStep,
+        "Do not use Local Time-Stepping with implicit time-discretization");
+
     LibUtilities::Timer timer;
 
     int nvariables = inarray.size();
     int nTracePts  = GetTraceTotPoints();
     int ncoeffs    = GetNcoeffs();
+
+    m_bndEvaluateTime = time;
+
     // Store forwards/backwards space along trace space
     Array<OneD, Array<OneD, NekDouble>> Fwd(nvariables);
     Array<OneD, Array<OneD, NekDouble>> Bwd(nvariables);
@@ -304,6 +325,7 @@ void CFSImplicit::DoOdeRhsCoeff(
         Vmath::Neg(ncoeffs, outarray[i], 1);
     }
 
+    // Add diffusion terms
     timer.Start();
     DoDiffusionCoeff(inarray, outarray, Fwd, Bwd);
     timer.Stop();
@@ -313,30 +335,6 @@ void CFSImplicit::DoOdeRhsCoeff(
     for (auto &x : m_forcing)
     {
         x->ApplyCoeff(m_fields, inarray, outarray, time);
-    }
-
-    if (m_useLocalTimeStep)
-    {
-        int nElements = m_fields[0]->GetExpSize();
-        int nq, offset;
-        NekDouble fac;
-        Array<OneD, NekDouble> tmp;
-
-        Array<OneD, NekDouble> tstep(nElements, 0.0);
-        GetElmtTimeStep(inarray, tstep);
-
-        // Loop over elements
-        for (int n = 0; n < nElements; ++n)
-        {
-            nq     = m_fields[0]->GetExp(n)->GetNcoeffs();
-            offset = m_fields[0]->GetCoeff_Offset(n);
-            fac    = tstep[n] / m_timestep;
-            for (int i = 0; i < nvariables; ++i)
-            {
-                Vmath::Smul(nq, fac, outarray[i] + offset, 1,
-                            tmp = outarray[i] + offset, 1);
-            }
-        }
     }
 }
 
@@ -360,6 +358,19 @@ void CFSImplicit::DoAdvectionCoeff(
                                   outarray, time, pFwd, pBwd);
 }
 
+/**
+ * @brief Add the diffusions terms to the right-hand side
+ * Similar to DoDiffusion() but with outarray in coefficient space
+ */
+void CFSImplicit::DoDiffusionCoeff(
+    const Array<OneD, const Array<OneD, NekDouble>> &inarray,
+    Array<OneD, Array<OneD, NekDouble>> &outarray,
+    const Array<OneD, const Array<OneD, NekDouble>> &pFwd,
+    const Array<OneD, const Array<OneD, NekDouble>> &pBwd)
+{
+    v_DoDiffusionCoeff(inarray, outarray, pFwd, pBwd);
+}
+
 void CFSImplicit::DoImplicitSolve(
     const Array<OneD, const Array<OneD, NekDouble>> &inpnts,
     Array<OneD, Array<OneD, NekDouble>> &outpnt, const NekDouble time,
@@ -370,7 +381,7 @@ void CFSImplicit::DoImplicitSolve(
     unsigned int ntotal     = nvariables * ncoeffs;
 
     Array<OneD, NekDouble> inarray(ntotal);
-    Array<OneD, NekDouble> out(ntotal);
+    Array<OneD, NekDouble> outarray(ntotal);
     Array<OneD, NekDouble> tmpArray;
 
     // Switch flag to make sure the physical shock capturing AV is updated
@@ -383,12 +394,12 @@ void CFSImplicit::DoImplicitSolve(
         m_fields[i]->FwdTrans(inpnts[i], tmpArray);
     }
 
-    DoImplicitSolveCoeff(inpnts, inarray, out, time, lambda);
+    DoImplicitSolveCoeff(inpnts, inarray, outarray, time, lambda);
 
     for (int i = 0; i < nvariables; ++i)
     {
         int noffset = i * ncoeffs;
-        tmpArray    = out + noffset;
+        tmpArray    = outarray + noffset;
         m_fields[i]->BwdTrans(tmpArray, outpnt[i]);
     }
 }
@@ -398,8 +409,6 @@ void CFSImplicit::DoImplicitSolveCoeff(
     const Array<OneD, const NekDouble> &inarray, Array<OneD, NekDouble> &out,
     const NekDouble time, const NekDouble lambda)
 {
-    boost::ignore_unused(inpnts);
-
     m_TimeIntegLambda   = lambda;
     m_bndEvaluateTime   = time;
     m_solutionPhys      = inpnts;
@@ -408,13 +417,11 @@ void CFSImplicit::DoImplicitSolveCoeff(
     if (m_inArrayNorm < 0.0)
     {
         CalcRefValues(inarray);
+
+        m_nonlinsol->SetRhsMagnitude(m_inArrayNorm);
     }
 
-    NekDouble tol = std::sqrt(m_inArrayNorm) * m_newtonAbsoluteIteTol;
-
-    m_nonlinsol->SetupNekNonlinSystem(ntotal, inarray, inarray, 0);
-
-    m_TotNewtonIts += m_nonlinsol->SolveSystem(ntotal, inarray, out, 0, tol);
+    m_TotNewtonIts += m_nonlinsol->SolveSystem(ntotal, inarray, out);
 
     m_TotLinIts += m_nonlinsol->GetNtotLinSysIts();
 
@@ -454,6 +461,7 @@ void CFSImplicit::CalcRefValues(const Array<OneD, const NekDouble> &inarray)
     {
         m_magnitdEstimat[1] += m_magnitdEstimat[i];
     }
+
     for (int i = 2; i < nvariables - 1; ++i)
     {
         m_magnitdEstimat[i] = m_magnitdEstimat[1];
@@ -474,6 +482,43 @@ void CFSImplicit::CalcRefValues(const Array<OneD, const NekDouble> &inarray)
     }
 }
 
+void CFSImplicit::MatrixMultiplyMatrixFreeCoeff(
+    const Array<OneD, const NekDouble> &inarray, Array<OneD, NekDouble> &out,
+    const bool &centralDifferenceFlag)
+{
+    const Array<OneD, const NekDouble> solref = m_nonlinsol->GetRefSolution();
+
+    unsigned int ntotal   = inarray.size();
+    NekDouble magninarray = Vmath::Dot(ntotal, inarray, inarray);
+    m_comm->GetSpaceComm()->AllReduce(magninarray,
+                                      Nektar::LibUtilities::ReduceSum);
+    NekDouble eps =
+        m_jacobiFreeEps * sqrt((sqrt(m_inArrayNorm) + 1.0) / magninarray);
+
+    Array<OneD, NekDouble> solplus{ntotal};
+    Array<OneD, NekDouble> resplus{ntotal};
+    Vmath::Svtvp(ntotal, eps, inarray, 1, solref, 1, solplus, 1);
+    NonlinSysEvaluatorCoeff1D(solplus, resplus, !centralDifferenceFlag);
+
+    if (centralDifferenceFlag)
+    {
+        Array<OneD, NekDouble> solminus{ntotal};
+        Array<OneD, NekDouble> resminus{ntotal};
+        Vmath::Svtvp(ntotal, -1.0 * eps, inarray, 1, solref, 1, solminus, 1);
+        NonlinSysEvaluatorCoeff1D(solminus, resminus, false);
+        Vmath::Vsub(ntotal, resplus, 1, resminus, 1, out, 1);
+        Vmath::Smul(ntotal, 0.5 / eps, out, 1, out, 1);
+    }
+    else
+    {
+        const Array<OneD, const NekDouble> resref =
+            m_nonlinsol->GetRefResidual();
+
+        Vmath::Vsub(ntotal, resplus, 1, resref, 1, out, 1);
+        Vmath::Smul(ntotal, 1.0 / eps, out, 1, out, 1);
+    }
+}
+
 void CFSImplicit::PreconCoeff(const Array<OneD, NekDouble> &inarray,
                               Array<OneD, NekDouble> &outarray,
                               const bool &flag)
@@ -485,8 +530,7 @@ void CFSImplicit::PreconCoeff(const Array<OneD, NekDouble> &inarray,
                                           m_TimeIntegLambda))
     {
         int nvariables = m_solutionPhys.size();
-
-        int nphspnt = m_solutionPhys[nvariables - 1].size();
+        int nphspnt    = m_solutionPhys[nvariables - 1].size();
         Array<OneD, Array<OneD, NekDouble>> intmp(nvariables);
         for (int i = 0; i < nvariables; i++)
         {
@@ -1018,10 +1062,9 @@ void CFSImplicit::AddMatNSBlkDiagBnd(
 template <typename DataType, typename TypeNekBlkMatSharedPtr>
 void CFSImplicit::ElmtVarInvMtrx(
     Array<OneD, Array<OneD, TypeNekBlkMatSharedPtr>> &gmtxarray,
-    TypeNekBlkMatSharedPtr &gmtVar, const DataType &tmpDataType)
+    TypeNekBlkMatSharedPtr &gmtVar,
+    [[maybe_unused]] const DataType &tmpDataType)
 {
-    boost::ignore_unused(tmpDataType);
-
     int n1d               = gmtxarray.size();
     int n2d               = gmtxarray[0].size();
     int nConvectiveFields = n1d;
@@ -1111,12 +1154,10 @@ void CFSImplicit::GetTraceJac(
     const Array<OneD, const Array<OneD, NekDouble>> &inarray,
     TensorOfArray3D<NekDouble> &qfield,
     Array<OneD, TypeNekBlkMatSharedPtr> &TraceJac,
-    Array<OneD, TypeNekBlkMatSharedPtr> &TraceJacDeriv,
-    Array<OneD, Array<OneD, DataType>> &TraceJacDerivSign,
+    [[maybe_unused]] Array<OneD, TypeNekBlkMatSharedPtr> &TraceJacDeriv,
+    [[maybe_unused]] Array<OneD, Array<OneD, DataType>> &TraceJacDerivSign,
     TensorOfArray5D<DataType> &TraceIPSymJacArray)
 {
-    boost::ignore_unused(TraceJacDeriv, TraceJacDerivSign);
-
     int nvariables = inarray.size();
     int nTracePts  = GetTraceTotPoints();
 
@@ -1175,16 +1216,13 @@ void CFSImplicit::NumCalcRiemFluxJac(
     const Array<OneD, const Array<OneD, NekDouble>> &Fwd,
     const Array<OneD, const Array<OneD, NekDouble>> &Bwd,
     TypeNekBlkMatSharedPtr &FJac, TypeNekBlkMatSharedPtr &BJac,
-    TensorOfArray5D<DataType> &TraceIPSymJacArray)
+    [[maybe_unused]] TensorOfArray5D<DataType> &TraceIPSymJacArray)
 {
-    boost::ignore_unused(TraceIPSymJacArray);
-
     const NekDouble PenaltyFactor2 = 0.0;
     int nvariables                 = nConvectiveFields;
     int npoints                    = GetNpoints();
-    // int nPts        = npoints;
-    int nTracePts = GetTraceTotPoints();
-    int nDim      = m_spacedim;
+    int nTracePts                  = GetTraceTotPoints();
+    int nDim                       = m_spacedim;
 
     Array<OneD, int> nonZeroIndex;
 
@@ -1361,22 +1399,21 @@ void CFSImplicit::NumCalcRiemFluxJac(
 }
 
 void CFSImplicit::CalcTraceNumericalFlux(
-    const int nConvectiveFields, const int nDim, const int nPts,
-    const int nTracePts, const NekDouble PenaltyFactor2,
+    const int nConvectiveFields, [[maybe_unused]] const int nDim,
+    [[maybe_unused]] const int nPts, const int nTracePts,
+    [[maybe_unused]] const NekDouble PenaltyFactor2,
     const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
     const Array<OneD, const Array<OneD, NekDouble>> &AdvVel,
     const Array<OneD, const Array<OneD, NekDouble>> &inarray,
-    const NekDouble time, TensorOfArray3D<NekDouble> &qfield,
+    [[maybe_unused]] const NekDouble time, TensorOfArray3D<NekDouble> &qfield,
     const Array<OneD, const Array<OneD, NekDouble>> &vFwd,
     const Array<OneD, const Array<OneD, NekDouble>> &vBwd,
-    const Array<OneD, const TensorOfArray2D<NekDouble>> &qFwd,
-    const Array<OneD, const TensorOfArray2D<NekDouble>> &qBwd,
-    const Array<OneD, NekDouble> &MuVarTrace, Array<OneD, int> &nonZeroIndex,
+    [[maybe_unused]] const Array<OneD, const TensorOfArray2D<NekDouble>> &qFwd,
+    [[maybe_unused]] const Array<OneD, const TensorOfArray2D<NekDouble>> &qBwd,
+    [[maybe_unused]] const Array<OneD, NekDouble> &MuVarTrace,
+    Array<OneD, int> &nonZeroIndex,
     Array<OneD, Array<OneD, NekDouble>> &traceflux)
 {
-    boost::ignore_unused(nDim, nPts, PenaltyFactor2, time, qFwd, qBwd,
-                         MuVarTrace);
-
     if (m_advectionJacFlag)
     {
         auto advWeakDGObject =
@@ -1443,7 +1480,7 @@ void CFSImplicit::CalcPreconMatBRJCoeff(
     Array<OneD, SNekBlkMatSharedPtr> &TraceJacDeriv,
     Array<OneD, Array<OneD, NekSingle>> &TraceJacDerivSign,
     TensorOfArray4D<NekSingle> &TraceJacArray,
-    TensorOfArray4D<NekSingle> &TraceJacDerivArray,
+    [[maybe_unused]] TensorOfArray4D<NekSingle> &TraceJacDerivArray,
     TensorOfArray5D<NekSingle> &TraceIPSymJacArray)
 {
     TensorOfArray3D<NekDouble> qfield;
@@ -1469,37 +1506,35 @@ void CFSImplicit::CalcPreconMatBRJCoeff(
     timer.Stop();
     timer.AccumulateRegion("CFSImplicit::AddMatNSBlkDiagBnd", 2);
 
-    MultiplyElmtInvMassPlusSource(gmtxarray, m_TimeIntegLambda, zero);
+    MultiplyElmtInvMassPlusSource<NekSingle>(gmtxarray, m_TimeIntegLambda);
 
     timer.Start();
     ElmtVarInvMtrx(gmtxarray, gmtVar, zero);
     timer.Stop();
     timer.AccumulateRegion("CFSImplicit::ElmtVarInvMtrx", 2);
 
-    TransTraceJacMatToArray(TraceJac, TraceJacDeriv, TraceJacArray,
-                            TraceJacDerivArray);
+    TransTraceJacMatToArray(TraceJac, TraceJacArray);
 }
 
 void CFSImplicit::v_MinusDiffusionFluxJacPoint(
-    const int nConvectiveFields, const int nElmtPnt,
-    const Array<OneD, const Array<OneD, NekDouble>> &locVars,
-    const TensorOfArray3D<NekDouble> &locDerv,
-    const Array<OneD, NekDouble> &locmu, const Array<OneD, NekDouble> &locDmuDT,
-    const Array<OneD, NekDouble> &normals, DNekMatSharedPtr &wspMat,
-    Array<OneD, Array<OneD, NekDouble>> &PntJacArray)
+    [[maybe_unused]] const int nConvectiveFields,
+    [[maybe_unused]] const int nElmtPnt,
+    [[maybe_unused]] const Array<OneD, const Array<OneD, NekDouble>> &locVars,
+    [[maybe_unused]] const TensorOfArray3D<NekDouble> &locDerv,
+    [[maybe_unused]] const Array<OneD, NekDouble> &locmu,
+    [[maybe_unused]] const Array<OneD, NekDouble> &locDmuDT,
+    [[maybe_unused]] const Array<OneD, NekDouble> &normals,
+    [[maybe_unused]] DNekMatSharedPtr &wspMat,
+    [[maybe_unused]] Array<OneD, Array<OneD, NekDouble>> &PntJacArray)
 {
-    boost::ignore_unused(nConvectiveFields, nElmtPnt, locVars, locDerv, locmu,
-                         locDmuDT, normals, wspMat, PntJacArray);
     // Do nothing by default
 }
 
 template <typename DataType, typename TypeNekBlkMatSharedPtr>
 void CFSImplicit::MultiplyElmtInvMassPlusSource(
     Array<OneD, Array<OneD, TypeNekBlkMatSharedPtr>> &gmtxarray,
-    const NekDouble dtlamda, const DataType tmpDataType)
+    const NekDouble dtlamda)
 {
-    boost::ignore_unused(tmpDataType);
-
     MultiRegions::ExpListSharedPtr explist              = m_fields[0];
     std::shared_ptr<LocalRegions::ExpansionVector> pexp = explist->GetExp();
     int nTotElmt                                        = (*pexp).size();
@@ -1586,12 +1621,8 @@ void CFSImplicit::MultiplyElmtInvMassPlusSource(
 template <typename DataType, typename TypeNekBlkMatSharedPtr>
 void CFSImplicit::TransTraceJacMatToArray(
     const Array<OneD, TypeNekBlkMatSharedPtr> &TraceJac,
-    const Array<OneD, TypeNekBlkMatSharedPtr> &TraceJacDeriv,
-    TensorOfArray4D<DataType> &TraceJacArray,
-    TensorOfArray4D<DataType> &TraceJacDerivArray)
+    TensorOfArray4D<DataType> &TraceJacArray)
 {
-    boost::ignore_unused(TraceJacArray, TraceJacDeriv, TraceJacDerivArray);
-
     int nFwdBwd, nDiagBlks, nvar0Jac, nvar1Jac;
 
     Array<OneD, unsigned int> rowSizes;
@@ -1631,37 +1662,35 @@ void CFSImplicit::TransTraceJacMatToArray(
 }
 
 void CFSImplicit::v_GetFluxDerivJacDirctn(
-    const MultiRegions::ExpListSharedPtr &explist,
-    const Array<OneD, const Array<OneD, NekDouble>> &normals,
-    const int nDervDir,
-    const Array<OneD, const Array<OneD, NekDouble>> &inarray,
-    TensorOfArray5D<NekDouble> &ElmtJacArray, const int nFluxDir)
+    [[maybe_unused]] const MultiRegions::ExpListSharedPtr &explist,
+    [[maybe_unused]] const Array<OneD, const Array<OneD, NekDouble>> &normals,
+    [[maybe_unused]] const int nDervDir,
+    [[maybe_unused]] const Array<OneD, const Array<OneD, NekDouble>> &inarray,
+    [[maybe_unused]] TensorOfArray5D<NekDouble> &ElmtJacArray,
+    [[maybe_unused]] const int nFluxDir)
 {
-    boost::ignore_unused(explist, normals, nDervDir, inarray, ElmtJacArray,
-                         nFluxDir);
     NEKERROR(ErrorUtil::efatal, "v_GetFluxDerivJacDirctn not coded");
 }
 
 void CFSImplicit::v_GetFluxDerivJacDirctnElmt(
-    const int nConvectiveFields, const int nElmtPnt, const int nDervDir,
-    const Array<OneD, const Array<OneD, NekDouble>> &locVars,
-    const Array<OneD, NekDouble> &locmu,
-    const Array<OneD, const Array<OneD, NekDouble>> &locnormal,
-    DNekMatSharedPtr &wspMat, Array<OneD, Array<OneD, NekDouble>> &PntJacArray)
+    [[maybe_unused]] const int nConvectiveFields,
+    [[maybe_unused]] const int nElmtPnt, [[maybe_unused]] const int nDervDir,
+    [[maybe_unused]] const Array<OneD, const Array<OneD, NekDouble>> &locVars,
+    [[maybe_unused]] const Array<OneD, NekDouble> &locmu,
+    [[maybe_unused]] const Array<OneD, const Array<OneD, NekDouble>> &locnormal,
+    [[maybe_unused]] DNekMatSharedPtr &wspMat,
+    [[maybe_unused]] Array<OneD, Array<OneD, NekDouble>> &PntJacArray)
 {
-    boost::ignore_unused(nConvectiveFields, nElmtPnt, nDervDir, locVars, locmu,
-                         locnormal, wspMat, PntJacArray);
     NEKERROR(ErrorUtil::efatal, "v_GetFluxDerivJacDirctn not coded");
 }
 
 void CFSImplicit::v_GetFluxDerivJacDirctn(
-    const MultiRegions::ExpListSharedPtr &explist,
-    const Array<OneD, const Array<OneD, NekDouble>> &normals,
-    const int nDervDir,
-    const Array<OneD, const Array<OneD, NekDouble>> &inarray,
-    TensorOfArray2D<DNekMatSharedPtr> &ElmtJac)
+    [[maybe_unused]] const MultiRegions::ExpListSharedPtr &explist,
+    [[maybe_unused]] const Array<OneD, const Array<OneD, NekDouble>> &normals,
+    [[maybe_unused]] const int nDervDir,
+    [[maybe_unused]] const Array<OneD, const Array<OneD, NekDouble>> &inarray,
+    [[maybe_unused]] TensorOfArray2D<DNekMatSharedPtr> &ElmtJac)
 {
-    boost::ignore_unused(explist, normals, nDervDir, inarray, ElmtJac);
 }
 
 void CFSImplicit::GetFluxVectorJacDirElmt(
@@ -1758,51 +1787,6 @@ void CFSImplicit::GetFluxVectorJacPoint(
     }
 }
 
-/**
- * @brief Add the diffusions terms to the right-hand side
- * Similar to DoDiffusion() but with outarray in coefficient space
- */
-void CFSImplicit::DoDiffusionCoeff(
-    const Array<OneD, const Array<OneD, NekDouble>> &inarray,
-    Array<OneD, Array<OneD, NekDouble>> &outarray,
-    const Array<OneD, const Array<OneD, NekDouble>> &pFwd,
-    const Array<OneD, const Array<OneD, NekDouble>> &pBwd)
-{
-    v_DoDiffusionCoeff(inarray, outarray, pFwd, pBwd);
-}
-
-void CFSImplicit::MatrixMultiplyMatrixFreeCoeff(
-    const Array<OneD, const NekDouble> &inarray, Array<OneD, NekDouble> &out,
-    const bool &flag)
-{
-    boost::ignore_unused(flag);
-    const Array<OneD, const NekDouble> refsol = m_nonlinsol->GetRefSolution();
-    const Array<OneD, const NekDouble> refres = m_nonlinsol->GetRefResidual();
-    const Array<OneD, const NekDouble> refsource =
-        m_nonlinsol->GetRefSourceVec();
-
-    NekDouble eps             = m_jacobiFreeEps;
-    unsigned int nTotalGlobal = inarray.size();
-    NekDouble magninarray     = Vmath::Dot(nTotalGlobal, inarray, inarray);
-    m_comm->GetSpaceComm()->AllReduce(magninarray,
-                                      Nektar::LibUtilities::ReduceSum);
-    eps *= sqrt((sqrt(m_inArrayNorm) + 1.0) / magninarray);
-
-    NekDouble oeps      = 1.0 / eps;
-    unsigned int ntotal = inarray.size();
-    Array<OneD, NekDouble> solplus{ntotal, 0.0};
-    Array<OneD, NekDouble> resplus{ntotal, 0.0};
-
-    Vmath::Svtvp(ntotal, eps, inarray, 1, refsol, 1, solplus, 1);
-
-    NonlinSysEvaluatorCoeff(solplus, resplus, flag, refsource);
-
-    Vmath::Vsub(ntotal, resplus, 1, refres, 1, out, 1);
-    Vmath::Smul(ntotal, oeps, out, 1, out, 1);
-
-    return;
-}
-
 template <typename DataType, typename TypeNekBlkMatSharedPtr>
 void CFSImplicit::TranSamesizeBlkDiagMatIntoArray(
     const TypeNekBlkMatSharedPtr &BlkMat, TensorOfArray3D<DataType> &MatArray)
@@ -1835,7 +1819,6 @@ void CFSImplicit::Fill2DArrayOfBlkDiagonalMat(
     Array<OneD, Array<OneD, TypeNekBlkMatSharedPtr>> &gmtxarray,
     const DataType valu)
 {
-
     int n1d = gmtxarray.size();
 
     for (int n1 = 0; n1 < n1d; ++n1)
@@ -1998,16 +1981,8 @@ bool CFSImplicit::v_UpdateTimeStepCheck()
     bool flag =
         (m_time + m_timestep > m_fintime && m_fintime > 0.0) ||
         (m_checktime && m_time + m_timestep - m_lastCheckTime >= m_checktime);
-    if (m_explicitAdvection)
-    {
-        flag = true;
-    }
-    else
-    {
-        flag = flag || m_preconCfs->UpdatePreconMatCheck(NullNekDouble1DArray,
-                                                         m_TimeIntegLambda);
-    }
-    return flag;
+    return flag || m_preconCfs->UpdatePreconMatCheck(NullNekDouble1DArray,
+                                                     m_TimeIntegLambda);
 }
 
 } // namespace Nektar

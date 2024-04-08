@@ -34,9 +34,7 @@
 
 #include <SolverUtils/AdvectionSystem.h>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 
 /**
@@ -172,5 +170,4 @@ NekDouble AdvectionSystem::GetCFLEstimate(int &elmtid)
     return CFL;
 }
 
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils

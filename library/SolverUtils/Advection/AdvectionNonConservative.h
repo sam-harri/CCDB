@@ -35,20 +35,15 @@
 #ifndef NEKTAR_SOLVERUTILS_ADVECTIONNONCONSERVATIVE
 #define NEKTAR_SOLVERUTILS_ADVECTIONNONCONSERVATIVE
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <SolverUtils/Advection/Advection.h>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 class AdvectionNonConservative : public Advection
 {
 public:
-    static AdvectionSharedPtr create(std::string advType)
+    static AdvectionSharedPtr create([[maybe_unused]] std::string advType)
     {
-        boost::ignore_unused(advType);
         return AdvectionSharedPtr(new AdvectionNonConservative());
     }
 
@@ -57,22 +52,21 @@ public:
 protected:
     AdvectionNonConservative();
 
-    virtual void v_InitObject(
+    void v_InitObject(
         LibUtilities::SessionReaderSharedPtr pSession,
         Array<OneD, MultiRegions::ExpListSharedPtr> pFields) override;
 
-    virtual void v_Advect(
-        const int nConvective,
-        const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
-        const Array<OneD, Array<OneD, NekDouble>> &advVel,
-        const Array<OneD, Array<OneD, NekDouble>> &inarray,
-        Array<OneD, Array<OneD, NekDouble>> &outarray, const NekDouble &time,
-        const Array<OneD, Array<OneD, NekDouble>> &pFwd =
-            NullNekDoubleArrayOfArray,
-        const Array<OneD, Array<OneD, NekDouble>> &pBwd =
-            NullNekDoubleArrayOfArray) override;
+    void v_Advect(const int nConvective,
+                  const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
+                  const Array<OneD, Array<OneD, NekDouble>> &advVel,
+                  const Array<OneD, Array<OneD, NekDouble>> &inarray,
+                  Array<OneD, Array<OneD, NekDouble>> &outarray,
+                  const NekDouble &time,
+                  const Array<OneD, Array<OneD, NekDouble>> &pFwd =
+                      NullNekDoubleArrayOfArray,
+                  const Array<OneD, Array<OneD, NekDouble>> &pBwd =
+                      NullNekDoubleArrayOfArray) override;
 };
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils
 
 #endif

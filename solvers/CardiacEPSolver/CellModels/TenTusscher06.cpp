@@ -34,7 +34,7 @@
 
 #include <iostream>
 #include <string>
-//#include <LibUtilities/BasicUtils/Vmath.hpp>
+// #include <LibUtilities/BasicUtils/Vmath.hpp>
 #include <CardiacEPSolver/CellModels/TenTusscher06.h>
 
 namespace Nektar
@@ -143,10 +143,9 @@ TenTusscher06::TenTusscher06(
  */
 void TenTusscher06::v_Update(
     const Array<OneD, const Array<OneD, NekDouble>> &inarray,
-    Array<OneD, Array<OneD, NekDouble>> &outarray, const NekDouble time)
+    Array<OneD, Array<OneD, NekDouble>> &outarray,
+    [[maybe_unused]] const NekDouble time)
 {
-    boost::ignore_unused(time);
-
     for (size_t i = 0; i < m_nq; ++i)
     {
         // Inputs:

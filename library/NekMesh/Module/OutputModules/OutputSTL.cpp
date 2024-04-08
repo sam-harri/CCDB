@@ -39,9 +39,7 @@
 using namespace std;
 using namespace Nektar::NekMesh;
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 ModuleKey OutputSTL::className = GetModuleFactory().RegisterCreatorFunction(
@@ -154,5 +152,4 @@ void OutputSTL::Process()
         m_mshFile << "endsolid" << endl;
     }
 }
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh

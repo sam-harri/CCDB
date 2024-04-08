@@ -43,9 +43,7 @@
 #include <LibUtilities/Communication/CommSerial.h>
 #include <LibUtilities/LibUtilitiesDeclspec.h>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 class Timer
@@ -59,7 +57,7 @@ public:
     LIB_UTILITIES_EXPORT Timer()  = default;
     LIB_UTILITIES_EXPORT ~Timer() = default;
 
-    Timer(const Timer &rhs) = delete;
+    Timer(const Timer &rhs)            = delete;
     Timer &operator=(const Timer &rhs) = delete;
 
     LIB_UTILITIES_EXPORT void Start();
@@ -90,7 +88,6 @@ private:
         m_elapsedRegion;
 };
 
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities
 
 #endif // NEKTAR_LIB_UTILITIES_BASIC_UTILS_TIMER_H

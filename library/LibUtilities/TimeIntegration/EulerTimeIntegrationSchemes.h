@@ -45,9 +45,7 @@
 
 #include <LibUtilities/TimeIntegration/TimeIntegrationSchemeGLM.h>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -60,7 +58,7 @@ public:
                                std::vector<NekDouble> freeParams)
         : TimeIntegrationSchemeGLM(variant, 1, freeParams)
     {
-        boost::ignore_unused(order);
+        boost::ignore_unused(variant, order);
 
         ASSERTL1(variant == "Backward" || variant == "Forward",
                  "Euler Time integration scheme unknown variant: " + variant +
@@ -74,15 +72,14 @@ public:
                                                     variant);
     }
 
-    virtual ~EulerTimeIntegrationScheme()
+    ~EulerTimeIntegrationScheme() override
     {
     }
 
     static TimeIntegrationSchemeSharedPtr create(
-        std::string variant, size_t order, std::vector<NekDouble> freeParams)
+        std::string variant, [[maybe_unused]] size_t order,
+        std::vector<NekDouble> freeParams)
     {
-        boost::ignore_unused(order);
-
         TimeIntegrationSchemeSharedPtr p =
             MemoryManager<EulerTimeIntegrationScheme>::AllocateSharedPtr(
                 variant, 1, freeParams);
@@ -139,17 +136,17 @@ public:
     }
 
 protected:
-    LUE virtual std::string v_GetFullName() const override
+    LUE std::string v_GetFullName() const override
     {
         return m_integration_phases.back()->m_name;
     }
 
-    LUE virtual std::string v_GetName() const override
+    LUE std::string v_GetName() const override
     {
         return std::string("Euler");
     }
 
-    LUE virtual NekDouble v_GetTimeStability() const override
+    LUE NekDouble v_GetTimeStability() const override
     {
         if (GetVariant() == "Backward")
         {
@@ -172,16 +169,13 @@ public:
                                        std::vector<NekDouble> freeParams)
         : EulerTimeIntegrationScheme("Backward", 1, freeParams)
     {
-        boost::ignore_unused(variant);
-        boost::ignore_unused(order);
+        boost::ignore_unused(variant, order);
     }
 
     static TimeIntegrationSchemeSharedPtr create(
-        std::string variant, size_t order, std::vector<NekDouble> freeParams)
+        [[maybe_unused]] std::string variant, [[maybe_unused]] size_t order,
+        std::vector<NekDouble> freeParams)
     {
-        boost::ignore_unused(variant);
-        boost::ignore_unused(order);
-
         TimeIntegrationSchemeSharedPtr p =
             MemoryManager<EulerTimeIntegrationScheme>::AllocateSharedPtr(
                 "Backward", 1, freeParams);
@@ -202,16 +196,13 @@ public:
                                       std::vector<NekDouble> freeParams)
         : EulerTimeIntegrationScheme("Forward", 1, freeParams)
     {
-        boost::ignore_unused(variant);
-        boost::ignore_unused(order);
+        boost::ignore_unused(variant, order);
     }
 
     static TimeIntegrationSchemeSharedPtr create(
-        std::string variant, size_t order, std::vector<NekDouble> freeParams)
+        [[maybe_unused]] std::string variant, [[maybe_unused]] size_t order,
+        std::vector<NekDouble> freeParams)
     {
-        boost::ignore_unused(variant);
-        boost::ignore_unused(order);
-
         TimeIntegrationSchemeSharedPtr p =
             MemoryManager<EulerTimeIntegrationScheme>::AllocateSharedPtr(
                 "Forward", 1, freeParams);
@@ -225,7 +216,6 @@ protected:
 
 }; // end class ForwardEulerTimeIntegrationScheme
 
-} // end namespace LibUtilities
-} // end namespace Nektar
+} // namespace Nektar::LibUtilities
 
 #endif

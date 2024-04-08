@@ -14,7 +14,7 @@ SET(BasicUtilsHeaders
     ./BasicUtils/Equation.h
     ./BasicUtils/FieldIO.h
     ./BasicUtils/FieldIOXml.h
-    ./BasicUtils/FileSystem.h
+    ./BasicUtils/Filesystem.hpp
     ./BasicUtils/ErrorUtil.hpp
     ./BasicUtils/Interpolator.h
     ./BasicUtils/HashUtils.hpp
@@ -32,7 +32,7 @@ SET(BasicUtilsHeaders
     ./BasicUtils/SharedArray.hpp
     ./BasicUtils/Smath.hpp
     ./BasicUtils/Thread.h
-    ./BasicUtils/ThreadBoost.h
+    ./BasicUtils/ThreadStd.h
     ./BasicUtils/Vmath.hpp
     ./BasicUtils/VmathSIMD.hpp
     ./BasicUtils/VmathArray.hpp
@@ -49,14 +49,13 @@ SET(BasicUtilsSources
 ./BasicUtils/ErrorUtil.cpp
 ./BasicUtils/FieldIO.cpp
 ./BasicUtils/FieldIOXml.cpp
-./BasicUtils/FileSystem.cpp
 ./BasicUtils/Interpolator.cpp
 ./BasicUtils/ParseUtils.cpp
 ./BasicUtils/PtsField.cpp
 ./BasicUtils/PtsIO.cpp
 ./BasicUtils/SessionReader.cpp
 ./BasicUtils/Thread.cpp
-./BasicUtils/ThreadBoost.cpp
+./BasicUtils/ThreadStd.cpp
 ./BasicUtils/Timer.cpp
 ./BasicUtils/Vmath.cpp
 )
@@ -201,7 +200,6 @@ SET(LinearAlgebraHeaders
 ./LinearAlgebra/MatrixOperations.hpp
 ./LinearAlgebra/MatrixStorageType.h
 ./LinearAlgebra/MatrixType.h
-./LinearAlgebra/NekLinAlgAlgorithms.hpp
 ./LinearAlgebra/NekLinSys.hpp
 ./LinearAlgebra/NekLinSysIter.h
 ./LinearAlgebra/NekLinSysIterCG.h
@@ -211,8 +209,8 @@ SET(LinearAlgebraHeaders
 ./LinearAlgebra/NekLinSysIterGMRESLoc.h
 ./LinearAlgebra/NekMatrixFwd.hpp
 ./LinearAlgebra/NekMatrix.hpp
-./LinearAlgebra/NekNonlinSys.h
-./LinearAlgebra/NekNonlinSysNewton.h
+./LinearAlgebra/NekNonlinSysIter.h
+./LinearAlgebra/NekNonlinSysIterNewton.h
 ./LinearAlgebra/NekPoint.hpp
 ./LinearAlgebra/NekSys.h
 ./LinearAlgebra/NekTypeDefs.hpp
@@ -231,7 +229,7 @@ SET(LinearAlgebraHeaders
 )
 
 SET(LinearAlgebraSources
-./LinearAlgebra/blas.cpp
+./LinearAlgebra/Blas.cpp
 ./LinearAlgebra/BlockMatrix.cpp
 ./LinearAlgebra/MatrixBase.cpp
 ./LinearAlgebra/MatrixFuncs.cpp
@@ -243,8 +241,8 @@ SET(LinearAlgebraSources
 ./LinearAlgebra/NekLinSysIterCG.cpp
 ./LinearAlgebra/NekLinSysIterCGLoc.cpp
 ./LinearAlgebra/NekLinSysIterFixedpointJacobi.cpp
-./LinearAlgebra/NekNonlinSys.cpp
-./LinearAlgebra/NekNonlinSysNewton.cpp
+./LinearAlgebra/NekNonlinSysIter.cpp
+./LinearAlgebra/NekNonlinSysIterNewton.cpp
 ./LinearAlgebra/NekSys.cpp
 ./LinearAlgebra/NekVector.cpp
 ./LinearAlgebra/ScaledMatrix.cpp
@@ -333,9 +331,6 @@ SOURCE_GROUP("Interpreter Sources" FILES ${InterpreterSources})
 SOURCE_GROUP("Communication Headers" FILES ${CommunicationHeaders})
 SOURCE_GROUP("Communication Sources" FILES ${CommunicationSources})
 
-SOURCE_GROUP("Kernel Headers" FILES ${KernelHeaders})
-SOURCE_GROUP("Kernel Sources" FILES ${KernelSources})
-
 SOURCE_GROUP("TimeIntegration Headers" FILES ${TimeIntegrationHeaders})
 SOURCE_GROUP("TimeIntegration Sources" FILES ${TimeIntegrationSources})
 
@@ -354,7 +349,6 @@ ${CADSystemHeaders}
 ${LinearAlgebraHeaders}
 ${BasicConstHeaders}
 ${InterpreterHeaders}
-${KernelHeaders}
 ${TimeIntegrationHeaders}
 ${FFTHeaders}
 ${BaseHeaders}
@@ -375,7 +369,6 @@ ${PolylibSources}
 ${CommunicationSources}
 ${LinearAlgebraSources}
 ${InterpreterSources}
-${KernelSources}
 ${TimeIntegrationSources}
 ${FFTSources}
 ${MemorySources}
@@ -395,6 +388,11 @@ ADD_LIBRARY(tinysimd INTERFACE)
 TARGET_INCLUDE_DIRECTORIES(tinysimd INTERFACE SimdLib)
 
 ADD_DEPENDENCIES(LibUtilities boost tinyxml-2.6.2 zlib-1.2.9 tinysimd)
+
+# Older gcc versions (6 <= version < 9) require libstdc++fs.
+IF (DEFINED NEKTAR_FILESYSTEM_LIBRARY)
+    TARGET_LINK_LIBRARIES(LibUtilities LINK_PRIVATE ${NEKTAR_FILESYSTEM_LIBRARY})
+ENDIF()
 
 ### Libraries needed specifically by LibUtilities ###
 
@@ -420,13 +418,10 @@ ENDIF( NEKTAR_USE_ARPACK )
 
 # Boost
 TARGET_LINK_LIBRARIES(LibUtilities LINK_PUBLIC
-  ${Boost_THREAD_LIBRARY}
   ${Boost_IOSTREAMS_LIBRARY}
-  ${Boost_PROGRAM_OPTIONS_LIBRARY}
-  ${Boost_FILESYSTEM_LIBRARY}
   ${Boost_SYSTEM_LIBRARY}
-  ${Boost_REGEX_LIBRARY}
-    optimized ${ZLIB_LIBRARIES} debug ${ZLIB_LIBRARIES_DEBUG}
+  ${Boost_PROGRAM_OPTIONS_LIBRARY}
+  optimized ${ZLIB_LIBRARIES} debug ${ZLIB_LIBRARIES_DEBUG}
 )
 
 # TinyXML
@@ -475,7 +470,7 @@ ENDIF()
 # HDF5
 IF( NEKTAR_USE_HDF5 )
     TARGET_LINK_LIBRARIES(LibUtilities LINK_PUBLIC ${HDF5_LIBRARIES})
-    ADD_DEPENDENCIES(LibUtilities hdf5-1.8.16)
+    ADD_DEPENDENCIES(LibUtilities hdf5-1.12.3)
 ENDIF( NEKTAR_USE_HDF5 )
 
 # Likwid

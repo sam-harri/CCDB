@@ -37,9 +37,7 @@
 
 #include <NekMesh/Module/Module.h>
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 class ProcessLoadOctree : public ProcessModule
@@ -53,16 +51,15 @@ public:
     static ModuleKey className;
 
     ProcessLoadOctree(MeshSharedPtr m);
-    virtual ~ProcessLoadOctree();
+    ~ProcessLoadOctree() override;
 
-    virtual void Process();
+    void Process() override;
 
-    virtual std::string GetModuleName()
+    std::string GetModuleName() override
     {
         return "LoadOctree";
     }
 };
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh
 
 #endif

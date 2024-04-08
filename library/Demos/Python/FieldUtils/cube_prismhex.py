@@ -2,7 +2,7 @@
 import sys
 from NekPy.FieldUtils import *
 
-field = Field(sys.argv, forceoutput=True, error=True)
+field = Field(sys.argv, force_output=True, error=True)
 
 InputModule.Create("xml",  field, "cube_prismhex.xml").Run()
 ProcessModule.Create("surfdistance", field, bnd="0").Run()

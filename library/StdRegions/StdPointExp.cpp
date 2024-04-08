@@ -32,35 +32,16 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <StdRegions/StdPointExp.h>
 
 using namespace std;
 
-namespace Nektar
+namespace Nektar::StdRegions
 {
-namespace StdRegions
-{
-
-StdPointExp::StdPointExp()
-{
-}
 
 StdPointExp::StdPointExp(const LibUtilities::BasisKey &Ba)
     : StdExpansion(Ba.GetNumModes(), 1, Ba),
       StdExpansion0D(Ba.GetNumModes(), Ba)
-{
-}
-
-/** \brief Copy Constructor */
-
-StdPointExp::StdPointExp(const StdPointExp &T)
-    : StdExpansion(T), StdExpansion0D(T)
-{
-}
-
-StdPointExp::~StdPointExp()
 {
 }
 
@@ -70,10 +51,9 @@ LibUtilities::ShapeType StdPointExp::v_DetShapeType() const
 }
 
 void StdPointExp::v_GetCoords(Array<OneD, NekDouble> &coords_0,
-                              Array<OneD, NekDouble> &coords_1,
-                              Array<OneD, NekDouble> &coords_2)
+                              [[maybe_unused]] Array<OneD, NekDouble> &coords_1,
+                              [[maybe_unused]] Array<OneD, NekDouble> &coords_2)
 {
-    boost::ignore_unused(coords_1, coords_2);
     Blas::Dcopy(GetNumPoints(0), (m_base[0]->GetZ()).get(), 1, &coords_0[0], 1);
 }
 
@@ -153,19 +133,17 @@ void StdPointExp::v_IProductWRTBase(const Array<OneD, const NekDouble> &inarray,
 }
 
 void StdPointExp::v_IProductWRTDerivBase(
-    const int dir, const Array<OneD, const NekDouble> &inarray,
+    [[maybe_unused]] const int dir, const Array<OneD, const NekDouble> &inarray,
     Array<OneD, NekDouble> &outarray)
 {
-    boost::ignore_unused(dir);
     ASSERTL1(dir >= 0 && dir < 1, "input dir is out of range");
     v_IProductWRTBase(m_base[0]->GetDbdata(), inarray, outarray, 1);
 }
 
 void StdPointExp::v_IProductWRTBase_SumFac(
     const Array<OneD, const NekDouble> &inarray,
-    Array<OneD, NekDouble> &outarray, bool multiplybyweights)
+    Array<OneD, NekDouble> &outarray, [[maybe_unused]] bool multiplybyweights)
 {
-    boost::ignore_unused(multiplybyweights);
     v_IProductWRTBase(m_base[0]->GetBdata(), inarray, outarray, 1);
 }
 
@@ -203,5 +181,4 @@ DNekMatSharedPtr StdPointExp::v_CreateStdMatrix(const StdMatrixKey &mkey)
     return v_GenMatrix(mkey);
 }
 
-} // namespace StdRegions
-} // namespace Nektar
+} // namespace Nektar::StdRegions

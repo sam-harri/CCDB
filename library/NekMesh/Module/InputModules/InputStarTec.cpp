@@ -33,7 +33,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <boost/algorithm/string.hpp>
-#include <boost/core/ignore_unused.hpp>
 #include <boost/iostreams/filtering_stream.hpp>
 
 #include <LibUtilities/Foundations/ManagerAccess.h>
@@ -46,9 +45,7 @@ using namespace std;
 using namespace Nektar::NekMesh;
 namespace io = boost::iostreams;
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 ModuleKey InputTec::className = GetModuleFactory().RegisterCreatorFunction(
@@ -635,12 +632,10 @@ static void PrismLineFaces(int prismid, map<int, int> &facelist,
     }
 }
 
-void InputTec::GenElement2D(vector<NodeSharedPtr> &VertNodes, int i,
-                            vector<int> &ElementFaces,
+void InputTec::GenElement2D(vector<NodeSharedPtr> &VertNodes,
+                            [[maybe_unused]] int i, vector<int> &ElementFaces,
                             vector<vector<int>> &FaceNodes, int nComposite)
 {
-    boost::ignore_unused(i);
-
     LibUtilities::ShapeType elType = (LibUtilities::ShapeType)0;
     // set up Node list
 
@@ -678,13 +673,11 @@ void InputTec::GenElement2D(vector<NodeSharedPtr> &VertNodes, int i,
     m_mesh->m_element[E->GetDim()].push_back(E);
 }
 
-void InputTec::GenElement3D(vector<NodeSharedPtr> &VertNodes, int i,
-                            vector<int> &ElementFaces,
+void InputTec::GenElement3D(vector<NodeSharedPtr> &VertNodes,
+                            [[maybe_unused]] int i, vector<int> &ElementFaces,
                             vector<vector<int>> &FaceNodes, int nComposite,
                             bool DoOrient)
 {
-    boost::ignore_unused(i);
-
     LibUtilities::ShapeType elType = (LibUtilities::ShapeType)0;
     // set up Node list
     Array<OneD, int> Nodes = SortFaceNodes(VertNodes, ElementFaces, FaceNodes);
@@ -1095,5 +1088,4 @@ Array<OneD, int> InputTec::SortFaceNodes(vector<NodeSharedPtr> &Vnodes,
 
     return returnval;
 }
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh

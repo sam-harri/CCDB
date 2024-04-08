@@ -44,9 +44,7 @@
 #include <LibUtilities/TimeIntegration/TimeIntegrationSchemeOperators.h>
 #include <LibUtilities/TimeIntegration/TimeIntegrationTypes.hpp>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 class TimeIntegrationAlgorithmGLM
@@ -390,7 +388,6 @@ LUE std::ostream &operator<<(std::ostream &os,
 
 // =========================================================================
 
-} // end of namespace LibUtilities
-} // end of namespace Nektar
+} // namespace Nektar::LibUtilities
 
 #endif

@@ -37,21 +37,18 @@
 #include <string>
 using namespace std;
 
-#include <boost/core/ignore_unused.hpp>
 #include <boost/format.hpp>
 
-#include <LibUtilities/BasicUtils/FileSystem.h>
+#include <LibUtilities/BasicUtils/Filesystem.hpp>
 
 #include "OutputVtkBase.h"
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 // Disable the base VTK factory if using the VTK library, this is so we can
 // register the same extension for both.
-#if !NEKTAR_USING_VTK
+#ifndef NEKTAR_USING_VTK
 ModuleKey OutputVtkBase::m_className =
     GetModuleFactory().RegisterCreatorFunction(ModuleKey(eOutputModule, "vtu"),
                                                OutputVtkBase::create,
@@ -143,7 +140,7 @@ void OutputVtkBase::v_OutputFromPts(po::variables_map &vm)
             << numBlocks << "\">" << endl;
     outfile << "      <Points>" << endl;
     outfile << "        <DataArray type=\"Float64\" "
-            << "NumberOfComponents=\"" << 3 << "\" format=\"ascii\">" << endl;
+            << "NumberOfComponents=\"" << 3 << R"(" format="ascii">)" << endl;
     for (i = 0; i < nPts; ++i)
     {
         for (j = 0; j < dim; ++j)
@@ -162,7 +159,7 @@ void OutputVtkBase::v_OutputFromPts(po::variables_map &vm)
     outfile << "      </Points>" << endl;
     outfile << "      <Cells>" << endl;
     outfile << "        <DataArray type=\"Int32\" "
-            << "Name=\"connectivity\" format=\"ascii\">" << endl;
+            << R"(Name="connectivity" format="ascii">)" << endl;
 
     // dump connectivity data if it exists
     outfile << "          ";
@@ -182,7 +179,7 @@ void OutputVtkBase::v_OutputFromPts(po::variables_map &vm)
     }
     outfile << "        </DataArray>" << endl;
     outfile << "        <DataArray type=\"Int32\" "
-            << "Name=\"offsets\" format=\"ascii\">" << endl;
+            << R"(Name="offsets" format="ascii">)" << endl;
 
     outfile << "          ";
     for (i = 0; i < numBlocks; ++i)
@@ -192,7 +189,7 @@ void OutputVtkBase::v_OutputFromPts(po::variables_map &vm)
     outfile << endl;
     outfile << "        </DataArray>" << endl;
     outfile << "        <DataArray type=\"UInt8\" "
-            << "Name=\"types\" format=\"ascii\">" << endl;
+            << R"(Name="types" format="ascii">)" << endl;
     outfile << "          ";
     for (i = 0; i < numBlocks; ++i)
     {
@@ -206,7 +203,7 @@ void OutputVtkBase::v_OutputFromPts(po::variables_map &vm)
     // printing the fields
     for (j = 0; j < nfields; ++j)
     {
-        outfile << "        <DataArray type=\"Float64\" Name=\""
+        outfile << R"(        <DataArray type="Float64" Name=")"
                 << m_f->m_variables[j] << "\">" << endl;
         outfile << "          ";
         for (i = 0; i < fPts->GetNpoints(); ++i)
@@ -280,18 +277,16 @@ void OutputVtkBase::v_OutputFromExp(po::variables_map &vm)
     }
 }
 
-void OutputVtkBase::v_OutputFromData(po::variables_map &vm)
+void OutputVtkBase::v_OutputFromData([[maybe_unused]] po::variables_map &vm)
 {
-    boost::ignore_unused(vm);
     NEKERROR(ErrorUtil::efatal,
              "OutputVtk can't write using only FieldData. You may need "
              "to add a mesh XML file to your input files.");
 }
 
-fs::path OutputVtkBase::v_GetPath(std::string &filename, po::variables_map &vm)
+fs::path OutputVtkBase::v_GetPath(std::string &filename,
+                                  [[maybe_unused]] po::variables_map &vm)
 {
-    boost::ignore_unused(vm);
-
     int nprocs = m_f->m_comm->GetSpaceComm()->GetSize();
     fs::path specPath;
     if (nprocs == 1)
@@ -335,7 +330,7 @@ fs::path OutputVtkBase::v_GetFullOutName(std::string &filename,
 void OutputVtkBase::WriteVtkHeader(std::ostream &outfile)
 {
     outfile << "<?xml version=\"1.0\"?>" << endl;
-    outfile << "<VTKFile type=\"UnstructuredGrid\" version=\"0.1\" "
+    outfile << R"(<VTKFile type="UnstructuredGrid" version="0.1" )"
             << "byte_order=\"LittleEndian\">" << endl;
     outfile << "  <UnstructuredGrid>" << endl;
 }
@@ -353,21 +348,21 @@ void OutputVtkBase::WriteEmptyVtkPiece(std::ofstream &outfile)
             << "\">" << endl;
     outfile << "      <Points>" << endl;
     outfile << "        <DataArray type=\"Float64\" "
-            << "NumberOfComponents=\"" << 3 << "\" format=\"ascii\">" << endl;
+            << "NumberOfComponents=\"" << 3 << R"(" format="ascii">)" << endl;
     outfile << "        </DataArray>" << endl;
     outfile << "      </Points>" << endl;
     outfile << "      <Cells>" << endl;
     outfile << "        <DataArray type=\"Int32\" "
-            << "Name=\"connectivity\" format=\"ascii\">" << endl;
+            << R"(Name="connectivity" format="ascii">)" << endl;
     outfile << "        </DataArray>" << endl;
     outfile << "        <DataArray type=\"Int32\" "
-            << "Name=\"offsets\" format=\"ascii\">" << endl;
+            << R"(Name="offsets" format="ascii">)" << endl;
 
     outfile << "          ";
     outfile << endl;
     outfile << "        </DataArray>" << endl;
     outfile << "        <DataArray type=\"UInt8\" "
-            << "Name=\"types\" format=\"ascii\">" << endl;
+            << R"(Name="types" format="ascii">)" << endl;
     outfile << "          ";
     outfile << endl;
     outfile << "        </DataArray>" << endl;
@@ -391,11 +386,11 @@ void OutputVtkBase::WritePVtu(po::variables_map &vm)
     string path = LibUtilities::PortablePath(GetPath(filename, vm));
 
     outfile << "<?xml version=\"1.0\"?>" << endl;
-    outfile << "<VTKFile type=\"PUnstructuredGrid\" version=\"0.1\" "
+    outfile << R"(<VTKFile type="PUnstructuredGrid" version="0.1" )"
             << "byte_order=\"LittleEndian\">" << endl;
     outfile << "<PUnstructuredGrid GhostLevel=\"0\">" << endl;
     outfile << "<PPoints> " << endl;
-    outfile << "<PDataArray type=\"Float64\" NumberOfComponents=\"" << 3
+    outfile << R"(<PDataArray type="Float64" NumberOfComponents=")" << 3
             << "\"/> " << endl;
     outfile << "</PPoints>" << endl;
     outfile << "<PCells>" << endl;
@@ -412,7 +407,7 @@ void OutputVtkBase::WritePVtu(po::variables_map &vm)
     outfile << "<PPointData Scalars=\"Material\">" << endl;
     for (int i = 0; i < m_f->m_variables.size(); ++i)
     {
-        outfile << "<PDataArray type=\"Float64\" Name=\"" << m_f->m_variables[i]
+        outfile << R"(<PDataArray type="Float64" Name=")" << m_f->m_variables[i]
                 << "\"/>" << endl;
     }
     outfile << "</PPointData>" << endl;
@@ -434,6 +429,8 @@ std::string OutputVtkBase::PrepareOutput(po::variables_map &vm)
 {
     // Extract the output filename and extension
     string filename = m_config["outfile"].as<string>();
+
+    ASSERTL0(filename != "", "Legacy VTK output requires a filename.");
 
     fs::path specPath    = GetPath(filename, vm);
     fs::path fulloutname = GetFullOutName(filename, vm);
@@ -462,5 +459,4 @@ std::string OutputVtkBase::PrepareOutput(po::variables_map &vm)
     return filename;
 }
 
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

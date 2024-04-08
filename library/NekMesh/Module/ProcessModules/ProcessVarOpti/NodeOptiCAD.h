@@ -39,9 +39,7 @@
 
 #include <NekMesh/CADSystem/CADCurve.h>
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 class NodeOpti1D3D : public NodeOpti // 1D optimsation in 3D space
@@ -55,9 +53,9 @@ public:
     {
     }
 
-    ~NodeOpti1D3D(){};
+    ~NodeOpti1D3D() override{};
 
-    void Optimise();
+    void Optimise() override;
 
     static int m_type;
     static NodeOptiSharedPtr create(
@@ -84,9 +82,9 @@ public:
     {
     }
 
-    ~NodeOpti2D3D(){};
+    ~NodeOpti2D3D() override{};
 
-    void Optimise();
+    void Optimise() override;
 
     static int m_type;
     static NodeOptiSharedPtr create(
@@ -114,9 +112,9 @@ public:
         m_bd = curve->GetBounds();
     }
 
-    ~NodeOpti1D2D(){};
+    ~NodeOpti1D2D() override{};
 
-    void Optimise();
+    void Optimise() override;
 
     static int m_type;
     static NodeOptiSharedPtr create(
@@ -130,9 +128,8 @@ public:
 private:
     void ProcessGradient();
     CADCurveSharedPtr curve;
-    Array<OneD, NekDouble> m_bd;
+    std::array<NekDouble, 2> m_bd;
 };
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh
 
 #endif

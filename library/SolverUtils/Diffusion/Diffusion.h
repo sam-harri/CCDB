@@ -38,8 +38,6 @@
 #include <functional>
 #include <string>
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/BasicUtils/NekFactory.hpp>
 #include <LibUtilities/BasicUtils/SharedArray.hpp>
 #include <MultiRegions/AssemblyMap/AssemblyMapDG.h>
@@ -47,9 +45,7 @@
 #include <SolverUtils/RiemannSolvers/RiemannSolver.h>
 #include <SolverUtils/SolverUtilsDeclspec.h>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 
 class Diffusion;
@@ -254,8 +250,8 @@ public:
     }
 
     /// Get trace normal
-    SOLVER_UTILS_EXPORT const Array<OneD, const Array<OneD, NekDouble>>
-        &GetTraceNormal()
+    SOLVER_UTILS_EXPORT const Array<OneD, const Array<OneD, NekDouble>> &
+    GetTraceNormal()
     {
         return v_GetTraceNormal();
     }
@@ -341,6 +337,12 @@ public:
                       std::placeholders::_5, std::placeholders::_6);
     }
 
+    SOLVER_UTILS_EXPORT inline void SetGridVelocityTrace(
+        Array<OneD, Array<OneD, NekDouble>> &gridVelocityTrace)
+    {
+        m_gridVelocityTrace = gridVelocityTrace;
+    }
+
 protected:
     /// Params for Ducros sensor
     Array<OneD, NekDouble> m_divVel;
@@ -354,7 +356,7 @@ protected:
     DiffusionFluxCons m_FunctorDiffusionfluxConsTrace;
     SpecialBndTreat m_SpecialBndTreat;
     DiffusionSymmFluxCons m_FunctorSymmetricfluxCons;
-
+    Array<OneD, Array<OneD, NekDouble>> m_gridVelocityTrace;
     NekDouble m_time = 0.0;
 
     SOLVER_UTILS_EXPORT virtual void v_InitObject(
@@ -403,9 +405,9 @@ protected:
         const Array<OneD, Array<OneD, NekDouble>> &pBwd,
         Array<OneD, int> &nonZeroIndex);
 
-    virtual void v_SetHomoDerivs(Array<OneD, Array<OneD, NekDouble>> &deriv)
+    virtual void v_SetHomoDerivs(
+        [[maybe_unused]] Array<OneD, Array<OneD, NekDouble>> &deriv)
     {
-        boost::ignore_unused(deriv);
     }
 
     virtual TensorOfArray3D<NekDouble> &v_GetFluxTensor()
@@ -414,11 +416,11 @@ protected:
         return tmp;
     }
 
-    SOLVER_UTILS_EXPORT virtual const Array<OneD, const Array<OneD, NekDouble>>
-        &v_GetTraceNormal();
+    SOLVER_UTILS_EXPORT virtual const Array<OneD,
+                                            const Array<OneD, NekDouble>> &
+    v_GetTraceNormal();
 };
 
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils
 
 #endif

@@ -32,7 +32,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
 #include <boost/format.hpp>
 
 #include "OutputVtk.h"
@@ -48,9 +47,7 @@
 #include <vtkXMLMultiBlockDataWriter.h>
 #include <vtkXMLUnstructuredGridWriter.h>
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 ModuleKey OutputVtk::m_className = GetModuleFactory().RegisterCreatorFunction(
@@ -651,8 +648,8 @@ std::vector<long long> hexTensorNodeOrdering(
                            {n * n * n - 1, -1},
                            {n * n * (n - 1) + n * (n - 1), -n}};
     int hexFaces[6][3]  = {{0, 1, n},         {0, 1, n * n},
-                          {n - 1, n, n * n}, {n * (n - 1), 1, n * n},
-                          {0, n, n * n},     {n * n * (n - 1), 1, n}};
+                           {n - 1, n, n * n}, {n * (n - 1), 1, n * n},
+                           {0, n, n * n},     {n * n * (n - 1), 1, n}};
 
     int gmshToNekEdge[12] = {0, 1, -2, -3, 8, 9, -10, -11, 4, 5, 6, 7};
 
@@ -828,7 +825,7 @@ std::vector<long long> lowOrderMapping(int nDim, Array<OneD, int> nquad)
     return p;
 }
 
-int GetHighOrderVtkCellType(int sType)
+int GetHighOrderVtkCellType([[maybe_unused]] int sType)
 {
 #if VTK_MAJOR_VERSION >= 8
     // For deformed elements this is a map of shape type to VTK type
@@ -843,7 +840,6 @@ int GetHighOrderVtkCellType(int sType)
 
     return vtkCellType.at(sType);
 #else
-    boost::ignore_unused(sType);
     NEKERROR(
         ErrorUtil::efatal,
         "High-order VTK output requires minimum VTK library version of 8.0")
@@ -1017,7 +1013,10 @@ void OutputVtk::AddFieldDataToVTKLowOrder(
         vtkMesh->GetPointData()->AddArray(fieldData.GetPointer());
     }
 
-    WriteVTK(vtkMesh, filename, vm);
+    if (!m_prohibitWrite)
+    {
+        WriteVTK(vtkMesh, filename, vm);
+    }
 }
 
 void OutputVtk::OutputFromExpLowOrderMultiBlock(po::variables_map &vm,
@@ -1296,7 +1295,10 @@ void OutputVtk::OutputFromExpLowOrderMultiBlock(po::variables_map &vm,
                                             "Other composites");
     }
 
-    WriteVTK(mainBlock.GetPointer(), filename, vm);
+    if (!m_prohibitWrite)
+    {
+        WriteVTK(mainBlock.GetPointer(), filename, vm);
+    }
 }
 
 vtkSmartPointer<vtkUnstructuredGrid> OutputVtk::OutputFromExpHighOrder(
@@ -1456,7 +1458,10 @@ void OutputVtk::AddFieldDataToVTKHighOrder(
         vtkMesh->GetPointData()->AddArray(fieldData.GetPointer());
     }
 
-    WriteVTK(vtkMesh, filename, vm);
+    if (!m_prohibitWrite)
+    {
+        WriteVTK(vtkMesh, filename, vm);
+    }
 }
 
 void OutputVtk::WriteVTK(vtkDataObject *vtkMesh, std::string &filename,
@@ -1535,7 +1540,7 @@ void OutputVtk::WritePVtu(po::variables_map &vm)
         LibUtilities::PortablePath(OutputVtkBase::v_GetPath(filename, vm));
 
     outfile << "<?xml version=\"1.0\"?>" << endl;
-    outfile << "<VTKFile type=\"PUnstructuredGrid\" version=\"0.1\" "
+    outfile << R"(<VTKFile type="PUnstructuredGrid" version="0.1" )"
             << "byte_order=\"LittleEndian\">" << endl;
     outfile << "  <PUnstructuredGrid GhostLevel=\"0\">" << endl;
 
@@ -1553,7 +1558,7 @@ void OutputVtk::WritePVtu(po::variables_map &vm)
 
     // Add point coordinates
     outfile << "    <PPoints> " << endl;
-    outfile << "      <PDataArray type=\"Float64\" NumberOfComponents=\"" << 3
+    outfile << R"(      <PDataArray type="Float64" NumberOfComponents=")" << 3
             << "\"/> " << endl;
     outfile << "    </PPoints>" << endl;
 
@@ -1574,7 +1579,7 @@ void OutputVtk::WritePVtu(po::variables_map &vm)
     outfile << "    <PPointData>" << endl;
     for (auto &var : m_f->m_variables)
     {
-        outfile << "      <PDataArray type=\"Float64\" Name=\"" << var << "\"/>"
+        outfile << R"(      <PDataArray type="Float64" Name=")" << var << "\"/>"
                 << endl;
     }
     outfile << "    </PPointData>" << endl;
@@ -1593,9 +1598,8 @@ void OutputVtk::WritePVtu(po::variables_map &vm)
     cout << "Written file: " << filename << endl;
 }
 
-void OutputVtk::v_OutputFromData(po::variables_map &vm)
+void OutputVtk::v_OutputFromData([[maybe_unused]] po::variables_map &vm)
 {
-    boost::ignore_unused(vm);
     NEKERROR(ErrorUtil::efatal,
              "OutputVtk can't write using only FieldData. You may need "
              "to add a mesh XML file to your input files.");
@@ -1608,6 +1612,22 @@ void OutputVtk::v_OutputFromPts(po::variables_map &vm)
 
 void OutputVtk::v_OutputFromExp(po::variables_map &vm)
 {
+    // Move geometry based on zones data in .xml and time in .fld metadatamap
+    // Perform movement of zones based on time in field files metadata map
+    if (m_f->m_graph->GetMovement()->GetMoveFlag())
+    {
+        if (!m_f->m_fieldMetaDataMap["Time"].empty())
+        {
+            m_f->m_graph->GetMovement()->PerformMovement(
+                boost::lexical_cast<NekDouble>(
+                    m_f->m_fieldMetaDataMap["Time"]));
+            for (auto &i : m_f->m_exp)
+            {
+                i->Reset();
+            }
+        }
+    }
+
     if (m_config["legacy"].m_beenSet)
     {
         ASSERTL0(!m_config["multiblock"].m_beenSet,
@@ -1621,12 +1641,20 @@ void OutputVtk::v_OutputFromExp(po::variables_map &vm)
         return;
     }
 
+    std::string filename;
+
     // Extract the output filename and extension
-    std::string filename = OutputVtkBase::PrepareOutput(vm);
+    if (!m_prohibitWrite)
+    {
+        filename = OutputVtkBase::PrepareOutput(vm);
+    }
 
     // Save mesh state (if using filter this allows us to only ProcessEquispaced
     // if needed)
-    m_cachedMesh = m_vtkMesh;
+    if (!m_f->m_graph->GetMovement()->GetMoveFlag())
+    {
+        m_cachedMesh = m_vtkMesh;
+    }
 
     if (m_config["highorder"].m_beenSet)
     {
@@ -1656,5 +1684,4 @@ void OutputVtk::v_OutputFromExp(po::variables_map &vm)
     }
 }
 
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

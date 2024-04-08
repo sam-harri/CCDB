@@ -36,7 +36,6 @@
 #include <string>
 using namespace std;
 
-#include <boost/core/ignore_unused.hpp>
 #include <boost/format.hpp>
 
 #include <LibUtilities/BasicUtils/FieldIOXml.h>
@@ -44,9 +43,7 @@ using namespace std;
 
 #include "OutputInfo.h"
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 ModuleKey OutputInfo::m_className = GetModuleFactory().RegisterCreatorFunction(
@@ -64,10 +61,8 @@ OutputInfo::~OutputInfo()
 {
 }
 
-void OutputInfo::v_Process(po::variables_map &vm)
+void OutputInfo::v_Process([[maybe_unused]] po::variables_map &vm)
 {
-    boost::ignore_unused(vm);
-
     // Extract the output filename and extension
     string filename = m_config["outfile"].as<string>();
 
@@ -128,5 +123,4 @@ void OutputInfo::v_Process(po::variables_map &vm)
     fldXml->WriteMultiFldFileIDs(infofile, filenames, ElementIDs);
 }
 
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

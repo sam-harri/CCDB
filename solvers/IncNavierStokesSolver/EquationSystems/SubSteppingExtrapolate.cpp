@@ -33,8 +33,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include <IncNavierStokesSolver/EquationSystems/SubSteppingExtrapolate.h>
-
-#include <LibUtilities/Communication/Comm.h>
+#include <MultiRegions/DisContField.h>
 
 namespace Nektar
 {
@@ -75,10 +74,10 @@ SubSteppingExtrapolate::~SubSteppingExtrapolate()
 }
 
 void SubSteppingExtrapolate::v_EvaluatePressureBCs(
-    const Array<OneD, const Array<OneD, NekDouble>> &fields,
-    const Array<OneD, const Array<OneD, NekDouble>> &N, NekDouble kinvis)
+    [[maybe_unused]] const Array<OneD, const Array<OneD, NekDouble>> &fields,
+    [[maybe_unused]] const Array<OneD, const Array<OneD, NekDouble>> &N,
+    [[maybe_unused]] NekDouble kinvis)
 {
-    boost::ignore_unused(fields, N, kinvis);
     ASSERTL0(false, "This method should not be called by Substepping routine");
 }
 
@@ -214,9 +213,9 @@ void SubSteppingExtrapolate::SubStepAdvection(
  */
 void SubSteppingExtrapolate::SubStepProjection(
     const Array<OneD, const Array<OneD, NekDouble>> &inarray,
-    Array<OneD, Array<OneD, NekDouble>> &outarray, const NekDouble time)
+    Array<OneD, Array<OneD, NekDouble>> &outarray,
+    [[maybe_unused]] const NekDouble time)
 {
-    boost::ignore_unused(time);
     ASSERTL1(inarray.size() == outarray.size(),
              "Inarray and outarray of different sizes ");
 
@@ -231,18 +230,16 @@ void SubSteppingExtrapolate::SubStepProjection(
  */
 void SubSteppingExtrapolate::v_SubStepSetPressureBCs(
     const Array<OneD, const Array<OneD, NekDouble>> &inarray,
-    const NekDouble Aii_Dt, NekDouble kinvis)
+    [[maybe_unused]] const NekDouble Aii_Dt, NekDouble kinvis)
 {
-    boost::ignore_unused(Aii_Dt);
-
     // int nConvectiveFields =m_fields.size()-1;
     Array<OneD, Array<OneD, NekDouble>> nullvelfields;
 
     m_pressureCalls++;
 
-    // Calculate non-linear and viscous BCs at current level and
+    // Calculate viscous BCs at current level and
     // put in m_pressureHBCs[0]
-    CalcNeumannPressureBCs(inarray, nullvelfields, kinvis);
+    CalcNeumannPressureBCs(m_previousVelFields, nullvelfields, kinvis);
 
     // Extrapolate to m_pressureHBCs to n+1
     ExtrapolateArray(m_pressureHBCs);
@@ -255,6 +252,40 @@ void SubSteppingExtrapolate::v_SubStepSetPressureBCs(
 
     // Evaluate High order outflow conditiosn if required.
     CalcOutflowBCs(inarray, kinvis);
+}
+
+/**
+ *    At the start, the newest value is stored in array[nlevels-1]
+ *        and the previous values in the first positions
+ *    At the end, the acceleration from BDF is stored in array[nlevels-1]
+ *        and the storage has been updated to included the new value
+ */
+void SubSteppingExtrapolate::v_AccelerationBDF(
+    Array<OneD, Array<OneD, NekDouble>> &array)
+{
+    int nlevels = array.size();
+    int nPts    = array[0].size();
+
+    if (nPts)
+    {
+        // Update array
+        RollOver(array);
+
+        // Calculate acceleration using Backward Differentiation Formula
+        Array<OneD, NekDouble> accelerationTerm(nPts, 0.0);
+
+        int acc_order = std::min(m_pressureCalls, m_intSteps);
+        Vmath::Smul(nPts, StifflyStable_Gamma0_Coeffs[acc_order - 1], array[0],
+                    1, accelerationTerm, 1);
+
+        for (int i = 0; i < acc_order; i++)
+        {
+            Vmath::Svtvp(
+                nPts, -1 * StifflyStable_Alpha_Coeffs[acc_order - 1][i],
+                array[i + 1], 1, accelerationTerm, 1, accelerationTerm, 1);
+        }
+        array[nlevels - 1] = accelerationTerm;
+    }
 }
 
 /**
@@ -442,8 +473,14 @@ void SubSteppingExtrapolate::AddAdvectionPenaltyFlux(
     for (i = 0; i < physfield.size(); ++i)
     {
         /// Extract forwards/backwards trace spaces
-        /// Note: Needs to have correct i value to get boundary conditions
-        m_fields[i]->GetFwdBwdTracePhys(physfield[i], Fwd, Bwd);
+        /// Note it is important to use the zeroth field but with the
+        /// specialised method to use boudnary conditions from other
+        /// fields since trace spaces may not be the same if there are
+        /// mixed boundary conditions
+        std::dynamic_pointer_cast<MultiRegions::DisContField>(m_fields[0])
+            ->GetFwdBwdTracePhys(physfield[i], Fwd, Bwd,
+                                 m_fields[i]->GetBndConditions(),
+                                 m_fields[i]->GetBndCondExpansions());
 
         /// Upwind between elements
         m_fields[0]->GetTrace()->Upwind(Vn, Fwd, Bwd, numflux);
@@ -507,10 +544,8 @@ void SubSteppingExtrapolate::SubStepExtrapolateField(
  */
 void SubSteppingExtrapolate::v_MountHOPBCs(
     int HBCdata, NekDouble kinvis, Array<OneD, NekDouble> &Q,
-    Array<OneD, const NekDouble> &Advection)
+    [[maybe_unused]] Array<OneD, const NekDouble> &Advection)
 {
-    boost::ignore_unused(Advection);
-
     Vmath::Smul(HBCdata, -kinvis, Q, 1, Q, 1);
 }
 

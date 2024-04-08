@@ -40,9 +40,7 @@
 #include <memory>
 #include <vector>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 class BLPoints;
@@ -75,7 +73,6 @@ typedef Points<NekDouble> PointsBaseType;
 typedef std::shared_ptr<Points<NekDouble>> PointsSharedPtr;
 typedef size_t GraphVertexID;
 
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities
 
 #endif // FOUNDATIONS_FWD_H

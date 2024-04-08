@@ -59,8 +59,7 @@ PreconCfsBRJ::PreconCfsBRJ(
     pSession->LoadParameter("PreconItsStep", m_PreconItsStep, 7);
     pSession->LoadParameter("BRJRelaxParam", m_BRJRelaxParam, 1.0);
 
-    size_t nvariables  = pFields.size();
-    m_PreconMatStorage = eDiagonal;
+    size_t nvariables = pFields.size();
 
     m_PreconMatVarsSingle =
         Array<OneD, Array<OneD, SNekBlkMatSharedPtr>>(nvariables);
@@ -86,12 +85,10 @@ void PreconCfsBRJ::v_InitObject()
 void PreconCfsBRJ::v_DoPreconCfs(
     const Array<OneD, MultiRegions::ExpListSharedPtr> &pFields,
     const Array<OneD, NekDouble> &inarray, Array<OneD, NekDouble> &outarray,
-    const bool &flag)
+    [[maybe_unused]] const bool &flag)
 {
-    boost::ignore_unused(flag);
-
     size_t nBRJIterTot = m_PreconItsStep;
-    if (0 == nBRJIterTot)
+    if (nBRJIterTot == 0)
     {
         DoNullPrecon(inarray, outarray, flag);
     }
@@ -152,8 +149,6 @@ void PreconCfsBRJ::v_DoPreconCfs(
             BwdFluxDeriv[j] = Array<OneD, NekDouble>(nTracePts);
         }
 
-        bool flagUpdateDervFlux = false;
-
         const size_t nwspTraceDataType = nvariables + 1;
         Array<OneD, Array<OneD, NekSingle>> wspTraceDataType(nwspTraceDataType);
         for (size_t m = 0; m < nwspTraceDataType; m++)
@@ -172,11 +167,8 @@ void PreconCfsBRJ::v_DoPreconCfs(
             Vmath::Smul(ntotpnt, OmBRJParam, outarray, 1, outN, 1);
 
             timer.Start();
-            MinusOffDiag2Rhs(
-                pFields, nvariables, npoints, rhs2d, out_2d, flagUpdateDervFlux,
-                FwdFluxDeriv, BwdFluxDeriv, qfield, tmpTrace, wspTraceDataType,
-                m_TraceJacArraySingle, m_TraceJacDerivArraySingle,
-                m_TraceJacDerivSignSingle, m_TraceIPSymJacArraySingle);
+            MinusOffDiag2Rhs(pFields, nvariables, npoints, rhs2d, out_2d,
+                             tmpTrace, wspTraceDataType, m_TraceJacArraySingle);
             timer.Stop();
             timer.AccumulateRegion("PreconCfsBRJ::MinusOffDiag2Rhs", 2);
 
@@ -194,13 +186,11 @@ void PreconCfsBRJ::v_DoPreconCfs(
  *
  */
 void PreconCfsBRJ::v_BuildPreconCfs(
-    const Array<OneD, MultiRegions::ExpListSharedPtr> &pFields,
+    [[maybe_unused]] const Array<OneD, MultiRegions::ExpListSharedPtr> &pFields,
     const Array<OneD, const Array<OneD, NekDouble>> &intmp,
-    const NekDouble time, const NekDouble lambda)
+    [[maybe_unused]] const NekDouble time, const NekDouble lambda)
 {
-    boost::ignore_unused(pFields);
-
-    if (0 < m_PreconItsStep)
+    if (m_PreconItsStep > 0)
     {
         SNekBlkMatSharedPtr PreconMatSingle;
         using vec_t    = simd<NekSingle>;
@@ -274,9 +264,7 @@ void PreconCfsBRJ::v_BuildPreconCfs(
         }
     }
 
-    m_BndEvaluateTime   = time;
-    m_DtLambdaPreconMat = lambda;
-
+    m_DtLambdaPreconMat  = lambda;
     m_CalcPreconMatFlag  = false;
     m_PreconTimesCounter = 1;
 }
@@ -285,22 +273,11 @@ void PreconCfsBRJ::v_BuildPreconCfs(
  *
  */
 bool PreconCfsBRJ::v_UpdatePreconMatCheck(
-    const Array<OneD, const NekDouble> &res, const NekDouble dtLambda)
+    [[maybe_unused]] const Array<OneD, const NekDouble> &res,
+    const NekDouble dtLambda)
 {
-    boost::ignore_unused(res);
-
-    bool flag = false;
-
-    if (m_CalcPreconMatFlag || (m_DtLambdaPreconMat != dtLambda))
-    {
-        flag = true;
-    }
-
-    if (m_PreconMatFreezNumb < m_PreconTimesCounter)
-    {
-        flag = true;
-    }
-
+    bool flag = (m_CalcPreconMatFlag || m_DtLambdaPreconMat != dtLambda ||
+                 m_PreconMatFreezNumb < m_PreconTimesCounter);
     m_CalcPreconMatFlag = flag;
     return flag;
 }
@@ -310,9 +287,8 @@ bool PreconCfsBRJ::v_UpdatePreconMatCheck(
  */
 void PreconCfsBRJ::DoNullPrecon(const Array<OneD, NekDouble> &pInput,
                                 Array<OneD, NekDouble> &pOutput,
-                                const bool &flag)
+                                [[maybe_unused]] const bool &flag)
 {
-    boost::ignore_unused(flag);
     Vmath::Vcopy(pInput.size(), pInput, 1, pOutput, 1);
 }
 
@@ -333,7 +309,6 @@ void PreconCfsBRJ::PreconBlkDiag(
     // vectorized matrix multiply
     std::vector<vec_t, tinysimd::allocator<vec_t>> Sinarray(m_max_nblocks);
     std::vector<vec_t, tinysimd::allocator<vec_t>> Soutarray(m_max_nElmtDof);
-    // std::vector<vec_t, tinysimd::allocator<vec_t>> tmp;
 
     alignas(vec_t::alignment) std::array<NekSingle, vec_t::width> tmp;
 
@@ -403,20 +378,11 @@ void PreconCfsBRJ::MinusOffDiag2Rhs(
     const Array<OneD, MultiRegions::ExpListSharedPtr> &pFields,
     const size_t nvariables, const size_t nCoeffs,
     const Array<OneD, const Array<OneD, NekDouble>> &inarray,
-    Array<OneD, Array<OneD, NekDouble>> &outarray, bool flagUpdateDervFlux,
-    Array<OneD, Array<OneD, NekDouble>> &FwdFluxDeriv,
-    Array<OneD, Array<OneD, NekDouble>> &BwdFluxDeriv,
-    TensorOfArray3D<NekDouble> &qfield, TensorOfArray3D<NekDouble> &wspTrace,
+    Array<OneD, Array<OneD, NekDouble>> &outarray,
+    TensorOfArray3D<NekDouble> &wspTrace,
     Array<OneD, Array<OneD, DataType>> &wspTraceDataType,
-    const TensorOfArray4D<DataType> &TraceJacArray,
-    const TensorOfArray4D<DataType> &TraceJacDerivArray,
-    const Array<OneD, const Array<OneD, DataType>> &TraceJacDerivSign,
-    const TensorOfArray5D<DataType> &TraceIPSymJacArray)
+    const TensorOfArray4D<DataType> &TraceJacArray)
 {
-    boost::ignore_unused(flagUpdateDervFlux, qfield, TraceJacDerivArray,
-                         TraceJacDerivSign, FwdFluxDeriv, BwdFluxDeriv,
-                         TraceIPSymJacArray);
-
     size_t nTracePts = pFields[0]->GetTrace()->GetNpoints();
     size_t npoints   = pFields[0]->GetNpoints();
     size_t nDim      = m_spacedim;

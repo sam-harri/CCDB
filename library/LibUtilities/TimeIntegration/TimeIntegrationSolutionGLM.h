@@ -40,9 +40,7 @@
 
 #include <LibUtilities/TimeIntegration/TimeIntegrationAlgorithmGLM.h>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 class TimeIntegrationSolutionGLM
@@ -354,7 +352,6 @@ private:
 
 }; // end class TimeIntegrationSolutionGLM
 
-} // end of namespace LibUtilities
-} // end of namespace Nektar
+} // namespace Nektar::LibUtilities
 
 #endif

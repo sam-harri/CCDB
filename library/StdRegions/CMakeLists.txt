@@ -25,7 +25,6 @@ StdExpansion2D.h
 StdExpansion3D.h
 StdExpansion.h
 StdHexExp.h
-StdLinSysKey.hpp
 StdMatrixKey.h
 StdNodalPrismExp.h
 StdNodalTetExp.h

@@ -32,8 +32,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include "ExtrapOrder0BC.h"
 
 using namespace std;
@@ -50,17 +48,17 @@ ExtrapOrder0BC::ExtrapOrder0BC(
     const LibUtilities::SessionReaderSharedPtr &pSession,
     const Array<OneD, MultiRegions::ExpListSharedPtr> &pFields,
     const Array<OneD, Array<OneD, NekDouble>> &pTraceNormals,
+    const Array<OneD, Array<OneD, NekDouble>> &pGridVelocity,
     const int pSpaceDim, const int bcRegion, const int cnt)
-    : CFSBndCond(pSession, pFields, pTraceNormals, pSpaceDim, bcRegion, cnt)
+    : CFSBndCond(pSession, pFields, pTraceNormals, pGridVelocity, pSpaceDim,
+                 bcRegion, cnt)
 {
 }
 
 void ExtrapOrder0BC::v_Apply(Array<OneD, Array<OneD, NekDouble>> &Fwd,
                              Array<OneD, Array<OneD, NekDouble>> &physarray,
-                             const NekDouble &time)
+                             [[maybe_unused]] const NekDouble &time)
 {
-    boost::ignore_unused(time);
-
     int i, j;
     int e, pnt;
     int id1, id2, nBCEdgePts;

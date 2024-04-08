@@ -36,8 +36,6 @@
 #ifndef NEKTAR_LIB_UTILITIES_BASIC_UTILS_CONSISTENT_ACCESS_OBJECT_HPP
 #define NEKTAR_LIB_UTILITIES_BASIC_UTILS_CONSISTENT_ACCESS_OBJECT_HPP
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/BasicUtils/ErrorUtil.hpp>
 #include <memory>
 
@@ -62,9 +60,8 @@ template <typename DataType> struct ConsistentObjectAccess
         return &o;
     }
 
-    static bool ReferencesObject(const DataType &o)
+    static bool ReferencesObject([[maybe_unused]] const DataType &o)
     {
-        boost::ignore_unused(o);
         return true;
     }
 };
@@ -73,7 +70,7 @@ template <typename DataType> struct ConsistentObjectAccess<DataType *>
 {
     static const DataType &const_reference(DataType *o)
     {
-        ASSERTL1(o != 0, "Can't dereference null pointer.");
+        ASSERTL1(o != nullptr, "Can't dereference null pointer.");
         return *o;
     }
     static const DataType *const_pointer(DataType *o)
@@ -82,12 +79,12 @@ template <typename DataType> struct ConsistentObjectAccess<DataType *>
     }
     static bool ReferencesObject(DataType *o)
     {
-        return o != 0;
+        return o != nullptr;
     }
 
     static DataType &reference(DataType *o)
     {
-        ASSERTL1(o != 0, "Can't dereference null pointer.");
+        ASSERTL1(o != nullptr, "Can't dereference null pointer.");
         return *o;
     }
     static DataType *pointer(DataType *o)

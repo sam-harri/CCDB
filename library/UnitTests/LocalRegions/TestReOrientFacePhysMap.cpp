@@ -38,9 +38,7 @@
 #include <StdRegions/StdRegions.hpp>
 #include <boost/test/unit_test.hpp>
 
-namespace Nektar
-{
-namespace Expansion3DTests
+namespace Nektar::Expansion3DTests
 {
 
 SpatialDomains::SegGeomSharedPtr CreateSegGeom(
@@ -251,5 +249,4 @@ BOOST_AUTO_TEST_CASE(TestReOrientQuadFacePhysMap)
     BOOST_CHECK_EQUAL(idmap[8], 0);
 }
 
-} // namespace Expansion3DTests
-} // namespace Nektar
+} // namespace Nektar::Expansion3DTests

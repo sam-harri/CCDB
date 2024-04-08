@@ -37,9 +37,7 @@
 
 #include <NekMesh/Module/Module.h>
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 /**
@@ -49,8 +47,8 @@ class InputSem : public NekMesh::InputModule
 {
 public:
     InputSem(NekMesh::MeshSharedPtr m);
-    virtual ~InputSem();
-    virtual void Process();
+    ~InputSem() override;
+    void Process() override;
 
     /// Creates an instance of this class
     static NekMesh::ModuleSharedPtr create(NekMesh::MeshSharedPtr m)
@@ -60,7 +58,7 @@ public:
     /// %ModuleKey for class.
     static NekMesh::ModuleKey className;
 
-    virtual std::string GetModuleName()
+    std::string GetModuleName() override
     {
         return "InputSem";
     }
@@ -72,7 +70,6 @@ private:
     /// Maps Semtex sections to positions inside the input file.
     std::map<std::string, std::streampos> sectionMap;
 };
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh
 
 #endif

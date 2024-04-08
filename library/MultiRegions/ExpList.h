@@ -35,8 +35,6 @@
 #ifndef NEKTAR_LIBS_MULTIREGIONS_EXPLIST_H
 #define NEKTAR_LIBS_MULTIREGIONS_EXPLIST_H
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <Collections/Collection.h>
 #include <LibUtilities/BasicUtils/SessionReader.h>
 #include <LibUtilities/Communication/Comm.h>
@@ -53,9 +51,7 @@
 #include <SpatialDomains/Movement/Movement.h>
 #include <tinyxml.h>
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 
 // Forward declarations
@@ -391,6 +387,10 @@ public:
     {
         v_Reset();
     }
+
+    /// Reset matrices
+    MULTI_REGIONS_EXPORT void ResetMatrices();
+
     // not sure we really need these in ExpList
     void WriteTecplotHeader(std::ostream &outfile, std::string var = "")
     {
@@ -749,10 +749,6 @@ public:
     inline void PhysDeriv(const int dir,
                           const Array<OneD, const NekDouble> &inarray,
                           Array<OneD, NekDouble> &out_d);
-
-    inline void Curl(Array<OneD, Array<OneD, NekDouble>> &Vel,
-                     Array<OneD, Array<OneD, NekDouble>> &Q);
-
     inline void CurlCurl(Array<OneD, Array<OneD, NekDouble>> &Vel,
                          Array<OneD, Array<OneD, NekDouble>> &Q);
     inline void PhysDirectionalDeriv(
@@ -763,8 +759,8 @@ public:
                                 const Array<OneD, const NekDouble> &CircCentre,
                                 Array<OneD, Array<OneD, NekDouble>> &outarray);
     // functions associated with DisContField
-    inline const Array<OneD, const std::shared_ptr<ExpList>>
-        &GetBndCondExpansions();
+    inline const Array<OneD, const std::shared_ptr<ExpList>> &
+    GetBndCondExpansions();
     /// Get the weight value for boundary conditions
     inline const Array<OneD, const NekDouble> &GetBndCondBwdWeight();
     /// Set the weight value for boundary conditions
@@ -834,10 +830,10 @@ public:
     inline void ExtractTracePhys(Array<OneD, NekDouble> &outarray);
     inline void ExtractTracePhys(const Array<OneD, const NekDouble> &inarray,
                                  Array<OneD, NekDouble> &outarray);
-    inline const Array<OneD, const SpatialDomains::BoundaryConditionShPtr>
-        &GetBndConditions();
-    inline Array<OneD, SpatialDomains::BoundaryConditionShPtr>
-        &UpdateBndConditions();
+    inline const Array<OneD, const SpatialDomains::BoundaryConditionShPtr> &
+    GetBndConditions();
+    inline Array<OneD, SpatialDomains::BoundaryConditionShPtr> &
+    UpdateBndConditions();
     inline void EvaluateBoundaryConditions(
         const NekDouble time = 0.0, const std::string varName = "",
         const NekDouble = NekConstants::kNekUnsetDouble,
@@ -990,12 +986,13 @@ public:
 
     MULTI_REGIONS_EXPORT void UnsetGlobalLinSys(GlobalLinSysKey, bool);
 
-    MULTI_REGIONS_EXPORT LibUtilities::NekManager<GlobalLinSysKey, GlobalLinSys>
-        &GetGlobalLinSysManager(void);
+    MULTI_REGIONS_EXPORT LibUtilities::NekManager<GlobalLinSysKey,
+                                                  GlobalLinSys> &
+    GetGlobalLinSysManager(void);
 
     /// Get m_coeffs to elemental value map
-    MULTI_REGIONS_EXPORT inline const Array<OneD, const std::pair<int, int>>
-        &GetCoeffsToElmt() const;
+    MULTI_REGIONS_EXPORT inline const Array<OneD, const std::pair<int, int>> &
+    GetCoeffsToElmt() const;
     MULTI_REGIONS_EXPORT void AddTraceJacToElmtJac(
         const Array<OneD, const DNekMatSharedPtr> &FwdMat,
         const Array<OneD, const DNekMatSharedPtr> &BwdMat,
@@ -1030,8 +1027,8 @@ public:
     MULTI_REGIONS_EXPORT std::vector<bool> &GetLeftAdjacentTraces(void);
 
     /// This function returns the map of index inside m_exp to geom id
-    MULTI_REGIONS_EXPORT inline const std::unordered_map<int, int>
-        &GetElmtToExpId(void)
+    MULTI_REGIONS_EXPORT inline const std::unordered_map<int, int> &GetElmtToExpId(
+        void)
     {
         return m_elmtToExpId;
     }
@@ -1048,7 +1045,7 @@ public:
     }
 
 protected:
-    /// Exapnsion type
+    /// Expansion type
     ExpansionType m_expType;
     std::shared_ptr<DNekMat> GenGlobalMatrixFull(
         const GlobalLinSysKey &mkey,
@@ -1121,10 +1118,6 @@ protected:
     /// Vector of bools to act as an initialise on first call flag
     std::vector<bool> m_collectionsDoInit;
     /// Offset of elemental data into the array #m_coeffs
-    std::vector<int> m_coll_coeff_offset;
-    /// Offset of elemental data into the array #m_phys
-    std::vector<int> m_coll_phys_offset;
-    /// Offset of elemental data into the array #m_coeffs
     Array<OneD, int> m_coeff_offset;
     /// Offset of elemental data into the array #m_phys
     Array<OneD, int> m_phys_offset;
@@ -1168,8 +1161,8 @@ protected:
     {
         return (*m_exp).size();
     }
-    virtual const Array<OneD, const std::shared_ptr<ExpList>>
-        &v_GetBndCondExpansions(void);
+    virtual const Array<OneD, const std::shared_ptr<ExpList>> &
+    v_GetBndCondExpansions(void);
     virtual const Array<OneD, const NekDouble> &v_GetBndCondBwdWeight();
     virtual void v_SetBndCondBwdWeight(const int index, const NekDouble value);
     virtual std::shared_ptr<ExpList> &v_UpdateBndCondExpansion(int i);
@@ -1432,8 +1425,8 @@ protected:
 
     virtual void v_UnsetGlobalLinSys(GlobalLinSysKey, bool);
 
-    virtual LibUtilities::NekManager<GlobalLinSysKey, GlobalLinSys>
-        &v_GetGlobalLinSysManager(void);
+    virtual LibUtilities::NekManager<GlobalLinSysKey, GlobalLinSys> &
+    v_GetGlobalLinSysManager(void);
 
     void ExtractFileBCs(const std::string &fileName,
                         LibUtilities::CommSharedPtr comm,
@@ -1447,11 +1440,11 @@ protected:
         const SpatialDomains::BoundaryConditionCollection &collection,
         unsigned int index, const std::string &variable);
 
-    virtual const Array<OneD, const SpatialDomains::BoundaryConditionShPtr>
-        &v_GetBndConditions();
+    virtual const Array<OneD, const SpatialDomains::BoundaryConditionShPtr> &
+    v_GetBndConditions();
 
-    virtual Array<OneD, SpatialDomains::BoundaryConditionShPtr>
-        &v_UpdateBndConditions();
+    virtual Array<OneD, SpatialDomains::BoundaryConditionShPtr> &
+    v_UpdateBndConditions();
 
     virtual void v_EvaluateBoundaryConditions(
         const NekDouble time = 0.0, const std::string varName = "",
@@ -1473,9 +1466,9 @@ protected:
     }
 
     // wrapper function to set viscosity for Homo1D expansion
-    virtual void v_SetHomo1DSpecVanVisc(Array<OneD, NekDouble> visc)
+    virtual void v_SetHomo1DSpecVanVisc(
+        [[maybe_unused]] Array<OneD, NekDouble> visc)
     {
-        boost::ignore_unused(visc);
         NEKERROR(ErrorUtil::efatal,
                  "This method is not defined or valid for this class type");
     }
@@ -1502,7 +1495,7 @@ private:
 static ExpList NullExpList;
 static ExpListSharedPtr NullExpListSharedPtr;
 
-// An empty GlobaLinSysManager and GlobalLinSysKey object
+// An empty GlobaLinSysManager object
 static LibUtilities::NekManager<GlobalLinSysKey, GlobalLinSys>
     NullGlobalLinSysManager;
 static GlobalLinSysKey NullGlobalLinSysKey(StdRegions::eNoMatrixType);
@@ -1833,14 +1826,6 @@ inline void ExpList::PhysDirectionalDeriv(
 /**
  *
  */
-inline void ExpList::Curl(Array<OneD, Array<OneD, NekDouble>> &Vel,
-                          Array<OneD, Array<OneD, NekDouble>> &Q)
-{
-    v_Curl(Vel, Q);
-}
-/**
- *
- */
 inline void ExpList::CurlCurl(Array<OneD, Array<OneD, NekDouble>> &Vel,
                               Array<OneD, Array<OneD, NekDouble>> &Q)
 {
@@ -2076,7 +2061,6 @@ inline LocalRegions::ExpansionSharedPtr &ExpList::GetExpFromGeomId(int n)
                                             "expansion ID map.")
     return (*m_exp)[it->second];
 }
-
 /**
  * @return  (A const shared pointer to) the local expansion vector #m_exp
  */
@@ -2121,14 +2105,14 @@ inline Array<OneD, NekDouble> &ExpList::UpdatePhys()
     return m_phys;
 }
 // functions associated with DisContField
-inline const Array<OneD, const std::shared_ptr<ExpList>>
-    &ExpList::GetBndCondExpansions()
+inline const Array<OneD, const std::shared_ptr<ExpList>> &ExpList::
+    GetBndCondExpansions()
 {
     return v_GetBndCondExpansions();
 }
 /// Get m_coeffs to elemental value map
-MULTI_REGIONS_EXPORT inline const Array<OneD, const std::pair<int, int>>
-    &ExpList::GetCoeffsToElmt() const
+MULTI_REGIONS_EXPORT inline const Array<OneD, const std::pair<int, int>> &ExpList::
+    GetCoeffsToElmt() const
 {
     return m_coeffsToElmt;
 }
@@ -2246,13 +2230,13 @@ inline void ExpList::ExtractTracePhys(
 {
     v_ExtractTracePhys(inarray, outarray);
 }
-inline const Array<OneD, const SpatialDomains::BoundaryConditionShPtr>
-    &ExpList::GetBndConditions()
+inline const Array<OneD, const SpatialDomains::BoundaryConditionShPtr> &ExpList::
+    GetBndConditions()
 {
     return v_GetBndConditions();
 }
-inline Array<OneD, SpatialDomains::BoundaryConditionShPtr>
-    &ExpList::UpdateBndConditions()
+inline Array<OneD, SpatialDomains::BoundaryConditionShPtr> &ExpList::
+    UpdateBndConditions()
 {
     return v_UpdateBndConditions();
 }
@@ -2313,7 +2297,6 @@ inline std::vector<bool> &ExpList::GetLeftAdjacentTraces(void)
 
 const static Array<OneD, ExpListSharedPtr> NullExpListSharedPtrArray;
 
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions
 
 #endif // EXPLIST_H

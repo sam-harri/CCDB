@@ -43,11 +43,11 @@
 
 #define LUE LIB_UTILITIES_EXPORT
 
+#include <boost/core/ignore_unused.hpp>
+
 #include <LibUtilities/TimeIntegration/TimeIntegrationSchemeGLM.h>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -80,7 +80,7 @@ public:
             m_integration_phases[0], variant, order, freeParams);
     }
 
-    virtual ~RungeKuttaTimeIntegrationScheme()
+    ~RungeKuttaTimeIntegrationScheme() override
     {
     }
 
@@ -96,12 +96,10 @@ public:
 
     static std::string className;
 
-    LUE static void SetupSchemeData(TimeIntegrationAlgorithmGLMSharedPtr &phase,
-                                    std::string variant, size_t order,
-                                    std::vector<NekDouble> freeParams)
+    LUE static void SetupSchemeData(
+        TimeIntegrationAlgorithmGLMSharedPtr &phase, std::string variant,
+        size_t order, [[maybe_unused]] std::vector<NekDouble> freeParams)
     {
-        boost::ignore_unused(freeParams);
-
         constexpr size_t nStages[6] = {0, 1, 2, 3, 4, 6};
 
         // A Coefficients for the lower diagonal quadrant stored in a
@@ -276,12 +274,12 @@ public:
     }
 
 protected:
-    LUE virtual std::string v_GetName() const override
+    LUE std::string v_GetName() const override
     {
         return std::string("RungeKutta");
     }
 
-    LUE virtual NekDouble v_GetTimeStability() const override
+    LUE NekDouble v_GetTimeStability() const override
     {
         if (GetOrder() == 1 || GetOrder() == 2)
         {
@@ -317,16 +315,13 @@ public:
                                      std::vector<NekDouble> freeParams)
         : RungeKuttaTimeIntegrationScheme("", 1, freeParams)
     {
-        boost::ignore_unused(variant);
-        boost::ignore_unused(order);
+        boost::ignore_unused(variant, order);
     }
 
     static TimeIntegrationSchemeSharedPtr create(
-        std::string variant, size_t order, std::vector<NekDouble> freeParams)
+        [[maybe_unused]] std::string variant, [[maybe_unused]] size_t order,
+        std::vector<NekDouble> freeParams)
     {
-        boost::ignore_unused(variant);
-        boost::ignore_unused(order);
-
         TimeIntegrationSchemeSharedPtr p =
             MemoryManager<RungeKuttaTimeIntegrationScheme>::AllocateSharedPtr(
                 "", 1, freeParams);
@@ -347,16 +342,13 @@ public:
                                      std::vector<NekDouble> freeParams)
         : RungeKuttaTimeIntegrationScheme("", 2, freeParams)
     {
-        boost::ignore_unused(variant);
-        boost::ignore_unused(order);
+        boost::ignore_unused(variant, order);
     }
 
     static TimeIntegrationSchemeSharedPtr create(
-        std::string variant, size_t order, std::vector<NekDouble> freeParams)
+        [[maybe_unused]] std::string variant, [[maybe_unused]] size_t order,
+        std::vector<NekDouble> freeParams)
     {
-        boost::ignore_unused(variant);
-        boost::ignore_unused(order);
-
         TimeIntegrationSchemeSharedPtr p =
             MemoryManager<RungeKuttaTimeIntegrationScheme>::AllocateSharedPtr(
                 "", 2, freeParams);
@@ -377,16 +369,13 @@ public:
                                      std::vector<NekDouble> freeParams)
         : RungeKuttaTimeIntegrationScheme("", 3, freeParams)
     {
-        boost::ignore_unused(variant);
-        boost::ignore_unused(order);
+        boost::ignore_unused(variant, order);
     }
 
     static TimeIntegrationSchemeSharedPtr create(
-        std::string variant, size_t order, std::vector<NekDouble> freeParams)
+        [[maybe_unused]] std::string variant, [[maybe_unused]] size_t order,
+        std::vector<NekDouble> freeParams)
     {
-        boost::ignore_unused(variant);
-        boost::ignore_unused(order);
-
         TimeIntegrationSchemeSharedPtr p =
             MemoryManager<RungeKuttaTimeIntegrationScheme>::AllocateSharedPtr(
                 "", 3, freeParams);
@@ -408,16 +397,13 @@ public:
                                               std::vector<NekDouble> freeParams)
         : RungeKuttaTimeIntegrationScheme("", 4, freeParams)
     {
-        boost::ignore_unused(variant);
-        boost::ignore_unused(order);
+        boost::ignore_unused(variant, order);
     }
 
     static TimeIntegrationSchemeSharedPtr create(
-        std::string variant, size_t order, std::vector<NekDouble> freeParams)
+        [[maybe_unused]] std::string variant, [[maybe_unused]] size_t order,
+        std::vector<NekDouble> freeParams)
     {
-        boost::ignore_unused(variant);
-        boost::ignore_unused(order);
-
         TimeIntegrationSchemeSharedPtr p =
             MemoryManager<RungeKuttaTimeIntegrationScheme>::AllocateSharedPtr(
                 "", 4, freeParams);
@@ -455,16 +441,13 @@ public:
                                      std::vector<NekDouble> freeParams)
         : RungeKuttaTimeIntegrationScheme("", 5, freeParams)
     {
-        boost::ignore_unused(variant);
-        boost::ignore_unused(order);
+        boost::ignore_unused(variant, order);
     }
 
     static TimeIntegrationSchemeSharedPtr create(
-        std::string variant, size_t order, std::vector<NekDouble> freeParams)
+        [[maybe_unused]] std::string variant, [[maybe_unused]] size_t order,
+        std::vector<NekDouble> freeParams)
     {
-        boost::ignore_unused(variant);
-        boost::ignore_unused(order);
-
         TimeIntegrationSchemeSharedPtr p =
             MemoryManager<RungeKuttaTimeIntegrationScheme>::AllocateSharedPtr(
                 "", 5, freeParams);
@@ -486,16 +469,13 @@ public:
         std::string variant, size_t order, std::vector<NekDouble> freeParams)
         : RungeKuttaTimeIntegrationScheme("SSP", 2, freeParams)
     {
-        boost::ignore_unused(variant);
-        boost::ignore_unused(order);
+        boost::ignore_unused(variant, order);
     }
 
     static TimeIntegrationSchemeSharedPtr create(
-        std::string variant, size_t order, std::vector<NekDouble> freeParams)
+        [[maybe_unused]] std::string variant, [[maybe_unused]] size_t order,
+        std::vector<NekDouble> freeParams)
     {
-        boost::ignore_unused(variant);
-        boost::ignore_unused(order);
-
         TimeIntegrationSchemeSharedPtr p =
             MemoryManager<RungeKuttaTimeIntegrationScheme>::AllocateSharedPtr(
                 "SSP", 2, freeParams);
@@ -517,16 +497,13 @@ public:
                                          std::vector<NekDouble> freeParams)
         : RungeKuttaTimeIntegrationScheme("SSP", 2, freeParams)
     {
-        boost::ignore_unused(variant);
-        boost::ignore_unused(order);
+        boost::ignore_unused(variant, order);
     }
 
     static TimeIntegrationSchemeSharedPtr create(
-        std::string variant, size_t order, std::vector<NekDouble> freeParams)
+        [[maybe_unused]] std::string variant, [[maybe_unused]] size_t order,
+        std::vector<NekDouble> freeParams)
     {
-        boost::ignore_unused(variant);
-        boost::ignore_unused(order);
-
         TimeIntegrationSchemeSharedPtr p =
             MemoryManager<RungeKuttaTimeIntegrationScheme>::AllocateSharedPtr(
                 "SSP", 2, freeParams);
@@ -548,16 +525,13 @@ public:
                                          std::vector<NekDouble> freeParams)
         : RungeKuttaTimeIntegrationScheme("SSP", 3, freeParams)
     {
-        boost::ignore_unused(variant);
-        boost::ignore_unused(order);
+        boost::ignore_unused(variant, order);
     }
 
     static TimeIntegrationSchemeSharedPtr create(
-        std::string variant, size_t order, std::vector<NekDouble> freeParams)
+        [[maybe_unused]] std::string variant, [[maybe_unused]] size_t order,
+        std::vector<NekDouble> freeParams)
     {
-        boost::ignore_unused(variant);
-        boost::ignore_unused(order);
-
         TimeIntegrationSchemeSharedPtr p =
             MemoryManager<RungeKuttaTimeIntegrationScheme>::AllocateSharedPtr(
                 "SSP", 3, freeParams);
@@ -571,7 +545,6 @@ protected:
 
 }; // end class RungeKutta3_SSPTimeIntegrationScheme
 
-} // end namespace LibUtilities
-} // end namespace Nektar
+} // namespace Nektar::LibUtilities
 
 #endif

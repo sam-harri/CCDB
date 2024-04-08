@@ -32,15 +32,11 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <SolverUtils/Filters/FilterThresholdMin.h>
 
 using namespace std;
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 
 std::string FilterThresholdMin::className =
@@ -52,7 +48,7 @@ std::string FilterThresholdMin::className =
  */
 FilterThresholdMin::FilterThresholdMin(
     const LibUtilities::SessionReaderSharedPtr &pSession,
-    const std::weak_ptr<EquationSystem> &pEquation, const ParamMap &pParams)
+    const std::shared_ptr<EquationSystem> &pEquation, const ParamMap &pParams)
     : Filter(pSession, pEquation)
 {
     // ThresholdValue
@@ -113,10 +109,8 @@ FilterThresholdMin::~FilterThresholdMin()
  */
 void FilterThresholdMin::v_Initialise(
     const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
-    const NekDouble &time)
+    [[maybe_unused]] const NekDouble &time)
 {
-    boost::ignore_unused(time);
-
     m_threshold = Array<OneD, NekDouble>(pFields[m_thresholdVar]->GetNpoints(),
                                          m_initialValue);
 }
@@ -152,10 +146,8 @@ void FilterThresholdMin::v_Update(
  */
 void FilterThresholdMin::v_Finalise(
     const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
-    const NekDouble &time)
+    [[maybe_unused]] const NekDouble &time)
 {
-    boost::ignore_unused(time);
-
     std::stringstream vOutputFilename;
     vOutputFilename << m_outputFile << ".fld";
 
@@ -185,5 +177,4 @@ bool FilterThresholdMin::v_IsTimeDependent()
     return true;
 }
 
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils

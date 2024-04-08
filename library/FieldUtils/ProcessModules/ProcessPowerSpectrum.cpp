@@ -35,15 +35,12 @@
 #include "ProcessPowerSpectrum.h"
 #include <LibUtilities/BasicUtils/ParseUtils.h>
 #include <LibUtilities/BasicUtils/SharedArray.hpp>
-#include <boost/core/ignore_unused.hpp>
 #include <iostream>
 #include <string>
 
 using namespace std;
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 ModuleKey ProcessPowerSpectrum::className =
@@ -202,5 +199,4 @@ void ProcessPowerSpectrum::v_Process(po::variables_map &vm)
     m_f->m_exp[nfields]->FwdTrans(m_f->m_exp[nfields]->GetPhys(),
                                   m_f->m_exp[nfields]->UpdateCoeffs());
 }
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

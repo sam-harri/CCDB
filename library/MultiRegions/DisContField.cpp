@@ -47,9 +47,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 /**
  * @class DisContField
@@ -519,9 +517,8 @@ bool DisContField::IsLeftAdjacentTrace(const int n, const int e)
 SpatialDomains::BoundaryConditionsSharedPtr DisContField::GetDomainBCs(
     const SpatialDomains::CompositeMap &domain,
     const SpatialDomains::BoundaryConditions &Allbcs,
-    const std::string &variable)
+    [[maybe_unused]] const std::string &variable)
 {
-    boost::ignore_unused(variable);
     SpatialDomains::BoundaryConditionsSharedPtr returnval;
 
     returnval =
@@ -2835,14 +2832,14 @@ std::vector<bool> &DisContField::v_GetLeftAdjacentTraces(void)
     return m_leftAdjacentTraces;
 }
 
-const Array<OneD, const MultiRegions::ExpListSharedPtr>
-    &DisContField::v_GetBndCondExpansions()
+const Array<OneD, const MultiRegions::ExpListSharedPtr> &DisContField::
+    v_GetBndCondExpansions()
 {
     return m_bndCondExpansions;
 }
 
-const Array<OneD, const SpatialDomains::BoundaryConditionShPtr>
-    &DisContField::v_GetBndConditions()
+const Array<OneD, const SpatialDomains::BoundaryConditionShPtr> &DisContField::
+    v_GetBndConditions()
 {
     return m_bndConditions;
 }
@@ -2852,8 +2849,8 @@ MultiRegions::ExpListSharedPtr &DisContField::v_UpdateBndCondExpansion(int i)
     return m_bndCondExpansions[i];
 }
 
-Array<OneD, SpatialDomains::BoundaryConditionShPtr>
-    &DisContField::v_UpdateBndConditions()
+Array<OneD, SpatialDomains::BoundaryConditionShPtr> &DisContField::
+    v_UpdateBndConditions()
 {
     return m_bndConditions;
 }
@@ -2910,11 +2907,43 @@ void DisContField::v_GetPeriodicEntities(PeriodicMap &periodicVerts,
  *
  * \return Updates a NekDouble array \a Fwd and \a Bwd
  */
+void DisContField::GetFwdBwdTracePhys(
+    const Array<OneD, const NekDouble> &field, Array<OneD, NekDouble> &Fwd,
+    Array<OneD, NekDouble> &Bwd,
+    const Array<OneD, const SpatialDomains::BoundaryConditionShPtr> &BndCond,
+    const Array<OneD, const ExpListSharedPtr> &BndCondExp)
+{
+    ASSERTL1((*m_exp)[0]->GetBasis(0)->GetBasisType() !=
+                 LibUtilities::eGauss_Lagrange,
+             "Routine not set up for Gauss Lagrange points distribution");
+
+    // blocked routine
+    Array<OneD, NekDouble> tracevals(m_locTraceToTraceMap->GetNLocTracePts());
+
+    m_locTraceToTraceMap->LocTracesFromField(field, tracevals);
+    m_locTraceToTraceMap->InterpLocTracesToTrace(0, tracevals, Fwd);
+
+    Array<OneD, NekDouble> invals =
+        tracevals + m_locTraceToTraceMap->GetNFwdLocTracePts();
+    m_locTraceToTraceMap->InterpLocTracesToTrace(1, invals, Bwd);
+
+    DisContField::v_PeriodicBwdCopy(Fwd, Bwd);
+
+    FillBwdWithBoundCond(Fwd, Bwd, BndCond, BndCondExp, false);
+
+    // Do parallel exchange for forwards/backwards spaces.
+    m_traceMap->GetAssemblyCommDG()->PerformExchange(Fwd, Bwd);
+
+    // Do exchange of interface traces (local and parallel)
+    // We may have to split this out into separate local and
+    // parallel for IP method???
+    m_interfaceMap->ExchangeTrace(Fwd, Bwd);
+}
+
 void DisContField::v_GetFwdBwdTracePhys(
     const Array<OneD, const NekDouble> &field, Array<OneD, NekDouble> &Fwd,
     Array<OneD, NekDouble> &Bwd,
-    bool FillBnd, // these should be template params so that compiler can remove
-                  // them
+    bool FillBnd, // these should be template params
     bool PutFwdInBwdOnBCs, bool DoExchange)
 {
     // Is this zeroing necessary?
@@ -2989,44 +3018,56 @@ void DisContField::v_FillBwdWithBoundCond(const Array<OneD, NekDouble> &Fwd,
                                           Array<OneD, NekDouble> &Bwd,
                                           bool PutFwdInBwdOnBCs)
 {
+    FillBwdWithBoundCond(Fwd, Bwd, m_bndConditions, m_bndCondExpansions,
+                         PutFwdInBwdOnBCs);
+}
+
+/** function allowing different BCs to be passed to routine
+ */
+void DisContField::FillBwdWithBoundCond(
+    const Array<OneD, NekDouble> &Fwd, Array<OneD, NekDouble> &Bwd,
+    const Array<OneD, const SpatialDomains::BoundaryConditionShPtr>
+        &bndConditions,
+    const Array<OneD, const ExpListSharedPtr> &bndCondExpansions,
+    bool PutFwdInBwdOnBCs)
+{
+
     // Fill boundary conditions into missing elements
     if (PutFwdInBwdOnBCs) // just set Bwd value to be Fwd value on BCs
     {
         // Fill boundary conditions into missing elements
-        for (int n = 0, cnt = 0; n < m_bndCondExpansions.size(); ++n)
+        for (int n = 0, cnt = 0; n < bndCondExpansions.size(); ++n)
         {
-            if (m_bndConditions[n]->GetBoundaryConditionType() ==
+            if (bndConditions[n]->GetBoundaryConditionType() ==
                 SpatialDomains::eDirichlet)
             {
-                auto ne = m_bndCondExpansions[n]->GetExpSize();
+                auto ne = bndCondExpansions[n]->GetExpSize();
                 for (int e = 0; e < ne; ++e)
                 {
-                    auto npts =
-                        m_bndCondExpansions[n]->GetExp(e)->GetTotPoints();
-                    auto id2 = m_trace->GetPhys_Offset(
+                    auto npts = bndCondExpansions[n]->GetExp(e)->GetTotPoints();
+                    auto id2  = m_trace->GetPhys_Offset(
                         m_traceMap->GetBndCondIDToGlobalTraceID(cnt + e));
                     Vmath::Vcopy(npts, &Fwd[id2], 1, &Bwd[id2], 1);
                 }
 
                 cnt += ne;
             }
-            else if (m_bndConditions[n]->GetBoundaryConditionType() ==
+            else if (bndConditions[n]->GetBoundaryConditionType() ==
                          SpatialDomains::eNeumann ||
-                     m_bndConditions[n]->GetBoundaryConditionType() ==
+                     bndConditions[n]->GetBoundaryConditionType() ==
                          SpatialDomains::eRobin)
             {
-                auto ne = m_bndCondExpansions[n]->GetExpSize();
+                auto ne = bndCondExpansions[n]->GetExpSize();
                 for (int e = 0; e < ne; ++e)
                 {
-                    auto npts =
-                        m_bndCondExpansions[n]->GetExp(e)->GetTotPoints();
-                    auto id2 = m_trace->GetPhys_Offset(
+                    auto npts = bndCondExpansions[n]->GetExp(e)->GetTotPoints();
+                    auto id2  = m_trace->GetPhys_Offset(
                         m_traceMap->GetBndCondIDToGlobalTraceID(cnt + e));
                     Vmath::Vcopy(npts, &Fwd[id2], 1, &Bwd[id2], 1);
                 }
                 cnt += ne;
             }
-            else if (m_bndConditions[n]->GetBoundaryConditionType() !=
+            else if (bndConditions[n]->GetBoundaryConditionType() !=
                      SpatialDomains::ePeriodic)
             {
                 ASSERTL0(false, "Method not set up for this "
@@ -3036,39 +3077,36 @@ void DisContField::v_FillBwdWithBoundCond(const Array<OneD, NekDouble> &Fwd,
     }
     else
     {
-        for (int n = 0, cnt = 0; n < m_bndCondExpansions.size(); ++n)
+        for (int n = 0, cnt = 0; n < bndCondExpansions.size(); ++n)
         {
-            if (m_bndConditions[n]->GetBoundaryConditionType() ==
+            if (bndConditions[n]->GetBoundaryConditionType() ==
                 SpatialDomains::eDirichlet)
             {
-                auto ne = m_bndCondExpansions[n]->GetExpSize();
+                auto ne = bndCondExpansions[n]->GetExpSize();
                 for (int e = 0; e < ne; ++e)
                 {
-                    auto npts =
-                        m_bndCondExpansions[n]->GetExp(e)->GetTotPoints();
-                    auto id1 = m_bndCondExpansions[n]->GetPhys_Offset(e);
-                    auto id2 = m_trace->GetPhys_Offset(
+                    auto npts = bndCondExpansions[n]->GetExp(e)->GetTotPoints();
+                    auto id1  = bndCondExpansions[n]->GetPhys_Offset(e);
+                    auto id2  = m_trace->GetPhys_Offset(
                         m_traceMap->GetBndCondIDToGlobalTraceID(cnt + e));
 
-                    Vmath::Vcopy(npts,
-                                 &(m_bndCondExpansions[n]->GetPhys())[id1], 1,
-                                 &Bwd[id2], 1);
+                    Vmath::Vcopy(npts, &(bndCondExpansions[n]->GetPhys())[id1],
+                                 1, &Bwd[id2], 1);
                 }
                 cnt += ne;
             }
-            else if (m_bndConditions[n]->GetBoundaryConditionType() ==
+            else if (bndConditions[n]->GetBoundaryConditionType() ==
                          SpatialDomains::eNeumann ||
-                     m_bndConditions[n]->GetBoundaryConditionType() ==
+                     bndConditions[n]->GetBoundaryConditionType() ==
                          SpatialDomains::eRobin)
             {
                 auto ne = m_bndCondExpansions[n]->GetExpSize();
                 for (int e = 0; e < ne; ++e)
                 {
-                    auto npts =
-                        m_bndCondExpansions[n]->GetExp(e)->GetTotPoints();
-                    auto id1 = m_bndCondExpansions[n]->GetPhys_Offset(e);
+                    auto npts = bndCondExpansions[n]->GetExp(e)->GetTotPoints();
+                    auto id1  = bndCondExpansions[n]->GetPhys_Offset(e);
 
-                    ASSERTL0((m_bndCondExpansions[n]->GetPhys())[id1] == 0.0,
+                    ASSERTL0((bndCondExpansions[n]->GetPhys())[id1] == 0.0,
                              "Method not set up for non-zero "
                              "Neumann boundary condition");
                     auto id2 = m_trace->GetPhys_Offset(
@@ -3079,12 +3117,12 @@ void DisContField::v_FillBwdWithBoundCond(const Array<OneD, NekDouble> &Fwd,
 
                 cnt += ne;
             }
-            else if (m_bndConditions[n]->GetBoundaryConditionType() ==
+            else if (bndConditions[n]->GetBoundaryConditionType() ==
                      SpatialDomains::eNotDefined)
             {
                 // Do nothing
             }
-            else if (m_bndConditions[n]->GetBoundaryConditionType() !=
+            else if (bndConditions[n]->GetBoundaryConditionType() !=
                      SpatialDomains::ePeriodic)
             {
                 NEKERROR(ErrorUtil::efatal,
@@ -3395,10 +3433,10 @@ GlobalLinSysKey DisContField::v_HelmSolve(
     const Array<OneD, const NekDouble> &inarray,
     Array<OneD, NekDouble> &outarray, const StdRegions::ConstFactorMap &factors,
     const StdRegions::VarCoeffMap &varcoeff,
-    const MultiRegions::VarFactorsMap &varfactors,
-    const Array<OneD, const NekDouble> &dirForcing, const bool PhysSpaceForcing)
+    [[maybe_unused]] const MultiRegions::VarFactorsMap &varfactors,
+    [[maybe_unused]] const Array<OneD, const NekDouble> &dirForcing,
+    const bool PhysSpaceForcing)
 {
-    boost::ignore_unused(varfactors, dirForcing);
     int i, n, cnt, nbndry;
     int nexp = GetExpSize();
     Array<OneD, NekDouble> f(m_ncoeffs);
@@ -4423,5 +4461,4 @@ void DisContField::v_AddTraceIntegralToOffDiag(
     m_trace->IProductWRTBase(BwdFlux, FCoeffs);
     m_locTraceToTraceMap->AddTraceCoeffsToFieldCoeffs(0, FCoeffs, outarray);
 }
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions

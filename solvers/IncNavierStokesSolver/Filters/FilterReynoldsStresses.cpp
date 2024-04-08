@@ -34,9 +34,7 @@
 
 #include <IncNavierStokesSolver/Filters/FilterReynoldsStresses.h>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 std::string FilterReynoldsStresses::className =
     GetFilterFactory().RegisterCreatorFunction("ReynoldsStresses",
@@ -65,7 +63,7 @@ std::string FilterReynoldsStresses::className =
  */
 FilterReynoldsStresses::FilterReynoldsStresses(
     const LibUtilities::SessionReaderSharedPtr &pSession,
-    const std::weak_ptr<SolverUtils::EquationSystem> &pEquation,
+    const std::shared_ptr<SolverUtils::EquationSystem> &pEquation,
     const std::map<std::string, std::string> &pParams)
     : FilterFieldConvert(pSession, pEquation, pParams)
 {
@@ -205,10 +203,9 @@ void FilterReynoldsStresses::v_FillVariablesName(
 
 void FilterReynoldsStresses::v_ProcessSample(
     const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
-    std::vector<Array<OneD, NekDouble>> &fieldcoeffs, const NekDouble &time)
+    [[maybe_unused]] std::vector<Array<OneD, NekDouble>> &fieldcoeffs,
+    [[maybe_unused]] const NekDouble &time)
 {
-    boost::ignore_unused(fieldcoeffs, time);
-
     size_t i, j, n;
     size_t nq          = pFields[0]->GetTotPoints();
     size_t dim         = pFields.size() - 1;
@@ -281,14 +278,11 @@ void FilterReynoldsStresses::v_ProcessSample(
 
 void FilterReynoldsStresses::v_PrepareOutput(
     const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
-    const NekDouble &time)
+    [[maybe_unused]] const NekDouble &time)
 {
-    boost::ignore_unused(time);
-
     size_t dim = pFields.size() - 1;
 
-    m_fieldMetaData["NumberOfFieldDumps"] =
-        boost::lexical_cast<std::string>(m_numSamples);
+    m_fieldMetaData["NumberOfFieldDumps"] = std::to_string(m_numSamples);
 
     // Set wavespace to false, as calculations were performed in physical space
     bool waveSpace = pFields[0]->GetWaveSpace();
@@ -319,5 +313,4 @@ NekDouble FilterReynoldsStresses::v_GetScale()
     }
 }
 
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils

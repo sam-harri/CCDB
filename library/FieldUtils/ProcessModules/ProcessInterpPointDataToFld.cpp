@@ -35,9 +35,7 @@
 #include <iostream>
 #include <string>
 
-#include <boost/core/ignore_unused.hpp>
 #include <boost/geometry.hpp>
-#include <boost/math/special_functions/fpclassify.hpp>
 
 #include <FieldUtils/Interpolator.h>
 #include <LibUtilities/BasicUtils/CsvIO.h>
@@ -52,9 +50,7 @@ using namespace std;
 namespace bg  = boost::geometry;
 namespace bgi = boost::geometry::index;
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 ModuleKey ProcessInterpPointDataToFld::className =
@@ -98,14 +94,14 @@ void ProcessInterpPointDataToFld::v_Process(po::variables_map &vm)
     }
     m_f->m_exp[0]->GetCoords(intFields[0], intFields[1], intFields[2]);
 
-    if (boost::filesystem::path(inFile).extension() == ".pts")
+    if (fs::path(inFile).extension() == ".pts")
     {
         LibUtilities::PtsIOSharedPtr ptsIO =
             MemoryManager<LibUtilities::PtsIO>::AllocateSharedPtr(m_f->m_comm);
 
         ptsIO->Import(inFile, fieldPts);
     }
-    else if (boost::filesystem::path(inFile).extension() == ".csv")
+    else if (fs::path(inFile).extension() == ".csv")
     {
         LibUtilities::CsvIOSharedPtr csvIO =
             MemoryManager<LibUtilities::CsvIO>::AllocateSharedPtr(m_f->m_comm);
@@ -205,5 +201,4 @@ void ProcessInterpPointDataToFld::v_Process(po::variables_map &vm)
         m_f->m_variables.push_back(fieldPts->GetFieldName(j));
     }
 }
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

@@ -35,11 +35,7 @@
 
 #include <LibUtilities/LinearAlgebra/NekSys.h>
 
-using namespace std;
-
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 /**
  * @class  NekSys
@@ -49,62 +45,14 @@ namespace LibUtilities
 
 NekSys::NekSys(const LibUtilities::SessionReaderSharedPtr &pSession,
                const LibUtilities::CommSharedPtr &vRowComm, const int nDimen,
-               const NekSysKey &pKey)
+               [[maybe_unused]] const NekSysKey &pKey)
 {
-    m_tolerance = pKey.m_Tolerance;
-    m_verbose   = false;
-    m_root      = false;
-    m_rowComm   = vRowComm;
-
+    m_rowComm      = vRowComm;
+    m_root         = m_rowComm->GetRank() == 0;
     m_FlagWarnings = true;
-
-    if (0 == m_rowComm->GetRank())
-    {
-        m_root = true;
-    }
-    m_verbose = pSession->DefinesCmdLineArgument("verbose");
-
-    m_converged = false;
-
-    m_SysDimen = nDimen;
+    m_verbose      = pSession->DefinesCmdLineArgument("verbose");
+    m_converged    = false;
+    m_SysDimen     = nDimen;
 }
 
-NekSys::~NekSys()
-{
-}
-
-bool NekSys::v_ConvergenceCheck(const int nIteration,
-                                const Array<OneD, const NekDouble> &Residual,
-                                const NekDouble tol)
-{
-    bool converged = false;
-    int ntotal     = Residual.size();
-    boost::ignore_unused(nIteration);
-
-    NekDouble SysResNorm = Vmath::Dot(ntotal, Residual, Residual);
-    m_rowComm->AllReduce(SysResNorm, Nektar::LibUtilities::ReduceSum);
-
-    if (SysResNorm < tol * tol)
-    {
-        converged = true;
-    }
-    return converged;
-}
-
-/**
- * Natural guess
- **/
-void NekSys::v_NekSysInitialGuess(const Array<OneD, const NekDouble> &pInput,
-                                  Array<OneD, NekDouble> &pguess)
-{
-    size_t ndim = pInput.size();
-    if (pguess.size() != ndim)
-    {
-        pguess = Array<OneD, NekDouble>{ndim};
-    }
-
-    Vmath::Vcopy(ndim, pInput, 1, pguess, 1);
-}
-
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities

@@ -37,8 +37,6 @@
 #define TIXML_USE_STL
 #endif
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <SpatialDomains/Geometry.h>
 #include <SpatialDomains/MeshPartition.h>
 
@@ -50,7 +48,7 @@
 #include <tinyxml.h>
 
 #include <LibUtilities/BasicUtils/FieldIO.h>
-#include <LibUtilities/BasicUtils/FileSystem.h>
+#include <LibUtilities/BasicUtils/Filesystem.hpp>
 #include <LibUtilities/BasicUtils/ParseUtils.h>
 #include <LibUtilities/BasicUtils/ShapeType.hpp>
 
@@ -62,9 +60,7 @@
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/detail/edge.hpp>
 
-namespace Nektar
-{
-namespace SpatialDomains
+namespace Nektar::SpatialDomains
 {
 
 SPATIAL_DOMAINS_EXPORT MeshPartitionFactory &GetMeshPartitionFactory()
@@ -105,10 +101,8 @@ MeshPartition::~MeshPartition()
 }
 
 void MeshPartition::PartitionMesh(int nParts, bool shared, bool overlapping,
-                                  int nLocal)
+                                  [[maybe_unused]] int nLocal)
 {
-    boost::ignore_unused(nLocal);
-
     ASSERTL0(m_parallel || m_elements.size() >= nParts,
              "Too few elements for this many processes.");
     m_shared = shared;
@@ -339,9 +333,7 @@ void MeshPartition::PrintPartInfo(std::ostream &out)
             ASSERTL0(it->second.size() == m_dim,
                      " Number of directional"
                      " modes in expansion spec for element id = " +
-                         boost::lexical_cast<std::string>(elid) +
-                         " and field " +
-                         boost::lexical_cast<std::string>(it->first) +
+                         std::to_string(elid) + " and field " + it->first +
                          " does not correspond to mesh dimension");
 
             int na = it->second[0];
@@ -479,9 +471,7 @@ void MeshPartition::WeightElements()
             ASSERTL0(it->second.size() == m_dim,
                      " Number of directional"
                      " modes in expansion spec for element id = " +
-                         boost::lexical_cast<std::string>(elid) +
-                         " and field " +
-                         boost::lexical_cast<std::string>(it->first) +
+                         std::to_string(elid) + " and field " + it->first +
                          " does not correspond to mesh dimension");
 
             int na = it->second[0];
@@ -963,5 +953,4 @@ int MeshPartition::CalculateEdgeWeight(LibUtilities::ShapeType elmtType, int na,
 
     return weight;
 }
-} // namespace SpatialDomains
-} // namespace Nektar
+} // namespace Nektar::SpatialDomains

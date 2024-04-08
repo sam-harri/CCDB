@@ -53,7 +53,7 @@
 #include <LibUtilities/BasicUtils/CheckedCast.hpp>
 #include <LibUtilities/BasicUtils/Equation.h>
 #include <LibUtilities/BasicUtils/ErrorUtil.hpp>
-#include <LibUtilities/BasicUtils/FileSystem.h>
+#include <LibUtilities/BasicUtils/Filesystem.hpp>
 #include <LibUtilities/BasicUtils/ParseUtils.h>
 #include <LibUtilities/Interpreter/Interpreter.h>
 #include <LibUtilities/Memory/NekMemoryManager.hpp>
@@ -70,9 +70,7 @@ using namespace std;
 namespace po = boost::program_options;
 namespace io = boost::iostreams;
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 /**
  * @class SessionReader
@@ -184,7 +182,7 @@ CmdLineArgMap &SessionReader::GetCmdLineArgMap()
  */
 SessionReader::SessionReader(int argc, char *argv[])
 {
-    m_xmlDoc    = 0;
+    m_xmlDoc    = nullptr;
     m_filenames = ParseCommandLineArguments(argc, argv);
 
     ASSERTL0(m_filenames.size() > 0, "No session file(s) given.");
@@ -208,7 +206,7 @@ SessionReader::SessionReader(int argc, char *argv[])
 
     m_interpreter = MemoryManager<Interpreter>::AllocateSharedPtr();
     m_interpreter->SetRandomSeed((m_comm->GetSpaceComm()->GetRank() + 1) *
-                                 (unsigned int)time(NULL));
+                                 (unsigned int)time(nullptr));
 }
 
 /**
@@ -221,7 +219,7 @@ SessionReader::SessionReader(int argc, char *argv[],
     ASSERTL0(pFilenames.size() > 0, "No filenames specified.");
 
     ParseCommandLineArguments(argc, argv);
-    m_xmlDoc    = 0;
+    m_xmlDoc    = nullptr;
     m_filenames = pFilenames;
 
     m_sessionName = ParseSessionName(m_filenames);
@@ -250,7 +248,7 @@ SessionReader::SessionReader(int argc, char *argv[],
 
     m_interpreter = MemoryManager<Interpreter>::AllocateSharedPtr();
     m_interpreter->SetRandomSeed((m_comm->GetSpaceComm()->GetRank() + 1) *
-                                 (unsigned int)time(NULL));
+                                 (unsigned int)time(nullptr));
 
     // Set time level (Parallel-in-Time)
     m_timeLevel = timelevel;
@@ -285,12 +283,13 @@ void SessionReader::InitSession(const std::vector<std::string> &filenames)
     std::string optfile;
     int exists;
 
-    if (DefinesCmdLineArgument("useoptfile"))
+    if (DefinesCmdLineArgument("use-opt-file"))
     {
-        optfile = m_cmdLineOptions.find("useoptfile")->second.as<std::string>();
-        exists  = (bool)boost::filesystem::exists(optfile.c_str());
+        optfile =
+            m_cmdLineOptions.find("use-opt-file")->second.as<std::string>();
+        exists = fs::exists(optfile.c_str());
         ASSERTL0(exists, "A valid .opt file was not specified "
-                         "with the --useoptfile command line option");
+                         "with the --use-opt-file command line option");
 
         m_filenames.push_back(optfile);
 
@@ -298,11 +297,11 @@ void SessionReader::InitSession(const std::vector<std::string> &filenames)
         std::rotate(m_filenames.rbegin(), m_filenames.rbegin() + 1,
                     m_filenames.rend());
     }
-    else // check for writeoptfile
+    else // check for write-opt-file
     {
         // check for opt file
         optfile = m_sessionName.substr(0, m_sessionName.find("_xml/")) + ".opt";
-        exists  = (bool)boost::filesystem::exists(optfile.c_str());
+        exists  = fs::exists(optfile.c_str());
 
         // For Paralell-in-Time
         if (exists && m_comm->IsParallelInTime())
@@ -411,7 +410,7 @@ void SessionReader::TestSharedFilesystem()
         }
         m_comm->Block();
 
-        int exists = (bool)boost::filesystem::exists("shared-fs-testfile");
+        int exists = fs::exists("shared-fs-testfile");
         m_comm->AllReduce(exists, LibUtilities::ReduceSum);
 
         m_sharedFilesystem = (exists == m_comm->GetSize());
@@ -442,36 +441,38 @@ std::vector<std::string> SessionReader::ParseCommandLineArguments(int argc,
 {
     // List the publically visible options (listed using --help).
     po::options_description desc("Allowed options");
+    po::options_description dep("Deprecated options");
 
     // clang-format off
-            desc.add_options()
-                ("verbose,v",    "be verbose")
-                ("version,V",    "print version information")
-                ("help,h",       "print this help message")
-                ("solverinfo,I", po::value<vector<std::string>>(),
-                                 "override a SOLVERINFO property")
-                ("parameter,P",  po::value<vector<std::string>>(),
-                                 "override a parameter")
-                ("npx",          po::value<int>(),
-                                 "number of procs in X-dir")
-                ("npy",          po::value<int>(),
-                                 "number of procs in Y-dir")
-                ("npz",          po::value<int>(),
-                                 "number of procs in Z-dir")
-                ("nsz",          po::value<int>(),
-                                 "number of slices in Z-dir")
-                ("npt",          po::value<int>(),
-                                 "number of procs in T-dir (parareal)")
-                ("part-only",    po::value<int>(),
-                                 "only partition mesh into N partitions.")
-                ("part-only-overlapping",    po::value<int>(),
-                                 "only partition mesh into N overlapping partitions.")
-                ("part-info",    "output partition information")
-                ("forceoutput,f",  "disables backups files and forces output to be "
-                                 "written without any checks")
-                ("writeoptfile", "write an optimisation file")
-                ("useoptfile",   po::value<std::string>(),
-                                 "use an optimisation file");
+    desc.add_options()
+        ("force-output,f","disables backups files and forces output to be "
+                          "written without any checks")
+        ("help,h",       "print this help message")
+        ("solverinfo,I", po::value<vector<std::string>>(),
+                         "override a SOLVERINFO property")
+        ("parameter,P",  po::value<vector<std::string>>(),
+                         "override a parameter")
+        ("verbose,v",    "be verbose")
+        ("version,V",    "print version information")
+        ("no-exp-opt",   "Do not use expansion optimisation for collections")
+        ("npx",          po::value<int>(),
+                         "number of procs in X-dir")
+        ("npy",          po::value<int>(),
+                         "number of procs in Y-dir")
+        ("npz",          po::value<int>(),
+                         "number of procs in Z-dir")
+        ("nsz",          po::value<int>(),
+                         "number of slices in Z-dir")
+        ("npt",          po::value<int>(),
+                         "number of procs in T-dir (parareal)")
+        ("part-only",    po::value<int>(),
+                         "only partition mesh into N partitions.")
+        ("part-only-overlapping",    po::value<int>(),
+                         "only partition mesh into N overlapping partitions.")
+        ("part-info",    "output partition information")
+        ("write-opt-file","write an optimisation file")
+        ("use-opt-file", po::value<std::string>(),
+                         "use an optimisation file");
     // clang-format on
 
 #ifdef NEKTAR_USE_CWIPI
@@ -496,6 +497,19 @@ std::vector<std::string> SessionReader::ParseCommandLineArguments(int argc,
         }
     }
 
+    // Deprecated options: introduced in 5.4.0 to homogenise command-line
+    // options to use '-' instead of camelCase or no spaces.
+    std::map<std::string, std::string> deprecated = {
+        {"forceoutput", "force-output"},
+        {"writeoptfile", "write-opt-file"},
+        {"useoptfile", "use-opt-file"}};
+
+    for (auto &d : deprecated)
+    {
+        std::string description = "Deprecated: use --" + d.second;
+        dep.add_options()(d.first.c_str(), description.c_str());
+    }
+
     // List hidden options (e.g. session file arguments are not actually
     // specified using the input-file option by the user).
     po::options_description hidden("Hidden options");
@@ -505,7 +519,7 @@ std::vector<std::string> SessionReader::ParseCommandLineArguments(int argc,
 
     // Combine all options for the parser
     po::options_description all("All options");
-    all.add(desc).add(hidden);
+    all.add(desc).add(dep).add(hidden);
 
     // Session file is a positional option
     po::positional_options_description p;
@@ -558,6 +572,18 @@ std::vector<std::string> SessionReader::ParseCommandLineArguments(int argc,
         exit(0);
     }
 
+    // Deal with deprecated options.
+    for (auto &d : deprecated)
+    {
+        if (m_cmdLineOptions.count(d.first))
+        {
+            std::cerr << "Warning: --" << d.first << " deprecated: use --"
+                      << d.second << std::endl;
+            m_cmdLineOptions.emplace(
+                d.second, po::variable_value(m_cmdLineOptions[d.first]));
+        }
+    }
+
     // Enable verbose mode
     if (m_cmdLineOptions.count("verbose"))
     {
@@ -569,7 +595,7 @@ std::vector<std::string> SessionReader::ParseCommandLineArguments(int argc,
     }
 
     // Disable backups
-    if (m_cmdLineOptions.count("forceoutput"))
+    if (m_cmdLineOptions.count("force-output"))
     {
         m_backups = false;
     }
@@ -579,7 +605,7 @@ std::vector<std::string> SessionReader::ParseCommandLineArguments(int argc,
     }
 
     // Enable update optimisation file
-    if (m_cmdLineOptions.count("writeoptfile"))
+    if (m_cmdLineOptions.count("write-opt-file"))
     {
         m_updateOptFile = true;
     }
@@ -707,7 +733,9 @@ bool SessionReader::DefinesElement(const std::string &pPath) const
     {
         vReturn = vReturn->FirstChildElement(st[i].c_str());
         if (!vReturn)
+        {
             return false;
+        }
     }
     return true;
 }
@@ -778,6 +806,15 @@ const NekDouble &SessionReader::GetParameter(const std::string &pName) const
              "Unable to find requested parameter: " + pName);
 
     return paramIter->second;
+}
+
+/**
+ * Getter for the session's parameters
+ * @returns A reference to the parameter map
+ */
+const ParameterMap &SessionReader::GetParameters()
+{
+    return m_parameters;
 }
 
 /**
@@ -2325,14 +2362,12 @@ void SessionReader::ReadFunctions(TiXmlElement *conditions)
                     // Check it has not already been defined
                     pair<std::string, int> key(variableList[i], domainList[j]);
                     auto fcnsIter = functionVarMap.find(key);
-                    ASSERTL0(
-                        fcnsIter == functionVarMap.end(),
-                        "Error setting expression '" + variableList[i] +
-                            " in domain " +
-                            boost::lexical_cast<std::string>(domainList[j]) +
-                            "' in function '" + functionStr +
-                            "'. "
-                            "Expression has already been defined.");
+                    ASSERTL0(fcnsIter == functionVarMap.end(),
+                             "Error setting expression '" + variableList[i] +
+                                 " in domain " + std::to_string(domainList[j]) +
+                                 "' in function '" + functionStr +
+                                 "'. "
+                                 "Expression has already been defined.");
 
                     if (varSplit.size() > 0)
                     {
@@ -2413,13 +2448,19 @@ void SessionReader::ParseEquals(const std::string &line, std::string &lhs,
     size_t end = line.find_first_of("=");
     // Check for no parameter name
     if (beg == end)
+    {
         throw 1;
+    }
     // Check for no parameter value
     if (end != line.find_last_of("="))
+    {
         throw 1;
+    }
     // Check for no equals sign
     if (end == std::string::npos)
+    {
         throw 1;
+    }
 
     lhs = line.substr(line.find_first_not_of(" "), end - beg);
     lhs = lhs.substr(0, lhs.find_last_not_of(" ") + 1);
@@ -2543,5 +2584,4 @@ TiXmlElement *GetChildElementOrThrow(const std::string &filename,
     return element;
 }
 
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities

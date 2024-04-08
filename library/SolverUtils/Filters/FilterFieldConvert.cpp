@@ -37,12 +37,9 @@
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/algorithm/string/split.hpp>
-#include <boost/core/ignore_unused.hpp>
 #include <boost/program_options.hpp>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 std::string FilterFieldConvert::className =
     GetFilterFactory().RegisterCreatorFunction("FieldConvert",
@@ -50,7 +47,7 @@ std::string FilterFieldConvert::className =
 
 FilterFieldConvert::FilterFieldConvert(
     const LibUtilities::SessionReaderSharedPtr &pSession,
-    const std::weak_ptr<EquationSystem> &pEquation, const ParamMap &pParams)
+    const std::shared_ptr<EquationSystem> &pEquation, const ParamMap &pParams)
     : Filter(pSession, pEquation)
 {
     m_dt = m_session->GetParameter("TimeStep");
@@ -258,12 +255,12 @@ FilterFieldConvert::FilterFieldConvert(
                 "Homogeneous 1D expansion(for .dat, .vtu).")
             ("error,e",
                 "Write error of fields for regression checking")
-            ("forceoutput,f",
+            ("force-output,f",
                 "Force the output to be written without any checks")
             ("range,r", po::value<std::string>(),
                 "Define output range i.e. (-r xmin,xmax,ymin,ymax,zmin,zmax) "
                 "in which any vertex is contained.")
-            ("noequispaced",
+            ("no-equispaced",
                 "Do not use equispaced output.")
             ("nparts", po::value<int>(),
                 "Define nparts if running serial problem to mimic "
@@ -284,9 +281,9 @@ FilterFieldConvert::FilterFieldConvert(
                 "Print options for a module.")
             ("module,m", po::value<std::vector<std::string> >(),
                 "Specify modules which are to be used.")
-            ("useSessionVariables",
+            ("use-session-variables",
                 "Use variables defined in session for output")
-            ("useSessionExpansion",
+            ("use-session-expansion",
                 "Use expansion defined in session.")
             ("verbose,v",
                 "Enable verbose mode.");
@@ -324,7 +321,7 @@ FilterFieldConvert::FilterFieldConvert(
             std::cerr << desc;
         }
     }
-    m_vm.insert(std::make_pair("forceoutput", po::variable_value()));
+    m_vm.insert(std::make_pair("force-output", po::variable_value()));
 }
 
 FilterFieldConvert::~FilterFieldConvert()
@@ -503,8 +500,7 @@ void FilterFieldConvert::v_Update(
     {
         m_fieldMetaData["FinalTime"] = boost::lexical_cast<std::string>(time);
         v_PrepareOutput(pFields, time);
-        m_fieldMetaData["FilterFileNum"] =
-            boost::lexical_cast<std::string>(++m_outputIndex);
+        m_fieldMetaData["FilterFileNum"] = std::to_string(++m_outputIndex);
         OutputField(pFields, m_outputIndex);
     }
 }
@@ -519,11 +515,11 @@ void FilterFieldConvert::v_Finalise(
 }
 
 void FilterFieldConvert::v_ProcessSample(
-    const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
-    std::vector<Array<OneD, NekDouble>> &fieldcoeffs, const NekDouble &time)
+    [[maybe_unused]] const Array<OneD, const MultiRegions::ExpListSharedPtr>
+        &pFields,
+    std::vector<Array<OneD, NekDouble>> &fieldcoeffs,
+    [[maybe_unused]] const NekDouble &time)
 {
-    boost::ignore_unused(pFields, time);
-
     for (int n = 0; n < m_outFields.size(); ++n)
     {
         Vmath::Vcopy(m_outFields[n].size(), fieldcoeffs[n], 1, m_outFields[n],
@@ -791,5 +787,4 @@ void FilterFieldConvert::CheckModules(std::vector<ModuleSharedPtr> &modules)
     }
 }
 
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils

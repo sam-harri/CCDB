@@ -33,8 +33,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <AcousticSolver/RiemannSolvers/APELaxFriedrichsSolver.h>
 
 using namespace std;
@@ -86,15 +84,14 @@ APELaxFriedrichsSolver::APELaxFriedrichsSolver(
  * @param wF     Computed Riemann flux for z perturbation velocity component
  */
 void APELaxFriedrichsSolver::v_PointSolve(
-    NekDouble pL, NekDouble rhoL, NekDouble uL, NekDouble vL, NekDouble wL,
-    NekDouble pR, NekDouble rhoR, NekDouble uR, NekDouble vR, NekDouble wR,
-    NekDouble c0sqL, NekDouble rho0L, NekDouble u0L, NekDouble v0L,
-    NekDouble w0L, NekDouble c0sqR, NekDouble rho0R, NekDouble u0R,
-    NekDouble v0R, NekDouble w0R, NekDouble &pF, NekDouble &rhoF, NekDouble &uF,
-    NekDouble &vF, NekDouble &wF)
+    NekDouble pL, [[maybe_unused]] NekDouble rhoL, NekDouble uL, NekDouble vL,
+    NekDouble wL, NekDouble pR, [[maybe_unused]] NekDouble rhoR, NekDouble uR,
+    NekDouble vR, NekDouble wR, NekDouble c0sqL, NekDouble rho0L, NekDouble u0L,
+    NekDouble v0L, NekDouble w0L, NekDouble c0sqR, NekDouble rho0R,
+    NekDouble u0R, NekDouble v0R, NekDouble w0R, NekDouble &pF,
+    [[maybe_unused]] NekDouble &rhoF, NekDouble &uF, NekDouble &vF,
+    NekDouble &wF)
 {
-    boost::ignore_unused(rhoL, rhoR, rhoF);
-
     // Speed of sound
     NekDouble cL = sqrt(c0sqL);
     NekDouble cR = sqrt(c0sqR);

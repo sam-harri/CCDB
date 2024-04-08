@@ -60,7 +60,7 @@ public:
     VCSImplicit(const LibUtilities::SessionReaderSharedPtr &pSession,
                 const SpatialDomains::MeshGraphSharedPtr &pGraph);
 
-    virtual ~VCSImplicit();
+    ~VCSImplicit() override;
 
 protected:
     /// 2D Array for Advection Velocities [dir][dof]
@@ -74,37 +74,38 @@ protected:
     /// integer for advection velocity
     int m_intOrder;
     std::string m_convectiveType;
+    /// Array checking whether GlobalLinSys needs to be unset
+    Array<OneD, NekInt> m_unsetGlobalLinSys;
 
     // Virtual functions
-    virtual void v_GenerateSummary(SolverUtils::SummaryList &s) override;
+    void v_GenerateSummary(SolverUtils::SummaryList &s) override;
 
-    virtual void v_SetUpPressureForcing(
+    void v_SetUpPressureForcing(
         const Array<OneD, const Array<OneD, NekDouble>> &fields,
         Array<OneD, Array<OneD, NekDouble>> &Forcing,
         const NekDouble aii_Dt) override;
 
-    virtual void v_SetUpViscousForcing(
+    void v_SetUpViscousForcing(
         const Array<OneD, const Array<OneD, NekDouble>> &inarray,
         Array<OneD, Array<OneD, NekDouble>> &Forcing,
         const NekDouble aii_Dt) override;
 
-    virtual void v_SolvePressure(
-        const Array<OneD, NekDouble> &Forcing) override;
+    void v_SolvePressure(const Array<OneD, NekDouble> &Forcing) override;
 
-    virtual void v_SolveViscous(
+    void v_SolveViscous(
         const Array<OneD, const Array<OneD, NekDouble>> &Forcing,
         const Array<OneD, const Array<OneD, NekDouble>> &inarray,
         Array<OneD, Array<OneD, NekDouble>> &outarray,
         const NekDouble aii_Dt) override;
 
-    virtual void v_DoInitialise(bool dumpInitialConditions) override;
+    void v_DoInitialise(bool dumpInitialConditions) override;
 
-    virtual std::string v_GetExtrapolateStr(void) override
+    std::string v_GetExtrapolateStr(void) override
     {
         return "Implicit"; // Use ImplicitExtrapolate.cpp
     }
 
-    virtual void v_EvaluateAdvection_SetPressureBCs(
+    void v_EvaluateAdvection_SetPressureBCs(
         const Array<OneD, const Array<OneD, NekDouble>> &inarray,
         Array<OneD, Array<OneD, NekDouble>> &outarray,
         const NekDouble time) override;
@@ -113,6 +114,10 @@ protected:
 
     void AddImplicitSkewSymAdvection(StdRegions::VarCoeffMap varcoeffs,
                                      NekDouble aii_Dt);
+
+    // Function to check whether UnsetGlobalLinSys has to be called
+    // at i-th call of LinearAdvectionDiffusionReactionSolve in SolveViscous
+    void CheckUnsetGlobalLinSys(Array<OneD, NekInt> &unsetGlobalLinSys);
 
 private:
 };

@@ -109,9 +109,8 @@ struct ElementMapHelper
         }
         return x[i];
     }
-    static int len(T const &x)
+    static int len([[maybe_unused]] T const &x)
     {
-        boost::ignore_unused(x);
         return 4;
     }
     static void IndexError()

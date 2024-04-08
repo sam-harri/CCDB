@@ -36,7 +36,6 @@
 
 #include <boost/algorithm/string.hpp>
 #include <boost/algorithm/string/predicate.hpp>
-#include <boost/core/ignore_unused.hpp>
 #include <iomanip>
 #include <iostream>
 
@@ -448,7 +447,7 @@ MMFMaxwell::~MMFMaxwell()
 
 void MMFMaxwell::v_DoSolve()
 {
-    ASSERTL0(m_intScheme != 0, "No time integration scheme.");
+    ASSERTL0(m_intScheme != nullptr, "No time integration scheme.");
 
     int i, nchk = 1;
     int nq         = GetTotPoints();
@@ -1319,10 +1318,9 @@ void MMFMaxwell::WeakDGMaxwellDirDeriv(
  */
 void MMFMaxwell::DoOdeProjection(
     const Array<OneD, const Array<OneD, NekDouble>> &inarray,
-    Array<OneD, Array<OneD, NekDouble>> &outarray, const NekDouble time)
+    Array<OneD, Array<OneD, NekDouble>> &outarray,
+    [[maybe_unused]] const NekDouble time)
 {
-    boost::ignore_unused(time);
-
     int var = inarray.size();
 
     if (inarray != outarray)
@@ -1337,10 +1335,8 @@ void MMFMaxwell::DoOdeProjection(
 
 void MMFMaxwell::v_SetInitialConditions(const NekDouble initialtime,
                                         bool dumpInitialConditions,
-                                        const int domain)
+                                        [[maybe_unused]] const int domain)
 {
-    boost::ignore_unused(domain);
-
     int nq   = GetTotPoints();
     int nvar = m_fields.size();
 
@@ -2298,10 +2294,9 @@ void MMFMaxwell::ComputeMaterialVector(
 void MMFMaxwell::ComputeMaterialOpticalCloak(
     const Array<OneD, const NekDouble> &radvec,
     Array<OneD, Array<OneD, NekDouble>> &epsvec,
-    Array<OneD, Array<OneD, NekDouble>> &muvec, const bool Dispersion)
+    [[maybe_unused]] Array<OneD, Array<OneD, NekDouble>> &muvec,
+    [[maybe_unused]] const bool Dispersion)
 {
-    boost::ignore_unused(muvec, Dispersion);
-
     int nq = GetNpoints();
 
     // Cloaking metamaterial
@@ -2567,8 +2562,7 @@ void MMFMaxwell::Checkpoint_TotalFieldOutput(
     int nq      = m_fields[0]->GetTotPoints();
     int ncoeffs = m_fields[0]->GetNcoeffs();
 
-    std::string outname =
-        m_sessionName + "Tot_" + boost::lexical_cast<std::string>(n) + ".chk";
+    std::string outname = m_sessionName + "Tot_" + std::to_string(n) + ".chk";
 
     std::vector<std::string> variables(nvar);
     std::vector<Array<OneD, NekDouble>> fieldcoeffs(nvar);
@@ -2599,8 +2593,7 @@ void MMFMaxwell::Checkpoint_PlotOutput(
     int nq      = m_fields[0]->GetTotPoints();
     int ncoeffs = m_fields[0]->GetNcoeffs();
 
-    std::string outname =
-        m_sessionName + "Plot_" + boost::lexical_cast<std::string>(n) + ".chk";
+    std::string outname = m_sessionName + "Plot_" + std::to_string(n) + ".chk";
 
     std::vector<std::string> variables(nvar);
     variables[0] = "Fx";
@@ -2635,8 +2628,8 @@ void MMFMaxwell::Checkpoint_TotPlotOutput(
     int nq      = m_fields[0]->GetTotPoints();
     int ncoeffs = m_fields[0]->GetNcoeffs();
 
-    std::string outname = m_sessionName + "TotPlot_" +
-                          boost::lexical_cast<std::string>(n) + ".chk";
+    std::string outname =
+        m_sessionName + "TotPlot_" + std::to_string(n) + ".chk";
 
     std::vector<std::string> variables(nvar);
     variables[0] = "Frx";
@@ -2682,17 +2675,15 @@ void MMFMaxwell::Checkpoint_TotPlotOutput(
 }
 
 void MMFMaxwell::Checkpoint_EDFluxOutput(
-    const int n, const NekDouble time,
+    const int n, [[maybe_unused]] const NekDouble time,
     const Array<OneD, const Array<OneD, NekDouble>> &fieldphys)
 {
-    boost::ignore_unused(time);
-
     int nvar    = m_fields.size();
     int nq      = m_fields[0]->GetTotPoints();
     int ncoeffs = m_fields[0]->GetNcoeffs();
 
-    std::string outname = m_sessionName + "EDFlux_" +
-                          boost::lexical_cast<std::string>(n) + ".chk";
+    std::string outname =
+        m_sessionName + "EDFlux_" + std::to_string(n) + ".chk";
 
     std::vector<std::string> variables(nvar);
     variables[0] = "EDFx";
@@ -2734,17 +2725,15 @@ void MMFMaxwell::Checkpoint_EDFluxOutput(
 }
 
 void MMFMaxwell::Checkpoint_EnergyOutput(
-    const int n, const NekDouble time,
+    const int n, [[maybe_unused]] const NekDouble time,
     const Array<OneD, const Array<OneD, NekDouble>> &fieldphys)
 {
-    boost::ignore_unused(time);
-
     int nvar    = m_fields.size();
     int nq      = m_fields[0]->GetTotPoints();
     int ncoeffs = m_fields[0]->GetNcoeffs();
 
-    std::string outname = m_sessionName + "Energy_" +
-                          boost::lexical_cast<std::string>(n) + ".chk";
+    std::string outname =
+        m_sessionName + "Energy_" + std::to_string(n) + ".chk";
 
     std::vector<std::string> variables(nvar);
     variables[0] = "Energy";

@@ -35,8 +35,6 @@
 #ifndef NEKMESH_MESHELEMENTS_ELEMENT
 #define NEKMESH_MESHELEMENTS_ELEMENT
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/BasicUtils/NekFactory.hpp>
 #include <LibUtilities/BasicUtils/ShapeType.hpp>
 #include <LibUtilities/Foundations/PointsType.h>
@@ -45,9 +43,7 @@
 #include <NekMesh/MeshElements/Face.h>
 #include <NekMesh/NekMeshDeclspec.h>
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 /**
@@ -69,10 +65,14 @@ public:
     /// boundary elements).
     size_t GetId() const
     {
-        if (m_faceLink.get() != 0)
+        if (m_faceLink.get() != nullptr)
+        {
             return m_faceLink->m_id;
-        if (m_edgeLink.get() != 0)
+        }
+        if (m_edgeLink.get() != nullptr)
+        {
             return m_edgeLink->m_id;
+        }
         return m_id;
     }
     /// Returns the expansion dimension of the element.
@@ -93,10 +93,14 @@ public:
     /// Returns the tag which defines the element shape.
     std::string GetTag() const
     {
-        if (m_faceLink.get() != 0)
+        if (m_faceLink.get() != nullptr)
+        {
             return "F";
-        if (m_edgeLink.get() != 0)
+        }
+        if (m_edgeLink.get() != nullptr)
+        {
             return "E";
+        }
         return m_tag;
     }
     /// Access a vertex node.
@@ -264,9 +268,9 @@ public:
     /// Generate a list of vertices (1D), edges (2D), or faces (3D).
     NEKMESH_EXPORT virtual std::string GetXmlString();
     /// get list of volume interior nodes
-    virtual void GetCurvedNodes(std::vector<NodeSharedPtr> &nodeList) const
+    virtual void GetCurvedNodes(
+        [[maybe_unused]] std::vector<NodeSharedPtr> &nodeList) const
     {
-        boost::ignore_unused(nodeList);
         NEKERROR(ErrorUtil::efatal,
                  "This function should be implemented at a shape level.");
     }
@@ -275,9 +279,9 @@ public:
     /// associated with this element.
     NEKMESH_EXPORT std::string GetXmlCurveString();
     /// Generate a Nektar++ geometry object for this element.
-    virtual SpatialDomains::GeometrySharedPtr GetGeom(int coordDim)
+    virtual SpatialDomains::GeometrySharedPtr GetGeom(
+        [[maybe_unused]] int coordDim)
     {
-        boost::ignore_unused(coordDim);
         NEKERROR(ErrorUtil::efatal,
                  "This function should be implemented at a shape level.");
         return std::shared_ptr<SpatialDomains::Geometry>();
@@ -375,11 +379,13 @@ public:
      *                       elements, which just require copying of face or
      *                       edge interior nodes.
      */
-    virtual void MakeOrder(int order, SpatialDomains::GeometrySharedPtr geom,
-                           LibUtilities::PointsType edgeType, int coordDim,
-                           int &id, bool justConfig = false)
+    virtual void MakeOrder(
+        [[maybe_unused]] int order,
+        [[maybe_unused]] SpatialDomains::GeometrySharedPtr geom,
+        [[maybe_unused]] LibUtilities::PointsType edgeType,
+        [[maybe_unused]] int coordDim, [[maybe_unused]] int &id,
+        [[maybe_unused]] bool justConfig = false)
     {
-        boost::ignore_unused(order, geom, edgeType, coordDim, id, justConfig);
         NEKERROR(ErrorUtil::efatal,
                  "This function should be implemented at a shape level.");
     }
@@ -388,10 +394,9 @@ public:
      * @brief Get the edge orientation of @p edge with respect to the local
      * element, which lies at edge index @p edgeId.
      */
-    virtual StdRegions::Orientation GetEdgeOrient(int edgeId,
-                                                  EdgeSharedPtr edge)
+    virtual StdRegions::Orientation GetEdgeOrient(
+        [[maybe_unused]] int edgeId, [[maybe_unused]] EdgeSharedPtr edge)
     {
-        boost::ignore_unused(edgeId, edge);
         NEKERROR(ErrorUtil::efatal,
                  "This function should be implemented at a shape level.");
         return StdRegions::eNoOrientation;
@@ -400,9 +405,8 @@ public:
     /**
      * @brief Returns the local index of vertex @p j of face @p i.
      */
-    virtual int GetFaceVertex(int i, int j)
+    virtual int GetFaceVertex([[maybe_unused]] int i, [[maybe_unused]] int j)
     {
-        boost::ignore_unused(i, j);
         NEKERROR(ErrorUtil::efatal,
                  "This function should be implemented at a shape level.");
         return 0;
@@ -437,12 +441,12 @@ public:
     /**
      * @brief returns the normal to the element
      */
-    virtual Array<OneD, NekDouble> Normal(bool inward = false)
+    virtual std::array<NekDouble, 3> Normal(
+        [[maybe_unused]] bool inward = false)
     {
-        boost::ignore_unused(inward);
         NEKERROR(ErrorUtil::efatal,
                  "This function should be implemented at a shape level.");
-        return Array<OneD, NekDouble>();
+        return {0.0, 0.0, 0.0};
     }
 
     CADObjectSharedPtr m_parentCAD;
@@ -500,13 +504,13 @@ struct element_id_less_than
     bool operator()(const pT a, const pT b) const
     {
         // check for 0
-        if (a.get() == 0)
+        if (a.get() == nullptr)
         {
             // if b is also 0, then they are equal, hence a is not
             // less than b
-            return b.get() != 0;
+            return b.get() != nullptr;
         }
-        else if (b.get() == 0)
+        else if (b.get() == nullptr)
         {
             return false;
         }
@@ -516,7 +520,6 @@ struct element_id_less_than
         }
     }
 };
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh
 
 #endif

@@ -43,9 +43,7 @@
 #include <SolverUtils/EquationSystem.h>
 #include <SolverUtils/SolverUtils.hpp>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 
 class Driver;
@@ -67,7 +65,7 @@ class Driver
 {
 public:
     /// Destructor
-    virtual ~Driver();
+    virtual ~Driver() = default;
 
     /// Initialise Object
     SOLVER_UTILS_EXPORT inline void InitObject(std::ostream &out = std::cout);
@@ -131,7 +129,6 @@ inline Array<OneD, EquationSystemSharedPtr> Driver::GetEqu()
     return m_equ;
 }
 
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils
 
 #endif // NEKTAR_SOLVERS_AUXILIARY_ADRBASE_H

@@ -36,8 +36,6 @@
 #include <string>
 using namespace std;
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <GlobalMapping/Mapping.h>
 #include <LibUtilities/BasicUtils/ParseUtils.h>
 #include <LibUtilities/BasicUtils/SharedArray.hpp>
@@ -45,9 +43,7 @@ using namespace std;
 #include "ProcessGrad.h"
 #include "ProcessMapping.h"
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 ModuleKey ProcessGrad::className = GetModuleFactory().RegisterCreatorFunction(
@@ -256,5 +252,4 @@ void ProcessGrad::v_Process(po::variables_map &vm)
             grad[i], m_f->m_exp[nfields + i]->UpdateCoeffs());
     }
 }
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

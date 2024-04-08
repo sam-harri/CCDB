@@ -29,11 +29,12 @@
 // DEALINGS IN THE SOFTWARE.
 //
 // Description: Implicit Velocity Correction Scheme for the Incompressible
-// Navier Stokes equations based on Dong and Shen 2010
+// Navier Stokes equations similar to Dong and Shen 2010
 ///////////////////////////////////////////////////////////////////////////////
 
 #include <IncNavierStokesSolver/EquationSystems/VelocityCorrectionSchemeImplicit.h>
 #include <LibUtilities/BasicUtils/Timer.h>
+#include <MultiRegions/ContField.h>
 #include <SolverUtils/Core/Misc.h>
 
 #include <boost/algorithm/string.hpp>
@@ -185,13 +186,13 @@ void VCSImplicit::v_DoInitialise(bool dumpInitialConditions)
             Array<OneD, NekDouble>(m_fields[i]->GetTotPoints(), 0.0);
     }
 
-    // Check advection velocity: Simo or Dong scheme
-    // Default to Simo scheme
-    m_session->MatchSolverInfo("AdvectionVelocity", "Simo", m_advectionVelocity,
-                               true);
+    // Check advection velocity: Extrapolated or Updated scheme
+    // Default to Extrapolated scheme
+    m_session->MatchSolverInfo("AdvectionVelocity", "Extrapolated",
+                               m_advectionVelocity, true);
 
-    // Extrapolated velocity (for 2nd order Simo scheme)
-    // Only initiliase for Simo scheme
+    // Extrapolated velocity (for 2nd order scheme)
+    // Only initiliase for Extrapolated scheme
     if (m_advectionVelocity)
     {
         m_extVel =
@@ -206,6 +207,12 @@ void VCSImplicit::v_DoInitialise(bool dumpInitialConditions)
             }
         }
     }
+
+    // Check whether multiple or single GlobalLinSys are
+    // required and when to delete them
+    // Initialise to always reset GlobalLinSys
+    m_unsetGlobalLinSys = Array<OneD, NekInt>(m_velocity.size(), 1);
+    CheckUnsetGlobalLinSys(m_unsetGlobalLinSys);
 
     // Check skew-symmetric advection operator
     // Default to Convective operator = false
@@ -316,13 +323,13 @@ void VCSImplicit::v_SetUpViscousForcing(
     // Build Advection Velocity
     for (int i = 0; i < nvel; ++i)
     {
-        // Advection Velocity = u^*n+1; Simo and Armero, 1994
+        // Extrapolated Advection Velocity = u^*n+1
         if (m_advectionVelocity)
         {
             Vmath::Smul(phystot, 1.0 / m_diffCoeff[i],
                         m_extVel[i][m_intOrder - 1], 1, m_AdvVel[i], 1);
         }
-        // Advection Velocity = u^*n+1 - (...); Dong and Shen, 2010
+        // Updated Advection Velocity = u^*n+1 - (...)
         else
         {
             // Get velocity fields [u^n, v^n, ..] for curl of vorticity
@@ -453,7 +460,7 @@ void VCSImplicit::v_SolveViscous(
         // assumes same matrix for each velocity)
         // - Catches Null return from 3DH1D solve by checking matrix type
         // is a LinearADR matrix (variant)
-        if (i == m_nConvectiveFields - 1 &&
+        if (m_unsetGlobalLinSys[i] &&
             (gkey.GetMatrixType() ==
                  StdRegions::eLinearAdvectionDiffusionReaction ||
              gkey.GetMatrixType() ==
@@ -496,7 +503,7 @@ void VCSImplicit::v_EvaluateAdvection_SetPressureBCs(
     timer.Stop();
     timer.AccumulateRegion("Pressure BCs");
 
-    // If Simo-advection: Extrapolate velocity
+    // Extrapolate advection velocity with StifflyStableBeta coefficients
     if (m_advectionVelocity)
     {
         for (int i = 0; i < m_velocity.size(); ++i)
@@ -542,6 +549,41 @@ void VCSImplicit::AddImplicitSkewSymAdvection(StdRegions::VarCoeffMap varcoeffs,
 
     // Assign VarcoeffMass
     varcoeffs[StdRegions::eVarCoeffMass] = divAdvVel;
+}
+
+void VCSImplicit::CheckUnsetGlobalLinSys(Array<OneD, NekInt> &unsetGlobalLinSys)
+{
+    // Loop over all convected Fields (excludes pressure)
+    for (int i = 0; i < m_nConvectiveFields; ++i)
+    {
+        // Always unset after last solve
+        if (i == m_nConvectiveFields - 1)
+        {
+            unsetGlobalLinSys[i] = 1;
+            continue;
+        }
+
+        auto contField =
+            std::dynamic_pointer_cast<MultiRegions::ContField>(m_fields[i]);
+        // Check against all solves after this one, whether same
+        // Global Linear system is required
+        for (int j = i + 1; j < m_nConvectiveFields; ++j)
+        {
+            // If same BCs (ie GlobalLinSys) in j-solves, save the GlobalLinSys
+            // for re-use
+            if (std::dynamic_pointer_cast<MultiRegions::ContField>(m_fields[j])
+                    ->SameTypeOfBoundaryConditions(*contField))
+            {
+                unsetGlobalLinSys[i] = 0;
+            }
+            // If no same BCs (ie GlobalLinSys) in j-solves, UnsetGlobalLinSys()
+            // for i-solve
+            else
+            {
+                unsetGlobalLinSys[i] = 1;
+            }
+        }
+    }
 }
 
 } // namespace Nektar

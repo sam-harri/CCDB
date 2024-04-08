@@ -39,13 +39,10 @@
 #include <NekMesh/CADSystem/CADVert.h>
 #include <NekMesh/MeshElements/Mesh.h>
 
-#include <LibUtilities/BasicUtils/SharedArray.hpp>
 #include <LibUtilities/Interpreter/Interpreter.h>
 #include <LibUtilities/Memory/NekMemoryManager.hpp>
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 class CurveMesh;
@@ -172,7 +169,7 @@ private:
     /// number of sampling points used in algorithm
     int m_numSamplePoints;
     /// coords of the ends of the parametric curve
-    Array<OneD, NekDouble> m_bounds;
+    std::array<NekDouble, 2> m_bounds;
     /// array of function ds evaluations
     std::vector<std::vector<NekDouble>> m_dst;
     /// array of function ps evaluations
@@ -202,7 +199,6 @@ private:
     Logger m_log;
 };
 
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh
 
 #endif

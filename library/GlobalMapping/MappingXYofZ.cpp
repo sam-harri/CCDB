@@ -32,14 +32,10 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <GlobalMapping/MappingXYofZ.h>
 #include <MultiRegions/ExpList.h>
 
-namespace Nektar
-{
-namespace GlobalMapping
+namespace Nektar::GlobalMapping
 {
 
 std::string MappingXYofZ::className =
@@ -161,11 +157,9 @@ void MappingXYofZ::v_GetJacobian(Array<OneD, NekDouble> &outarray)
 }
 
 void MappingXYofZ::v_DotGradJacobian(
-    const Array<OneD, Array<OneD, NekDouble>> &inarray,
+    [[maybe_unused]] const Array<OneD, Array<OneD, NekDouble>> &inarray,
     Array<OneD, NekDouble> &outarray)
 {
-    boost::ignore_unused(inarray);
-
     int physTot = m_fields[0]->GetTotPoints();
     Vmath::Zero(physTot, outarray, 1);
 }
@@ -333,5 +327,4 @@ void MappingXYofZ::v_UpdateGeomInfo()
     m_fields[0]->SetWaveSpace(waveSpace);
 }
 
-} // namespace GlobalMapping
-} // namespace Nektar
+} // namespace Nektar::GlobalMapping

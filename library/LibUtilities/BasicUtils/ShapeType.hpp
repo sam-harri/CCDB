@@ -38,17 +38,13 @@
 #include <algorithm>
 #include <vector>
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/BasicUtils/ErrorUtil.hpp>
 
 #ifdef min
 #undef min
 #endif
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 // Types of geometry types.
@@ -101,9 +97,8 @@ inline int getNumberOfCoefficients(int Na)
     return Na;
 }
 
-inline int getNumberOfBndCoefficients(int Na)
+inline int getNumberOfBndCoefficients([[maybe_unused]] int Na)
 {
-    boost::ignore_unused(Na);
     return 2;
 }
 } // namespace StdSegData
@@ -381,7 +376,6 @@ inline int GetNumberOfCoefficients(ShapeType shape, int na, int nb = 0,
 
     return returnval;
 }
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities
 
 #endif

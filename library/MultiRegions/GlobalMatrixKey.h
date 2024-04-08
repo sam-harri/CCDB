@@ -38,9 +38,7 @@
 #include <MultiRegions/AssemblyMap/AssemblyMap.h>
 #include <StdRegions/StdRegions.hpp>
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 
 /// Describes a matrix with ordering defined by a local to global map.
@@ -127,7 +125,7 @@ inline LibUtilities::ShapeType GlobalMatrixKey::GetShapeType() const
 
 inline bool GlobalMatrixKey::LocToGloMapIsDefined(void) const
 {
-    if (m_locToGloMap.lock().get() == 0) // NullAssemblyMapSharedPtr)
+    if (m_locToGloMap.lock().get() == nullptr) // NullAssemblyMapSharedPtr)
     {
         return false;
     }
@@ -170,7 +168,6 @@ inline const StdRegions::VarCoeffMap &GlobalMatrixKey::GetVarCoeffs() const
 {
     return m_varCoeffs;
 }
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions
 
 #endif

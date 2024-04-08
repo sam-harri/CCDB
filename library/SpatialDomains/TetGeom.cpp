@@ -40,9 +40,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace SpatialDomains
+namespace Nektar::SpatialDomains
 {
 const unsigned int TetGeom::VertexEdgeConnectivity[4][3] = {
     {0, 2, 3}, {0, 1, 4}, {1, 2, 5}, {3, 4, 5}};
@@ -615,13 +613,13 @@ void TetGeom::v_GenGeomFactors()
         v_FillGeom();
 
         // check to see if expansions are linear
-        m_straightEdge = true;
+        m_straightEdge = 1;
         if (m_xmap->GetBasisNumModes(0) != 2 ||
             m_xmap->GetBasisNumModes(1) != 2 ||
             m_xmap->GetBasisNumModes(2) != 2)
         {
             Gtype          = eDeformed;
-            m_straightEdge = false;
+            m_straightEdge = 0;
         }
 
         if (Gtype == eRegular)
@@ -687,5 +685,4 @@ void TetGeom::SetUpXmap()
     m_xmap = MemoryManager<StdRegions::StdTetExp>::AllocateSharedPtr(A, B, C);
 }
 
-} // namespace SpatialDomains
-} // namespace Nektar
+} // namespace Nektar::SpatialDomains

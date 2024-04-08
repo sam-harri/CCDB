@@ -35,15 +35,11 @@
 
 #include <iomanip>
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <SolverUtils/DriverModifiedArnoldi.h>
 
 using namespace std;
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 
 string DriverModifiedArnoldi::className =
@@ -427,8 +423,8 @@ void DriverModifiedArnoldi::EV_small(
         alpha[kdim] *
         std::fabs(R[kdim * kdimp + kdim] / R[(kdim - 1) * kdimp + kdim - 1]);
 
-    Lapack::dgeev_('N', 'V', kdim, &H[0], kdim, &wr[0], &wi[0], 0, 1, &zvec[0],
-                   kdim, &rwork[0], lwork, ier);
+    Lapack::dgeev_('N', 'V', kdim, &H[0], kdim, &wr[0], &wi[0], nullptr, 1,
+                   &zvec[0], kdim, &rwork[0], lwork, ier);
 
     ASSERTL0(!ier, "Error with dgeev");
 
@@ -563,7 +559,7 @@ void DriverModifiedArnoldi::EV_post(Array<OneD, Array<OneD, NekDouble>> &Tseq,
         for (int j = 0; j < icon; ++j)
         {
             std::string file = m_session->GetSessionName() + "_eig_" +
-                               boost::lexical_cast<std::string>(j) + ".fld";
+                               std::to_string(j) + ".fld";
 
             if (m_comm->GetRank() == 0)
             {
@@ -572,9 +568,9 @@ void DriverModifiedArnoldi::EV_post(Array<OneD, Array<OneD, NekDouble>> &Tseq,
             WriteFld(file, Kseq[j]);
             if (m_useMask)
             {
-                std::string fileunmask =
-                    m_session->GetSessionName() + "_eig_masked_" +
-                    boost::lexical_cast<std::string>(j) + ".fld";
+                std::string fileunmask = m_session->GetSessionName() +
+                                         "_eig_masked_" + std::to_string(j) +
+                                         ".fld";
                 WriteFld(fileunmask, Tseq[j]);
             }
         }
@@ -593,11 +589,9 @@ void DriverModifiedArnoldi::EV_big(Array<OneD, Array<OneD, NekDouble>> &bvecs,
                                    Array<OneD, Array<OneD, NekDouble>> &evecs,
                                    const int ntot, const int kdim,
                                    const int nvec, Array<OneD, NekDouble> &zvec,
-                                   Array<OneD, NekDouble> &wr,
+                                   [[maybe_unused]] Array<OneD, NekDouble> &wr,
                                    Array<OneD, NekDouble> &wi)
 {
-    boost::ignore_unused(wr);
-
     NekDouble wgt, norm;
     Array<OneD, Array<OneD, NekDouble>> btmp(nvec);
     Array<OneD, Array<OneD, NekDouble>> etmp(nvec);
@@ -685,5 +679,4 @@ void DriverModifiedArnoldi::EV_big(Array<OneD, Array<OneD, NekDouble>> &bvecs,
     }
 }
 
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils

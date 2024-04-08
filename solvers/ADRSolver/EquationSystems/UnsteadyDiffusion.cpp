@@ -33,11 +33,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include <ADRSolver/EquationSystems/UnsteadyDiffusion.h>
-#include <LibUtilities/TimeIntegration/TimeIntegrationScheme.h>
-#include <iomanip>
-#include <iostream>
-
-#include <boost/core/ignore_unused.hpp>
 
 using namespace std;
 
@@ -61,7 +56,7 @@ void UnsteadyDiffusion::v_InitObject(bool DeclareFields)
 {
     UnsteadySystem::v_InitObject(DeclareFields);
 
-    m_session->LoadParameter("wavefreq", m_waveFreq, 0.0);
+    // Load diffusion parameter
     m_session->LoadParameter("epsilon", m_epsilon, 1.0);
 
     m_session->MatchSolverInfo("SpectralVanishingViscosity", "True",
@@ -77,16 +72,19 @@ void UnsteadyDiffusion::v_InitObject(bool DeclareFields)
 
     if (m_session->DefinesParameter("d00"))
     {
+        m_d00 = m_session->GetParameter("d00");
         m_varcoeff[StdRegions::eVarCoeffD00] =
             Array<OneD, NekDouble>(npoints, m_session->GetParameter("d00"));
     }
     if (m_session->DefinesParameter("d11"))
     {
+        m_d11 = m_session->GetParameter("d11");
         m_varcoeff[StdRegions::eVarCoeffD11] =
             Array<OneD, NekDouble>(npoints, m_session->GetParameter("d11"));
     }
     if (m_session->DefinesParameter("d22"))
     {
+        m_d22 = m_session->GetParameter("d22");
         m_varcoeff[StdRegions::eVarCoeffD22] =
             Array<OneD, NekDouble>(npoints, m_session->GetParameter("d22"));
     }
@@ -107,9 +105,7 @@ void UnsteadyDiffusion::v_InitObject(bool DeclareFields)
             m_diffusion->InitObject(m_session, m_fields);
             break;
         }
-
         case MultiRegions::eGalerkin:
-        case MultiRegions::eMixed_CG_Discontinuous:
         {
             // In case of Galerkin explicit diffusion gives an error
             if (m_explicitDiffusion)
@@ -117,27 +113,18 @@ void UnsteadyDiffusion::v_InitObject(bool DeclareFields)
                 ASSERTL0(false, "Explicit Galerkin diffusion not set up.");
             }
             // In case of Galerkin implicit diffusion: do nothing
+            break;
+        }
+        default:
+        {
+            ASSERTL0(false, "Unknown projection scheme");
+            break;
         }
     }
 
-    if (m_explicitDiffusion)
-    {
-        m_ode.DefineOdeRhs(&UnsteadyDiffusion::DoOdeRhs, this);
-        m_ode.DefineProjection(&UnsteadyDiffusion::DoOdeProjection, this);
-    }
-    else
-    {
-        m_ode.DefineOdeRhs(&UnsteadyDiffusion::DoOdeRhs, this);
-        m_ode.DefineProjection(&UnsteadyDiffusion::DoOdeProjection, this);
-        m_ode.DefineImplicitSolve(&UnsteadyDiffusion::DoImplicitSolve, this);
-    }
-}
-
-/**
- * @brief Unsteady diffusion problem destructor.
- */
-UnsteadyDiffusion::~UnsteadyDiffusion()
-{
+    m_ode.DefineOdeRhs(&UnsteadyDiffusion::DoOdeRhs, this);
+    m_ode.DefineProjection(&UnsteadyDiffusion::DoOdeProjection, this);
+    m_ode.DefineImplicitSolve(&UnsteadyDiffusion::DoImplicitSolve, this);
 }
 
 void UnsteadyDiffusion::v_GenerateSummary(SummaryList &s)
@@ -160,10 +147,9 @@ void UnsteadyDiffusion::v_GenerateSummary(SummaryList &s)
  */
 void UnsteadyDiffusion::DoOdeRhs(
     const Array<OneD, const Array<OneD, NekDouble>> &inarray,
-    Array<OneD, Array<OneD, NekDouble>> &outarray, const NekDouble time)
+    Array<OneD, Array<OneD, NekDouble>> &outarray,
+    [[maybe_unused]] const NekDouble time)
 {
-    boost::ignore_unused(time);
-
     // Number of fields (variables of the problem)
     int nVariables = inarray.size();
 
@@ -203,7 +189,6 @@ void UnsteadyDiffusion::DoOdeProjection(
             break;
         }
         case MultiRegions::eGalerkin:
-        case MultiRegions::eMixed_CG_Discontinuous:
         {
             Array<OneD, NekDouble> coeffs(m_fields[0]->GetNcoeffs());
 
@@ -227,11 +212,9 @@ void UnsteadyDiffusion::DoOdeProjection(
  */
 void UnsteadyDiffusion::DoImplicitSolve(
     const Array<OneD, const Array<OneD, NekDouble>> &inarray,
-    Array<OneD, Array<OneD, NekDouble>> &outarray, const NekDouble time,
-    const NekDouble lambda)
+    Array<OneD, Array<OneD, NekDouble>> &outarray,
+    [[maybe_unused]] const NekDouble time, const NekDouble lambda)
 {
-    boost::ignore_unused(time);
-
     StdRegions::ConstFactorMap factors;
 
     int nvariables                     = inarray.size();
@@ -269,22 +252,22 @@ void UnsteadyDiffusion::DoImplicitSolve(
  * @brief Return the flux vector for the unsteady diffusion problem.
  */
 void UnsteadyDiffusion::GetFluxVector(
-    const Array<OneD, Array<OneD, NekDouble>> &inarray,
+    [[maybe_unused]] const Array<OneD, Array<OneD, NekDouble>> &inarray,
     const Array<OneD, Array<OneD, Array<OneD, NekDouble>>> &qfield,
     Array<OneD, Array<OneD, Array<OneD, NekDouble>>> &viscousTensor)
 {
-    boost::ignore_unused(inarray);
-
     unsigned int nDim              = qfield.size();
     unsigned int nConvectiveFields = qfield[0].size();
     unsigned int nPts              = qfield[0][0].size();
+
+    NekDouble d[3] = {m_d00, m_d11, m_d22};
 
     for (unsigned int j = 0; j < nDim; ++j)
     {
         for (unsigned int i = 0; i < nConvectiveFields; ++i)
         {
-            Vmath::Smul(nPts, m_epsilon, qfield[j][i], 1, viscousTensor[j][i],
-                        1);
+            Vmath::Smul(nPts, m_epsilon * d[j], qfield[j][i], 1,
+                        viscousTensor[j][i], 1);
         }
     }
 }

@@ -36,16 +36,12 @@
 #include <string>
 using namespace std;
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/BasicUtils/ParseUtils.h>
 #include <LibUtilities/BasicUtils/SharedArray.hpp>
 
 #include "ProcessFieldFromString.h"
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 ModuleKey ProcessFieldFromString::className =
@@ -152,5 +148,4 @@ void ProcessFieldFromString::v_Process(po::variables_map &vm)
     m_f->m_exp[fieldID]->FwdTransLocalElmt(m_f->m_exp[fieldID]->GetPhys(),
                                            m_f->m_exp[fieldID]->UpdateCoeffs());
 }
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

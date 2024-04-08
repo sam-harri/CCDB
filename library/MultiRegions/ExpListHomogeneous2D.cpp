@@ -32,8 +32,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/Foundations/ManagerAccess.h> // for PointsManager, etc
 #include <LocalRegions/Expansion.h>
 #include <MultiRegions/ExpListHomogeneous2D.h>
@@ -42,9 +40,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 // Forward declaration for typedefs
 ExpListHomogeneous2D::ExpListHomogeneous2D(const ExpansionType type)
@@ -397,10 +393,9 @@ void ExpListHomogeneous2D::v_IProductWRTBase(
 
 void ExpListHomogeneous2D::Homogeneous2DTrans(
     const int num_dofs, const Array<OneD, const NekDouble> &inarray,
-    Array<OneD, NekDouble> &outarray, bool IsForwards, bool Shuff, bool UnShuff)
+    Array<OneD, NekDouble> &outarray, bool IsForwards,
+    [[maybe_unused]] bool Shuff, [[maybe_unused]] bool UnShuff)
 {
-    boost::ignore_unused(Shuff, UnShuff);
-
     if (m_useFFT)
     {
 
@@ -753,9 +748,9 @@ void ExpListHomogeneous2D::v_AppendFieldData(
 void ExpListHomogeneous2D::v_ExtractDataToCoeffs(
     LibUtilities::FieldDefinitionsSharedPtr &fielddef,
     std::vector<NekDouble> &fielddata, std::string &field,
-    Array<OneD, NekDouble> &coeffs, std::unordered_map<int, int> zIdToPlane)
+    Array<OneD, NekDouble> &coeffs,
+    [[maybe_unused]] std::unordered_map<int, int> zIdToPlane)
 {
-    boost::ignore_unused(zIdToPlane);
     int i, k;
     int offset           = 0;
     int datalen          = fielddata.size() / fielddef->m_fields.size();
@@ -800,7 +795,7 @@ void ExpListHomogeneous2D::v_WriteVtkPieceData(std::ostream &outfile,
     int npoints_per_line = m_lines[0]->GetTotPoints();
 
     // printing the fields of that zone
-    outfile << "        <DataArray type=\"Float64\" Name=\"" << var << "\">"
+    outfile << R"(        <DataArray type="Float64" Name=")" << var << "\">"
             << endl;
     outfile << "          ";
     for (int n = 0; n < m_lines.size(); ++n)
@@ -1106,5 +1101,4 @@ void ExpListHomogeneous2D::SetPaddingBase(void)
     MatFwdPAD = StdQuad.GetStdMatrix(matkey1);
     MatBwdPAD = StdQuad.GetStdMatrix(matkey2);
 }
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions

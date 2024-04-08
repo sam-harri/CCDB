@@ -33,14 +33,9 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <LibUtilities/BasicUtils/Timer.h>
 #include <LibUtilities/LinearAlgebra/NekLinSysIter.h>
 
-using namespace std;
-
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 /**
  * @class  NekLinSysIter
@@ -59,57 +54,15 @@ NekLinSysIter::NekLinSysIter(
     const NekSysKey &pKey)
     : NekSys(pSession, vRowComm, nDimen, pKey)
 {
-    std::vector<std::string> variables(1);
-    variables[0]    = pSession->GetVariable(0);
-    string variable = variables[0];
-
-    if (pSession->DefinesGlobalSysSolnInfo(variable, "NekLinSysTolerance"))
-    {
-        m_tolerance = boost::lexical_cast<NekDouble>(
-            pSession->GetGlobalSysSolnInfo(variable, "NekLinSysTolerance")
-                .c_str());
-    }
-    else
-    {
-        pSession->LoadParameter("NekLinSysTolerance", m_tolerance,
-                                pKey.m_NekLinSysTolerance);
-    }
-
-    if (pSession->DefinesGlobalSysSolnInfo(variable, "NekLinSysMaxIterations"))
-    {
-        m_maxiter = boost::lexical_cast<int>(
-            pSession->GetGlobalSysSolnInfo(variable, "NekLinSysMaxIterations")
-                .c_str());
-    }
-    else
-    {
-        pSession->LoadParameter("NekLinSysMaxIterations", m_maxiter,
-                                pKey.m_NekLinSysMaxIterations);
-    }
-
-    if (pSession->DefinesGlobalSysSolnInfo(variable, "LinSysMaxStorage"))
-    {
-        m_LinSysMaxStorage = boost::lexical_cast<int>(
-            pSession->GetGlobalSysSolnInfo(variable, "LinSysMaxStorage")
-                .c_str());
-    }
-    else
-    {
-        pSession->LoadParameter("LinSysMaxStorage", m_LinSysMaxStorage,
-                                pKey.m_LinSysMaxStorage);
-    }
-
-    m_isLocal = false;
+    m_NekLinSysTolerance     = fmax(pKey.m_NekLinSysTolerance, 1.0E-16);
+    m_NekLinSysMaxIterations = pKey.m_NekLinSysMaxIterations;
+    m_isLocal                = false;
 }
 
 void NekLinSysIter::v_InitObject()
 {
     NekSys::v_InitObject();
     SetUniversalUniqueMap();
-}
-
-NekLinSysIter::~NekLinSysIter()
-{
 }
 
 void NekLinSysIter::SetUniversalUniqueMap(const Array<OneD, const int> &map)
@@ -127,58 +80,33 @@ void NekLinSysIter::SetUniversalUniqueMap()
     m_map = Array<OneD, int>(m_SysDimen, 1);
 }
 
-void NekLinSysIter::Set_Rhs_Magnitude(const NekVector<NekDouble> &pIn)
-{
-    NekDouble vExchange(0.0);
-    if (m_map.size() > 0)
-    {
-        vExchange =
-            Vmath::Dot2(pIn.GetDimension(), &pIn[0], &pIn[0], &m_map[0]);
-    }
-    m_rowComm->AllReduce(vExchange, LibUtilities::ReduceSum);
-
-    // To ensure that very different rhs values are not being
-    // used in subsequent solvers such as the velocit solve in
-    // INC NS. If this works we then need to work out a better
-    // way to control this.
-    NekDouble new_rhs_mag = (vExchange > 1.0e-6) ? vExchange : 1.0;
-
-    if (m_rhs_magnitude == NekConstants::kNekUnsetDouble)
-    {
-        m_rhs_magnitude = new_rhs_mag;
-    }
-    else
-    {
-        m_rhs_magnitude = (m_rhs_mag_sm * (m_rhs_magnitude) +
-                           (1.0 - m_rhs_mag_sm) * new_rhs_mag);
-    }
-}
-
 void NekLinSysIter::Set_Rhs_Magnitude(const Array<OneD, NekDouble> &pIn)
 {
-    Array<OneD, NekDouble> vExchange(1, 0.0);
+    NekDouble vExchange(0.0);
 
-    Array<OneD, NekDouble> wk(pIn.size());
-    m_operator.DoAssembleLoc(pIn, wk);
-    vExchange[0] = Vmath::Dot(pIn.size(), wk, pIn);
-    m_rowComm->AllReduce(vExchange, LibUtilities::ReduceSum);
-
-    // To ensure that very different rhs values are not being
-    // used in subsequent solvers such as the velocit solve in
-    // INC NS. If this works we then need to work out a better
-    // way to control this.
-    NekDouble new_rhs_mag = (vExchange[0] > 1e-6) ? vExchange[0] : 1.0;
-
-    if (m_rhs_magnitude == NekConstants::kNekUnsetDouble)
+    if (m_isLocal)
     {
-        m_rhs_magnitude = new_rhs_mag;
+        Array<OneD, NekDouble> wk(pIn.size());
+        m_operator.DoAssembleLoc(pIn, wk);
+        vExchange = Vmath::Dot(pIn.size(), wk, pIn);
     }
     else
     {
-        m_rhs_magnitude = (m_rhs_mag_sm * (m_rhs_magnitude) +
-                           (1.0 - m_rhs_mag_sm) * new_rhs_mag);
+        vExchange = Vmath::Dot2(pIn.size(), pIn, pIn, m_map);
     }
+
+    m_rowComm->AllReduce(vExchange, LibUtilities::ReduceSum);
+    m_rhs_magnitude = (vExchange > 1.0e-6) ? vExchange : 1.0;
 }
 
-} // namespace LibUtilities
-} // namespace Nektar
+void NekLinSysIter::ConvergenceCheck(
+    const Array<OneD, const NekDouble> &Residual)
+{
+    NekDouble SysResNorm = Vmath::Dot(Residual.size(), Residual, Residual);
+    m_rowComm->AllReduce(SysResNorm, Nektar::LibUtilities::ReduceSum);
+
+    m_converged = SysResNorm <
+                  m_NekLinSysTolerance * m_NekLinSysTolerance * m_rhs_magnitude;
+}
+
+} // namespace Nektar::LibUtilities

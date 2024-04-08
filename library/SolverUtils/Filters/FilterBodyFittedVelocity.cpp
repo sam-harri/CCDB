@@ -34,8 +34,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <CompressibleFlowSolver/Misc/VariableConverter.h>
 #include <SolverUtils/Filters/FilterBodyFittedVelocity.h>
 
@@ -47,9 +45,7 @@
 using std::cout;
 using std::endl;
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 std::string FilterBodyFittedVelocity::className =
     GetFilterFactory().RegisterCreatorFunction(
@@ -57,7 +53,7 @@ std::string FilterBodyFittedVelocity::className =
 
 FilterBodyFittedVelocity::FilterBodyFittedVelocity(
     const LibUtilities::SessionReaderSharedPtr &pSession,
-    const std::weak_ptr<EquationSystem> &pEquation, const ParamMap &pParams)
+    const std::shared_ptr<EquationSystem> &pEquation, const ParamMap &pParams)
     : FilterFieldConvert(pSession, pEquation, pParams)
 {
     // Load sampling frequency
@@ -341,10 +337,9 @@ void FilterBodyFittedVelocity::v_FillVariablesName(
 // contains noises for unknown reasons at the moment.
 void FilterBodyFittedVelocity::v_ProcessSample(
     const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
-    std::vector<Array<OneD, NekDouble>> &fieldcoeffs, const NekDouble &time)
+    std::vector<Array<OneD, NekDouble>> &fieldcoeffs,
+    [[maybe_unused]] const NekDouble &time)
 {
-    boost::ignore_unused(time);
-
     // Use shift_vel to get the current u,v,w in Cartesian coordinate
     // cfs_2D:
     // rho,rhou,rhov,E,u,v,p,T,s,a,Mach,Sensor,distanceToWall,u_bfc,v_bfc
@@ -489,13 +484,11 @@ void FilterBodyFittedVelocity::v_ProcessSample(
 }
 
 void FilterBodyFittedVelocity::v_PrepareOutput(
-    const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
-    const NekDouble &time)
+    [[maybe_unused]] const Array<OneD, const MultiRegions::ExpListSharedPtr>
+        &pFields,
+    [[maybe_unused]] const NekDouble &time)
 {
-    boost::ignore_unused(pFields, time);
-
-    m_fieldMetaData["NumberOfFieldDumps"] =
-        boost::lexical_cast<std::string>(m_numSamples);
+    m_fieldMetaData["NumberOfFieldDumps"] = std::to_string(m_numSamples);
 }
 
 NekDouble FilterBodyFittedVelocity::v_GetScale()
@@ -503,5 +496,4 @@ NekDouble FilterBodyFittedVelocity::v_GetScale()
     return 1.0;
 }
 
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils

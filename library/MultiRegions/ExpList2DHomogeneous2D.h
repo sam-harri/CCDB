@@ -40,9 +40,7 @@
 #include <MultiRegions/MultiRegionsDeclspec.h>
 #include <vector>
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 
 // Forward declaration for typedefs
@@ -74,7 +72,7 @@ public:
         const ExpList2DHomogeneous2D &In);
 
     /// Destructor.
-    MULTI_REGIONS_EXPORT virtual ~ExpList2DHomogeneous2D();
+    MULTI_REGIONS_EXPORT ~ExpList2DHomogeneous2D() override;
 
     // MULTI_REGIONS_EXPORT void HomoFwdTrans2D(const Array<OneD, const
     // NekDouble> &inarray, Array<OneD, NekDouble> &outarray);
@@ -87,36 +85,32 @@ protected:
 
     //  virtual functions
 
-    virtual void v_GetCoords(Array<OneD, NekDouble> &coord_0,
-                             Array<OneD, NekDouble> &coord_1,
-                             Array<OneD, NekDouble> &coord_2) override;
+    void v_GetCoords(Array<OneD, NekDouble> &coord_0,
+                     Array<OneD, NekDouble> &coord_1,
+                     Array<OneD, NekDouble> &coord_2) override;
 
-    virtual void v_GetCoords(const int eid, Array<OneD, NekDouble> &xc0,
-                             Array<OneD, NekDouble> &xc1,
-                             Array<OneD, NekDouble> &xc2) override;
+    void v_GetCoords(const int eid, Array<OneD, NekDouble> &xc0,
+                     Array<OneD, NekDouble> &xc1,
+                     Array<OneD, NekDouble> &xc2) override;
 
-    virtual void v_FwdTrans(const Array<OneD, const NekDouble> &inarray,
-                            Array<OneD, NekDouble> &outarray) override;
+    void v_FwdTrans(const Array<OneD, const NekDouble> &inarray,
+                    Array<OneD, NekDouble> &outarray) override;
 
-    virtual void v_FwdTransLocalElmt(
-        const Array<OneD, const NekDouble> &inarray,
-        Array<OneD, NekDouble> &outarray) override;
+    void v_FwdTransLocalElmt(const Array<OneD, const NekDouble> &inarray,
+                             Array<OneD, NekDouble> &outarray) override;
 
     // This is same as fwdtrans for this expansion
-    virtual void v_FwdTransBndConstrained(
-        const Array<OneD, const NekDouble> &inarray,
-        Array<OneD, NekDouble> &outarray) override;
+    void v_FwdTransBndConstrained(const Array<OneD, const NekDouble> &inarray,
+                                  Array<OneD, NekDouble> &outarray) override;
 
-    virtual void v_WriteTecplotZone(std::ostream &outfile,
-                                    int expansion) override;
+    void v_WriteTecplotZone(std::ostream &outfile, int expansion) override;
 
-    virtual void v_WriteVtkPieceHeader(std::ostream &outfile, int expansion,
-                                       int istrip) override;
+    void v_WriteVtkPieceHeader(std::ostream &outfile, int expansion,
+                               int istrip) override;
 
 private:
 };
 
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions
 
 #endif // EXPLIST3DHOMO1D_H

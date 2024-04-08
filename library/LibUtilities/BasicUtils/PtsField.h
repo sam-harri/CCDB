@@ -39,15 +39,11 @@
 #include <memory>
 #include <vector>
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/BasicUtils/ErrorUtil.hpp>
 #include <LibUtilities/BasicUtils/SharedArray.hpp>
 #include <LibUtilities/BasicUtils/VmathArray.hpp>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 enum PtsType
@@ -85,13 +81,11 @@ public:
     LIB_UTILITIES_EXPORT PtsField(
         const int dim, const std::vector<std::string> fieldnames,
         const Array<OneD, Array<OneD, NekDouble>> &pts,
-        const Array<OneD, Array<OneD, float>> &weights,
-        const Array<OneD, Array<OneD, unsigned int>> &neighInds)
+        [[maybe_unused]] const Array<OneD, Array<OneD, float>> &weights,
+        [[maybe_unused]] const Array<OneD, Array<OneD, unsigned int>>
+            &neighInds)
         : m_ptsInfo(NullPtsInfoMap), m_dim(dim), m_fieldNames(fieldnames),
-          m_pts(pts), m_ptsType(ePtsFile)
-    {
-        boost::ignore_unused(weights, neighInds);
-    };
+          m_pts(pts), m_ptsType(ePtsFile){};
 
     LIB_UTILITIES_EXPORT void GetConnectivity(
         std::vector<Array<OneD, int>> &conn) const;
@@ -189,7 +183,6 @@ private:
 
 typedef std::shared_ptr<PtsField> PtsFieldSharedPtr;
 static PtsFieldSharedPtr NullPtsField;
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities
 
 #endif

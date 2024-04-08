@@ -36,9 +36,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 
 std::string DriverArpack::arpackProblemTypeLookupIds[6] = {
@@ -252,7 +250,9 @@ void DriverArpack::v_Execute(ostream &out)
         }
 
         if (ido == 99)
+        {
             break;
+        }
 
         switch (ido)
         {
@@ -376,7 +376,7 @@ void DriverArpack::v_Execute(ostream &out)
             WriteEvs(pFile, i, dr[i], di[i]);
 
             std::string file = m_session->GetSessionName() + "_eig_" +
-                               boost::lexical_cast<std::string>(i) + ".fld";
+                               std::to_string(i) + ".fld";
             WriteFld(file, z + i * n);
         }
     }
@@ -392,7 +392,7 @@ void DriverArpack::v_Execute(ostream &out)
                      false);
 
             std::string file = m_session->GetSessionName() + "_eig_" +
-                               boost::lexical_cast<std::string>(i) + ".fld";
+                               std::to_string(i) + ".fld";
             WriteFld(file, z + i * n);
         }
     }
@@ -416,5 +416,4 @@ void DriverArpack::v_Execute(ostream &out)
     }
 }
 
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils

@@ -79,31 +79,32 @@ public:
                            const Array<OneD, int> pVel,
                            const SolverUtils::AdvectionSharedPtr advObject);
 
-    virtual ~SubSteppingExtrapolate();
+    ~SubSteppingExtrapolate() override;
 
 protected:
-    virtual void v_EvaluatePressureBCs(
+    void v_EvaluatePressureBCs(
         const Array<OneD, const Array<OneD, NekDouble>> &fields,
         const Array<OneD, const Array<OneD, NekDouble>> &N,
         NekDouble kinvis) override;
 
-    virtual void v_SubSteppingTimeIntegration(
+    void v_SubSteppingTimeIntegration(
         const LibUtilities::TimeIntegrationSchemeSharedPtr &IntegrationScheme)
         override;
 
-    virtual void v_SubStepSaveFields(int nstep) override;
+    void v_SubStepSaveFields(int nstep) override;
 
-    virtual void v_SubStepSetPressureBCs(
+    void v_SubStepSetPressureBCs(
         const Array<OneD, const Array<OneD, NekDouble>> &inarray,
         NekDouble Aii_Dt, NekDouble kinvis) override;
 
-    virtual void v_SubStepAdvance(int nstep, NekDouble time) override;
+    void v_AccelerationBDF(Array<OneD, Array<OneD, NekDouble>> &array) override;
 
-    virtual void v_MountHOPBCs(
-        int HBCdata, NekDouble kinvis, Array<OneD, NekDouble> &Q,
-        Array<OneD, const NekDouble> &Advection) override;
+    void v_SubStepAdvance(int nstep, NekDouble time) override;
 
-    virtual std::string v_GetSubStepName(void) override;
+    void v_MountHOPBCs(int HBCdata, NekDouble kinvis, Array<OneD, NekDouble> &Q,
+                       Array<OneD, const NekDouble> &Advection) override;
+
+    std::string v_GetSubStepName(void) override;
 
     void SubStepAdvection(
         const Array<OneD, const Array<OneD, NekDouble>> &inarray,

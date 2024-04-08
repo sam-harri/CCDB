@@ -35,14 +35,12 @@
 #include <Collections/CoalescedGeomData.h>
 #include <Collections/MatrixFreeBase.h>
 #include <Collections/Operator.h>
+
 #include <MatrixFreeOps/Operator.hpp>
-#include <boost/core/ignore_unused.hpp>
 
 using namespace std;
 
-namespace Nektar
-{
-namespace Collections
+namespace Nektar::Collections
 {
 
 using LibUtilities::eHexahedron;
@@ -54,9 +52,28 @@ using LibUtilities::eTetrahedron;
 using LibUtilities::eTriangle;
 
 /**
+ * @brief Backward transform help class to calculate the size of the collection
+ * that is given as an input and as an output to the BwdTrans Operator. The size
+ * evaluation takes into account the conversion from the coefficient space to
+ * the physical space
+ */
+class BwdTrans_Helper : virtual public Operator
+{
+protected:
+    BwdTrans_Helper()
+    {
+        // expect input to be number of elements by the number of coefficients
+        m_inputSize = m_numElmt * m_stdExp->GetNcoeffs();
+        // expect input to be number of elements by the number of quad points
+        m_outputSize = m_numElmt * m_stdExp->GetTotPoints();
+    }
+};
+
+/**
  * @brief Backward transform operator using standard matrix approach.
  */
-class BwdTrans_StdMat final : public Operator
+class BwdTrans_StdMat final : virtual public Operator,
+                              virtual public BwdTrans_Helper
 {
 public:
     OPERATOR_CREATE(BwdTrans_StdMat)
@@ -65,29 +82,21 @@ public:
 
     void operator()(const Array<OneD, const NekDouble> &input,
                     Array<OneD, NekDouble> &output0,
-                    Array<OneD, NekDouble> &output1,
-                    Array<OneD, NekDouble> &output2,
-                    Array<OneD, NekDouble> &wsp) override
+                    [[maybe_unused]] Array<OneD, NekDouble> &output1,
+                    [[maybe_unused]] Array<OneD, NekDouble> &output2,
+                    [[maybe_unused]] Array<OneD, NekDouble> &wsp) override
     {
-        boost::ignore_unused(output1, output2, wsp);
         Blas::Dgemm('N', 'N', m_mat->GetRows(), m_numElmt, m_mat->GetColumns(),
                     1.0, m_mat->GetRawPtr(), m_mat->GetRows(), input.get(),
                     m_stdExp->GetNcoeffs(), 0.0, output0.get(),
                     m_stdExp->GetTotPoints());
     }
 
-    void operator()(int dir, const Array<OneD, const NekDouble> &input,
-                    Array<OneD, NekDouble> &output,
-                    Array<OneD, NekDouble> &wsp) override final
+    void operator()([[maybe_unused]] int dir,
+                    [[maybe_unused]] const Array<OneD, const NekDouble> &input,
+                    [[maybe_unused]] Array<OneD, NekDouble> &output,
+                    [[maybe_unused]] Array<OneD, NekDouble> &wsp) final
     {
-        boost::ignore_unused(dir, input, output, wsp);
-        ASSERTL0(false, "Not valid for this operator.");
-    }
-
-    virtual void CheckFactors(StdRegions::FactorMap factors,
-                              int coll_phys_offset) override
-    {
-        boost::ignore_unused(factors, coll_phys_offset);
         ASSERTL0(false, "Not valid for this operator.");
     }
 
@@ -98,7 +107,7 @@ private:
     BwdTrans_StdMat(vector<StdRegions::StdExpansionSharedPtr> pCollExp,
                     CoalescedGeomDataSharedPtr pGeomData,
                     StdRegions::FactorMap factors)
-        : Operator(pCollExp, pGeomData, factors)
+        : Operator(pCollExp, pGeomData, factors), BwdTrans_Helper()
     {
         StdRegions::StdMatrixKey key(StdRegions::eBwdTrans,
                                      m_stdExp->DetShapeType(), *m_stdExp);
@@ -145,7 +154,9 @@ OperatorKey BwdTrans_StdMat::m_typeArr[] = {
 /**
  * @brief Backward transform operator using matrix free operators.
  */
-class BwdTrans_MatrixFree final : public Operator, MatrixFreeOneInOneOut
+class BwdTrans_MatrixFree final : virtual public Operator,
+                                  MatrixFreeOneInOneOut,
+                                  virtual public BwdTrans_Helper
 {
 public:
     OPERATOR_CREATE(BwdTrans_MatrixFree)
@@ -154,12 +165,10 @@ public:
 
     void operator()(const Array<OneD, const NekDouble> &input,
                     Array<OneD, NekDouble> &output0,
-                    Array<OneD, NekDouble> &output1,
-                    Array<OneD, NekDouble> &output2,
-                    Array<OneD, NekDouble> &wsp) override final
+                    [[maybe_unused]] Array<OneD, NekDouble> &output1,
+                    [[maybe_unused]] Array<OneD, NekDouble> &output2,
+                    [[maybe_unused]] Array<OneD, NekDouble> &wsp) final
     {
-        boost::ignore_unused(output1, output2, wsp);
-
         if (m_isPadded)
         {
             // copy into padded vector
@@ -175,20 +184,13 @@ public:
         }
     }
 
-    void operator()(int dir, const Array<OneD, const NekDouble> &input,
-                    Array<OneD, NekDouble> &output,
-                    Array<OneD, NekDouble> &wsp) override final
+    void operator()([[maybe_unused]] int dir,
+                    [[maybe_unused]] const Array<OneD, const NekDouble> &input,
+                    [[maybe_unused]] Array<OneD, NekDouble> &output,
+                    [[maybe_unused]] Array<OneD, NekDouble> &wsp) final
     {
-        boost::ignore_unused(dir, input, output, wsp);
         NEKERROR(ErrorUtil::efatal,
                  "BwdTrans_MatrixFree: Not valid for this operator.");
-    }
-
-    virtual void CheckFactors(StdRegions::FactorMap factors,
-                              int coll_phys_offset) override
-    {
-        boost::ignore_unused(factors, coll_phys_offset);
-        ASSERTL0(false, "Not valid for this operator.");
     }
 
 private:
@@ -197,7 +199,7 @@ private:
     BwdTrans_MatrixFree(vector<StdRegions::StdExpansionSharedPtr> pCollExp,
                         CoalescedGeomDataSharedPtr pGeomData,
                         StdRegions::FactorMap factors)
-        : Operator(pCollExp, pGeomData, factors),
+        : Operator(pCollExp, pGeomData, factors), BwdTrans_Helper(),
           MatrixFreeOneInOneOut(pCollExp[0]->GetStdExp()->GetNcoeffs(),
                                 pCollExp[0]->GetStdExp()->GetTotPoints(),
                                 pCollExp.size())
@@ -251,7 +253,8 @@ OperatorKey BwdTrans_MatrixFree::m_typeArr[] = {
 /**
  * @brief Backward transform operator using default StdRegions operator
  */
-class BwdTrans_IterPerExp final : public Operator
+class BwdTrans_IterPerExp final : virtual public Operator,
+                                  virtual public BwdTrans_Helper
 {
 public:
     OPERATOR_CREATE(BwdTrans_IterPerExp)
@@ -260,12 +263,10 @@ public:
 
     void operator()(const Array<OneD, const NekDouble> &input,
                     Array<OneD, NekDouble> &output0,
-                    Array<OneD, NekDouble> &output1,
-                    Array<OneD, NekDouble> &output2,
-                    Array<OneD, NekDouble> &wsp) override
+                    [[maybe_unused]] Array<OneD, NekDouble> &output1,
+                    [[maybe_unused]] Array<OneD, NekDouble> &output2,
+                    [[maybe_unused]] Array<OneD, NekDouble> &wsp) override
     {
-        boost::ignore_unused(output1, output2, wsp);
-
         const int nCoeffs = m_stdExp->GetNcoeffs();
         const int nPhys   = m_stdExp->GetTotPoints();
         Array<OneD, NekDouble> tmp;
@@ -276,18 +277,11 @@ public:
         }
     }
 
-    void operator()(int dir, const Array<OneD, const NekDouble> &input,
-                    Array<OneD, NekDouble> &output,
-                    Array<OneD, NekDouble> &wsp) override final
+    void operator()([[maybe_unused]] int dir,
+                    [[maybe_unused]] const Array<OneD, const NekDouble> &input,
+                    [[maybe_unused]] Array<OneD, NekDouble> &output,
+                    [[maybe_unused]] Array<OneD, NekDouble> &wsp) final
     {
-        boost::ignore_unused(dir, input, output, wsp);
-        ASSERTL0(false, "Not valid for this operator.");
-    }
-
-    virtual void CheckFactors(StdRegions::FactorMap factors,
-                              int coll_phys_offset) override
-    {
-        boost::ignore_unused(factors, coll_phys_offset);
         ASSERTL0(false, "Not valid for this operator.");
     }
 
@@ -295,7 +289,7 @@ private:
     BwdTrans_IterPerExp(vector<StdRegions::StdExpansionSharedPtr> pCollExp,
                         CoalescedGeomDataSharedPtr pGeomData,
                         StdRegions::FactorMap factors)
-        : Operator(pCollExp, pGeomData, factors)
+        : Operator(pCollExp, pGeomData, factors), BwdTrans_Helper()
     {
     }
 };
@@ -337,7 +331,8 @@ OperatorKey BwdTrans_IterPerExp::m_typeArr[] = {
 /**
  * @brief Backward transform operator using LocalRegions implementation.
  */
-class BwdTrans_NoCollection final : public Operator
+class BwdTrans_NoCollection final : virtual public Operator,
+                                    virtual public BwdTrans_Helper
 {
 public:
     OPERATOR_CREATE(BwdTrans_NoCollection)
@@ -346,12 +341,10 @@ public:
 
     void operator()(const Array<OneD, const NekDouble> &input,
                     Array<OneD, NekDouble> &output0,
-                    Array<OneD, NekDouble> &output1,
-                    Array<OneD, NekDouble> &output2,
-                    Array<OneD, NekDouble> &wsp) override
+                    [[maybe_unused]] Array<OneD, NekDouble> &output1,
+                    [[maybe_unused]] Array<OneD, NekDouble> &output2,
+                    [[maybe_unused]] Array<OneD, NekDouble> &wsp) override
     {
-        boost::ignore_unused(output1, output2, wsp);
-
         const int nCoeffs = m_expList[0]->GetNcoeffs();
         const int nPhys   = m_expList[0]->GetTotPoints();
         Array<OneD, NekDouble> tmp;
@@ -363,18 +356,11 @@ public:
         }
     }
 
-    void operator()(int dir, const Array<OneD, const NekDouble> &input,
-                    Array<OneD, NekDouble> &output,
-                    Array<OneD, NekDouble> &wsp) override final
+    void operator()([[maybe_unused]] int dir,
+                    [[maybe_unused]] const Array<OneD, const NekDouble> &input,
+                    [[maybe_unused]] Array<OneD, NekDouble> &output,
+                    [[maybe_unused]] Array<OneD, NekDouble> &wsp) final
     {
-        boost::ignore_unused(dir, input, output, wsp);
-        ASSERTL0(false, "Not valid for this operator.");
-    }
-
-    virtual void CheckFactors(StdRegions::FactorMap factors,
-                              int coll_phys_offset) override
-    {
-        boost::ignore_unused(factors, coll_phys_offset);
         ASSERTL0(false, "Not valid for this operator.");
     }
 
@@ -385,7 +371,7 @@ private:
     BwdTrans_NoCollection(vector<StdRegions::StdExpansionSharedPtr> pCollExp,
                           CoalescedGeomDataSharedPtr pGeomData,
                           StdRegions::FactorMap factors)
-        : Operator(pCollExp, pGeomData, factors)
+        : Operator(pCollExp, pGeomData, factors), BwdTrans_Helper()
     {
         m_expList = pCollExp;
     }
@@ -428,7 +414,8 @@ OperatorKey BwdTrans_NoCollection::m_typeArr[] = {
 /**
  * @brief Backward transform operator using sum-factorisation (Segment)
  */
-class BwdTrans_SumFac_Seg final : public Operator
+class BwdTrans_SumFac_Seg final : virtual public Operator,
+                                  virtual public BwdTrans_Helper
 {
 public:
     OPERATOR_CREATE(BwdTrans_SumFac_Seg)
@@ -437,11 +424,10 @@ public:
 
     void operator()(const Array<OneD, const NekDouble> &input,
                     Array<OneD, NekDouble> &output0,
-                    Array<OneD, NekDouble> &output1,
-                    Array<OneD, NekDouble> &output2,
-                    Array<OneD, NekDouble> &wsp) override
+                    [[maybe_unused]] Array<OneD, NekDouble> &output1,
+                    [[maybe_unused]] Array<OneD, NekDouble> &output2,
+                    [[maybe_unused]] Array<OneD, NekDouble> &wsp) override
     {
-        boost::ignore_unused(output1, output2, wsp);
         if (m_colldir0)
         {
             Vmath::Vcopy(m_numElmt * m_nmodes0, input.get(), 1, output0.get(),
@@ -456,18 +442,11 @@ public:
         }
     }
 
-    void operator()(int dir, const Array<OneD, const NekDouble> &input,
-                    Array<OneD, NekDouble> &output,
-                    Array<OneD, NekDouble> &wsp) override final
+    void operator()([[maybe_unused]] int dir,
+                    [[maybe_unused]] const Array<OneD, const NekDouble> &input,
+                    [[maybe_unused]] Array<OneD, NekDouble> &output,
+                    [[maybe_unused]] Array<OneD, NekDouble> &wsp) final
     {
-        boost::ignore_unused(dir, input, output, wsp);
-        ASSERTL0(false, "Not valid for this operator.");
-    }
-
-    virtual void CheckFactors(StdRegions::FactorMap factors,
-                              int coll_phys_offset) override
-    {
-        boost::ignore_unused(factors, coll_phys_offset);
         ASSERTL0(false, "Not valid for this operator.");
     }
 
@@ -481,7 +460,7 @@ private:
     BwdTrans_SumFac_Seg(vector<StdRegions::StdExpansionSharedPtr> pCollExp,
                         CoalescedGeomDataSharedPtr pGeomData,
                         StdRegions::FactorMap factors)
-        : Operator(pCollExp, pGeomData, factors),
+        : Operator(pCollExp, pGeomData, factors), BwdTrans_Helper(),
           m_nquad0(m_stdExp->GetNumPoints(0)),
           m_nmodes0(m_stdExp->GetBasisNumModes(0)),
           m_colldir0(m_stdExp->GetBasis(0)->Collocation()),
@@ -500,7 +479,8 @@ OperatorKey BwdTrans_SumFac_Seg::m_type =
 /**
  * @brief Backward transform operator using sum-factorisation (Quad)
  */
-class BwdTrans_SumFac_Quad final : public Operator
+class BwdTrans_SumFac_Quad final : virtual public Operator,
+                                   virtual public BwdTrans_Helper
 {
 public:
     OPERATOR_CREATE(BwdTrans_SumFac_Quad)
@@ -509,12 +489,10 @@ public:
 
     void operator()(const Array<OneD, const NekDouble> &input,
                     Array<OneD, NekDouble> &output0,
-                    Array<OneD, NekDouble> &output1,
-                    Array<OneD, NekDouble> &output2,
+                    [[maybe_unused]] Array<OneD, NekDouble> &output1,
+                    [[maybe_unused]] Array<OneD, NekDouble> &output2,
                     Array<OneD, NekDouble> &wsp) override
     {
-        boost::ignore_unused(output1, output2);
-
         int i = 0;
         if (m_colldir0 && m_colldir1)
         {
@@ -557,18 +535,11 @@ public:
         }
     }
 
-    void operator()(int dir, const Array<OneD, const NekDouble> &input,
-                    Array<OneD, NekDouble> &output,
-                    Array<OneD, NekDouble> &wsp) override final
+    void operator()([[maybe_unused]] int dir,
+                    [[maybe_unused]] const Array<OneD, const NekDouble> &input,
+                    [[maybe_unused]] Array<OneD, NekDouble> &output,
+                    [[maybe_unused]] Array<OneD, NekDouble> &wsp) final
     {
-        boost::ignore_unused(dir, input, output, wsp);
-        ASSERTL0(false, "Not valid for this operator.");
-    }
-
-    virtual void CheckFactors(StdRegions::FactorMap factors,
-                              int coll_phys_offset) override
-    {
-        boost::ignore_unused(factors, coll_phys_offset);
         ASSERTL0(false, "Not valid for this operator.");
     }
 
@@ -586,7 +557,7 @@ private:
     BwdTrans_SumFac_Quad(vector<StdRegions::StdExpansionSharedPtr> pCollExp,
                          CoalescedGeomDataSharedPtr pGeomData,
                          StdRegions::FactorMap factors)
-        : Operator(pCollExp, pGeomData, factors),
+        : Operator(pCollExp, pGeomData, factors), BwdTrans_Helper(),
           m_nquad0(m_stdExp->GetNumPoints(0)),
           m_nquad1(m_stdExp->GetNumPoints(1)),
           m_nmodes0(m_stdExp->GetBasisNumModes(0)),
@@ -609,7 +580,8 @@ OperatorKey BwdTrans_SumFac_Quad::m_type =
 /**
  * @brief Backward transform operator using sum-factorisation (Tri)
  */
-class BwdTrans_SumFac_Tri final : public Operator
+class BwdTrans_SumFac_Tri final : virtual public Operator,
+                                  virtual public BwdTrans_Helper
 {
 public:
     OPERATOR_CREATE(BwdTrans_SumFac_Tri)
@@ -618,12 +590,10 @@ public:
 
     void operator()(const Array<OneD, const NekDouble> &input,
                     Array<OneD, NekDouble> &output0,
-                    Array<OneD, NekDouble> &output1,
-                    Array<OneD, NekDouble> &output2,
+                    [[maybe_unused]] Array<OneD, NekDouble> &output1,
+                    [[maybe_unused]] Array<OneD, NekDouble> &output2,
                     Array<OneD, NekDouble> &wsp) override
     {
-        boost::ignore_unused(output1, output2);
-
         ASSERTL1(wsp.size() == m_wspSize, "Incorrect workspace size");
 
         int ncoeffs = m_stdExp->GetNcoeffs();
@@ -655,18 +625,11 @@ public:
                     &output0[0], m_nquad0);
     }
 
-    void operator()(int dir, const Array<OneD, const NekDouble> &input,
-                    Array<OneD, NekDouble> &output,
-                    Array<OneD, NekDouble> &wsp) override final
+    void operator()([[maybe_unused]] int dir,
+                    [[maybe_unused]] const Array<OneD, const NekDouble> &input,
+                    [[maybe_unused]] Array<OneD, NekDouble> &output,
+                    [[maybe_unused]] Array<OneD, NekDouble> &wsp) final
     {
-        boost::ignore_unused(dir, input, output, wsp);
-        ASSERTL0(false, "Not valid for this operator.");
-    }
-
-    virtual void CheckFactors(StdRegions::FactorMap factors,
-                              int coll_phys_offset) override
-    {
-        boost::ignore_unused(factors, coll_phys_offset);
         ASSERTL0(false, "Not valid for this operator.");
     }
 
@@ -710,7 +673,8 @@ OperatorKey BwdTrans_SumFac_Tri::m_type =
         BwdTrans_SumFac_Tri::create, "BwdTrans_SumFac_Tri");
 
 /// Backward transform operator using sum-factorisation (Hex)
-class BwdTrans_SumFac_Hex final : public Operator
+class BwdTrans_SumFac_Hex final : virtual public Operator,
+                                  virtual public BwdTrans_Helper
 {
 public:
     OPERATOR_CREATE(BwdTrans_SumFac_Hex)
@@ -719,12 +683,10 @@ public:
 
     void operator()(const Array<OneD, const NekDouble> &input,
                     Array<OneD, NekDouble> &output0,
-                    Array<OneD, NekDouble> &output1,
-                    Array<OneD, NekDouble> &output2,
+                    [[maybe_unused]] Array<OneD, NekDouble> &output1,
+                    [[maybe_unused]] Array<OneD, NekDouble> &output2,
                     Array<OneD, NekDouble> &wsp) override
     {
-        boost::ignore_unused(output1, output2);
-
         if (m_colldir0 && m_colldir1 && m_colldir2)
         {
             Vmath::Vcopy(m_numElmt * m_nmodes0 * m_nmodes1 * m_nmodes2,
@@ -763,18 +725,11 @@ public:
         }
     }
 
-    void operator()(int dir, const Array<OneD, const NekDouble> &input,
-                    Array<OneD, NekDouble> &output,
-                    Array<OneD, NekDouble> &wsp) override final
+    void operator()([[maybe_unused]] int dir,
+                    [[maybe_unused]] const Array<OneD, const NekDouble> &input,
+                    [[maybe_unused]] Array<OneD, NekDouble> &output,
+                    [[maybe_unused]] Array<OneD, NekDouble> &wsp) final
     {
-        boost::ignore_unused(dir, input, output, wsp);
-        ASSERTL0(false, "Not valid for this operator.");
-    }
-
-    virtual void CheckFactors(StdRegions::FactorMap factors,
-                              int coll_phys_offset) override
-    {
-        boost::ignore_unused(factors, coll_phys_offset);
         ASSERTL0(false, "Not valid for this operator.");
     }
 
@@ -796,7 +751,7 @@ private:
     BwdTrans_SumFac_Hex(vector<StdRegions::StdExpansionSharedPtr> pCollExp,
                         CoalescedGeomDataSharedPtr pGeomData,
                         StdRegions::FactorMap factors)
-        : Operator(pCollExp, pGeomData, factors),
+        : Operator(pCollExp, pGeomData, factors), BwdTrans_Helper(),
           m_nquad0(pCollExp[0]->GetNumPoints(0)),
           m_nquad1(pCollExp[0]->GetNumPoints(1)),
           m_nquad2(pCollExp[0]->GetNumPoints(2)),
@@ -824,7 +779,8 @@ OperatorKey BwdTrans_SumFac_Hex::m_type =
 /**
  * @brief Backward transform operator using sum-factorisation (Tet)
  */
-class BwdTrans_SumFac_Tet final : public Operator
+class BwdTrans_SumFac_Tet final : virtual public Operator,
+                                  virtual public BwdTrans_Helper
 {
 public:
     OPERATOR_CREATE(BwdTrans_SumFac_Tet)
@@ -833,12 +789,10 @@ public:
 
     void operator()(const Array<OneD, const NekDouble> &input,
                     Array<OneD, NekDouble> &output0,
-                    Array<OneD, NekDouble> &output1,
-                    Array<OneD, NekDouble> &output2,
-                    Array<OneD, NekDouble> &wsp) override final
+                    [[maybe_unused]] Array<OneD, NekDouble> &output1,
+                    [[maybe_unused]] Array<OneD, NekDouble> &output2,
+                    Array<OneD, NekDouble> &wsp) final
     {
-        boost::ignore_unused(output1, output2);
-
         ASSERTL1(wsp.size() == m_wspSize, "Incorrect workspace size");
 
         Array<OneD, NekDouble> tmp = wsp;
@@ -933,18 +887,11 @@ public:
                     m_nquad0);
     }
 
-    void operator()(int dir, const Array<OneD, const NekDouble> &input,
-                    Array<OneD, NekDouble> &output,
-                    Array<OneD, NekDouble> &wsp) override final
+    void operator()([[maybe_unused]] int dir,
+                    [[maybe_unused]] const Array<OneD, const NekDouble> &input,
+                    [[maybe_unused]] Array<OneD, NekDouble> &output,
+                    [[maybe_unused]] Array<OneD, NekDouble> &wsp) final
     {
-        boost::ignore_unused(dir, input, output, wsp);
-        ASSERTL0(false, "Not valid for this operator.");
-    }
-
-    virtual void CheckFactors(StdRegions::FactorMap factors,
-                              int coll_phys_offset) override
-    {
-        boost::ignore_unused(factors, coll_phys_offset);
         ASSERTL0(false, "Not valid for this operator.");
     }
 
@@ -964,7 +911,7 @@ private:
     BwdTrans_SumFac_Tet(vector<StdRegions::StdExpansionSharedPtr> pCollExp,
                         CoalescedGeomDataSharedPtr pGeomData,
                         StdRegions::FactorMap factors)
-        : Operator(pCollExp, pGeomData, factors),
+        : Operator(pCollExp, pGeomData, factors), BwdTrans_Helper(),
           m_nquad0(m_stdExp->GetNumPoints(0)),
           m_nquad1(m_stdExp->GetNumPoints(1)),
           m_nquad2(m_stdExp->GetNumPoints(2)),
@@ -999,7 +946,8 @@ OperatorKey BwdTrans_SumFac_Tet::m_type =
 /**
  * @brief Backward transform operator using sum-factorisation (Prism)
  */
-class BwdTrans_SumFac_Prism final : public Operator
+class BwdTrans_SumFac_Prism final : virtual public Operator,
+                                    virtual public BwdTrans_Helper
 {
 public:
     OPERATOR_CREATE(BwdTrans_SumFac_Prism)
@@ -1008,12 +956,10 @@ public:
 
     void operator()(const Array<OneD, const NekDouble> &input,
                     Array<OneD, NekDouble> &output0,
-                    Array<OneD, NekDouble> &output1,
-                    Array<OneD, NekDouble> &output2,
-                    Array<OneD, NekDouble> &wsp) override final
+                    [[maybe_unused]] Array<OneD, NekDouble> &output1,
+                    [[maybe_unused]] Array<OneD, NekDouble> &output2,
+                    Array<OneD, NekDouble> &wsp) final
     {
-        boost::ignore_unused(output1, output2);
-
         ASSERTL1(wsp.size() == m_wspSize, "Incorrect workspace size");
 
         // Assign second half of workspace for 2nd DGEMM operation.
@@ -1078,18 +1024,11 @@ public:
                     m_nquad0);
     }
 
-    void operator()(int dir, const Array<OneD, const NekDouble> &input,
-                    Array<OneD, NekDouble> &output,
-                    Array<OneD, NekDouble> &wsp) override final
+    void operator()([[maybe_unused]] int dir,
+                    [[maybe_unused]] const Array<OneD, const NekDouble> &input,
+                    [[maybe_unused]] Array<OneD, NekDouble> &output,
+                    [[maybe_unused]] Array<OneD, NekDouble> &wsp) final
     {
-        boost::ignore_unused(dir, input, output, wsp);
-        ASSERTL0(false, "Not valid for this operator.");
-    }
-
-    virtual void CheckFactors(StdRegions::FactorMap factors,
-                              int coll_phys_offset) override
-    {
-        boost::ignore_unused(factors, coll_phys_offset);
         ASSERTL0(false, "Not valid for this operator.");
     }
 
@@ -1109,7 +1048,7 @@ private:
     BwdTrans_SumFac_Prism(vector<StdRegions::StdExpansionSharedPtr> pCollExp,
                           CoalescedGeomDataSharedPtr pGeomData,
                           StdRegions::FactorMap factors)
-        : Operator(pCollExp, pGeomData, factors),
+        : Operator(pCollExp, pGeomData, factors), BwdTrans_Helper(),
           m_nquad0(m_stdExp->GetNumPoints(0)),
           m_nquad1(m_stdExp->GetNumPoints(1)),
           m_nquad2(m_stdExp->GetNumPoints(2)),
@@ -1143,7 +1082,8 @@ OperatorKey BwdTrans_SumFac_Prism::m_type =
 /**
  * @brief Backward transform operator using sum-factorisation (Pyr)
  */
-class BwdTrans_SumFac_Pyr final : public Operator
+class BwdTrans_SumFac_Pyr final : virtual public Operator,
+                                  virtual public BwdTrans_Helper
 {
 public:
     OPERATOR_CREATE(BwdTrans_SumFac_Pyr)
@@ -1152,12 +1092,10 @@ public:
 
     void operator()(const Array<OneD, const NekDouble> &input,
                     Array<OneD, NekDouble> &output0,
-                    Array<OneD, NekDouble> &output1,
-                    Array<OneD, NekDouble> &output2,
-                    Array<OneD, NekDouble> &wsp) override final
+                    [[maybe_unused]] Array<OneD, NekDouble> &output1,
+                    [[maybe_unused]] Array<OneD, NekDouble> &output2,
+                    Array<OneD, NekDouble> &wsp) final
     {
-        boost::ignore_unused(output1, output2);
-
         ASSERTL1(wsp.size() == m_wspSize, "Incorrect workspace size");
 
         // Assign second half of workspace for 2nd DGEMM operation.
@@ -1242,18 +1180,11 @@ public:
                     m_nquad0);
     }
 
-    void operator()(int dir, const Array<OneD, const NekDouble> &input,
-                    Array<OneD, NekDouble> &output,
-                    Array<OneD, NekDouble> &wsp) override final
+    void operator()([[maybe_unused]] int dir,
+                    [[maybe_unused]] const Array<OneD, const NekDouble> &input,
+                    [[maybe_unused]] Array<OneD, NekDouble> &output,
+                    [[maybe_unused]] Array<OneD, NekDouble> &wsp) final
     {
-        boost::ignore_unused(dir, input, output, wsp);
-        ASSERTL0(false, "Not valid for this operator.");
-    }
-
-    virtual void CheckFactors(StdRegions::FactorMap factors,
-                              int coll_phys_offset) override
-    {
-        boost::ignore_unused(factors, coll_phys_offset);
         ASSERTL0(false, "Not valid for this operator.");
     }
 
@@ -1273,7 +1204,7 @@ private:
     BwdTrans_SumFac_Pyr(vector<StdRegions::StdExpansionSharedPtr> pCollExp,
                         CoalescedGeomDataSharedPtr pGeomData,
                         StdRegions::FactorMap factors)
-        : Operator(pCollExp, pGeomData, factors),
+        : Operator(pCollExp, pGeomData, factors), BwdTrans_Helper(),
           m_nquad0(m_stdExp->GetNumPoints(0)),
           m_nquad1(m_stdExp->GetNumPoints(1)),
           m_nquad2(m_stdExp->GetNumPoints(2)),
@@ -1303,6 +1234,4 @@ OperatorKey BwdTrans_SumFac_Pyr::m_type =
         OperatorKey(ePyramid, eBwdTrans, eSumFac, false),
         BwdTrans_SumFac_Pyr::create, "BwdTrans_SumFac_Pyr");
 
-} // namespace Collections
-
-} // namespace Nektar
+} // namespace Nektar::Collections

@@ -38,9 +38,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace StdRegions
+namespace Nektar::StdRegions
 {
 StdMatrixKey::StdMatrixKey(const MatrixType matrixType,
                            const LibUtilities::ShapeType shapeType,
@@ -310,5 +308,4 @@ std::ostream &operator<<(std::ostream &os, const StdMatrixKey &rhs)
 
     return os;
 }
-} // namespace StdRegions
-} // namespace Nektar
+} // namespace Nektar::StdRegions

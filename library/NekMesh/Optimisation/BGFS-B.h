@@ -38,11 +38,8 @@
 #include <NekMesh/CADSystem/CADSystem.h>
 #include <NekMesh/Optimisation/OptimiseObj.h>
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 bool BGFSUpdate(OptiObjSharedPtr opti, DNekMat &J, DNekMat &B, DNekMat &H);
-}
-} // namespace Nektar
+} // namespace Nektar::NekMesh
 #endif

@@ -33,8 +33,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include "PressureMachTemperatureBC.h"
 
 using namespace std;
@@ -51,8 +49,10 @@ PressureMachTemperatureBC::PressureMachTemperatureBC(
     const LibUtilities::SessionReaderSharedPtr &pSession,
     const Array<OneD, MultiRegions::ExpListSharedPtr> &pFields,
     const Array<OneD, Array<OneD, NekDouble>> &pTraceNormals,
+    const Array<OneD, Array<OneD, NekDouble>> &pGridVelocity,
     const int pSpaceDim, const int bcRegion, const int cnt)
-    : CFSBndCond(pSession, pFields, pTraceNormals, pSpaceDim, bcRegion, cnt)
+    : CFSBndCond(pSession, pFields, pTraceNormals, pGridVelocity, pSpaceDim,
+                 bcRegion, cnt)
 {
     int nvariables = m_fields.size();
     int numBCPts =
@@ -113,11 +113,10 @@ PressureMachTemperatureBC::PressureMachTemperatureBC(
 }
 
 void PressureMachTemperatureBC::v_Apply(
-    Array<OneD, Array<OneD, NekDouble>> &Fwd,
-    Array<OneD, Array<OneD, NekDouble>> &physarray, const NekDouble &time)
+    [[maybe_unused]] Array<OneD, Array<OneD, NekDouble>> &Fwd,
+    [[maybe_unused]] Array<OneD, Array<OneD, NekDouble>> &physarray,
+    [[maybe_unused]] const NekDouble &time)
 {
-    boost::ignore_unused(Fwd, physarray, time);
-
     int nvariables = m_fields.size();
     int numBCPts =
         m_fields[0]->GetBndCondExpansions()[m_bcRegion]->GetNpoints();

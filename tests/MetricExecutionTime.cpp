@@ -82,7 +82,7 @@ MetricExecutionTime::MetricExecutionTime(TiXmlElement *metric, bool generate)
     else
     {
         // Set the regex to a default value.
-        m_regex = "^.*Total Computation Time\\s*=\\s*(\\d+\\.?\\d*).*";
+        m_regex = R"(^.*Total Computation Time\s*=\s*(\d+\.?\d*).*)";
     }
 
     // Inform the Tester this metric supports averaging data from multiple runs.
@@ -160,7 +160,7 @@ bool MetricExecutionTime::v_Test(istream &pStdout, istream &pStderr)
     // Select istream to use.
     istream &is = m_useStderr ? pStderr : pStdout;
 
-    boost::cmatch matches;
+    std::smatch matches;
     string line;
     // Vector of execution times found in the output.
     vector<double> times;
@@ -170,7 +170,7 @@ bool MetricExecutionTime::v_Test(istream &pStdout, istream &pStderr)
     while (getline(is, line))
     {
         // Test to see if we have a match on this line.
-        if (boost::regex_match(line.c_str(), matches, m_regex))
+        if (std::regex_match(line, matches, m_regex))
         {
             // If no matches are found then throw an error.
             if (matches.size() == 1)
@@ -212,20 +212,19 @@ bool MetricExecutionTime::v_Test(istream &pStdout, istream &pStderr)
         success = false;
     }
 
-    // Average the found execution times.
-    double avgTime = 0.0;
+    // Find the minimum of the execution times.
+    double minTime = times[0];
     for (unsigned int i = 0; i < times.size(); ++i)
     {
-        avgTime += times[i];
+        minTime = (times[i] < minTime) ? times[i] : minTime;
     }
-    avgTime /= times.size();
 
     // If a skip flag is set (due to no matching hostname) then return
     // successful test and output the average time.
     if (m_match.m_skip)
     {
-        cerr << "Average execution time for host "
-             << boost::asio::ip::host_name() << ": " << avgTime << endl;
+        cerr << "Minimum execution time for host "
+             << boost::asio::ip::host_name() << ": " << minTime << endl;
         return success;
     }
 
@@ -233,15 +232,15 @@ bool MetricExecutionTime::v_Test(istream &pStdout, istream &pStderr)
              "No test conditions defined for execution time.");
 
     // Check that the average time is within the tolerance.
-    if (fabs(avgTime - boost::lexical_cast<double>(m_match.m_value)) >
+    if (fabs(minTime - boost::lexical_cast<double>(m_match.m_value)) >
             m_match.m_tolerance &&
         !m_match.m_skip)
     {
         cerr << endl;
         cerr << "Failed tolerance match." << endl;
-        cerr << "  Expected avg execution time: " << m_match.m_value << " +/- "
+        cerr << "  Expected min execution time: " << m_match.m_value << " +/- "
              << m_match.m_tolerance << endl;
-        cerr << "  Actual avg: " << avgTime << endl;
+        cerr << "  Actual min: " << minTime << endl;
 
         for (unsigned int i = 0; i < times.size(); ++i)
         {
@@ -271,7 +270,7 @@ void MetricExecutionTime::v_Generate(istream &pStdout, istream &pStderr)
     // Select istream to use
     istream &is = m_useStderr ? pStderr : pStdout;
 
-    boost::cmatch matches;
+    std::smatch matches;
 
     string line;
     // Vector of execution times found in the output
@@ -282,7 +281,7 @@ void MetricExecutionTime::v_Generate(istream &pStdout, istream &pStderr)
     while (getline(is, line))
     {
         // Test to see if we have a match on this line
-        if (boost::regex_match(line.c_str(), matches, m_regex))
+        if (std::regex_match(line, matches, m_regex))
         {
             // If no fields in regex then throw an error
             ASSERTL0(matches.size() != 1, "No test sections in regex!");
@@ -316,14 +315,13 @@ void MetricExecutionTime::v_Generate(istream &pStdout, istream &pStderr)
     if (matched)
     {
         // Average the found execution times and set it as the accepted value.
-        double avgTime = 0.0;
+        double minTime = sampleTimes[0];
         for (unsigned int i = 0; i < sampleTimes.size(); ++i)
         {
-            avgTime += sampleTimes[i];
+            minTime = (sampleTimes[i] < minTime ? sampleTimes[i] : minTime);
         }
-        avgTime /= sampleTimes.size();
 
-        okValue.m_value = to_string(avgTime);
+        okValue.m_value = to_string(minTime);
         m_match         = okValue;
     }
     else

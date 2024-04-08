@@ -32,17 +32,13 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/Foundations/ManagerAccess.h>
 #include <StdRegions/StdPyrExp.h>
 #include <iomanip>
 
 using namespace std;
 
-namespace Nektar
-{
-namespace StdRegions
+namespace Nektar::StdRegions
 {
 StdPyrExp::StdPyrExp(const LibUtilities::BasisKey &Ba,
                      const LibUtilities::BasisKey &Bb,
@@ -65,10 +61,6 @@ StdPyrExp::StdPyrExp(const LibUtilities::BasisKey &Ba,
                  Bc.GetBasisType() == LibUtilities::eOrthoPyr_C,
              "Expected basis type in 'c' direction to be ModifiedPyr_C or "
              "OrthoPyr_C");
-}
-
-StdPyrExp::StdPyrExp(const StdPyrExp &T) : StdExpansion(T), StdExpansion3D(T)
-{
 }
 
 //---------------------------------------
@@ -275,10 +267,10 @@ void StdPyrExp::v_BwdTrans_SumFacKernel(
     const Array<OneD, const NekDouble> &base2,
     const Array<OneD, const NekDouble> &inarray,
     Array<OneD, NekDouble> &outarray, Array<OneD, NekDouble> &wsp,
-    bool doCheckCollDir0, bool doCheckCollDir1, bool doCheckCollDir2)
+    [[maybe_unused]] bool doCheckCollDir0,
+    [[maybe_unused]] bool doCheckCollDir1,
+    [[maybe_unused]] bool doCheckCollDir2)
 {
-    boost::ignore_unused(doCheckCollDir0, doCheckCollDir1, doCheckCollDir2);
-
     int nquad0 = m_base[0]->GetNumPoints();
     int nquad1 = m_base[1]->GetNumPoints();
     int nquad2 = m_base[2]->GetNumPoints();
@@ -448,10 +440,10 @@ void StdPyrExp::v_IProductWRTBase_SumFacKernel(
     const Array<OneD, const NekDouble> &base2,
     const Array<OneD, const NekDouble> &inarray,
     Array<OneD, NekDouble> &outarray, Array<OneD, NekDouble> &wsp,
-    bool doCheckCollDir0, bool doCheckCollDir1, bool doCheckCollDir2)
+    [[maybe_unused]] bool doCheckCollDir0,
+    [[maybe_unused]] bool doCheckCollDir1,
+    [[maybe_unused]] bool doCheckCollDir2)
 {
-    boost::ignore_unused(doCheckCollDir0, doCheckCollDir1, doCheckCollDir2);
-
     int nquad0 = m_base[0]->GetNumPoints();
     int nquad1 = m_base[1]->GetNumPoints();
     int nquad2 = m_base[2]->GetNumPoints();
@@ -2199,5 +2191,4 @@ void StdPyrExp::v_ReduceOrderCoeffs(int numMin,
     StdPyrExp::FwdTrans(phys_tmp, outarray);
 }
 
-} // namespace StdRegions
-} // namespace Nektar
+} // namespace Nektar::StdRegions

@@ -62,22 +62,25 @@ public:
     static std::string className;
 
     /// Destructor
-    virtual ~UnsteadyDiffusion();
+    ~UnsteadyDiffusion() override = default;
 
 protected:
+    NekDouble m_epsilon;
+    NekDouble m_d00 = 1.0, m_d11 = 1.0, m_d22 = 1.0;
     bool m_useSpecVanVisc;
-    NekDouble
-        m_sVVCutoffRatio; // cut off ratio from which to start decayhing modes
-    NekDouble m_sVVDiffCoeff; // Diffusion coefficient of SVV modes
+    // cut off ratio from which to start decayhing modes
+    NekDouble m_sVVCutoffRatio;
+    // Diffusion coefficient of SVV modes
+    NekDouble m_sVVDiffCoeff;
+    StdRegions::VarCoeffMap m_varcoeff;
     SolverUtils::DiffusionSharedPtr m_diffusion;
     SolverUtils::RiemannSolverSharedPtr m_riemannSolver;
-
-    virtual void v_GenerateSummary(SummaryList &s) override;
 
     UnsteadyDiffusion(const LibUtilities::SessionReaderSharedPtr &pSession,
                       const SpatialDomains::MeshGraphSharedPtr &pGraph);
 
-    virtual void v_InitObject(bool DeclareFields = true) override;
+    void v_GenerateSummary(SummaryList &s) override;
+    void v_InitObject(bool DeclareFields = true) override;
 
     void GetFluxVector(
         const Array<OneD, Array<OneD, NekDouble>> &inarray,
@@ -93,11 +96,6 @@ protected:
         const Array<OneD, const Array<OneD, NekDouble>> &inarray,
         Array<OneD, Array<OneD, NekDouble>> &outarray, NekDouble time,
         NekDouble lambda);
-
-private:
-    NekDouble m_waveFreq;
-    NekDouble m_epsilon;
-    StdRegions::VarCoeffMap m_varcoeff;
 };
 } // namespace Nektar
 

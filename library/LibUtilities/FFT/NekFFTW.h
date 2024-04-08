@@ -73,7 +73,7 @@ public:
     NekFFTW(int N);
 
     // Distructor
-    virtual ~NekFFTW();
+    ~NekFFTW() override;
 
 protected:
     Array<OneD, NekDouble>
@@ -98,11 +98,11 @@ protected:
 
     void Reshuffle_Nek2FFTW(Array<OneD, NekDouble> &coef);
 
-    virtual void v_FFTFwdTrans(Array<OneD, NekDouble> &inarray,
-                               Array<OneD, NekDouble> &outarray) override;
+    void v_FFTFwdTrans(Array<OneD, NekDouble> &inarray,
+                       Array<OneD, NekDouble> &outarray) override;
 
-    virtual void v_FFTBwdTrans(Array<OneD, NekDouble> &inarray,
-                               Array<OneD, NekDouble> &outarray) override;
+    void v_FFTBwdTrans(Array<OneD, NekDouble> &inarray,
+                       Array<OneD, NekDouble> &outarray) override;
 
 private:
 };

@@ -72,16 +72,15 @@ protected:
     // Mapping object
     GlobalMapping::MappingSharedPtr m_mapping;
 
-    virtual void v_InitObject(
+    void v_InitObject(
         const Array<OneD, MultiRegions::ExpListSharedPtr> &pFields,
         const unsigned int &pNumForcingFields,
         const TiXmlElement *pForce) override;
 
-    virtual void v_Apply(
-        const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
-        const Array<OneD, Array<OneD, NekDouble>> &inarray,
-        Array<OneD, Array<OneD, NekDouble>> &outarray,
-        const NekDouble &time) override;
+    void v_Apply(const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
+                 const Array<OneD, Array<OneD, NekDouble>> &inarray,
+                 Array<OneD, Array<OneD, NekDouble>> &outarray,
+                 const NekDouble &time) override;
 
 private:
     ForcingMovingBody(
@@ -150,9 +149,6 @@ private:
     Array<OneD, Array<OneD, NekDouble>> m_eta;
     ///
     unsigned int m_outputFrequency;
-    Array<OneD, std::ofstream> m_outputStream;
-    std::string m_outputFile_fce;
-    std::string m_outputFile_mot;
 };
 
 } // namespace Nektar

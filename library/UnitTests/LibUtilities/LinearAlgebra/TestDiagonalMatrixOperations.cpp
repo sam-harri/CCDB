@@ -40,9 +40,7 @@
 #include <boost/test/tools/floating_point_comparison.hpp>
 #include <boost/test/unit_test.hpp>
 
-namespace Nektar
-{
-namespace DiagonalMatrixOperationsUnitTests
+namespace Nektar::DiagonalMatrixOperationsUnitTests
 {
 BOOST_AUTO_TEST_CASE(TestDoubleDiagonalVectorMultiplication)
 {
@@ -79,5 +77,4 @@ BOOST_AUTO_TEST_CASE(TestDoubleScaledDiagonalVectorMultiplication)
     BOOST_CHECK_EQUAL(expected_result, result);
 }
 
-} // namespace DiagonalMatrixOperationsUnitTests
-} // namespace Nektar
+} // namespace Nektar::DiagonalMatrixOperationsUnitTests

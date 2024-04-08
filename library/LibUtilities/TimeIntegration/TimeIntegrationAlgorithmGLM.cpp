@@ -40,13 +40,9 @@
 
 #include <iostream>
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <cmath>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -68,6 +64,13 @@ TimeIntegrationSolutionGLMSharedPtr TimeIntegrationAlgorithmGLM::InitializeData(
     if (m_schemeType == eExplicit || m_schemeType == eExponential)
     {
         // Ensure initial solution is in correct space.
+        m_op.DoProjection(y_out->GetSolution(), y_out->UpdateSolution(), time);
+    }
+    else if (m_schemeType == eDiagonallyImplicit &&
+             fabs(A(0, 0)) < NekConstants::kNekZeroTol)
+    {
+        // Explicit first-stage when first diagonal coefficient is equal to
+        // zero (EDIRK/ESDIRK schemes).
         m_op.DoProjection(y_out->GetSolution(), y_out->UpdateSolution(), time);
     }
 
@@ -898,13 +901,11 @@ void TimeIntegrationAlgorithmGLM::VerifyIntegrationSchemeType()
 }
 
 bool TimeIntegrationAlgorithmGLM::CheckTimeIntegrateArguments(
-    ConstTripleArray &y_old, ConstSingleArray &t_old, TripleArray &y_new,
-    SingleArray &t_new) const
+    [[maybe_unused]] ConstTripleArray &y_old,
+    [[maybe_unused]] ConstSingleArray &t_old,
+    [[maybe_unused]] TripleArray &y_new,
+    [[maybe_unused]] SingleArray &t_new) const
 {
-#ifndef NEKTAR_DEBUG
-    boost::ignore_unused(y_old, t_old, y_new, t_new);
-#endif
-
     // Check if arrays are all of consistent size
 
     ASSERTL1(y_old.size() == m_numsteps, "Non-matching number of steps.");
@@ -1090,5 +1091,4 @@ std::ostream &operator<<(std::ostream &os,
     return os;
 } // end function operator<<
 
-} // end namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities

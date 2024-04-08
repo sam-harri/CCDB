@@ -35,9 +35,7 @@
 #ifndef NEKTAR_SPATIALDOMAINS_SPATIALDOMAINS_H
 #define NEKTAR_SPATIALDOMAINS_SPATIALDOMAINS_H
 
-namespace Nektar
-{
-namespace SpatialDomains
+namespace Nektar::SpatialDomains
 {
 /**
  * @brief Indicates the type of element geometry.
@@ -91,7 +89,6 @@ const char *const GeomMMFMap[] = {
     "TangentCircular", "TangentIrregular", "TangentNonconvex", "LOCAL",
 };
 
-} // namespace SpatialDomains
-} // namespace Nektar
+} // namespace Nektar::SpatialDomains
 
 #endif // NEKTAR_SPATIALDOMAINS_SPATIALDOMAINS_H

@@ -44,7 +44,7 @@
 using namespace std;
 using namespace Nektar;
 
-//#define TIMING
+// #define TIMING
 #ifdef TIMING
 #include <time.h>
 #define Timing(s)                                                              \

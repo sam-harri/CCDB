@@ -41,9 +41,7 @@
 #include <LibUtilities/BasicUtils/SharedArray.hpp>
 #include <SolverUtils/SolverUtilsDeclspec.h>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 
 class FluidInterface
@@ -84,13 +82,19 @@ public:
     SOLVER_UTILS_EXPORT void GetMovingFrameProjectionMat(
         boost::numeric::ublas::matrix<NekDouble> &vProjMat);
 
-    // gave access and set the angle between moving frame and stationary
-    // inertial frame
-    SOLVER_UTILS_EXPORT void SetMovingFrameAngles(
-        const Array<OneD, NekDouble> &vFrameTheta);
+    // gave access and set the displacement and angles between moving frame and
+    // stationary one
+    SOLVER_UTILS_EXPORT void SetMovingFrameDisp(
+        const Array<OneD, NekDouble> &vFrameDisp);
 
-    SOLVER_UTILS_EXPORT void GetMovingFrameAngles(
-        Array<OneD, NekDouble> &vFrameTheta);
+    SOLVER_UTILS_EXPORT void GetMovingFrameDisp(
+        Array<OneD, NekDouble> &vFrameDisp);
+
+    /// Set aerodynamic force and moment
+    SOLVER_UTILS_EXPORT void SetAeroForce(Array<OneD, NekDouble> forces);
+
+    /// Get aerodynamic force and moment
+    SOLVER_UTILS_EXPORT void GetAeroForce(Array<OneD, NekDouble> forces);
 
 protected:
     SOLVER_UTILS_EXPORT virtual void v_GetVelocity(
@@ -104,34 +108,39 @@ protected:
         const Array<OneD, const Array<OneD, NekDouble>> &physfield,
         Array<OneD, NekDouble> &pressure) = 0;
     SOLVER_UTILS_EXPORT virtual void v_SetMovingFrameVelocities(
-        const Array<OneD, NekDouble> &vFrameVels)
+        [[maybe_unused]] const Array<OneD, NekDouble> &vFrameVels)
     {
-        boost::ignore_unused(vFrameVels);
     }
     SOLVER_UTILS_EXPORT virtual void v_GetMovingFrameVelocities(
-        Array<OneD, NekDouble> &vFrameVels)
+        [[maybe_unused]] Array<OneD, NekDouble> &vFrameVels)
     {
-        boost::ignore_unused(vFrameVels);
     }
     SOLVER_UTILS_EXPORT virtual void v_SetMovingFrameProjectionMat(
-        const boost::numeric::ublas::matrix<NekDouble> &vProjMat)
+        [[maybe_unused]] const boost::numeric::ublas::matrix<NekDouble>
+            &vProjMat)
     {
-        boost::ignore_unused(vProjMat);
     }
     SOLVER_UTILS_EXPORT virtual void v_GetMovingFrameProjectionMat(
-        boost::numeric::ublas::matrix<NekDouble> &vProjMat)
+        [[maybe_unused]] boost::numeric::ublas::matrix<NekDouble> &vProjMat)
     {
-        boost::ignore_unused(vProjMat);
     }
-    SOLVER_UTILS_EXPORT virtual void v_SetMovingFrameAngles(
-        const Array<OneD, NekDouble> &vFrameTheta)
+    SOLVER_UTILS_EXPORT virtual void v_SetMovingFrameDisp(
+        [[maybe_unused]] const Array<OneD, NekDouble> &vFrameDisp)
     {
-        boost::ignore_unused(vFrameTheta);
     }
-    SOLVER_UTILS_EXPORT virtual void v_GetMovingFrameAngles(
-        Array<OneD, NekDouble> &vFrameTheta)
+    SOLVER_UTILS_EXPORT virtual void v_GetMovingFrameDisp(
+        [[maybe_unused]] Array<OneD, NekDouble> &vFrameDisp)
     {
-        boost::ignore_unused(vFrameTheta);
+    }
+
+    SOLVER_UTILS_EXPORT virtual void v_SetAeroForce(
+        [[maybe_unused]] Array<OneD, NekDouble> forces)
+    {
+    }
+
+    SOLVER_UTILS_EXPORT virtual void v_GetAeroForce(
+        [[maybe_unused]] Array<OneD, NekDouble> forces)
+    {
     }
 };
 
@@ -212,19 +221,28 @@ inline void FluidInterface::GetMovingFrameProjectionMat(
 /**
  *
  */
-inline void FluidInterface::SetMovingFrameAngles(
-    const Array<OneD, NekDouble> &vFrameTheta)
+inline void FluidInterface::SetMovingFrameDisp(
+    const Array<OneD, NekDouble> &vFrameDisp)
 {
-    v_SetMovingFrameAngles(vFrameTheta);
+    v_SetMovingFrameDisp(vFrameDisp);
 }
 
-inline void FluidInterface::GetMovingFrameAngles(
-    Array<OneD, NekDouble> &vFrameTheta)
+inline void FluidInterface::GetMovingFrameDisp(
+    Array<OneD, NekDouble> &vFrameDisp)
 {
-    v_GetMovingFrameAngles(vFrameTheta);
+    v_GetMovingFrameDisp(vFrameDisp);
 }
 
-} // namespace SolverUtils
-} // namespace Nektar
+inline void FluidInterface::SetAeroForce(Array<OneD, NekDouble> forces)
+{
+    v_SetAeroForce(forces);
+}
+
+inline void FluidInterface::GetAeroForce(Array<OneD, NekDouble> forces)
+{
+    v_GetAeroForce(forces);
+}
+
+} // namespace Nektar::SolverUtils
 
 #endif

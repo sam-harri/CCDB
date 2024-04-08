@@ -52,9 +52,7 @@
 // are constructed by CMake in the CMakeLists.txt file which uses an
 // implementation file.  See the CMakeLists.txt files for more
 // details.
-namespace Nektar
-{
-namespace MatrixFree
+namespace Nektar::MatrixFree
 {
 
 template <LibUtilities::ShapeType SHAPE_TYPE, bool DEFORMED = false>
@@ -354,7 +352,6 @@ private:
     int m_nmTot;
 };
 
-} // namespace MatrixFree
-} // namespace Nektar
+} // namespace Nektar::MatrixFree
 
 #endif

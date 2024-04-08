@@ -37,9 +37,7 @@
 
 #include <NekMesh/MeshElements/Node.h>
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 /**
  * @brief A lightweight struct for dealing with high-order triangle
@@ -355,6 +353,5 @@ template <typename T> struct HOQuadrilateral
     }
 };
 
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh
 #endif

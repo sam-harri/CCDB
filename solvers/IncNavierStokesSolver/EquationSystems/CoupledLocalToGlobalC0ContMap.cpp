@@ -52,15 +52,14 @@ namespace Nektar
  */
 CoupledLocalToGlobalC0ContMap::CoupledLocalToGlobalC0ContMap(
     const LibUtilities::SessionReaderSharedPtr &pSession,
-    const SpatialDomains::MeshGraphSharedPtr &graph,
-    const SpatialDomains::BoundaryConditionsSharedPtr &boundaryConditions,
+    [[maybe_unused]] const SpatialDomains::MeshGraphSharedPtr &graph,
+    [[maybe_unused]] const SpatialDomains::BoundaryConditionsSharedPtr
+        &boundaryConditions,
     const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
     const MultiRegions::ExpListSharedPtr &pressure, const size_t nz_loc,
     const bool CheckforSingularSys)
     : AssemblyMapCG(pSession, fields[0]->GetComm())
 {
-    boost::ignore_unused(graph, boundaryConditions);
-
     size_t i, j, k, n;
     size_t cnt = 0, offset = 0;
     size_t meshVertId;
@@ -897,12 +896,11 @@ CoupledLocalToGlobalC0ContMap::CoupledLocalToGlobalC0ContMap(
 void CoupledLocalToGlobalC0ContMap::FindEdgeIdToAddMeanPressure(
     vector<map<int, int>> &ReorderedGraphVertId, size_t &nel,
     const LocalRegions::ExpansionVector &locExpVector, size_t &edgeId,
-    size_t &vertId, int &firstNonDirGraphVertId, map<int, int> &IsDirEdgeDof,
+    [[maybe_unused]] size_t &vertId, int &firstNonDirGraphVertId,
+    map<int, int> &IsDirEdgeDof,
     MultiRegions::BottomUpSubStructuredGraphSharedPtr &bottomUpGraph,
     Array<OneD, int> &AddMeanPressureToEdgeId)
 {
-    boost::ignore_unused(vertId);
-
     size_t i, j, k;
 
     // Make list of homogeneous graph edges to elmt mappings
@@ -1047,20 +1045,9 @@ void CoupledLocalToGlobalC0ContMap::FindEdgeIdToAddMeanPressure(
                                     if (HomGraphEdgeIdToEdgeId.count(
                                             GlobIdOffset1 + l) != 0)
                                     {
-                                        // June 2012: commenting this condition
-                                        // apparently solved the bug caused by
-                                        // the edge reordering procedure
-
-                                        // if(AddMeanPressureToEdgeId[elmtid] ==
-                                        // -1)
-                                        //{
-
-                                        // AddMeanPressureToEdgeId[elmtid] =
-                                        // HomGraphEdgeIdToEdgeId[GlobIdOffset1+l];
                                         AddMeanPressureToEdgeId[elmtid] =
                                             defedge;
 
-                                        //}
                                         SetEdge = true;
                                         break;
                                     }

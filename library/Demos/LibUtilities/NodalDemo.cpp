@@ -137,7 +137,7 @@ int main(int argc, char *argv[])
 
     // Generate nodal utility.
     ShapeType shape = nodalTypes[pointsType];
-    NodalUtil *util = NULL;
+    NodalUtil *util = nullptr;
 
     if (shape == eTriangle)
     {

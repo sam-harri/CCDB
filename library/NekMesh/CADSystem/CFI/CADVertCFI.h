@@ -68,9 +68,8 @@ public:
 
     void Initialise(int i, cfi::Point *in, NekDouble s);
 
-    NekDouble DistanceTo(Array<OneD, NekDouble> l)
+    NekDouble DistanceTo([[maybe_unused]] std::array<NekDouble, 3> l)
     {
-        boost::ignore_unused(l);
         ASSERTL0(false, "Not implemented in CFI");
         return 0;
     }

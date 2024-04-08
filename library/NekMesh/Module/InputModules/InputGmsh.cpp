@@ -52,9 +52,7 @@ using namespace std;
 
 using namespace Nektar::NekMesh;
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 ModuleKey InputGmsh::className = GetModuleFactory().RegisterCreatorFunction(
@@ -568,20 +566,20 @@ std::vector<int> hexTensorNodeOrdering(const std::vector<int> &nodes, int n)
     }
 
     int hexEdges[12][2]   = {{0, 1},
-                           {n - 1, n},
-                           {n * n - 1, -1},
-                           {n * (n - 1), -n},
-                           {0, n * n},
-                           {n - 1, n * n},
-                           {n * n - 1, n * n},
-                           {n * (n - 1), n * n},
-                           {n * n * (n - 1), 1},
-                           {n * n * (n - 1) + n - 1, n},
-                           {n * n * n - 1, -1},
-                           {n * n * (n - 1) + n * (n - 1), -n}};
+                             {n - 1, n},
+                             {n * n - 1, -1},
+                             {n * (n - 1), -n},
+                             {0, n * n},
+                             {n - 1, n * n},
+                             {n * n - 1, n * n},
+                             {n * (n - 1), n * n},
+                             {n * n * (n - 1), 1},
+                             {n * n * (n - 1) + n - 1, n},
+                             {n * n * n - 1, -1},
+                             {n * n * (n - 1) + n * (n - 1), -n}};
     int hexFaces[6][3]    = {{0, 1, n},         {0, 1, n * n},
-                          {n - 1, n, n * n}, {n * (n - 1), 1, n * n},
-                          {0, n, n * n},     {n * n * (n - 1), 1, n}};
+                             {n - 1, n, n * n}, {n * (n - 1), 1, n * n},
+                             {0, n, n * n},     {n * n * (n - 1), 1, n}};
     int gmshToNekEdge[12] = {0, -3, 4, 1, 5, 2, 6, 7, 8, -11, 9, 10};
 
     // Edges
@@ -2036,5 +2034,4 @@ std::map<unsigned int, ElmtConfig> InputGmsh::GenElmMap()
     return tmp;
 }
 
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh

@@ -37,7 +37,8 @@
 #define NEKTAR_TESTS_METRICEXECUTIONTIME_H
 
 #include <Metric.h>
-#include <boost/regex.hpp>
+
+#include <regex>
 #include <vector>
 
 namespace Nektar
@@ -70,7 +71,7 @@ struct MetricExecutionTimeFieldValue
 class MetricExecutionTime : public Metric
 {
 public:
-    virtual ~MetricExecutionTime()
+    ~MetricExecutionTime() override
     {
     }
 
@@ -83,7 +84,7 @@ public:
 
 protected:
     /// Regex used to match an execution time in a test output.
-    boost::regex m_regex;
+    std::regex m_regex;
     /// Stores each execution time found in the test output.
     MetricExecutionTimeFieldValue m_match;
     /// If true, use stderr for testing/generation instead of stdout.
@@ -91,8 +92,8 @@ protected:
 
     MetricExecutionTime(TiXmlElement *metric, bool generate);
 
-    virtual bool v_Test(std::istream &pStdout, std::istream &pStderr);
-    virtual void v_Generate(std::istream &pStdout, std::istream &pStderr);
+    bool v_Test(std::istream &pStdout, std::istream &pStderr) override;
+    void v_Generate(std::istream &pStdout, std::istream &pStderr) override;
 };
 } // namespace Nektar
 

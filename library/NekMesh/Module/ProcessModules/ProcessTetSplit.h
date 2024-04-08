@@ -37,9 +37,7 @@
 
 #include <NekMesh/Module/Module.h>
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 /**
@@ -59,17 +57,16 @@ public:
     static NekMesh::ModuleKey className;
 
     ProcessTetSplit(NekMesh::MeshSharedPtr m);
-    virtual ~ProcessTetSplit();
+    ~ProcessTetSplit() override;
 
     /// Write mesh to output file.
-    virtual void Process();
+    void Process() override;
 
-    virtual std::string GetModuleName()
+    std::string GetModuleName() override
     {
         return "ProcessTetSplit";
     }
 };
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh
 
 #endif

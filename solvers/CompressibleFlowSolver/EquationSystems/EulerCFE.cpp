@@ -62,21 +62,14 @@ void EulerCFE::v_InitObject(bool DeclareFields)
 }
 
 /**
- * @brief Destructor for EulerCFE class.
- */
-EulerCFE::~EulerCFE()
-{
-}
-
-/**
  * @brief Apply artificial diffusion (Laplacian operator)
  */
-void EulerCFE::v_DoDiffusion(const Array<OneD, Array<OneD, NekDouble>> &inarray,
-                             Array<OneD, Array<OneD, NekDouble>> &outarray,
-                             const Array<OneD, Array<OneD, NekDouble>> &pFwd,
-                             const Array<OneD, Array<OneD, NekDouble>> &pBwd)
+void EulerCFE::v_DoDiffusion(
+    const Array<OneD, Array<OneD, NekDouble>> &inarray,
+    Array<OneD, Array<OneD, NekDouble>> &outarray,
+    [[maybe_unused]] const Array<OneD, Array<OneD, NekDouble>> &pFwd,
+    [[maybe_unused]] const Array<OneD, Array<OneD, NekDouble>> &pBwd)
 {
-    boost::ignore_unused(pFwd, pBwd);
     if (m_artificialDiffusion)
     {
         m_artificialDiffusion->DoArtificialDiffusion(inarray, outarray);
@@ -88,14 +81,7 @@ void EulerCFE::v_DoDiffusion(const Array<OneD, Array<OneD, NekDouble>> &inarray,
  */
 bool EulerCFE::v_SupportsShockCaptType(const std::string type) const
 {
-    if (type == "NonSmooth" || type == "Off")
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
+    return (type == "NonSmooth" || type == "Off");
 }
 
 } // namespace Nektar

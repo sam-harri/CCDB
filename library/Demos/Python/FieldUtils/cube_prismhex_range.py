@@ -2,7 +2,7 @@
 import sys
 from NekPy.FieldUtils import *
 
-field = Field(sys.argv, domain="0,0.5,0,0.5,0,0.5", forceoutput=True)
+field = Field(sys.argv, domain="0,0.5,0,0.5,0,0.5", force_output=True)
 
 InputModule.Create("xml", field,  "cube_prismhex.xml").Run()
 OutputModule.Create("xml", field, "out.xml").Run()

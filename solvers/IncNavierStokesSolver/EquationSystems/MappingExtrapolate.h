@@ -67,11 +67,12 @@ public:
     /// Name of class
     static std::string className;
 
-    virtual void v_CorrectPressureBCs(const Array<OneD, NekDouble> &pressure);
+    void v_CorrectPressureBCs(const Array<OneD, NekDouble> &pressure) override;
 
-    virtual void v_CalcNeumannPressureBCs(
+    void v_CalcNeumannPressureBCs(
         const Array<OneD, const Array<OneD, NekDouble>> &fields,
-        const Array<OneD, const Array<OneD, NekDouble>> &N, NekDouble kinvis);
+        const Array<OneD, const Array<OneD, NekDouble>> &N,
+        NekDouble kinvis) override;
 
     MappingExtrapolate(const LibUtilities::SessionReaderSharedPtr pSession,
                        Array<OneD, MultiRegions::ExpListSharedPtr> pFields,
@@ -79,7 +80,7 @@ public:
                        const Array<OneD, int> pVel,
                        const SolverUtils::AdvectionSharedPtr advObject);
 
-    virtual ~MappingExtrapolate();
+    ~MappingExtrapolate() override;
 
 protected:
     // Mapping object

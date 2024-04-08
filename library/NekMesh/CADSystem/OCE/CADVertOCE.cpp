@@ -39,9 +39,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 std::string CADVertOCE::key = GetCADVertFactory().RegisterCreatorFunction(
@@ -64,5 +62,4 @@ void CADVertOCE::Initialise(int i, TopoDS_Shape in)
     degen  = false;
 }
 
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh

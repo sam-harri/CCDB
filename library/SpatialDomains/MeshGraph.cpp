@@ -68,9 +68,7 @@ namespace bg = boost::geometry;
 
 using namespace std;
 
-namespace Nektar
-{
-namespace SpatialDomains
+namespace Nektar::SpatialDomains
 {
 
 /**
@@ -2856,7 +2854,7 @@ void MeshGraph::ReadRefinementInfo()
                                      "REFINEMENT section of input for the "
                                      "SPHERE TYPE");
 
-                    coord2Vector.empty();
+                    coord2Vector.clear();
                 }
                 else
                 {
@@ -2909,7 +2907,7 @@ void MeshGraph::ReadRefinementInfo()
                         n_modesRef = boost::lexical_cast<int>(numModesStr);
                     }
                     nModesVector.push_back(n_modesRef);
-                    nPointsVector.empty(); // No points.
+                    nPointsVector.clear(); // No points.
                 }
 
                 // Instantiate an object
@@ -4166,5 +4164,4 @@ void MeshGraph::SetDomainRange(NekDouble xmin, NekDouble xmax, NekDouble ymin,
     }
 }
 
-} // namespace SpatialDomains
-} // namespace Nektar
+} // namespace Nektar::SpatialDomains

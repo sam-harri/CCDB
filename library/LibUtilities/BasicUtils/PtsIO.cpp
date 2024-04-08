@@ -44,14 +44,12 @@
 #include <mpi.h>
 #endif
 
-#include <LibUtilities/BasicUtils/FileSystem.h>
+#include <LibUtilities/BasicUtils/Filesystem.hpp>
 #include <LibUtilities/BasicUtils/ParseUtils.h>
 
 using namespace std;
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 PtsIO::PtsIO(CommSharedPtr pComm, bool sharedFilesystem)
@@ -143,7 +141,7 @@ void PtsIO::Write(const string &outFile,
     std::ofstream ptsFile;
     ptsFile.open(filename.c_str());
 
-    ptsFile << "<?xml version=\"1.0\" encoding=\"utf-8\" ?>" << endl;
+    ptsFile << R"(<?xml version="1.0" encoding="utf-8" ?>)" << endl;
     ptsFile << "<NEKTAR>" << endl;
     ptsFile << "    <POINTS ";
     ptsFile << "DIM=\"" << ptsField->GetDim() << "\" ";
@@ -174,9 +172,8 @@ void PtsIO::Write(const string &outFile,
  */
 void PtsIO::v_ImportPtsFieldData(const string inFile,
                                  PtsFieldSharedPtr &ptsField,
-                                 DomainRangeShPtr &Range)
+                                 [[maybe_unused]] DomainRangeShPtr &Range)
 {
-    boost::ignore_unused(Range);
     TiXmlDocument docInput(inFile);
     bool loadOkay1 = docInput.LoadFile();
 
@@ -305,5 +302,4 @@ void PtsIO::SetUpFieldMetaData(const string outname)
         WriteMultiFldFileIDs(infofile, filenames, ElementIDs, fieldmetadatamap);
     }
 }
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities

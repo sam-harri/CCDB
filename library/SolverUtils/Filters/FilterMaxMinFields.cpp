@@ -32,14 +32,10 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <CompressibleFlowSolver/Misc/VariableConverter.h>
 #include <SolverUtils/Filters/FilterMaxMinFields.h>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 std::string FilterMaxMinFields::className =
     GetFilterFactory().RegisterCreatorFunction("MaxMinFields",
@@ -47,7 +43,7 @@ std::string FilterMaxMinFields::className =
 
 FilterMaxMinFields::FilterMaxMinFields(
     const LibUtilities::SessionReaderSharedPtr &pSession,
-    const std::weak_ptr<EquationSystem> &pEquation, const ParamMap &pParams)
+    const std::shared_ptr<EquationSystem> &pEquation, const ParamMap &pParams)
     : FilterFieldConvert(pSession, pEquation, pParams)
 {
     // Load sampling frequency
@@ -156,10 +152,9 @@ void FilterMaxMinFields::v_Initialise(
 
 void FilterMaxMinFields::v_ProcessSample(
     const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
-    std::vector<Array<OneD, NekDouble>> &fieldcoeffs, const NekDouble &time)
+    std::vector<Array<OneD, NekDouble>> &fieldcoeffs,
+    [[maybe_unused]] const NekDouble &time)
 {
-    boost::ignore_unused(time);
-
     for (int n = 0; n < m_variables.size(); ++n)
     {
         int nf = (n < pFields.size()) ? n : 0;
@@ -221,13 +216,11 @@ void FilterMaxMinFields::v_ProcessSample(
 }
 
 void FilterMaxMinFields::v_PrepareOutput(
-    const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
-    const NekDouble &time)
+    [[maybe_unused]] const Array<OneD, const MultiRegions::ExpListSharedPtr>
+        &pFields,
+    [[maybe_unused]] const NekDouble &time)
 {
-    boost::ignore_unused(pFields, time);
-
-    m_fieldMetaData["NumberOfFieldDumps"] =
-        boost::lexical_cast<std::string>(m_numSamples);
+    m_fieldMetaData["NumberOfFieldDumps"] = std::to_string(m_numSamples);
 }
 
 NekDouble FilterMaxMinFields::v_GetScale()
@@ -235,5 +228,4 @@ NekDouble FilterMaxMinFields::v_GetScale()
     return 1.0;
 }
 
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils

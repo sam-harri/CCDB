@@ -39,9 +39,7 @@
 #include <LibUtilities/Foundations/PointsType.h>
 #include <string>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 const char *const BasisTypeMap[] = {
     "NoBasisType",       "Ortho_A",           "Ortho_B",
@@ -85,7 +83,6 @@ const std::string kPointsTypeStr[] = {"NoPointsType",
                                       "NodalPrismSPI",
                                       "NodalQuadElec",
                                       "NodalHexElec"};
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities
 
 #endif // FOUNDATIONS_H

@@ -37,9 +37,7 @@
 
 #include <NekMesh/Module/Module.h>
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 /**
  * @brief This processing module removes all the high-order information
@@ -56,12 +54,12 @@ public:
     static NekMesh::ModuleKey className;
 
     ProcessLinear(NekMesh::MeshSharedPtr m);
-    virtual ~ProcessLinear();
+    ~ProcessLinear() override;
 
     /// Write mesh to output file.
-    virtual void Process();
+    void Process() override;
 
-    virtual std::string GetModuleName()
+    std::string GetModuleName() override
     {
         return "ProcessLinear";
     }
@@ -69,7 +67,6 @@ public:
 private:
     bool Invalid(NekMesh::ElementSharedPtr el, NekDouble thr);
 };
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh
 
 #endif

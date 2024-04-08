@@ -32,14 +32,10 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/Foundations/FourierSingleModePoints.h>
 #include <LibUtilities/Foundations/ManagerAccess.h>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 bool FourierSingleModePoints::initPointsManager[] = {
     PointsManager().RegisterCreator(PointsKey(0, eFourierSingleModeSpaced),
@@ -95,10 +91,8 @@ std::shared_ptr<Points<NekDouble>> FourierSingleModePoints::Create(
 }
 
 std::shared_ptr<NekMatrix<NekDouble>> FourierSingleModePoints::CreateMatrix(
-    const PointsKey &pkey)
+    [[maybe_unused]] const PointsKey &pkey)
 {
-    boost::ignore_unused(pkey);
-
     ASSERTL0(false,
              "CreateMatrix not available for Fourier Single Mode Points");
 
@@ -106,45 +100,38 @@ std::shared_ptr<NekMatrix<NekDouble>> FourierSingleModePoints::CreateMatrix(
 }
 
 const std::shared_ptr<NekMatrix<NekDouble>> FourierSingleModePoints::v_GetI(
-    const PointsKey &pkey)
+    [[maybe_unused]] const PointsKey &pkey)
 {
-    boost::ignore_unused(pkey);
-
     ASSERTL0(false, "Interp not available for Fourier Single Mode Points");
 
     return nullptr;
 }
 
 const std::shared_ptr<NekMatrix<NekDouble>> FourierSingleModePoints::v_GetI(
-    const Array<OneD, const NekDouble> &x)
+    [[maybe_unused]] const Array<OneD, const NekDouble> &x)
 {
-    boost::ignore_unused(x);
-
     ASSERTL0(false, "Interp not available for Fourier Single Mode Points");
 
     return nullptr;
 }
 
 const std::shared_ptr<NekMatrix<NekDouble>> FourierSingleModePoints::v_GetI(
-    size_t numpoints, const Array<OneD, const NekDouble> &x)
+    [[maybe_unused]] size_t numpoints,
+    [[maybe_unused]] const Array<OneD, const NekDouble> &x)
 {
-    boost::ignore_unused(numpoints, x);
-
     ASSERTL0(false, "Interp not available for Fourier Single Mode Points");
 
     return nullptr;
 }
 
 void FourierSingleModePoints::CalculateInterpMatrix(
-    size_t npts, const Array<OneD, const NekDouble> &xpoints,
-    Array<OneD, NekDouble> &interp)
+    [[maybe_unused]] size_t npts,
+    [[maybe_unused]] const Array<OneD, const NekDouble> &xpoints,
+    [[maybe_unused]] Array<OneD, NekDouble> &interp)
 {
-    boost::ignore_unused(npts, xpoints, interp);
-
     ASSERTL0(
         false,
         "CalculateInterpMatrix not available for Fourier Single Mode Points");
 }
 
-} // end of namespace LibUtilities
-} // end of namespace Nektar
+} // namespace Nektar::LibUtilities

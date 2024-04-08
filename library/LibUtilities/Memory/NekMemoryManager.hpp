@@ -40,8 +40,6 @@
 #include <memory>
 #include <type_traits>
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/BasicConst/NektarUnivTypeDefs.hpp>
 #include <LibUtilities/BasicUtils/ErrorUtil.hpp>
 #include <LibUtilities/Memory/ThreadSpecificPool.hpp>
@@ -108,7 +106,7 @@ public:
 #endif
 #endif
 
-        data = NULL;
+        data = nullptr;
     }
 
 #ifdef NEKTAR_MEMORY_POOL_ENABLED
@@ -215,12 +213,12 @@ public:
     /// This method is not meant to be called by client code.  Use Array
     /// instead. Only memory allocated via RawAllocate should be returned to the
     /// pool here.
-    static void RawDeallocate(DataType *array, size_t NumberOfElements)
+    static void RawDeallocate(DataType *array,
+                              [[maybe_unused]] size_t NumberOfElements)
     {
 #ifdef NEKTAR_MEMORY_POOL_ENABLED
         GetMemoryPool().Deallocate(array, sizeof(DataType) * NumberOfElements);
 #else // NEKTAR_MEMORY_POOL_ENABLED
-        boost::ignore_unused(NumberOfElements);
 #ifdef NEKTAR_USE_ALIGNED_MEM
         boost::alignment::aligned_free(array);
 #else
@@ -260,11 +258,8 @@ public:
         return &r;
     }
 
-    pointer allocate(size_type n,
-                     std::allocator<void>::const_pointer hint =
-                         0) // typename MemoryManager<void>::pointer hint = 0)
+    pointer allocate(size_type n)
     {
-        boost::ignore_unused(hint);
         return RawAllocate(n);
     }
 
@@ -301,10 +296,9 @@ private:
 };
 
 template <typename DataType>
-bool operator==(const MemoryManager<DataType> &lhs,
-                const MemoryManager<DataType> &rhs)
+bool operator==([[maybe_unused]] const MemoryManager<DataType> &lhs,
+                [[maybe_unused]] const MemoryManager<DataType> &rhs)
 {
-    boost::ignore_unused(lhs, rhs);
     return true;
 }
 

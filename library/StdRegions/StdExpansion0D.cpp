@@ -36,24 +36,11 @@
 
 #include <StdRegions/StdExpansion0D.h>
 
-namespace Nektar
+namespace Nektar::StdRegions
 {
-namespace StdRegions
-{
-StdExpansion0D::StdExpansion0D()
-{
-}
 
 StdExpansion0D::StdExpansion0D(int numcoeffs, const LibUtilities::BasisKey &Ba)
     : StdExpansion(numcoeffs, 1, Ba)
-{
-}
-
-StdExpansion0D::StdExpansion0D(const StdExpansion0D &T) : StdExpansion(T)
-{
-}
-
-StdExpansion0D::~StdExpansion0D()
 {
 }
 
@@ -92,17 +79,4 @@ NekDouble StdExpansion0D::v_PhysEvaluate(
     return StdExpansion::BaryEvaluate<0>(Lcoord[0], &physvals[0]);
 }
 
-// NekDouble StdExpansion0D::v_PhysEvaluate(
-//    const Array<OneD, DNekMatSharedPtr> &I,
-//    const Array<OneD, const NekDouble> &physvals)
-//{
-//    NekDouble val;
-//    int nquad = GetTotPoints();
-//
-//    val = Blas::Ddot(nquad, I[0]->GetPtr(), 1, physvals, 1);
-//
-//    return val;
-//}
-
-} // namespace StdRegions
-} // namespace Nektar
+} // namespace Nektar::StdRegions

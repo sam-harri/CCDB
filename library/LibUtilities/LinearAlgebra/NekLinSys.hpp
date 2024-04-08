@@ -442,10 +442,6 @@ public:
         return *this;
     }
 
-    ~LinearSystem()
-    {
-    }
-
     // In the following calls to Solve, VectorType must be a NekVector.
     // Anything else won't compile.
     template <typename VectorType>

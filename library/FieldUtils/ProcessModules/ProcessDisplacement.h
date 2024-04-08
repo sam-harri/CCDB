@@ -37,9 +37,7 @@
 
 #include "ProcessBoundaryExtract.h"
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 class ProcessDisplacement : public ProcessBoundaryExtract
@@ -53,23 +51,22 @@ public:
     static ModuleKey className;
 
     ProcessDisplacement(FieldSharedPtr f);
-    virtual ~ProcessDisplacement();
+    ~ProcessDisplacement() override;
 
 protected:
     /// Write mesh to output file.
-    virtual void v_Process(po::variables_map &vm) override;
+    void v_Process(po::variables_map &vm) override;
 
-    virtual std::string v_GetModuleName() override
+    std::string v_GetModuleName() override
     {
         return "ProcessDisplacement";
     }
 
-    virtual std::string v_GetModuleDescription() override
+    std::string v_GetModuleDescription() override
     {
         return "Calculating displacement";
     }
 };
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils
 
 #endif

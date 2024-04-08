@@ -35,13 +35,9 @@
 #ifndef UTILITIES_NEKMESH_NODEOPTI_EVALUATOR
 #define UTILITIES_NEKMESH_NODEOPTI_EVALUATOR
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/BasicConst/NektarUnivTypeDefs.hpp>
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 using namespace std;
@@ -112,9 +108,9 @@ template <> inline NekDouble Determinant<3>(NekDouble jac[][3])
  * @param out  Output matrix \f$ A^{-\top} \f$
  */
 template <int DIM>
-inline void InvTrans(NekDouble in[][DIM], NekDouble out[][DIM])
+inline void InvTrans([[maybe_unused]] NekDouble in[][DIM],
+                     [[maybe_unused]] NekDouble out[][DIM])
 {
-    boost::ignore_unused(in, out);
 }
 
 template <> inline void InvTrans<2>(NekDouble in[][2], NekDouble out[][2])
@@ -164,9 +160,9 @@ template <> inline NekDouble ScalarProd<3>(NekDouble in1[3], NekDouble in2[3])
             + in1[2] * in2[2];
 }*/
 template <int DIM>
-inline NekDouble ScalarProd(NekDouble (&in1)[DIM], NekDouble (&in2)[DIM])
+inline NekDouble ScalarProd([[maybe_unused]] NekDouble (&in1)[DIM],
+                            [[maybe_unused]] NekDouble (&in2)[DIM])
 {
-    boost::ignore_unused(in1, in2);
     return 0.0;
 }
 
@@ -191,9 +187,9 @@ inline NekDouble ScalarProd<3>(NekDouble (&in1)[3], NekDouble (&in2)[3])
  * @param out  Output matrix \f$ F^\top F - I \f$
  */
 template <int DIM>
-inline void EMatrix(NekDouble in[][DIM], NekDouble out[][DIM])
+inline void EMatrix([[maybe_unused]] NekDouble in[][DIM],
+                    [[maybe_unused]] NekDouble out[][DIM])
 {
-    boost::ignore_unused(in, out);
 }
 
 template <> inline void EMatrix<2>(NekDouble in[][2], NekDouble out[][2])
@@ -227,9 +223,9 @@ template <> inline void EMatrix<3>(NekDouble in[][3], NekDouble out[][3])
  * @brief Calculate Frobenius inner product of input matrices.
  */
 template <int DIM>
-inline NekDouble FrobProd(NekDouble in1[][DIM], NekDouble in2[][DIM])
+inline NekDouble FrobProd([[maybe_unused]] NekDouble in1[][DIM],
+                          [[maybe_unused]] NekDouble in2[][DIM])
 {
-    boost::ignore_unused(in1, in2);
     return 0.0;
 }
 
@@ -253,9 +249,9 @@ template <> inline NekDouble FrobProd<3>(NekDouble in1[][3], NekDouble in2[][3])
  *
  * @param inarray   Input matrix \f$ A \f$
  */
-template <int DIM> inline NekDouble FrobeniusNorm(NekDouble inarray[][DIM])
+template <int DIM>
+inline NekDouble FrobeniusNorm([[maybe_unused]] NekDouble inarray[][DIM])
 {
-    boost::ignore_unused(inarray);
     return 0.0;
 }
 
@@ -274,7 +270,6 @@ template <> inline NekDouble FrobeniusNorm<3>(NekDouble inarray[][3])
            inarray[2][2] * inarray[2][2];
 }
 
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh
 
 #endif

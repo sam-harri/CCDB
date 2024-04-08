@@ -39,9 +39,7 @@
 #include <boost/test/tools/floating_point_comparison.hpp>
 #include <boost/test/unit_test.hpp>
 
-namespace Nektar
-{
-namespace HexCollectionTests
+namespace Nektar::HexCollectionTests
 {
 SpatialDomains::SegGeomSharedPtr CreateSegGeom(
     unsigned int id, SpatialDomains::PointGeomSharedPtr v0,
@@ -421,7 +419,9 @@ BOOST_AUTO_TEST_CASE(TestHexBwdTrans_IterPerExp_VariableP_MultiElmt)
 
     std::vector<StdRegions::StdExpansionSharedPtr> CollExp;
     for (int i = 0; i < nelmts; ++i)
+    {
         CollExp.push_back(Exp);
+    }
 
     LibUtilities::SessionReaderSharedPtr dummySession;
     Collections::CollectionOptimisation colOpt(dummySession, 3,
@@ -562,7 +562,9 @@ BOOST_AUTO_TEST_CASE(TestHexBwdTrans_SumFac_UniformP)
 
     std::vector<StdRegions::StdExpansionSharedPtr> CollExp;
     for (int i = 0; i < nelmts; ++i)
+    {
         CollExp.push_back(Exp);
+    }
 
     LibUtilities::SessionReaderSharedPtr dummySession;
     Collections::CollectionOptimisation colOpt(dummySession, 3,
@@ -633,7 +635,9 @@ BOOST_AUTO_TEST_CASE(TestHexBwdTrans_SumFac_UniformP_MultiElmt)
 
     std::vector<StdRegions::StdExpansionSharedPtr> CollExp;
     for (int i = 0; i < nelmts; ++i)
+    {
         CollExp.push_back(Exp);
+    }
 
     LibUtilities::SessionReaderSharedPtr dummySession;
     Collections::CollectionOptimisation colOpt(dummySession, 3,
@@ -2083,7 +2087,9 @@ BOOST_AUTO_TEST_CASE(TestHexIProductWRTBase_SumFac_VariableP_MultiElmt)
 
     std::vector<StdRegions::StdExpansionSharedPtr> CollExp;
     for (int i = 0; i < nelmts; ++i)
+    {
         CollExp.push_back(Exp);
+    }
 
     LibUtilities::SessionReaderSharedPtr dummySession;
     Collections::CollectionOptimisation colOpt(dummySession, 3,
@@ -2177,7 +2183,9 @@ BOOST_AUTO_TEST_CASE(
 
     std::vector<StdRegions::StdExpansionSharedPtr> CollExp;
     for (int i = 0; i < nelmts; ++i)
+    {
         CollExp.push_back(Exp);
+    }
 
     LibUtilities::SessionReaderSharedPtr dummySession;
     Collections::CollectionOptimisation colOpt(dummySession, 3,
@@ -2271,7 +2279,9 @@ BOOST_AUTO_TEST_CASE(
 
     std::vector<StdRegions::StdExpansionSharedPtr> CollExp;
     for (int i = 0; i < nelmts; ++i)
+    {
         CollExp.push_back(Exp);
+    }
 
     LibUtilities::SessionReaderSharedPtr dummySession;
     Collections::CollectionOptimisation colOpt(dummySession, 3,
@@ -4634,5 +4644,4 @@ BOOST_AUTO_TEST_CASE(TestHexHelmholtz_MatrixFree_UniformP_ConstVarDiff)
         BOOST_CHECK_CLOSE(coeffsRef[i], coeffs[i], epsilon);
     }
 }
-} // namespace HexCollectionTests
-} // namespace Nektar
+} // namespace Nektar::HexCollectionTests

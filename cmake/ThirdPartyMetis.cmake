@@ -55,7 +55,7 @@ IF (NEKTAR_USE_METIS)
             # compile.
             IF (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER "7.3")
                 EXTERNALPROJECT_ADD_STEP(metis-5.1.0 patch-install-path
-                    COMMAND sed -i ".bak" "s|#define MAX_JBUFS 128|#define MAX_JBUFS 24|" ${TPSRC}/metis-5.1.0/GKlib/error.c
+                    COMMAND sed -i".bak" "s|#define MAX_JBUFS 128|#define MAX_JBUFS 24|" ${TPSRC}/metis-5.1.0/GKlib/error.c
                     DEPENDERS build
                     DEPENDEES download)
             ENDIF()
@@ -84,4 +84,6 @@ IF (NEKTAR_USE_METIS)
         MESSAGE(STATUS "Found Metis: ${METIS_LIBRARY}")
         SET(METIS_CONFIG_INCLUDE_DIR ${METIS_INCLUDE_DIR})
     ENDIF()
+
+    ADD_DEPENDENCIES(thirdparty metis-5.1.0)
 ENDIF()

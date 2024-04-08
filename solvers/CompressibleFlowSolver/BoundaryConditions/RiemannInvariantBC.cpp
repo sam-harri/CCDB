@@ -32,8 +32,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include "RiemannInvariantBC.h"
 
 using namespace std;
@@ -50,8 +48,10 @@ RiemannInvariantBC::RiemannInvariantBC(
     const LibUtilities::SessionReaderSharedPtr &pSession,
     const Array<OneD, MultiRegions::ExpListSharedPtr> &pFields,
     const Array<OneD, Array<OneD, NekDouble>> &pTraceNormals,
+    const Array<OneD, Array<OneD, NekDouble>> &pGridVelocity,
     const int pSpaceDim, const int bcRegion, const int cnt)
-    : CFSBndCond(pSession, pFields, pTraceNormals, pSpaceDim, bcRegion, cnt)
+    : CFSBndCond(pSession, pFields, pTraceNormals, pGridVelocity, pSpaceDim,
+                 bcRegion, cnt)
 {
     // Calculate VnInf
     int nTracePts = m_fields[0]->GetTrace()->GetNpoints();
@@ -66,12 +66,11 @@ RiemannInvariantBC::RiemannInvariantBC(
     }
 }
 
-void RiemannInvariantBC::v_Apply(Array<OneD, Array<OneD, NekDouble>> &Fwd,
-                                 Array<OneD, Array<OneD, NekDouble>> &physarray,
-                                 const NekDouble &time)
+void RiemannInvariantBC::v_Apply(
+    Array<OneD, Array<OneD, NekDouble>> &Fwd,
+    [[maybe_unused]] Array<OneD, Array<OneD, NekDouble>> &physarray,
+    [[maybe_unused]] const NekDouble &time)
 {
-    boost::ignore_unused(physarray, time);
-
     int i, j;
     int nTracePts   = m_fields[0]->GetTrace()->GetNpoints();
     int nDimensions = m_spacedim;

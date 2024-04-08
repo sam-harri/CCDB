@@ -32,17 +32,13 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <SolverUtils/Advection/AdvectionWeakDG.h>
 #include <iomanip>
 #include <iostream>
 
 #include <LibUtilities/BasicUtils/Timer.h>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 std::string AdvectionWeakDG::type =
     GetAdvectionFactory().RegisterCreatorFunction(
@@ -80,16 +76,16 @@ void AdvectionWeakDG::v_InitObject(
 void AdvectionWeakDG::v_Advect(
     const int nConvectiveFields,
     const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
-    const Array<OneD, Array<OneD, NekDouble>> &advVel,
+    [[maybe_unused]] const Array<OneD, Array<OneD, NekDouble>> &advVel,
     const Array<OneD, Array<OneD, NekDouble>> &inarray,
-    Array<OneD, Array<OneD, NekDouble>> &outarray, const NekDouble &time,
+    Array<OneD, Array<OneD, NekDouble>> &outarray,
+    [[maybe_unused]] const NekDouble &time,
     const Array<OneD, Array<OneD, NekDouble>> &pFwd,
     const Array<OneD, Array<OneD, NekDouble>> &pBwd)
 {
     LibUtilities::Timer timer1;
     timer1.Start();
 
-    boost::ignore_unused(advVel, time);
     size_t nCoeffs = fields[0]->GetNcoeffs();
 
     Array<OneD, Array<OneD, NekDouble>> tmp{size_t(nConvectiveFields)};
@@ -178,11 +174,16 @@ void AdvectionWeakDG::AdvectCoeffs(
         fields[i]->AddTraceIntegral(numflux[i], outarray[i]);
         timer.Stop();
         timer.AccumulateRegion("AdvWeakDG:_AddTraceIntegral", 10);
-
-        timer.Start();
-        fields[i]->MultiplyByElmtInvMass(outarray[i], outarray[i]);
-        timer.Stop();
-        timer.AccumulateRegion("AdvWeakDG:_MultiplyByElmtInvMass", 10);
+    }
+    if (!fields[0]->GetGraph()->GetMovement()->GetMoveFlag())
+    {
+        for (int i = 0; i < nConvectiveFields; ++i)
+        {
+            timer.Start();
+            fields[i]->MultiplyByElmtInvMass(outarray[i], outarray[i]);
+            timer.Stop();
+            timer.AccumulateRegion("AdvWeakDG:_MultiplyByElmtInvMass", 10);
+        }
     }
 }
 
@@ -192,13 +193,13 @@ void AdvectionWeakDG::AdvectCoeffs(
 void AdvectionWeakDG::AdvectTraceFlux(
     const int nConvectiveFields,
     const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
-    const Array<OneD, Array<OneD, NekDouble>> &advVel,
+    [[maybe_unused]] const Array<OneD, Array<OneD, NekDouble>> &advVel,
     const Array<OneD, Array<OneD, NekDouble>> &inarray,
-    Array<OneD, Array<OneD, NekDouble>> &TraceFlux, const NekDouble &time,
+    Array<OneD, Array<OneD, NekDouble>> &TraceFlux,
+    [[maybe_unused]] const NekDouble &time,
     const Array<OneD, Array<OneD, NekDouble>> &pFwd,
     const Array<OneD, Array<OneD, NekDouble>> &pBwd)
 {
-    boost::ignore_unused(advVel, time);
     int nTracePointsTot = fields[0]->GetTrace()->GetTotPoints();
 
     ASSERTL1(m_riemann, "Riemann solver must be provided for AdvectionWeakDG.");
@@ -232,5 +233,4 @@ void AdvectionWeakDG::AdvectTraceFlux(
     timer.AccumulateRegion("AdvWeakDG:_Riemann", 10);
 }
 
-} // end of namespace SolverUtils
-} // end of namespace Nektar
+} // namespace Nektar::SolverUtils

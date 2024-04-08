@@ -41,15 +41,13 @@
 #include <LibUtilities/Foundations/ManagerAccess.h>
 #include <LibUtilities/Foundations/NodalUtil.h>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 class NodalTriFekete : public Points<NekDouble>
 {
 public:
-    virtual ~NodalTriFekete()
+    ~NodalTriFekete() override
     {
     }
 
@@ -61,7 +59,7 @@ public:
         const PointsKey &key);
 
 protected:
-    virtual const MatrixSharedPtrType v_GetI(const PointsKey &pkey) override
+    const MatrixSharedPtrType v_GetI(const PointsKey &pkey) override
     {
         ASSERTL0(pkey.GetPointsDim() == 2,
                  "Fekete Points can only interp to other 2d "
@@ -71,7 +69,7 @@ protected:
         return GetI(x, y);
     }
 
-    virtual const MatrixSharedPtrType v_GetI(
+    const MatrixSharedPtrType v_GetI(
         const Array<OneD, const NekDouble> &x,
         const Array<OneD, const NekDouble> &y) override
     {
@@ -96,15 +94,14 @@ private:
 
     void NodalPointReorder2d();
 
-    virtual void v_CalculatePoints() override final;
-    virtual void v_CalculateWeights() override final;
-    virtual void v_CalculateDerivMatrix() override final;
+    void v_CalculatePoints() final;
+    void v_CalculateWeights() final;
+    void v_CalculateDerivMatrix() final;
 
     void CalculateInterpMatrix(const Array<OneD, const NekDouble> &xi,
                                const Array<OneD, const NekDouble> &yi,
                                Array<OneD, NekDouble> &interp);
 }; // end of NodalTriFekete
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities
 
 #endif // NODALTRIFEKETE_H

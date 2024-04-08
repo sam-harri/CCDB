@@ -44,9 +44,7 @@
 using namespace std;
 using namespace Nektar::NekMesh;
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 typedef std::pair<int, int> ipair;
@@ -479,5 +477,4 @@ void ProcessTetSplit::Process()
     ProcessElements();
     ProcessComposites();
 }
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh

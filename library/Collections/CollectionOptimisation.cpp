@@ -33,7 +33,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include <boost/algorithm/string/predicate.hpp>
-#include <boost/core/ignore_unused.hpp>
 
 #include <Collections/CollectionOptimisation.h>
 #include <LibUtilities/BasicUtils/ParseUtils.h>
@@ -46,9 +45,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace Collections
+namespace Nektar::Collections
 {
 
 // static manager for Operator ImplementationMap
@@ -61,7 +58,7 @@ CollectionOptimisation::CollectionOptimisation(
     : m_shapeDim(shapedim)
 {
     map<ElmtOrder, ImplementationType> defaults, defaultsPhysDeriv,
-        defaultsHelmholtz;
+        defaultsHelmholtz, defaultsPhysInterp1DScaled;
     bool verbose = (pSession.get()) &&
                    (pSession->DefinesCmdLineArgument("verbose")) &&
                    (pSession->GetComm()->GetRank() == 0);
@@ -83,9 +80,10 @@ CollectionOptimisation::CollectionOptimisation(
     // Set defaults for all element types.
     for (auto &it2 : elTypes)
     {
-        defaults[ElmtOrder(it2.second, -1)]          = m_defaultType;
-        defaultsPhysDeriv[ElmtOrder(it2.second, -1)] = m_defaultType;
-        defaultsHelmholtz[ElmtOrder(it2.second, -1)] = m_defaultType;
+        defaults[ElmtOrder(it2.second, -1)]                   = m_defaultType;
+        defaultsPhysDeriv[ElmtOrder(it2.second, -1)]          = m_defaultType;
+        defaultsHelmholtz[ElmtOrder(it2.second, -1)]          = m_defaultType;
+        defaultsPhysInterp1DScaled[ElmtOrder(it2.second, -1)] = m_defaultType;
     }
 
     if (defaultType == eNoImpType)
@@ -97,6 +95,10 @@ CollectionOptimisation::CollectionOptimisation(
 
             // Use IterPerExp
             defaultsHelmholtz[ElmtOrder(it2.second, -1)] = eMatrixFree;
+
+            // Use NoCollection for PhysInterp1DScaled
+            defaultsPhysInterp1DScaled[ElmtOrder(it2.second, -1)] =
+                eNoCollection;
         }
     }
 
@@ -111,6 +113,9 @@ CollectionOptimisation::CollectionOptimisation(
                 break;
             case ePhysDeriv:
                 m_global[(OperatorType)i] = defaultsPhysDeriv;
+                break;
+            case ePhysInterp1DScaled:
+                m_global[(OperatorType)i] = defaultsPhysInterp1DScaled;
                 break;
             default:
                 m_global[(OperatorType)i] = defaults;
@@ -387,10 +392,8 @@ OperatorImpMap CollectionOptimisation::GetOperatorImpMap(
 
 OperatorImpMap CollectionOptimisation::SetWithTimings(
     vector<StdRegions::StdExpansionSharedPtr> pCollExp,
-    OperatorImpMap &impTypes, bool verbose)
+    [[maybe_unused]] OperatorImpMap &impTypes, bool verbose)
 {
-    boost::ignore_unused(impTypes);
-
     OperatorImpMap ret;
 
     StdRegions::StdExpansionSharedPtr pExp = pCollExp[0];
@@ -403,13 +406,6 @@ OperatorImpMap CollectionOptimisation::SetWithTimings(
         ret = m_opImpMap[m_timeLevel][OpKey];
         return ret;
     }
-
-    int maxsize =
-        pCollExp.size() * max(pExp->GetNcoeffs(), pExp->GetTotPoints());
-    Array<OneD, NekDouble> inarray(maxsize, 1.0);
-    Array<OneD, NekDouble> outarray1(maxsize);
-    Array<OneD, NekDouble> outarray2(maxsize);
-    Array<OneD, NekDouble> outarray3(maxsize);
 
     LibUtilities::Timer t;
 
@@ -430,10 +426,43 @@ OperatorImpMap CollectionOptimisation::SetWithTimings(
     StdRegions::ConstFactorMap factors; // required for helmholtz operator
     factors[StdRegions::eFactorLambda] = 1.5;
 
+    // do we need to dynamically update the value of this eFactorconst based on
+    // the solver that is called?
+    factors[StdRegions::eFactorConst] = 1.5;
+    int qpInsideElmt_idir; // declaration for the total number of points towards
+                           // the i-th direction
+    int newQpInsideElmt_idir;  // declaration for the scaled total number of
+                               // points towards the i-th direction
+    int newTotQpInsideElmt{1}; // initialization for the total number of scaled
+                               // quadrature points inside an element
+    for (int i = 0; i < pExp->GetShapeDimension(); ++i)
+    {
+        qpInsideElmt_idir = pExp->GetNumPoints(i);
+        newQpInsideElmt_idir =
+            (int)qpInsideElmt_idir * factors[StdRegions::eFactorConst];
+        newTotQpInsideElmt *= newQpInsideElmt_idir;
+    }
+    int maxsize = pCollExp.size() * max(pExp->GetNcoeffs(), newTotQpInsideElmt);
+    Array<OneD, NekDouble> inarray(maxsize, 1.0);
+    Array<OneD, NekDouble> outarray1(maxsize);
+    Array<OneD, NekDouble> outarray2(maxsize);
+    Array<OneD, NekDouble> outarray3(maxsize);
+
+    // Advection velocities required for optimisation of linearADR operator
+    StdRegions::VarCoeffMap varcoeffs;
+    StdRegions::VarCoeffType varcoefftypes[] = {StdRegions::eVarCoeffVelX,
+                                                StdRegions::eVarCoeffVelY,
+                                                StdRegions::eVarCoeffVelZ};
+    for (int i = 0; i < pExp->GetShapeDimension(); i++)
+    {
+        varcoeffs[varcoefftypes[i]] = Array<OneD, NekDouble>(maxsize, 1.0);
+    }
+
     for (int imp = 1; imp < SIZE_ImplementationType; ++imp)
     {
         ImplementationType impType = (ImplementationType)imp;
         OperatorImpMap impTypes;
+        std::vector<OperatorType> opTypes;
         for (int i = 0; i < SIZE_OperatorType; ++i)
         {
             OperatorType opType = (OperatorType)i;
@@ -443,13 +472,19 @@ OperatorImpMap CollectionOptimisation::SetWithTimings(
             if (GetOperatorFactory().ModuleExists(opKey))
             {
                 impTypes[opType] = impType;
+                opTypes.push_back(opType);
             }
         }
 
         Collection collLoc(pCollExp, impTypes);
-        for (int i = 0; i < SIZE_OperatorType; ++i)
+        for (auto opType : opTypes)
         {
-            collLoc.Initialise((OperatorType)i, factors);
+            collLoc.Initialise(opType, factors);
+            // Add varcoeffs only for ADR operator
+            if (opType == eLinearAdvectionDiffusionReaction)
+            {
+                collLoc.UpdateVarcoeffs(opType, varcoeffs);
+            }
         }
         coll.push_back(collLoc);
     }
@@ -697,5 +732,4 @@ void CollectionOptimisation::UpdateOptFile(std::string sessName,
     }
 }
 
-} // namespace Collections
-} // namespace Nektar
+} // namespace Nektar::Collections

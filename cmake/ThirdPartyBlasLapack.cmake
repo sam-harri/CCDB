@@ -79,5 +79,7 @@ ELSE()
 
         THIRDPARTY_LIBRARY(BLAS_LAPACK SHARED blas lapack DESCRIPTION "BLAS and LAPACK libraries")
         MESSAGE(STATUS "Build BLAS/LAPACK: ${BLAS_LAPACK}")
+
+        ADD_DEPENDENCIES(thirdparty lapack-3.7.1)
     ENDIF()
 ENDIF()

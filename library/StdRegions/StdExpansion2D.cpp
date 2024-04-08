@@ -40,25 +40,12 @@
 #undef max
 #endif
 
-namespace Nektar
+namespace Nektar::StdRegions
 {
-namespace StdRegions
-{
-StdExpansion2D::StdExpansion2D()
-{
-}
 
 StdExpansion2D::StdExpansion2D(int numcoeffs, const LibUtilities::BasisKey &Ba,
                                const LibUtilities::BasisKey &Bb)
     : StdExpansion(numcoeffs, 2, Ba, Bb)
-{
-}
-
-StdExpansion2D::StdExpansion2D(const StdExpansion2D &T) : StdExpansion(T)
-{
-}
-
-StdExpansion2D::~StdExpansion2D()
 {
 }
 
@@ -159,11 +146,10 @@ NekDouble StdExpansion2D::v_PhysEvaluate(
 }
 
 NekDouble StdExpansion2D::v_PhysEvaluate(
-    const Array<OneD, NekDouble> &coord,
-    const Array<OneD, const NekDouble> &inarray,
-    std::array<NekDouble, 3> &firstOrderDerivs)
+    [[maybe_unused]] const Array<OneD, NekDouble> &coord,
+    [[maybe_unused]] const Array<OneD, const NekDouble> &inarray,
+    [[maybe_unused]] std::array<NekDouble, 3> &firstOrderDerivs)
 {
-    boost::ignore_unused(coord, inarray, firstOrderDerivs);
     return 0;
 }
 
@@ -380,11 +366,10 @@ void StdExpansion2D::v_HelmholtzMatrixOp_MatFree(
     }
 }
 
-void StdExpansion2D::v_GetTraceCoeffMap(const unsigned int traceid,
-                                        Array<OneD, unsigned int> &maparray)
+void StdExpansion2D::v_GetTraceCoeffMap(
+    [[maybe_unused]] const unsigned int traceid,
+    [[maybe_unused]] Array<OneD, unsigned int> &maparray)
 {
-    boost::ignore_unused(traceid, maparray);
-
     ASSERTL0(false,
              "This method must be defined at the individual shape level");
 }
@@ -396,11 +381,9 @@ void StdExpansion2D::v_GetTraceCoeffMap(const unsigned int traceid,
  */
 void StdExpansion2D::v_GetElmtTraceToTraceMap(
     const unsigned int eid, Array<OneD, unsigned int> &maparray,
-    Array<OneD, int> &signarray, Orientation edgeOrient, int P, int Q)
+    Array<OneD, int> &signarray, Orientation edgeOrient, int P,
+    [[maybe_unused]] int Q)
 {
-    // Q is only used in 2D traces.
-    boost::ignore_unused(Q);
-
     unsigned int i;
 
     int dir;
@@ -499,5 +482,4 @@ void StdExpansion2D::v_GetTraceToElementMap(const int eid,
     }
 }
 
-} // namespace StdRegions
-} // namespace Nektar
+} // namespace Nektar::StdRegions

@@ -44,9 +44,7 @@
 
 #include <LibUtilities/BasicUtils/NekFactory.hpp>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 typedef std::map<std::string, std::string> FieldMetaDataMap;
@@ -286,6 +284,9 @@ protected:
     LIB_UTILITIES_EXPORT int CheckFieldDefinition(
         const FieldDefinitionsSharedPtr &fielddefs);
 
+    LIB_UTILITIES_EXPORT std::vector<unsigned int> GetNumberOfCoeffsPerElement(
+        const FieldDefinitionsSharedPtr &fielddefs);
+
     LIB_UTILITIES_EXPORT std::string SetUpOutput(const std::string outname,
                                                  bool perRank,
                                                  bool backup = false);
@@ -373,6 +374,5 @@ inline DataSourceSharedPtr FieldIO::ImportFieldMetaData(
     return v_ImportFieldMetaData(filename, fieldmetadatamap);
 }
 
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities
 #endif

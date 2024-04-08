@@ -36,13 +36,9 @@
 #include <string>
 using namespace std;
 
-#include <boost/core/ignore_unused.hpp>
-
 #include "ProcessDOF.h"
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 ModuleKey ProcessDOF::className = GetModuleFactory().RegisterCreatorFunction(
@@ -69,5 +65,4 @@ void ProcessDOF::v_Process(po::variables_map &vm)
         cout << "Total number of DOF: " << nDOF << endl;
     }
 }
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

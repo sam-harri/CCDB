@@ -42,9 +42,7 @@
 
 #include <SolverUtils/SolverUtilsDeclspec.h>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 class Filter;
 class EquationSystem;
@@ -56,7 +54,7 @@ typedef std::shared_ptr<Filter> FilterSharedPtr;
 /// the Driver class.
 typedef LibUtilities::NekFactory<std::string, Filter,
                                  const LibUtilities::SessionReaderSharedPtr &,
-                                 const std::weak_ptr<EquationSystem> &,
+                                 const std::shared_ptr<EquationSystem> &,
                                  const std::map<std::string, std::string> &>
     FilterFactory;
 SOLVER_UTILS_EXPORT FilterFactory &GetFilterFactory();
@@ -67,7 +65,7 @@ public:
     typedef std::map<std::string, std::string> ParamMap;
     SOLVER_UTILS_EXPORT Filter(
         const LibUtilities::SessionReaderSharedPtr &pSession,
-        const std::weak_ptr<EquationSystem> &pEquation);
+        const std::shared_ptr<EquationSystem> &pEquation);
     SOLVER_UTILS_EXPORT virtual ~Filter();
 
     SOLVER_UTILS_EXPORT inline void Initialise(
@@ -122,6 +120,5 @@ inline bool Filter::IsTimeDependent()
 {
     return v_IsTimeDependent();
 }
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils
 #endif /* NEKTAR_SOLVERUTILS_FILTER_FILTER_H */

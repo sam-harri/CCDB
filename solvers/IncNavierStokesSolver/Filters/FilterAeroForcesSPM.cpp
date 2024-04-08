@@ -48,7 +48,7 @@ std::string FilterAeroForcesSPM::className =
  */
 FilterAeroForcesSPM::FilterAeroForcesSPM(
     const LibUtilities::SessionReaderSharedPtr &pSession,
-    const std::weak_ptr<SolverUtils::EquationSystem> &pEquation,
+    const std::shared_ptr<SolverUtils::EquationSystem> &pEquation,
     const ParamMap &pParams)
     : Filter(pSession, pEquation)
 {
@@ -106,10 +106,8 @@ FilterAeroForcesSPM::~FilterAeroForcesSPM()
  */
 void FilterAeroForcesSPM::v_Initialise(
     const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
-    const NekDouble &time)
+    [[maybe_unused]] const NekDouble &time)
 {
-    boost::ignore_unused(time);
-
     // Save space dimension
     m_spaceDim = pFields[0]->GetGraph()->GetMeshDimension();
 
@@ -196,10 +194,8 @@ void FilterAeroForcesSPM::v_Update(
  */
 void FilterAeroForcesSPM::v_Finalise(
     const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
-    const NekDouble &time)
+    [[maybe_unused]] const NekDouble &time)
 {
-    boost::ignore_unused(time);
-
     if (pFields[0]->GetComm()->GetRank() == 0)
     {
         m_outputStream.close();

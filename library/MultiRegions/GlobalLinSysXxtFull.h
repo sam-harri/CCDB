@@ -31,15 +31,15 @@
 // Description: GlobalLinSysXxtFull header
 //
 ///////////////////////////////////////////////////////////////////////////////
+
 #ifndef NEKTAR_LIB_MULTIREGIONS_GLOBALLINSYSDIRECTXXT_H
 #define NEKTAR_LIB_MULTIREGIONS_GLOBALLINSYSDIRECTXXT_H
+
 #include <MultiRegions/AssemblyMap/AssemblyMapCG.h>
 #include <MultiRegions/GlobalLinSysXxt.h>
 #include <MultiRegions/MultiRegionsDeclspec.h>
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 // Forward declarations
 
@@ -69,28 +69,26 @@ public:
         const std::weak_ptr<ExpList> &pExpList,
         const std::shared_ptr<AssemblyMap> &pLocToGloMap);
 
-    MULTI_REGIONS_EXPORT virtual ~GlobalLinSysXxtFull();
-
-protected:
-    /// Solve the linear system for given input and output vectors
-    /// using a specified local to global map.
-    virtual void v_Solve(const Array<OneD, const NekDouble> &in,
-                         Array<OneD, NekDouble> &out,
-                         const AssemblyMapSharedPtr &locToGloMap,
-                         const Array<OneD, const NekDouble> &dirForcing =
-                             NullNekDouble1DArray) override;
+    MULTI_REGIONS_EXPORT ~GlobalLinSysXxtFull() override = default;
 
 private:
     void AssembleMatrixArrays(const std::shared_ptr<AssemblyMap> &pLocToGloMap);
 
+    /// Solve the linear system for given input and output vectors
+    /// using a specified local to global map.
+    void v_Solve(const Array<OneD, const NekDouble> &in,
+                 Array<OneD, NekDouble> &out,
+                 const AssemblyMapSharedPtr &locToGloMap,
+                 const Array<OneD, const NekDouble> &dirForcing =
+                     NullNekDouble1DArray) override;
+
     /// Solve the linear system for given input and output vectors.
-    virtual void v_SolveLinearSystem(const int pNumRows,
-                                     const Array<OneD, const NekDouble> &pInput,
-                                     Array<OneD, NekDouble> &pOutput,
-                                     const AssemblyMapSharedPtr &locToGloMap,
-                                     const int pNumDir = 0) override;
+    void v_SolveLinearSystem(const int pNumRows,
+                             const Array<OneD, const NekDouble> &pInput,
+                             Array<OneD, NekDouble> &pOutput,
+                             const AssemblyMapSharedPtr &locToGloMap,
+                             const int pNumDir = 0) override;
 };
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions
 
 #endif

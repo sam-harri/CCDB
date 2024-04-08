@@ -34,8 +34,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/LinearAlgebra/MatrixFuncs.h>
 
 namespace Nektar
@@ -75,10 +73,9 @@ unsigned int BandedMatrixFuncs::CalculateNumberOfRows(unsigned int totalRows,
 }
 
 unsigned int BandedMatrixFuncs::CalculateIndex(
-    unsigned int totalRows, unsigned int totalColumns, unsigned int row,
-    unsigned int column, unsigned int sub, unsigned int super)
+    unsigned int totalRows, [[maybe_unused]] unsigned int totalColumns,
+    unsigned int row, unsigned int column, unsigned int sub, unsigned int super)
 {
-    boost::ignore_unused(totalColumns);
     if ((column <= row &&
          (row - column) <= CalculateNumberOfDiags(totalRows, sub)) ||
         (column > row &&
@@ -98,10 +95,10 @@ unsigned int BandedMatrixFuncs::CalculateIndex(
 }
 
 std::tuple<unsigned int, unsigned int> BandedMatrixFuncs::Advance(
-    const unsigned int totalRows, const unsigned int totalColumns,
-    const unsigned int curRow, const unsigned int curColumn)
+    [[maybe_unused]] const unsigned int totalRows,
+    [[maybe_unused]] const unsigned int totalColumns, const unsigned int curRow,
+    const unsigned int curColumn)
 {
-    boost::ignore_unused(totalRows, totalColumns);
     unsigned int nextRow    = curRow;
     unsigned int nextColumn = curColumn;
 
@@ -114,12 +111,10 @@ unsigned int FullMatrixFuncs::GetRequiredStorageSize(unsigned int rows,
     return rows * columns;
 }
 
-unsigned int FullMatrixFuncs::CalculateIndex(unsigned int totalRows,
-                                             unsigned int totalColumns,
-                                             unsigned int curRow,
-                                             unsigned int curColumn)
+unsigned int FullMatrixFuncs::CalculateIndex(
+    unsigned int totalRows, [[maybe_unused]] unsigned int totalColumns,
+    unsigned int curRow, unsigned int curColumn)
 {
-    boost::ignore_unused(totalColumns);
     return curColumn * totalRows + curRow;
 }
 
@@ -171,11 +166,10 @@ unsigned int UpperTriangularMatrixFuncs::CalculateIndex(unsigned int curRow,
 }
 
 std::tuple<unsigned int, unsigned int> UpperTriangularMatrixFuncs::Advance(
-    const unsigned int totalRows, const unsigned int totalColumns,
-    const unsigned int curRow, const unsigned int curColumn)
+    [[maybe_unused]] const unsigned int totalRows,
+    const unsigned int totalColumns, const unsigned int curRow,
+    const unsigned int curColumn)
 {
-    boost::ignore_unused(totalRows);
-
     ASSERTL1(totalRows == totalColumns, "Triangular matrices must be square.");
     ASSERTL1(curRow < totalRows,
              "Attemping to iterate through an element on row " +
@@ -332,11 +326,10 @@ std::tuple<unsigned int, unsigned int> SymmetricMatrixFuncs::Advance(
 }
 
 std::tuple<unsigned int, unsigned int> DiagonalMatrixFuncs::Advance(
-    const unsigned int totalRows, const unsigned int totalColumns,
-    const unsigned int curRow, const unsigned int curColumn)
+    const unsigned int totalRows,
+    [[maybe_unused]] const unsigned int totalColumns, const unsigned int curRow,
+    const unsigned int curColumn)
 {
-    boost::ignore_unused(totalColumns);
-
     ASSERTL0(
         curRow == curColumn,
         "Iteration of a diagonal matrix is only valid along the diagonal.");

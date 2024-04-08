@@ -45,9 +45,7 @@
 #include <SolverUtils/SolverUtilsDeclspec.h>
 #include <iomanip>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 
 class Advection;
@@ -196,7 +194,6 @@ protected:
         const Array<OneD, MultiRegions::ExpListSharedPtr> &fields);
 };
 
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils
 
 #endif

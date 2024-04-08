@@ -42,9 +42,7 @@
 #include <vtkSmartPointer.h>
 #include <vtkUnstructuredGrid.h>
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 /// Converter from fld to vtk.
@@ -63,20 +61,25 @@ public:
 
     ~OutputVtk() final = default;
 
+    vtkUnstructuredGrid *GetVtkGrid()
+    {
+        return m_vtkMesh.GetPointer();
+    }
+
 protected:
-    virtual std::string v_GetModuleName() override final
+    std::string v_GetModuleName() final
     {
         return "OutputVtk";
     }
 
     /// Write from pts to output file.
-    virtual void v_OutputFromPts(po::variables_map &vm) override final;
+    void v_OutputFromPts(po::variables_map &vm) final;
 
     /// Write from m_exp to output file.
-    virtual void v_OutputFromExp(po::variables_map &vm) override final;
+    void v_OutputFromExp(po::variables_map &vm) final;
 
     /// Write from data to output file.
-    virtual void v_OutputFromData(po::variables_map &vm) override final;
+    void v_OutputFromData(po::variables_map &vm) final;
 
     /// Cache file for unstructured grid VTK mesh data
     vtkSmartPointer<vtkUnstructuredGrid> m_vtkMesh;
@@ -119,7 +122,6 @@ private:
     /// Write the parallel .pvtu file
     void WritePVtu(po::variables_map &vm);
 };
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils
 
 #endif

@@ -32,8 +32,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <GlobalMapping/Mapping.h>
 #include <MultiRegions/DisContField.h>
 
@@ -41,9 +39,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace GlobalMapping
+namespace Nektar::GlobalMapping
 {
 
 MappingSharedPtr Mapping::m_mappingPtr = MappingSharedPtr();
@@ -99,11 +95,9 @@ Mapping::Mapping(const LibUtilities::SessionReaderSharedPtr &pSession,
  * @param pMapping xml element describing the mapping
  */
 void Mapping::v_InitObject(
-    const Array<OneD, MultiRegions::ExpListSharedPtr> &pFields,
+    [[maybe_unused]] const Array<OneD, MultiRegions::ExpListSharedPtr> &pFields,
     const TiXmlElement *pMapping)
 {
-    boost::ignore_unused(pFields);
-
     int phystot    = m_fields[0]->GetTotPoints();
     m_fromFunction = true;
     // Initialise variables
@@ -249,7 +243,7 @@ void Mapping::ReplaceField(
 {
     m_fields = pFields;
 
-    TiXmlElement *vMapping = NULL;
+    TiXmlElement *vMapping = nullptr;
 
     if (m_session->DefinesElement("Nektar/Mapping"))
     {
@@ -275,7 +269,7 @@ MappingSharedPtr Mapping::Load(
 {
     if (!m_init)
     {
-        TiXmlElement *vMapping = NULL;
+        TiXmlElement *vMapping = nullptr;
         string vType;
         if (pSession->DefinesElement("Nektar/Mapping"))
         {
@@ -1270,5 +1264,4 @@ void Mapping::v_UpdateMapping(
     UpdateGeomInfo();
 }
 
-} // namespace GlobalMapping
-} // namespace Nektar
+} // namespace Nektar::GlobalMapping

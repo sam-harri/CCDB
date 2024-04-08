@@ -36,7 +36,8 @@
 #define NEKTAR_TESTS_METRICREGEX_H
 
 #include <Metric.h>
-#include <boost/regex.hpp>
+
+#include <regex>
 #include <vector>
 
 namespace Nektar
@@ -65,7 +66,7 @@ struct MetricRegexFieldValue
 class MetricRegex : public Metric
 {
 public:
-    virtual ~MetricRegex()
+    ~MetricRegex() override
     {
     }
 
@@ -78,7 +79,7 @@ public:
 
 protected:
     /// Storage for the boost regex.
-    boost::regex m_regex;
+    std::regex m_regex;
     /// Stores the multiple matches defined in each <MATCH> tag.
     std::vector<std::vector<MetricRegexFieldValue>> m_matches;
     /// If true, regex matches may be in any order in output
@@ -88,8 +89,8 @@ protected:
 
     MetricRegex(TiXmlElement *metric, bool generate);
 
-    virtual bool v_Test(std::istream &pStdout, std::istream &pStderr);
-    virtual void v_Generate(std::istream &pStdout, std::istream &pStderr);
+    bool v_Test(std::istream &pStdout, std::istream &pStderr) override;
+    void v_Generate(std::istream &pStdout, std::istream &pStderr) override;
 };
 } // namespace Nektar
 

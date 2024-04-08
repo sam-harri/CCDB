@@ -37,17 +37,15 @@
 
 #include <NekMesh/Module/Module.h>
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 class InputMCF : public InputModule
 {
 public:
     InputMCF(MeshSharedPtr m);
-    virtual ~InputMCF();
-    virtual void Process();
+    ~InputMCF() override;
+    void Process() override;
 
     /// Creates an instance of this class
     static ModuleSharedPtr create(MeshSharedPtr m)
@@ -59,7 +57,7 @@ public:
 
     void ParseFile(std::string nm);
 
-    virtual std::string GetModuleName()
+    std::string GetModuleName() override
     {
         return "InputMCF";
     }
@@ -74,7 +72,6 @@ private:
         m_naca, m_adjust, m_adjustall, m_smoothbl, m_manifold, m_spaceoutbl,
         m_curverefine;
 };
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh
 
 #endif

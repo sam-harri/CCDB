@@ -32,17 +32,12 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/Communication/Comm.h>
 
-namespace Nektar
+namespace Nektar::LibUtilities
 {
-namespace LibUtilities
+Comm::Comm([[maybe_unused]] int narg, [[maybe_unused]] char *arg[])
 {
-Comm::Comm(int narg, char *arg[])
-{
-    boost::ignore_unused(narg, arg);
 }
 
 /**
@@ -76,5 +71,4 @@ std::pair<CommSharedPtr, CommSharedPtr> Comm::v_SplitCommNode()
     return std::make_pair(CommSharedPtr(), CommSharedPtr());
 }
 
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities

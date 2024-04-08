@@ -32,8 +32,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <Collections/Collection.h>
 #include <Collections/IProduct.h>
 #include <Collections/MatrixFreeBase.h>
@@ -42,9 +40,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace Collections
+namespace Nektar::Collections
 {
 
 using LibUtilities::eHexahedron;
@@ -56,9 +52,32 @@ using LibUtilities::eTetrahedron;
 using LibUtilities::eTriangle;
 
 /**
+ * @brief Helmholtz help class to calculate the size of the collection
+ * that is given as an input and as an output to the Helmholtz Operator. The
+ * size evaluation takes into account that the evaluation of the Helmholtz
+ * operator takes input from the coeff space and gives the output in the coeff
+ * space too.
+ */
+class Helmholtz_Helper : virtual public Operator
+{
+protected:
+    Helmholtz_Helper()
+    {
+        // expect input to be number of elements by the number of coefficients
+        m_inputSize      = m_numElmt * m_stdExp->GetNcoeffs();
+        m_inputSizeOther = m_numElmt * m_stdExp->GetTotPoints();
+
+        // expect output to be number of elements by the number of coefficients
+        // computation is from coeff space to coeff space
+        m_outputSize      = m_inputSize;
+        m_outputSizeOther = m_inputSizeOther;
+    }
+};
+
+/**
  * @brief Helmholtz operator using LocalRegions implementation.
  */
-class Helmholtz_NoCollection final : public Operator
+class Helmholtz_NoCollection final : virtual public Operator, Helmholtz_Helper
 {
 public:
     OPERATOR_CREATE(Helmholtz_NoCollection)
@@ -67,38 +86,48 @@ public:
 
     void operator()(const Array<OneD, const NekDouble> &entry0,
                     Array<OneD, NekDouble> &entry1,
-                    Array<OneD, NekDouble> &entry2,
-                    Array<OneD, NekDouble> &entry3,
-                    Array<OneD, NekDouble> &wsp) override final
+                    [[maybe_unused]] Array<OneD, NekDouble> &entry2,
+                    [[maybe_unused]] Array<OneD, NekDouble> &entry3,
+                    [[maybe_unused]] Array<OneD, NekDouble> &wsp) final
     {
-        boost::ignore_unused(entry2, entry3, wsp);
-
         unsigned int nmodes = m_expList[0]->GetNcoeffs();
+        unsigned int nphys  = m_expList[0]->GetTotPoints();
         Array<OneD, NekDouble> tmp;
 
         for (int n = 0; n < m_numElmt; ++n)
         {
-            StdRegions::StdMatrixKey mkey(StdRegions::eHelmholtz,
-                                          (m_expList)[n]->DetShapeType(),
-                                          *(m_expList)[n], m_factors);
+            // Restrict varcoeffs to size of element
+            StdRegions::VarCoeffMap varcoeffs = StdRegions::NullVarCoeffMap;
+            if (m_varcoeffs.size())
+            {
+                varcoeffs =
+                    StdRegions::RestrictCoeffMap(m_varcoeffs, n * nphys, nphys);
+            }
+
+            StdRegions::StdMatrixKey mkey(
+                StdRegions::eHelmholtz, (m_expList)[n]->DetShapeType(),
+                *(m_expList)[n], m_factors, varcoeffs);
             m_expList[n]->GeneralMatrixOp(entry0 + n * nmodes,
                                           tmp = entry1 + n * nmodes, mkey);
         }
     }
 
-    void operator()(int dir, const Array<OneD, const NekDouble> &input,
-                    Array<OneD, NekDouble> &output,
-                    Array<OneD, NekDouble> &wsp) override final
+    void operator()([[maybe_unused]] int dir,
+                    [[maybe_unused]] const Array<OneD, const NekDouble> &input,
+                    [[maybe_unused]] Array<OneD, NekDouble> &output,
+                    [[maybe_unused]] Array<OneD, NekDouble> &wsp) final
     {
-        boost::ignore_unused(dir, input, output, wsp);
         NEKERROR(ErrorUtil::efatal, "Not valid for this operator.");
     }
 
-    virtual void CheckFactors(StdRegions::FactorMap factors,
-                              int coll_phys_offset) override
+    void UpdateFactors(StdRegions::FactorMap factors) override
     {
-        boost::ignore_unused(coll_phys_offset);
         m_factors = factors;
+    }
+
+    void UpdateVarcoeffs(StdRegions::VarCoeffMap &varcoeffs) override
+    {
+        m_varcoeffs = varcoeffs;
     }
 
 protected:
@@ -106,18 +135,20 @@ protected:
     int m_coordim;
     vector<StdRegions::StdExpansionSharedPtr> m_expList;
     StdRegions::FactorMap m_factors;
+    StdRegions::VarCoeffMap m_varcoeffs;
 
 private:
     Helmholtz_NoCollection(vector<StdRegions::StdExpansionSharedPtr> pCollExp,
                            CoalescedGeomDataSharedPtr pGeomData,
                            StdRegions::FactorMap factors)
-        : Operator(pCollExp, pGeomData, factors)
+        : Operator(pCollExp, pGeomData, factors), Helmholtz_Helper()
     {
         m_expList = pCollExp;
         m_dim     = pCollExp[0]->GetNumBases();
         m_coordim = pCollExp[0]->GetCoordim();
 
-        m_factors = factors;
+        m_factors   = factors;
+        m_varcoeffs = StdRegions::NullVarCoeffMap;
     }
 };
 
@@ -157,7 +188,7 @@ OperatorKey Helmholtz_NoCollection::m_typeArr[] = {
 /**
  * @brief Helmholtz operator using LocalRegions implementation.
  */
-class Helmholtz_IterPerExp final : public Operator
+class Helmholtz_IterPerExp final : virtual public Operator, Helmholtz_Helper
 {
 public:
     OPERATOR_CREATE(Helmholtz_IterPerExp)
@@ -166,12 +197,10 @@ public:
 
     void operator()(const Array<OneD, const NekDouble> &input,
                     Array<OneD, NekDouble> &output,
-                    Array<OneD, NekDouble> &output1,
-                    Array<OneD, NekDouble> &output2,
-                    Array<OneD, NekDouble> &wsp) override final
+                    [[maybe_unused]] Array<OneD, NekDouble> &output1,
+                    [[maybe_unused]] Array<OneD, NekDouble> &output2,
+                    Array<OneD, NekDouble> &wsp) final
     {
-        boost::ignore_unused(output1, output2);
-
         const int nCoeffs = m_stdExp->GetNcoeffs();
         const int nPhys   = m_stdExp->GetTotPoints();
 
@@ -393,11 +422,11 @@ public:
         }
     }
 
-    void operator()(int dir, const Array<OneD, const NekDouble> &input,
-                    Array<OneD, NekDouble> &output,
-                    Array<OneD, NekDouble> &wsp) override final
+    void operator()([[maybe_unused]] int dir,
+                    [[maybe_unused]] const Array<OneD, const NekDouble> &input,
+                    [[maybe_unused]] Array<OneD, NekDouble> &output,
+                    [[maybe_unused]] Array<OneD, NekDouble> &wsp) final
     {
-        boost::ignore_unused(dir, input, output, wsp);
         NEKERROR(ErrorUtil::efatal, "Not valid for this operator.");
     }
 
@@ -405,13 +434,9 @@ public:
      * @brief Check the validity of supplied constant factors.
      *
      * @param factors Map of factors
-     * @param coll_phys_offset Unused
      */
-    virtual void CheckFactors(StdRegions::FactorMap factors,
-                              int coll_phys_offset) override
+    void UpdateFactors(StdRegions::FactorMap factors) override
     {
-        boost::ignore_unused(coll_phys_offset);
-
         // If match previous factors, nothing to do.
         if (m_factors == factors)
         {
@@ -467,12 +492,27 @@ public:
         m_HasVarCoeffDiff = true;
     }
 
+    /**
+     * @brief Check the validity of supplied variable coefficients.
+     * Note that the m_varcoeffs are not implemented for the IterPerExp
+     * operator.
+     * There exists a specialised implementation for variable diffusion in the
+     * above function UpdateFactors.
+     *
+     * @param varcoeffs Map of varcoeffs
+     */
+    void UpdateVarcoeffs(StdRegions::VarCoeffMap &varcoeffs) override
+    {
+        m_varcoeffs = varcoeffs;
+    }
+
 protected:
     Array<TwoD, const NekDouble> m_derivFac;
     Array<OneD, const NekDouble> m_jac;
     int m_dim;
     int m_coordim;
     StdRegions::FactorMap m_factors;
+    StdRegions::VarCoeffMap m_varcoeffs;
     NekDouble m_lambda;
     bool m_HasVarCoeffDiff;
     Array<OneD, Array<OneD, NekDouble>> m_diff;
@@ -488,7 +528,7 @@ private:
     Helmholtz_IterPerExp(vector<StdRegions::StdExpansionSharedPtr> pCollExp,
                          CoalescedGeomDataSharedPtr pGeomData,
                          StdRegions::FactorMap factors)
-        : Operator(pCollExp, pGeomData, factors)
+        : Operator(pCollExp, pGeomData, factors), Helmholtz_Helper()
     {
         m_dim     = pCollExp[0]->GetShapeDimension();
         m_coordim = pCollExp[0]->GetCoordim();
@@ -501,7 +541,8 @@ private:
         m_lambda          = 1.0;
         m_HasVarCoeffDiff = false;
         m_factors         = StdRegions::NullFactorMap;
-        this->CheckFactors(factors, 0);
+        m_varcoeffs       = StdRegions::NullVarCoeffMap;
+        this->UpdateFactors(factors);
     }
 };
 
@@ -541,7 +582,9 @@ OperatorKey Helmholtz_IterPerExp::m_typeArr[] = {
 /**
  * @brief Helmholtz operator using matrix free operators.
  */
-class Helmholtz_MatrixFree final : public Operator, MatrixFreeOneInOneOut
+class Helmholtz_MatrixFree final : virtual public Operator,
+                                   MatrixFreeOneInOneOut,
+                                   Helmholtz_Helper
 {
 public:
     OPERATOR_CREATE(Helmholtz_MatrixFree)
@@ -550,12 +593,10 @@ public:
 
     void operator()(const Array<OneD, const NekDouble> &input,
                     Array<OneD, NekDouble> &output0,
-                    Array<OneD, NekDouble> &output1,
-                    Array<OneD, NekDouble> &output2,
-                    Array<OneD, NekDouble> &wsp) override final
+                    [[maybe_unused]] Array<OneD, NekDouble> &output1,
+                    [[maybe_unused]] Array<OneD, NekDouble> &output2,
+                    [[maybe_unused]] Array<OneD, NekDouble> &wsp) final
     {
-        boost::ignore_unused(output1, output2, wsp);
-
         if (m_isPadded)
         {
             // copy into padded vector
@@ -569,22 +610,19 @@ public:
         }
     }
 
-    void operator()(int dir, const Array<OneD, const NekDouble> &input,
-                    Array<OneD, NekDouble> &output,
-                    Array<OneD, NekDouble> &wsp) override final
+    void operator()([[maybe_unused]] int dir,
+                    [[maybe_unused]] const Array<OneD, const NekDouble> &input,
+                    [[maybe_unused]] Array<OneD, NekDouble> &output,
+                    [[maybe_unused]] Array<OneD, NekDouble> &wsp) final
     {
-        boost::ignore_unused(dir, input, output, wsp);
         NEKERROR(ErrorUtil::efatal, "Not valid for this operator.");
     }
 
     /**
      *
      */
-    virtual void CheckFactors(StdRegions::FactorMap factors,
-                              int coll_phys_offset) override
+    void UpdateFactors(StdRegions::FactorMap factors) override
     {
-        boost::ignore_unused(coll_phys_offset);
-
         if (factors == m_factors)
         {
             return;
@@ -661,10 +699,25 @@ public:
         }
     }
 
+    /**
+     * @brief Check the validity of supplied variable coefficients.
+     * Note that the m_varcoeffs are not implemented for the MatrixFree
+     * operator.
+     * There exists a specialised implementation for variable diffusion in the
+     * above function UpdateFactors.
+     *
+     * @param varcoeffs Map of varcoeffs
+     */
+    void UpdateVarcoeffs(StdRegions::VarCoeffMap &varcoeffs) override
+    {
+        m_varcoeffs = varcoeffs;
+    }
+
 private:
     std::shared_ptr<MatrixFree::Helmholtz> m_oper;
     unsigned int m_nmtot;
     StdRegions::FactorMap m_factors;
+    StdRegions::VarCoeffMap m_varcoeffs;
 
     Helmholtz_MatrixFree(vector<StdRegions::StdExpansionSharedPtr> pCollExp,
                          CoalescedGeomDataSharedPtr pGeomData,
@@ -672,7 +725,8 @@ private:
         : Operator(pCollExp, pGeomData, factors),
           MatrixFreeOneInOneOut(pCollExp[0]->GetStdExp()->GetNcoeffs(),
                                 pCollExp[0]->GetStdExp()->GetNcoeffs(),
-                                pCollExp.size())
+                                pCollExp.size()),
+          Helmholtz_Helper()
     {
 
         m_nmtot = m_numElmt * pCollExp[0]->GetStdExp()->GetNcoeffs();
@@ -705,8 +759,9 @@ private:
         ASSERTL0(m_oper, "Failed to cast pointer.");
 
         // Set factors
-        m_factors = StdRegions::NullFactorMap;
-        this->CheckFactors(factors, 0);
+        m_factors   = StdRegions::NullFactorMap;
+        m_varcoeffs = StdRegions::NullVarCoeffMap;
+        this->UpdateFactors(factors);
     }
 };
 
@@ -732,5 +787,4 @@ OperatorKey Helmholtz_MatrixFree::m_typeArr[] = {
         Helmholtz_MatrixFree::create, "Helmholtz_MatrixFree_Tet"),
 };
 
-} // namespace Collections
-} // namespace Nektar
+} // namespace Nektar::Collections

@@ -42,9 +42,7 @@
 #include <LibUtilities/BasicUtils/SharedArray.hpp>
 #include <MultiRegions/ExpList.h>
 
-namespace Nektar
-{
-namespace GlobalMapping
+namespace Nektar::GlobalMapping
 {
 //  Forward declaration
 class Mapping;
@@ -538,7 +536,6 @@ protected:
     GLOBAL_MAPPING_EXPORT virtual void v_UpdateBCs(const NekDouble time);
 };
 
-} // namespace GlobalMapping
-} // namespace Nektar
+} // namespace Nektar::GlobalMapping
 
 #endif

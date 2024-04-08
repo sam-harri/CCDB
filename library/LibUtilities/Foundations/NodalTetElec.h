@@ -39,15 +39,13 @@
 #include <LibUtilities/Foundations/NodalUtil.h>
 #include <memory>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 class NodalTetElec : public Points<NekDouble>
 {
 public:
-    virtual ~NodalTetElec()
+    ~NodalTetElec() override
     {
     }
 
@@ -59,7 +57,7 @@ public:
     }
 
 protected:
-    virtual const MatrixSharedPtrType v_GetI(const PointsKey &pkey) override
+    const MatrixSharedPtrType v_GetI(const PointsKey &pkey) override
     {
         ASSERTL0(pkey.GetPointsDim() == 3,
                  "NodalTetElec Points can only interp to other 3d "
@@ -69,7 +67,7 @@ protected:
         return GetI(x, y, z);
     }
 
-    virtual const MatrixSharedPtrType v_GetI(
+    const MatrixSharedPtrType v_GetI(
         const Array<OneD, const NekDouble> &x,
         const Array<OneD, const NekDouble> &y,
         const Array<OneD, const NekDouble> &z) override
@@ -95,16 +93,15 @@ private:
 
     void NodalPointReorder3d();
 
-    virtual void v_CalculatePoints() override final;
-    virtual void v_CalculateWeights() override final;
-    virtual void v_CalculateDerivMatrix() override final;
+    void v_CalculatePoints() final;
+    void v_CalculateWeights() final;
+    void v_CalculateDerivMatrix() final;
 
     void CalculateInterpMatrix(const Array<OneD, const NekDouble> &xia,
                                const Array<OneD, const NekDouble> &yia,
                                const Array<OneD, const NekDouble> &zia,
                                Array<OneD, NekDouble> &interp);
 };
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities
 
 #endif // NODALTETELEC_H

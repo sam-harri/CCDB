@@ -60,20 +60,19 @@ public:
                   const MultiRegions::ExpListSharedPtr &pField);
 
     /// Desctructor
-    virtual ~TenTusscher06()
+    ~TenTusscher06() override
     {
     }
 
 protected:
-    virtual void v_Update(
-        const Array<OneD, const Array<OneD, NekDouble>> &inarray,
-        Array<OneD, Array<OneD, NekDouble>> &outarray,
-        const NekDouble time) override;
+    void v_Update(const Array<OneD, const Array<OneD, NekDouble>> &inarray,
+                  Array<OneD, Array<OneD, NekDouble>> &outarray,
+                  const NekDouble time) override;
 
     /// Prints a summary of the model parameters.
-    virtual void v_GenerateSummary(SummaryList &s) override;
+    void v_GenerateSummary(SummaryList &s) override;
 
-    virtual void v_SetInitialConditions() override;
+    void v_SetInitialConditions() override;
 
     NekDouble g_to;
     NekDouble g_Ks;

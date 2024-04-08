@@ -40,9 +40,7 @@
 #include <LibUtilities/BasicUtils/Interpolator.h>
 #include <MultiRegions/ExpList.h>
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 /// A class that contains algorithms for interpolation between pts fields,
@@ -104,7 +102,6 @@ typedef std::shared_ptr<
     Interpolator<std::vector<MultiRegions::ExpListSharedPtr>>>
     InterpolatorSharedPtr;
 
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils
 
 #endif

@@ -35,7 +35,6 @@
 #ifndef NEKTAR_SOLVERS_ADRSOLVER_EQUATIONSYSTEMS_MMFSWE_H
 #define NEKTAR_SOLVERS_ADRSOLVER_EQUATIONSYSTEMS_MMFSWE_H
 
-#include <ShallowWaterSolver/EquationSystems/ShallowWaterSystem.h>
 #include <SolverUtils/MMFSystem.h>
 
 namespace Nektar
@@ -79,7 +78,7 @@ public:
     TestType m_TestType;
 
     /// Destructor
-    virtual ~MMFSWE();
+    ~MMFSWE() override = default;
 
 protected:
     /// Still water depth
@@ -105,8 +104,6 @@ protected:
 
     /// Advection velocity
     Array<OneD, Array<OneD, NekDouble>> m_velocity;
-    Array<OneD, NekDouble> m_traceVn;
-
     Array<OneD, Array<OneD, NekDouble>> m_veldotMF;
     Array<OneD, NekDouble> m_vellc;
 
@@ -158,9 +155,6 @@ protected:
     void ComputeVorticity(const Array<OneD, const NekDouble> &u,
                           const Array<OneD, const NekDouble> &v,
                           Array<OneD, NekDouble> &Vorticity);
-
-    /// Get the normal velocity
-    void GetNormalVelocity(Array<OneD, NekDouble> &traceVn);
 
     void ComputeNablaCdotVelocity(Array<OneD, NekDouble> &vellc);
 
@@ -247,29 +241,29 @@ protected:
                         Array<OneD, Array<OneD, NekDouble>> &physarray);
 
     /// Initialise the object
-    virtual void v_InitObject(bool DeclareFields = true) override;
+    void v_InitObject(bool DeclareFields = true) override;
 
-    virtual void v_DoSolve() override;
+    void v_DoSolve() override;
 
-    virtual void v_DoInitialise(bool dumpInitialConditions = false) override;
+    void v_DoInitialise(bool dumpInitialConditions = false) override;
 
     /// Print Summary
-    virtual void v_GenerateSummary(SolverUtils::SummaryList &s) override;
+    void v_GenerateSummary(SolverUtils::SummaryList &s) override;
 
-    virtual void v_SetInitialConditions(const NekDouble initialtime = 0.0,
-                                        bool dumpInitialConditions  = true,
-                                        const int domain = 0) override;
+    void v_SetInitialConditions(const NekDouble initialtime = 0.0,
+                                bool dumpInitialConditions  = true,
+                                const int domain            = 0) override;
 
-    virtual void v_EvaluateExactSolution(unsigned int field,
-                                         Array<OneD, NekDouble> &outfield,
-                                         const NekDouble time) override;
+    void v_EvaluateExactSolution(unsigned int field,
+                                 Array<OneD, NekDouble> &outfield,
+                                 const NekDouble time) override;
 
-    virtual NekDouble v_L2Error(unsigned int field,
-                                const Array<OneD, NekDouble> &exactsoln,
-                                bool Normalised) override;
+    NekDouble v_L2Error(unsigned int field,
+                        const Array<OneD, NekDouble> &exactsoln,
+                        bool Normalised) override;
 
-    virtual NekDouble v_LinfError(
-        unsigned int field, const Array<OneD, NekDouble> &exactsoln) override;
+    NekDouble v_LinfError(unsigned int field,
+                          const Array<OneD, NekDouble> &exactsoln) override;
 
 private:
     int m_RossbyDisturbance;

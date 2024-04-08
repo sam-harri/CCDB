@@ -36,16 +36,12 @@
 #ifndef NEKTAR_SOLVERUTILS_FILTERS_FILTERFIELDCONVERT_H
 #define NEKTAR_SOLVERUTILS_FILTERS_FILTERFIELDCONVERT_H
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <FieldUtils/Module.h>
 #include <SolverUtils/Filters/Filter.h>
 
 using namespace Nektar::FieldUtils;
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 class FilterFieldConvert : public Filter
 {
@@ -55,7 +51,7 @@ public:
     /// Creates an instance of this class
     static FilterSharedPtr create(
         const LibUtilities::SessionReaderSharedPtr &pSession,
-        const std::weak_ptr<EquationSystem> &pEquation,
+        const std::shared_ptr<EquationSystem> &pEquation,
         const std::map<std::string, std::string> &pParams)
     {
         FilterSharedPtr p =
@@ -69,20 +65,20 @@ public:
 
     SOLVER_UTILS_EXPORT FilterFieldConvert(
         const LibUtilities::SessionReaderSharedPtr &pSession,
-        const std::weak_ptr<EquationSystem> &pEquation,
+        const std::shared_ptr<EquationSystem> &pEquation,
         const ParamMap &pParams);
-    SOLVER_UTILS_EXPORT virtual ~FilterFieldConvert();
+    SOLVER_UTILS_EXPORT ~FilterFieldConvert() override;
 
 protected:
-    SOLVER_UTILS_EXPORT virtual void v_Initialise(
+    SOLVER_UTILS_EXPORT void v_Initialise(
         const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
         const NekDouble &time) override;
     SOLVER_UTILS_EXPORT virtual void v_FillVariablesName(
         const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields);
-    SOLVER_UTILS_EXPORT virtual void v_Update(
+    SOLVER_UTILS_EXPORT void v_Update(
         const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
         const NekDouble &time) override;
-    SOLVER_UTILS_EXPORT virtual void v_Finalise(
+    SOLVER_UTILS_EXPORT void v_Finalise(
         const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
         const NekDouble &time) override;
     SOLVER_UTILS_EXPORT virtual void v_ProcessSample(
@@ -90,11 +86,10 @@ protected:
         std::vector<Array<OneD, NekDouble>> &fieldcoeffs,
         const NekDouble &time);
     SOLVER_UTILS_EXPORT virtual void v_PrepareOutput(
-        const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
-        const NekDouble &time)
+        [[maybe_unused]] const Array<OneD, const MultiRegions::ExpListSharedPtr>
+            &pFields,
+        [[maybe_unused]] const NekDouble &time)
     {
-        boost::ignore_unused(pFields, time);
-        // Do nothing by default
     }
     SOLVER_UTILS_EXPORT virtual NekDouble v_GetScale()
     {
@@ -109,7 +104,7 @@ protected:
         const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
         int dump = -1);
 
-    SOLVER_UTILS_EXPORT virtual bool v_IsTimeDependent() override;
+    SOLVER_UTILS_EXPORT bool v_IsTimeDependent() override;
 
     void CreateModules(std::vector<std::string> &modcmds);
 
@@ -140,7 +135,6 @@ protected:
     FieldSharedPtr m_f;
     po::variables_map m_vm;
 };
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils
 
 #endif /* NEKTAR_SOLVERUTILS_FILTERS_FILTERFIELDCONVERT_H */

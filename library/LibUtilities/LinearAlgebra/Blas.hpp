@@ -35,8 +35,6 @@
 #ifndef NEKTAR_LIB_UTILITIES_LINEAR_ALGEBRA_BLAS_HPP
 #define NEKTAR_LIB_UTILITIES_LINEAR_ALGEBRA_BLAS_HPP
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/LinearAlgebra/BlasArray.hpp>
 #include <LibUtilities/LinearAlgebra/TransF77.hpp>
 
@@ -395,11 +393,11 @@ static inline void Dgemm(const char &transa, const char &transb, const int &m,
 // \brief Wrapper to mutliply two (row major) matrices together C =
 // a*A*B + b*C
 static inline void Cdgemm(const int M, const int N, const int K, const double a,
-                          const double *A, const int ldA, const double *B,
-                          const int ldB, const double b, double *C,
-                          const int ldC)
+                          const double *A, [[maybe_unused]] const int ldA,
+                          const double *B, [[maybe_unused]] const int ldB,
+                          const double b, double *C,
+                          [[maybe_unused]] const int ldC)
 {
-    boost::ignore_unused(ldA, ldB, ldC);
     Dgemm('N', 'N', N, M, K, a, B, N, A, K, b, C, N);
 }
 } // namespace Blas

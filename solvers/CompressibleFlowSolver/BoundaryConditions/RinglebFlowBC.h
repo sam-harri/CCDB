@@ -53,10 +53,12 @@ public:
         const LibUtilities::SessionReaderSharedPtr &pSession,
         const Array<OneD, MultiRegions::ExpListSharedPtr> &pFields,
         const Array<OneD, Array<OneD, NekDouble>> &pTraceNormals,
+        const Array<OneD, Array<OneD, NekDouble>> &pGridVelocity,
         const int pSpaceDim, const int bcRegion, const int cnt)
     {
         CFSBndCondSharedPtr p = MemoryManager<RinglebFlowBC>::AllocateSharedPtr(
-            pSession, pFields, pTraceNormals, pSpaceDim, bcRegion, cnt);
+            pSession, pFields, pTraceNormals, pGridVelocity, pSpaceDim,
+            bcRegion, cnt);
         return p;
     }
 
@@ -64,17 +66,18 @@ public:
     static std::string className;
 
 protected:
-    virtual void v_Apply(Array<OneD, Array<OneD, NekDouble>> &Fwd,
-                         Array<OneD, Array<OneD, NekDouble>> &physarray,
-                         const NekDouble &time) override;
+    void v_Apply(Array<OneD, Array<OneD, NekDouble>> &Fwd,
+                 Array<OneD, Array<OneD, NekDouble>> &physarray,
+                 const NekDouble &time) override;
 
 private:
     RinglebFlowBC(const LibUtilities::SessionReaderSharedPtr &pSession,
                   const Array<OneD, MultiRegions::ExpListSharedPtr> &pFields,
                   const Array<OneD, Array<OneD, NekDouble>> &pTraceNormals,
+                  const Array<OneD, Array<OneD, NekDouble>> &pGridVelocity,
                   const int pSpaceDim, const int bcRegion, const int cnt);
 
-    virtual ~RinglebFlowBC(void){};
+    ~RinglebFlowBC(void) override{};
 
     int m_expdim;
     bool m_homo1D;

@@ -42,9 +42,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 ModuleKey ProcessWSS::className = GetModuleFactory().RegisterCreatorFunction(
@@ -442,5 +440,4 @@ void ProcessWSS::GetVelocity(
     }
 }
 
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

@@ -39,15 +39,12 @@
 using namespace std;
 
 #include <boost/algorithm/string.hpp>
-#include <boost/core/ignore_unused.hpp>
 
 #include <LibUtilities/BasicUtils/CompressData.h>
 
 #include "InputSemtex.h"
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 ModuleKey InputSemtex::m_className[1] = {
@@ -79,10 +76,8 @@ InputSemtex::~InputSemtex()
  * is a classic nodal-Lagrangian spectral element code at a single polynomial
  * order, meaning that the field data are set up according to this structure.
  */
-void InputSemtex::v_Process(po::variables_map &vm)
+void InputSemtex::v_Process([[maybe_unused]] po::variables_map &vm)
 {
-    boost::ignore_unused(vm);
-
     // Variables to be read from session file
     string sessionName, date, fields, endian;
     int nr, ns, nz, nelmt, step;
@@ -276,5 +271,4 @@ void InputSemtex::v_Process(po::variables_map &vm)
     m_f->m_variables = m_f->m_fielddef[0]->m_fields;
 }
 
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

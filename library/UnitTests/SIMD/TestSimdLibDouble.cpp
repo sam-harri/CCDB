@@ -35,7 +35,6 @@
 #include <LibUtilities/SimdLib/io.hpp>
 #include <LibUtilities/SimdLib/tinysimd.hpp>
 
-#include <boost/core/ignore_unused.hpp>
 #include <boost/test/tools/floating_point_comparison.hpp>
 #include <boost/test/unit_test.hpp>
 
@@ -80,9 +79,7 @@
 #undef USING_SCALAR
 #endif
 
-namespace Nektar
-{
-namespace SimdLibTests
+namespace Nektar::SimdLibTests
 {
 using namespace tinysimd;
 using vec_t = simd<double>;
@@ -155,25 +152,22 @@ BOOST_AUTO_TEST_CASE(SimdLibDouble_mem_size)
 
 BOOST_AUTO_TEST_CASE(SimdLibDouble_ctors)
 {
-    vec_t avec1;
+    [[maybe_unused]] vec_t avec1;
 
     vec_t::scalarType ascalar = 0;
     vec_t avec2(ascalar);
-    vec_t avec3{ascalar};
+    [[maybe_unused]] vec_t avec3{ascalar};
     vec_t avec4 = ascalar;
 
-    vec_t avec5(avec2);
-    vec_t avec6{avec4};
+    [[maybe_unused]] vec_t avec5(avec2);
+    [[maybe_unused]] vec_t avec6{avec4};
 
-    vec_t avec7(avec2._data);
-    vec_t avec8{avec2._data};
+    [[maybe_unused]] vec_t avec7(avec2._data);
+    [[maybe_unused]] vec_t avec8{avec2._data};
 
     vec_t::vectorType anative;
-    vec_t avec9(anative);
-    vec_t avec10{anative};
-
-    boost::ignore_unused(avec1, avec3, avec5, avec6, avec7, avec8, avec9,
-                         avec10);
+    [[maybe_unused]] vec_t avec9(anative);
+    [[maybe_unused]] vec_t avec10{anative};
 }
 
 BOOST_AUTO_TEST_CASE(SimdLibDouble_load)
@@ -882,5 +876,4 @@ BOOST_AUTO_TEST_CASE(SimdLibDouble_io)
     std::cout << avec << std::endl;
 }
 
-} // namespace SimdLibTests
-} // namespace Nektar
+} // namespace Nektar::SimdLibTests

@@ -37,7 +37,6 @@
 
 #include <memory>
 
-#include <LibUtilities/BasicUtils/SharedArray.hpp>
 #include <LibUtilities/Memory/NekMemoryManager.hpp>
 
 #include <NekMesh/MeshElements/Mesh.h>
@@ -46,9 +45,7 @@
 #define TETLIBRARY
 #include <tetgen.h>
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 /**
@@ -62,7 +59,7 @@ public:
     /**
      * @brief Default constructor
      */
-    TetGenInterface(std::vector<Array<OneD, NekDouble>> holes)
+    TetGenInterface(std::vector<std::array<NekDouble, 3>> holes)
     {
         m_holes = holes;
     }
@@ -71,12 +68,12 @@ public:
      * @brief Assign parameters for meshing
      */
     void InitialMesh(std::map<int, NodeSharedPtr> tgidton,
-                     std::vector<Array<OneD, int>> tri);
+                     std::vector<std::array<int, 3>> tri);
 
     /**
      * @brief Gets the locations of the Stiener points added by TetGen
      */
-    void GetNewPoints(int num, std::vector<Array<OneD, NekDouble>> &newp);
+    void GetNewPoints(int num, std::vector<std::array<NekDouble, 3>> &newp);
 
     /**
      * @brief Refines a previously made tetmesh with node delta information
@@ -87,7 +84,7 @@ public:
     /**
      * @brief Get the list of connectivites of the nodes
      */
-    std::vector<Array<OneD, int>> Extract();
+    std::vector<std::array<int, 4>> Extract();
 
     /**
      * @brief Clear previous mesh
@@ -99,10 +96,9 @@ private:
     tetgenio surface, output, input;
 
     /// Holes in volume
-    std::vector<Array<OneD, NekDouble>> m_holes;
+    std::vector<std::array<NekDouble, 3>> m_holes;
 };
 
 typedef std::shared_ptr<TetGenInterface> TetGenInterfaceSharedPtr;
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh
 #endif

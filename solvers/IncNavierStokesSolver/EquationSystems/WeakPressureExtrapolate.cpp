@@ -33,7 +33,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include <IncNavierStokesSolver/EquationSystems/WeakPressureExtrapolate.h>
-#include <LibUtilities/Communication/Comm.h>
 
 namespace Nektar
 {
@@ -98,10 +97,9 @@ void WeakPressureExtrapolate::v_EvaluatePressureBCs(
 // In weak pressure formulation we also require \int q u.n ds on
 // outflow boundary
 void WeakPressureExtrapolate::v_AddNormVelOnOBC(
-    const int noutflow, const int nreg, Array<OneD, Array<OneD, NekDouble>> &u)
+    [[maybe_unused]] const int noutflow, const int nreg,
+    Array<OneD, Array<OneD, NekDouble>> &u)
 {
-    boost::ignore_unused(noutflow);
-
     if (!m_houtflow.get()) // no outflow on partition so just return
     {
         return;
@@ -140,10 +138,8 @@ void WeakPressureExtrapolate::v_AddNormVelOnOBC(
  */
 void WeakPressureExtrapolate::v_MountHOPBCs(
     int HBCdata, NekDouble kinvis, Array<OneD, NekDouble> &Q,
-    Array<OneD, const NekDouble> &Advection)
+    [[maybe_unused]] Array<OneD, const NekDouble> &Advection)
 {
-    boost::ignore_unused(Advection);
-
     Vmath::Smul(HBCdata, -kinvis, Q, 1, Q, 1);
 }
 

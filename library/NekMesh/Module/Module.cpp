@@ -32,7 +32,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <boost/filesystem.hpp>
+#include <LibUtilities/BasicUtils/Filesystem.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
 
 #include "Module.h"
@@ -40,9 +40,7 @@
 using namespace std;
 namespace io = boost::iostreams;
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 /**
@@ -82,7 +80,7 @@ void InputModule::OpenStream()
     string filename = m_config["infile"].as<string>();
 
     // Check to see if filename exists.
-    if (!boost::filesystem::exists(filename))
+    if (!fs::exists(filename))
     {
         m_log(FATAL) << "Unable to read file: '" << filename << "'"
                      << std::endl;
@@ -153,7 +151,7 @@ bool OutputModule::CheckOverwrite(const std::string &filename)
         return true;
     }
 
-    if (!boost::filesystem::exists(filename))
+    if (!fs::exists(filename))
     {
         return true;
     }
@@ -233,7 +231,9 @@ void Module::ProcessVertices()
 void Module::ProcessEdges(bool ReprocessEdges)
 {
     if (m_mesh->m_expDim < 2)
+    {
         return;
+    }
 
     if (ReprocessEdges)
     {
@@ -348,7 +348,9 @@ void Module::ProcessEdges(bool ReprocessEdges)
 void Module::ProcessFaces(bool ReprocessFaces)
 {
     if (m_mesh->m_expDim < 3)
+    {
         return;
+    }
 
     if (ReprocessFaces)
     {
@@ -996,5 +998,4 @@ void InputModule::PrintSummary()
                    << m_mesh->GetNumBndryElements() << endl;
 }
 
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh

@@ -32,8 +32,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include "SymmetryBC.h"
 
 using namespace std;
@@ -49,18 +47,18 @@ SymmetryBC::SymmetryBC(
     const LibUtilities::SessionReaderSharedPtr &pSession,
     const Array<OneD, MultiRegions::ExpListSharedPtr> &pFields,
     const Array<OneD, Array<OneD, NekDouble>> &pTraceNormals,
+    const Array<OneD, Array<OneD, NekDouble>> &pGridVelocity,
     const int pSpaceDim, const int bcRegion, const int cnt)
-    : CFSBndCond(pSession, pFields, pTraceNormals, pSpaceDim, bcRegion, cnt)
+    : CFSBndCond(pSession, pFields, pTraceNormals, pGridVelocity, pSpaceDim,
+                 bcRegion, cnt)
 {
     m_diffusionAveWeight = 0.5;
 }
 
 void SymmetryBC::v_Apply(Array<OneD, Array<OneD, NekDouble>> &Fwd,
                          Array<OneD, Array<OneD, NekDouble>> &physarray,
-                         const NekDouble &time)
+                         [[maybe_unused]] const NekDouble &time)
 {
-    boost::ignore_unused(time);
-
     int i;
     int nVariables = physarray.size();
 

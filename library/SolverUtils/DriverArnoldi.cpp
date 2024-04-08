@@ -37,9 +37,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 
 /**
@@ -122,10 +120,8 @@ void DriverArnoldi::v_InitObject(ostream &out)
 /**
  *
  */
-void DriverArnoldi::v_Execute(std::ostream &out)
+void DriverArnoldi::v_Execute([[maybe_unused]] std::ostream &out)
 {
-    boost::ignore_unused(out);
-
     ASSERTL0(false, "Specific version of Arnoldi driver not implemented");
 }
 
@@ -435,7 +431,9 @@ void DriverArnoldi::MaskInit()
                 }
             }
             if (unmask == 1)
+            {
                 break;
+            }
         }
         for (int j = 0; j < m_nfields; ++j)
         {
@@ -452,5 +450,4 @@ void DriverArnoldi::MaskInit()
     }
 }
 
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils

@@ -36,8 +36,6 @@
 #include <string>
 using namespace std;
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/BasicUtils/ParseUtils.h>
 #include <LibUtilities/BasicUtils/PtsField.h>
 #include <LibUtilities/BasicUtils/PtsIO.h>
@@ -46,9 +44,7 @@ using namespace std;
 
 #include "InputDat.h"
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 ModuleKey InputDat::m_className[1] = {
@@ -75,10 +71,8 @@ InputDat::~InputDat()
 /**
  *
  */
-void InputDat::v_Process(po::variables_map &vm)
+void InputDat::v_Process([[maybe_unused]] po::variables_map &vm)
 {
-    boost::ignore_unused(vm);
-
     string line;
     std::ifstream datFile;
 
@@ -219,5 +213,4 @@ void InputDat::ReadTecplotFEBlockZone(std::ifstream &datFile, string &line,
 
     getline(datFile, line);
 }
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

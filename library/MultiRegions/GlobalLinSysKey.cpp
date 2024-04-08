@@ -36,9 +36,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 /**
  * @class GlobalLinSysKey
@@ -168,5 +166,4 @@ std::ostream &operator<<(std::ostream &os, const GlobalLinSysKey &rhs)
 
     return os;
 }
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions

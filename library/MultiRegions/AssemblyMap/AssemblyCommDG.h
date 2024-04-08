@@ -38,9 +38,7 @@
 #include <LibUtilities/BasicUtils/Timer.h>
 #include <MultiRegions/ExpList.h>
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 
 /**
@@ -85,10 +83,9 @@ public:
     MULTI_REGIONS_EXPORT Serial() = default;
 
     MULTI_REGIONS_EXPORT inline void PerformExchange(
-        const Array<OneD, NekDouble> &testFwd,
-        Array<OneD, NekDouble> &testBwd) final
+        [[maybe_unused]] const Array<OneD, NekDouble> &testFwd,
+        [[maybe_unused]] Array<OneD, NekDouble> &testBwd) final
     {
-        boost::ignore_unused(testFwd, testBwd);
     }
 };
 
@@ -301,7 +298,6 @@ private:
 
 typedef std::shared_ptr<AssemblyCommDG> AssemblyCommDGSharedPtr;
 
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions
 
 #endif

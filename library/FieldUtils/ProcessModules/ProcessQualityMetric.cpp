@@ -36,8 +36,6 @@
 #include <string>
 using namespace std;
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/BasicUtils/SharedArray.hpp>
 #include <LibUtilities/Foundations/Interp.h>
 #include <StdRegions/StdHexExp.h>
@@ -48,9 +46,7 @@ using namespace std;
 
 #include "ProcessQualityMetric.h"
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 ModuleKey ProcessQualityMetric::className =
@@ -564,5 +560,4 @@ Array<OneD, NekDouble> ProcessQualityMetric::GetQ(
 
     return eta;
 }
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

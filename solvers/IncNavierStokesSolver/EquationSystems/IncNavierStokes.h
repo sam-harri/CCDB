@@ -148,9 +148,9 @@ class IncNavierStokes : public SolverUtils::AdvectionSystem,
 {
 public:
     // Destructor
-    virtual ~IncNavierStokes();
+    ~IncNavierStokes() override;
 
-    virtual void v_InitObject(bool DeclareField = true) override;
+    void v_InitObject(bool DeclareField = true) override;
 
     int GetNConvectiveFields(void)
     {
@@ -159,38 +159,38 @@ public:
 
     void AddForcing(const SolverUtils::ForcingSharedPtr &pForce);
 
-    virtual void v_GetPressure(
+    void v_GetPressure(
         const Array<OneD, const Array<OneD, NekDouble>> &physfield,
         Array<OneD, NekDouble> &pressure) override;
 
-    virtual void v_GetDensity(
+    void v_GetDensity(
         const Array<OneD, const Array<OneD, NekDouble>> &physfield,
         Array<OneD, NekDouble> &density) override;
 
-    virtual bool v_HasConstantDensity() override
+    bool v_HasConstantDensity() override
     {
         return true;
     }
 
-    virtual void v_GetVelocity(
+    void v_GetVelocity(
         const Array<OneD, const Array<OneD, NekDouble>> &physfield,
         Array<OneD, Array<OneD, NekDouble>> &velocity) override;
 
-    virtual void v_SetMovingFrameVelocities(
+    void v_SetMovingFrameVelocities(
         const Array<OneD, NekDouble> &vFrameVels) override;
-    virtual void v_GetMovingFrameVelocities(
+    void v_GetMovingFrameVelocities(
         Array<OneD, NekDouble> &vFrameVels) override;
-    virtual void v_SetMovingFrameAngles(
-        const Array<OneD, NekDouble> &vFrameTheta) override;
-    virtual void v_GetMovingFrameAngles(
-        Array<OneD, NekDouble> &vFrameTheta) override;
-    virtual void v_SetMovingFrameProjectionMat(
+    void v_SetMovingFrameDisp(
+        const Array<OneD, NekDouble> &vFrameDisp) override;
+    void v_GetMovingFrameDisp(Array<OneD, NekDouble> &vFrameDisp) override;
+    void v_SetMovingFrameProjectionMat(
         const bnu::matrix<NekDouble> &vProjMat) override;
-    virtual void v_GetMovingFrameProjectionMat(
+    void v_GetMovingFrameProjectionMat(
         bnu::matrix<NekDouble> &vProjMat) override;
+    void v_SetAeroForce(Array<OneD, NekDouble> forces) override;
+    void v_GetAeroForce(Array<OneD, NekDouble> forces) override;
 
     bool DefinedForcing(const std::string &sForce);
-    void GetPivotPoint(Array<OneD, NekDouble> &vPivotPoint);
 
 protected:
     // pointer to the extrapolation class for sub-stepping and HOPBS
@@ -237,6 +237,7 @@ protected:
     // pivot point for moving reference frame
     // TODO: relocate this variable
     Array<OneD, NekDouble> m_pivotPoint;
+    Array<OneD, NekDouble> m_aeroForces;
 
     /// Constructor.
     IncNavierStokes(const LibUtilities::SessionReaderSharedPtr &pSession,
@@ -277,27 +278,27 @@ protected:
     /// Womersley parameters if required
     std::map<int, std::map<int, WomersleyParamsSharedPtr>> m_womersleyParams;
 
-    virtual MultiRegions::ExpListSharedPtr v_GetPressure() override
+    MultiRegions::ExpListSharedPtr v_GetPressure() override
     {
         return m_pressure;
     }
 
-    virtual void v_TransCoeffToPhys(void) override
+    void v_TransCoeffToPhys(void) override
     {
         ASSERTL0(false, "This method is not defined in this class");
     }
 
-    virtual void v_TransPhysToCoeff(void) override
+    void v_TransPhysToCoeff(void) override
     {
         ASSERTL0(false, "This method is not defined in this class");
     }
 
     virtual int v_GetForceDimension() = 0;
 
-    virtual Array<OneD, NekDouble> v_GetMaxStdVelocity(
+    Array<OneD, NekDouble> v_GetMaxStdVelocity(
         const NekDouble SpeedSoundFactor) override;
 
-    virtual bool v_PreIntegrate(int step) override;
+    bool v_PreIntegrate(int step) override;
 
 private:
 };

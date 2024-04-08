@@ -56,9 +56,7 @@
 #define NEKTAR_VERSION "Unknown"
 #endif
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 /**
@@ -105,7 +103,7 @@ std::string GetCompressString(void)
 
 std::string GetBitSizeStr(void)
 {
-    return boost::lexical_cast<std::string>(sizeof(void *) * 8);
+    return std::to_string(sizeof(void *) * 8);
 }
 
 /**
@@ -153,5 +151,4 @@ void Base64StrToBinaryStr(std::string &base64string,
                                        binary_t(base64string.end()));
 }
 } // namespace CompressData
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities

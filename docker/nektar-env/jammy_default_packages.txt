@@ -2,12 +2,11 @@ ccache
 clang-14
 cmake
 g++
-libboost-filesystem-dev
+git-core
+lcov
 libboost-iostreams-dev
 libboost-program-options-dev
-libboost-regex-dev
 libboost-system-dev
-libboost-thread-dev
 liblapack-dev
 libscotch-dev
 libtinyxml-dev

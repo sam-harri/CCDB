@@ -36,24 +36,11 @@
 
 #include <StdRegions/StdExpansion1D.h>
 
-namespace Nektar
+namespace Nektar::StdRegions
 {
-namespace StdRegions
-{
-StdExpansion1D::StdExpansion1D()
-{
-}
 
 StdExpansion1D::StdExpansion1D(int numcoeffs, const LibUtilities::BasisKey &Ba)
     : StdExpansion(numcoeffs, 1, Ba)
-{
-}
-
-StdExpansion1D::StdExpansion1D(const StdExpansion1D &T) : StdExpansion(T)
-{
-}
-
-StdExpansion1D::~StdExpansion1D()
 {
 }
 
@@ -93,23 +80,20 @@ NekDouble StdExpansion1D::v_PhysEvaluate(
 }
 
 NekDouble StdExpansion1D::v_PhysEvaluate(
-    const Array<OneD, NekDouble> &coord,
-    const Array<OneD, const NekDouble> &inarray,
-    std::array<NekDouble, 3> &firstOrderDerivs)
+    [[maybe_unused]] const Array<OneD, NekDouble> &coord,
+    [[maybe_unused]] const Array<OneD, const NekDouble> &inarray,
+    [[maybe_unused]] std::array<NekDouble, 3> &firstOrderDerivs)
 {
-    boost::ignore_unused(coord, inarray, firstOrderDerivs);
     return 0;
 }
 
 NekDouble StdExpansion1D::v_PhysEvaluate(
-    const Array<OneD, NekDouble> &coord,
-    const Array<OneD, const NekDouble> &inarray,
-    std::array<NekDouble, 3> &firstOrderDerivs,
-    std::array<NekDouble, 6> &secondOrderDerivs)
+    [[maybe_unused]] const Array<OneD, NekDouble> &coord,
+    [[maybe_unused]] const Array<OneD, const NekDouble> &inarray,
+    [[maybe_unused]] std::array<NekDouble, 3> &firstOrderDerivs,
+    [[maybe_unused]] std::array<NekDouble, 6> &secondOrderDerivs)
 {
-    boost::ignore_unused(coord, inarray, firstOrderDerivs, secondOrderDerivs);
     return 0;
 }
 
-} // namespace StdRegions
-} // namespace Nektar
+} // namespace Nektar::StdRegions

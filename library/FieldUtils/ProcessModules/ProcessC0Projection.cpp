@@ -36,16 +36,12 @@
 #include <string>
 using namespace std;
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/BasicUtils/ParseUtils.h>
 #include <LibUtilities/BasicUtils/SharedArray.hpp>
 
 #include "ProcessC0Projection.h"
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 ModuleKey ProcessC0Projection::className =
@@ -232,5 +228,4 @@ void ProcessC0Projection::v_Process(po::variables_map &vm)
             tmp = m_f->m_exp[processFields[i]]->UpdatePhys());
     }
 }
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

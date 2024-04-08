@@ -38,9 +38,7 @@
 #include <SolverUtils/RiemannSolvers/RiemannSolver.h>
 #include <SolverUtils/SolverUtilsDeclspec.h>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 class UpwindSolver : public RiemannSolver
 {
@@ -56,12 +54,11 @@ public:
 protected:
     UpwindSolver(const LibUtilities::SessionReaderSharedPtr &pSession);
 
-    virtual void v_Solve(
-        const int nDim, const Array<OneD, const Array<OneD, NekDouble>> &Fwd,
-        const Array<OneD, const Array<OneD, NekDouble>> &Bwd,
-        Array<OneD, Array<OneD, NekDouble>> &flux) override final;
+    void v_Solve(const int nDim,
+                 const Array<OneD, const Array<OneD, NekDouble>> &Fwd,
+                 const Array<OneD, const Array<OneD, NekDouble>> &Bwd,
+                 Array<OneD, Array<OneD, NekDouble>> &flux) final;
 };
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils
 
 #endif

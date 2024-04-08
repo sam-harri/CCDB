@@ -39,9 +39,7 @@
 #include <MultiRegions/ExpList3DHomogeneous2D.h>
 #include <MultiRegions/MultiRegionsDeclspec.h>
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 class DisContField3DHomogeneous2D : public ExpList3DHomogeneous2D
 {
@@ -72,7 +70,7 @@ public:
         const bool DeclareLinesSetCoeffPhys = true);
 
     /// Destructor.
-    MULTI_REGIONS_EXPORT virtual ~DisContField3DHomogeneous2D();
+    MULTI_REGIONS_EXPORT ~DisContField3DHomogeneous2D() override;
 
     MULTI_REGIONS_EXPORT void SetupBoundaryConditions(
         const LibUtilities::BasisKey &HomoBasis_y,
@@ -95,49 +93,45 @@ protected:
 
     Array<OneD, SpatialDomains::BoundaryConditionShPtr> m_bndConditions;
 
-    virtual GlobalLinSysKey v_HelmSolve(
-        const Array<OneD, const NekDouble> &inarray,
-        Array<OneD, NekDouble> &outarray,
-        const StdRegions::ConstFactorMap &factors,
-        const StdRegions::VarCoeffMap &varcoeff,
-        const MultiRegions::VarFactorsMap &varfactors,
-        const Array<OneD, const NekDouble> &dirForcing,
-        const bool PhysSpaceForcing) override;
+    GlobalLinSysKey v_HelmSolve(const Array<OneD, const NekDouble> &inarray,
+                                Array<OneD, NekDouble> &outarray,
+                                const StdRegions::ConstFactorMap &factors,
+                                const StdRegions::VarCoeffMap &varcoeff,
+                                const MultiRegions::VarFactorsMap &varfactors,
+                                const Array<OneD, const NekDouble> &dirForcing,
+                                const bool PhysSpaceForcing) override;
 
-    virtual void v_GetBndElmtExpansion(
-        int i, std::shared_ptr<ExpList> &result,
-        const bool DeclareCoeffPhysArrays) override;
+    void v_GetBndElmtExpansion(int i, std::shared_ptr<ExpList> &result,
+                               const bool DeclareCoeffPhysArrays) override;
 
-    virtual void v_GetBoundaryToElmtMap(Array<OneD, int> &ElmtID,
-                                        Array<OneD, int> &EdgeID) override;
+    void v_GetBoundaryToElmtMap(Array<OneD, int> &ElmtID,
+                                Array<OneD, int> &EdgeID) override;
 
     /// @todo Fix Robin BCs for homogeneous case
-    virtual std::map<int, RobinBCInfoSharedPtr> v_GetRobinBCInfo() override;
+    std::map<int, RobinBCInfoSharedPtr> v_GetRobinBCInfo() override;
 
-    virtual void v_EvaluateBoundaryConditions(
+    void v_EvaluateBoundaryConditions(
         const NekDouble time = 0.0, const std::string varName = "",
         const NekDouble x2_in = NekConstants::kNekUnsetDouble,
         const NekDouble x3_in = NekConstants::kNekUnsetDouble) override;
 
-    virtual const Array<OneD, const std::shared_ptr<ExpList>>
-        &v_GetBndCondExpansions(void) override;
+    const Array<OneD, const std::shared_ptr<ExpList>> &v_GetBndCondExpansions(
+        void) override;
 
-    virtual const Array<OneD, const SpatialDomains::BoundaryConditionShPtr>
-        &v_GetBndConditions() override;
+    const Array<OneD, const SpatialDomains::BoundaryConditionShPtr> &
+    v_GetBndConditions() override;
 
-    virtual std::shared_ptr<ExpList> &v_UpdateBndCondExpansion(int i) override;
+    std::shared_ptr<ExpList> &v_UpdateBndCondExpansion(int i) override;
 
-    virtual Array<OneD, SpatialDomains::BoundaryConditionShPtr>
-        &v_UpdateBndConditions() override;
+    Array<OneD, SpatialDomains::BoundaryConditionShPtr> &v_UpdateBndConditions()
+        override;
 
-    virtual void v_SetBndCondBwdWeight(const int index,
-                                       const NekDouble value) override;
+    void v_SetBndCondBwdWeight(const int index, const NekDouble value) override;
 };
 
 typedef std::shared_ptr<DisContField3DHomogeneous2D>
     DisContField3DHomogeneous2DSharedPtr;
 
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions
 
 #endif // MULTIERGIONS_DISCONTFIELD3DHOMO2D_H

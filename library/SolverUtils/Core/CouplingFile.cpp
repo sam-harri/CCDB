@@ -39,9 +39,7 @@
 
 #include <boost/format.hpp>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 
 using namespace std;
@@ -188,5 +186,4 @@ void CouplingFile::v_Receive(const int step, const NekDouble time,
                      field[recvVarsToVars[i]], 1);
     }
 }
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils

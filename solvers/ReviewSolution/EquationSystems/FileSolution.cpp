@@ -33,8 +33,16 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/algorithm/string.hpp>
+#include <algorithm>
+#include <fstream>
 #include <iomanip>
+#include <iostream>
+#include <sstream>
+
+#include <boost/algorithm/string.hpp>
+#include <boost/format.hpp>
+
+#include <tinyxml.h>
 
 #include <LibUtilities/BasicUtils/Timer.h>
 #include <LibUtilities/Communication/Comm.h>
@@ -42,24 +50,18 @@
 #include <LocalRegions/Expansion3D.h>
 #include <SolverUtils/Filters/Filter.h>
 
-#include <LibUtilities/BasicUtils/FileSystem.h>
+#include <LibUtilities/BasicUtils/Filesystem.hpp>
 #include <LibUtilities/BasicUtils/PtsIO.h>
 #include <LibUtilities/Polylib/Polylib.h>
-#include <algorithm>
-#include <fstream>
-#include <iostream>
-#include <sstream>
 
 #include <LibUtilities/BasicUtils/ParseUtils.h>
 #include <ReviewSolution/EquationSystems/FileSolution.h>
 #include <SolverUtils/Forcing/ForcingMovingReferenceFrame.h>
 #include <StdRegions/StdSegExp.h>
-#include <tinyxml.h>
+
 using namespace std;
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 /**
  * Constructor. Creates ...
@@ -179,11 +181,10 @@ FileSolution::~FileSolution()
 }
 
 void FileSolution::DoImplicitSolve(
-    const Array<OneD, const Array<OneD, NekDouble>> &inarray,
-    Array<OneD, Array<OneD, NekDouble>> &outarray, NekDouble time,
-    NekDouble lambda)
+    [[maybe_unused]] const Array<OneD, const Array<OneD, NekDouble>> &inarray,
+    [[maybe_unused]] Array<OneD, Array<OneD, NekDouble>> &outarray,
+    [[maybe_unused]] NekDouble time, [[maybe_unused]] NekDouble lambda)
 {
-    boost::ignore_unused(inarray, outarray, time, lambda);
 }
 
 /**
@@ -194,10 +195,10 @@ void FileSolution::DoImplicitSolve(
  * @param time       Time.
  */
 void FileSolution::DoOdeRhs(
-    const Array<OneD, const Array<OneD, NekDouble>> &inarray,
-    Array<OneD, Array<OneD, NekDouble>> &outarray, const NekDouble time)
+    [[maybe_unused]] const Array<OneD, const Array<OneD, NekDouble>> &inarray,
+    Array<OneD, Array<OneD, NekDouble>> &outarray,
+    [[maybe_unused]] const NekDouble time)
 {
-    boost::ignore_unused(inarray, time);
     int nSolutionPts = GetNpoints();
     for (size_t i = 0; i < outarray.size(); ++i)
     {
@@ -213,15 +214,14 @@ void FileSolution::DoOdeRhs(
  * @param time       Time.
  */
 void FileSolution::DoOdeProjection(
-    const Array<OneD, const Array<OneD, NekDouble>> &inarray,
-    Array<OneD, Array<OneD, NekDouble>> &outarray, const NekDouble time)
+    [[maybe_unused]] const Array<OneD, const Array<OneD, NekDouble>> &inarray,
+    [[maybe_unused]] Array<OneD, Array<OneD, NekDouble>> &outarray,
+    [[maybe_unused]] const NekDouble time)
 {
-    boost::ignore_unused(inarray, outarray, time);
 }
 
-bool FileSolution::v_PostIntegrate(int step)
+bool FileSolution::v_PostIntegrate([[maybe_unused]] int step)
 {
-    boost::ignore_unused(step);
     UpdateField(m_time);
     return false;
 }
@@ -276,10 +276,9 @@ bool FileSolution::v_RequireFwdTrans()
 }
 
 void FileSolution::v_GetPressure(
-    const Array<OneD, const Array<OneD, NekDouble>> &physfield,
-    Array<OneD, NekDouble> &pressure)
+    [[maybe_unused]] const Array<OneD, const Array<OneD, NekDouble>> &physfield,
+    [[maybe_unused]] Array<OneD, NekDouble> &pressure)
 {
-    boost::ignore_unused(physfield, pressure);
 }
 
 void FileSolution::v_GetDensity(
@@ -421,6 +420,24 @@ void FileFieldInterpolator::InitObject(
     else
     {
         m_timeStart = 0.;
+    }
+
+    if (m_session->GetComm()->GetRank() == 0)
+    {
+        cout << "baseflow info : interpolation order " << m_interporder
+             << ", period " << m_period << ", periodicity ";
+        if (m_isperiodic)
+        {
+            cout << "yes\n";
+        }
+        else
+        {
+            cout << "no\n";
+        }
+        cout << "baseflow info : files from " << m_start << " to "
+             << (m_start + (m_slices - 1) * m_skip) << " (skip " << m_skip
+             << ") with " << (m_slices - (m_interporder > 1))
+             << " time intervals" << endl;
     }
 
     string file = m_session->GetFunctionFilename("Solution", 0);
@@ -656,23 +673,22 @@ void FileFieldInterpolator::DFT(
     {
         ASSERTL0(file.find("%d", found + 1) == string::npos,
                  "There are more than one '%d'.");
-        char *buffer = new char[file.length() + 8];
-        int nstart   = m_start;
+        int nstart = m_start;
         std::vector<NekDouble> times;
-        for (int i = nstart; i < nstart + m_slices * m_skip; i += m_skip)
+        for (int i = 0; i < m_slices; ++i)
         {
-            sprintf(buffer, file.c_str(), i);
-            ImportFldBase(buffer, pFields, (i - nstart) / m_skip, params);
+            int filen = nstart + i * m_skip;
+            auto fmt  = boost::format(file) % filen;
+            ImportFldBase(fmt.str(), pFields, i, params);
             if (m_session->GetComm()->GetRank() == 0)
             {
-                cout << "read base flow file " << buffer << endl;
+                cout << "read base flow file " << fmt.str() << endl;
             }
             if (timefromfile && params.count("time"))
             {
                 times.push_back(params["time"]);
             }
         }
-        delete[] buffer;
         if (timefromfile && times.size() == m_slices && m_slices > 1)
         {
             m_timeStart = times[0];
@@ -790,5 +806,4 @@ NekDouble FileFieldInterpolator::GetStartTime()
 {
     return m_timeStart;
 }
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils

@@ -37,9 +37,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 /**
  * @class GlobalLinSysDirect
@@ -90,10 +88,6 @@ GlobalLinSysDirectFull::GlobalLinSysDirectFull(
     AssembleFullMatrix(pLocToGloMap);
 }
 
-GlobalLinSysDirectFull::~GlobalLinSysDirectFull()
-{
-}
-
 /**
  * Solve the linear system using a full global matrix system.
  */
@@ -104,59 +98,59 @@ void GlobalLinSysDirectFull::v_Solve(
     const Array<OneD, const NekDouble> &pDirForcing)
 {
     bool dirForcCalculated = (bool)pDirForcing.size();
-
-    int nDirDofs  = pLocToGloMap->GetNumGlobalDirBndCoeffs();
-    int nGlobDofs = pLocToGloMap->GetNumGlobalCoeffs();
-    int nLocDofs  = pLocToGloMap->GetNumLocalCoeffs();
-
-    Array<OneD, NekDouble> tmp(nLocDofs);
-    Array<OneD, NekDouble> tmp1(nLocDofs);
+    int nDirDofs           = pLocToGloMap->GetNumGlobalDirBndCoeffs();
+    int nGlobDofs          = pLocToGloMap->GetNumGlobalCoeffs();
+    int nLocDofs           = pLocToGloMap->GetNumLocalCoeffs();
 
     if (nDirDofs)
     {
         std::shared_ptr<MultiRegions::ExpList> expList = m_expList.lock();
+        Array<OneD, NekDouble> rhs(nLocDofs);
 
-        // calculate the dirichlet forcing
+        // Calculate the Dirichlet forcing
         if (dirForcCalculated)
         {
-            // assume pDirForcing is in local space
+            // Assume pDirForcing is in local space
             ASSERTL0(
                 pDirForcing.size() >= nLocDofs,
                 "DirForcing is not of sufficient size. Is it in local space?");
-            Vmath::Vsub(nLocDofs, pLocInput, 1, pDirForcing, 1, tmp1, 1);
+            Vmath::Vsub(nLocDofs, pLocInput, 1, pDirForcing, 1, rhs, 1);
         }
         else
         {
-
-            // Calculate Dirichlet forcing and subtract it from the rhs
-            expList->GeneralMatrixOp(m_linSysKey, pLocOutput, tmp);
+            // Calculate initial condition and Dirichlet forcing and subtract it
+            // from the rhs
+            expList->GeneralMatrixOp(m_linSysKey, pLocOutput, rhs);
 
             // Iterate over all the elements computing Robin BCs where
             // necessary
             for (auto &r : m_robinBCInfo) // add robin mass matrix
             {
                 RobinBCInfoSharedPtr rBC;
-                Array<OneD, NekDouble> tmploc;
+                Array<OneD, NekDouble> rhsloc;
 
                 int n      = r.first;
                 int offset = expList->GetCoeff_Offset(n);
 
                 LocalRegions::ExpansionSharedPtr vExp = expList->GetExp(n);
-                // add local matrix contribution
+                // Add local matrix contribution
                 for (rBC = r.second; rBC; rBC = rBC->next)
                 {
                     vExp->AddRobinTraceContribution(
                         rBC->m_robinID, rBC->m_robinPrimitiveCoeffs,
-                        pLocOutput + offset, tmploc = tmp + offset);
+                        pLocOutput + offset, rhsloc = rhs + offset);
                 }
             }
-            Vmath::Vsub(nLocDofs, pLocInput, 1, tmp, 1, tmp1, 1);
+            Vmath::Vsub(nLocDofs, pLocInput, 1, rhs, 1, rhs, 1);
         }
 
-        SolveLinearSystem(nGlobDofs, tmp1, tmp, pLocToGloMap, nDirDofs);
+        Array<OneD, NekDouble> diff(nLocDofs);
 
-        // Add back initial condition
-        Vmath::Vadd(nLocDofs, tmp, 1, pLocOutput, 1, pLocOutput, 1);
+        // Solve for perturbation from initial guess in pOutput
+        SolveLinearSystem(nGlobDofs, rhs, diff, pLocToGloMap, nDirDofs);
+
+        // Add back initial and boundary condition
+        Vmath::Vadd(nLocDofs, diff, 1, pLocOutput, 1, pLocOutput, 1);
     }
     else
     {
@@ -291,5 +285,4 @@ void GlobalLinSysDirectFull::v_SolveLinearSystem(
     pLocToGloMap->GlobalToLocal(global, pOutput);
 }
 
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions

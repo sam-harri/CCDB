@@ -37,9 +37,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 /**
  * @class GlobalLinSysIterativeStaticCond
@@ -228,12 +226,11 @@ GlobalLinSysStaticCondSharedPtr GlobalLinSysXxtStaticCond::v_Recurse(
 
 /// Solve the linear system for given input and output vectors.
 void GlobalLinSysXxtStaticCond::v_SolveLinearSystem(
-    const int pNumRows, const Array<OneD, const NekDouble> &pInput,
-    Array<OneD, NekDouble> &pOutput, const AssemblyMapSharedPtr &pLocToGloMap,
-    const int pNumDir)
+    [[maybe_unused]] const int pNumRows,
+    const Array<OneD, const NekDouble> &pInput, Array<OneD, NekDouble> &pOutput,
+    const AssemblyMapSharedPtr &pLocToGloMap,
+    [[maybe_unused]] const int pNumDir)
 {
-    boost::ignore_unused(pNumRows, pNumDir);
-
     int nLocal = pLocToGloMap->GetLocalToGlobalBndSign().size();
     Vmath::Zero(nLocal, pOutput, 1);
 
@@ -253,5 +250,5 @@ void GlobalLinSysXxtStaticCond::v_SolveLinearSystem(
         Xxt::Solve(pOutput, m_crsData, pInput);
     }
 }
-} // namespace MultiRegions
-} // namespace Nektar
+
+} // namespace Nektar::MultiRegions

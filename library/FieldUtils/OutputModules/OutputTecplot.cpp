@@ -37,16 +37,12 @@
 #include <string>
 using namespace std;
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/BasicUtils/PtsField.h>
 #include <LibUtilities/BasicUtils/PtsIO.h>
 
 #include "OutputTecplot.h"
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 std::string TecplotZoneTypeMap[] = {"ORDERED",       "LINESEG",     "TRIANGLE",
@@ -67,9 +63,9 @@ OutputTecplot::OutputTecplot(FieldSharedPtr f)
 {
     m_requireEquiSpaced = true;
     m_config["double"]  = ConfigOption(true, "0",
-                                      "Write double-precision format data:"
-                                      "more accurate but more disk space"
-                                      " required");
+                                       "Write double-precision format data:"
+                                        "more accurate but more disk space"
+                                        " required");
 }
 
 OutputTecplot::~OutputTecplot()
@@ -347,18 +343,15 @@ void OutputTecplot::v_OutputFromExp(po::variables_map &vm)
     WriteTecplotFile(vm);
 }
 
-void OutputTecplot::v_OutputFromData(po::variables_map &vm)
+void OutputTecplot::v_OutputFromData([[maybe_unused]] po::variables_map &vm)
 {
-    boost::ignore_unused(vm);
-
     NEKERROR(ErrorUtil::efatal,
              "OutputTecplot can't write using only FieldData.");
 }
 
-fs::path OutputTecplot::v_GetPath(std::string &filename, po::variables_map &vm)
+fs::path OutputTecplot::v_GetPath(std::string &filename,
+                                  [[maybe_unused]] po::variables_map &vm)
 {
-    boost::ignore_unused(vm);
-
     int nprocs = m_f->m_comm->GetSpaceComm()->GetSize();
     string returnstr(filename);
 
@@ -368,7 +361,7 @@ fs::path OutputTecplot::v_GetPath(std::string &filename, po::variables_map &vm)
         int rank      = m_f->m_comm->GetSpaceComm()->GetRank();
         int dot       = filename.find_last_of('.');
         string ext    = filename.substr(dot, filename.length() - dot);
-        string procId = "_P" + boost::lexical_cast<std::string>(rank);
+        string procId = "_P" + std::to_string(rank);
         string start  = filename.substr(0, dot);
         returnstr     = start + procId + ext;
     }
@@ -1148,5 +1141,4 @@ void OutputTecplot::CalculateConnectivity()
         }
     }
 }
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

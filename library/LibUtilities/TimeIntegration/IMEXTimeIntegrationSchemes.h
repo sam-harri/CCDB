@@ -43,14 +43,13 @@
 
 #define LUE LIB_UTILITIES_EXPORT
 
-#include <LibUtilities/TimeIntegration/TimeIntegrationSchemeGLM.h>
+#include <boost/core/ignore_unused.hpp>
 
 #include <LibUtilities/TimeIntegration/IMEXGearTimeIntegrationScheme.h>
 #include <LibUtilities/TimeIntegration/IMEXdirkTimeIntegrationSchemes.h>
+#include <LibUtilities/TimeIntegration/TimeIntegrationSchemeGLM.h>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -167,7 +166,7 @@ public:
         }
     }
 
-    virtual ~IMEXTimeIntegrationScheme()
+    ~IMEXTimeIntegrationScheme() override
     {
     }
 
@@ -252,7 +251,9 @@ public:
         for (size_t n = 1; n < 2 * phase->m_order; ++n)
         {
             if (n != phase->m_order)
+            {
                 phase->m_V[n][n - 1] = 1.0; // constant 1
+            }
         }
 
         phase->m_numMultiStepValues         = phase->m_order;
@@ -272,17 +273,17 @@ public:
     }
 
 protected:
-    LUE virtual std::string v_GetFullName() const override
+    LUE std::string v_GetFullName() const override
     {
         return m_integration_phases.back()->m_name;
     }
 
-    LUE virtual std::string v_GetName() const override
+    LUE std::string v_GetName() const override
     {
         return std::string("IMEX");
     }
 
-    LUE virtual NekDouble v_GetTimeStability() const override
+    LUE NekDouble v_GetTimeStability() const override
     {
         return 1.0;
     }
@@ -298,16 +299,13 @@ public:
                                     std::vector<NekDouble> freeParams)
         : IMEXTimeIntegrationScheme("", 1, freeParams)
     {
-        boost::ignore_unused(variant);
-        boost::ignore_unused(order);
+        boost::ignore_unused(variant, order);
     }
 
     static TimeIntegrationSchemeSharedPtr create(
-        std::string variant, size_t order, std::vector<NekDouble> freeParams)
+        [[maybe_unused]] std::string variant, [[maybe_unused]] size_t order,
+        std::vector<NekDouble> freeParams)
     {
-        boost::ignore_unused(variant);
-        boost::ignore_unused(order);
-
         TimeIntegrationSchemeSharedPtr p =
             MemoryManager<IMEXTimeIntegrationScheme>::AllocateSharedPtr(
                 "", 1, freeParams);
@@ -328,16 +326,13 @@ public:
                                     std::vector<NekDouble> freeParams)
         : IMEXTimeIntegrationScheme("", 2, freeParams)
     {
-        boost::ignore_unused(variant);
-        boost::ignore_unused(order);
+        boost::ignore_unused(variant, order);
     }
 
     static TimeIntegrationSchemeSharedPtr create(
-        std::string variant, size_t order, std::vector<NekDouble> freeParams)
+        [[maybe_unused]] std::string variant, [[maybe_unused]] size_t order,
+        std::vector<NekDouble> freeParams)
     {
-        boost::ignore_unused(variant);
-        boost::ignore_unused(order);
-
         TimeIntegrationSchemeSharedPtr p =
             MemoryManager<IMEXTimeIntegrationScheme>::AllocateSharedPtr(
                 "", 2, freeParams);
@@ -358,16 +353,13 @@ public:
                                     std::vector<NekDouble> freeParams)
         : IMEXTimeIntegrationScheme("", 3, freeParams)
     {
-        boost::ignore_unused(variant);
-        boost::ignore_unused(order);
+        boost::ignore_unused(variant, order);
     }
 
     static TimeIntegrationSchemeSharedPtr create(
-        std::string variant, size_t order, std::vector<NekDouble> freeParams)
+        [[maybe_unused]] std::string variant, [[maybe_unused]] size_t order,
+        std::vector<NekDouble> freeParams)
     {
-        boost::ignore_unused(variant);
-        boost::ignore_unused(order);
-
         TimeIntegrationSchemeSharedPtr p =
             MemoryManager<IMEXTimeIntegrationScheme>::AllocateSharedPtr(
                 "", 3, freeParams);
@@ -388,15 +380,13 @@ public:
                                     std::vector<NekDouble> freeParams)
         : IMEXTimeIntegrationScheme("", 4, freeParams)
     {
-        boost::ignore_unused(variant);
-        boost::ignore_unused(order);
+        boost::ignore_unused(variant, order);
     }
 
     static TimeIntegrationSchemeSharedPtr create(
-        std::string variant, size_t order, std::vector<NekDouble> freeParams)
+        [[maybe_unused]] std::string variant, [[maybe_unused]] size_t order,
+        std::vector<NekDouble> freeParams)
     {
-        boost::ignore_unused(variant);
-        boost::ignore_unused(order);
 
         TimeIntegrationSchemeSharedPtr p =
             MemoryManager<IMEXTimeIntegrationScheme>::AllocateSharedPtr(
@@ -411,7 +401,6 @@ protected:
 
 }; // end class IMEXOrder4TimeIntegrationScheme
 
-} // end namespace LibUtilities
-} // end namespace Nektar
+} // namespace Nektar::LibUtilities
 
 #endif

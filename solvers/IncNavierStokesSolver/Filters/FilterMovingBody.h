@@ -55,7 +55,7 @@ public:
     /// Creates an instance of this class
     static SolverUtils::FilterSharedPtr create(
         const LibUtilities::SessionReaderSharedPtr &pSession,
-        const std::weak_ptr<SolverUtils::EquationSystem> &pEquation,
+        const std::shared_ptr<SolverUtils::EquationSystem> &pEquation,
         const ParamMap &pParams)
     {
         SolverUtils::FilterSharedPtr p =
@@ -68,19 +68,19 @@ public:
 
     FilterMovingBody(
         const LibUtilities::SessionReaderSharedPtr &pSession,
-        const std::weak_ptr<SolverUtils::EquationSystem> &pEquation,
+        const std::shared_ptr<SolverUtils::EquationSystem> &pEquation,
         const ParamMap &pParams);
-    ~FilterMovingBody();
+    ~FilterMovingBody() override;
 
-    virtual void v_Initialise(
+    void v_Initialise(
         const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
         const NekDouble &time) override;
 
-    virtual void v_Update(
-        const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
-        const NekDouble &time) override
+    void v_Update(
+        [[maybe_unused]] const Array<OneD, const MultiRegions::ExpListSharedPtr>
+            &pFields,
+        [[maybe_unused]] const NekDouble &time) override
     {
-        boost::ignore_unused(pFields, time);
     }
 
     void UpdateForce(
@@ -93,11 +93,11 @@ public:
         const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
         Array<OneD, NekDouble> &MotionVars, const NekDouble &time);
 
-    virtual void v_Finalise(
+    void v_Finalise(
         const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
         const NekDouble &time) override;
 
-    virtual bool v_IsTimeDependent() override;
+    bool v_IsTimeDependent() override;
 
 private:
     /// ID's of boundary regions where we want the forces

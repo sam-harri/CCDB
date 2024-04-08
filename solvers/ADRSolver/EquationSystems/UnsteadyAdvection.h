@@ -37,7 +37,6 @@
 
 #include <SolverUtils/AdvectionSystem.h>
 #include <SolverUtils/Forcing/Forcing.h>
-#include <SolverUtils/RiemannSolvers/RiemannSolver.h>
 
 namespace Nektar
 {
@@ -57,25 +56,27 @@ public:
         p->InitObject();
         return p;
     }
+
     /// Name of class
     static std::string className;
 
     /// Destructor
-    virtual ~UnsteadyAdvection();
+    ~UnsteadyAdvection() override = default;
+
+    void v_ALEInitObject(
+        int spaceDim,
+        Array<OneD, MultiRegions::ExpListSharedPtr> &fields) override;
 
 protected:
     bool m_useGJPStabilisation;
     // scaling factor for GJP penalisation, default = 1.0
     NekDouble m_GJPJumpScale;
+
     SolverUtils::RiemannSolverSharedPtr m_riemannSolver;
 
     /// Advection velocity
     Array<OneD, Array<OneD, NekDouble>> m_velocity;
     Array<OneD, NekDouble> m_traceVn;
-
-    // Plane (used only for Discontinous projection
-    //        with 3DHomogenoeus1D expansion)
-    int m_planeNumber;
 
     /// Forcing terms
     std::vector<SolverUtils::ForcingSharedPtr> m_forcing;
@@ -106,11 +107,20 @@ protected:
     /// Get the normal velocity
     Array<OneD, NekDouble> &GetNormalVelocity();
 
+    /// Get the normal velocity based on input velfield
+    Array<OneD, NekDouble> &GetNormalVel(
+        const Array<OneD, const Array<OneD, NekDouble>> &velfield);
+
     /// Initialise the object
-    virtual void v_InitObject(bool DeclareFields = true) override;
+    void v_InitObject(bool DeclareFields = true) override;
 
     /// Print Summary
-    virtual void v_GenerateSummary(SolverUtils::SummaryList &s) override;
+    void v_GenerateSummary(SolverUtils::SummaryList &s) override;
+
+    bool v_PreIntegrate(int step) override;
+
+    void v_ExtraFldOutput(std::vector<Array<OneD, NekDouble>> &fieldcoeffs,
+                          std::vector<std::string> &variables) override;
 
 private:
     NekDouble m_waveFreq;

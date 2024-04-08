@@ -41,9 +41,7 @@ using namespace std;
 #include <LibUtilities/BasicUtils/SharedArray.hpp>
 #include <LibUtilities/BasicUtils/Timer.h>
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 ModuleKey ProcessCreateExp::className =
@@ -74,7 +72,7 @@ void ProcessCreateExp::v_Process(po::variables_map &vm)
         // check to see if fld file defined so can use in
         // expansion defintion if required
         bool fldfilegiven = (m_f->m_fielddef.size() != 0);
-        bool expFromFld   = fldfilegiven && !vm.count("useSessionExpansion");
+        bool expFromFld   = fldfilegiven && !vm.count("use-session-expansion");
 
         // load fielddef header if fld file is defined. This gives
         // precedence to Homogeneous definition in fld file
@@ -179,7 +177,7 @@ void ProcessCreateExp::v_Process(po::variables_map &vm)
 
         if (fldfilegiven)
         {
-            LoadFieldData(vm.count("useSessionVariables"));
+            LoadFieldData(vm.count("use-session-variables"));
         }
     }
 }
@@ -191,7 +189,6 @@ void ProcessCreateExp::LoadFieldData(bool useSessionVariables)
     m_f->m_session->LoadParameter("Strip_Z", nstrips, 1);
     vector<string> vars = m_f->m_session->GetVariables();
 
-    // if (vm.count("useSessionVariables"))
     if (useSessionVariables)
     {
         m_f->m_variables = vars;
@@ -260,5 +257,4 @@ void ProcessCreateExp::LoadFieldData(bool useSessionVariables)
     m_f->m_data     = vector<std::vector<NekDouble>>();
 }
 
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

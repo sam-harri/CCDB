@@ -37,16 +37,12 @@
 #include <string>
 using namespace std;
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/BasicUtils/SharedArray.hpp>
 #include <MultiRegions/ExpList.h>
 
 #include "ProcessMultiShear.h"
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 ModuleKey ProcessMultiShear::className =
@@ -394,5 +390,4 @@ void ProcessMultiShear::v_Process(po::variables_map &vm)
                                 m_f->m_exp[i]->UpdatePhys());
     }
 }
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

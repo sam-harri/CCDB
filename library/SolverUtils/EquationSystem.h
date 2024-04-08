@@ -36,7 +36,6 @@
 #define NEKTAR_SOLVERUTILS_EQUATIONSYSTEM_H
 
 #include <LibUtilities/BasicUtils/FieldIO.h>
-#include <LibUtilities/BasicUtils/FileSystem.h>
 #include <LibUtilities/BasicUtils/NekFactory.hpp>
 #include <LibUtilities/BasicUtils/Progressbar.hpp>
 #include <LibUtilities/BasicUtils/PtsField.h>
@@ -220,8 +219,8 @@ public:
     /// Write out a session summary.
     SOLVER_UTILS_EXPORT void SessionSummary(SummaryList &vSummary);
 
-    SOLVER_UTILS_EXPORT inline Array<OneD, MultiRegions::ExpListSharedPtr>
-        &UpdateFields();
+    SOLVER_UTILS_EXPORT inline Array<OneD, MultiRegions::ExpListSharedPtr> &
+    UpdateFields();
 
     /// Get hold of FieldInfoMap so it can be updated
     SOLVER_UTILS_EXPORT inline LibUtilities::FieldMetaDataMap &
@@ -426,11 +425,14 @@ protected:
     LibUtilities::FieldMetaDataMap m_fieldMetaDataMap;
 
     /// Moving frame of reference velocities
+    /// (u, v, w, omega_x, omega_y, omega_z, a_x, a_y, a_z, domega_x, domega_y,
+    /// domega_z)
     Array<OneD, NekDouble> m_movingFrameVelsxyz;
 
     /// Moving frame of reference angles with respect to the
     // stationary inertial frame
-    Array<OneD, NekDouble> m_movingFrameTheta;
+    // (x, y, z, angle_x, angle_y, angle_y, pivot_x, pivot_y, pivot_z)
+    Array<OneD, NekDouble> m_movingFrameData;
 
     /// Projection matrix for transformation between inertial and moving
     // frame of reference
@@ -689,8 +691,8 @@ inline bool EquationSystem::NegatedOp(void)
     return v_NegatedOp();
 }
 
-inline Array<OneD, MultiRegions::ExpListSharedPtr>
-    &EquationSystem::UpdateFields(void)
+inline Array<OneD, MultiRegions::ExpListSharedPtr> &EquationSystem::
+    UpdateFields(void)
 {
     return m_fields;
 }

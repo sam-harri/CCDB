@@ -32,22 +32,13 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/Foundations/InterpCoeff.h>
 #include <StdRegions/StdSegExp.h>
 
 using namespace std;
 
-namespace Nektar
+namespace Nektar::StdRegions
 {
-namespace StdRegions
-{
-/** \brief defult constructor */
-StdSegExp::StdSegExp()
-{
-}
-
 /** \brief Constructor using BasisKey class for quadrature points and
  *  order definition
  *
@@ -57,16 +48,6 @@ StdSegExp::StdSegExp()
 StdSegExp::StdSegExp(const LibUtilities::BasisKey &Ba)
     : StdExpansion(Ba.GetNumModes(), 1, Ba),
       StdExpansion1D(Ba.GetNumModes(), Ba)
-{
-}
-
-/** \brief Copy Constructor */
-StdSegExp::StdSegExp(const StdSegExp &T) : StdExpansion(T), StdExpansion1D(T)
-{
-}
-
-/** \brief Destructor */
-StdSegExp::~StdSegExp()
 {
 }
 
@@ -139,18 +120,16 @@ NekDouble StdSegExp::v_Integral(const Array<OneD, const NekDouble> &inarray)
 
 void StdSegExp::v_PhysDeriv(const Array<OneD, const NekDouble> &inarray,
                             Array<OneD, NekDouble> &out_d0,
-                            Array<OneD, NekDouble> &out_d1,
-                            Array<OneD, NekDouble> &out_d2)
+                            [[maybe_unused]] Array<OneD, NekDouble> &out_d1,
+                            [[maybe_unused]] Array<OneD, NekDouble> &out_d2)
 {
-    boost::ignore_unused(out_d1, out_d2);
     PhysTensorDeriv(inarray, out_d0);
 }
 
-void StdSegExp::v_PhysDeriv(const int dir,
+void StdSegExp::v_PhysDeriv([[maybe_unused]] const int dir,
                             const Array<OneD, const NekDouble> &inarray,
                             Array<OneD, NekDouble> &outarray)
 {
-    boost::ignore_unused(dir);
     ASSERTL1(dir == 0, "input dir is out of range");
     PhysTensorDeriv(inarray, outarray);
     // PhysDeriv(inarray, outarray);
@@ -158,22 +137,18 @@ void StdSegExp::v_PhysDeriv(const int dir,
 
 void StdSegExp::v_StdPhysDeriv(const Array<OneD, const NekDouble> &inarray,
                                Array<OneD, NekDouble> &out_d0,
-                               Array<OneD, NekDouble> &out_d1,
-                               Array<OneD, NekDouble> &out_d2)
+                               [[maybe_unused]] Array<OneD, NekDouble> &out_d1,
+                               [[maybe_unused]] Array<OneD, NekDouble> &out_d2)
 {
-    boost::ignore_unused(out_d1, out_d2);
     PhysTensorDeriv(inarray, out_d0);
-    // PhysDeriv(inarray, out_d0);
 }
 
-void StdSegExp::v_StdPhysDeriv(const int dir,
+void StdSegExp::v_StdPhysDeriv([[maybe_unused]] const int dir,
                                const Array<OneD, const NekDouble> &inarray,
                                Array<OneD, NekDouble> &outarray)
 {
-    boost::ignore_unused(dir);
     ASSERTL1(dir == 0, "input dir is out of range");
     PhysTensorDeriv(inarray, outarray);
-    // PhysDeriv(inarray, outarray);
 }
 
 //---------------------------------------------------------------------
@@ -210,7 +185,6 @@ void StdSegExp::v_BwdTrans(const Array<OneD, const NekDouble> &inarray,
     }
     else
     {
-
         Blas::Dgemv('N', nquad, m_base[0]->GetNumModes(), 1.0,
                     (m_base[0]->GetBdata()).get(), nquad, &inarray[0], 1, 0.0,
                     &outarray[0], 1);
@@ -396,10 +370,8 @@ void StdSegExp::v_BwdTrans_SumFac(const Array<OneD, const NekDouble> &inarray,
 void StdSegExp::v_IProductWRTBase(const Array<OneD, const NekDouble> &base,
                                   const Array<OneD, const NekDouble> &inarray,
                                   Array<OneD, NekDouble> &outarray,
-                                  int coll_check)
+                                  [[maybe_unused]] int coll_check)
 {
-    boost::ignore_unused(coll_check);
-
     int nquad = m_base[0]->GetNumPoints();
     Array<OneD, NekDouble> tmp(nquad);
     Array<OneD, const NekDouble> w = m_base[0]->GetW();
@@ -446,10 +418,9 @@ void StdSegExp::v_IProductWRTDerivBase(
 }
 
 void StdSegExp::v_IProductWRTDerivBase_SumFac(
-    const int dir, const Array<OneD, const NekDouble> &inarray,
+    [[maybe_unused]] const int dir, const Array<OneD, const NekDouble> &inarray,
     Array<OneD, NekDouble> &outarray)
 {
-    boost::ignore_unused(dir);
     ASSERTL1(dir == 0, "input dir is out of range");
     StdSegExp::v_IProductWRTBase(m_base[0]->GetDbdata(), inarray, outarray, 1);
 }
@@ -511,10 +482,8 @@ NekDouble StdSegExp::v_PhysEvaluateBasis(
 
 void StdSegExp::v_LaplacianMatrixOp(const Array<OneD, const NekDouble> &inarray,
                                     Array<OneD, NekDouble> &outarray,
-                                    const StdMatrixKey &mkey)
+                                    [[maybe_unused]] const StdMatrixKey &mkey)
 {
-    boost::ignore_unused(mkey);
-
     int nquad = m_base[0]->GetNumPoints();
 
     Array<OneD, NekDouble> physValues(nquad);
@@ -642,10 +611,9 @@ void StdSegExp::v_MultiplyByStdQuadratureMetric(
 }
 
 void StdSegExp::v_GetCoords(Array<OneD, NekDouble> &coords_0,
-                            Array<OneD, NekDouble> &coords_1,
-                            Array<OneD, NekDouble> &coords_2)
+                            [[maybe_unused]] Array<OneD, NekDouble> &coords_1,
+                            [[maybe_unused]] Array<OneD, NekDouble> &coords_2)
 {
-    boost::ignore_unused(coords_1, coords_2);
     Blas::Dcopy(GetNumPoints(0), (m_base[0]->GetZ()).get(), 1, &coords_0[0], 1);
 }
 
@@ -663,21 +631,18 @@ int StdSegExp::v_GetNtraces() const
     return 2;
 }
 
-int StdSegExp::v_GetTraceNcoeffs(const int i) const
+int StdSegExp::v_GetTraceNcoeffs([[maybe_unused]] const int i) const
 {
-    boost::ignore_unused(i);
     return 1;
 }
 
-int StdSegExp::v_GetTraceIntNcoeffs(const int i) const
+int StdSegExp::v_GetTraceIntNcoeffs([[maybe_unused]] const int i) const
 {
-    boost::ignore_unused(i);
     return 0;
 }
 
-int StdSegExp::v_GetTraceNumPoints(const int i) const
+int StdSegExp::v_GetTraceNumPoints([[maybe_unused]] const int i) const
 {
-    boost::ignore_unused(i);
     return 1;
 }
 
@@ -838,9 +803,9 @@ void StdSegExp::v_GetInteriorMap(Array<OneD, unsigned int> &outarray)
     }
 }
 
-int StdSegExp::v_GetVertexMap(int localVertexId, bool useCoeffPacking)
+int StdSegExp::v_GetVertexMap(int localVertexId,
+                              [[maybe_unused]] bool useCoeffPacking)
 {
-    boost::ignore_unused(useCoeffPacking);
     ASSERTL0((localVertexId == 0) || (localVertexId == 1),
              "local vertex id"
              "must be between 0 or 1");
@@ -855,10 +820,9 @@ int StdSegExp::v_GetVertexMap(int localVertexId, bool useCoeffPacking)
     return localDOF;
 }
 
-void StdSegExp::v_GetSimplexEquiSpacedConnectivity(Array<OneD, int> &conn,
-                                                   bool standard)
+void StdSegExp::v_GetSimplexEquiSpacedConnectivity(
+    Array<OneD, int> &conn, [[maybe_unused]] bool standard)
 {
-    boost::ignore_unused(standard);
     int np = m_base[0]->GetNumPoints();
 
     conn    = Array<OneD, int>(2 * (np - 1));
@@ -906,10 +870,10 @@ void StdSegExp::v_GetTraceCoeffMap(const unsigned int traceid,
 void StdSegExp::v_GetTraceToElementMap(const int tid,
                                        Array<OneD, unsigned int> &maparray,
                                        Array<OneD, int> &signarray,
-                                       Orientation orient, int P, int Q)
+                                       [[maybe_unused]] Orientation orient,
+                                       [[maybe_unused]] int P,
+                                       [[maybe_unused]] int Q)
 {
-    boost::ignore_unused(orient, P, Q);
-
     v_GetTraceCoeffMap(tid, maparray);
 
     if (signarray.size() != 1)
@@ -922,13 +886,13 @@ void StdSegExp::v_GetTraceToElementMap(const int tid,
     }
 }
 
-void StdSegExp::v_GetElmtTraceToTraceMap(const unsigned int eid,
-                                         Array<OneD, unsigned int> &maparray,
-                                         Array<OneD, int> &signarray,
-                                         Orientation orient, int P, int Q)
+void StdSegExp::v_GetElmtTraceToTraceMap(
+    [[maybe_unused]] const unsigned int eid,
+    Array<OneD, unsigned int> &maparray, Array<OneD, int> &signarray,
+    [[maybe_unused]] Orientation orient, [[maybe_unused]] int P,
+    [[maybe_unused]] int Q)
 {
     // parameters for higher dimnesion traces
-    boost::ignore_unused(eid, orient, P, Q);
     if (maparray.size() != 1)
     {
         maparray = Array<OneD, unsigned int>(1);
@@ -946,5 +910,4 @@ void StdSegExp::v_GetElmtTraceToTraceMap(const unsigned int eid,
     }
 }
 
-} // namespace StdRegions
-} // namespace Nektar
+} // namespace Nektar::StdRegions

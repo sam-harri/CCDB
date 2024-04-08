@@ -38,9 +38,7 @@
 using namespace std;
 using namespace Nektar::NekMesh;
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 ModuleKey InputSwan::className = GetModuleFactory().RegisterCreatorFunction(
@@ -203,5 +201,4 @@ void InputSwan::Process()
 
     PrintSummary();
 }
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh

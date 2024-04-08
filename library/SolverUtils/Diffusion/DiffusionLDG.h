@@ -35,20 +35,15 @@
 #ifndef NEKTAR_SOLVERUTILS_DIFFUSIONWEAKDG
 #define NEKTAR_SOLVERUTILS_DIFFUSIONWEAKDG
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <SolverUtils/Diffusion/Diffusion.h>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 class DiffusionLDG : public Diffusion
 {
 public:
-    static DiffusionSharedPtr create(std::string diffType)
+    static DiffusionSharedPtr create([[maybe_unused]] std::string diffType)
     {
-        boost::ignore_unused(diffType);
         return DiffusionSharedPtr(new DiffusionLDG());
     }
 
@@ -57,11 +52,18 @@ public:
 protected:
     DiffusionLDG();
 
-    virtual void v_InitObject(
+    void v_InitObject(
         LibUtilities::SessionReaderSharedPtr pSession,
         Array<OneD, MultiRegions::ExpListSharedPtr> pFields) override;
 
-    virtual void v_Diffuse(
+    void v_Diffuse(const std::size_t nConvective,
+                   const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
+                   const Array<OneD, Array<OneD, NekDouble>> &inarray,
+                   Array<OneD, Array<OneD, NekDouble>> &outarray,
+                   const Array<OneD, Array<OneD, NekDouble>> &pFwd,
+                   const Array<OneD, Array<OneD, NekDouble>> &pBwd) override;
+
+    void v_DiffuseCoeffs(
         const std::size_t nConvective,
         const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
         const Array<OneD, Array<OneD, NekDouble>> &inarray,
@@ -69,29 +71,21 @@ protected:
         const Array<OneD, Array<OneD, NekDouble>> &pFwd,
         const Array<OneD, Array<OneD, NekDouble>> &pBwd) override;
 
-    virtual void v_DiffuseCoeffs(
-        const std::size_t nConvective,
-        const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
-        const Array<OneD, Array<OneD, NekDouble>> &inarray,
-        Array<OneD, Array<OneD, NekDouble>> &outarray,
-        const Array<OneD, Array<OneD, NekDouble>> &pFwd,
-        const Array<OneD, Array<OneD, NekDouble>> &pBwd) override;
-
-    virtual void v_DiffuseCalcDerivative(
+    void v_DiffuseCalcDerivative(
         const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
         const Array<OneD, Array<OneD, NekDouble>> &inarray,
         TensorOfArray3D<NekDouble> &qfields,
         const Array<OneD, Array<OneD, NekDouble>> &pFwd,
         const Array<OneD, Array<OneD, NekDouble>> &pBwd) override;
 
-    virtual void v_DiffuseVolumeFlux(
+    void v_DiffuseVolumeFlux(
         const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
         const Array<OneD, Array<OneD, NekDouble>> &inarray,
         TensorOfArray3D<NekDouble> &qfields,
         TensorOfArray3D<NekDouble> &VolumeFlux,
         Array<OneD, int> &nonZeroIndex) override;
 
-    virtual void v_DiffuseTraceFlux(
+    void v_DiffuseTraceFlux(
         const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
         const Array<OneD, Array<OneD, NekDouble>> &inarray,
         TensorOfArray3D<NekDouble> &qfields,
@@ -138,7 +132,6 @@ private:
         const Array<OneD, const NekDouble> &qBwd,
         Array<OneD, NekDouble> &penaltyflux);
 };
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils
 
 #endif

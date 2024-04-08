@@ -38,14 +38,10 @@
 #include <map>
 #include <string>
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/BasicUtils/SharedArray.hpp>
 #include <LibUtilities/Interpreter/Interpreter.h>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 /**
@@ -128,7 +124,6 @@ private:
 
 typedef std::shared_ptr<Equation> EquationSharedPtr;
 
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities
 
 #endif // NEKTAR_LIBUTILITIES_EQUATION_HPP

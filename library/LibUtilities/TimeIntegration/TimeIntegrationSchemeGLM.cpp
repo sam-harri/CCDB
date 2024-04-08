@@ -36,9 +36,7 @@
 
 #include <LibUtilities/TimeIntegration/TimeIntegrationSchemeGLM.h>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 // Access Methods
@@ -107,10 +105,9 @@ ConstDoubleArray &TimeIntegrationSchemeGLM::v_TimeIntegrate(
 }
 
 void TimeIntegrationSchemeGLM::v_InitializeSecondaryData(
-    TimeIntegrationAlgorithmGLM *phase, NekDouble deltaT) const
+    [[maybe_unused]] TimeIntegrationAlgorithmGLM *phase,
+    [[maybe_unused]] NekDouble deltaT) const
 {
-    boost::ignore_unused(phase, deltaT);
-
     ASSERTL0(false,
              "No InitializeSecondaryData method for scheme " + GetFullName());
 }
@@ -160,5 +157,4 @@ std::ostream &operator<<(std::ostream &os,
     return os;
 }
 
-} // end namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities

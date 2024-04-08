@@ -34,34 +34,19 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <StdRegions/StdExpansion3D.h>
 
 #ifdef max
 #undef max
 #endif
 
-namespace Nektar
+namespace Nektar::StdRegions
 {
-namespace StdRegions
-{
-StdExpansion3D::StdExpansion3D()
-{
-}
 
 StdExpansion3D::StdExpansion3D(int numcoeffs, const LibUtilities::BasisKey &Ba,
                                const LibUtilities::BasisKey &Bb,
                                const LibUtilities::BasisKey &Bc)
     : StdExpansion(numcoeffs, 3, Ba, Bb, Bc)
-{
-}
-
-StdExpansion3D::StdExpansion3D(const StdExpansion3D &T) : StdExpansion(T)
-{
-}
-
-StdExpansion3D::~StdExpansion3D()
 {
 }
 
@@ -219,7 +204,7 @@ NekDouble StdExpansion3D::v_PhysEvaluate(
     WARNINGL2(coords[2] >= -1 - NekConstants::kNekZeroTol, "coord[2] < -1");
     WARNINGL2(coords[2] <= 1 + NekConstants::kNekZeroTol, "coord[2] >  1");
 
-    // Obtain local collapsed corodinate from Cartesian coordinate.
+    // Obtain local collapsed coordinate from Cartesian coordinate.
     LocCoordToLocCollapsed(coords, eta);
 
     const int nq0 = m_base[0]->GetNumPoints();
@@ -258,7 +243,7 @@ NekDouble StdExpansion3D::v_PhysEvaluate(
     Array<OneD, NekDouble> sumFactorization_r = Array<OneD, NekDouble>(Qz);
 
     // Lagrangian interpolation matrix
-    NekDouble *interpolatingNodes = 0;
+    NekDouble *interpolatingNodes = nullptr;
 
     // Interpolate first coordinate direction
     interpolatingNodes = &I[0]->GetPtr()[0];
@@ -280,11 +265,10 @@ NekDouble StdExpansion3D::v_PhysEvaluate(
 }
 
 NekDouble StdExpansion3D::v_PhysEvaluate(
-    const Array<OneD, NekDouble> &coord,
-    const Array<OneD, const NekDouble> &inarray,
-    std::array<NekDouble, 3> &firstOrderDerivs)
+    [[maybe_unused]] const Array<OneD, NekDouble> &coord,
+    [[maybe_unused]] const Array<OneD, const NekDouble> &inarray,
+    [[maybe_unused]] std::array<NekDouble, 3> &firstOrderDerivs)
 {
-    boost::ignore_unused(coord, inarray, firstOrderDerivs);
     return 0;
 }
 
@@ -414,18 +398,18 @@ int StdExpansion3D::v_GetNedges(void) const
     return 0;
 }
 
-int StdExpansion3D::v_GetEdgeNcoeffs(const int i) const
+int StdExpansion3D::v_GetEdgeNcoeffs([[maybe_unused]] const int i) const
 {
-    boost::ignore_unused(i);
     NEKERROR(ErrorUtil::efatal, "This function is not valid or not defined");
     return 0;
 }
 
 void StdExpansion3D::v_GetEdgeInteriorToElementMap(
-    const int tid, Array<OneD, unsigned int> &maparray,
-    Array<OneD, int> &signarray, Orientation traceOrient)
+    [[maybe_unused]] const int tid,
+    [[maybe_unused]] Array<OneD, unsigned int> &maparray,
+    [[maybe_unused]] Array<OneD, int> &signarray,
+    [[maybe_unused]] Orientation traceOrient)
 {
-    boost::ignore_unused(tid, maparray, signarray, traceOrient);
     NEKERROR(ErrorUtil::efatal, "Method does not exist for this shape");
 }
 
@@ -451,10 +435,10 @@ void StdExpansion3D::v_GetTraceToElementMap(const int tid,
 }
 
 LibUtilities::BasisKey EvaluateQuadFaceBasisKey(
-    const int facedir, const LibUtilities::BasisType faceDirBasisType,
-    const int numpoints, const int nummodes)
+    [[maybe_unused]] const int facedir,
+    const LibUtilities::BasisType faceDirBasisType, const int numpoints,
+    const int nummodes)
 {
-    boost::ignore_unused(facedir);
 
     switch (faceDirBasisType)
     {
@@ -534,9 +518,6 @@ LibUtilities::BasisKey EvaluateTriFaceBasisKey(
                 }
                 case 1:
                 {
-                    //   const LibUtilities::PointsKey pkey(
-                    //   numpoints+1,
-                    //   LibUtilities::eGaussLobattoLegendre);
                     const LibUtilities::PointsKey pkey(
                         numpoints, LibUtilities::eGaussRadauMAlpha1Beta0);
                     return LibUtilities::BasisKey(LibUtilities::eModified_B,
@@ -618,5 +599,4 @@ LibUtilities::BasisKey EvaluateTriFaceBasisKey(
     // Keep things happy by returning a value.
     return LibUtilities::NullBasisKey;
 }
-} // namespace StdRegions
-} // namespace Nektar
+} // namespace Nektar::StdRegions

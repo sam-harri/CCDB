@@ -36,7 +36,7 @@
 #include "MeshGraphXmlCompressed.h"
 
 #include <LibUtilities/BasicUtils/CompressData.h>
-#include <LibUtilities/BasicUtils/FileSystem.h>
+#include <LibUtilities/BasicUtils/Filesystem.hpp>
 #include <LibUtilities/BasicUtils/ParseUtils.h>
 
 #include <LibUtilities/Interpreter/Interpreter.h>
@@ -56,9 +56,7 @@
 #include <tinyxml.h>
 using namespace std;
 
-namespace Nektar
-{
-namespace SpatialDomains
+namespace Nektar::SpatialDomains
 {
 
 std::string MeshGraphXmlCompressed::className =
@@ -199,7 +197,7 @@ void MeshGraphXmlCompressed::v_ReadVertices()
     {
         ASSERTL0(false, "Compressed formats do not match. Expected :" +
                             LibUtilities::CompressData::GetCompressString() +
-                            " but got " + std::string(IsCompressed));
+                            " but got " + IsCompressed);
     }
 }
 
@@ -312,7 +310,7 @@ void MeshGraphXmlCompressed::v_ReadCurves()
                             LibUtilities::CompressData::GetCompressString()),
              "Compressed formats do not match. Expected :" +
                  LibUtilities::CompressData::GetCompressString() + " but got " +
-                 boost::lexical_cast<std::string>(IsCompressed));
+                 IsCompressed);
 
     std::vector<SpatialDomains::MeshCurvedInfo> edginfo;
     std::vector<SpatialDomains::MeshCurvedInfo> facinfo;
@@ -465,7 +463,7 @@ void MeshGraphXmlCompressed::v_ReadEdges()
                             LibUtilities::CompressData::GetCompressString()),
              "Compressed formats do not match. Expected :" +
                  LibUtilities::CompressData::GetCompressString() + " but got " +
-                 std::string(IsCompressed));
+                 IsCompressed);
     // Extract the edge body
     TiXmlNode *edgeChild = field->FirstChild();
     ASSERTL0(edgeChild, "Unable to extract the data from "
@@ -532,7 +530,7 @@ void MeshGraphXmlCompressed::v_ReadFaces()
                            LibUtilities::CompressData::GetCompressString()),
             "Compressed formats do not match. Expected :" +
                 LibUtilities::CompressData::GetCompressString() + " but got " +
-                std::string(IsCompressed));
+                IsCompressed);
 
         // Extract the face body
         TiXmlNode *faceChild = element->FirstChild();
@@ -619,7 +617,7 @@ void MeshGraphXmlCompressed::v_ReadFaces()
 
 void MeshGraphXmlCompressed::v_ReadElements1D()
 {
-    TiXmlElement *field = NULL;
+    TiXmlElement *field = nullptr;
 
     /// Look for elements in ELEMENT block.
     field = m_xmlGeom->FirstChildElement("ELEMENT");
@@ -641,7 +639,7 @@ void MeshGraphXmlCompressed::v_ReadElements1D()
                            LibUtilities::CompressData::GetCompressString()),
             "Compressed formats do not match. Expected :" +
                 LibUtilities::CompressData::GetCompressString() + " but got " +
-                std::string(IsCompressed));
+                IsCompressed);
 
         // Extract the face body
         TiXmlNode *child = segment->FirstChild();
@@ -721,7 +719,7 @@ void MeshGraphXmlCompressed::v_ReadElements2D()
                            LibUtilities::CompressData::GetCompressString()),
             "Compressed formats do not match. Expected :" +
                 LibUtilities::CompressData::GetCompressString() + " but got " +
-                std::string(IsCompressed));
+                IsCompressed);
 
         // Extract the face body
         TiXmlNode *faceChild = element->FirstChild();
@@ -836,7 +834,7 @@ void MeshGraphXmlCompressed::v_ReadElements3D()
                            LibUtilities::CompressData::GetCompressString()),
             "Compressed formats do not match. Expected :" +
                 LibUtilities::CompressData::GetCompressString() + " but got " +
-                std::string(IsCompressed));
+                IsCompressed);
 
         // Extract the face body
         TiXmlNode *child = element->FirstChild();
@@ -1404,5 +1402,4 @@ void MeshGraphXmlCompressed::v_WriteCurves(TiXmlElement *geomTag,
 
     geomTag->LinkEndChild(curveTag);
 }
-} // namespace SpatialDomains
-} // namespace Nektar
+} // namespace Nektar::SpatialDomains

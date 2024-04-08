@@ -34,9 +34,7 @@
 
 #include <SolverUtils/Filters/Filter.h>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 FilterFactory &GetFilterFactory()
 {
@@ -45,7 +43,7 @@ FilterFactory &GetFilterFactory()
 }
 
 Filter::Filter(const LibUtilities::SessionReaderSharedPtr &pSession,
-               const std::weak_ptr<EquationSystem> &pEquation)
+               const std::shared_ptr<EquationSystem> &pEquation)
     : m_session(pSession), m_equ(pEquation)
 {
 }
@@ -54,5 +52,4 @@ Filter::~Filter()
 {
 }
 
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils

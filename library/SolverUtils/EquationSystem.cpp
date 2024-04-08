@@ -32,8 +32,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <FieldUtils/Interpolator.h>
 #include <SolverUtils/EquationSystem.h>
 
@@ -59,9 +57,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 
 std::string EquationSystem::equationSystemTypeLookupIds[2] = {
@@ -124,9 +120,9 @@ EquationSystem::EquationSystem(
     for (int i = 0; i < filenames.size(); ++i)
     {
         string sessionname = "SessionName";
-        sessionname += boost::lexical_cast<std::string>(i);
+        sessionname += std::to_string(i);
         m_fieldMetaDataMap[sessionname]  = filenames[i];
-        m_fieldMetaDataMap["ChkFileNum"] = boost::lexical_cast<std::string>(0);
+        m_fieldMetaDataMap["ChkFileNum"] = std::to_string(0);
     }
 }
 
@@ -987,12 +983,10 @@ Array<OneD, NekDouble> EquationSystem::ErrorExtraPoints(unsigned int field)
  * @param  initialtime           Time at which to evaluate the function.
  * @param  dumpInitialConditions Write the initial condition to file?
  */
-void EquationSystem::v_SetInitialConditions(NekDouble initialtime,
-                                            bool dumpInitialConditions,
-                                            const int domain)
+void EquationSystem::v_SetInitialConditions(
+    [[maybe_unused]] NekDouble initialtime, bool dumpInitialConditions,
+    const int domain)
 {
-    boost::ignore_unused(initialtime);
-
     if (m_session->GetComm()->GetRank() == 0)
     {
         cout << "Initial Conditions:" << endl;
@@ -1084,9 +1078,8 @@ void EquationSystem::v_EvaluateExactSolution(unsigned int field,
 /**
  * By default, nothing needs initialising at the EquationSystem level.
  */
-void EquationSystem::v_DoInitialise(bool dumpInitialConditions)
+void EquationSystem::v_DoInitialise([[maybe_unused]] bool dumpInitialConditions)
 {
-    boost::ignore_unused(dumpInitialConditions);
 }
 
 /**
@@ -1146,9 +1139,8 @@ void EquationSystem::v_Output(void)
             fs::create_directory(newdir);
         }
         WriteFld(newdir + "/" + m_sessionName + "_" +
-                 boost::lexical_cast<std::string>(
-                     m_windowPIT * m_comm->GetTimeComm()->GetSize() +
-                     m_comm->GetTimeComm()->GetRank() + 1) +
+                 std::to_string(m_windowPIT * m_comm->GetTimeComm()->GetSize() +
+                                m_comm->GetTimeComm()->GetRank() + 1) +
                  ".fld");
     }
 }
@@ -1186,22 +1178,23 @@ void EquationSystem::Checkpoint_Output(const int n)
     if (!m_comm->IsParallelInTime())
     {
         // Serial-in-time
-        std::string outname =
-            m_sessionName + "_" + boost::lexical_cast<std::string>(n);
+        std::string outname = m_sessionName + "_" + std::to_string(n);
         WriteFld(outname + ".chk");
     }
     else
     {
         // Parallel-in-time
-        std::string paradir = m_sessionName + "_" +
-                              boost::lexical_cast<std::string>(m_iterPIT) +
-                              ".pit";
+        auto loc         = m_sessionName.find("_xml/");
+        auto sessionName = m_sessionName.substr(0, loc);
+        std::string paradir =
+            sessionName + "_" + std::to_string(m_iterPIT) + ".pit";
         if (!fs::is_directory(paradir))
         {
             fs::create_directory(paradir);
         }
-        std::string outname = paradir + "/" + m_sessionName + "_" +
-                              boost::lexical_cast<std::string>(n);
+        std::string outname = paradir + "/" + sessionName + "_timeLevel" +
+                              std::to_string(m_session->GetTimeLevel()) + "_" +
+                              std::to_string(n);
         WriteFld(outname + ".chk");
     }
 }
@@ -1218,23 +1211,12 @@ void EquationSystem::Checkpoint_Output(
     if (!m_comm->IsParallelInTime())
     {
         // Serial-in-time
-        std::string outname =
-            m_sessionName + "_" + boost::lexical_cast<std::string>(n);
+        std::string outname = m_sessionName + "_" + std::to_string(n);
         WriteFld(outname, field, fieldcoeffs, variables);
     }
     else
     {
-        // Parallel-in-time
-        std::string paradir = m_sessionName + "_" +
-                              boost::lexical_cast<std::string>(m_iterPIT) +
-                              ".pit";
-        if (!fs::is_directory(paradir))
-        {
-            fs::create_directory(paradir);
-        }
-        std::string outname = paradir + "/" + m_sessionName + "_" +
-                              boost::lexical_cast<std::string>(n);
-        WriteFld(outname, field, fieldcoeffs, variables);
+        ASSERTL0(false, "Not Implemented for Parallel-in-Time");
     }
 }
 
@@ -1244,8 +1226,7 @@ void EquationSystem::Checkpoint_Output(
  */
 void EquationSystem::Checkpoint_BaseFlow(const int n)
 {
-    std::string outname =
-        m_sessionName + "_BaseFlow_" + boost::lexical_cast<std::string>(n);
+    std::string outname = m_sessionName + "_BaseFlow_" + std::to_string(n);
 
     WriteFld(outname + ".chk");
 }
@@ -1315,8 +1296,7 @@ void EquationSystem::WriteFld(const std::string &outname,
     // Update step in field info if required
     if (m_fieldMetaDataMap.find("ChkFileNum") != m_fieldMetaDataMap.end())
     {
-        m_fieldMetaDataMap["ChkFileNum"] =
-            boost::lexical_cast<std::string>(m_nchk);
+        m_fieldMetaDataMap["ChkFileNum"] = std::to_string(m_nchk);
     }
 
     // If necessary, add mapping information to metadata
@@ -1329,16 +1309,16 @@ void EquationSystem::WriteFld(const std::string &outname,
     mapping->Output(fieldMetaDataMap, outname);
 
     // If necessary, add informaton for moving frame reference to metadata
-    if (m_fieldMetaDataMap.find("Theta_x") != m_fieldMetaDataMap.end())
+    // X, Y, Z translational displacements
+    // Theta_x, Theta_y, Theta_z angular displacements
+    // X0, Y0, Z0 pivot point
+    std::vector<std::string> strFrameData = {
+        "X", "Y", "Z", "Theta_x", "Theta_y", "Theta_z", "X0", "Y0", "Z0"};
+    for (size_t i = 0; i < strFrameData.size() && i < m_movingFrameData.size();
+         ++i)
     {
-        // if one theta exists, add all three thetas
-        std::vector<std::string> vSuffix = {"_x", "_y", "_z"};
-        for (int i = 0; i < 3; ++i)
-        {
-            std::string sTheta = "Theta" + vSuffix[i];
-            m_fieldMetaDataMap[sTheta] =
-                boost::lexical_cast<std::string>(m_movingFrameTheta[i]);
-        }
+        fieldMetaDataMap[strFrameData[i]] =
+            boost::lexical_cast<std::string>(m_movingFrameData[i]);
     }
 
     m_fld->Write(outname, FieldDef, FieldData, fieldMetaDataMap,
@@ -1508,7 +1488,10 @@ void EquationSystem::ImportFld(const std::string &infile,
  */
 void EquationSystem::SessionSummary(SummaryList &s)
 {
-    AddSummaryItem(s, "EquationType", m_session->GetSolverInfo("EQTYPE"));
+    if (m_session->DefinesSolverInfo("EQTYPE"))
+    {
+        AddSummaryItem(s, "EquationType", m_session->GetSolverInfo("EQTYPE"));
+    }
     AddSummaryItem(s, "Session Name", m_sessionName);
     AddSummaryItem(s, "Spatial Dim.", m_spacedim);
     AddSummaryItem(s, "Max SEM Exp. Order",
@@ -1569,6 +1552,15 @@ void EquationSystem::SessionSummary(SummaryList &s)
             GetAdvectionFactory().GetClassDescription(AdvectionType));
     }
 
+    if (m_session->DefinesSolverInfo("DiffusionType"))
+    {
+        std::string DiffusionType;
+        DiffusionType = m_session->GetSolverInfo("DiffusionType");
+        AddSummaryItem(
+            s, "Diffusion Type",
+            GetDiffusionFactory().GetClassDescription(DiffusionType));
+    }
+
     if (m_projectionType == MultiRegions::eGalerkin)
     {
         AddSummaryItem(s, "Projection Type", "Continuous Galerkin");
@@ -1581,15 +1573,6 @@ void EquationSystem::SessionSummary(SummaryList &s)
     {
         AddSummaryItem(s, "Projection Type",
                        "Mixed Continuous Galerkin and Discontinuous");
-    }
-
-    if (m_session->DefinesSolverInfo("DiffusionType"))
-    {
-        std::string DiffusionType;
-        DiffusionType = m_session->GetSolverInfo("DiffusionType");
-        AddSummaryItem(
-            s, "Diffusion Type",
-            GetDiffusionFactory().GetClassDescription(DiffusionType));
     }
 }
 
@@ -1615,11 +1598,9 @@ MultiRegions::ExpListSharedPtr EquationSystem::v_GetPressure()
  *
  */
 void EquationSystem::v_ExtraFldOutput(
-    std::vector<Array<OneD, NekDouble>> &fieldcoeffs,
-    std::vector<std::string> &variables)
+    [[maybe_unused]] std::vector<Array<OneD, NekDouble>> &fieldcoeffs,
+    [[maybe_unused]] std::vector<std::string> &variables)
 {
-    boost::ignore_unused(fieldcoeffs, variables);
 }
 
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils

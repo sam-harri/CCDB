@@ -39,15 +39,13 @@
 #include <LibUtilities/Foundations/NodalUtil.h>
 #include <memory>
 
-namespace Nektar
-{
-namespace LibUtilities
+namespace Nektar::LibUtilities
 {
 
 class NodalPrismSPI : public Points<NekDouble>
 {
 public:
-    virtual ~NodalPrismSPI()
+    ~NodalPrismSPI() override
     {
     }
 
@@ -67,11 +65,10 @@ private:
     Array<OneD, NekDouble> m_t0, m_t1, m_tw, m_e0, m_ew;
     size_t m_numtri;
 
-    virtual void v_CalculatePoints() override final;
-    virtual void v_CalculateWeights() override final;
-    virtual void v_CalculateDerivMatrix() override final;
+    void v_CalculatePoints() final;
+    void v_CalculateWeights() final;
+    void v_CalculateDerivMatrix() final;
 };
-} // namespace LibUtilities
-} // namespace Nektar
+} // namespace Nektar::LibUtilities
 
 #endif // NODALTRIELEC_H

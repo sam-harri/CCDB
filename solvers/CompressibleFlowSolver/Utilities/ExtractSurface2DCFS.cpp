@@ -40,12 +40,10 @@
 #include <string>
 
 #include <MultiRegions/AssemblyMap/AssemblyMapDG.h>
-#include <MultiRegions/ExpList.h>
 #include <MultiRegions/ExpList2DHomogeneous1D.h>
 #include <MultiRegions/ExpList3DHomogeneous1D.h>
 #include <MultiRegions/ExpList3DHomogeneous2D.h>
 
-#include <LocalRegions/Expansion.h>
 #include <LocalRegions/Expansion2D.h>
 #include <LocalRegions/MatrixKey.h>
 #include <MultiRegions/DisContField.h>
@@ -55,7 +53,6 @@
 #include <LibUtilities/BasicUtils/NekFactory.hpp>
 #include <LibUtilities/BasicUtils/SessionReader.h>
 #include <LibUtilities/BasicUtils/SharedArray.hpp>
-#include <LibUtilities/Communication/Comm.h>
 
 #include <LibUtilities/Memory/NekMemoryManager.hpp>
 #include <MultiRegions/ContField.h>
@@ -245,6 +242,18 @@ int main(int argc, char *argv[])
         pFields[i] =
             MemoryManager<MultiRegions::DisContField>::AllocateSharedPtr(
                 vSession, graphShPt, vSession->GetVariable(i));
+    }
+
+    //@TODO: Might need this to rotate mesh based on time
+    for (auto &fld : pFields)
+    {
+        if (fld->GetGraph()->GetMovement() != nullptr)
+        {
+            fld->GetGraph()->GetMovement()->PerformMovement(
+                boost::lexical_cast<NekDouble>(fieldMetaDataMap["Time"]));
+            fld->Reset();
+            fld->SetUpPhysNormals();
+        }
     }
 
     MultiRegions::ExpListSharedPtr Exp2D;

@@ -18,12 +18,16 @@ IF( NEKTAR_SOLVER_COMPRESSIBLE_FLOW )
         BoundaryConditions/PressureOutflowBC.cpp
         BoundaryConditions/PressureOutflowNonReflectiveBC.cpp
         BoundaryConditions/RiemannInvariantBC.cpp
+        BoundaryConditions/EnforceEntropyPressure.cpp
+        BoundaryConditions/EnforceEntropyVelocity.cpp
+        BoundaryConditions/EnforceEntropyTotalEnthalpy.cpp
         BoundaryConditions/RinglebFlowBC.cpp
         BoundaryConditions/StagnationInflowBC.cpp
         BoundaryConditions/SymmetryBC.cpp
         BoundaryConditions/TimeDependentBC.cpp
         BoundaryConditions/WallBC.cpp
         BoundaryConditions/WallViscousBC.cpp
+        BoundaryConditions/WallRotationalBC.cpp
         CompressibleFlowSolver.cpp
         Diffusion/DiffusionLDGNS.cpp
         EquationSystems/CompressibleFlowSystem.cpp
@@ -61,6 +65,63 @@ IF( NEKTAR_SOLVER_COMPRESSIBLE_FLOW )
         Preconditioner/PreconCfs.cpp
         Preconditioner/PreconCfsBRJ.cpp
         )
+    IF (NEKTAR_BUILD_SOLVER_LIBS)
+        SET(CompressibleFlowSolverHeaders
+        ArtificialDiffusion/ArtificialDiffusion.h
+        ArtificialDiffusion/NonSmoothShockCapture.h
+        BoundaryConditions/CFSBndCond.h
+        BoundaryConditions/EnforceEntropyPressure.h
+        BoundaryConditions/EnforceEntropyTotalEnthalpy.h
+        BoundaryConditions/EnforceEntropyVelocity.h
+        BoundaryConditions/ExtrapOrder0BC.h
+        BoundaryConditions/IsentropicVortexBC.h
+        BoundaryConditions/PressureInflowFileBC.h
+        BoundaryConditions/PressureMachTemperatureBC.h
+        BoundaryConditions/PressureOutflowBC.h
+        BoundaryConditions/PressureOutflowNonReflectiveBC.h
+        BoundaryConditions/RiemannInvariantBC.h
+        BoundaryConditions/RinglebFlowBC.h
+        BoundaryConditions/StagnationInflowBC.h
+        BoundaryConditions/SymmetryBC.h
+        BoundaryConditions/TimeDependentBC.h
+        BoundaryConditions/WallBC.h
+        BoundaryConditions/WallViscousBC.h
+        Diffusion/DiffusionLDGNS.h
+        EquationSystems/CompressibleFlowSystem.h
+        EquationSystems/CompressibleFlowSystemImplicit.h
+        EquationSystems/EulerCFE.h
+        EquationSystems/EulerImplicitCFE.h
+        EquationSystems/NavierStokesCFEAxisym.h
+        EquationSystems/NavierStokesCFE.h
+        EquationSystems/NavierStokesImplicitCFE.h
+        Forcing/ForcingAxiSymmetric.h
+        Forcing/ForcingQuasi1D.h
+        Misc/EquationOfState.h
+        Misc/IdealGasEoS.h
+        Misc/PengRobinsonEoS.h
+        Misc/RedlichKwongEoS.h
+        Misc/VanDerWaalsEoS.h
+        Misc/VariableConverter.h
+        Preconditioner/PreconCfsBRJ.h
+        Preconditioner/PreconCfs.h
+        Preconditioner/PreconCfsOp.h
+        RiemannSolvers/AUSM0Solver.h
+        RiemannSolvers/AUSM1Solver.h
+        RiemannSolvers/AUSM2Solver.h
+        RiemannSolvers/AUSM3Solver.h
+        RiemannSolvers/AverageSolver.h
+        RiemannSolvers/CompressibleSolver.h
+        RiemannSolvers/ExactSolverToro.h
+        RiemannSolvers/HLLCSolver.h
+        RiemannSolvers/HLLSolver.h
+        RiemannSolvers/LaxFriedrichsSolver.h
+        RiemannSolvers/RoeSolver.h
+        RiemannSolvers/RoeSolverSIMD.h
+        )
+        # Create separate library. No need to pass source files, as the executable's LIBRARY_SOURCES objects will be reused
+        ADD_SOLVER_LIBRARY(CompressibleFlowSolver HEADERS ${CompressibleFlowSolverHeaders} DEPENDS SolverUtils)
+    ENDIF()
+
     IF(NEKTAR_BUILD_UNIT_TESTS)
       ADD_SUBDIRECTORY(RiemannSolvers/UnitTests)
     ENDIF()
@@ -82,6 +143,7 @@ IF( NEKTAR_SOLVER_COMPRESSIBLE_FLOW )
     ADD_NEKTAR_TEST(IsentropicVortex_FRHU_SEM LENGTHY)
     ADD_NEKTAR_TEST(IsentropicVortex16_P8 LENGTHY)
     IF (NOT APPLE OR CMAKE_SYSTEM_PROCESSOR MATCHES "arm64")
+        ADD_NEKTAR_PERFORMANCE_TEST(Perf_IsentropicVortex16Implicit_P8)
         ADD_NEKTAR_TEST(IsentropicVortex16Implicit_P8 LENGTHY)
     ENDIF()
     ADD_NEKTAR_TEST(IsentropicVortex16_P3_GAUSS LENGTHY)
@@ -158,6 +220,10 @@ IF( NEKTAR_SOLVER_COMPRESSIBLE_FLOW )
     ADD_NEKTAR_TEST(Duct_Euler_2D_AxiSym_ForcedVortexSwirl)
     ADD_NEKTAR_TEST(EmbededCylinder2D)
     ADD_NEKTAR_TEST(Movement_fixed_couette)
+    ADD_NEKTAR_TEST(Movement_rotate_couette)
+    ADD_NEKTAR_TEST(cfs_bc_enforceEntropyPressure)
+    ADD_NEKTAR_TEST(cfs_bc_enforceEntropyVelocity)
+    ADD_NEKTAR_TEST(cfs_bc_enforceEntropyTotalEnthalpy)
 
     IF (NEKTAR_USE_MPI)
         #ADD_NEKTAR_TEST(Perturbation_M05_square_CBC_par LENGTHY)
@@ -175,6 +241,7 @@ IF( NEKTAR_SOLVER_COMPRESSIBLE_FLOW )
         #ADD_NEKTAR_TEST(Couette_WeakDG_LDG_Exact_par)
         ADD_NEKTAR_TEST(Couette_WeakDG_IP_MODIFIED_IM_par)
         ADD_NEKTAR_TEST(Movement_fixed_couette_par)
+        ADD_NEKTAR_TEST(Movement_rotate_couette_par)
     ENDIF (NEKTAR_USE_MPI)
 
     IF (NEKTAR_USE_FFTW)

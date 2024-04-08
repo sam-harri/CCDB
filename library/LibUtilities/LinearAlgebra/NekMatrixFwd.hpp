@@ -30,8 +30,6 @@
 //
 // Description: Matrix Forward Declarations
 //
-//
-//
 ///////////////////////////////////////////////////////////////////////////////
 
 #ifndef NEKTAR_LIB_UTILITIES_LINEAR_ALGEBRA_NEK_MATRIX_FWD_HPP

@@ -37,9 +37,7 @@
 
 #include <SolverUtils/Diffusion/Diffusion.h>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 class Diffusion3DHomogeneous1D : public Diffusion
 {
@@ -55,19 +53,18 @@ protected:
 
     std::string m_diffType;
 
-    virtual void v_InitObject(
+    void v_InitObject(
         LibUtilities::SessionReaderSharedPtr pSession,
         Array<OneD, MultiRegions::ExpListSharedPtr> pFields) override;
 
-    virtual void v_Diffuse(
-        const size_t nConvective,
-        const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
-        const Array<OneD, Array<OneD, NekDouble>> &inarray,
-        Array<OneD, Array<OneD, NekDouble>> &outarray,
-        const Array<OneD, Array<OneD, NekDouble>> &pFwd =
-            NullNekDoubleArrayOfArray,
-        const Array<OneD, Array<OneD, NekDouble>> &pBwd =
-            NullNekDoubleArrayOfArray) override;
+    void v_Diffuse(const size_t nConvective,
+                   const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
+                   const Array<OneD, Array<OneD, NekDouble>> &inarray,
+                   Array<OneD, Array<OneD, NekDouble>> &outarray,
+                   const Array<OneD, Array<OneD, NekDouble>> &pFwd =
+                       NullNekDoubleArrayOfArray,
+                   const Array<OneD, Array<OneD, NekDouble>> &pBwd =
+                       NullNekDoubleArrayOfArray) override;
 
 private:
     LibUtilities::TranspositionSharedPtr m_trans;
@@ -84,7 +81,6 @@ private:
     Array<OneD, Array<OneD, NekDouble>> m_outarrayPlane;
     Array<OneD, MultiRegions::ExpListSharedPtr> m_fieldsPlane;
 };
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils
 
 #endif

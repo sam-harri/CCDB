@@ -3,7 +3,7 @@ import sys
 from NekPy.FieldUtils import *
 
 nParts = 2
-field = Field(sys.argv, nParts, forceoutput=True, error=True)
+field = Field(sys.argv, nParts, force_output=True, error=True)
 
 inputxml  = InputModule.Create("xml" , field, "chan3D_xml")
 inputfld  = InputModule.Create("fld",  field, "chan3D.fld")

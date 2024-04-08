@@ -32,16 +32,15 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-#include "ProcessLoadCAD.h"
+#include <LibUtilities/BasicUtils/Filesystem.hpp>
 #include <NekMesh/CADSystem/CADSystem.h>
 
 #include <boost/algorithm/string.hpp>
-#include <boost/filesystem.hpp>
+
+#include "ProcessLoadCAD.h"
 
 using namespace std;
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 ModuleKey ProcessLoadCAD::className =
@@ -72,7 +71,7 @@ void ProcessLoadCAD::Process()
 
     m_log(VERBOSE) << "Loading CAD for: '" << name << "'" << endl;
 
-    if (boost::filesystem::path(name).extension() == ".fbm")
+    if (fs::path(name).extension() == ".fbm")
     {
         m_mesh->m_cad = GetEngineFactory().CreateInstance("cfi", name);
 
@@ -102,7 +101,7 @@ void ProcessLoadCAD::Process()
     if (voidPoints.length() > 0)
     {
         std::vector<std::string> splitStr;
-        std::vector<Array<OneD, NekDouble>> voidPts;
+        std::vector<std::array<NekDouble, 3>> voidPts;
 
         boost::split(splitStr, voidPoints, boost::is_any_of(";"));
 
@@ -117,10 +116,9 @@ void ProcessLoadCAD::Process()
                              << "coordinates." << endl;
             }
 
-            Array<OneD, NekDouble> tmp(3);
-            tmp[0] = std::stod(coords[0]);
-            tmp[1] = std::stod(coords[1]);
-            tmp[2] = std::stod(coords[2]);
+            std::array<NekDouble, 3> tmp = {std::stod(coords[0]),
+                                            std::stod(coords[1]),
+                                            std::stod(coords[2])};
 
             voidPts.push_back(tmp);
         }
@@ -130,5 +128,4 @@ void ProcessLoadCAD::Process()
 
     ASSERTL0(m_mesh->m_cad->LoadCAD(), "Failed to load CAD");
 }
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh

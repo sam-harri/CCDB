@@ -913,8 +913,7 @@ but the basic usage is:
 where type can be \texttt{hyperelastic}, \texttt{linearelastic},
 \texttt{winslow} or \texttt{roca}.
 
-\subsection{\emph{r}-adaptation}
-
+\subsection{\emph{r}-adaptation: interpolation file}
 This module can deform an existing mesh by using the variational optimiser
 presented above. A file must be provided that contains a list of points
 and a scaling value for each of them. This scaling factor is then used to
@@ -942,6 +941,26 @@ It is often recommended to run \emph{r}-adaptation on a linear mesh for
 stability and performance reasons. Note also that the mesh must have
 CAD information in order for nodes to slide on curves and surfaces.
 
+\subsection{\emph{r}-adaptation: CAD curves}
+Another option for \emph{r}-adaptation can be defined where instead of providing
+an interpolation file, the user can provide a list of CAD curves towards which
+the scaling takes place. With this option, the \emph{r}-adaption uses a fixed
+scaling factor for all elements which are on or within a specified distance from
+the curve.
+
+The call is similar to the \emph{r}-adaption with interpolation file, with the difference of replacing the file with a list of CAD curve IDs, the scaling factor and an optional distance from the curve:
+\begin{lstlisting}[style=BashInputStyle]
+  NekMesh -m varopti:type:radaptcurves=CurveIDs:radaptscale=scale:radaptrad=rad:subiter=x inital.xml adapted.xml
+\end{lstlisting}
+where \texttt{radaptcurves}, \texttt{radaptscale} and \texttt{radaptscale} are
+additional containing the list of CAD curve IDs (integers separated by commas,
+or with a dash for ranges, i.e. 1-3,6 would select curves with ID 1, 2, 3, and
+6), the scaling factor as a float and the distance from the CAD curves as a
+float, respectively. As with the \emph{r}-adaption with interpolation file,
+\texttt{subiter} is to define the frequency at which individual elements update
+their target scaling based on their current proximity to the selected CAD
+curves.
+
 \subsection{Mesh projection}
 This module can take any linear mesh, providing that it is a close
 representation of the CAD and project the boundary of the mesh onto the CAD.
@@ -957,6 +976,15 @@ order at which to curve the surface:
   NekMesh -m projectcad:file=cadfile.step:order=x inital.xml optimised.xml
 \end{lstlisting}
 
+\subsection{Mesh combine}
+This module can combine two mesh files into one output file.
+This will read all information from two mesh files and generate the combine meish 
+file with all these information. The process will duplicate composite IDs 
+from mesh 1 detected in mesh 2 and will remap into the output file.
+
+\begin{lstlisting}[style=BashInputStyle]
+  NekMesh -m combine:file=mesh1.xml mesh2.xml combine.xml
+\end{lstlisting}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

@@ -44,9 +44,7 @@
 #include <SpatialDomains/Geometry.h>
 #include <StdRegions/StdExpansion.h>
 
-namespace Nektar
-{
-namespace Collections
+namespace Nektar::Collections
 {
 
 /**
@@ -59,9 +57,13 @@ public:
         std::vector<StdRegions::StdExpansionSharedPtr> pCollExp,
         OperatorImpMap &impTypes);
 
-    COLLECTIONS_EXPORT void CheckFactors(const OperatorType opType,
-                                         StdRegions::FactorMap factors,
-                                         int coll_phys_offset = 0);
+    /// Update the factor map in operator @param opType by input @param factors
+    COLLECTIONS_EXPORT void UpdateFactors(const OperatorType opType,
+                                          StdRegions::FactorMap factors);
+
+    COLLECTIONS_EXPORT void UpdateVarcoeffs(
+        const OperatorType opType,
+        StdRegions::VarCoeffMap &varcoeffs = StdRegions::NullVarCoeffMap);
 
     COLLECTIONS_EXPORT void Initialise(
         const OperatorType opType,
@@ -96,6 +98,22 @@ public:
     inline CoalescedGeomDataSharedPtr GetGeomSharedPtr()
     {
         return m_geomData;
+    }
+
+    inline int GetInputSize(const OperatorType &op, bool defaultIn = true)
+    {
+        return m_ops[op]->GetInputSize(defaultIn);
+    }
+
+    inline int GetOutputSize(const OperatorType &op, bool defaultOut = true)
+    {
+        return m_ops[op]->GetOutputSize(defaultOut);
+    }
+
+    /// Return the number of elements in collection attached to @param op
+    inline int GetNumElmt(const OperatorType &op)
+    {
+        return m_ops[op]->GetNumElmt();
     }
 
 protected:
@@ -161,7 +179,6 @@ inline bool Collection::HasOperator(const OperatorType &op)
     return (m_ops.find(op) != m_ops.end());
 }
 
-} // namespace Collections
-} // namespace Nektar
+} // namespace Nektar::Collections
 
 #endif

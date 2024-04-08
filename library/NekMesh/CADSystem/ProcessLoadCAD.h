@@ -37,9 +37,7 @@
 
 #include <NekMesh/Module/Module.h>
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 class ProcessLoadCAD : public ProcessModule
@@ -53,16 +51,15 @@ public:
     static ModuleKey className;
 
     ProcessLoadCAD(MeshSharedPtr m);
-    virtual ~ProcessLoadCAD();
+    ~ProcessLoadCAD() override;
 
-    virtual void Process();
+    void Process() override;
 
-    virtual std::string GetModuleName()
+    std::string GetModuleName() override
     {
         return "LoadCAD";
     }
 };
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh
 
 #endif

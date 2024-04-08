@@ -43,7 +43,7 @@ namespace Nektar
 class MetricFileExists : public Metric
 {
 public:
-    virtual ~MetricFileExists()
+    ~MetricFileExists() override
     {
     }
 
@@ -59,8 +59,8 @@ protected:
 
     MetricFileExists(TiXmlElement *metric, bool generate);
 
-    virtual bool v_Test(std::istream &pStdout, std::istream &pStderr);
-    virtual void v_Generate(std::istream &pStdout, std::istream &pStderr);
+    bool v_Test(std::istream &pStdout, std::istream &pStderr) override;
+    void v_Generate(std::istream &pStdout, std::istream &pStderr) override;
 };
 } // namespace Nektar
 

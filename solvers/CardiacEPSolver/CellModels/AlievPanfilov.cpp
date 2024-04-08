@@ -70,10 +70,9 @@ CellModelAlievPanfilov::CellModelAlievPanfilov(
 
 void CellModelAlievPanfilov::v_Update(
     const Array<OneD, const Array<OneD, NekDouble>> &inarray,
-    Array<OneD, Array<OneD, NekDouble>> &outarray, const NekDouble time)
+    Array<OneD, Array<OneD, NekDouble>> &outarray,
+    [[maybe_unused]] const NekDouble time)
 {
-    boost::ignore_unused(time);
-
     // inarray[0] holds initial physical u values throughout
     // inarray[1] holds initial physical v values throughout
 

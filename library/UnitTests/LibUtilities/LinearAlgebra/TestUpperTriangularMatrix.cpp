@@ -37,9 +37,7 @@
 #include <boost/test/tools/floating_point_comparison.hpp>
 #include <boost/test/unit_test.hpp>
 
-namespace Nektar
-{
-namespace UpperTriangularMatrixUnitTests
+namespace Nektar::UpperTriangularMatrixUnitTests
 {
 typedef UpperTriangularMatrixFuncs Policy;
 
@@ -81,5 +79,4 @@ BOOST_AUTO_TEST_CASE(Test3x3MatrixVectorMultiplyUpper)
         BOOST_CHECK_EQUAL(expected_result, result);
     }
 }
-} // namespace UpperTriangularMatrixUnitTests
-} // namespace Nektar
+} // namespace Nektar::UpperTriangularMatrixUnitTests

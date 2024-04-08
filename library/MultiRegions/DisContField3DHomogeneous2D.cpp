@@ -33,15 +33,11 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <MultiRegions/DisContField.h>
 #include <MultiRegions/DisContField3DHomogeneous2D.h>
 #include <MultiRegions/ExpList2DHomogeneous2D.h>
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 
 DisContField3DHomogeneous2D::DisContField3DHomogeneous2D(void)
@@ -329,10 +325,10 @@ std::map<int, RobinBCInfoSharedPtr> DisContField3DHomogeneous2D::
 }
 
 void DisContField3DHomogeneous2D::v_EvaluateBoundaryConditions(
-    const NekDouble time, const std::string varName, const NekDouble x2_in,
-    const NekDouble x3_in)
+    const NekDouble time, const std::string varName,
+    [[maybe_unused]] const NekDouble x2_in,
+    [[maybe_unused]] const NekDouble x3_in)
 {
-    boost::ignore_unused(x2_in, x3_in);
     int n, m;
     const Array<OneD, const NekDouble> y = m_homogeneousBasis_y->GetZ();
     const Array<OneD, const NekDouble> z = m_homogeneousBasis_z->GetZ();
@@ -361,14 +357,14 @@ void DisContField3DHomogeneous2D::v_EvaluateBoundaryConditions(
     }
 }
 
-const Array<OneD, const std::shared_ptr<ExpList>>
-    &DisContField3DHomogeneous2D::v_GetBndCondExpansions(void)
+const Array<OneD, const std::shared_ptr<ExpList>> &DisContField3DHomogeneous2D::
+    v_GetBndCondExpansions(void)
 {
     return m_bndCondExpansions;
 }
 
-const Array<OneD, const SpatialDomains::BoundaryConditionShPtr>
-    &DisContField3DHomogeneous2D::v_GetBndConditions()
+const Array<OneD, const SpatialDomains::BoundaryConditionShPtr> &
+DisContField3DHomogeneous2D::v_GetBndConditions()
 {
     return m_bndConditions;
 }
@@ -379,8 +375,8 @@ std::shared_ptr<ExpList> &DisContField3DHomogeneous2D::v_UpdateBndCondExpansion(
     return m_bndCondExpansions[i];
 }
 
-Array<OneD, SpatialDomains::BoundaryConditionShPtr>
-    &DisContField3DHomogeneous2D::v_UpdateBndConditions()
+Array<OneD, SpatialDomains::BoundaryConditionShPtr> &DisContField3DHomogeneous2D::
+    v_UpdateBndConditions()
 {
     return m_bndConditions;
 }
@@ -390,5 +386,4 @@ void DisContField3DHomogeneous2D::v_SetBndCondBwdWeight(const int index,
 {
     m_bndCondBndWeight[index] = value;
 }
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions

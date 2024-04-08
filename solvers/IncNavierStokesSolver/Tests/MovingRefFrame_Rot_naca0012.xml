@@ -94,9 +94,6 @@
         <FUNCTION NAME="VelMRF">
             <E VAR="u" VALUE="0.0" />
             <E VAR="v" VALUE="0" />
-        </FUNCTION>
-
-        <FUNCTION NAME="OmegaMRF">
             <E VAR="Omega_z" VALUE="amp*omega*cos(omega*(t-t0))"/>
         </FUNCTION>
 
@@ -104,9 +101,8 @@
 
     <FORCING>
         <FORCE TYPE="MovingReferenceFrame">
-            <LinearVelocity> VelMRF </LinearVelocity>
-            <AngularVelocity> OmegaMRF </AngularVelocity>
-            <PivotPoint> 0.25 0.0 0.0 </PivotPoint>
+            <FRAMEVELOCITY> VelMRF </FRAMEVELOCITY>
+            <PIVOTPOINT> 0.25, 0.0, 0.0 </PIVOTPOINT>
         </FORCE>
     </FORCING>
 

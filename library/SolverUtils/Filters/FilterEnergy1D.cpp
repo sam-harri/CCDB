@@ -32,16 +32,12 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/Foundations/InterpCoeff.h>
 #include <SolverUtils/Filters/FilterEnergy1D.h>
 
 using namespace std;
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 std::string FilterEnergy1D::className =
     GetFilterFactory().RegisterCreatorFunction("Energy1D",
@@ -55,7 +51,7 @@ std::string FilterEnergy1D::className =
  */
 FilterEnergy1D::FilterEnergy1D(
     const LibUtilities::SessionReaderSharedPtr &pSession,
-    const std::weak_ptr<EquationSystem> &pEquation, const ParamMap &pParams)
+    const std::shared_ptr<EquationSystem> &pEquation, const ParamMap &pParams)
     : Filter(pSession, pEquation), m_index(0)
 {
     ASSERTL0(pSession->GetComm()->GetSize() == 1,
@@ -102,9 +98,8 @@ FilterEnergy1D::~FilterEnergy1D()
  */
 void FilterEnergy1D::v_Initialise(
     const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
-    const NekDouble &time)
+    [[maybe_unused]] const NekDouble &time)
 {
-    boost::ignore_unused(time);
     ASSERTL0(pFields[0]->GetExp(0)->GetNumBases() == 1,
              "The Energy 1D filter is only valid in 1D.");
 }
@@ -168,10 +163,10 @@ void FilterEnergy1D::v_Update(
 }
 
 void FilterEnergy1D::v_Finalise(
-    const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
-    const NekDouble &time)
+    [[maybe_unused]] const Array<OneD, const MultiRegions::ExpListSharedPtr>
+        &pFields,
+    [[maybe_unused]] const NekDouble &time)
 {
-    boost::ignore_unused(pFields, time);
     m_out.close();
 }
 
@@ -179,5 +174,4 @@ bool FilterEnergy1D::v_IsTimeDependent()
 {
     return true;
 }
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils

@@ -39,9 +39,7 @@
 
 #include <iostream>
 
-namespace Nektar
-{
-namespace InterpreterUnitTests
+namespace Nektar::InterpreterUnitTests
 {
 
 BOOST_AUTO_TEST_CASE(TestConstant)
@@ -87,5 +85,4 @@ BOOST_AUTO_TEST_CASE(TestFmodOperator)
     BOOST_CHECK_CLOSE(out[0], 2.0, epsilon);
 }
 
-} // namespace InterpreterUnitTests
-} // namespace Nektar
+} // namespace Nektar::InterpreterUnitTests

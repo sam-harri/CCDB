@@ -32,8 +32,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <LibUtilities/Foundations/ManagerAccess.h>
 #include <LibUtilities/Foundations/NodalUtil.h>
 
@@ -51,7 +49,6 @@
 #include <LibUtilities/Foundations/NodalUtil.h>
 
 #include <boost/algorithm/string.hpp>
-#include <boost/filesystem.hpp>
 
 // Including Timer.h includes Windows.h, which causes GetJob to be set as a
 // macro for some reason.
@@ -62,9 +59,7 @@
 using namespace std;
 using namespace Nektar::NekMesh;
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 ModuleKey ProcessVarOpti::className =
@@ -105,6 +100,12 @@ ProcessVarOpti::ProcessVarOpti(MeshSharedPtr m) : ProcessModule(m)
         ConfigOption(false, "", "basic analytics module");
     m_config["scalingfile"] =
         ConfigOption(false, "", "Read scaling field from file for r-adaptation");
+    m_config["radaptscale"] =
+        ConfigOption(false, "0", "Maps scaling for curve-based r-adaption");
+    m_config["radaptrad"] =
+        ConfigOption(false, "0", "Radius of influence for curve-based r-adaption");
+    m_config["radaptcurves"] =
+        ConfigOption(false, "", "Array of curves to use for adaption");
     // clang-format on
 }
 
@@ -231,11 +232,30 @@ void ProcessVarOpti::Process()
 
             int optiKind = m_mesh->m_spaceDim;
 
-            if (freenodes[i][j]->GetNumCadCurve() == 1)
+            if (freenodes[i][j]->GetNumCadCurve())
             {
-                optiKind += 10;
+                // ensures CAD vertices are removed from optimisation and not
+                // allowed to move.
+                [&] { // in a lambda function to avoid checking multiple curves
+                      // if node is already identified as a vertex.
+                    for (auto &curve : freenodes[i][j]->GetCADCurves())
+                    {
+                        for (auto &vert : curve->GetVertex())
+                        {
+                            if (freenodes[i][j] == vert->GetNode())
+                            {
+                                // node is a vertex of the CAD curve and should
+                                // not be optimised.
+                                optiKind = 0;
+                                return;
+                            }
+                        }
+                    }
+                    optiKind += 10; // if the lambda function hasn't returned
+                                    // then node is not a vertex.
+                }();
             }
-            else if (freenodes[i][j]->GetNumCADSurf() == 1)
+            else if (freenodes[i][j]->GetNumCADSurf())
             {
                 optiKind += 20;
             }
@@ -248,9 +268,12 @@ void ProcessVarOpti::Process()
             ASSERTL0(c == check.end(), "duplicate node");
             check.insert(freenodes[i][j]->m_id);
 
-            ns.push_back(GetNodeOptiFactory().CreateInstance(
-                optiKind, freenodes[i][j], it->second, m_res, derivUtils,
-                m_opti));
+            if (optiKind)
+            {
+                ns.push_back(GetNodeOptiFactory().CreateInstance(
+                    optiKind, freenodes[i][j], it->second, m_res, derivUtils,
+                    m_opti));
+            }
         }
         optiNodes.push_back(ns);
     }
@@ -310,7 +333,7 @@ void ProcessVarOpti::Process()
 
     int ctr = 0;
     Thread::ThreadMaster tms;
-    tms.SetThreadingType("ThreadManagerBoost");
+    tms.SetThreadingType("ThreadManagerStd");
     Thread::ThreadManagerSharedPtr tm =
         tms.CreateInstance(Thread::ThreadMaster::SessionJob, nThreads);
 
@@ -360,12 +383,23 @@ void ProcessVarOpti::Process()
         m_res->startInv = 0;
         m_res->worstJac = numeric_limits<double>::max();
 
-        bool update = m_config["scalingfile"].beenSet && (ctr % subIter) == 0;
+        bool updateCAD = (m_radaptCAD && (ctr % subIter) == 0);
+        bool updateFile =
+            ((m_config["scalingfile"].beenSet) && (ctr % subIter) == 0);
 
         vector<Thread::ThreadJob *> elJobs(m_dataSet.size());
         for (int i = 0; i < m_dataSet.size(); i++)
         {
-            elJobs[i] = m_dataSet[i]->GetJob(update);
+            if (updateCAD)
+            {
+                elJobs[i] = m_dataSet[i]->GetAdaptJob(
+                    m_adaptCurves, m_config["radaptscale"].as<NekDouble>(),
+                    m_config["radaptrad"].as<NekDouble>());
+            }
+            else
+            {
+                elJobs[i] = m_dataSet[i]->GetJob(updateFile);
+            }
         }
 
         tm->SetNumWorkers(0);
@@ -392,7 +426,7 @@ void ProcessVarOpti::Process()
             break;
         }
 
-        if (update)
+        if (updateFile || updateCAD)
         {
             m_log(VERBOSE) << "    => Mapping updated!" << endl;
         }
@@ -434,12 +468,12 @@ public:
     {
     }
 
-    virtual ~NodalUtilTriMonomial()
+    ~NodalUtilTriMonomial() override
     {
     }
 
 protected:
-    virtual NekVector<NekDouble> v_OrthoBasis(const size_t mode) override
+    NekVector<NekDouble> v_OrthoBasis(const size_t mode) override
     {
         // Monomial basis.
         std::pair<int, int> modes = m_ordering[mode];
@@ -454,15 +488,15 @@ protected:
         return ret;
     }
 
-    virtual NekVector<NekDouble> v_OrthoBasisDeriv(const size_t dir,
-                                                   const size_t mode) override
+    NekVector<NekDouble> v_OrthoBasisDeriv(
+        [[maybe_unused]] const size_t dir,
+        [[maybe_unused]] const size_t mode) override
     {
-        boost::ignore_unused(dir, mode);
         NEKERROR(ErrorUtil::efatal, "OrthoBasisDeriv: not supported");
         return NekVector<NekDouble>();
     }
 
-    virtual std::shared_ptr<NodalUtil> v_CreateUtil(
+    std::shared_ptr<NodalUtil> v_CreateUtil(
         Array<OneD, Array<OneD, NekDouble>> &xi) override
     {
         return MemoryManager<NodalUtilTriMonomial>::AllocateSharedPtr(
@@ -543,5 +577,4 @@ void ProcessVarOpti::Analytics()
         }
     }
 }
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh

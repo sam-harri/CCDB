@@ -49,7 +49,7 @@ std::string FilterElectrogram::className =
  */
 FilterElectrogram::FilterElectrogram(
     const LibUtilities::SessionReaderSharedPtr &pSession,
-    const std::weak_ptr<SolverUtils::EquationSystem> &pEquation,
+    const std::shared_ptr<SolverUtils::EquationSystem> &pEquation,
     const ParamMap &pParams)
     : Filter(pSession, pEquation)
 {
@@ -258,10 +258,8 @@ void FilterElectrogram::v_Update(
  */
 void FilterElectrogram::v_Finalise(
     const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
-    const NekDouble &time)
+    [[maybe_unused]] const NekDouble &time)
 {
-    boost::ignore_unused(time);
-
     if (pFields[0]->GetComm()->GetRank() == 0)
     {
         m_outputStream.close();

@@ -7,7 +7,7 @@ IF (NOT NEKTAR_BUILD_SOLVERS)
 ENDIF()
 
 IF( NEKTAR_SOLVER_CARDIAC_EP )
-    SET(CARDIACEPSOLVER_SOURCES
+    SET(CardiacEPSolverSources
         EquationSystems/Monodomain.cpp
         EquationSystems/Bidomain.cpp
         EquationSystems/BidomainRoth.cpp
@@ -18,6 +18,7 @@ IF( NEKTAR_SOLVER_CARDIAC_EP )
         CellModels/FentonKarma.cpp
         CellModels/LuoRudy91.cpp
         CellModels/Fox02.cpp
+        CellModels/PanditGilesDemir03.cpp
         CellModels/Winslow99.cpp
         CellModels/TenTusscher06.cpp
         Filters/FilterCheckpointCellModel.cpp
@@ -36,7 +37,7 @@ IF( NEKTAR_SOLVER_CARDIAC_EP )
         )
 
     IF( NEKTAR_USE_FFTW )
-        SET(CARDIACEPSOLVER_SOURCES ${CARDIACEPSOLVER_SOURCES}
+        SET(CardiacEPSolverSources ${CardiacEPSolverSources}
             Filters/FilterHilbertFFTPhase.cpp
         )
     ENDIF( NEKTAR_USE_FFTW )
@@ -44,6 +45,42 @@ IF( NEKTAR_SOLVER_CARDIAC_EP )
     ADD_SOLVER_EXECUTABLE(CardiacEPSolver
         SOURCES CardiacEPSolver.cpp
         LIBRARY_SOURCES
-        ${CARDIACEPSOLVER_SOURCES})
+        ${CardiacEPSolverSources})
+
+    IF(NEKTAR_BUILD_SOLVER_LIBS)
+        SET(CardiacEPSolverHeaders
+            CellModels/AlievPanfilov.h
+            CellModels/CellModel.h
+            CellModels/CourtemancheRamirezNattel98.h
+            CellModels/FentonKarma.h
+            CellModels/FitzhughNagumo.h
+            CellModels/Fox02.h
+            CellModels/LuoRudy91.h
+            CellModels/PanditGilesDemir03.h
+            CellModels/TenTusscher06.h
+            CellModels/Winslow99.h
+            EquationSystems/Bidomain.h
+            EquationSystems/BidomainRoth.h
+            EquationSystems/Monodomain.h
+            Filters/FilterBenchmark.h
+            Filters/FilterCellHistoryPoints.h
+            Filters/FilterCheckpointCellModel.h
+            Filters/FilterElectrogram.h
+            Filters/FilterHilbertFFTPhase.h
+            Filters/FilterOffsetPhase.h
+            Stimuli/Protocol.h
+            Stimuli/ProtocolS1.h
+            Stimuli/ProtocolS1S2.h
+            Stimuli/ProtocolSingle.h
+            Stimuli/StimulusCircle.h
+            Stimuli/Stimulus.h
+            Stimuli/StimulusPoint.h
+            Stimuli/StimulusRect.h)
+        # Create separate library. No need to pass source files, as the executable's
+        # LIBRARY_SOURCES objects will be reused
+        ADD_SOLVER_LIBRARY(CardiacEPSolver HEADERS ${CardiacEPSolverHeaders}
+                            DEPENDS SolverUtils)
+    ENDIF()
+
     ADD_SUBDIRECTORY(Utilities)
 ENDIF( NEKTAR_SOLVER_CARDIAC_EP )

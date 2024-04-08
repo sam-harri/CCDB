@@ -5,10 +5,12 @@ SET(COLLECTIONS_SOURCES
   Operator.cpp
   BwdTrans.cpp
   Helmholtz.cpp
+  LinearAdvectionDiffusionReaction.cpp
   IProductWRTBase.cpp
   IProductWRTDerivBase.cpp
   IProduct.cpp
   PhysDeriv.cpp
+  PhysInterp1DScaled.cpp
   )
 
 SET(COLLECTIONS_HEADERS
@@ -19,6 +21,9 @@ SET(COLLECTIONS_HEADERS
   MatrixFreeBase.h
   Operator.h      
 )
+
+# The current source dir is needed to get the header files.
+ADD_DEFINITIONS(-DCOLLECTIONS_EXPORTS -I${CMAKE_CURRENT_SOURCE_DIR})
 
 ADD_NEKTAR_LIBRARY(Collections
     SOURCES ${COLLECTIONS_SOURCES}

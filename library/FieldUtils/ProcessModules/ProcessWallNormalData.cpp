@@ -44,9 +44,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace FieldUtils
+namespace Nektar::FieldUtils
 {
 
 ModuleKey ProcessWallNormalData::className =
@@ -84,8 +82,11 @@ ProcessWallNormalData::ProcessWallNormalData(FieldSharedPtr f)
                           in (0,0.95] gives controled points; d in (0.95,inf) \
                           gives evenly spaced points");
 
-    // To allow some functions called somewhere else outside Process()
-    m_spacedim = m_f->m_exp[0]->GetCoordim(0) + m_f->m_numHomogeneousDir;
+    // To allow some functions called somewhere else outside Process(),
+    // m_spacedim should be defined while it cannot be defined here in the
+    // constructor because f->m_exp[0]->GetCoordim(0) and
+    // f->m_graph->GetMeshDimension() has not been defeind yet
+    // *It is defeind in m_f->SetUpExp(vm), where vm is necessary.
 }
 
 ProcessWallNormalData::~ProcessWallNormalData()
@@ -121,7 +122,8 @@ void ProcessWallNormalData::v_Process(po::variables_map &vm)
     const int nfields       = m_f->m_variables.size();
     const int nCoordDim     = m_f->m_exp[0]->GetCoordim(0);
     const int nBndLcoordDim = nCoordDim - 1;
-    const int totVars       = m_spacedim + nfields;
+    m_spacedim        = m_f->m_exp[0]->GetCoordim(0) + m_f->m_numHomogeneousDir;
+    const int totVars = m_spacedim + nfields;
 
     // Initialize the sampling parameters
     std::vector<NekDouble> xorig, searchDir;
@@ -1012,5 +1014,4 @@ void ProcessWallNormalData::GetNormals(
     }
 }
 
-} // namespace FieldUtils
-} // namespace Nektar
+} // namespace Nektar::FieldUtils

@@ -65,16 +65,15 @@ void FillWhiteNoise(int n, const T eps, Array<OneD, T> &x, const int incx,
 
 /// \brief Multiply vector z = x*y
 template <class T>
-void Vmul(int n, const Array<OneD, const T> &x, const int incx,
-          const Array<OneD, const T> &y, const int incy, Array<OneD, T> &z,
-          const int incz)
+void Vmul(int n, const Array<OneD, const T> &x, [[maybe_unused]] const int incx,
+          const Array<OneD, const T> &y, [[maybe_unused]] const int incy,
+          Array<OneD, T> &z, [[maybe_unused]] const int incz)
 {
     ASSERTL1(n * incx <= x.size() + x.GetOffset(), "Array out of bounds");
     ASSERTL1(n * incy <= y.size() + y.GetOffset(), "Array out of bounds");
     ASSERTL1(n * incz <= z.size() + z.GetOffset(), "Array out of bounds");
 
 #ifdef NEKTAR_ENABLE_SIMD_VMATH
-    boost::ignore_unused(incx, incy, incz);
     ASSERTL1(incx == 1, "Simd vmath requires inc = 1");
     ASSERTL1(incy == 1, "Simd vmath requires inc = 1");
     ASSERTL1(incz == 1, "Simd vmath requires inc = 1");
@@ -85,7 +84,7 @@ void Vmul(int n, const Array<OneD, const T> &x, const int incx,
 }
 
 template <class T>
-void Vmul(int n, const Array<TwoD, NekDouble>::const_reference &x,
+void Vmul(int n, const typename Array<TwoD, T>::const_reference &x,
           const int incx, const Array<OneD, const T> &y, const int incy,
           Array<OneD, T> &z, const int incz)
 {
@@ -141,9 +140,9 @@ void Sdiv(int n, const T alpha, const Array<OneD, const T> &x, const int incx,
 
 /// \brief Add vector z = x+y
 template <class T>
-void Vadd(int n, const Array<OneD, const T> &x, const int incx,
-          const Array<OneD, const T> &y, const int incy, Array<OneD, T> &z,
-          const int incz)
+void Vadd(int n, const Array<OneD, const T> &x, [[maybe_unused]] const int incx,
+          const Array<OneD, const T> &y, [[maybe_unused]] const int incy,
+          Array<OneD, T> &z, [[maybe_unused]] const int incz)
 {
     ASSERTL1(static_cast<unsigned int>(n * incx) <= x.size() + x.GetOffset(),
              "Array out of bounds");
@@ -153,7 +152,6 @@ void Vadd(int n, const Array<OneD, const T> &x, const int incx,
              "Array out of bounds");
 
 #ifdef NEKTAR_ENABLE_SIMD_VMATH
-    boost::ignore_unused(incx, incy, incz);
     ASSERTL1(incx == 1, "Simd vmath requires inc = 1");
     ASSERTL1(incy == 1, "Simd vmath requires inc = 1");
     ASSERTL1(incz == 1, "Simd vmath requires inc = 1");
@@ -275,10 +273,11 @@ void Vabs(int n, const Array<OneD, const T> &x, const int incx,
 
 /// \brief  vvtvp (vector times vector plus vector): z = w*x + y
 template <class T>
-void Vvtvp(int n, const Array<OneD, const T> &w, const int incw,
-           const Array<OneD, const T> &x, const int incx,
-           const Array<OneD, const T> &y, const int incy, Array<OneD, T> &z,
-           const int incz)
+void Vvtvp(int n, const Array<OneD, const T> &w,
+           [[maybe_unused]] const int incw, const Array<OneD, const T> &x,
+           [[maybe_unused]] const int incx, const Array<OneD, const T> &y,
+           [[maybe_unused]] const int incy, Array<OneD, T> &z,
+           [[maybe_unused]] const int incz)
 {
     ASSERTL1(n * incw <= w.size() + w.GetOffset(), "Array out of bounds");
     ASSERTL1(n * incx <= x.size() + x.GetOffset(), "Array out of bounds");
@@ -286,7 +285,6 @@ void Vvtvp(int n, const Array<OneD, const T> &w, const int incw,
     ASSERTL1(n * incz <= z.size() + z.GetOffset(), "Array out of bounds");
 
 #ifdef NEKTAR_ENABLE_SIMD_VMATH
-    boost::ignore_unused(incw, incx, incy, incz);
     ASSERTL1(incw == 1, "Simd vmath requires inc = 1");
     ASSERTL1(incx == 1, "Simd vmath requires inc = 1");
     ASSERTL1(incy == 1, "Simd vmath requires inc = 1");
@@ -299,7 +297,7 @@ void Vvtvp(int n, const Array<OneD, const T> &w, const int incw,
 
 /// \brief  Vvtvp (vector times vector plus vector): z = w*x + y
 template <class T>
-void Vvtvp(int n, const Array<TwoD, NekDouble>::const_reference &w,
+void Vvtvp(int n, const typename Array<TwoD, T>::const_reference &w,
            const int incw, const Array<OneD, const T> &x, const int incx,
            const Array<OneD, const T> &y, const int incy, Array<OneD, T> &z,
            const int incz)
@@ -314,10 +312,11 @@ void Vvtvp(int n, const Array<TwoD, NekDouble>::const_reference &w,
 
 /// \brief vvtvm (vector times vector minus vector): z = w*x - y
 template <class T>
-void Vvtvm(int n, const Array<OneD, const T> &w, const int incw,
-           const Array<OneD, const T> &x, const int incx,
-           const Array<OneD, const T> &y, const int incy, Array<OneD, T> &z,
-           const int incz)
+void Vvtvm(int n, const Array<OneD, const T> &w,
+           [[maybe_unused]] const int incw, const Array<OneD, const T> &x,
+           [[maybe_unused]] const int incx, const Array<OneD, const T> &y,
+           [[maybe_unused]] const int incy, Array<OneD, T> &z,
+           [[maybe_unused]] const int incz)
 {
     ASSERTL1(n * incw <= w.size() + w.GetOffset(), "Array out of bounds");
     ASSERTL1(n * incx <= x.size() + x.GetOffset(), "Array out of bounds");
@@ -325,7 +324,6 @@ void Vvtvm(int n, const Array<OneD, const T> &w, const int incw,
     ASSERTL1(n * incz <= z.size() + z.GetOffset(), "Array out of bounds");
 
 #ifdef NEKTAR_ENABLE_SIMD_VMATH
-    boost::ignore_unused(incw, incx, incy, incz);
     ASSERTL1(incw == 1, "Simd vmath requires inc = 1");
     ASSERTL1(incx == 1, "Simd vmath requires inc = 1");
     ASSERTL1(incy == 1, "Simd vmath requires inc = 1");
@@ -365,10 +363,10 @@ void Svtvm(int n, const T alpha, const Array<OneD, const T> &x, const int incx,
 /// \brief vvtvvtp (vector times vector plus vector times vector): z = v*w + x*y
 template <class T>
 void Vvtvvtp(int n, const Array<OneD, const T> &v, int incv,
-             const Array<OneD, const T> &w, int incw,
-             const Array<OneD, const T> &x, int incx,
-             const Array<OneD, const T> &y, int incy, Array<OneD, T> &z,
-             int incz)
+             const Array<OneD, const T> &w, [[maybe_unused]] int incw,
+             const Array<OneD, const T> &x, [[maybe_unused]] int incx,
+             const Array<OneD, const T> &y, [[maybe_unused]] int incy,
+             Array<OneD, T> &z, [[maybe_unused]] int incz)
 {
     ASSERTL1(n * incv <= v.size() + v.GetOffset(), "Array out of bounds");
     ASSERTL1(n * incw <= w.size() + w.GetOffset(), "Array out of bounds");
@@ -377,7 +375,6 @@ void Vvtvvtp(int n, const Array<OneD, const T> &v, int incv,
     ASSERTL1(n * incz <= z.size() + z.GetOffset(), "Array out of bounds");
 
 #ifdef NEKTAR_ENABLE_SIMD_VMATH
-    boost::ignore_unused(incv, incw, incx, incy, incz);
     ASSERTL1(incw == 1, "Simd vmath requires inc = 1");
     ASSERTL1(incx == 1, "Simd vmath requires inc = 1");
     ASSERTL1(incy == 1, "Simd vmath requires inc = 1");
@@ -391,11 +388,11 @@ void Vvtvvtp(int n, const Array<OneD, const T> &v, int incv,
 /// \brief vvtvvtm (vector times vector minus vector times vector): z = v*w -
 /// x*y
 template <class T>
-void Vvtvvtm(int n, const Array<OneD, const T> &v, int incv,
-             const Array<OneD, const T> &w, int incw,
-             const Array<OneD, const T> &x, int incx,
-             const Array<OneD, const T> &y, int incy, Array<OneD, T> &z,
-             int incz)
+void Vvtvvtm(int n, const Array<OneD, const T> &v, [[maybe_unused]] int incv,
+             const Array<OneD, const T> &w, [[maybe_unused]] int incw,
+             const Array<OneD, const T> &x, [[maybe_unused]] int incx,
+             const Array<OneD, const T> &y, [[maybe_unused]] int incy,
+             Array<OneD, T> &z, [[maybe_unused]] int incz)
 {
     ASSERTL1(n * incv <= v.size() + v.GetOffset(), "Array out of bounds");
     ASSERTL1(n * incw <= w.size() + w.GetOffset(), "Array out of bounds");
@@ -404,7 +401,6 @@ void Vvtvvtm(int n, const Array<OneD, const T> &v, int incv,
     ASSERTL1(n * incz <= z.size() + z.GetOffset(), "Array out of bounds");
 
 #ifdef NEKTAR_ENABLE_SIMD_VMATH
-    boost::ignore_unused(incv, incw, incx, incy, incz);
     ASSERTL1(incw == 1, "Simd vmath requires inc = 1");
     ASSERTL1(incx == 1, "Simd vmath requires inc = 1");
     ASSERTL1(incy == 1, "Simd vmath requires inc = 1");

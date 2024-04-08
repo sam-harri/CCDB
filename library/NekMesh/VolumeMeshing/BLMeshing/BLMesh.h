@@ -38,9 +38,7 @@
 #include <LibUtilities/Memory/NekMemoryManager.hpp>
 #include <NekMesh/MeshElements/Mesh.h>
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 class BLMesh
@@ -85,7 +83,7 @@ public:
         NodeSharedPtr pNode;
         NodeSharedPtr oNode;
         int bl;
-        Array<OneD, NekDouble> N;
+        std::array<NekDouble, 3> N;
         int symsurf;
         bool onSym;
         std::vector<ElementSharedPtr> els;
@@ -112,8 +110,8 @@ private:
     NekDouble Proximity(NodeSharedPtr n, ElementSharedPtr el);
 
     NekDouble Visability(std::vector<ElementSharedPtr> tris,
-                         Array<OneD, NekDouble> N);
-    Array<OneD, NekDouble> GetNormal(std::vector<ElementSharedPtr> tris);
+                         std::array<NekDouble, 3> N);
+    std::array<NekDouble, 3> GetNormal(std::vector<ElementSharedPtr> tris);
 
     /// mesh object containing surface mesh
     MeshSharedPtr m_mesh;
@@ -124,7 +122,7 @@ private:
     NekDouble m_prog;
     int m_layer;
     int m_id;
-    Array<OneD, NekDouble> m_layerT;
+    std::vector<NekDouble> m_layerT;
     /// list of surfaces to be remeshed due to the boundary layer
     std::vector<unsigned int> m_symSurfs;
     /// data structure used to store and develop bl information
@@ -139,7 +137,6 @@ private:
 };
 
 typedef std::shared_ptr<BLMesh> BLMeshSharedPtr;
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh
 
 #endif

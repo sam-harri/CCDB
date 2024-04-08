@@ -40,9 +40,7 @@
 #include <boost/test/tools/floating_point_comparison.hpp>
 #include <boost/test/unit_test.hpp>
 
-namespace Nektar
-{
-namespace DiagonalMatrixStoragePolicyUnitTests
+namespace Nektar::DiagonalMatrixStoragePolicyUnitTests
 {
 typedef DiagonalMatrixFuncs Policy;
 
@@ -81,5 +79,4 @@ BOOST_AUTO_TEST_CASE(TestAdvanceDiagonal)
     }
 }
 
-} // namespace DiagonalMatrixStoragePolicyUnitTests
-} // namespace Nektar
+} // namespace Nektar::DiagonalMatrixStoragePolicyUnitTests

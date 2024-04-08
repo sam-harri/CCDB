@@ -43,9 +43,7 @@
 #include <LibUtilities/BasicUtils/SharedArray.hpp>
 #include <MultiRegions/ExpList.h>
 
-namespace Nektar
-{
-namespace GlobalMapping
+namespace Nektar::GlobalMapping
 {
 
 class MappingXofXZ : public Mapping
@@ -76,61 +74,60 @@ protected:
 
     // Virtual functions
     GLOBAL_MAPPING_EXPORT
-    virtual void v_InitObject(
+    void v_InitObject(
         const Array<OneD, MultiRegions::ExpListSharedPtr> &pFields,
         const TiXmlElement *pMapping) override;
 
-    GLOBAL_MAPPING_EXPORT virtual void v_ContravarToCartesian(
+    GLOBAL_MAPPING_EXPORT void v_ContravarToCartesian(
         const Array<OneD, Array<OneD, NekDouble>> &inarray,
         Array<OneD, Array<OneD, NekDouble>> &outarray) override;
 
-    GLOBAL_MAPPING_EXPORT virtual void v_CovarToCartesian(
+    GLOBAL_MAPPING_EXPORT void v_CovarToCartesian(
         const Array<OneD, Array<OneD, NekDouble>> &inarray,
         Array<OneD, Array<OneD, NekDouble>> &outarray) override;
 
-    GLOBAL_MAPPING_EXPORT virtual void v_ContravarFromCartesian(
+    GLOBAL_MAPPING_EXPORT void v_ContravarFromCartesian(
         const Array<OneD, Array<OneD, NekDouble>> &inarray,
         Array<OneD, Array<OneD, NekDouble>> &outarray) override;
 
-    GLOBAL_MAPPING_EXPORT virtual void v_CovarFromCartesian(
+    GLOBAL_MAPPING_EXPORT void v_CovarFromCartesian(
         const Array<OneD, Array<OneD, NekDouble>> &inarray,
         Array<OneD, Array<OneD, NekDouble>> &outarray) override;
 
-    GLOBAL_MAPPING_EXPORT virtual void v_GetJacobian(
+    GLOBAL_MAPPING_EXPORT void v_GetJacobian(
         Array<OneD, NekDouble> &outarray) override;
 
-    GLOBAL_MAPPING_EXPORT virtual void v_DotGradJacobian(
+    GLOBAL_MAPPING_EXPORT void v_DotGradJacobian(
         const Array<OneD, Array<OneD, NekDouble>> &inarray,
         Array<OneD, NekDouble> &outarray) override;
 
-    GLOBAL_MAPPING_EXPORT virtual void v_GetMetricTensor(
+    GLOBAL_MAPPING_EXPORT void v_GetMetricTensor(
         Array<OneD, Array<OneD, NekDouble>> &outarray) override;
 
-    GLOBAL_MAPPING_EXPORT virtual void v_GetInvMetricTensor(
+    GLOBAL_MAPPING_EXPORT void v_GetInvMetricTensor(
         Array<OneD, Array<OneD, NekDouble>> &outarray) override;
 
-    GLOBAL_MAPPING_EXPORT virtual void v_LowerIndex(
+    GLOBAL_MAPPING_EXPORT void v_LowerIndex(
         const Array<OneD, Array<OneD, NekDouble>> &inarray,
         Array<OneD, Array<OneD, NekDouble>> &outarray) override;
 
-    GLOBAL_MAPPING_EXPORT virtual void v_RaiseIndex(
+    GLOBAL_MAPPING_EXPORT void v_RaiseIndex(
         const Array<OneD, Array<OneD, NekDouble>> &inarray,
         Array<OneD, Array<OneD, NekDouble>> &outarray) override;
 
-    GLOBAL_MAPPING_EXPORT virtual void v_ApplyChristoffelContravar(
+    GLOBAL_MAPPING_EXPORT void v_ApplyChristoffelContravar(
         const Array<OneD, Array<OneD, NekDouble>> &inarray,
         Array<OneD, Array<OneD, NekDouble>> &outarray) override;
 
-    GLOBAL_MAPPING_EXPORT virtual void v_ApplyChristoffelCovar(
+    GLOBAL_MAPPING_EXPORT void v_ApplyChristoffelCovar(
         const Array<OneD, Array<OneD, NekDouble>> &inarray,
         Array<OneD, Array<OneD, NekDouble>> &outarray) override;
 
-    GLOBAL_MAPPING_EXPORT virtual void v_UpdateGeomInfo() override;
+    GLOBAL_MAPPING_EXPORT void v_UpdateGeomInfo() override;
 
 private:
 };
 
-} // namespace GlobalMapping
-} // namespace Nektar
+} // namespace Nektar::GlobalMapping
 
 #endif

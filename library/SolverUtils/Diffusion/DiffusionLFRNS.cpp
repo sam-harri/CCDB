@@ -37,14 +37,10 @@
 #include <LocalRegions/Expansion2D.h>
 #include <SolverUtils/Diffusion/DiffusionLFRNS.h>
 #include <boost/algorithm/string/predicate.hpp>
-#include <boost/core/ignore_unused.hpp>
-#include <boost/math/special_functions/gamma.hpp>
 #include <iomanip>
 #include <iostream>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 std::string DiffusionLFRNS::type[] = {
     GetDiffusionFactory().RegisterCreatorFunction("LFRDGNS",
@@ -210,11 +206,9 @@ void DiffusionLFRNS::v_InitObject(
  * \todo Add the metric terms for 3D Hexahedra.
  */
 void DiffusionLFRNS::SetupMetrics(
-    LibUtilities::SessionReaderSharedPtr pSession,
+    [[maybe_unused]] LibUtilities::SessionReaderSharedPtr pSession,
     Array<OneD, MultiRegions::ExpListSharedPtr> pFields)
 {
-    boost::ignore_unused(pSession);
-
     int i, n;
     int nquad0, nquad1;
     int phys_offset;
@@ -373,11 +367,9 @@ void DiffusionLFRNS::SetupMetrics(
  * @param pFields   Pointer to fields.
  */
 void DiffusionLFRNS::SetupCFunctions(
-    LibUtilities::SessionReaderSharedPtr pSession,
+    [[maybe_unused]] LibUtilities::SessionReaderSharedPtr pSession,
     Array<OneD, MultiRegions::ExpListSharedPtr> pFields)
 {
-    boost::ignore_unused(pSession);
-
     int i, n;
     NekDouble c0 = 0.0;
     NekDouble c1 = 0.0;
@@ -422,9 +414,9 @@ void DiffusionLFRNS::SetupCFunctions(
                 NekDouble sign0 = pow(-1.0, p0);
 
                 // Factorial factor to build the scheme
-                NekDouble ap0 = boost::math::tgamma(2 * p0 + 1) /
-                                (pow(2.0, p0) * boost::math::tgamma(p0 + 1) *
-                                 boost::math::tgamma(p0 + 1));
+                NekDouble ap0 =
+                    std::tgamma(2 * p0 + 1) /
+                    (pow(2.0, p0) * std::tgamma(p0 + 1) * std::tgamma(p0 + 1));
 
                 // Scalar parameter which recovers the FR schemes
                 if (m_diffType == "LFRDGNS")
@@ -435,21 +427,20 @@ void DiffusionLFRNS::SetupCFunctions(
                 {
                     c0 = 2.0 * p0 /
                          ((2.0 * p0 + 1.0) * (p0 + 1.0) *
-                          (ap0 * boost::math::tgamma(p0 + 1)) *
-                          (ap0 * boost::math::tgamma(p0 + 1)));
+                          (ap0 * std::tgamma(p0 + 1)) *
+                          (ap0 * std::tgamma(p0 + 1)));
                 }
                 else if (m_diffType == "LFRHUNS")
                 {
                     c0 = 2.0 * (p0 + 1.0) /
-                         ((2.0 * p0 + 1.0) * p0 *
-                          (ap0 * boost::math::tgamma(p0 + 1)) *
-                          (ap0 * boost::math::tgamma(p0 + 1)));
+                         ((2.0 * p0 + 1.0) * p0 * (ap0 * std::tgamma(p0 + 1)) *
+                          (ap0 * std::tgamma(p0 + 1)));
                 }
                 else if (m_diffType == "LFRcminNS")
                 {
-                    c0 = -2.0 / ((2.0 * p0 + 1.0) *
-                                 (ap0 * boost::math::tgamma(p0 + 1)) *
-                                 (ap0 * boost::math::tgamma(p0 + 1)));
+                    c0 =
+                        -2.0 / ((2.0 * p0 + 1.0) * (ap0 * std::tgamma(p0 + 1)) *
+                                (ap0 * std::tgamma(p0 + 1)));
                 }
                 else if (m_diffType == "LFRcinfNS")
                 {
@@ -457,8 +448,8 @@ void DiffusionLFRNS::SetupCFunctions(
                 }
 
                 NekDouble etap0 = 0.5 * c0 * (2.0 * p0 + 1.0) *
-                                  (ap0 * boost::math::tgamma(p0 + 1)) *
-                                  (ap0 * boost::math::tgamma(p0 + 1));
+                                  (ap0 * std::tgamma(p0 + 1)) *
+                                  (ap0 * std::tgamma(p0 + 1));
 
                 NekDouble overeta0 = 1.0 / (1.0 + etap0);
 
@@ -545,13 +536,13 @@ void DiffusionLFRNS::SetupCFunctions(
                 NekDouble sign1 = pow(-1.0, p1);
 
                 // Factorial factor to build the scheme
-                NekDouble ap0 = boost::math::tgamma(2 * p0 + 1) /
-                                (pow(2.0, p0) * boost::math::tgamma(p0 + 1) *
-                                 boost::math::tgamma(p0 + 1));
+                NekDouble ap0 =
+                    std::tgamma(2 * p0 + 1) /
+                    (pow(2.0, p0) * std::tgamma(p0 + 1) * std::tgamma(p0 + 1));
 
-                NekDouble ap1 = boost::math::tgamma(2 * p1 + 1) /
-                                (pow(2.0, p1) * boost::math::tgamma(p1 + 1) *
-                                 boost::math::tgamma(p1 + 1));
+                NekDouble ap1 =
+                    std::tgamma(2 * p1 + 1) /
+                    (pow(2.0, p1) * std::tgamma(p1 + 1) * std::tgamma(p1 + 1));
 
                 // Scalar parameter which recovers the FR schemes
                 if (m_diffType == "LFRDGNS")
@@ -563,35 +554,33 @@ void DiffusionLFRNS::SetupCFunctions(
                 {
                     c0 = 2.0 * p0 /
                          ((2.0 * p0 + 1.0) * (p0 + 1.0) *
-                          (ap0 * boost::math::tgamma(p0 + 1)) *
-                          (ap0 * boost::math::tgamma(p0 + 1)));
+                          (ap0 * std::tgamma(p0 + 1)) *
+                          (ap0 * std::tgamma(p0 + 1)));
 
                     c1 = 2.0 * p1 /
                          ((2.0 * p1 + 1.0) * (p1 + 1.0) *
-                          (ap1 * boost::math::tgamma(p1 + 1)) *
-                          (ap1 * boost::math::tgamma(p1 + 1)));
+                          (ap1 * std::tgamma(p1 + 1)) *
+                          (ap1 * std::tgamma(p1 + 1)));
                 }
                 else if (m_diffType == "LFRHUNS")
                 {
                     c0 = 2.0 * (p0 + 1.0) /
-                         ((2.0 * p0 + 1.0) * p0 *
-                          (ap0 * boost::math::tgamma(p0 + 1)) *
-                          (ap0 * boost::math::tgamma(p0 + 1)));
+                         ((2.0 * p0 + 1.0) * p0 * (ap0 * std::tgamma(p0 + 1)) *
+                          (ap0 * std::tgamma(p0 + 1)));
 
                     c1 = 2.0 * (p1 + 1.0) /
-                         ((2.0 * p1 + 1.0) * p1 *
-                          (ap1 * boost::math::tgamma(p1 + 1)) *
-                          (ap1 * boost::math::tgamma(p1 + 1)));
+                         ((2.0 * p1 + 1.0) * p1 * (ap1 * std::tgamma(p1 + 1)) *
+                          (ap1 * std::tgamma(p1 + 1)));
                 }
                 else if (m_diffType == "LFRcminNS")
                 {
-                    c0 = -2.0 / ((2.0 * p0 + 1.0) *
-                                 (ap0 * boost::math::tgamma(p0 + 1)) *
-                                 (ap0 * boost::math::tgamma(p0 + 1)));
+                    c0 =
+                        -2.0 / ((2.0 * p0 + 1.0) * (ap0 * std::tgamma(p0 + 1)) *
+                                (ap0 * std::tgamma(p0 + 1)));
 
-                    c1 = -2.0 / ((2.0 * p1 + 1.0) *
-                                 (ap1 * boost::math::tgamma(p1 + 1)) *
-                                 (ap1 * boost::math::tgamma(p1 + 1)));
+                    c1 =
+                        -2.0 / ((2.0 * p1 + 1.0) * (ap1 * std::tgamma(p1 + 1)) *
+                                (ap1 * std::tgamma(p1 + 1)));
                 }
                 else if (m_diffType == "LFRcinfNS")
                 {
@@ -600,12 +589,12 @@ void DiffusionLFRNS::SetupCFunctions(
                 }
 
                 NekDouble etap0 = 0.5 * c0 * (2.0 * p0 + 1.0) *
-                                  (ap0 * boost::math::tgamma(p0 + 1)) *
-                                  (ap0 * boost::math::tgamma(p0 + 1));
+                                  (ap0 * std::tgamma(p0 + 1)) *
+                                  (ap0 * std::tgamma(p0 + 1));
 
                 NekDouble etap1 = 0.5 * c1 * (2.0 * p1 + 1.0) *
-                                  (ap1 * boost::math::tgamma(p1 + 1)) *
-                                  (ap1 * boost::math::tgamma(p1 + 1));
+                                  (ap1 * std::tgamma(p1 + 1)) *
+                                  (ap1 * std::tgamma(p1 + 1));
 
                 NekDouble overeta0 = 1.0 / (1.0 + etap0);
                 NekDouble overeta1 = 1.0 / (1.0 + etap1);
@@ -728,19 +717,19 @@ void DiffusionLFRNS::SetupCFunctions(
                 NekDouble sign2 = pow(-1.0, p2);
 
                 // Factorial factor to build the scheme
-                NekDouble ap0 = boost::math::tgamma(2 * p0 + 1) /
-                                (pow(2.0, p0) * boost::math::tgamma(p0 + 1) *
-                                 boost::math::tgamma(p0 + 1));
+                NekDouble ap0 =
+                    std::tgamma(2 * p0 + 1) /
+                    (pow(2.0, p0) * std::tgamma(p0 + 1) * std::tgamma(p0 + 1));
 
                 // Factorial factor to build the scheme
-                NekDouble ap1 = boost::math::tgamma(2 * p1 + 1) /
-                                (pow(2.0, p1) * boost::math::tgamma(p1 + 1) *
-                                 boost::math::tgamma(p1 + 1));
+                NekDouble ap1 =
+                    std::tgamma(2 * p1 + 1) /
+                    (pow(2.0, p1) * std::tgamma(p1 + 1) * std::tgamma(p1 + 1));
 
                 // Factorial factor to build the scheme
-                NekDouble ap2 = boost::math::tgamma(2 * p2 + 1) /
-                                (pow(2.0, p2) * boost::math::tgamma(p2 + 1) *
-                                 boost::math::tgamma(p2 + 1));
+                NekDouble ap2 =
+                    std::tgamma(2 * p2 + 1) /
+                    (pow(2.0, p2) * std::tgamma(p2 + 1) * std::tgamma(p2 + 1));
 
                 // Scalar parameter which recovers the FR schemes
                 if (m_diffType == "LFRDGNS")
@@ -753,49 +742,46 @@ void DiffusionLFRNS::SetupCFunctions(
                 {
                     c0 = 2.0 * p0 /
                          ((2.0 * p0 + 1.0) * (p0 + 1.0) *
-                          (ap0 * boost::math::tgamma(p0 + 1)) *
-                          (ap0 * boost::math::tgamma(p0 + 1)));
+                          (ap0 * std::tgamma(p0 + 1)) *
+                          (ap0 * std::tgamma(p0 + 1)));
 
                     c1 = 2.0 * p1 /
                          ((2.0 * p1 + 1.0) * (p1 + 1.0) *
-                          (ap1 * boost::math::tgamma(p1 + 1)) *
-                          (ap1 * boost::math::tgamma(p1 + 1)));
+                          (ap1 * std::tgamma(p1 + 1)) *
+                          (ap1 * std::tgamma(p1 + 1)));
 
                     c2 = 2.0 * p2 /
                          ((2.0 * p2 + 1.0) * (p2 + 1.0) *
-                          (ap2 * boost::math::tgamma(p2 + 1)) *
-                          (ap2 * boost::math::tgamma(p2 + 1)));
+                          (ap2 * std::tgamma(p2 + 1)) *
+                          (ap2 * std::tgamma(p2 + 1)));
                 }
                 else if (m_diffType == "LFRHUNS")
                 {
                     c0 = 2.0 * (p0 + 1.0) /
-                         ((2.0 * p0 + 1.0) * p0 *
-                          (ap0 * boost::math::tgamma(p0 + 1)) *
-                          (ap0 * boost::math::tgamma(p0 + 1)));
+                         ((2.0 * p0 + 1.0) * p0 * (ap0 * std::tgamma(p0 + 1)) *
+                          (ap0 * std::tgamma(p0 + 1)));
 
                     c1 = 2.0 * (p1 + 1.0) /
-                         ((2.0 * p1 + 1.0) * p1 *
-                          (ap1 * boost::math::tgamma(p1 + 1)) *
-                          (ap1 * boost::math::tgamma(p1 + 1)));
+                         ((2.0 * p1 + 1.0) * p1 * (ap1 * std::tgamma(p1 + 1)) *
+                          (ap1 * std::tgamma(p1 + 1)));
 
                     c2 = 2.0 * (p2 + 1.0) /
-                         ((2.0 * p2 + 1.0) * p2 *
-                          (ap2 * boost::math::tgamma(p2 + 1)) *
-                          (ap2 * boost::math::tgamma(p2 + 1)));
+                         ((2.0 * p2 + 1.0) * p2 * (ap2 * std::tgamma(p2 + 1)) *
+                          (ap2 * std::tgamma(p2 + 1)));
                 }
                 else if (m_diffType == "LFRcminNS")
                 {
-                    c0 = -2.0 / ((2.0 * p0 + 1.0) *
-                                 (ap0 * boost::math::tgamma(p0 + 1)) *
-                                 (ap0 * boost::math::tgamma(p0 + 1)));
+                    c0 =
+                        -2.0 / ((2.0 * p0 + 1.0) * (ap0 * std::tgamma(p0 + 1)) *
+                                (ap0 * std::tgamma(p0 + 1)));
 
-                    c1 = -2.0 / ((2.0 * p1 + 1.0) *
-                                 (ap1 * boost::math::tgamma(p1 + 1)) *
-                                 (ap1 * boost::math::tgamma(p1 + 1)));
+                    c1 =
+                        -2.0 / ((2.0 * p1 + 1.0) * (ap1 * std::tgamma(p1 + 1)) *
+                                (ap1 * std::tgamma(p1 + 1)));
 
-                    c2 = -2.0 / ((2.0 * p2 + 1.0) *
-                                 (ap2 * boost::math::tgamma(p2 + 1)) *
-                                 (ap2 * boost::math::tgamma(p2 + 1)));
+                    c2 =
+                        -2.0 / ((2.0 * p2 + 1.0) * (ap2 * std::tgamma(p2 + 1)) *
+                                (ap2 * std::tgamma(p2 + 1)));
                 }
                 else if (m_diffType == "LFRcinfNS")
                 {
@@ -805,16 +791,16 @@ void DiffusionLFRNS::SetupCFunctions(
                 }
 
                 NekDouble etap0 = 0.5 * c0 * (2.0 * p0 + 1.0) *
-                                  (ap0 * boost::math::tgamma(p0 + 1)) *
-                                  (ap0 * boost::math::tgamma(p0 + 1));
+                                  (ap0 * std::tgamma(p0 + 1)) *
+                                  (ap0 * std::tgamma(p0 + 1));
 
                 NekDouble etap1 = 0.5 * c1 * (2.0 * p1 + 1.0) *
-                                  (ap1 * boost::math::tgamma(p1 + 1)) *
-                                  (ap1 * boost::math::tgamma(p1 + 1));
+                                  (ap1 * std::tgamma(p1 + 1)) *
+                                  (ap1 * std::tgamma(p1 + 1));
 
                 NekDouble etap2 = 0.5 * c2 * (2.0 * p2 + 1.0) *
-                                  (ap2 * boost::math::tgamma(p2 + 1)) *
-                                  (ap2 * boost::math::tgamma(p2 + 1));
+                                  (ap2 * std::tgamma(p2 + 1)) *
+                                  (ap2 * std::tgamma(p2 + 1));
 
                 NekDouble overeta0 = 1.0 / (1.0 + etap0);
                 NekDouble overeta1 = 1.0 / (1.0 + etap1);
@@ -925,11 +911,9 @@ void DiffusionLFRNS::v_Diffuse(
     const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
     const Array<OneD, Array<OneD, NekDouble>> &inarray,
     Array<OneD, Array<OneD, NekDouble>> &outarray,
-    const Array<OneD, Array<OneD, NekDouble>> &pFwd,
-    const Array<OneD, Array<OneD, NekDouble>> &pBwd)
+    [[maybe_unused]] const Array<OneD, Array<OneD, NekDouble>> &pFwd,
+    [[maybe_unused]] const Array<OneD, Array<OneD, NekDouble>> &pBwd)
 {
-    boost::ignore_unused(pFwd, pBwd);
-
     int i, j, n;
     int phys_offset;
 
@@ -1664,13 +1648,11 @@ void DiffusionLFRNS::WeakPenaltyO2(
  *
  */
 void DiffusionLFRNS::DerCFlux_1D(
-    const int nConvectiveFields,
+    [[maybe_unused]] const int nConvectiveFields,
     const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
     const Array<OneD, const NekDouble> &flux,
     const Array<OneD, const NekDouble> &iFlux, Array<OneD, NekDouble> &derCFlux)
 {
-    boost::ignore_unused(nConvectiveFields);
-
     int n;
     int nLocalSolutionPts, phys_offset;
 
@@ -1760,13 +1742,11 @@ void DiffusionLFRNS::DerCFlux_1D(
  * \todo: Switch on shapes eventually here.
  */
 void DiffusionLFRNS::DerCFlux_2D(
-    const int nConvectiveFields, const int direction,
+    [[maybe_unused]] const int nConvectiveFields, const int direction,
     const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
     const Array<OneD, const NekDouble> &flux,
     const Array<OneD, NekDouble> &iFlux, Array<OneD, NekDouble> &derCFlux)
 {
-    boost::ignore_unused(nConvectiveFields);
-
     int n, e, i, j, cnt;
 
     Array<OneD, const NekDouble> jac;
@@ -1958,15 +1938,13 @@ void DiffusionLFRNS::DerCFlux_2D(
  * \todo: Switch on shapes eventually here.
  */
 void DiffusionLFRNS::DivCFlux_2D(
-    const int nConvectiveFields,
+    [[maybe_unused]] const int nConvectiveFields,
     const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
     const Array<OneD, const NekDouble> &fluxX1,
     const Array<OneD, const NekDouble> &fluxX2,
     const Array<OneD, const NekDouble> &numericalFlux,
     Array<OneD, NekDouble> &divCFlux)
 {
-    boost::ignore_unused(nConvectiveFields);
-
     int n, e, i, j, cnt;
 
     int nElements = fields[0]->GetExpSize();
@@ -2148,15 +2126,13 @@ void DiffusionLFRNS::DivCFlux_2D(
  */
 
 void DiffusionLFRNS::DivCFlux_2D_Gauss(
-    const int nConvectiveFields,
+    [[maybe_unused]] const int nConvectiveFields,
     const Array<OneD, MultiRegions::ExpListSharedPtr> &fields,
     const Array<OneD, const NekDouble> &fluxX1,
     const Array<OneD, const NekDouble> &fluxX2,
     const Array<OneD, const NekDouble> &numericalFlux,
     Array<OneD, NekDouble> &divCFlux)
 {
-    boost::ignore_unused(nConvectiveFields);
-
     int n, e, i, j, cnt;
 
     int nElements = fields[0]->GetExpSize();
@@ -2466,5 +2442,4 @@ void DiffusionLFRNS::DivCFlux_2D_Gauss(
     }
 }
 
-} // end of namespace SolverUtils
-} // end of namespace Nektar
+} // namespace Nektar::SolverUtils

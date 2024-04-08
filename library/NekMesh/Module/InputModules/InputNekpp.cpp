@@ -40,9 +40,7 @@ using namespace std;
 #include <NekMesh/MeshElements/Element.h>
 #include <SpatialDomains/MeshGraph.h>
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 using namespace Nektar::NekMesh;
@@ -73,6 +71,9 @@ void InputNekpp::Process()
 
     m_log(VERBOSE) << "Reading Nektar++ XML file '" << filename[0] << "'"
                    << endl;
+
+    LibUtilities::CommSharedPtr pComm =
+        m_mesh->m_comm ? m_mesh->m_comm : LibUtilities::CommSharedPtr();
 
     char *prgname = const_cast<char *>("NekMesh");
     LibUtilities::SessionReaderSharedPtr pSession =
@@ -323,5 +324,4 @@ void InputNekpp::Process()
     }
     ProcessComposites();
 }
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh

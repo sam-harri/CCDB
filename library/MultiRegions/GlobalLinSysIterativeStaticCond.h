@@ -39,9 +39,7 @@
 #include <MultiRegions/GlobalLinSysStaticCond.h>
 #include <MultiRegions/GlobalMatrix.h>
 
-namespace Nektar
-{
-namespace MultiRegions
+namespace Nektar::MultiRegions
 {
 // Forward declarations
 class ExpList;
@@ -101,36 +99,34 @@ public:
         const std::shared_ptr<AssemblyMap> &locToGloMap,
         const PreconditionerSharedPtr pPrecon);
 
-    virtual ~GlobalLinSysIterativeStaticCond();
+    ~GlobalLinSysIterativeStaticCond() override;
 
 protected:
-    virtual void v_InitObject() override;
+    void v_InitObject() override;
 
     /// Assemble the Schur complement matrix.
-    virtual void v_AssembleSchurComplement(
+    void v_AssembleSchurComplement(
         const std::shared_ptr<AssemblyMap> locToGloMap) override;
 
     /// Perform a Shur-complement matrix multiply operation.
-    virtual void v_DoMatrixMultiply(const Array<OneD, NekDouble> &pInput,
-                                    Array<OneD, NekDouble> &pOutput) override;
+    void v_DoMatrixMultiply(const Array<OneD, NekDouble> &pInput,
+                            Array<OneD, NekDouble> &pOutput) override;
 
-    virtual void v_UniqueMap() override;
+    void v_UniqueMap() override;
 
-    virtual DNekScalBlkMatSharedPtr v_GetStaticCondBlock(
-        unsigned int n) override;
-    virtual GlobalLinSysStaticCondSharedPtr v_Recurse(
+    DNekScalBlkMatSharedPtr v_GetStaticCondBlock(unsigned int n) override;
+    GlobalLinSysStaticCondSharedPtr v_Recurse(
         const GlobalLinSysKey &mkey, const std::weak_ptr<ExpList> &pExpList,
         const DNekScalBlkMatSharedPtr pSchurCompl,
         const DNekScalBlkMatSharedPtr pBinvD, const DNekScalBlkMatSharedPtr pC,
         const DNekScalBlkMatSharedPtr pInvD,
         const std::shared_ptr<AssemblyMap> &locToGloMap) override;
 
-    virtual void v_PreSolve(int scLevel,
-                            Array<OneD, NekDouble> &F_bnd) override;
-    virtual void v_BasisFwdTransform(Array<OneD, NekDouble> &pInOut) override;
-    virtual void v_CoeffsBwdTransform(Array<OneD, NekDouble> &pInOut) override;
-    virtual void v_CoeffsFwdTransform(const Array<OneD, NekDouble> &pInput,
-                                      Array<OneD, NekDouble> &pOutput) override;
+    void v_PreSolve(int scLevel, Array<OneD, NekDouble> &F_bnd) override;
+    void v_BasisFwdTransform(Array<OneD, NekDouble> &pInOut) override;
+    void v_CoeffsBwdTransform(Array<OneD, NekDouble> &pInOut) override;
+    void v_CoeffsFwdTransform(const Array<OneD, NekDouble> &pInput,
+                              Array<OneD, NekDouble> &pOutput) override;
 
 private:
     /// Dense storage for block Schur complement matrix
@@ -152,13 +148,12 @@ private:
     void PrepareLocalSchurComplement();
 
     /// Solve the matrix system
-    virtual void v_SolveLinearSystem(const int pNumRows,
-                                     const Array<OneD, const NekDouble> &pInput,
-                                     Array<OneD, NekDouble> &pOutput,
-                                     const AssemblyMapSharedPtr &locToGloMap,
-                                     const int pNumDir) override;
+    void v_SolveLinearSystem(const int pNumRows,
+                             const Array<OneD, const NekDouble> &pInput,
+                             Array<OneD, NekDouble> &pOutput,
+                             const AssemblyMapSharedPtr &locToGloMap,
+                             const int pNumDir) override;
 };
-} // namespace MultiRegions
-} // namespace Nektar
+} // namespace Nektar::MultiRegions
 
 #endif

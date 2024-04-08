@@ -39,9 +39,7 @@
 #include <LocalRegions/TetExp.h>
 #include <SpatialDomains/TetGeom.h>
 
-namespace Nektar
-{
-namespace LocalRegions
+namespace Nektar::LocalRegions
 {
 
 class NodalTetExp : public TetExp
@@ -61,13 +59,12 @@ class NodalTetExp : public TetExp
     LOCAL_REGIONS_EXPORT NodalTetExp(const NodalTetExp &T);
 
     /// Destructor
-    LOCAL_REGIONS_EXPORT virtual ~NodalTetExp() override = default;
+    LOCAL_REGIONS_EXPORT ~NodalTetExp() override = default;
 
 protected:
 private:
 };
 
-} // namespace LocalRegions
-} // namespace Nektar
+} // namespace Nektar::LocalRegions
 
 #endif // NODALTETEXP_H

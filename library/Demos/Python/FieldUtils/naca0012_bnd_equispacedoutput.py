@@ -2,7 +2,7 @@
 import sys
 from NekPy.FieldUtils import *
 
-field = Field(sys.argv, forceoutput=True, error=True)
+field = Field(sys.argv, force_output=True, error=True)
 
 InputModule.Create("xml", field, infile={"xml":"naca0012_bnd.xml"}).Run()
 InputModule.Create("fld", field, infile={"fld":"naca0012_b0.fld"}).Run()

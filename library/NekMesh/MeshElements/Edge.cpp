@@ -39,9 +39,7 @@
 #include <NekMesh/CADSystem/CADSurf.h>
 #include <NekMesh/MeshElements/Edge.h>
 
-namespace Nektar
-{
-namespace NekMesh
+namespace Nektar::NekMesh
 {
 
 using namespace std;
@@ -148,13 +146,14 @@ void Edge::MakeOrder(int order, SpatialDomains::GeometrySharedPtr geom,
                 std::dynamic_pointer_cast<CADCurve>(m_parentCAD);
             for (int i = 0; i < m_edgeNodes.size(); i++)
             {
-                Array<OneD, NekDouble> loc(3);
-                loc[0] = m_edgeNodes[i]->m_x;
-                loc[1] = m_edgeNodes[i]->m_y;
-                loc[2] = m_edgeNodes[i]->m_z;
+                std::array<NekDouble, 3> loc = {m_edgeNodes[i]->m_x,
+                                                m_edgeNodes[i]->m_y,
+                                                m_edgeNodes[i]->m_z};
+
                 NekDouble t;
                 c->loct(loc, t);
                 m_edgeNodes[i]->SetCADCurve(c, t);
+
                 loc                 = c->P(t);
                 m_edgeNodes[i]->m_x = loc[0];
                 m_edgeNodes[i]->m_y = loc[1];
@@ -164,7 +163,7 @@ void Edge::MakeOrder(int order, SpatialDomains::GeometrySharedPtr geom,
                     c->GetAdjSurf();
                 for (int j = 0; j < s.size(); j++)
                 {
-                    Array<OneD, NekDouble> uv = s[j].first.lock()->locuv(loc);
+                    auto uv = s[j].first.lock()->locuv(loc);
                     m_edgeNodes[i]->SetCADSurf(s[j].first.lock(), uv);
                 }
             }
@@ -175,19 +174,17 @@ void Edge::MakeOrder(int order, SpatialDomains::GeometrySharedPtr geom,
                 std::dynamic_pointer_cast<CADSurf>(m_parentCAD);
             for (int i = 0; i < m_edgeNodes.size(); i++)
             {
-                Array<OneD, NekDouble> loc(3);
-                loc[0]                    = m_edgeNodes[i]->m_x;
-                loc[1]                    = m_edgeNodes[i]->m_y;
-                loc[2]                    = m_edgeNodes[i]->m_z;
-                Array<OneD, NekDouble> uv = s->locuv(loc);
-                loc                       = s->P(uv);
-                m_edgeNodes[i]->m_x       = loc[0];
-                m_edgeNodes[i]->m_y       = loc[1];
-                m_edgeNodes[i]->m_z       = loc[2];
+                std::array<NekDouble, 3> loc = {m_edgeNodes[i]->m_x,
+                                                m_edgeNodes[i]->m_y,
+                                                m_edgeNodes[i]->m_z};
+                auto uv                      = s->locuv(loc);
+                loc                          = s->P(uv);
+                m_edgeNodes[i]->m_x          = loc[0];
+                m_edgeNodes[i]->m_y          = loc[1];
+                m_edgeNodes[i]->m_z          = loc[2];
                 m_edgeNodes[i]->SetCADSurf(s, uv);
             }
         }
     }
 }
-} // namespace NekMesh
-} // namespace Nektar
+} // namespace Nektar::NekMesh

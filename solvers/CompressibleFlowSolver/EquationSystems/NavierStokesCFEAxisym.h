@@ -35,8 +35,6 @@
 #ifndef NEKTAR_SOLVERS_COMPRESSIBLEFLOWSOLVER_EQUATIONSYSTEMS_NSCFEAXISYM_H
 #define NEKTAR_SOLVERS_COMPRESSIBLEFLOWSOLVER_EQUATIONSYSTEMS_NSCFEAXISYM_H
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <CompressibleFlowSolver/EquationSystems/NavierStokesCFE.h>
 
 namespace Nektar
@@ -64,7 +62,7 @@ public:
     // Name of class
     static std::string className;
 
-    virtual ~NavierStokesCFEAxisym();
+    ~NavierStokesCFEAxisym() override;
 
 protected:
     Array<OneD, Array<OneD, NekDouble>> m_viscousForcing;
@@ -72,25 +70,25 @@ protected:
     NavierStokesCFEAxisym(const LibUtilities::SessionReaderSharedPtr &pSession,
                           const SpatialDomains::MeshGraphSharedPtr &pGraph);
 
-    virtual void v_InitObject(bool DeclareFields = true) override;
+    void v_InitObject(bool DeclareFields = true) override;
 
-    virtual void v_DoDiffusion(
+    void v_DoDiffusion(
         const Array<OneD, Array<OneD, NekDouble>> &inarray,
         Array<OneD, Array<OneD, NekDouble>> &outarray,
         const Array<OneD, Array<OneD, NekDouble>> &pFwd,
         const Array<OneD, Array<OneD, NekDouble>> &pBwd) override;
 
-    virtual void v_GetViscousFluxVector(
+    void v_GetViscousFluxVector(
         const Array<OneD, const Array<OneD, NekDouble>> &physfield,
         TensorOfArray3D<NekDouble> &derivatives,
         TensorOfArray3D<NekDouble> &viscousTensor) override;
 
-    virtual void v_GetViscousFluxVectorDeAlias(
-        const Array<OneD, const Array<OneD, NekDouble>> &physfield,
-        TensorOfArray3D<NekDouble> &derivatives,
-        TensorOfArray3D<NekDouble> &viscousTensor) override
+    void v_GetViscousFluxVectorDeAlias(
+        [[maybe_unused]] const Array<OneD, const Array<OneD, NekDouble>>
+            &physfield,
+        [[maybe_unused]] TensorOfArray3D<NekDouble> &derivatives,
+        [[maybe_unused]] TensorOfArray3D<NekDouble> &viscousTensor) override
     {
-        boost::ignore_unused(physfield, derivatives, viscousTensor);
         NEKERROR(ErrorUtil::efatal,
                  "Dealiased flux not implemented for axisymmetric case");
     }

@@ -159,10 +159,10 @@ bool MetricNoWarning::v_Test(std::istream &pStdout, std::istream &pStderr)
     // Loop over both standard output and error output
     for (std::string line; getline(pStdout, line) || getline(pStderr, line);)
     {
-        boost::smatch matches;
+        std::smatch matches;
 
         // Check if regex match against given output
-        if (boost::regex_search(line, matches, m_regexWarning))
+        if (std::regex_search(line, matches, m_regexWarning))
         {
             // Test fails if regex matches line and
             // no matching groups have been specified
@@ -221,10 +221,10 @@ void MetricNoWarning::v_Generate(std::istream &pStdout, std::istream &pStderr)
     // Check both standard output and error output
     for (std::string line; getline(pStdout, line) || getline(pStderr, line);)
     {
-        boost::smatch matches;
+        std::smatch matches;
 
         // Check if regex match against given output
-        if (boost::regex_search(line, matches, m_regexWarning))
+        if (std::regex_search(line, matches, m_regexWarning))
         {
             // If regex groups were not found, continue
             if (matches.size() == 1)

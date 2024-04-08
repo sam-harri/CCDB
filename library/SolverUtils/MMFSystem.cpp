@@ -35,9 +35,7 @@
 #include <MultiRegions/AssemblyMap/AssemblyMapDG.h>
 #include <SolverUtils/MMFSystem.h>
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 
 MMFSystem::MMFSystem(const LibUtilities::SessionReaderSharedPtr &pSession,
@@ -150,21 +148,37 @@ void MMFSystem::SetUpMovingFrames(
     m_session->LoadParameter("MMFCircCentreY", m_MMFfactors[3], 0.0);
 
     if (conn == "TangentX")
+    {
         m_MMFdir = SpatialDomains::eTangentX;
+    }
     if (conn == "TangentY")
+    {
         m_MMFdir = SpatialDomains::eTangentY;
+    }
     if (conn == "TangentXY")
+    {
         m_MMFdir = SpatialDomains::eTangentXY;
+    }
     if (conn == "TangentZ")
+    {
         m_MMFdir = SpatialDomains::eTangentZ;
+    }
     if (conn == "TangentCircular")
+    {
         m_MMFdir = SpatialDomains::eTangentCircular;
+    }
     if (conn == "TangentIrregular")
+    {
         m_MMFdir = SpatialDomains::eTangentIrregular;
+    }
     if (conn == "TangentNonconvex")
+    {
         m_MMFdir = SpatialDomains::eTangentNonconvex;
+    }
     if (conn == "LOCAL")
+    {
         m_MMFdir = SpatialDomains::eLOCAL;
+    }
 
     // Get Tangetn vectors from GeomFactors2D, Orthonormalized = true
     m_fields[0]->GetMovingFrames(m_MMFdir, m_MMFfactors, m_movingframes);
@@ -792,7 +806,7 @@ void MMFSystem::CartesianToSpherical(const NekDouble x0j, const NekDouble x1j,
                   x1j * x1j / (m_Yscale * m_Yscale) +
                   x2j * x2j / (m_Zscale * m_Zscale));
     radxy  = sqrt(x0j * x0j / (m_Xscale * m_Xscale) +
-                 x1j * x1j / (m_Yscale * m_Yscale));
+                  x1j * x1j / (m_Yscale * m_Yscale));
 
     if (radxy > Tol)
     {
@@ -823,7 +837,7 @@ void MMFSystem::CopyBoundaryTrace(const Array<OneD, const NekDouble> &Fwd,
                                   const BoundaryCopyType BDCopyType,
                                   const int var, const std::string BDtype)
 {
-    int id1, id2, npts, nptselem, cnt = 0, bdrycnt = 0;
+    int id1, id2, npts, nptselem, cnt = 0;
     Array<OneD, NekDouble> Dirichlet, x0, x1, x2;
 
     // loop over Boundary Regions
@@ -865,14 +879,12 @@ void MMFSystem::CopyBoundaryTrace(const Array<OneD, const NekDouble> &Fwd,
                     case eDirichlet:
                     {
                         Vmath::Vcopy(npts, &Dirichlet[id1], 1, &Bwd[id2], 1);
-                        bdrycnt++;
                     }
                     break;
 
                     case eFwdEQBwd:
                     {
                         Vmath::Vcopy(npts, &Fwd[id2], 1, &Bwd[id2], 1);
-                        bdrycnt++;
                     }
                     break;
 
@@ -880,7 +892,6 @@ void MMFSystem::CopyBoundaryTrace(const Array<OneD, const NekDouble> &Fwd,
                     {
                         Vmath::Vcopy(npts, &Fwd[id2], 1, &Bwd[id2], 1);
                         Vmath::Neg(npts, &Bwd[id2], 1);
-                        bdrycnt++;
                     }
                     break;
 
@@ -2502,5 +2513,4 @@ void MMFSystem::v_GenerateSummary(SummaryList &s)
         AddSummaryItem(s, "MMFCircCentreY", m_MMFfactors[3]);
     }
 }
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils
