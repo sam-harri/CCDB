@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <test>
     <description> Process 2D tecplot output with a range restriction</description>
-    <executable>FieldConvert</executable>
-    <parameters> -f -e bfs_tg.xml:xml:range="-1,1,-1,1"  bfs_tg.fld bfs_tg.dat</parameters>
+    <executable python="true">bfs_plt_rng.py</executable>
+    <parameters></parameters>
     <files>
         <file description="Session File">bfs_tg.xml</file>
 	<file description="Session File">bfs_tg.fld</file>
