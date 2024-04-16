@@ -6,4 +6,4 @@ field = Field(sys.argv, force_output=True, error=True)
 
 InputModule.Create("xml",  field, "bfs_tg.xml", range="-1,1,-1,1").Run()
 InputModule.Create("fld",  field, "bfs_tg.fld").Run()
-OutputModule.Create("dat", field, "bfs_tg.dat").Run()
+OutputModule.Create("plt", field, "bfs_tg.plt").Run()

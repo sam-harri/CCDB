@@ -62,13 +62,12 @@ void NewPartition(FieldSharedPtr f, py::list &py_argv, int part)
 // Returns: f
 FieldSharedPtr Field_Init(py::list &argv, int nparts = 0, int output_points = 0,
                           int output_points_hom_z = 0, bool error = false,
-                          bool force_output = false, std::string domain = "",
-                          bool no_equispaced = false, int npz = 0,
-                          std::string onlyshape = "", int part_only = 0,
-                          int part_only_overlapping = 0,
-                          bool useSessionVariables  = false,
-                          bool useSessionExpansion  = false,
-                          bool verbose              = false)
+                          bool force_output = false, bool no_equispaced = false,
+                          int npz = 0, std::string onlyshape = "",
+                          int part_only = 0, int part_only_overlapping = 0,
+                          bool useSessionVariables = false,
+                          bool useSessionExpansion = false,
+                          bool verbose = false, std::string domain = "")
 {
     // Construct shared pointer to a Field object.
     std::shared_ptr<Field> f = MemoryManager<Field>::AllocateSharedPtr();
@@ -120,8 +119,11 @@ FieldSharedPtr Field_Init(py::list &argv, int nparts = 0, int output_points = 0,
 
     if (domain.size())
     {
-        f->m_vm.insert(
-            std::make_pair("range", po::variable_value(domain, false)));
+        NEKERROR(ErrorUtil::efatal,
+                 "The doamin option in field is deprecated. Please use "
+                 "the xml option range=\"xmax,xmin,ymax,ymin\", \n\t i.e."
+                 "InputModule.Create(\"xml\",  field, \"myfile.xml\", "
+                 "range=\"-1,1,-1,1\").Run()");
     }
 
     if (no_equispaced)
@@ -225,13 +227,13 @@ void export_Field()
                  (py::arg("argv") = py::list(), py::arg("nparts") = 0,
                   py::arg("output_points")       = 0,
                   py::arg("output_points_hom_z") = 0, py::arg("error") = false,
-                  py::arg("force_output") = false, py::arg("domain") = "",
+                  py::arg("force_output")  = false,
                   py::arg("no_equispaced") = false, py::arg("npz") = 0,
                   py::arg("onlyshape") = "", py::arg("part_only") = 0,
                   py::arg("part_only_overlapping") = 0,
                   py::arg("use_session_variables") = false,
                   py::arg("use_session_expansion") = false,
-                  py::arg("verbose")               = false)))
+                  py::arg("verbose") = false, py::arg("domain") = "")))
 
         .def("GetPts", &Field_GetPts)
         .def("SetPts", &Field_SetPts)

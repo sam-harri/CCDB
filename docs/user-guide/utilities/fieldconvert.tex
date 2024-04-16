@@ -7,10 +7,7 @@ post-processing software, primarily Paraview/VisIt (in unstructured VTK
 \inltt{.vtu} format) or Tecplot/VisIt (in ASCII \inltt{.dat} or binary
 \inltt{.plt} formats). FieldConvert also allows the user to manipulate the
 \nekpp output binary files by using some additional modules which can be called
-with the option \inltt{-m} which stands for \inltt{m}odule. Note that another
-flag, \inltt{-r} (which stand for \inltt{r}ange) allows the user to specify a
-sub-range of the domain on which the conversion or manipulation of the \nekpp
-output binary files will be performed.
+with the option \inltt{-m} which stands for \inltt{m}odule.
 
 Almost all of the FieldConvert functionalities can be run in parallel if \nekpp
 is compiled using MPI (see the installation documentation for additional info on
@@ -119,9 +116,10 @@ recommended for full functionality because this is the minimum version which all
 for high-order VTK output. Versions older than this are supported but the high-order
 VTK output will be disabled.
 
-Using the VTK library automatically enables file compression on the output .vtu file
-which can substantially reduce file sizes. This can be turned off with the
-command line option \inltt{uncompress} when using \inltt{FieldConvert}.
+Using the  VTK library automatically  enables file compression  on the
+output .vtu file  which can substantially reduce file  sizes. This can
+be turned  off with  the command  line option  \inltt{uncompress} when
+using \inltt{FieldConvert}.
 
 \begin{lstlisting}[style=BashInputStyle]
 FieldConvert session.xml field.fld output.vtu:vtu:uncompress
@@ -265,37 +263,34 @@ format by issuing the command
 FieldConvert in.fld out.fld:fld:format=Hdf5
 \end{lstlisting}
 %
-\section{Range option \textit{-r}}
-The Fieldconvert range option \inltt{-r} allows the user to specify
-a sub-range of the mesh (computational domain) by using an
-additional flag, \inltt{-r} (which stands for \inltt{r}ange and either
-convert or manipulate the \nekpp output binary files.
-Taking as an example the conversion of the \nekpp binary files
-(.chk or .fld) shown before and wanting to convert just the 2D
-sub-range defined by $-2\leq x \leq 3$, $-1\leq y \leq 2$ the
-additional flag \inltt{-r} can be used as follows:
+\section{Specifying a sub-range of the mesh}
+Fieldconvert allows for a sub-range of the mesh (computational
+domain) by using an xml input option and either convert or manipulate
+the \nekpp output binary files.  Taking as an example the conversion
+of the \nekpp binary files (.chk or .fld) shown before and wanting to
+convert just the 2D sub-range defined by $-2\leq x \leq 3$, $-1\leq y
+\leq 2$ the additional flag \inltt{-r} can be used as follows:
 %
 \begin{itemize}
 \item Paraview or VisIt (.vtu format)
 %
 \begin{lstlisting}[style=BashInputStyle]
-FieldConvert -r -2,3,-1,2 test.xml test.fld test.vtu
+FieldConvert test.xml:xml:range=''-2,3,-1,2''  test.fld test.vtu
 \end{lstlisting}
 %
 \item Tecplot (.dat format)
 %
 \begin{lstlisting}[style=BashInputStyle]
-FieldConvert -r 2,3,-1,2 test.xml test.fld test.dat
+FieldConvert  test.xml:xml:range=''2,3,-1,2'' test.fld test.dat
 \end{lstlisting}
 %
 \end{itemize}
-where \inltt{-r} defines the range option of the FieldConvert
-utility, the two first numbers define the range in $x$ direction
-and the the third and fourth number specify the $y$ range.
-A sub-range of a 3D domain can also be specified.
-For doing so, a third set of numbers has to be provided
-to define the $z$ range.
-%
+where the \inltt{range} information defines the range option of
+\inltt{xml} input module, the two first numbers define the range in
+$x$ direction and the the third and fourth number specify the $y$
+range.  A sub-range of a 3D domain can also be specified.  For doing
+so, a third set of numbers has to be provided to define the $z$ range.
+
 %
 %
 
@@ -376,9 +371,19 @@ for part in range(2):
 OutputModule.Create("info", field, "field_wss_b0.fld", nparts=2).Run()
 \end{lstlisting}
 
-The number of partitions is looped over, with \verb+NewPartition+ called at
-the start of each. When using \verb+OutputModule+, the \verb+info+ module
-must be used in order to obtain the correct result.
+The sub-range can also be specified by using the \inltt{xml} input module options  in the following manner: 
+
+\begin{lstlisting}[style=C++Style, language=Python]
+import sys
+from NekPy.FieldUtils import *
+
+field = Field(sys.argv)
+
+inputxml   = InputModule.Create("xml",   field, , session.xml, range="-1,1,-1,1").Run()
+inputfld   = InputModule.Create("fld",   field, "field.fld").Run()
+processwss = ProcessModule.Create("wss", field,  bnd="2").Run()
+outputfld  = OutputModule.Create("fld",  field, "field_wss.fld").Run()
+\end{lstlisting}
 
 \section{FieldConvert modules \textit{-m}}
 FieldConvert allows the user to manipulate the \nekpp output
