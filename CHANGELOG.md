@@ -15,6 +15,7 @@ v5.6.0
 - Further tidy-up in linear solver (!1761)
 - Use FwdTrans in UnsteadySystem when using Parareal (!1785)
 - Automate deployment of README.md to dockerhub (!1786)
+- Fix memory leak with Block preconditioner for time-updated matrices (!1737)
 
 **CompressibleFlowSolver**
 - Complete second Frechet derivative implementation (!1761)

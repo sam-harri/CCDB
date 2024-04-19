@@ -185,10 +185,10 @@ void PreconditionerBlock::BlockPreconditionerCG()
             int nBndDofs = exp->NumBndryCoeffs();
             int nIntDofs = exp->GetNcoeffs() - nBndDofs;
 
-            // Get boundary & interior maps
-            Array<OneD, unsigned int> bndMap(nBndDofs), intMap(nIntDofs);
+            /// Process boundary matrices
+            // Get boundary map
+            Array<OneD, unsigned int> bndMap(nBndDofs);
             exp->GetBoundaryMap(bndMap);
-            exp->GetInteriorMap(intMap);
 
             // Create temporary matrices
             DNekMatSharedPtr bndryMat =
@@ -208,23 +208,29 @@ void PreconditionerBlock::BlockPreconditionerCG()
                 MemoryManager<DNekScalMat>::AllocateSharedPtr(1.0, bndryMat);
 
             // Extract interior matrix and save for block matrix setting
-            vector<NekDouble> tmpStore(nIntDofs * nIntDofs);
-            for (int i = 0; i < nIntDofs; ++i)
+            if (nIntDofs)
             {
-                for (int j = 0; j < nIntDofs; ++j)
-                {
-                    tmpStore[j + i * nIntDofs] =
-                        (*tmpMat)(intMap[i], intMap[j]);
-                }
-            }
+                Array<OneD, unsigned int> intMap(nIntDofs);
+                exp->GetInteriorMap(intMap);
 
-            // Save interior mats and nDofs
-            idMats[3][n]  = tmpStore;
-            gidDofs[3][n] = nIntDofs;
-            // then intMat gets added to a block diagonal matrix that
-            // handles the extra interior dofs no need to do any
-            // communication for that because all interior dofs are
-            // local to each element
+                vector<NekDouble> tmpStore(nIntDofs * nIntDofs);
+                for (int i = 0; i < nIntDofs; ++i)
+                {
+                    for (int j = 0; j < nIntDofs; ++j)
+                    {
+                        tmpStore[j + i * nIntDofs] =
+                            (*tmpMat)(intMap[i], intMap[j]);
+                    }
+                }
+
+                // Save interior matrices and nDofs
+                idMats[3][n]  = tmpStore;
+                gidDofs[3][n] = nIntDofs;
+                // then intMat gets added to a block diagonal matrix that
+                // handles the extra interior dofs no need to do any
+                // communication for that because all interior dofs are
+                // local to each element
+            }
         }
         else
         {
@@ -327,8 +333,14 @@ void PreconditionerBlock::BlockPreconditionerCG()
                             ->GetTraceInverseBoundaryMap(i);
             }
 
-            // Allocate temporary storage for the extracted edge matrix.
+            // Check that edge has edge-interior dofs
             const int nEdgeCoeffs = bmap.size();
+            if (nEdgeCoeffs == 0)
+            {
+                continue;
+            }
+
+            // Allocate temporary storage for the extracted edge matrix.
             vector<NekDouble> tmpStore(nEdgeCoeffs * nEdgeCoeffs);
 
             gId = asmMap->GetLocalToGlobalMap(cnt + bmap[0]);
@@ -406,12 +418,19 @@ void PreconditionerBlock::BlockPreconditionerCG()
                                                          pIt->second[0].orient);
             }
 
+            // Trace Interior to Element Map
             exp->GetTraceInteriorToElementMap(i, bmap, sign, faceOrient);
             bmap2 = exp->as<LocalRegions::Expansion3D>()
                         ->GetTraceInverseBoundaryMap(i);
 
-            // Allocate temporary storage for the extracted face matrix.
+            // Check that face has face-interior dofs
             const int nFaceCoeffs = bmap.size();
+            if (nFaceCoeffs == 0)
+            {
+                continue;
+            }
+
+            // Allocate temporary storage for the extracted face matrix.
             vector<NekDouble> tmpStore(nFaceCoeffs * nFaceCoeffs);
 
             gId = asmMap->GetLocalToGlobalMap(cnt + bmap[0]);
@@ -518,11 +537,13 @@ void PreconditionerBlock::BlockPreconditionerCG()
     Array<OneD, long> globalToUniversalMap(globalToUniversal.size(),
                                            &globalToUniversal[0]);
 
-    // Use GS to assemble data between processors.
-    Gs::gs_data *tmpGs =
+    // Initialise Gs mapping
+    m_gs_mapping =
         Gs::Init(globalToUniversalMap, m_comm,
                  expList->GetSession()->DefinesCmdLineArgument("verbose"));
-    Gs::Gather(storageData, Gs::gs_add, tmpGs);
+
+    // Use GSlib to assemble data between processors.
+    Gs::Gather(storageData, Gs::gs_add, m_gs_mapping);
 
     // Figure out what storage we need in the block matrix.
     int nblksSize = 1 + idMats[1].size() + idMats[2].size();
@@ -547,7 +568,11 @@ void PreconditionerBlock::BlockPreconditionerCG()
                      "global ID " +
                          boost::lexical_cast<string>(gIt.first));
 
-            n_blks[cnt++] = gidDofs[i][gIt.first];
+            // Check for non-zero DoF count
+            if (gidDofs[i][gIt.first])
+            {
+                n_blks[cnt++] = gidDofs[i][gIt.first];
+            }
         }
     }
 
@@ -578,6 +603,12 @@ void PreconditionerBlock::BlockPreconditionerCG()
         for (auto &gIt : idMats[i])
         {
             int nDofs = gidDofs[i][gIt.first];
+
+            // Skip, if zero DoFs
+            if (nDofs == 0)
+            {
+                continue;
+            }
 
             DNekMatSharedPtr tmp =
                 MemoryManager<DNekMat>::AllocateSharedPtr(nDofs, nDofs);
