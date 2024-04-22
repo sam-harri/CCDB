@@ -60,7 +60,7 @@ ForcingIncNSSyntheticEddy::ForcingIncNSSyntheticEddy(
  * @brief Read input from xml file and initialise the class members.
  *        The main parameters are the characteristic lengths, Reynolds
  *        stresses and the synthetic eddy region (box of eddies).
- * 
+ *
  * @param pFields           Pointer to fields.
  * @param pNumForcingField  Number of forcing fields.
  * @param pForce            Xml element describing the mapping.
@@ -77,8 +77,8 @@ void ForcingIncNSSyntheticEddy::v_InitObject(
     if (m_spacedim != 3)
     {
         NEKERROR(Nektar::ErrorUtil::efatal,
-                "Sythetic eddy method "
-                "only supports fully three-dimensional simulations");     
+                 "Sythetic eddy method "
+                 "only supports fully three-dimensional simulations");
     }
 
     // Get gamma parameter
@@ -200,9 +200,9 @@ void ForcingIncNSSyntheticEddy::v_InitObject(
     m_Ub                = boost::lexical_cast<NekDouble>(bVelStr);
 
     // Read flag to check if the run is a test case
-    elmtInfTurb = pForce->FirstChildElement("TestCase");
+    elmtInfTurb          = pForce->FirstChildElement("TestCase");
     const char *tcaseStr = (elmtInfTurb) ? elmtInfTurb->GetText() : "NoName";
-    m_tCase = (strcmp(tcaseStr, "ChanFlow3D") == 0) ? true : false; 
+    m_tCase              = (strcmp(tcaseStr, "ChanFlow3D") == 0) ? true : false;
 
     // Set Cholesky decomposition of the Reynolds Stresses in the domain
     SetCholeskyReyStresses(pFields);
@@ -217,7 +217,7 @@ void ForcingIncNSSyntheticEddy::v_InitObject(
     // Set Forcing for each eddy
     InitialiseForcingEddy(pFields);
 
-    //Check for test case
+    // Check for test case
     if (!m_tCase)
     {
         // Compute initial location of the eddies in the box
@@ -248,10 +248,10 @@ void ForcingIncNSSyntheticEddy::v_InitObject(
 
 /**
  * @brief Apply forcing term if an eddy left the box of eddies and
- *        update the eddies positions. 
- * 
+ *        update the eddies positions.
+ *
  * @param pFields   Pointer to fields.
- * @param inarray   Given fields. The fields are in in physical space.    
+ * @param inarray   Given fields. The fields are in in physical space.
  * @param outarray  Calculated solution after forcing term being applied
  *                  in physical space.
  * @param time      time.
@@ -278,7 +278,7 @@ void ForcingIncNSSyntheticEddy::v_Apply(
 
     // Incompressible version
     // Only velocities u,v,w: nVars - 1
-    for (size_t i = 0; i < (nVars - 1); ++i) 
+    for (size_t i = 0; i < (nVars - 1); ++i)
     {
         Vmath::Vadd(nqTot, m_Forcing[i], 1, outarray[i], 1, outarray[i], 1);
     }
@@ -289,7 +289,7 @@ void ForcingIncNSSyntheticEddy::v_Apply(
 
 /**
  * @brief Calculate forcing term.
- *  
+ *
  * @param pFfields  Pointer to fields.
  */
 void ForcingIncNSSyntheticEddy::CalculateForcing(
@@ -329,14 +329,14 @@ void ForcingIncNSSyntheticEddy::CalculateForcing(
         {
             //  velocity term
             for (size_t j = 0; j < m_spacedim; ++j)
-                {
+            {
                 for (size_t i = 0; i < nqTot; ++i)
                 {
                     if (m_mask[i])
                     {
                         m_ForcingEddy[n][j][i] +=
-                            ((velFluc[n][j * nqTot + i] * smoothFac[j][i]) / 
-                            convTurbTime[j][i]);
+                            ((velFluc[n][j * nqTot + i] * smoothFac[j][i]) /
+                             convTurbTime[j][i]);
                         // Update forcing
                         m_Forcing[j][i] += m_ForcingEddy[n][j][i];
                     }
@@ -355,7 +355,7 @@ void ForcingIncNSSyntheticEddy::CalculateForcing(
 
 /**
  * @brief Compute characteristic convective turbulent time.
- * 
+ *
  * @param pFields  Pointer to fields.
  */
 Array<OneD, Array<OneD, NekDouble>> ForcingIncNSSyntheticEddy::
@@ -375,9 +375,9 @@ Array<OneD, Array<OneD, NekDouble>> ForcingIncNSSyntheticEddy::
             NekDouble convTurbLength = m_xiMaxMin * m_lref[0];
             // 3*k because of the structure of the m_l parameter
             // to obtain lxk.
-            if ((m_l[3*k] > m_xiMaxMin * m_lref[0]) && (m_mask[i]))
+            if ((m_l[3 * k] > m_xiMaxMin * m_lref[0]) && (m_mask[i]))
             {
-                convTurbLength = m_l[3*k]; 
+                convTurbLength = m_l[3 * k];
             }
             convTurbTime[k][i] = convTurbLength / m_Ub;
         }
@@ -389,7 +389,7 @@ Array<OneD, Array<OneD, NekDouble>> ForcingIncNSSyntheticEddy::
 /**
  * @brief Compute smoothing factor to avoid strong variations
  *        of the source term across the domain.
- * 
+ *
  * @param pFields       Pointer to fields.
  * @param convTurbTime  Convective turbulent time.
  */
@@ -430,20 +430,21 @@ Array<OneD, Array<OneD, NekDouble>> ForcingIncNSSyntheticEddy::
         {
             if (m_mask[count + i])
             {
-                mod = (coords0[i] - m_rc[0] + m_lref[0]) * (coords0[i] - m_rc[0] + m_lref[0]);
+                mod = (coords0[i] - m_rc[0] + m_lref[0]) *
+                      (coords0[i] - m_rc[0] + m_lref[0]);
 
                 smoothFac[0][count + i] =
-                    exp((-0.5 * M_PI * mod) / 
-                    (convTurbTime[0][count + i] * convTurbTime[0][count + i] * 
-                    m_Ub * m_Ub));
+                    exp((-0.5 * M_PI * mod) /
+                        (convTurbTime[0][count + i] *
+                         convTurbTime[0][count + i] * m_Ub * m_Ub));
                 smoothFac[1][count + i] =
-                    exp((-0.5 * M_PI * mod) / 
-                    (convTurbTime[1][count + i] * convTurbTime[1][count + i] * 
-                    m_Ub * m_Ub));
+                    exp((-0.5 * M_PI * mod) /
+                        (convTurbTime[1][count + i] *
+                         convTurbTime[1][count + i] * m_Ub * m_Ub));
                 smoothFac[2][count + i] =
-                    exp((-0.5 * M_PI * mod) / 
-                    (convTurbTime[2][count + i] * convTurbTime[2][count + i] * 
-                    m_Ub * m_Ub));
+                    exp((-0.5 * M_PI * mod) /
+                        (convTurbTime[2][count + i] *
+                         convTurbTime[2][count + i] * m_Ub * m_Ub));
             }
         }
         count += nqe;
@@ -454,7 +455,7 @@ Array<OneD, Array<OneD, NekDouble>> ForcingIncNSSyntheticEddy::
 
 /**
  * @brief Calculate velocity fluctuation for the source term
- * 
+ *
  * @param pFields           Pointer to fields.
  * @param stochasticSignal  Stochastic signal.
  * @return                  Velocity fluctuation.
@@ -477,7 +478,7 @@ Array<OneD, Array<OneD, NekDouble>> ForcingIncNSSyntheticEddy::
         for (size_t k = 0; k < m_spacedim; ++k)
         {
             for (size_t j = 0; j < k + 1; ++j)
-	    {
+            {
                 for (size_t i = 0; i < nqTot; ++i)
                 {
                     if (m_mask[i])
@@ -497,7 +498,7 @@ Array<OneD, Array<OneD, NekDouble>> ForcingIncNSSyntheticEddy::
 
 /**
  * @brief Compute stochastic signal.
- * 
+ *
  * @param pFields  Pointer to fields.
  * @return         Stochastic signal.
  */
@@ -515,7 +516,7 @@ Array<OneD, Array<OneD, NekDouble>> ForcingIncNSSyntheticEddy::
     Array<OneD, Array<OneD, NekDouble>> stochasticSignal(m_N);
     // Random numbers: -1 and 1
     Array<OneD, Array<OneD, int>> epsilonSign;
-    
+
     // Generate only for the new eddies after the first time step
     epsilonSign = GenerateRandomOneOrMinusOne();
 
@@ -575,7 +576,7 @@ Array<OneD, Array<OneD, NekDouble>> ForcingIncNSSyntheticEddy::
 void ForcingIncNSSyntheticEddy::UpdateEddiesPositions()
 {
     NekDouble dt = m_session->GetParameter("TimeStep");
-    
+
     for (size_t n = 0; n < m_N; ++n)
     {
         // Check if any eddy went through the outlet plane (box)
@@ -592,11 +593,11 @@ void ForcingIncNSSyntheticEddy::UpdateEddiesPositions()
             {
                 m_eddyPos[n][1] =
                     (m_rc[1] - 0.5 * m_lyz[0]) +
-                    (NekSingle(std::rand()) / NekSingle(RAND_MAX)) * (m_lyz[0]); 
+                    (NekSingle(std::rand()) / NekSingle(RAND_MAX)) * (m_lyz[0]);
                 m_eddyPos[n][2] =
                     (m_rc[2] - 0.5 * m_lyz[1] + 0.5 * m_lref[2]) +
-                    (NekSingle(std::rand()) / NekSingle(RAND_MAX)) * (m_lyz[1]); 
-	    }
+                    (NekSingle(std::rand()) / NekSingle(RAND_MAX)) * (m_lyz[1]);
+            }
             else
             {
                 // same place (center) for the test case
@@ -611,27 +612,27 @@ void ForcingIncNSSyntheticEddy::UpdateEddiesPositions()
 
 /**
  * @brief Remove eddy from forcing term
- * 
+ *
  * @param pFields  Pointer to fields.
  */
 void ForcingIncNSSyntheticEddy::RemoveEddiesFromForcing(
     const Array<OneD, MultiRegions::ExpListSharedPtr> &pFields)
 {
-        // Total number of quadrature points
-        int nqTot = pFields[0]->GetTotPoints();
-        // Number of Variables
-        int nVars = pFields.size();
+    // Total number of quadrature points
+    int nqTot = pFields[0]->GetTotPoints();
+    // Number of Variables
+    int nVars = pFields.size();
 
-        for (auto &n : m_eddiesIDForcing)
+    for (auto &n : m_eddiesIDForcing)
+    {
+        for (size_t j = 0; j < nVars; ++j)
         {
-            for (size_t j = 0; j < nVars; ++j)
+            for (size_t i = 0; i < nqTot; ++i)
             {
-                for (size_t i = 0; i < nqTot; ++i)
-                {
-                    m_Forcing[j][i] -= m_ForcingEddy[n][j][i];
-                }
+                m_Forcing[j][i] -= m_ForcingEddy[n][j][i];
             }
         }
+    }
 }
 
 /**
@@ -643,7 +644,7 @@ void ForcingIncNSSyntheticEddy::InitialiseForcingEddy(
     // Total number of quadrature points
     int nqTot = pFields[0]->GetTotPoints();
     // Number of Variables
-    int nVars = pFields.size();
+    int nVars     = pFields.size();
     m_ForcingEddy = Array<OneD, Array<OneD, Array<OneD, NekDouble>>>(m_N);
 
     for (size_t i = 0; i < m_N; ++i)
@@ -685,7 +686,7 @@ void ForcingIncNSSyntheticEddy::ComputeInitialRandomLocationOfEddies()
 
 /**
  * @brief Compute standard Gaussian with zero mean.
- * 
+ *
  * @param coord  Coordianate.
  * @return       Gaussian value for the coordinate.
  */
@@ -707,7 +708,7 @@ NekDouble ForcingIncNSSyntheticEddy::ComputeGaussian(NekDouble coord,
 
 /**
  * @brief Compute constant C for the gaussian funcion.
- * 
+ *
  * @param row  index for the rows of the matrix.
  * @param col  index for the columns of the matrix.
  * @return     Value of C.
@@ -755,12 +756,13 @@ Array<OneD, Array<OneD, int>> ForcingIncNSSyntheticEddy::
             if (!m_tCase)
             {
                 epsilonSign[j][n] =
-                    ((NekSingle(std::rand()) / NekSingle(RAND_MAX)) <= 0.5) ? -1 : 1;
+                    ((NekSingle(std::rand()) / NekSingle(RAND_MAX)) <= 0.5) ? -1
+                                                                            : 1;
             }
             else
             {
                 // Positive values only for the test case
-                epsilonSign[j][n] = 1; 
+                epsilonSign[j][n] = 1;
             }
         }
     }
@@ -772,7 +774,7 @@ Array<OneD, Array<OneD, int>> ForcingIncNSSyntheticEddy::
  * @brief Set box of eddies mask to be use to seprate the
  *        degrees of freedom (coordinates) inside and outside
  *        the box of eddies.
- * 
+ *
  * @param pFields  Pointer to fields.
  */
 void ForcingIncNSSyntheticEddy::SetBoxOfEddiesMask(
@@ -824,8 +826,8 @@ bool ForcingIncNSSyntheticEddy::InsideBoxOfEddies(NekDouble coord0,
                                                   NekDouble coord2)
 {
     NekDouble tol = 1e-6;
-    if ((coord0 >= (m_rc[0] - m_lref[0] - m_lref[0])) && 
-	(coord0 <= (m_rc[0] + m_lref[0] + tol)) &&
+    if ((coord0 >= (m_rc[0] - m_lref[0] - m_lref[0])) &&
+        (coord0 <= (m_rc[0] + m_lref[0] + tol)) &&
         (coord1 >= (m_rc[1] - 0.5 * m_lyz[0] - tol)) &&
         (coord1 <= (m_rc[1] + 0.5 * m_lyz[0] + tol)) &&
         (coord2 >= (m_rc[2] - 0.5 * m_lyz[1] - tol)) &&
@@ -838,7 +840,7 @@ bool ForcingIncNSSyntheticEddy::InsideBoxOfEddies(NekDouble coord0,
 }
 
 /**
- * @brief Calculates the reference lenghts ... 
+ * @brief Calculates the reference lenghts ...
  */
 void ForcingIncNSSyntheticEddy::ComputeRefLenghts()
 {
@@ -863,7 +865,7 @@ void ForcingIncNSSyntheticEddy::ComputeRefLenghts()
 }
 
 /**
- * @brief Calculates the \f$\xi_{max}\f$. 
+ * @brief Calculates the \f$\xi_{max}\f$.
  */
 void ForcingIncNSSyntheticEddy::ComputeXiMax()
 {
@@ -890,8 +892,8 @@ void ForcingIncNSSyntheticEddy::ComputeXiMax()
 /**
  * @brief Calculates the Cholesky decomposition of the Reynolds Stresses
  *        in each degree of freedom of the mesh.
- * 
- * @param pFields  Pointer to fields. 
+ *
+ * @param pFields  Pointer to fields.
  */
 void ForcingIncNSSyntheticEddy::SetCholeskyReyStresses(
     const Array<OneD, MultiRegions::ExpListSharedPtr> &pFields)
@@ -904,7 +906,7 @@ void ForcingIncNSSyntheticEddy::SetCholeskyReyStresses(
     int nElmts = pFields[0]->GetNumElmts();
     // Count the degrees of freedom
     int nqeCount = 0;
-    // Block diagonal size 
+    // Block diagonal size
     int diagSize = m_spacedim * (m_spacedim + 1) * 0.5;
     // Cholesky decomposition matrix for the synthetic eddy region (box)
     m_Cholesky = Array<OneD, Array<OneD, NekDouble>>(nqTot);
@@ -924,10 +926,10 @@ void ForcingIncNSSyntheticEddy::SetCholeskyReyStresses(
         for (size_t i = 0; i < nqe; ++i)
         {
             int l = 0;
-    	    // Size of Cholesky decomposition matrix - aux vector
+            // Size of Cholesky decomposition matrix - aux vector
             Array<OneD, NekDouble> A(diagSize, 0.0);
 
-    	    while (l < diagSize)
+            while (l < diagSize)
             {
                 // Variable to compute the Cholesky decomposition for each
                 // degree of freedom
@@ -950,10 +952,10 @@ void ForcingIncNSSyntheticEddy::SetCholeskyReyStresses(
                                       " is not positive definite from dpptrf";
                 NEKERROR(ErrorUtil::efatal, message.c_str());
             }*/
-	    m_Cholesky[nqeCount + i] = Array<OneD, NekDouble>(diagSize);
+            m_Cholesky[nqeCount + i] = Array<OneD, NekDouble>(diagSize);
             for (size_t l = 0; l < diagSize; ++l)
             {
-               m_Cholesky[nqeCount + i][l] = A[l];
+                m_Cholesky[nqeCount + i][l] = A[l];
             }
         }
         nqeCount += nqe;
@@ -962,41 +964,42 @@ void ForcingIncNSSyntheticEddy::SetCholeskyReyStresses(
 
 /**
  * @brief Calculate the number of eddies that are going to be
- *        injected in the synthetic eddy region (box). 
+ *        injected in the synthetic eddy region (box).
  */
 void ForcingIncNSSyntheticEddy::SetNumberOfEddies()
 {
     m_N = int((m_lyz[0] * m_lyz[1]) /
-              (4 * m_lref[m_spacedim - 2] * m_lref[m_spacedim - 1])) + 1;
+              (4 * m_lref[m_spacedim - 2] * m_lref[m_spacedim - 1])) +
+          1;
 }
 
 /**
  * @brief Place eddies in specific locations in the test case
- *        geometry for consistency and comparison. 
- * 
- *        This function was design for a three-dimensional 
- *        channel flow test case (ChanFlow3d_infTurb). 
+ *        geometry for consistency and comparison.
+ *
+ *        This function was design for a three-dimensional
+ *        channel flow test case (ChanFlow3d_infTurb).
  *        It is only called for testing purposes (unit test).
  */
 void ForcingIncNSSyntheticEddy::ComputeInitialLocationTestCase()
 {
-    m_N = 3; // Redefine number of eddies
+    m_N       = 3; // Redefine number of eddies
     m_eddyPos = Array<OneD, Array<OneD, NekDouble>>(m_N);
 
     // First eddy (center)
-    m_eddyPos[0] = Array<OneD, NekDouble>(m_spacedim);
+    m_eddyPos[0]    = Array<OneD, NekDouble>(m_spacedim);
     m_eddyPos[0][0] = (m_rc[0] - m_lref[0]) + 0.2 * 2 * m_lref[0];
     m_eddyPos[0][1] = m_rc[1];
     m_eddyPos[0][2] = m_rc[2];
 
     // Second eddy (top)
-    m_eddyPos[1] = Array<OneD, NekDouble>(m_spacedim);
+    m_eddyPos[1]    = Array<OneD, NekDouble>(m_spacedim);
     m_eddyPos[1][0] = (m_rc[0] - m_lref[0]) + 0.3 * 2 * m_lref[0];
     m_eddyPos[1][1] = (m_rc[1] - 0.5 * m_lyz[0]) + 0.9 * m_lyz[0];
     m_eddyPos[1][2] = m_rc[2];
 
     // Third eddy (bottom)
-    m_eddyPos[2] = Array<OneD, NekDouble>(m_spacedim);
+    m_eddyPos[2]    = Array<OneD, NekDouble>(m_spacedim);
     m_eddyPos[2][0] = (m_rc[0] - m_lref[0]) + 0.4 * 2 * m_lref[0];
     m_eddyPos[2][1] = (m_rc[1] - 0.5 * m_lyz[0]) + 0.1 * m_lyz[0];
     m_eddyPos[2][2] = m_rc[2];

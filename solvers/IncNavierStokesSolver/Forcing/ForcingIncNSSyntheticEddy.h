@@ -129,7 +129,6 @@ protected:
     void InitialiseForcingEddy(
         const Array<OneD, MultiRegions::ExpListSharedPtr> &pFields);
 
- 
     // Members
     // Expressions (functions) of the prescribed Reynolds stresses
     std::map<int, LibUtilities::EquationSharedPtr> m_R;
@@ -171,8 +170,8 @@ protected:
     /// Keep applying force during GMRES iteration
     bool m_implicitForcing{false};
     /// Check for test case
-    bool m_tCase; 
-    /// Forcing for each eddy 
+    bool m_tCase;
+    /// Forcing for each eddy
     Array<OneD, Array<OneD, Array<OneD, NekDouble>>> m_ForcingEddy;
 
 private:
