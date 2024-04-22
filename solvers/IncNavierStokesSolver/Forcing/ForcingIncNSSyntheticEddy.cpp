@@ -214,6 +214,9 @@ void ForcingIncNSSyntheticEddy::v_InitObject(
     SetNumberOfEddies();
     // Set mask
     SetBoxOfEddiesMask(pFields);
+    // Set Forcing for each eddy
+    InitialiseForcingEddy(pFields);
+
     //Check for test case
     if (!m_tCase)
     {
@@ -265,17 +268,19 @@ void ForcingIncNSSyntheticEddy::v_Apply(
     // Total number of coefficients
     unsigned int nqTot = pFields[0]->GetTotPoints();
 
-    // Only apply in the first time step and when an eddy leaves
-    // the synthetic eddy region (box).
+    // Only calculates the forcing in the first time step and when an eddy
+    // leaves the synthetic eddy region (box).
     if (m_calcForcing)
     {
         CalculateForcing(pFields);
-
-        for (size_t i = 0; i < (nVars - 1); ++i) // Only velocity: nVars - 1
-        {
-            Vmath::Vadd(nqTot, m_Forcing[i], 1, outarray[i], 1, outarray[i], 1);
-        }
         m_calcForcing = false;
+    }
+
+    // Incompressible version
+    // Only velocities u,v,w: nVars - 1
+    for (size_t i = 0; i < (nVars - 1); ++i) 
+    {
+        Vmath::Vadd(nqTot, m_Forcing[i], 1, outarray[i], 1, outarray[i], 1);
     }
 
     // Update eddies position inside the box.
@@ -292,8 +297,6 @@ void ForcingIncNSSyntheticEddy::CalculateForcing(
 {
     // Total number of quadrature points
     int nqTot = pFields[0]->GetTotPoints();
-    // Number of Variables
-    int nVars = pFields.size();
 
     // Compute Stochastic Signal
     Array<OneD, Array<OneD, NekDouble>> stochasticSignal;
@@ -316,27 +319,26 @@ void ForcingIncNSSyntheticEddy::CalculateForcing(
     // to be empty
     if (!m_eddiesIDForcing.empty())
     {
-        // Clean the m_Forcing member
-        for (size_t j = 0; j < nVars; ++j)
-        {
-            for (int i = 0; i < nqTot; ++i)
-            {
-                m_Forcing[j][i] = 0.0;
-            }
-        }
+        // Forcing must stop applying for eddies that left the box
+        RemoveEddiesFromForcing(pFields);
+
+        // Update Forcing term which are going to be applied until
+        // the eddy leave the leave the domain
         // Select the eddies to apply the forcing. Superposition.
         for (auto &n : m_eddiesIDForcing)
         {
-            for (size_t i = 0; i < nqTot; ++i)
-            {
-                if (m_mask[i])
+            //  velocity term
+            for (size_t j = 0; j < m_spacedim; ++j)
                 {
-                    //  velocity term
-                    for (size_t j = 0; j < m_spacedim; ++j)
+                for (size_t i = 0; i < nqTot; ++i)
+                {
+                    if (m_mask[i])
                     {
-                        m_Forcing[j][i] +=
-                            ((velFluc[n][j * nqTot + i] * smoothFac[j][i]) /
+                        m_ForcingEddy[n][j][i] +=
+                            ((velFluc[n][j * nqTot + i] * smoothFac[j][i]) / 
                             convTurbTime[j][i]);
+                        // Update forcing
+                        m_Forcing[j][i] += m_ForcingEddy[n][j][i];
                     }
                 }
             }
