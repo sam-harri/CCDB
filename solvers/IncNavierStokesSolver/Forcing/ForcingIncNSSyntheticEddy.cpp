@@ -608,6 +608,57 @@ void ForcingIncNSSyntheticEddy::UpdateEddiesPositions()
 }
 
 /**
+ * @brief Remove eddy from forcing term
+ * 
+ * @param pFields  Pointer to fields.
+ */
+void ForcingIncNSSyntheticEddy::RemoveEddiesFromForcing(
+    const Array<OneD, MultiRegions::ExpListSharedPtr> &pFields)
+{
+        // Total number of quadrature points
+        int nqTot = pFields[0]->GetTotPoints();
+        // Number of Variables
+        int nVars = pFields.size();
+
+        for (auto &n : m_eddiesIDForcing)
+        {
+            for (size_t j = 0; j < nVars; ++j)
+            {
+                for (size_t i = 0; i < nqTot; ++i)
+                {
+                    m_Forcing[j][i] -= m_ForcingEddy[n][j][i];
+                }
+            }
+        }
+}
+
+/**
+ * @brief Initialise Forcing term for each eddy.
+ */
+void ForcingIncNSSyntheticEddy::InitialiseForcingEddy(
+    const Array<OneD, MultiRegions::ExpListSharedPtr> &pFields)
+{
+    // Total number of quadrature points
+    int nqTot = pFields[0]->GetTotPoints();
+    // Number of Variables
+    int nVars = pFields.size();
+    m_ForcingEddy = Array<OneD, Array<OneD, Array<OneD, NekDouble>>>(m_N);
+
+    for (size_t i = 0; i < m_N; ++i)
+    {
+        m_ForcingEddy[i] = Array<OneD, Array<OneD, NekDouble>>(nVars);
+        for (size_t j = 0; j < nVars; ++j)
+        {
+            m_ForcingEddy[i][j] = Array<OneD, NekDouble>(nqTot);
+            for (size_t k = 0; k < nqTot; ++k)
+            {
+                m_ForcingEddy[i][j][k] = 0.0;
+            }
+        }
+    }
+}
+
+/**
  * @brief Calculate distribution of eddies in the box.
  */
 void ForcingIncNSSyntheticEddy::ComputeInitialRandomLocationOfEddies()

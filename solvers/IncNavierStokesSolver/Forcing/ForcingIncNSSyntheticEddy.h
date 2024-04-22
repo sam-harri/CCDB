@@ -36,6 +36,7 @@
 #define NEKTAR_SOLVERUTILS_FORCINGINCNSSYNTHETICEDDY
 
 #include <SolverUtils/Forcing/Forcing.h>
+#include <boost/core/ignore_unused.hpp>
 #include <string>
 
 namespace Nektar
@@ -121,6 +122,13 @@ protected:
         const Array<OneD, MultiRegions::ExpListSharedPtr> &pFields);
     /// Compute the initial location of the eddies for the test case
     void ComputeInitialLocationTestCase();
+    /// Remove eddy from forcing term
+    void RemoveEddiesFromForcing(
+        const Array<OneD, MultiRegions::ExpListSharedPtr> &pFields);
+    /// Initialise forcing term for each eddy
+    void InitialiseForcingEddy(
+        const Array<OneD, MultiRegions::ExpListSharedPtr> &pFields);
+
  
     // Members
     // Expressions (functions) of the prescribed Reynolds stresses
@@ -164,6 +172,8 @@ protected:
     bool m_implicitForcing{false};
     /// Check for test case
     bool m_tCase; 
+    /// Forcing for each eddy 
+    Array<OneD, Array<OneD, Array<OneD, NekDouble>>> m_ForcingEddy;
 
 private:
     ForcingIncNSSyntheticEddy(
