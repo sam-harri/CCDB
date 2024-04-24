@@ -230,7 +230,7 @@ void ForcingIncNSSyntheticEddy::v_InitObject(
     }
 
     // Seed to generate random positions for the eddies
-    srand(time(0));
+    srand(time(nullptr));
 
     // Initialise member from the base class
     m_Forcing = Array<OneD, Array<OneD, NekDouble>>(pFields.size());
