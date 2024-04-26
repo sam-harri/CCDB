@@ -50,6 +50,7 @@ v5.6.0
 
 **IncNavierStokesSolver**
 - Matrix-Free LinearADR operator for VCSImplicit and others (!1627)
+- Make substepping normal velocity evaluation more efficient (!1795)
 
 **FieldConvert**
 - Add range function as an option in Xml Input, align python usage and start depracation of -r option (!1791) 
