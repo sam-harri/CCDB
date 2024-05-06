@@ -230,6 +230,8 @@ v5.4.0
 - Remove useless ReadExpressions and SubstituteExpressions function in sessionReader (!1608)
 - Corrected workspace size in triangle BwdTrans (!1610)
 - Reactivate Reactivate Movement_fixed_3D_stacked_cylinders_curved_hdf5_par test except on ARM MacOS (!1536)
+- Updated the PETSc version to v3.19.3 for THIRDPARTY_USE_PETSC, enabled local PETSc version usage (!1618)
+
 - Rename communicator in LinearAlgebra (!1612)
 - Add IProductWRTDerivBase operator for 3DH1D problems (!1483)
 - Full support of mixed-order elements in DG (!1606)
