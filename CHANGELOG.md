@@ -47,7 +47,7 @@ v5.6.0
 - Add feature for r-adaption on user-defined CAD curves (!1349)
 - Add unit testing infrustructure and initial example (!1753)
 - Added a custom cmake cache file to load defaults for building only NekMesh without the solvers (!1641)
-
+- Extend peralign module to all types of meshes (!1702)
 
 **IncNavierStokesSolver**
 - Matrix-Free LinearADR operator for VCSImplicit and others (!1627)

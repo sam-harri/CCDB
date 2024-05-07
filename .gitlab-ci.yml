@@ -154,7 +154,7 @@ include:
     - apt-get update && apt-get install -y clang-format-$CL_F_VER git-core
   script:
     - cd "$CI_PROJECT_DIR"
-    - find $TARGETS -iname "*.cpp" -o -iname "*.h" -o -iname "*.hpp" | 
+    - find $TARGETS -iname "*.cpp" -o -iname "*.cpp.in" -o -iname "*.h" -o -iname "*.hpp" |
       xargs clang-format-$CL_F_VER --dry-run -Werror
   allow_failure: true
   timeout: 15m
