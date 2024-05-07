@@ -16,6 +16,7 @@ v5.6.0
 - Use FwdTrans in UnsteadySystem when using Parareal (!1785)
 - Automate deployment of README.md to dockerhub (!1786)
 - Fix memory leak with Block preconditioner for time-updated matrices (!1737)
+- Fix compilation issue with OpenCASCADE 7.8.0 (!1799)
 
 **CompressibleFlowSolver**
 - Complete second Frechet derivative implementation (!1761)
