@@ -39,9 +39,7 @@
 
 using namespace std;
 
-namespace Nektar
-{
-namespace SolverUtils
+namespace Nektar::SolverUtils
 {
 
 std::string ForcingIncNSSyntheticEddy::className =
@@ -998,5 +996,4 @@ void ForcingIncNSSyntheticEddy::ComputeInitialLocationTestCase()
     m_eddyPos[2][2] = m_rc[2];
 }
 
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils

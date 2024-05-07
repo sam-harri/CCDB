@@ -39,10 +39,9 @@
 #include <boost/core/ignore_unused.hpp>
 #include <string>
 
-namespace Nektar
+namespace Nektar::SolverUtils
 {
-namespace SolverUtils
-{
+
 class ForcingIncNSSyntheticEddy : public SolverUtils::Forcing
 {
 public:
@@ -181,7 +180,6 @@ private:
     ~ForcingIncNSSyntheticEddy(void) override{};
 };
 
-} // namespace SolverUtils
-} // namespace Nektar
+} // namespace Nektar::SolverUtils
 
 #endif
