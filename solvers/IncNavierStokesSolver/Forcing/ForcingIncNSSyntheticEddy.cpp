@@ -130,7 +130,7 @@ void ForcingIncNSSyntheticEddy::v_InitObject(
     std::vector<std::string> lenScalesVars = {"l00", "l10", "l20", "l01", "l11",
                                               "l21", "l02", "l12", "l22"};
     LibUtilities::EquationSharedPtr clsAux;
-    m_l = {m_spacedim * m_spacedim, 0.0};
+    m_l = Array<OneD, NekDouble>(m_spacedim * m_spacedim, 0.0);
 
     for (size_t i = 0; i < lenScalesVars.size(); ++i)
     {
@@ -150,9 +150,9 @@ void ForcingIncNSSyntheticEddy::v_InitObject(
     }
 
     // Read box of eddies parameters
-    m_rc = {m_spacedim, 0.0};
+    m_rc = Array<OneD, NekDouble>(m_spacedim, 0.0);
     // Array<OneD, NekDouble> m_lyz(m_spacedim - 1, 0.0);
-    m_lyz       = {m_spacedim - 1, 0.0};
+    m_lyz       = Array<OneD, NekDouble>(m_spacedim - 1, 0.0);
     elmtInfTurb = pForce->FirstChildElement("BoxOfEddies");
     ASSERTL0(elmtInfTurb,
              "Unable to find BoxOfEddies tag. in SyntheticTurbulence forcing");
@@ -785,7 +785,7 @@ void ForcingIncNSSyntheticEddy::SetBoxOfEddiesMask(
     // Total number of quadrature points of each element
     int nqe;
     // Mask
-    m_mask = {nqTot, 0}; // 0 for ouside, 1 for inside
+    m_mask = Array<OneD, int>(nqTot, 0); // 0 for ouside, 1 for inside
     // Counter
     int count = 0;
 
@@ -842,7 +842,7 @@ bool ForcingIncNSSyntheticEddy::InsideBoxOfEddies(NekDouble coord0,
  */
 void ForcingIncNSSyntheticEddy::ComputeRefLenghts()
 {
-    m_lref    = {m_spacedim, 0.0};
+    m_lref    = Array<OneD, NekDouble>(m_spacedim, 0.0);
     m_lref[0] = m_l[0];
     m_lref[1] = m_l[1];
     m_lref[2] = m_l[2];
@@ -868,7 +868,7 @@ void ForcingIncNSSyntheticEddy::ComputeRefLenghts()
 void ForcingIncNSSyntheticEddy::ComputeXiMax()
 {
     NekDouble value;
-    m_xiMax = {m_spacedim * m_spacedim, 0.0};
+    m_xiMax = Array<OneD, NekDouble>(m_spacedim * m_spacedim, 0.0);
 
     for (size_t i = 0; i < m_spacedim; i++)
     {
