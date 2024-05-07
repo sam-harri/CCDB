@@ -14,6 +14,9 @@ ADD_NEKTAR_TEST(Nektar++/extrude)
 ADD_NEKTAR_TEST(Nektar++/jac_list_tet_face)
 ADD_NEKTAR_TEST(Nektar++/linearise_invalid_quad)
 ADD_NEKTAR_TEST(Nektar++/linearise_invalid_tet)
+IF (NOT WIN32)
+    ADD_NEKTAR_TEST(Nektar++/peralign_double_periodic_hybrid)
+ENDIF ()
 
 # MeshGen test
 IF(NEKTAR_USE_MESHGEN)
@@ -35,7 +38,6 @@ IF(NEKTAR_USE_MESHGEN)
     IF(NEKTAR_USE_CCM)
         ADD_NEKTAR_TEST(MeshGen/StarCCM/projectcad_ahmed)
         ADD_NEKTAR_TEST(MeshGen/StarCCM/projectcad_pyramids)
-
     ENDIF()
 ENDIF()
 
