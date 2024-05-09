@@ -228,6 +228,7 @@ protected:
     ExpListSharedPtr &v_GetTrace() override;
 
     AssemblyMapDGSharedPtr &v_GetTraceMap(void) override;
+    InterfaceMapDGSharedPtr &v_GetInterfaceMap(void) override;
 
     const LocTraceToTraceMapSharedPtr &v_GetLocTraceToTraceMap(
         void) const override;

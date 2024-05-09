@@ -91,6 +91,7 @@ protected:
     Array<OneD, Array<OneD, NekDouble>> m_gridVelocityTrace;
     std::vector<ALEBaseShPtr> m_ALEs;
     bool m_ALESolver          = false;
+    bool m_ImplicitALESolver  = false;
     NekDouble m_prevStageTime = 0.0;
     int m_spaceDim;
 };

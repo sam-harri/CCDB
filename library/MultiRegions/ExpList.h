@@ -59,6 +59,7 @@ class ExpList;
 class GlobalLinSys;
 class AssemblyMapDG;
 class AssemblyMapCG;
+class InterfaceMapDG;
 class GlobalLinSysKey;
 class GlobalMatrix;
 
@@ -780,6 +781,7 @@ public:
      */
     inline std::shared_ptr<ExpList> &GetTrace();
     inline std::shared_ptr<AssemblyMapDG> &GetTraceMap(void);
+    inline std::shared_ptr<InterfaceMapDG> &GetInterfaceMap(void);
     inline const Array<OneD, const int> &GetTraceBndMap(void);
     inline void GetNormals(Array<OneD, Array<OneD, NekDouble>> &normals);
     /// Get the length of elements in boundary normal direction
@@ -1176,6 +1178,7 @@ protected:
                           Array<OneD, NekDouble> &Upwind);
     virtual std::shared_ptr<ExpList> &v_GetTrace();
     virtual std::shared_ptr<AssemblyMapDG> &v_GetTraceMap();
+    virtual std::shared_ptr<InterfaceMapDG> &v_GetInterfaceMap();
     virtual const Array<OneD, const int> &v_GetTraceBndMap();
     virtual const std::shared_ptr<LocTraceToTraceMap> &v_GetLocTraceToTraceMap(
         void) const;
@@ -2154,6 +2157,10 @@ inline std::shared_ptr<ExpList> &ExpList::GetTrace()
 inline std::shared_ptr<AssemblyMapDG> &ExpList::GetTraceMap()
 {
     return v_GetTraceMap();
+}
+inline std::shared_ptr<InterfaceMapDG> &ExpList::GetInterfaceMap()
+{
+    return v_GetInterfaceMap();
 }
 inline const Array<OneD, const int> &ExpList::GetTraceBndMap()
 {
