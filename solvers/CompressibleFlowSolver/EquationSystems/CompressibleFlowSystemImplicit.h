@@ -101,6 +101,10 @@ protected:
 
     void v_PrintSummaryStatistics(const NekDouble intTime) override;
 
+    void v_ALEInitObject(
+        int spaceDim,
+        Array<OneD, MultiRegions::ExpListSharedPtr> &fields) override;
+
     void NonlinSysEvaluatorCoeff1D(const Array<OneD, const NekDouble> &inarray,
                                    Array<OneD, NekDouble> &out,
                                    const bool &flag);

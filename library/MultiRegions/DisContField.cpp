@@ -2818,6 +2818,11 @@ AssemblyMapDGSharedPtr &DisContField::v_GetTraceMap(void)
     return m_traceMap;
 }
 
+InterfaceMapDGSharedPtr &DisContField::v_GetInterfaceMap(void)
+{
+    return m_interfaceMap;
+}
+
 const LocTraceToTraceMapSharedPtr &DisContField::v_GetLocTraceToTraceMap(
     void) const
 {
