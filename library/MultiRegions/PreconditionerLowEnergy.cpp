@@ -80,8 +80,6 @@ void PreconditionerLowEnergy::v_InitObject()
     std::shared_ptr<MultiRegions::ExpList> expList =
         ((m_linsys.lock())->GetLocMat()).lock();
 
-    m_comm = expList->GetComm();
-
     LocalRegions::ExpansionSharedPtr locExpansion;
 
     locExpansion = expList->GetExp(0);
@@ -120,6 +118,8 @@ void PreconditionerLowEnergy::v_BuildPreconditioner()
         ((m_linsys.lock())->GetLocMat()).lock();
     LocalRegions::Expansion3DSharedPtr locExpansion;
     GlobalLinSysKey linSysKey = (m_linsys.lock())->GetKey();
+
+    LibUtilities::CommSharedPtr vComm = expList->GetComm()->GetSpaceComm();
 
     int i, j, k;
     int nVerts, nEdges, nFaces;
@@ -287,7 +287,7 @@ void PreconditionerLowEnergy::v_BuildPreconditioner()
 
     // For parallel runs need to check have minimum of edges and faces over
     // partition boundaries
-    if (m_comm->GetSize() > 1)
+    if (vComm->GetSize() > 1)
     {
         int EdgeSizeLen = EdgeSize.size();
         int FaceSizeLen = FaceSize.size();
@@ -306,7 +306,7 @@ void PreconditionerLowEnergy::v_BuildPreconditioner()
         }
         maxid++;
 
-        m_comm->AllReduce(maxid, ReduceMax);
+        vComm->AllReduce(maxid, ReduceMax);
 
         for (it = FaceSize.begin(); it != FaceSize.end(); ++it, ++cnt)
         {
@@ -315,7 +315,7 @@ void PreconditionerLowEnergy::v_BuildPreconditioner()
         }
 
         // Exchange vertex data over different processes
-        Gs::gs_data *tmp = Gs::Init(FacetMap, m_comm, verbose);
+        Gs::gs_data *tmp = Gs::Init(FacetMap, vComm, verbose);
         Gs::Gather(FacetLen, Gs::gs_min, tmp);
 
         cnt = 0;
@@ -486,8 +486,8 @@ void PreconditionerLowEnergy::v_BuildPreconditioner()
         }
     }
 
-    m_comm->AllReduce(maxEdgeDof, ReduceMax);
-    m_comm->AllReduce(maxFaceDof, ReduceMax);
+    vComm->AllReduce(maxEdgeDof, ReduceMax);
+    vComm->AllReduce(maxFaceDof, ReduceMax);
 
     // Allocate arrays for block to universal map (number of expansions * p^2)
     Array<OneD, long> BlockToUniversalMap(ntotalentries, -1);
@@ -517,7 +517,7 @@ void PreconditionerLowEnergy::v_BuildPreconditioner()
     }
     uniEdgeOffset++;
 
-    m_comm->AllReduce(uniEdgeOffset, ReduceMax);
+    vComm->AllReduce(uniEdgeOffset, ReduceMax);
     uniEdgeOffset = uniEdgeOffset * maxEdgeDof * maxEdgeDof;
 
     for (n = 0; n < n_exp; ++n)
@@ -839,7 +839,7 @@ void PreconditionerLowEnergy::v_BuildPreconditioner()
     }
 
     // Exchange vertex data over different processes
-    Gs::gs_data *tmp = Gs::Init(VertBlockToUniversalMap, m_comm, verbose);
+    Gs::gs_data *tmp = Gs::Init(VertBlockToUniversalMap, vComm, verbose);
     Gs::Gather(vertArray, Gs::gs_add, tmp);
 
     Array<OneD, NekDouble> GlobalBlock(ntotalentries, 0.0);
@@ -851,7 +851,7 @@ void PreconditionerLowEnergy::v_BuildPreconditioner()
     }
 
     // Exchange edge & face data over different processes
-    Gs::gs_data *tmp1 = Gs::Init(BlockToUniversalMap, m_comm, verbose);
+    Gs::gs_data *tmp1 = Gs::Init(BlockToUniversalMap, vComm, verbose);
     Gs::Gather(GlobalBlock, Gs::gs_add, tmp1);
 
     // Populate vertex block
@@ -1626,6 +1626,8 @@ void PreconditionerLowEnergy::SetUpReferenceElements(
         ((m_linsys.lock())->GetLocMat()).lock();
     GlobalLinSysKey linSysKey = (m_linsys.lock())->GetKey();
 
+    LibUtilities::CommSharedPtr vComm = expList->GetComm()->GetSpaceComm();
+
     LocalRegions::ExpansionSharedPtr locExp;
 
     // face maps for pyramid and hybrid meshes - not need to return.
@@ -1646,8 +1648,8 @@ void PreconditionerLowEnergy::SetUpReferenceElements(
         Shapes[locExp->DetShapeType()] = 1;
     }
 
-    m_comm->AllReduce(nummodesmax, ReduceMax);
-    m_comm->AllReduce(Shapes, ReduceMax);
+    vComm->AllReduce(nummodesmax, ReduceMax);
+    vComm->AllReduce(Shapes, ReduceMax);
 
     if (Shapes[ePyramid] || Shapes[ePrism]) // if Pyramids or Prisms used then
                                             // need Tet and Hex expansion

@@ -64,7 +64,8 @@ int main(int argc, char *argv[])
         drv->Execute();
 
         // Print out timings
-        LibUtilities::Timer::PrintElapsedRegions(session->GetComm());
+        LibUtilities::Timer::PrintElapsedRegions(
+            session->GetComm()->GetSpaceComm());
         // Finalise session
         session->Finalise();
     }

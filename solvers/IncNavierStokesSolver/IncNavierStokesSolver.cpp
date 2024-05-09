@@ -72,8 +72,8 @@ int main(int argc, char *argv[])
         session->LoadParameter("IO_Timer_Level", iolevel, 0);
 
         // Print out timings
-        LibUtilities::Timer::PrintElapsedRegions(session->GetComm(), std::cout,
-                                                 iolevel);
+        LibUtilities::Timer::PrintElapsedRegions(
+            session->GetComm()->GetSpaceComm(), std::cout, iolevel);
         // Finalise communications
         session->Finalise();
     }
