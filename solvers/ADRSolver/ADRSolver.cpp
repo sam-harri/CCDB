@@ -79,8 +79,8 @@ int main(int argc, char *argv[])
         {
             int iolevel;
             session->LoadParameter("IO_Timer_Level", iolevel, 1);
-            LibUtilities::Timer::PrintElapsedRegions(session->GetComm(),
-                                                     std::cout, iolevel);
+            LibUtilities::Timer::PrintElapsedRegions(
+                session->GetComm()->GetSpaceComm(), std::cout, iolevel);
         }
 
         LIKWID_MARKER_CLOSE;

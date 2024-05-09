@@ -488,8 +488,9 @@ void PreconditionerBlock::BlockPreconditionerCG()
 
     // Perform a reduction to find maximum vertex, edge and face
     // geometry IDs.
-    m_comm = expList->GetSession()->GetComm()->GetRowComm();
-    m_comm->AllReduce(maxVertIds, LibUtilities::ReduceMax);
+    LibUtilities::CommSharedPtr vComm =
+        expList->GetSession()->GetComm()->GetRowComm();
+    vComm->AllReduce(maxVertIds, LibUtilities::ReduceMax);
 
     // Concatenate all matrices into contiguous storage and figure out
     // universal ID numbering.
@@ -539,7 +540,7 @@ void PreconditionerBlock::BlockPreconditionerCG()
 
     // Initialise Gs mapping
     m_gs_mapping =
-        Gs::Init(globalToUniversalMap, m_comm,
+        Gs::Init(globalToUniversalMap, vComm,
                  expList->GetSession()->DefinesCmdLineArgument("verbose"));
 
     // Use GSlib to assemble data between processors.
@@ -703,8 +704,9 @@ void PreconditionerBlock::BlockPreconditionerHDG()
     }
 
     // Find maximum trace size.
-    m_comm = expList->GetSession()->GetComm()->GetRowComm();
-    m_comm->AllReduce(maxTraceSize, LibUtilities::ReduceMax);
+    LibUtilities::CommSharedPtr vComm =
+        expList->GetSession()->GetComm()->GetRowComm();
+    vComm->AllReduce(maxTraceSize, LibUtilities::ReduceMax);
 
     // Zero matrix storage.
     Array<OneD, NekDouble> tmpStore(cnt, 0.0);
@@ -771,7 +773,7 @@ void PreconditionerBlock::BlockPreconditionerHDG()
 
     // Assemble matrices across partitions.
     Gs::gs_data *gsh =
-        Gs::Init(uniIds, m_comm,
+        Gs::Init(uniIds, vComm,
                  expList->GetSession()->DefinesCmdLineArgument("verbose"));
     Gs::Gather(tmpStore, Gs::gs_add, gsh);
 

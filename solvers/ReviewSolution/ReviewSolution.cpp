@@ -77,7 +77,8 @@ int main(int argc, char *argv[])
         // Print out timings if verbose
         if (session->DefinesCmdLineArgument("verbose"))
         {
-            LibUtilities::Timer::PrintElapsedRegions(session->GetComm());
+            LibUtilities::Timer::PrintElapsedRegions(
+                session->GetComm()->GetSpaceComm());
         }
 
         LIKWID_MARKER_CLOSE;
