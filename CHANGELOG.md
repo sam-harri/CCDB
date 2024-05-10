@@ -20,6 +20,7 @@ v5.6.0
 - Fix compilation issue with OpenCASCADE 7.8.0 (!1799)
 - Fix MPI communicator for Parallel-in-Time (!1801)
 - Fix warnings issued by MSVC compiler in LibUtilities and StdRegions (!1740)
+- Fix Parareal convergence monitoring (!1802)
 
 **CompressibleFlowSolver**
 - Complete second Frechet derivative implementation (!1761)
