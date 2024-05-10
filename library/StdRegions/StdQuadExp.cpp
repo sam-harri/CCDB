@@ -1194,7 +1194,7 @@ void StdQuadExp::v_GetTraceInteriorToElementMap(
 
 DNekMatSharedPtr StdQuadExp::v_GenMatrix(const StdMatrixKey &mkey)
 {
-    int i;
+    int i, j;
     int order0       = GetBasisNumModes(0);
     int order1       = GetBasisNumModes(1);
     MatrixType mtype = mkey.GetMatrixType();
@@ -1229,9 +1229,9 @@ DNekMatSharedPtr StdQuadExp::v_GenMatrix(const StdMatrixKey &mkey)
             Mat     = MemoryManager<DNekMat>::AllocateSharedPtr(neq, nq0 * nq1);
             int cnt = 0;
 
-            for (int i = 0; i < nq; ++i)
+            for (i = 0; i < nq; ++i)
             {
-                for (int j = 0; j < nq; ++j, ++cnt)
+                for (j = 0; j < nq; ++j, ++cnt)
                 {
                     coords[cnt]    = Array<OneD, NekDouble>(2);
                     coords[cnt][0] = -1.0 + 2 * j / (NekDouble)(nq - 1);
@@ -1239,7 +1239,7 @@ DNekMatSharedPtr StdQuadExp::v_GenMatrix(const StdMatrixKey &mkey)
                 }
             }
 
-            for (int i = 0; i < neq; ++i)
+            for (i = 0; i < neq; ++i)
             {
                 LocCoordToLocCollapsed(coords[i], coll);
 
@@ -1247,7 +1247,7 @@ DNekMatSharedPtr StdQuadExp::v_GenMatrix(const StdMatrixKey &mkey)
                 I[1] = m_base[1]->GetI(coll + 1);
 
                 // interpolate first coordinate direction
-                for (int j = 0; j < nq1; ++j)
+                for (j = 0; j < nq1; ++j)
                 {
                     NekDouble fac = (I[1]->GetPtr())[j];
                     Vmath::Smul(nq0, fac, I[0]->GetPtr(), 1, tmp, 1);

@@ -19,6 +19,7 @@ v5.6.0
 - Support for implicit sliding meshes (!1787)
 - Fix compilation issue with OpenCASCADE 7.8.0 (!1799)
 - Fix MPI communicator for Parallel-in-Time (!1801)
+- Fix warnings issued by MSVC compiler in LibUtilities and StdRegions (!1740)
 
 **CompressibleFlowSolver**
 - Complete second Frechet derivative implementation (!1761)

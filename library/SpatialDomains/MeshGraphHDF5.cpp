@@ -1319,7 +1319,7 @@ CompositeDescriptor MeshGraphHDF5::CreateCompositeDescriptor(
         vector<unsigned int> seqVector;
         ParseUtils::GenerateSeqVector(indxStr, seqVector);
 
-        LibUtilities::ShapeType shapeType;
+        LibUtilities::ShapeType shapeType = eNoShapeType;
 
         switch (type)
         {
@@ -1353,6 +1353,8 @@ CompositeDescriptor MeshGraphHDF5::CreateCompositeDescriptor(
                 shapeType = LibUtilities::eHexahedron;
                 break;
         }
+
+        ASSERTL0(shapeType != eNoShapeType, "Invalid shape.");
 
         std::vector<int> filteredVector;
         for (auto &compElmt : seqVector)
