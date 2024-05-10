@@ -285,10 +285,10 @@ DNekMatSharedPtr StdExpansion::CreateGeneralMatrix(const StdMatrixKey &mkey)
             DNekMatSharedPtr MatBwdTrans         = GetStdMatrix(matkey);
             Array<OneD, NekDouble> BwdTrans_data = MatBwdTrans->GetPtr();
 
-            for (int i = 0; i < m_ncoeffs; ++i)
+            for (i = 0; i < m_ncoeffs; ++i)
             {
                 Array<OneD, NekDouble> tmpinn = BwdTrans_data + nq * i;
-                Array<OneD, NekDouble> tmpout = Bwd_data + i;
+                tmpout                        = Bwd_data + i;
 
                 Vmath::Vcopy(nq, tmpinn, 1, tmpout, m_ncoeffs);
             }
@@ -303,7 +303,7 @@ DNekMatSharedPtr StdExpansion::CreateGeneralMatrix(const StdMatrixKey &mkey)
             returnval =
                 MemoryManager<DNekMat>::AllocateSharedPtr(nq, m_ncoeffs);
 
-            for (int i = 0; i < m_ncoeffs; ++i)
+            for (i = 0; i < m_ncoeffs; ++i)
             {
                 Vmath::Zero(m_ncoeffs, tmpin, 1);
                 tmpin[i] = 1.0;
@@ -428,7 +428,7 @@ DNekMatSharedPtr StdExpansion::CreateGeneralMatrix(const StdMatrixKey &mkey)
             // check to see if equispaced basis
             int nummodes    = m_base[0]->GetNumModes();
             bool equispaced = true;
-            for (int i = 1; i < m_base.size(); ++i)
+            for (i = 1; i < m_base.size(); ++i)
             {
                 if (m_base[i]->GetNumModes() != nummodes)
                 {
@@ -446,7 +446,7 @@ DNekMatSharedPtr StdExpansion::CreateGeneralMatrix(const StdMatrixKey &mkey)
 
             returnval =
                 MemoryManager<DNekMat>::AllocateSharedPtr(m_ncoeffs, m_ncoeffs);
-            for (int i = 0; i < m_ncoeffs; ++i)
+            for (i = 0; i < m_ncoeffs; ++i)
             {
                 // Get mode at quadrature points
                 FillMode(i, qmode);

@@ -976,7 +976,6 @@ public:
                             return std::make_pair(true,
                                                   left.second < right.second);
                         }
-                        return std::make_pair(false, 0);
                     case '>':
                         if (*(valueStr.end() - 1) == '=')
                         {
@@ -988,7 +987,6 @@ public:
                             return std::make_pair(true,
                                                   left.second > right.second);
                         }
-                        return std::make_pair(false, 0);
                     default:
                         ASSERTL0(false,
                                  "Invalid operator encountered: " + valueStr);
