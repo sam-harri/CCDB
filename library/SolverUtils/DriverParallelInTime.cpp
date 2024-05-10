@@ -442,6 +442,7 @@ void DriverParallelInTime::CopyToPhysField(
     for (size_t i = 0; i < m_nVar; ++i)
     {
         m_EqSys[timeLevel]->CopyToPhysField(i, in[i]);
+        m_EqSys[timeLevel]->UpdateFields()[i]->SetPhysState(true);
     }
 }
 
