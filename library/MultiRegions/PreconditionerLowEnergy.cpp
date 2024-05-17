@@ -317,6 +317,7 @@ void PreconditionerLowEnergy::v_BuildPreconditioner()
         // Exchange vertex data over different processes
         Gs::gs_data *tmp = Gs::Init(FacetMap, vComm, verbose);
         Gs::Gather(FacetLen, Gs::gs_min, tmp);
+        Gs::Free(tmp);
 
         cnt = 0;
         for (it = EdgeSize.begin(); it != EdgeSize.end(); ++it, ++cnt)
@@ -841,6 +842,7 @@ void PreconditionerLowEnergy::v_BuildPreconditioner()
     // Exchange vertex data over different processes
     Gs::gs_data *tmp = Gs::Init(VertBlockToUniversalMap, vComm, verbose);
     Gs::Gather(vertArray, Gs::gs_add, tmp);
+    Gs::Free(tmp);
 
     Array<OneD, NekDouble> GlobalBlock(ntotalentries, 0.0);
     if (ntotalentries)
@@ -853,6 +855,7 @@ void PreconditionerLowEnergy::v_BuildPreconditioner()
     // Exchange edge & face data over different processes
     Gs::gs_data *tmp1 = Gs::Init(BlockToUniversalMap, vComm, verbose);
     Gs::Gather(GlobalBlock, Gs::gs_add, tmp1);
+    Gs::Free(tmp1);
 
     // Populate vertex block
     for (int i = 0; i < nNonDirVerts; ++i)
@@ -1706,6 +1709,7 @@ void PreconditionerLowEnergy::SetUpReferenceElements(
         LocalRegions::MatrixKey HexR(PreconR, eHexahedron, *HexExp,
                                      linSysKey.GetConstFactors());
         maxRmat[eHexahedron] = HexExp->GetLocMatrix(HexR);
+        HexExp->DropLocMatrix(HexR); // Need to delete reference from manager
     }
 
     if (Shapes[eTetrahedron])
@@ -1736,6 +1740,7 @@ void PreconditionerLowEnergy::SetUpReferenceElements(
         LocalRegions::MatrixKey TetR(PreconR, eTetrahedron, *TetExp,
                                      linSysKey.GetConstFactors());
         maxRmat[eTetrahedron] = TetExp->GetLocMatrix(TetR);
+        TetExp->DropLocMatrix(TetR); // Need to delete reference from manager
 
         if ((Shapes[ePyramid]) || (Shapes[eHexahedron]))
         {
@@ -1814,6 +1819,8 @@ void PreconditionerLowEnergy::SetUpReferenceElements(
             LocalRegions::MatrixKey PrismR(PreconR, ePrism, *PrismExp,
                                            linSysKey.GetConstFactors());
             maxRmat[ePrism] = PrismExp->GetLocMatrix(PrismR);
+            PrismExp->DropLocMatrix(
+                PrismR); // Need to delete reference from manager
 
             if (Shapes[eTetrahedron]) // reset triangular faces from Tet
             {

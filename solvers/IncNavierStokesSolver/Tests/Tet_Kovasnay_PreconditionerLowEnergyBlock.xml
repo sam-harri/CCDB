@@ -35,7 +35,7 @@
         <GLOBALSYSSOLNINFO>
             <V VAR="u,v,w">
                 <I PROPERTY="GlobalSysSoln"         VALUE="IterativeStaticCond"/>
-                <I PROPERTY="Preconditioner"        VALUE="Block"/>
+                <I PROPERTY="Preconditioner"        VALUE="LowEnergyBlock"/>
                 <I PROPERTY="AbsoluteTolerance"     VALUE="True"/>
             </V>
             <V VAR="p">

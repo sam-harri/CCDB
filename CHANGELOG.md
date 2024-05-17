@@ -21,6 +21,7 @@ v5.6.0
 - Fix MPI communicator for Parallel-in-Time (!1801)
 - Fix warnings issued by MSVC compiler in LibUtilities and StdRegions (!1740)
 - Fix Parareal convergence monitoring (!1802)
+- Fix memory-leak with LowEnergyBlock preconditioner for time-updated matrices (!1627)
 
 **CompressibleFlowSolver**
 - Complete second Frechet derivative implementation (!1761)
