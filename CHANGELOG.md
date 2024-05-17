@@ -1,6 +1,11 @@
 Changelog
 =========
 
+v5.7.0
+------
+**IncNavierStokesSolver**
+- Fix initial and boundary conditions in the moving reference frame (!1692)
+
 v5.6.0
 ------
 **Library**

@@ -424,19 +424,14 @@ protected:
     /// Map to identify relevant solver info to dump in output fields
     LibUtilities::FieldMetaDataMap m_fieldMetaDataMap;
 
-    /// Moving frame of reference velocities
-    /// (u, v, w, omega_x, omega_y, omega_z, a_x, a_y, a_z, domega_x, domega_y,
-    /// domega_z)
-    Array<OneD, NekDouble> m_movingFrameVelsxyz;
-
-    /// Moving frame of reference angles with respect to the
-    // stationary inertial frame
-    // (x, y, z, angle_x, angle_y, angle_y, pivot_x, pivot_y, pivot_z)
+    /// Moving reference frame status in the inertial frame
+    /// X, Y, Z, Theta_x, Theta_y, Theta_z,
+    /// U, V, W, Omega_x, Omega_y, Omega_z,
+    /// A_x, A_y, A_z, DOmega_x, DOmega_y, DOmega_z,
+    /// pivot_x, pivot_y, pivot_z
     Array<OneD, NekDouble> m_movingFrameData;
-
-    /// Projection matrix for transformation between inertial and moving
-    // frame of reference
-    boost::numeric::ublas::matrix<NekDouble> m_movingFrameProjMat;
+    /// variable name in m_movingFrameData
+    std::vector<std::string> m_strFrameData;
 
     /// Number of Quadrature points used to work out the error
     int m_NumQuadPointsError;

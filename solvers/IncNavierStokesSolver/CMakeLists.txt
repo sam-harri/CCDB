@@ -36,6 +36,12 @@ IF( NEKTAR_SOLVER_INCNAVIERSTOKES )
         ./Filters/FilterAeroForcesSPM.cpp
         ./Forcing/ForcingMovingBody.cpp
         ./Forcing/ForcingStabilityCoupledLNS.cpp
+        ./BoundaryConditions/IncBoundaryConditions.cpp
+        ./BoundaryConditions/IncBaseCondition.cpp
+        ./BoundaryConditions/MovingFrameFar.cpp
+        ./BoundaryConditions/StaticWall.cpp
+        ./BoundaryConditions/TransMovingWall.cpp
+        ./BoundaryConditions/MovingFrameWall.cpp
         )
 
     IF(NEKTAR_BUILD_SOLVER_LIBS)
@@ -65,7 +71,13 @@ IF( NEKTAR_SOLVER_INCNAVIERSTOKES )
             Filters/FilterMovingBody.h
             Filters/FilterReynoldsStresses.h
             Forcing/ForcingMovingBody.h
-            Forcing/ForcingStabilityCoupledLNS.h)
+            Forcing/ForcingStabilityCoupledLNS.h
+            BoundaryConditions/IncBoundaryConditions.h
+            BoundaryConditions/IncBaseCondition.h
+            BoundaryConditions/MovingFrameFar.h
+            BoundaryConditions/StaticWall.h
+            BoundaryConditions/TransMovingWall.h
+            BoundaryConditions/MovingFrameWall.h)
         # Create separate library. No need to pass source files, as the executable's
         # LIBRARY_SOURCES objects will be reused
         ADD_SOLVER_LIBRARY(IncNavierStokesSolver HEADERS
@@ -109,6 +121,7 @@ IF( NEKTAR_SOLVER_INCNAVIERSTOKES )
     ADD_NEKTAR_TEST(channelFlow_Heating_FlowRate)
     ADD_NEKTAR_TEST(channelFlow_nonuniform_Heating)
     ADD_NEKTAR_TEST(Couette_3DH2D_MVM)
+    ADD_NEKTAR_TEST(FreeFallCyl)
     ADD_NEKTAR_TEST(Hex_channel_m3)
     ADD_NEKTAR_TEST(Hex_channel_varP)
     ADD_NEKTAR_TEST(Pyr_channel_m3)
@@ -202,6 +215,7 @@ IF( NEKTAR_SOLVER_INCNAVIERSTOKES )
     ADD_NEKTAR_TEST(CylFlow2DMov_SPM)
     ADD_NEKTAR_TEST(CylFlow3DH1D_SPM)
     ADD_NEKTAR_TEST(manufactured_3DH1D)
+    ADD_NEKTAR_TEST(PlungingAirfoil_2D)
 
     IF(NEKTAR_USE_SCOTCH)
         # This tests exhibits sensitivity to the choice of DirectStaticCond vs.
@@ -242,6 +256,8 @@ IF( NEKTAR_SOLVER_INCNAVIERSTOKES )
         ADD_NEKTAR_TEST(ChanFlow_3DH1D_Parallel_mode1)
         ADD_NEKTAR_TEST(ChanFlow_3DH1D_Parallel_mode2)
         ADD_NEKTAR_TEST(ChanFlow_m3_par)
+        ADD_NEKTAR_TEST(FlapAirfoil_3DH1D_par LENGTHY)
+        ADD_NEKTAR_TEST(PlungingAirfoil_3DH1D_parBCs LENGTHY)
         ADD_NEKTAR_TEST(ChanFlow_m8_BodyForce_par LENGTHY)
 
         IF(NOT WIN32)
