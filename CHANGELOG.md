@@ -8,6 +8,7 @@ v5.7.0
 
 **IncNavierStokesSolver**
 - Fix initial and boundary conditions in the moving reference frame (!1692)
+- Fix memory-leak for the Mixed_CG_Discontinuous projection when initializing the traceMep (!1806)
 
 **ShallowWaterSolver**
 - Implement implicit time-discritization (!1784)
