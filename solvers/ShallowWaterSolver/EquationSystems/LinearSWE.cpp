@@ -55,26 +55,16 @@ void LinearSWE::v_InitObject(bool DeclareFields)
 {
     ShallowWaterSystem::v_InitObject(DeclareFields);
 
-    if (m_explicitAdvection)
-    {
-        m_ode.DefineOdeRhs(&LinearSWE::DoOdeRhs, this);
-        m_ode.DefineProjection(&LinearSWE::DoOdeProjection, this);
-    }
-    else
-    {
-        ASSERTL0(false, "Implicit SWE not set up.");
-    }
-
     // Type of advection class to be used
     switch (m_projectionType)
     {
-            // Continuous field
+        // Continuous field
         case MultiRegions::eGalerkin:
         {
             //  Do nothing
             break;
         }
-            // Discontinuous field
+        // Discontinuous field
         case MultiRegions::eDiscontinuous:
         {
             std::string advName;
@@ -125,34 +115,16 @@ void LinearSWE::v_InitObject(bool DeclareFields)
             break;
         }
     }
+
+    m_ode.DefineOdeRhs(&LinearSWE::v_DoOdeRhs, this);
+    m_ode.DefineProjection(&LinearSWE::DoOdeProjection, this);
+    m_ode.DefineImplicitSolve(&LinearSWE::DoImplicitSolve, this);
 }
 
-void LinearSWE::v_GenerateSummary(SolverUtils::SummaryList &s)
-{
-    ShallowWaterSystem::v_GenerateSummary(s);
-    if (m_session->DefinesSolverInfo("UpwindType"))
-    {
-        std::string UpwindType;
-        UpwindType = m_session->GetSolverInfo("UpwindType");
-        if (UpwindType == "LinearAverage")
-        {
-            SolverUtils::AddSummaryItem(s, "Riemann Solver", "Linear Average");
-        }
-        if (UpwindType == "LinearHLL")
-        {
-            SolverUtils::AddSummaryItem(s, "Riemann Solver", "Linear HLL");
-        }
-    }
-    SolverUtils::AddSummaryItem(s, "Variables", "eta  should be in field[0]");
-    SolverUtils::AddSummaryItem(s, "", "u    should be in field[1]");
-    SolverUtils::AddSummaryItem(s, "", "v    should be in field[2]");
-}
-
-void LinearSWE::DoOdeRhs(
+void LinearSWE::v_DoOdeRhs(
     const Array<OneD, const Array<OneD, NekDouble>> &inarray,
     Array<OneD, Array<OneD, NekDouble>> &outarray, const NekDouble time)
 {
-    int i, j;
     int ndim       = m_spacedim;
     int nvariables = inarray.size();
     int nq         = GetTotPoints();
@@ -161,20 +133,17 @@ void LinearSWE::DoOdeRhs(
     {
         case MultiRegions::eDiscontinuous:
         {
-
             //-------------------------------------------------------
             // Compute the DG advection including the numerical flux
             // by using SolverUtils/Advection
             // Input and output in physical space
-            Array<OneD, Array<OneD, NekDouble>> advVel;
-
-            m_advection->Advect(nvariables, m_fields, advVel, inarray, outarray,
-                                time);
+            m_advection->Advect(nvariables, m_fields, NullNekDoubleArrayOfArray,
+                                inarray, outarray, time);
             //-------------------------------------------------------
 
             //-------------------------------------------------------
             // negate the outarray since moving terms to the rhs
-            for (i = 0; i < nvariables; ++i)
+            for (int i = 0; i < nvariables; ++i)
             {
                 Vmath::Neg(nq, outarray[i], 1);
             }
@@ -193,18 +162,16 @@ void LinearSWE::DoOdeRhs(
         }
         break;
         case MultiRegions::eGalerkin:
-        case MultiRegions::eMixed_CG_Discontinuous:
         {
-
             //-------------------------------------------------------
             // Compute the fluxvector in physical space
             Array<OneD, Array<OneD, Array<OneD, NekDouble>>> fluxvector(
                 nvariables);
 
-            for (i = 0; i < nvariables; ++i)
+            for (int i = 0; i < nvariables; ++i)
             {
                 fluxvector[i] = Array<OneD, Array<OneD, NekDouble>>(ndim);
-                for (j = 0; j < ndim; ++j)
+                for (int j = 0; j < ndim; ++j)
                 {
                     fluxvector[i][j] = Array<OneD, NekDouble>(nq);
                 }
@@ -216,16 +183,16 @@ void LinearSWE::DoOdeRhs(
             //-------------------------------------------------------
             // Take the derivative of the flux terms
             // and negate the outarray since moving terms to the rhs
-            Array<OneD, NekDouble> tmp(nq);
+            Array<OneD, NekDouble> tmp0(nq);
             Array<OneD, NekDouble> tmp1(nq);
 
-            for (i = 0; i < nvariables; ++i)
+            for (int i = 0; i < nvariables; ++i)
             {
                 m_fields[i]->PhysDeriv(MultiRegions::DirCartesianMap[0],
-                                       fluxvector[i][0], tmp);
+                                       fluxvector[i][0], tmp0);
                 m_fields[i]->PhysDeriv(MultiRegions::DirCartesianMap[1],
                                        fluxvector[i][1], tmp1);
-                Vmath::Vadd(nq, tmp, 1, tmp1, 1, outarray[i], 1);
+                Vmath::Vadd(nq, tmp0, 1, tmp1, 1, outarray[i], 1);
                 Vmath::Neg(nq, outarray[i], 1);
             }
 
@@ -242,9 +209,30 @@ void LinearSWE::DoOdeRhs(
         }
         break;
         default:
-            ASSERTL0(false, "Unknown projection scheme for the NonlinearSWE");
+            ASSERTL0(false, "Unknown projection scheme for the LinearSWE");
             break;
     }
+}
+
+void LinearSWE::v_GenerateSummary(SolverUtils::SummaryList &s)
+{
+    ShallowWaterSystem::v_GenerateSummary(s);
+    if (m_session->DefinesSolverInfo("UpwindType"))
+    {
+        std::string UpwindType;
+        UpwindType = m_session->GetSolverInfo("UpwindType");
+        if (UpwindType == "LinearAverage")
+        {
+            SolverUtils::AddSummaryItem(s, "Riemann Solver", "Linear Average");
+        }
+        else if (UpwindType == "LinearHLL")
+        {
+            SolverUtils::AddSummaryItem(s, "Riemann Solver", "Linear HLL");
+        }
+    }
+    SolverUtils::AddSummaryItem(s, "Variables", "eta  should be in field[0]");
+    SolverUtils::AddSummaryItem(s, "", "u    should be in field[1]");
+    SolverUtils::AddSummaryItem(s, "", "v    should be in field[2]");
 }
 
 // Physfield in primitive Form
@@ -252,33 +240,27 @@ void LinearSWE::GetFluxVector(
     const Array<OneD, const Array<OneD, NekDouble>> &physfield,
     Array<OneD, Array<OneD, Array<OneD, NekDouble>>> &flux)
 {
-    int i, j;
     int nq = m_fields[0]->GetTotPoints();
 
     NekDouble g = m_g;
 
     // Flux vector for the mass equation
-    for (i = 0; i < m_spacedim; ++i)
+    for (int i = 0; i < m_spacedim; ++i)
     {
         Vmath::Vmul(nq, m_depth, 1, physfield[i + 1], 1, flux[0][i], 1);
     }
 
-    // Put (g eta) in tmp
-    Array<OneD, NekDouble> tmp(nq);
-    Vmath::Smul(nq, g, physfield[0], 1, tmp, 1);
-
     // Flux vector for the momentum equations
-    for (i = 0; i < m_spacedim; ++i)
+    for (int i = 0; i < m_spacedim; ++i)
     {
-        for (j = 0; j < m_spacedim; ++j)
+        for (int j = 0; j < m_spacedim; ++j)
         {
             // must zero fluxes as not initialised to zero in AdvectionWeakDG
-            // ...
             Vmath::Zero(nq, flux[i + 1][j], 1);
         }
 
         // Add (g eta) to appropriate field
-        Vmath::Vadd(nq, flux[i + 1][i], 1, tmp, 1, flux[i + 1][i], 1);
+        Vmath::Smul(nq, g, physfield[0], 1, flux[i + 1][i], 1);
     }
 }
 
@@ -290,7 +272,7 @@ void LinearSWE::GetFluxVector(
  * @param velocity   Velocity field.
  */
 void LinearSWE::GetVelocityVector(
-    const Array<OneD, Array<OneD, NekDouble>> &physfield,
+    const Array<OneD, const Array<OneD, NekDouble>> &physfield,
     Array<OneD, Array<OneD, NekDouble>> &velocity)
 {
     const int npts = physfield[0].size();
@@ -298,6 +280,44 @@ void LinearSWE::GetVelocityVector(
     for (int i = 0; i < m_spacedim; ++i)
     {
         Vmath::Vcopy(npts, physfield[1 + i], 1, velocity[i], 1);
+    }
+}
+
+void LinearSWE::CopyBoundaryTrace(const Array<OneD, const NekDouble> &Fwd,
+                                  Array<OneD, NekDouble> &Bwd)
+{
+    int cnt = 0;
+
+    // loop over Boundary Regions
+    for (int bcRegion = 0; bcRegion < m_fields[0]->GetBndConditions().size();
+         ++bcRegion)
+    {
+        if (m_fields[0]
+                ->GetBndConditions()[bcRegion]
+                ->GetBoundaryConditionType() == SpatialDomains::ePeriodic)
+        {
+            continue;
+        }
+
+        // Copy the forward trace of the field to the backward trace
+        int id2, npts;
+
+        for (int e = 0;
+             e < m_fields[0]->GetBndCondExpansions()[bcRegion]->GetExpSize();
+             ++e)
+        {
+            npts = m_fields[0]
+                       ->GetBndCondExpansions()[bcRegion]
+                       ->GetExp(e)
+                       ->GetTotPoints();
+            id2 = m_fields[0]->GetTrace()->GetPhys_Offset(
+                m_fields[0]->GetTraceMap()->GetBndCondIDToGlobalTraceID(cnt +
+                                                                        e));
+
+            Vmath::Vcopy(npts, &Fwd[id2], 1, &Bwd[id2], 1);
+        }
+
+        cnt += m_fields[0]->GetBndCondExpansions()[bcRegion]->GetExpSize();
     }
 }
 
