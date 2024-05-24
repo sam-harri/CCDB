@@ -141,7 +141,7 @@ DisContField::DisContField(const LibUtilities::SessionReaderSharedPtr &pSession,
             if ((ProjectStr == "MixedCGDG") ||
                 (ProjectStr == "Mixed_CG_Discontinuous"))
             {
-                SetUpDG();
+                SetUpDG(variable);
             }
             else
             {
@@ -719,7 +719,7 @@ DisContField::DisContField(const DisContField &In,
                     if ((ProjectStr == "MixedCGDG") ||
                         (ProjectStr == "Mixed_CG_Discontinuous"))
                     {
-                        SetUpDG();
+                        SetUpDG(variable);
                     }
                     else
                     {
