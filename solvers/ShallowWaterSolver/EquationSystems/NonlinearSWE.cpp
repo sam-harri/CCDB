@@ -55,26 +55,16 @@ void NonlinearSWE::v_InitObject(bool DeclareFields)
 {
     ShallowWaterSystem::v_InitObject(DeclareFields);
 
-    if (m_explicitAdvection)
-    {
-        m_ode.DefineOdeRhs(&NonlinearSWE::DoOdeRhs, this);
-        m_ode.DefineProjection(&NonlinearSWE::DoOdeProjection, this);
-    }
-    else
-    {
-        ASSERTL0(false, "Implicit SWE not set up.");
-    }
-
     // Type of advection class to be used
     switch (m_projectionType)
     {
-            // Continuous field
+        // Continuous field
         case MultiRegions::eGalerkin:
         {
             //  Do nothing
             break;
         }
-            // Discontinuous field
+        // Discontinuous field
         case MultiRegions::eDiscontinuous:
         {
             std::string advName;
@@ -113,21 +103,16 @@ void NonlinearSWE::v_InitObject(bool DeclareFields)
             break;
         }
     }
+
+    m_ode.DefineOdeRhs(&NonlinearSWE::v_DoOdeRhs, this);
+    m_ode.DefineProjection(&NonlinearSWE::DoOdeProjection, this);
+    m_ode.DefineImplicitSolve(&NonlinearSWE::DoImplicitSolve, this);
 }
 
-void NonlinearSWE::v_GenerateSummary(SolverUtils::SummaryList &s)
-{
-    ShallowWaterSystem::v_GenerateSummary(s);
-    SolverUtils::AddSummaryItem(s, "Variables", "h  should be in field[0]");
-    SolverUtils::AddSummaryItem(s, "", "hu should be in field[1]");
-    SolverUtils::AddSummaryItem(s, "", "hv should be in field[2]");
-}
-
-void NonlinearSWE::DoOdeRhs(
+void NonlinearSWE::v_DoOdeRhs(
     const Array<OneD, const Array<OneD, NekDouble>> &inarray,
     Array<OneD, Array<OneD, NekDouble>> &outarray, const NekDouble time)
 {
-    int i, j;
     int ndim       = m_spacedim;
     int nvariables = inarray.size();
     int nq         = GetTotPoints();
@@ -136,20 +121,17 @@ void NonlinearSWE::DoOdeRhs(
     {
         case MultiRegions::eDiscontinuous:
         {
-
             //-------------------------------------------------------
             // Compute the DG advection including the numerical flux
             // by using SolverUtils/Advection
             // Input and output in physical space
-            Array<OneD, Array<OneD, NekDouble>> advVel;
-
-            m_advection->Advect(nvariables, m_fields, advVel, inarray, outarray,
-                                time);
+            m_advection->Advect(nvariables, m_fields, NullNekDoubleArrayOfArray,
+                                inarray, outarray, time);
             //-------------------------------------------------------
 
             //-------------------------------------------------------
             // negate the outarray since moving terms to the rhs
-            for (i = 0; i < nvariables; ++i)
+            for (int i = 0; i < nvariables; ++i)
             {
                 Vmath::Neg(nq, outarray[i], 1);
             }
@@ -174,18 +156,16 @@ void NonlinearSWE::DoOdeRhs(
         }
         break;
         case MultiRegions::eGalerkin:
-        case MultiRegions::eMixed_CG_Discontinuous:
         {
-
             //-------------------------------------------------------
             // Compute the fluxvector in physical space
             Array<OneD, Array<OneD, Array<OneD, NekDouble>>> fluxvector(
                 nvariables);
 
-            for (i = 0; i < nvariables; ++i)
+            for (int i = 0; i < nvariables; ++i)
             {
                 fluxvector[i] = Array<OneD, Array<OneD, NekDouble>>(ndim);
-                for (j = 0; j < ndim; ++j)
+                for (int j = 0; j < ndim; ++j)
                 {
                     fluxvector[i][j] = Array<OneD, NekDouble>(nq);
                 }
@@ -197,16 +177,16 @@ void NonlinearSWE::DoOdeRhs(
             //-------------------------------------------------------
             // Take the derivative of the flux terms
             // and negate the outarray since moving terms to the rhs
-            Array<OneD, NekDouble> tmp(nq);
+            Array<OneD, NekDouble> tmp0(nq);
             Array<OneD, NekDouble> tmp1(nq);
 
-            for (i = 0; i < nvariables; ++i)
+            for (int i = 0; i < nvariables; ++i)
             {
                 m_fields[i]->PhysDeriv(MultiRegions::DirCartesianMap[0],
-                                       fluxvector[i][0], tmp);
+                                       fluxvector[i][0], tmp0);
                 m_fields[i]->PhysDeriv(MultiRegions::DirCartesianMap[1],
                                        fluxvector[i][1], tmp1);
-                Vmath::Vadd(nq, tmp, 1, tmp1, 1, outarray[i], 1);
+                Vmath::Vadd(nq, tmp0, 1, tmp1, 1, outarray[i], 1);
                 Vmath::Neg(nq, outarray[i], 1);
             }
 
@@ -234,19 +214,26 @@ void NonlinearSWE::DoOdeRhs(
     }
 }
 
+void NonlinearSWE::v_GenerateSummary(SolverUtils::SummaryList &s)
+{
+    ShallowWaterSystem::v_GenerateSummary(s);
+    SolverUtils::AddSummaryItem(s, "Variables", "h  should be in field[0]");
+    SolverUtils::AddSummaryItem(s, "", "hu should be in field[1]");
+    SolverUtils::AddSummaryItem(s, "", "hv should be in field[2]");
+}
+
 // Physfield in conservative Form
 void NonlinearSWE::GetFluxVector(
     const Array<OneD, const Array<OneD, NekDouble>> &physfield,
     Array<OneD, Array<OneD, Array<OneD, NekDouble>>> &flux)
 {
-    int i, j;
     int nq = m_fields[0]->GetTotPoints();
 
     NekDouble g = m_g;
     Array<OneD, Array<OneD, NekDouble>> velocity(m_spacedim);
 
     // Flux vector for the mass equation
-    for (i = 0; i < m_spacedim; ++i)
+    for (int i = 0; i < m_spacedim; ++i)
     {
         velocity[i] = Array<OneD, NekDouble>(nq);
         Vmath::Vcopy(nq, physfield[i + 1], 1, flux[0][i], 1);
@@ -260,9 +247,9 @@ void NonlinearSWE::GetFluxVector(
     Vmath::Smul(nq, 0.5 * g, tmp, 1, tmp, 1);
 
     // Flux vector for the momentum equations
-    for (i = 0; i < m_spacedim; ++i)
+    for (int i = 0; i < m_spacedim; ++i)
     {
-        for (j = 0; j < m_spacedim; ++j)
+        for (int j = 0; j < m_spacedim; ++j)
         {
             Vmath::Vmul(nq, velocity[j], 1, physfield[i + 1], 1, flux[i + 1][j],
                         1);
@@ -281,7 +268,7 @@ void NonlinearSWE::GetFluxVector(
  * @param velocity   Velocity field.
  */
 void NonlinearSWE::GetVelocityVector(
-    const Array<OneD, Array<OneD, NekDouble>> &physfield,
+    const Array<OneD, const Array<OneD, NekDouble>> &physfield,
     Array<OneD, Array<OneD, NekDouble>> &velocity)
 {
     const int npts = physfield[0].size();
@@ -319,7 +306,6 @@ void NonlinearSWE::AddVariableDepth(
         }
         break;
         case MultiRegions::eGalerkin:
-        case MultiRegions::eMixed_CG_Discontinuous:
         {
             for (int i = 0; i < m_spacedim; ++i)
             {

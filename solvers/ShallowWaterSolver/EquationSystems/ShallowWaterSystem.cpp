@@ -36,8 +36,6 @@
 
 #include <ShallowWaterSolver/EquationSystems/ShallowWaterSystem.h>
 
-using namespace std;
-
 namespace Nektar
 {
 /**
@@ -59,7 +57,7 @@ namespace Nektar
  * @param   pSession        Session object to read parameters from.
  */
 
-string ShallowWaterSystem::className =
+std::string ShallowWaterSystem::className =
     SolverUtils::GetEquationSystemFactory().RegisterCreatorFunction(
         "ShallowWaterSystem", ShallowWaterSystem::create,
         "Auxiliary functions for the shallow water system.");
@@ -75,13 +73,6 @@ void ShallowWaterSystem::v_InitObject(bool DeclareFields)
 {
     UnsteadySystem::v_InitObject(DeclareFields);
 
-    // if discontinuous Galerkin determine numerical flux to use
-    if (m_projectionType == MultiRegions::eDiscontinuous)
-    {
-        ASSERTL0(m_session->DefinesSolverInfo("UPWINDTYPE"),
-                 "No UPWINDTYPE defined in session.");
-    }
-
     // Set up locations of velocity vector.
     m_vecLocs    = Array<OneD, Array<OneD, NekDouble>>(1);
     m_vecLocs[0] = Array<OneD, NekDouble>(m_spacedim);
@@ -92,9 +83,6 @@ void ShallowWaterSystem::v_InitObject(bool DeclareFields)
 
     // Load acceleration of gravity
     m_session->LoadParameter("Gravity", m_g, 9.81);
-
-    // input/output in primitive variables
-    m_primitive = true;
 
     EvaluateWaterDepth();
 
@@ -124,39 +112,224 @@ void ShallowWaterSystem::v_InitObject(bool DeclareFields)
     }
 
     EvaluateCoriolis();
+
+    if (!m_explicitAdvection)
+    {
+        InitialiseNonlinSysSolver();
+    }
+}
+
+void ShallowWaterSystem::v_DoOdeRhs(
+    [[maybe_unused]] const Array<OneD, const Array<OneD, NekDouble>> &inarray,
+    [[maybe_unused]] Array<OneD, Array<OneD, NekDouble>> &outarray,
+    [[maybe_unused]] const NekDouble time)
+{
 }
 
 void ShallowWaterSystem::v_GenerateSummary(SolverUtils::SummaryList &s)
 {
     UnsteadySystem::v_GenerateSummary(s);
-    if (m_constantDepth == true)
+    SolverUtils::AddSummaryItem(s, "Depth",
+                                m_constantDepth ? "constant" : "variable");
+}
+
+void ShallowWaterSystem::InitialiseNonlinSysSolver()
+{
+    unsigned int nvariables = m_fields.size();
+    int ntotal              = nvariables * m_fields[0]->GetNpoints();
+
+    // Create the key to hold settings for nonlin solver
+    LibUtilities::NekSysKey key = LibUtilities::NekSysKey();
+
+    // Load required LinSys parameters:
+    m_session->LoadParameter("NekLinSysMaxIterations",
+                             key.m_NekLinSysMaxIterations, 30);
+    m_session->LoadParameter("LinSysMaxStorage", key.m_LinSysMaxStorage, 30);
+    m_session->LoadParameter("LinSysRelativeTolInNonlin",
+                             key.m_NekLinSysTolerance, 5.0E-2);
+    m_session->LoadParameter("GMRESMaxHessMatBand", key.m_KrylovMaxHessMatBand,
+                             31);
+
+    // Load required NonLinSys parameters:
+    m_session->LoadParameter("JacobiFreeEps", m_jacobiFreeEps, 5.0E-8);
+    m_session->LoadParameter("NekNonlinSysMaxIterations",
+                             key.m_NekNonlinSysMaxIterations, 10);
+    m_session->LoadParameter("NewtonRelativeIteTol",
+                             key.m_NekNonLinSysTolerance, 1.0E-12);
+    WARNINGL0(!m_session->DefinesParameter("NewtonAbsoluteIteTol"),
+              "Please specify NewtonRelativeIteTol instead of "
+              "NewtonAbsoluteIteTol in XML session file");
+    m_session->LoadParameter("NonlinIterTolRelativeL2",
+                             key.m_NonlinIterTolRelativeL2, 1.0E-3);
+    m_session->LoadSolverInfo("LinSysIterSolverTypeInNonlin",
+                              key.m_LinSysIterSolverTypeInNonlin, "GMRES");
+
+    LibUtilities::NekSysOperators nekSysOp;
+    nekSysOp.DefineNekSysResEval(&ShallowWaterSystem::NonlinSysEvaluator1D,
+                                 this);
+    nekSysOp.DefineNekSysLhsEval(&ShallowWaterSystem::MatrixMultiplyMatrixFree,
+                                 this);
+    nekSysOp.DefineNekSysPrecon(&ShallowWaterSystem::DoNullPrecon, this);
+
+    // Initialize non-linear system
+    m_nonlinsol = LibUtilities::GetNekNonlinSysIterFactory().CreateInstance(
+        "Newton", m_session, m_comm->GetRowComm(), ntotal, key);
+    m_nonlinsol->SetSysOperators(nekSysOp);
+}
+
+void ShallowWaterSystem::DoImplicitSolve(
+    const Array<OneD, const Array<OneD, NekDouble>> &inpnts,
+    Array<OneD, Array<OneD, NekDouble>> &outpnt, const NekDouble time,
+    const NekDouble lambda)
+{
+    m_TimeIntegLambda       = lambda;
+    m_bndEvaluateTime       = time;
+    unsigned int npoints    = m_fields[0]->GetNpoints();
+    unsigned int nvariables = m_fields.size();
+
+    Array<OneD, NekDouble> inarray(nvariables * npoints);
+    Array<OneD, NekDouble> outarray(nvariables * npoints);
+    Array<OneD, NekDouble> tmp;
+
+    for (int i = 0; i < nvariables; ++i)
     {
-        SolverUtils::AddSummaryItem(s, "Depth", "constant");
+        int noffset = i * npoints;
+        Vmath::Vcopy(npoints, inpnts[i], 1, tmp = inarray + noffset, 1);
     }
-    else
+
+    DoImplicitSolve1D(inarray, outarray);
+
+    for (int i = 0; i < nvariables; ++i)
     {
-        SolverUtils::AddSummaryItem(s, "Depth", "variable");
+        int noffset = i * npoints;
+        Vmath::Vcopy(npoints, outarray + noffset, 1, outpnt[i], 1);
     }
+}
+
+void ShallowWaterSystem::DoImplicitSolve1D(
+    const Array<OneD, const NekDouble> &inarray, Array<OneD, NekDouble> &out)
+{
+    CalcRefValues(inarray);
+
+    m_nonlinsol->SetRhsMagnitude(m_inArrayNorm);
+
+    m_TotNewtonIts += m_nonlinsol->SolveSystem(inarray.size(), inarray, out, 0);
+
+    m_TotLinIts += m_nonlinsol->GetNtotLinSysIts();
+
+    m_TotImpStages++;
+}
+
+void ShallowWaterSystem::CalcRefValues(
+    const Array<OneD, const NekDouble> &inarray)
+{
+    unsigned int npoints = m_fields[0]->GetNpoints();
+
+    Array<OneD, NekDouble> magnitdEstimat(3, 0.0);
+
+    for (int i = 0; i < 3; ++i)
+    {
+        int offset = i * npoints;
+        magnitdEstimat[i] =
+            Vmath::Dot(npoints, inarray + offset, inarray + offset);
+    }
+    m_comm->GetSpaceComm()->AllReduce(magnitdEstimat,
+                                      Nektar::LibUtilities::ReduceSum);
+
+    m_inArrayNorm = 0.0;
+    for (int i = 0; i < 3; ++i)
+    {
+        m_inArrayNorm += magnitdEstimat[i];
+    }
+}
+
+void ShallowWaterSystem::NonlinSysEvaluator1D(
+    const Array<OneD, const NekDouble> &inarray, Array<OneD, NekDouble> &out,
+    [[maybe_unused]] const bool &flag)
+{
+    unsigned int npoints    = m_fields[0]->GetNpoints();
+    unsigned int nvariables = m_fields.size();
+    Array<OneD, Array<OneD, NekDouble>> in2D(nvariables);
+    Array<OneD, Array<OneD, NekDouble>> out2D(nvariables);
+    for (int i = 0; i < nvariables; ++i)
+    {
+        int offset = i * npoints;
+        in2D[i]    = inarray + offset;
+        out2D[i]   = out + offset;
+    }
+    NonlinSysEvaluator(in2D, out2D);
+}
+
+void ShallowWaterSystem::NonlinSysEvaluator(
+    const Array<OneD, const Array<OneD, NekDouble>> &inarray,
+    Array<OneD, Array<OneD, NekDouble>> &out)
+{
+    unsigned int npoints    = m_fields[0]->GetNpoints();
+    unsigned int nvariables = m_fields.size();
+    Array<OneD, Array<OneD, NekDouble>> inpnts(nvariables);
+    for (int i = 0; i < nvariables; ++i)
+    {
+        inpnts[i] = Array<OneD, NekDouble>(npoints, 0.0);
+    }
+
+    DoOdeProjection(inarray, inpnts, m_bndEvaluateTime);
+    v_DoOdeRhs(inpnts, out, m_bndEvaluateTime);
+
+    for (int i = 0; i < nvariables; ++i)
+    {
+        Vmath::Svtvp(npoints, -m_TimeIntegLambda, out[i], 1, inarray[i], 1,
+                     out[i], 1);
+        Vmath::Vsub(npoints, out[i], 1,
+                    m_nonlinsol->GetRefSourceVec() + i * npoints, 1, out[i], 1);
+    }
+}
+
+void ShallowWaterSystem::MatrixMultiplyMatrixFree(
+    const Array<OneD, const NekDouble> &inarray, Array<OneD, NekDouble> &out,
+    [[maybe_unused]] const bool &flag)
+{
+    const Array<OneD, const NekDouble> solref = m_nonlinsol->GetRefSolution();
+    const Array<OneD, const NekDouble> resref = m_nonlinsol->GetRefResidual();
+
+    unsigned int ntotal   = inarray.size();
+    NekDouble magninarray = Vmath::Dot(ntotal, inarray, inarray);
+    m_comm->GetSpaceComm()->AllReduce(magninarray,
+                                      Nektar::LibUtilities::ReduceSum);
+    NekDouble eps =
+        m_jacobiFreeEps * sqrt((sqrt(m_inArrayNorm) + 1.0) / magninarray);
+
+    Array<OneD, NekDouble> solplus{ntotal};
+    Array<OneD, NekDouble> resplus{ntotal};
+
+    Vmath::Svtvp(ntotal, eps, inarray, 1, solref, 1, solplus, 1);
+    NonlinSysEvaluator1D(solplus, resplus, flag);
+    Vmath::Vsub(ntotal, resplus, 1, resref, 1, out, 1);
+    Vmath::Smul(ntotal, 1.0 / eps, out, 1, out, 1);
+}
+
+void ShallowWaterSystem::DoNullPrecon(
+    const Array<OneD, const NekDouble> &inarray,
+    Array<OneD, NekDouble> &outarray, [[maybe_unused]] const bool &flag)
+{
+    Vmath::Vcopy(inarray.size(), inarray, 1, outarray, 1);
 }
 
 void ShallowWaterSystem::DoOdeProjection(
     const Array<OneD, const Array<OneD, NekDouble>> &inarray,
     Array<OneD, Array<OneD, NekDouble>> &outarray, const NekDouble time)
 {
-    int i;
     int nvariables = inarray.size();
 
     switch (m_projectionType)
     {
         case MultiRegions::eDiscontinuous:
         {
-
             // Just copy over array
             if (inarray != outarray)
             {
                 int npoints = GetNpoints();
 
-                for (i = 0; i < nvariables; ++i)
+                for (int i = 0; i < nvariables; ++i)
                 {
                     Vmath::Vcopy(npoints, inarray[i], 1, outarray[i], 1);
                 }
@@ -166,13 +339,11 @@ void ShallowWaterSystem::DoOdeProjection(
             break;
         }
         case MultiRegions::eGalerkin:
-        case MultiRegions::eMixed_CG_Discontinuous:
         {
-
             EquationSystem::SetBoundaryConditions(time);
             Array<OneD, NekDouble> coeffs(m_fields[0]->GetNcoeffs(), 0.0);
 
-            for (i = 0; i < nvariables; ++i)
+            for (int i = 0; i < nvariables; ++i)
             {
                 m_fields[i]->FwdTrans(inarray[i], coeffs);
                 m_fields[i]->BwdTrans(coeffs, outarray[i]);
@@ -185,9 +356,8 @@ void ShallowWaterSystem::DoOdeProjection(
     }
 }
 
-//----------------------------------------------------
 void ShallowWaterSystem::SetBoundaryConditions(
-    Array<OneD, Array<OneD, NekDouble>> &inarray, NekDouble time)
+    const Array<OneD, const Array<OneD, NekDouble>> &inarray, NekDouble time)
 {
     std::string varName;
     int nvariables = 3;
@@ -235,15 +405,14 @@ void ShallowWaterSystem::SetBoundaryConditions(
 void ShallowWaterSystem::WallBoundary2D(
     int bcRegion, int cnt, Array<OneD, Array<OneD, NekDouble>> &Fwd)
 {
-    int i;
     int nvariables = 3;
 
     // Adjust the physical values of the trace to take
     // user defined boundaries into account
-    int e, id1, id2, npts;
+    int id1, id2, npts;
 
-    for (e = 0; e < m_fields[0]->GetBndCondExpansions()[bcRegion]->GetExpSize();
-         ++e)
+    for (int e = 0;
+         e < m_fields[0]->GetBndCondExpansions()[bcRegion]->GetExpSize(); ++e)
     {
         npts = m_fields[0]
                    ->GetBndCondExpansions()[bcRegion]
@@ -300,61 +469,7 @@ void ShallowWaterSystem::WallBoundary2D(
         }
 
         // copy boundary adjusted values into the boundary expansion
-        for (i = 0; i < nvariables; ++i)
-        {
-            Vmath::Vcopy(npts, &Fwd[i][id2], 1,
-                         &(m_fields[i]
-                               ->GetBndCondExpansions()[bcRegion]
-                               ->UpdatePhys())[id1],
-                         1);
-        }
-    }
-}
-
-void ShallowWaterSystem::WallBoundary(
-    int bcRegion, int cnt, Array<OneD, Array<OneD, NekDouble>> &Fwd,
-    Array<OneD, Array<OneD, NekDouble>> &physarray)
-{
-    int i;
-    int nvariables = physarray.size();
-
-    // Adjust the physical values of the trace to take
-    // user defined boundaries into account
-    int e, id1, id2, npts;
-
-    for (e = 0; e < m_fields[0]->GetBndCondExpansions()[bcRegion]->GetExpSize();
-         ++e)
-    {
-        npts = m_fields[0]
-                   ->GetBndCondExpansions()[bcRegion]
-                   ->GetExp(e)
-                   ->GetTotPoints();
-        id1 = m_fields[0]->GetBndCondExpansions()[bcRegion]->GetPhys_Offset(e);
-        id2 = m_fields[0]->GetTrace()->GetPhys_Offset(
-            m_fields[0]->GetTraceMap()->GetBndCondIDToGlobalTraceID(cnt + e));
-
-        // For 2D/3D, define: v* = v - 2(v.n)n
-        Array<OneD, NekDouble> tmp(npts, 0.0);
-
-        // Calculate (v.n)
-        for (i = 0; i < m_spacedim; ++i)
-        {
-            Vmath::Vvtvp(npts, &Fwd[1 + i][id2], 1, &m_traceNormals[i][id2], 1,
-                         &tmp[0], 1, &tmp[0], 1);
-        }
-
-        // Calculate 2.0(v.n)
-        Vmath::Smul(npts, -2.0, &tmp[0], 1, &tmp[0], 1);
-
-        // Calculate v* = v - 2.0(v.n)n
-        for (i = 0; i < m_spacedim; ++i)
-        {
-            Vmath::Vvtvp(npts, &tmp[0], 1, &m_traceNormals[i][id2], 1,
-                         &Fwd[1 + i][id2], 1, &Fwd[1 + i][id2], 1);
-        }
-
-        // copy boundary adjusted values into the boundary expansion
-        for (i = 0; i < nvariables; ++i)
+        for (int i = 0; i < nvariables; ++i)
         {
             Vmath::Vcopy(npts, &Fwd[i][id2], 1,
                          &(m_fields[i]
@@ -370,7 +485,6 @@ void ShallowWaterSystem::AddCoriolis(
     const Array<OneD, const Array<OneD, NekDouble>> &physarray,
     Array<OneD, Array<OneD, NekDouble>> &outarray)
 {
-
     int ncoeffs = GetNcoeffs();
     int nq      = GetTotPoints();
 
@@ -398,7 +512,6 @@ void ShallowWaterSystem::AddCoriolis(
         }
         break;
         case MultiRegions::eGalerkin:
-        case MultiRegions::eMixed_CG_Discontinuous:
         {
             // add to u equation
             Vmath::Vmul(nq, m_coriolis, 1, physarray[2], 1, tmp, 1);
@@ -420,17 +533,17 @@ void ShallowWaterSystem::ConservativeToPrimitive()
 {
     int nq = GetTotPoints();
 
-    // u = hu/h
-    Vmath::Vdiv(nq, m_fields[1]->GetPhys(), 1, m_fields[0]->GetPhys(), 1,
-                m_fields[1]->UpdatePhys(), 1);
-
-    // v = hv/ v
-    Vmath::Vdiv(nq, m_fields[2]->GetPhys(), 1, m_fields[0]->GetPhys(), 1,
-                m_fields[2]->UpdatePhys(), 1);
-
     // \eta = h - d
     Vmath::Vsub(nq, m_fields[0]->GetPhys(), 1, m_depth, 1,
                 m_fields[0]->UpdatePhys(), 1);
+
+    // u = hu / h
+    Vmath::Vdiv(nq, m_fields[1]->GetPhys(), 1, m_fields[0]->GetPhys(), 1,
+                m_fields[1]->UpdatePhys(), 1);
+
+    // v = hv / v
+    Vmath::Vdiv(nq, m_fields[2]->GetPhys(), 1, m_fields[0]->GetPhys(), 1,
+                m_fields[2]->UpdatePhys(), 1);
 }
 
 void ShallowWaterSystem::PrimitiveToConservative()
@@ -458,44 +571,6 @@ void ShallowWaterSystem::EvaluateWaterDepth(void)
 void ShallowWaterSystem::EvaluateCoriolis(void)
 {
     GetFunction("Coriolis")->Evaluate("f", m_coriolis);
-}
-
-void ShallowWaterSystem::CopyBoundaryTrace(const Array<OneD, NekDouble> &Fwd,
-                                           Array<OneD, NekDouble> &Bwd)
-{
-
-    int cnt = 0;
-    // loop over Boundary Regions
-    for (int bcRegion = 0; bcRegion < m_fields[0]->GetBndConditions().size();
-         ++bcRegion)
-    {
-        if (m_fields[0]
-                ->GetBndConditions()[bcRegion]
-                ->GetBoundaryConditionType() == SpatialDomains::ePeriodic)
-        {
-            continue;
-        }
-
-        // Copy the forward trace of the field to the backward trace
-        int e, id2, npts;
-
-        for (e = 0;
-             e < m_fields[0]->GetBndCondExpansions()[bcRegion]->GetExpSize();
-             ++e)
-        {
-            npts = m_fields[0]
-                       ->GetBndCondExpansions()[bcRegion]
-                       ->GetExp(e)
-                       ->GetTotPoints();
-            id2 = m_fields[0]->GetTrace()->GetPhys_Offset(
-                m_fields[0]->GetTraceMap()->GetBndCondIDToGlobalTraceID(cnt +
-                                                                        e));
-
-            Vmath::Vcopy(npts, &Fwd[id2], 1, &Bwd[id2], 1);
-        }
-
-        cnt += m_fields[0]->GetBndCondExpansions()[bcRegion]->GetExpSize();
-    }
 }
 
 } // namespace Nektar
