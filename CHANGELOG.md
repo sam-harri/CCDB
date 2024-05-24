@@ -5,6 +5,7 @@ v5.7.0
 ------
 **Library**
 - Fix memory-leak with LowEnergyBlock preconditioner for time-updated matrices (!1627)
+- Fix Fourier expansion integration weights are related test (!1803)
 
 **IncNavierStokesSolver**
 - Fix initial and boundary conditions in the moving reference frame (!1692)
@@ -44,9 +45,6 @@ v5.6.0
 - Update Docker images to use bookworm (!1775)
 - Update `clang-tidy` and `clang-format` to v16 (!1777)
 - Add coverage metric capturing (!1776)
-
-**CompressibleFlowSolver**
-- Complete second Frechet derivative implementation (!1761)
 
 **ShallowWaterSolver**
 - Refractoring to reduce code duplication (!1782)
