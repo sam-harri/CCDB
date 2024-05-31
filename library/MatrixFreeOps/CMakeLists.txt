@@ -6,6 +6,11 @@ SET(MATRIXFREEOPS_SOURCES
     Operator.cpp
 )
 
+CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/SwitchLimits.h.in
+               ${CMAKE_CURRENT_SOURCE_DIR}/SwitchLimits.h
+               @ONLY)
+
+
 # Boilerplate cpp implementation files for registering an operator
 # with the factory. There are individual files for each operator shape
 # so to reduce compile time timeout failures due to the large number
