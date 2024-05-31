@@ -2,8 +2,9 @@ Changelog
 =========
 
 v5.7.0
-------
+-----
 **Library**
+- Modified MatrixFreeOp library  switch initialisation to use BOOST_PP (!1794)
 - Fix memory-leak with LowEnergyBlock preconditioner for time-updated matrices (!1627)
 - Fix Fourier expansion integration weights are related test (!1803)
 
