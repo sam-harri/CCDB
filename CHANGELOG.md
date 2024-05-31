@@ -1,5 +1,9 @@
 Changelog
 =========
+v5.7.0
+------
+**Library**
+- Separate MeshGraph input/output functions into a new class (!1778)
 
 v5.6.0
 ------

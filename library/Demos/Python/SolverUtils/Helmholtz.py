@@ -36,7 +36,7 @@ import sys
 import numpy as np
 from NekPy.LibUtilities import SessionReader, NekError
 from NekPy.StdRegions import ConstFactorMap, ConstFactorType
-from NekPy.SpatialDomains import MeshGraph
+from NekPy.SpatialDomains import MeshGraphIO
 from NekPy.SolverUtils import EquationSystem, Filter
 
 class Helmholtz(EquationSystem):
@@ -69,7 +69,7 @@ EquationSystem.Register("Helmholtz", Helmholtz)
             
 if __name__ == '__main__':
     session = SessionReader.CreateInstance(sys.argv)
-    graph = MeshGraph.Read(session)
+    graph = MeshGraphIO.Read(session)
 
     # Manually set projection
     session.SetSolverInfo("Projection", "Continuous")

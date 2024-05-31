@@ -39,6 +39,7 @@
 #include <LibUtilities/BasicUtils/Vmath.hpp>
 #include <LibUtilities/Foundations/Interp.h>
 #include <LibUtilities/Foundations/PhysGalerkinProject.h>
+#include <SpatialDomains/MeshGraphIO.h>
 
 #include <MultiRegions/ContField.h>
 
@@ -238,7 +239,7 @@ void CouplingCwipi::SetupReceive()
     int oversamp = boost::lexical_cast<int>(m_config["OVERSAMPLE"]);
 
     SpatialDomains::MeshGraphSharedPtr recvGraph =
-        SpatialDomains::MeshGraph::Read(m_evalField->GetSession());
+        SpatialDomains::MeshGraphIO::Read(m_evalField->GetSession());
     recvGraph->SetExpansionInfoToPointOrder(
         oversamp + m_evalField->GetExp(0)->GetNumPoints(0));
 

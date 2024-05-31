@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-//  File: MeshGraphXml.h
+//  File: MeshGraphIOXml.h
 //
 //  For more information, please see: http://www.nektar.info/
 //
@@ -28,28 +28,26 @@
 //  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 //  DEALINGS IN THE SOFTWARE.
 //
-//  Description:  This file contains the base class specification for the
-//                MeshGraphXml class.
-//
+//  Description:
 //
 ////////////////////////////////////////////////////////////////////////////////
-#ifndef NEKTAR_SPATIALDOMAINS_MGXML_H
-#define NEKTAR_SPATIALDOMAINS_MGXML_H
+#ifndef NEKTAR_SPATIALDOMAINS_MGIOXML_H
+#define NEKTAR_SPATIALDOMAINS_MGIOXML_H
 
-#include <SpatialDomains/MeshGraph.h>
+#include <SpatialDomains/MeshGraphIO.h>
 #include <SpatialDomains/MeshPartition.h>
 
 namespace Nektar::SpatialDomains
 {
 
-class MeshGraphXml : public MeshGraph
+class MeshGraphIOXml : public MeshGraphIO
 {
 public:
-    MeshGraphXml()
+    MeshGraphIOXml()
     {
     }
 
-    ~MeshGraphXml() override
+    ~MeshGraphIOXml() override
     {
     }
 
@@ -57,14 +55,16 @@ public:
         std::string outname, std::vector<std::set<unsigned int>> elements,
         std::vector<unsigned int> partitions);
 
-    static MeshGraphSharedPtr create()
+    static MeshGraphIOSharedPtr create()
     {
-        return MemoryManager<MeshGraphXml>::AllocateSharedPtr();
+        return MemoryManager<MeshGraphIOXml>::AllocateSharedPtr();
     }
 
     static std::string className;
 
 protected:
+    TiXmlElement *m_xmlGeom{};
+
     // some of these functions are going to be virtual because they will be
     // inherited by the XmlCompressed version
 

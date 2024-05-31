@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-//  File: SpatialDomains.cpp
+//  File: MeshGraphIOXmlCompressed.h
 //
 //  For more information, please see: http://www.nektar.info/
 //
@@ -28,31 +28,58 @@
 //  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 //  DEALINGS IN THE SOFTWARE.
 //
-//  Description: Python wrapper for SpatialDomains classes.
+//  Description:
 //
 ////////////////////////////////////////////////////////////////////////////////
+#ifndef NEKTAR_SPATIALDOMAINS_MGIOXMLCOMP_H
+#define NEKTAR_SPATIALDOMAINS_MGIOXMLCOMP_H
 
-#include <LibUtilities/Python/NekPyConfig.hpp>
+#include "MeshGraphIOXml.h"
 
-void export_Geometry();
-void export_Curve();
-void export_MeshGraph();
-void export_MeshGraphIO();
-void export_GeomElements();
-void export_Zones();
-void export_Interfaces();
-void export_Movement();
-
-BOOST_PYTHON_MODULE(_SpatialDomains)
+namespace Nektar::SpatialDomains
 {
-    np::initialize();
 
-    export_Geometry();
-    export_Curve();
-    export_MeshGraph();
-    export_MeshGraphIO();
-    export_GeomElements();
-    export_Zones();
-    export_Interfaces();
-    export_Movement();
-}
+class MeshGraphIOXmlCompressed : public MeshGraphIOXml
+{
+public:
+    MeshGraphIOXmlCompressed()
+    {
+    }
+
+    ~MeshGraphIOXmlCompressed() override
+    {
+    }
+
+    static MeshGraphIOSharedPtr create()
+    {
+        return MemoryManager<MeshGraphIOXmlCompressed>::AllocateSharedPtr();
+    }
+
+    static std::string className;
+
+protected:
+    void v_ReadVertices() override;
+    void v_ReadCurves() override;
+
+    void v_ReadEdges() override;
+    void v_ReadFaces() override;
+
+    void v_ReadElements1D() override;
+    void v_ReadElements2D() override;
+    void v_ReadElements3D() override;
+
+    void v_WriteVertices(TiXmlElement *geomTag, PointGeomMap &verts) override;
+    void v_WriteEdges(TiXmlElement *geomTag, SegGeomMap &edges) override;
+    void v_WriteTris(TiXmlElement *faceTag, TriGeomMap &tris) override;
+    void v_WriteQuads(TiXmlElement *faceTag, QuadGeomMap &quads) override;
+    void v_WriteHexs(TiXmlElement *elmtTag, HexGeomMap &hexs) override;
+    void v_WritePrisms(TiXmlElement *elmtTag, PrismGeomMap &pris) override;
+    void v_WritePyrs(TiXmlElement *elmtTag, PyrGeomMap &pyrs) override;
+    void v_WriteTets(TiXmlElement *elmtTag, TetGeomMap &tets) override;
+    void v_WriteCurves(TiXmlElement *geomTag, CurveMap &edges,
+                       CurveMap &faces) override;
+};
+
+} // namespace Nektar::SpatialDomains
+
+#endif

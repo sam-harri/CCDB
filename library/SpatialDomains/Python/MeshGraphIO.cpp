@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-//  File: MeshGraphXmlCompressed.h
+//  File: MeshGraphIO.cpp
 //
 //  For more information, please see: http://www.nektar.info/
 //
@@ -28,58 +28,46 @@
 //  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 //  DEALINGS IN THE SOFTWARE.
 //
-//  Description:
+//  Description: Python wrapper for MeshGraphIO.
 //
 ////////////////////////////////////////////////////////////////////////////////
-#ifndef NEKTAR_SPATIALDOMAINS_MGXMLCOM_H
-#define NEKTAR_SPATIALDOMAINS_MGXMLCOM_H
 
-#include "MeshGraphXml.h"
+#include <LibUtilities/Python/NekPyConfig.hpp>
 
-namespace Nektar::SpatialDomains
+#include <SpatialDomains/MeshGraphIO.h>
+
+using namespace Nektar;
+using namespace Nektar::SpatialDomains;
+
+/*
+ * @brief Lightweight wrapper around MeshGraph::Read to avoid wrapping
+ * DomainRange struct.
+ */
+MeshGraphSharedPtr MeshGraphIO_Read(
+    const LibUtilities::SessionReaderSharedPtr &session)
 {
+    return MeshGraphIO::Read(session);
+}
 
-class MeshGraphXmlCompressed : public MeshGraphXml
+MeshGraphIOSharedPtr MeshGraphIO_Create(std::string ioType)
 {
-public:
-    MeshGraphXmlCompressed()
-    {
-    }
+    return GetMeshGraphIOFactory().CreateInstance(ioType);
+}
 
-    ~MeshGraphXmlCompressed() override
-    {
-    }
+void export_MeshGraphIO()
+{
+    py::class_<MeshGraphIO, std::shared_ptr<MeshGraphIO>, boost::noncopyable>(
+        "MeshGraphIO", py::no_init)
 
-    static MeshGraphSharedPtr create()
-    {
-        return MemoryManager<MeshGraphXmlCompressed>::AllocateSharedPtr();
-    }
+        .def("Write", &MeshGraphIO::WriteGeometry, py::default_call_policies(),
+             (py::arg("outfile"), py::arg("defaultExp") = false,
+              py::arg("metadata") = LibUtilities::NullFieldMetaDataMap))
 
-    static std::string className;
+        .def("SetMeshGraph", &MeshGraphIO::SetMeshGraph)
 
-protected:
-    void v_ReadVertices() override;
-    void v_ReadCurves() override;
+        .def("Read", MeshGraphIO_Read)
+        .staticmethod("Read")
 
-    void v_ReadEdges() override;
-    void v_ReadFaces() override;
-
-    void v_ReadElements1D() override;
-    void v_ReadElements2D() override;
-    void v_ReadElements3D() override;
-
-    void v_WriteVertices(TiXmlElement *geomTag, PointGeomMap &verts) override;
-    void v_WriteEdges(TiXmlElement *geomTag, SegGeomMap &edges) override;
-    void v_WriteTris(TiXmlElement *faceTag, TriGeomMap &tris) override;
-    void v_WriteQuads(TiXmlElement *faceTag, QuadGeomMap &quads) override;
-    void v_WriteHexs(TiXmlElement *elmtTag, HexGeomMap &hexs) override;
-    void v_WritePrisms(TiXmlElement *elmtTag, PrismGeomMap &pris) override;
-    void v_WritePyrs(TiXmlElement *elmtTag, PyrGeomMap &pyrs) override;
-    void v_WriteTets(TiXmlElement *elmtTag, TetGeomMap &tets) override;
-    void v_WriteCurves(TiXmlElement *geomTag, CurveMap &edges,
-                       CurveMap &faces) override;
-};
-
-} // namespace Nektar::SpatialDomains
-
-#endif
+        .def("Create", MeshGraphIO_Create)
+        .staticmethod("Create");
+}

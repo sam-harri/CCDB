@@ -46,6 +46,7 @@
 #include <LocalRegions/TriExp.h>
 #include <MultiRegions/ContField.h>
 #include <MultiRegions/ExpList.h>
+#include <SpatialDomains/MeshGraphIO.h>
 #include <boost/lexical_cast.hpp>
 #include <tinyxml.h>
 
@@ -190,7 +191,7 @@ int main(int argc, char *argv[])
     LibUtilities::SessionReaderSharedPtr vSession =
         LibUtilities::SessionReader::CreateInstance(2, argv);
     SpatialDomains::MeshGraphSharedPtr graphShPt =
-        SpatialDomains::MeshGraph::Read(vSession);
+        SpatialDomains::MeshGraphIO::Read(vSession);
     //----------------------------------------------
 
     if (argc == 6 && vSession->DefinesSolverInfo("INTERFACE") &&

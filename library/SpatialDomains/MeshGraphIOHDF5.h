@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-//  File: MeshGraphHDF5.h
+//  File: MeshGraphIOHDF5.h
 //
 //  For more information, please see: http://www.nektar.info/
 //
@@ -28,48 +28,47 @@
 //  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 //  DEALINGS IN THE SOFTWARE.
 //
-//  Description:  This file contains the base class specification for the
-//                MeshGraphHDF5 class.
-//
+//  Description:
 //
 ////////////////////////////////////////////////////////////////////////////////
-#ifndef NEKTAR_SPATIALDOMAINS_MGHDF5_H
-#define NEKTAR_SPATIALDOMAINS_MGHDF5_H
+
+#ifndef NEKTAR_SPATIALDOMAINS_MGIOHDF5_H
+#define NEKTAR_SPATIALDOMAINS_MGIOHDF5_H
 
 #include <LibUtilities/BasicUtils/H5.h>
-#include <SpatialDomains/MeshEntities.hpp>
-#include <SpatialDomains/MeshGraph.h>
+#include <SpatialDomains/MeshGraphIO.h>
+#include <SpatialDomains/MeshPartition.h>
 
 namespace Nektar::SpatialDomains
 {
 
-class MeshGraphHDF5 : public MeshGraph
+class MeshGraphIOHDF5 : public MeshGraphIO
 {
 public:
-    MeshGraphHDF5()
-    {
-    }
+    MeshGraphIOHDF5()           = default;
+    ~MeshGraphIOHDF5() override = default;
 
-    ~MeshGraphHDF5() override
+    static MeshGraphIOSharedPtr create()
     {
-    }
-
-    static MeshGraphSharedPtr create()
-    {
-        return MemoryManager<MeshGraphHDF5>::AllocateSharedPtr();
+        return MemoryManager<MeshGraphIOHDF5>::AllocateSharedPtr();
     }
 
     static std::string className, cmdSwitch;
 
 protected:
+    TiXmlElement *m_xmlGeom{};
+
+    // some of these functions are going to be virtual because they will be
+    // inherited by the XmlCompressed version
+
     SPATIAL_DOMAINS_EXPORT void v_WriteGeometry(
         const std::string &outfilename, bool defaultExp = false,
         const LibUtilities::FieldMetaDataMap &metadata =
-            LibUtilities::NullFieldMetaDataMap) override;
+            LibUtilities::NullFieldMetaDataMap) final;
     SPATIAL_DOMAINS_EXPORT void v_ReadGeometry(
-        LibUtilities::DomainRangeShPtr rng, bool fillGraph) override;
+        LibUtilities::DomainRangeShPtr rng, bool fillGraph) final;
     SPATIAL_DOMAINS_EXPORT void v_PartitionMesh(
-        LibUtilities::SessionReaderSharedPtr session) override;
+        LibUtilities::SessionReaderSharedPtr session) final;
 
 private:
     void ReadCurveMap(CurveMap &curveMap, std::string dsName,

@@ -43,6 +43,7 @@
 #include <LocalRegions/TetExp.h>
 #include <LocalRegions/TriExp.h>
 #include <SolverUtils/DriverParallelInTime.h>
+#include <SpatialDomains/MeshGraphIO.h>
 #include <boost/format.hpp>
 
 namespace Nektar::SolverUtils
@@ -212,7 +213,7 @@ void DriverParallelInTime::SetParallelInTimeEquationSystem(
             argc, argv, sessionFileNames, m_session->GetComm(), timeLevel);
 
         // Set graph for coarse solver.
-        auto graph = SpatialDomains::MeshGraph::Read(
+        auto graph = SpatialDomains::MeshGraphIO::Read(
             session, LibUtilities::NullDomainRangeShPtr, true, m_graph);
 
         // Set BndRegionOrdering (necessary for DG with periodic BC) FIXME

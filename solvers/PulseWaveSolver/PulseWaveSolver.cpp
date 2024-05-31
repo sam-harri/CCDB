@@ -36,6 +36,7 @@
 #include <LibUtilities/BasicUtils/SessionReader.h>
 #include <LibUtilities/BasicUtils/Timer.h>
 #include <SolverUtils/Driver.h>
+#include <SpatialDomains/MeshGraphIO.h>
 
 using namespace std;
 using namespace Nektar;
@@ -54,7 +55,7 @@ int main(int argc, char *argv[])
         session = LibUtilities::SessionReader::CreateInstance(argc, argv);
 
         // Create MeshGraph.
-        graph = SpatialDomains::MeshGraph::Read(session);
+        graph = SpatialDomains::MeshGraphIO::Read(session);
 
         // Create driver
         session->LoadSolverInfo("Driver", vDriverModule, "Standard");
