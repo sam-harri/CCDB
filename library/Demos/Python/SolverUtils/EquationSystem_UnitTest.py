@@ -36,7 +36,7 @@ import math, sys, io, os, unittest, argparse
 import numpy as np
 
 from NekPy.LibUtilities import SessionReader, NekError
-from NekPy.SpatialDomains import MeshGraph
+from NekPy.SpatialDomains import MeshGraphIO
 from NekPy.SolverUtils import EquationSystem, Filter
 from UnitTestUtils import SuppressStream
 
@@ -71,7 +71,7 @@ class TestEquationSystem(unittest.TestCase):
     def setUp(self):
         # Create session and meshgraph
         self.session = SessionReader.CreateInstance(['EquationSystem_UnitTest', nektar_filename])
-        self.graph = MeshGraph.Read(self.session)
+        self.graph = MeshGraphIO.Read(self.session)
 
         assert self.graph.GetSpaceDimension() == 2, "Input file should be 2D"
 

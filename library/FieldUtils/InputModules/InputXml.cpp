@@ -39,6 +39,7 @@ using namespace std;
 
 #include <LibUtilities/BasicUtils/ParseUtils.h>
 #include <LibUtilities/BasicUtils/Timer.h>
+#include <SpatialDomains/MeshGraphIO.h>
 
 #include "InputXml.h"
 using namespace Nektar;
@@ -276,7 +277,7 @@ void InputXml::v_Process(po::variables_map &vm)
         }
     }
 
-    m_f->m_graph = SpatialDomains::MeshGraph::Read(m_f->m_session, rng);
+    m_f->m_graph = SpatialDomains::MeshGraphIO::Read(m_f->m_session, rng);
 
     if (m_f->m_verbose)
     {

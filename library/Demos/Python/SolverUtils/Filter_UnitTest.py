@@ -34,7 +34,7 @@
 
 import sys, io, os, unittest, argparse
 from NekPy.LibUtilities import SessionReader, NekError
-from NekPy.SpatialDomains import MeshGraph
+from NekPy.SpatialDomains import MeshGraph, MeshGraphIO
 from NekPy.SolverUtils import EquationSystem, Filter
 from UnitTestUtils import SuppressStream
 
@@ -67,7 +67,7 @@ class TestFilter(unittest.TestCase):
     def setUp(self):
         # Create session and meshgraph
         self.session = SessionReader.CreateInstance(['filtertest', nektar_filename])
-        self.graph = MeshGraph.Read(self.session)
+        self.graph = MeshGraphIO.Read(self.session)
 
         # Create our 'dummy' equationsystem
         self.eqsys = EquationSystem.Create("Dummy", self.session, self.graph)

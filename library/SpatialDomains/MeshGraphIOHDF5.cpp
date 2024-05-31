@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-//  File: MeshGraphHDF5.cpp
+//  File: MeshGraphIOHDF5.cpp
 //
 //  For more information, please see: http://www.nektar.info/
 //
@@ -39,7 +39,7 @@
 #include <LibUtilities/BasicUtils/Filesystem.hpp>
 #include <LibUtilities/BasicUtils/ParseUtils.h>
 #include <LibUtilities/BasicUtils/Timer.h>
-#include <SpatialDomains/MeshGraphHDF5.h>
+#include <SpatialDomains/MeshGraphIOHDF5.h>
 #include <SpatialDomains/MeshPartition.h>
 #include <SpatialDomains/Movement/Movement.h>
 
@@ -58,18 +58,20 @@ namespace Nektar::SpatialDomains
 
 /// Version of the Nektar++ HDF5 geometry format, which is embedded into the
 /// main NEKTAR/GEOMETRY group as an attribute.
-const unsigned int MeshGraphHDF5::FORMAT_VERSION = 2;
+const unsigned int MeshGraphIOHDF5::FORMAT_VERSION = 2;
 
-std::string MeshGraphHDF5::className =
-    GetMeshGraphFactory().RegisterCreatorFunction("HDF5", MeshGraphHDF5::create,
-                                                  "IO with HDF5 geometry");
+std::string MeshGraphIOHDF5::className =
+    GetMeshGraphIOFactory().RegisterCreatorFunction(
+        "HDF5", MeshGraphIOHDF5::create, "IO with HDF5 geometry");
 
-void MeshGraphHDF5::v_ReadGeometry(DomainRangeShPtr rng, bool fillGraph)
+void MeshGraphIOHDF5::v_ReadGeometry(DomainRangeShPtr rng, bool fillGraph)
 {
-    m_domainRange = rng;
+    m_meshGraph->SetDomainRange(rng);
 
     ReadComposites();
     ReadDomain();
+
+    m_meshGraph->ReadExpansionInfo();
 
     // Close up shop.
     m_mesh->Close();
@@ -78,7 +80,7 @@ void MeshGraphHDF5::v_ReadGeometry(DomainRangeShPtr rng, bool fillGraph)
 
     if (fillGraph)
     {
-        MeshGraph::FillGraph();
+        m_meshGraph->FillGraph();
     }
 }
 
@@ -152,7 +154,7 @@ inline void UniqueValues(std::unordered_set<int> &unique,
     UniqueValues(unique, args...);
 }
 
-std::string MeshGraphHDF5::cmdSwitch =
+std::string MeshGraphIOHDF5::cmdSwitch =
     LibUtilities::SessionReader::RegisterCmdLineFlag(
         "use-hdf5-node-comm", "",
         "Use a per-node communicator for HDF5 partitioning.");
@@ -160,15 +162,13 @@ std::string MeshGraphHDF5::cmdSwitch =
 /**
  * @brief Partition the mesh
  */
-void MeshGraphHDF5::v_PartitionMesh(
+void MeshGraphIOHDF5::v_PartitionMesh(
     LibUtilities::SessionReaderSharedPtr session)
 {
-    m_session = session;
-
     LibUtilities::Timer all;
     all.Start();
     int err;
-    LibUtilities::CommSharedPtr comm     = m_session->GetComm();
+    LibUtilities::CommSharedPtr comm     = session->GetComm();
     LibUtilities::CommSharedPtr commMesh = comm->GetRowComm();
     const bool isRoot                    = comm->TreatAsRankZero();
 
@@ -177,26 +177,27 @@ void MeshGraphHDF5::v_PartitionMesh(
     // don't care about this, so just have every process parse the session file.
     if (!isRoot)
     {
-        m_session->InitSession();
+        session->InitSession();
     }
 
     // We use the XML geometry to find information about the HDF5 file.
-    m_xmlGeom            = m_session->GetElement("NEKTAR/GEOMETRY");
+    m_session            = session;
+    m_xmlGeom            = session->GetElement("NEKTAR/GEOMETRY");
     TiXmlAttribute *attr = m_xmlGeom->FirstAttribute();
-    m_meshDimension      = 3;
-    m_spaceDimension     = 3;
+    int meshDimension    = 3;
+    int spaceDimension   = 3;
 
     while (attr)
     {
         std::string attrName(attr->Name());
         if (attrName == "DIM")
         {
-            err = attr->QueryIntValue(&m_meshDimension);
+            err = attr->QueryIntValue(&meshDimension);
             ASSERTL0(err == TIXML_SUCCESS, "Unable to read mesh dimension.");
         }
         else if (attrName == "SPACE")
         {
-            err = attr->QueryIntValue(&m_spaceDimension);
+            err = attr->QueryIntValue(&spaceDimension);
             ASSERTL0(err == TIXML_SUCCESS, "Unable to read space dimension.");
         }
         else if (attrName == "PARTITION")
@@ -224,8 +225,11 @@ void MeshGraphHDF5::v_PartitionMesh(
     }
 
     ASSERTL0(m_hdf5Name.size() > 0, "Unable to obtain mesh file name.");
-    ASSERTL0(m_meshDimension <= m_spaceDimension,
+    ASSERTL0(meshDimension <= spaceDimension,
              "Mesh dimension greater than space dimension.");
+
+    m_meshGraph->SetMeshDimension(meshDimension);
+    m_meshGraph->SetSpaceDimension(spaceDimension);
 
     // Open handle to the HDF5 mesh
     LibUtilities::H5::PListSharedPtr parallelProps = H5::PList::Default();
@@ -277,26 +281,24 @@ void MeshGraphHDF5::v_PartitionMesh(
     {
         return;
     }
-    else
-    {
-        m_meshPartitioned = true;
-    }
+
+    m_meshPartitioned = true;
+    m_meshGraph->SetMeshPartitioned(true);
 
     // Depending on dimension, read element IDs.
     std::map<int,
              std::vector<std::tuple<std::string, int, LibUtilities::ShapeType>>>
         dataSets;
 
-    dataSets[1] = {make_tuple("SEG", 2, LibUtilities::eSegment)};
-    dataSets[2] = {make_tuple("TRI", 3, LibUtilities::eTriangle),
-                   make_tuple("QUAD", 4, LibUtilities::eQuadrilateral)};
-    dataSets[3] = {make_tuple("TET", 4, LibUtilities::eTetrahedron),
-                   make_tuple("PYR", 5, LibUtilities::ePyramid),
-                   make_tuple("PRISM", 5, LibUtilities::ePrism),
-                   make_tuple("HEX", 6, LibUtilities::eHexahedron)};
+    dataSets[1] = {{"SEG", 2, LibUtilities::eSegment}};
+    dataSets[2] = {{"TRI", 3, LibUtilities::eTriangle},
+                   {"QUAD", 4, LibUtilities::eQuadrilateral}};
+    dataSets[3] = {{"TET", 4, LibUtilities::eTetrahedron},
+                   {"PYR", 5, LibUtilities::ePyramid},
+                   {"PRISM", 5, LibUtilities::ePrism},
+                   {"HEX", 6, LibUtilities::eHexahedron}};
 
-    const bool verbRoot =
-        isRoot && m_session->DefinesCmdLineArgument("verbose");
+    const bool verbRoot = isRoot && session->DefinesCmdLineArgument("verbose");
 
     if (verbRoot)
     {
@@ -331,7 +333,7 @@ void MeshGraphHDF5::v_PartitionMesh(
     }
 
     // Unordered set of rows of the dataset this process needs to read for the
-    // elements of dimension m_meshDimension.
+    // elements of dimension meshDimension.
     std::unordered_set<int> toRead;
 
     // Calculate reasonably even distribution of processors for calling
@@ -385,7 +387,7 @@ void MeshGraphHDF5::v_PartitionMesh(
         }
 
         int rowCount = 0;
-        for (auto &it : dataSets[m_meshDimension])
+        for (auto &it : dataSets[meshDimension])
         {
             std::string ds = std::get<0>(it);
 
@@ -510,7 +512,7 @@ void MeshGraphHDF5::v_PartitionMesh(
 
         MeshPartitionSharedPtr partitioner =
             GetMeshPartitionFactory().CreateInstance(
-                partitionerName, session, interComm, m_meshDimension, partElmts,
+                partitionerName, session, interComm, meshDimension, partElmts,
                 CreateCompositeDescriptor(id2row));
 
         t2.Stop();
@@ -553,7 +555,7 @@ void MeshGraphHDF5::v_PartitionMesh(
 
             MeshPartitionSharedPtr partitioner =
                 GetMeshPartitionFactory().CreateInstance(
-                    "Scotch", session, tmpComm, m_meshDimension, partElmts,
+                    "Scotch", session, tmpComm, meshDimension, partElmts,
                     CreateCompositeDescriptor(elmtid2row));
 
             t2.Stop();
@@ -626,14 +628,25 @@ void MeshGraphHDF5::v_PartitionMesh(
     std::vector<int> prismData, pyrData, hexData;
     std::vector<NekDouble> vertData;
 
-    if (m_meshDimension == 3)
+    auto &vertSet     = m_meshGraph->GetAllPointGeoms();
+    auto &segGeoms    = m_meshGraph->GetAllSegGeoms();
+    auto &triGeoms    = m_meshGraph->GetAllTriGeoms();
+    auto &quadGeoms   = m_meshGraph->GetAllQuadGeoms();
+    auto &hexGeoms    = m_meshGraph->GetAllHexGeoms();
+    auto &pyrGeoms    = m_meshGraph->GetAllPyrGeoms();
+    auto &prismGeoms  = m_meshGraph->GetAllPrismGeoms();
+    auto &tetGeoms    = m_meshGraph->GetAllTetGeoms();
+    auto &curvedEdges = m_meshGraph->GetCurvedEdges();
+    auto &curvedFaces = m_meshGraph->GetCurvedFaces();
+
+    if (meshDimension == 3)
     {
         t.Start();
         // Read 3D data
-        ReadGeometryData(m_hexGeoms, "HEX", toRead, hexIDs, hexData);
-        ReadGeometryData(m_pyrGeoms, "PYR", toRead, pyrIDs, pyrData);
-        ReadGeometryData(m_prismGeoms, "PRISM", toRead, prismIDs, prismData);
-        ReadGeometryData(m_tetGeoms, "TET", toRead, tetIDs, tetData);
+        ReadGeometryData(hexGeoms, "HEX", toRead, hexIDs, hexData);
+        ReadGeometryData(pyrGeoms, "PYR", toRead, pyrIDs, pyrData);
+        ReadGeometryData(prismGeoms, "PRISM", toRead, prismIDs, prismData);
+        ReadGeometryData(tetGeoms, "TET", toRead, tetIDs, tetData);
 
         toRead.clear();
         UniqueValues(toRead, hexData, pyrData, prismData, tetData);
@@ -641,12 +654,12 @@ void MeshGraphHDF5::v_PartitionMesh(
         TIME_RESULT(verbRoot, "read 3D elements", t);
     }
 
-    if (m_meshDimension >= 2)
+    if (meshDimension >= 2)
     {
         t.Start();
         // Read 2D data
-        ReadGeometryData(m_triGeoms, "TRI", toRead, triIDs, triData);
-        ReadGeometryData(m_quadGeoms, "QUAD", toRead, quadIDs, quadData);
+        ReadGeometryData(triGeoms, "TRI", toRead, triIDs, triData);
+        ReadGeometryData(quadGeoms, "QUAD", toRead, quadIDs, quadData);
 
         toRead.clear();
         UniqueValues(toRead, triData, quadData);
@@ -654,11 +667,11 @@ void MeshGraphHDF5::v_PartitionMesh(
         TIME_RESULT(verbRoot, "read 2D elements", t);
     }
 
-    if (m_meshDimension >= 1)
+    if (meshDimension >= 1)
     {
         t.Start();
         // Read 1D data
-        ReadGeometryData(m_segGeoms, "SEG", toRead, segIDs, segData);
+        ReadGeometryData(segGeoms, "SEG", toRead, segIDs, segData);
 
         toRead.clear();
         UniqueValues(toRead, segData);
@@ -667,17 +680,17 @@ void MeshGraphHDF5::v_PartitionMesh(
     }
 
     t.Start();
-    ReadGeometryData(m_vertSet, "VERT", toRead, vertIDs, vertData);
+    ReadGeometryData(vertSet, "VERT", toRead, vertIDs, vertData);
     t.Stop();
     TIME_RESULT(verbRoot, "read 0D elements", t);
 
     // Now start to construct geometry objects, starting from vertices upwards.
     t.Start();
-    FillGeomMap(m_vertSet, CurveMap(), vertIDs, vertData);
+    FillGeomMap(vertSet, CurveMap(), vertIDs, vertData);
     t.Stop();
     TIME_RESULT(verbRoot, "construct 0D elements", t);
 
-    if (m_meshDimension >= 1)
+    if (meshDimension >= 1)
     {
         // Read curves
         toRead.clear();
@@ -685,15 +698,15 @@ void MeshGraphHDF5::v_PartitionMesh(
         {
             toRead.insert(edge);
         }
-        ReadCurveMap(m_curvedEdges, "CURVE_EDGE", toRead);
+        ReadCurveMap(curvedEdges, "CURVE_EDGE", toRead);
 
         t.Start();
-        FillGeomMap(m_segGeoms, m_curvedEdges, segIDs, segData);
+        FillGeomMap(segGeoms, curvedEdges, segIDs, segData);
         t.Stop();
         TIME_RESULT(verbRoot, "construct 1D elements", t);
     }
 
-    if (m_meshDimension >= 2)
+    if (meshDimension >= 2)
     {
         // Read curves
         toRead.clear();
@@ -705,32 +718,32 @@ void MeshGraphHDF5::v_PartitionMesh(
         {
             toRead.insert(face);
         }
-        ReadCurveMap(m_curvedFaces, "CURVE_FACE", toRead);
+        ReadCurveMap(curvedFaces, "CURVE_FACE", toRead);
 
         t.Start();
-        FillGeomMap(m_triGeoms, m_curvedFaces, triIDs, triData);
-        FillGeomMap(m_quadGeoms, m_curvedFaces, quadIDs, quadData);
+        FillGeomMap(triGeoms, curvedFaces, triIDs, triData);
+        FillGeomMap(quadGeoms, curvedFaces, quadIDs, quadData);
         t.Stop();
         TIME_RESULT(verbRoot, "construct 2D elements", t);
     }
 
-    if (m_meshDimension >= 3)
+    if (meshDimension >= 3)
     {
         t.Start();
-        FillGeomMap(m_hexGeoms, CurveMap(), hexIDs, hexData);
-        FillGeomMap(m_prismGeoms, CurveMap(), prismIDs, prismData);
-        FillGeomMap(m_pyrGeoms, CurveMap(), pyrIDs, pyrData);
-        FillGeomMap(m_tetGeoms, CurveMap(), tetIDs, tetData);
+        FillGeomMap(hexGeoms, CurveMap(), hexIDs, hexData);
+        FillGeomMap(prismGeoms, CurveMap(), prismIDs, prismData);
+        FillGeomMap(pyrGeoms, CurveMap(), pyrIDs, pyrData);
+        FillGeomMap(tetGeoms, CurveMap(), tetIDs, tetData);
         t.Stop();
         TIME_RESULT(verbRoot, "construct 3D elements", t);
     }
 
     // Populate m_bndRegOrder.
-    if (m_session->DefinesElement("NEKTAR/CONDITIONS"))
+    if (session->DefinesElement("NEKTAR/CONDITIONS"))
     {
         std::set<int> vBndRegionIdList;
         TiXmlElement *vConditions =
-            new TiXmlElement(*m_session->GetElement("Nektar/Conditions"));
+            new TiXmlElement(*session->GetElement("Nektar/Conditions"));
         TiXmlElement *vBndRegions =
             vConditions->FirstChildElement("BOUNDARYREGIONS");
         // Use fine-level for mesh partition (Parallel-in-Time)
@@ -739,7 +752,8 @@ void MeshGraphHDF5::v_PartitionMesh(
 
         if (vBndRegions)
         {
-            vItem = vBndRegions->FirstChildElement();
+            auto &graph_bndRegOrder = m_meshGraph->GetBndRegionOrdering();
+            vItem                   = vBndRegions->FirstChildElement();
             while (vItem)
             {
                 std::string vSeqStr = vItem->FirstChild()->ToText()->Value();
@@ -750,9 +764,10 @@ void MeshGraphHDF5::v_PartitionMesh(
                 std::vector<unsigned int> vSeq;
                 ParseUtils::GenerateSeqVector(vSeqStr.c_str(), vSeq);
 
-                int p            = atoi(vItem->Attribute("ID"));
-                m_bndRegOrder[p] = vSeq;
-                vItem            = vItem->NextSiblingElement();
+                int p                = atoi(vItem->Attribute("ID"));
+                m_bndRegOrder[p]     = vSeq;
+                graph_bndRegOrder[p] = vSeq;
+                vItem                = vItem->NextSiblingElement();
             }
         }
     }
@@ -762,7 +777,7 @@ void MeshGraphHDF5::v_PartitionMesh(
 }
 
 template <class T, typename DataType>
-void MeshGraphHDF5::ConstructGeomObject(
+void MeshGraphIOHDF5::ConstructGeomObject(
     [[maybe_unused]] std::map<int, std::shared_ptr<T>> &geomMap,
     [[maybe_unused]] int id, [[maybe_unused]] DataType *data,
     [[maybe_unused]] CurveSharedPtr curve)
@@ -770,110 +785,119 @@ void MeshGraphHDF5::ConstructGeomObject(
 }
 
 template <>
-void MeshGraphHDF5::ConstructGeomObject(
+void MeshGraphIOHDF5::ConstructGeomObject(
     std::map<int, std::shared_ptr<PointGeom>> &geomMap, int id, NekDouble *data,
     [[maybe_unused]] CurveSharedPtr curve)
 {
     geomMap[id] = MemoryManager<PointGeom>::AllocateSharedPtr(
-        m_spaceDimension, id, data[0], data[1], data[2]);
+        m_meshGraph->GetSpaceDimension(), id, data[0], data[1], data[2]);
 }
 
 template <>
-void MeshGraphHDF5::ConstructGeomObject(
+void MeshGraphIOHDF5::ConstructGeomObject(
     std::map<int, std::shared_ptr<SegGeom>> &geomMap, int id, int *data,
     CurveSharedPtr curve)
 {
-    PointGeomSharedPtr pts[2] = {GetVertex(data[0]), GetVertex(data[1])};
+    PointGeomSharedPtr pts[2] = {m_meshGraph->GetVertex(data[0]),
+                                 m_meshGraph->GetVertex(data[1])};
     geomMap[id]               = MemoryManager<SegGeom>::AllocateSharedPtr(
-        id, m_spaceDimension, pts, curve);
+        id, m_meshGraph->GetSpaceDimension(), pts, curve);
 }
 
 template <>
-void MeshGraphHDF5::ConstructGeomObject(
+void MeshGraphIOHDF5::ConstructGeomObject(
     std::map<int, std::shared_ptr<TriGeom>> &geomMap, int id, int *data,
     CurveSharedPtr curve)
 {
-    SegGeomSharedPtr segs[3] = {GetSegGeom(data[0]), GetSegGeom(data[1]),
-                                GetSegGeom(data[2])};
+    SegGeomSharedPtr segs[3] = {m_meshGraph->GetSegGeom(data[0]),
+                                m_meshGraph->GetSegGeom(data[1]),
+                                m_meshGraph->GetSegGeom(data[2])};
     geomMap[id] = MemoryManager<TriGeom>::AllocateSharedPtr(id, segs, curve);
 }
 
 template <>
-void MeshGraphHDF5::ConstructGeomObject(
+void MeshGraphIOHDF5::ConstructGeomObject(
     std::map<int, std::shared_ptr<QuadGeom>> &geomMap, int id, int *data,
     CurveSharedPtr curve)
 {
-    SegGeomSharedPtr segs[4] = {GetSegGeom(data[0]), GetSegGeom(data[1]),
-                                GetSegGeom(data[2]), GetSegGeom(data[3])};
+    SegGeomSharedPtr segs[4] = {
+        m_meshGraph->GetSegGeom(data[0]), m_meshGraph->GetSegGeom(data[1]),
+        m_meshGraph->GetSegGeom(data[2]), m_meshGraph->GetSegGeom(data[3])};
     geomMap[id] = MemoryManager<QuadGeom>::AllocateSharedPtr(id, segs, curve);
 }
 
 template <>
-void MeshGraphHDF5::ConstructGeomObject(
+void MeshGraphIOHDF5::ConstructGeomObject(
     std::map<int, std::shared_ptr<TetGeom>> &geomMap, int id, int *data,
     [[maybe_unused]] CurveSharedPtr curve)
 {
     TriGeomSharedPtr faces[4] = {
-        std::static_pointer_cast<TriGeom>(GetGeometry2D(data[0])),
-        std::static_pointer_cast<TriGeom>(GetGeometry2D(data[1])),
-        std::static_pointer_cast<TriGeom>(GetGeometry2D(data[2])),
-        std::static_pointer_cast<TriGeom>(GetGeometry2D(data[3]))};
+        std::static_pointer_cast<TriGeom>(m_meshGraph->GetGeometry2D(data[0])),
+        std::static_pointer_cast<TriGeom>(m_meshGraph->GetGeometry2D(data[1])),
+        std::static_pointer_cast<TriGeom>(m_meshGraph->GetGeometry2D(data[2])),
+        std::static_pointer_cast<TriGeom>(m_meshGraph->GetGeometry2D(data[3]))};
 
     auto tetGeom = MemoryManager<TetGeom>::AllocateSharedPtr(id, faces);
-    PopulateFaceToElMap(tetGeom, TetGeom::kNfaces);
+    m_meshGraph->PopulateFaceToElMap(tetGeom, TetGeom::kNfaces);
     geomMap[id] = tetGeom;
 }
 
 template <>
-void MeshGraphHDF5::ConstructGeomObject(
+void MeshGraphIOHDF5::ConstructGeomObject(
     std::map<int, std::shared_ptr<PyrGeom>> &geomMap, int id, int *data,
     [[maybe_unused]] CurveSharedPtr curve)
 {
-    Geometry2DSharedPtr faces[5] = {
-        GetGeometry2D(data[0]), GetGeometry2D(data[1]), GetGeometry2D(data[2]),
-        GetGeometry2D(data[3]), GetGeometry2D(data[4])};
+    Geometry2DSharedPtr faces[5] = {m_meshGraph->GetGeometry2D(data[0]),
+                                    m_meshGraph->GetGeometry2D(data[1]),
+                                    m_meshGraph->GetGeometry2D(data[2]),
+                                    m_meshGraph->GetGeometry2D(data[3]),
+                                    m_meshGraph->GetGeometry2D(data[4])};
 
     auto pyrGeom = MemoryManager<PyrGeom>::AllocateSharedPtr(id, faces);
-    PopulateFaceToElMap(pyrGeom, PyrGeom::kNfaces);
+    m_meshGraph->PopulateFaceToElMap(pyrGeom, PyrGeom::kNfaces);
     geomMap[id] = pyrGeom;
 }
 
 template <>
-void MeshGraphHDF5::ConstructGeomObject(
+void MeshGraphIOHDF5::ConstructGeomObject(
     std::map<int, std::shared_ptr<PrismGeom>> &geomMap, int id, int *data,
     [[maybe_unused]] CurveSharedPtr curve)
 {
-    Geometry2DSharedPtr faces[5] = {
-        GetGeometry2D(data[0]), GetGeometry2D(data[1]), GetGeometry2D(data[2]),
-        GetGeometry2D(data[3]), GetGeometry2D(data[4])};
+    Geometry2DSharedPtr faces[5] = {m_meshGraph->GetGeometry2D(data[0]),
+                                    m_meshGraph->GetGeometry2D(data[1]),
+                                    m_meshGraph->GetGeometry2D(data[2]),
+                                    m_meshGraph->GetGeometry2D(data[3]),
+                                    m_meshGraph->GetGeometry2D(data[4])};
 
     auto prismGeom = MemoryManager<PrismGeom>::AllocateSharedPtr(id, faces);
-    PopulateFaceToElMap(prismGeom, PrismGeom::kNfaces);
+    m_meshGraph->PopulateFaceToElMap(prismGeom, PrismGeom::kNfaces);
     geomMap[id] = prismGeom;
 }
 
 template <>
-void MeshGraphHDF5::ConstructGeomObject(
+void MeshGraphIOHDF5::ConstructGeomObject(
     std::map<int, std::shared_ptr<HexGeom>> &geomMap, int id, int *data,
     [[maybe_unused]] CurveSharedPtr curve)
 {
     QuadGeomSharedPtr faces[6] = {
-        std::static_pointer_cast<QuadGeom>(GetGeometry2D(data[0])),
-        std::static_pointer_cast<QuadGeom>(GetGeometry2D(data[1])),
-        std::static_pointer_cast<QuadGeom>(GetGeometry2D(data[2])),
-        std::static_pointer_cast<QuadGeom>(GetGeometry2D(data[3])),
-        std::static_pointer_cast<QuadGeom>(GetGeometry2D(data[4])),
-        std::static_pointer_cast<QuadGeom>(GetGeometry2D(data[5]))};
+        std::static_pointer_cast<QuadGeom>(m_meshGraph->GetGeometry2D(data[0])),
+        std::static_pointer_cast<QuadGeom>(m_meshGraph->GetGeometry2D(data[1])),
+        std::static_pointer_cast<QuadGeom>(m_meshGraph->GetGeometry2D(data[2])),
+        std::static_pointer_cast<QuadGeom>(m_meshGraph->GetGeometry2D(data[3])),
+        std::static_pointer_cast<QuadGeom>(m_meshGraph->GetGeometry2D(data[4])),
+        std::static_pointer_cast<QuadGeom>(
+            m_meshGraph->GetGeometry2D(data[5]))};
 
     auto hexGeom = MemoryManager<HexGeom>::AllocateSharedPtr(id, faces);
-    PopulateFaceToElMap(hexGeom, HexGeom::kNfaces);
+    m_meshGraph->PopulateFaceToElMap(hexGeom, HexGeom::kNfaces);
     geomMap[id] = hexGeom;
 }
 
 template <class T, typename DataType>
-void MeshGraphHDF5::FillGeomMap(std::map<int, std::shared_ptr<T>> &geomMap,
-                                const CurveMap &curveMap, std::vector<int> &ids,
-                                std::vector<DataType> &geomData)
+void MeshGraphIOHDF5::FillGeomMap(std::map<int, std::shared_ptr<T>> &geomMap,
+                                  const CurveMap &curveMap,
+                                  std::vector<int> &ids,
+                                  std::vector<DataType> &geomData)
 {
     const int nGeomData = GetGeomDataDim(geomMap);
     const int nRows     = geomData.size() / nGeomData;
@@ -899,11 +923,10 @@ void MeshGraphHDF5::FillGeomMap(std::map<int, std::shared_ptr<T>> &geomMap,
 }
 
 template <class T, typename DataType>
-void MeshGraphHDF5::ReadGeometryData(std::map<int, std::shared_ptr<T>> &geomMap,
-                                     std::string dataSet,
-                                     const std::unordered_set<int> &readIds,
-                                     std::vector<int> &ids,
-                                     std::vector<DataType> &geomData)
+void MeshGraphIOHDF5::ReadGeometryData(
+    std::map<int, std::shared_ptr<T>> &geomMap, std::string dataSet,
+    const std::unordered_set<int> &readIds, std::vector<int> &ids,
+    std::vector<DataType> &geomData)
 {
     if (!m_mesh->ContainsDataSet(dataSet))
     {
@@ -954,8 +977,8 @@ void MeshGraphHDF5::ReadGeometryData(std::map<int, std::shared_ptr<T>> &geomMap,
     data->Read(geomData, space, m_readPL);
 }
 
-void MeshGraphHDF5::ReadCurveMap(CurveMap &curveMap, std::string dsName,
-                                 const std::unordered_set<int> &readIds)
+void MeshGraphIOHDF5::ReadCurveMap(CurveMap &curveMap, std::string dsName,
+                                   const std::unordered_set<int> &readIds)
 {
     // If dataset does not exist, exit.
     if (!m_mesh->ContainsDataSet(dsName))
@@ -1067,14 +1090,16 @@ void MeshGraphHDF5::ReadCurveMap(CurveMap &curveMap, std::string dsName,
         for (int i = 0; i < curve->m_points.size(); ++i, cnt += 3)
         {
             curve->m_points[i] = MemoryManager<PointGeom>::AllocateSharedPtr(
-                0, m_spaceDimension, nodeRawData[cnt], nodeRawData[cnt + 1],
-                nodeRawData[cnt + 2]);
+                0, m_meshGraph->GetSpaceDimension(), nodeRawData[cnt],
+                nodeRawData[cnt + 1], nodeRawData[cnt + 2]);
         }
     }
 }
 
-void MeshGraphHDF5::ReadDomain()
+void MeshGraphIOHDF5::ReadDomain()
 {
+    auto &domain = m_meshGraph->GetDomain();
+
     if (m_inFormatVersion == 1)
     {
         map<int, CompositeSharedPtr> fullDomain;
@@ -1083,8 +1108,8 @@ void MeshGraphHDF5::ReadDomain()
 
         vector<string> data;
         dst->ReadVectorString(data, space, m_readPL);
-        GetCompositeList(data[0], fullDomain);
-        m_domain[0] = fullDomain;
+        m_meshGraph->GetCompositeList(data[0], fullDomain);
+        domain[0] = fullDomain;
 
         return;
     }
@@ -1098,7 +1123,7 @@ void MeshGraphHDF5::ReadDomain()
     for (auto &dIt : data)
     {
         fullDomain.push_back(CompositeMap());
-        GetCompositeList(dIt, fullDomain.back());
+        m_meshGraph->GetCompositeList(dIt, fullDomain.back());
     }
 
     H5::DataSetSharedPtr mdata    = m_maps->OpenDataSet("DOMAIN");
@@ -1109,12 +1134,22 @@ void MeshGraphHDF5::ReadDomain()
 
     for (int i = 0; i < ids.size(); ++i)
     {
-        m_domain[ids[i]] = fullDomain[i];
+        domain[ids[i]] = fullDomain[i];
     }
 }
 
-void MeshGraphHDF5::ReadComposites()
+void MeshGraphIOHDF5::ReadComposites()
 {
+    PointGeomMap &vertSet        = m_meshGraph->GetAllPointGeoms();
+    SegGeomMap &segGeoms         = m_meshGraph->GetAllSegGeoms();
+    TriGeomMap &triGeoms         = m_meshGraph->GetAllTriGeoms();
+    QuadGeomMap &quadGeoms       = m_meshGraph->GetAllQuadGeoms();
+    TetGeomMap &tetGeoms         = m_meshGraph->GetAllTetGeoms();
+    PyrGeomMap &pyrGeoms         = m_meshGraph->GetAllPyrGeoms();
+    PrismGeomMap &prismGeoms     = m_meshGraph->GetAllPrismGeoms();
+    HexGeomMap &hexGeoms         = m_meshGraph->GetAllHexGeoms();
+    CompositeMap &meshComposites = m_meshGraph->GetComposites();
+
     string nm = "COMPOSITE";
 
     H5::DataSetSharedPtr data    = m_mesh->OpenDataSet(nm);
@@ -1131,6 +1166,7 @@ void MeshGraphHDF5::ReadComposites()
     vector<int> ids;
     mdata->Read(ids, mspace);
 
+    auto &graph_compOrder = m_meshGraph->GetCompositeOrdering();
     for (int i = 0; i < dims[0]; i++)
     {
         string compStr = comps[i];
@@ -1149,15 +1185,16 @@ void MeshGraphHDF5::ReadComposites()
         vector<unsigned int> seqVector;
 
         ParseUtils::GenerateSeqVector(indxStr, seqVector);
-        m_compOrder[ids[i]] = seqVector;
+        m_compOrder[ids[i]]     = seqVector;
+        graph_compOrder[ids[i]] = seqVector;
 
         switch (type)
         {
             case 'V':
                 for (auto &i : seqVector)
                 {
-                    auto it = m_vertSet.find(i);
-                    if (it != m_vertSet.end())
+                    auto it = vertSet.find(i);
+                    if (it != vertSet.end())
                     {
                         comp->m_geomVec.push_back(it->second);
                     }
@@ -1167,8 +1204,8 @@ void MeshGraphHDF5::ReadComposites()
             case 'E':
                 for (auto &i : seqVector)
                 {
-                    auto it = m_segGeoms.find(i);
-                    if (it != m_segGeoms.end())
+                    auto it = segGeoms.find(i);
+                    if (it != segGeoms.end())
                     {
                         comp->m_geomVec.push_back(it->second);
                     }
@@ -1177,10 +1214,10 @@ void MeshGraphHDF5::ReadComposites()
             case 'Q':
                 for (auto &i : seqVector)
                 {
-                    auto it = m_quadGeoms.find(i);
-                    if (it != m_quadGeoms.end())
+                    auto it = quadGeoms.find(i);
+                    if (it != quadGeoms.end())
                     {
-                        if (CheckRange(*it->second))
+                        if (m_meshGraph->CheckRange(*it->second))
                         {
                             comp->m_geomVec.push_back(it->second);
                         }
@@ -1190,10 +1227,10 @@ void MeshGraphHDF5::ReadComposites()
             case 'T':
                 for (auto &i : seqVector)
                 {
-                    auto it = m_triGeoms.find(i);
-                    if (it != m_triGeoms.end())
+                    auto it = triGeoms.find(i);
+                    if (it != triGeoms.end())
                     {
-                        if (CheckRange(*it->second))
+                        if (m_meshGraph->CheckRange(*it->second))
                         {
                             comp->m_geomVec.push_back(it->second);
                         }
@@ -1203,18 +1240,18 @@ void MeshGraphHDF5::ReadComposites()
             case 'F':
                 for (auto &i : seqVector)
                 {
-                    auto it1 = m_quadGeoms.find(i);
-                    if (it1 != m_quadGeoms.end())
+                    auto it1 = quadGeoms.find(i);
+                    if (it1 != quadGeoms.end())
                     {
-                        if (CheckRange(*it1->second))
+                        if (m_meshGraph->CheckRange(*it1->second))
                         {
                             comp->m_geomVec.push_back(it1->second);
                         }
                     }
-                    auto it2 = m_triGeoms.find(i);
-                    if (it2 != m_triGeoms.end())
+                    auto it2 = triGeoms.find(i);
+                    if (it2 != triGeoms.end())
                     {
-                        if (CheckRange(*it2->second))
+                        if (m_meshGraph->CheckRange(*it2->second))
                         {
                             comp->m_geomVec.push_back(it2->second);
                         }
@@ -1224,10 +1261,10 @@ void MeshGraphHDF5::ReadComposites()
             case 'A':
                 for (auto &i : seqVector)
                 {
-                    auto it = m_tetGeoms.find(i);
-                    if (it != m_tetGeoms.end())
+                    auto it = tetGeoms.find(i);
+                    if (it != tetGeoms.end())
                     {
-                        if (CheckRange(*it->second))
+                        if (m_meshGraph->CheckRange(*it->second))
                         {
                             comp->m_geomVec.push_back(it->second);
                         }
@@ -1237,10 +1274,10 @@ void MeshGraphHDF5::ReadComposites()
             case 'P':
                 for (auto &i : seqVector)
                 {
-                    auto it = m_pyrGeoms.find(i);
-                    if (it != m_pyrGeoms.end())
+                    auto it = pyrGeoms.find(i);
+                    if (it != pyrGeoms.end())
                     {
-                        if (CheckRange(*it->second))
+                        if (m_meshGraph->CheckRange(*it->second))
                         {
                             comp->m_geomVec.push_back(it->second);
                         }
@@ -1250,10 +1287,10 @@ void MeshGraphHDF5::ReadComposites()
             case 'R':
                 for (auto &i : seqVector)
                 {
-                    auto it = m_prismGeoms.find(i);
-                    if (it != m_prismGeoms.end())
+                    auto it = prismGeoms.find(i);
+                    if (it != prismGeoms.end())
                     {
-                        if (CheckRange(*it->second))
+                        if (m_meshGraph->CheckRange(*it->second))
                         {
                             comp->m_geomVec.push_back(it->second);
                         }
@@ -1263,10 +1300,10 @@ void MeshGraphHDF5::ReadComposites()
             case 'H':
                 for (auto &i : seqVector)
                 {
-                    auto it = m_hexGeoms.find(i);
-                    if (it != m_hexGeoms.end())
+                    auto it = hexGeoms.find(i);
+                    if (it != hexGeoms.end())
                     {
-                        if (CheckRange(*it->second))
+                        if (m_meshGraph->CheckRange(*it->second))
                         {
                             comp->m_geomVec.push_back(it->second);
                         }
@@ -1277,12 +1314,12 @@ void MeshGraphHDF5::ReadComposites()
 
         if (comp->m_geomVec.size() > 0)
         {
-            m_meshComposites[ids[i]] = comp;
+            meshComposites[ids[i]] = comp;
         }
     }
 }
 
-CompositeDescriptor MeshGraphHDF5::CreateCompositeDescriptor(
+CompositeDescriptor MeshGraphIOHDF5::CreateCompositeDescriptor(
     std::unordered_map<int, int> &id2row)
 {
     CompositeDescriptor ret;
@@ -1403,8 +1440,8 @@ inline int GetGeomData(std::shared_ptr<T> &geom, int i)
 }
 
 template <class T>
-void MeshGraphHDF5::WriteGeometryMap(std::map<int, std::shared_ptr<T>> &geomMap,
-                                     std::string datasetName)
+void MeshGraphIOHDF5::WriteGeometryMap(
+    std::map<int, std::shared_ptr<T>> &geomMap, std::string datasetName)
 {
     typedef typename std::conditional<std::is_same<T, PointGeom>::value,
                                       NekDouble, int>::type DataType;
@@ -1449,9 +1486,9 @@ void MeshGraphHDF5::WriteGeometryMap(std::map<int, std::shared_ptr<T>> &geomMap,
     dst->Write(idMap, ds);
 }
 
-void MeshGraphHDF5::WriteCurveMap(CurveMap &curves, std::string dsName,
-                                  MeshCurvedPts &curvedPts, int &ptOffset,
-                                  int &newIdx)
+void MeshGraphIOHDF5::WriteCurveMap(CurveMap &curves, std::string dsName,
+                                    MeshCurvedPts &curvedPts, int &ptOffset,
+                                    int &newIdx)
 {
     vector<int> data, map;
 
@@ -1490,7 +1527,7 @@ void MeshGraphHDF5::WriteCurveMap(CurveMap &curves, std::string dsName,
     dst->Write(map, ds);
 }
 
-void MeshGraphHDF5::WriteCurvePoints(MeshCurvedPts &curvedPts)
+void MeshGraphIOHDF5::WriteCurvePoints(MeshCurvedPts &curvedPts)
 {
     vector<double> vertData(curvedPts.pts.size() * 3);
 
@@ -1510,7 +1547,7 @@ void MeshGraphHDF5::WriteCurvePoints(MeshCurvedPts &curvedPts)
     dst->Write(vertData, ds);
 }
 
-void MeshGraphHDF5::WriteComposites(CompositeMap &composites)
+void MeshGraphIOHDF5::WriteComposites(CompositeMap &composites)
 {
     vector<string> comps;
 
@@ -1541,7 +1578,7 @@ void MeshGraphHDF5::WriteComposites(CompositeMap &composites)
     dst->Write(c_map, ds);
 }
 
-void MeshGraphHDF5::WriteDomain(std::map<int, CompositeMap> &domain)
+void MeshGraphIOHDF5::WriteDomain(std::map<int, CompositeMap> &domain)
 {
     // dont need location map only a id map
     // will filter the composites per parition on read, its easier
@@ -1580,10 +1617,23 @@ void MeshGraphHDF5::WriteDomain(std::map<int, CompositeMap> &domain)
     dst->Write(d_map, ds);
 }
 
-void MeshGraphHDF5::v_WriteGeometry(
+void MeshGraphIOHDF5::v_WriteGeometry(
     const std::string &outfilename, bool defaultExp,
     [[maybe_unused]] const LibUtilities::FieldMetaDataMap &metadata)
 {
+    PointGeomMap &vertSet        = m_meshGraph->GetAllPointGeoms();
+    SegGeomMap &segGeoms         = m_meshGraph->GetAllSegGeoms();
+    TriGeomMap &triGeoms         = m_meshGraph->GetAllTriGeoms();
+    QuadGeomMap &quadGeoms       = m_meshGraph->GetAllQuadGeoms();
+    TetGeomMap &tetGeoms         = m_meshGraph->GetAllTetGeoms();
+    PyrGeomMap &pyrGeoms         = m_meshGraph->GetAllPyrGeoms();
+    PrismGeomMap &prismGeoms     = m_meshGraph->GetAllPrismGeoms();
+    HexGeomMap &hexGeoms         = m_meshGraph->GetAllHexGeoms();
+    CurveMap &curvedEdges        = m_meshGraph->GetCurvedEdges();
+    CurveMap &curvedFaces        = m_meshGraph->GetCurvedFaces();
+    CompositeMap &meshComposites = m_meshGraph->GetComposites();
+    auto domain                  = m_meshGraph->GetDomain();
+
     vector<string> tmp;
     boost::split(tmp, outfilename, boost::is_any_of("."));
     string filenameXml  = tmp[0] + ".xml";
@@ -1622,8 +1672,8 @@ void MeshGraphHDF5::v_WriteGeometry(
     }
 
     // Update attributes with dimensions.
-    geomTag->SetAttribute("DIM", m_meshDimension);
-    geomTag->SetAttribute("SPACE", m_spaceDimension);
+    geomTag->SetAttribute("DIM", m_meshGraph->GetMeshDimension());
+    geomTag->SetAttribute("SPACE", m_meshGraph->GetSpaceDimension());
     geomTag->SetAttribute("HDF5FILE", filenameHdf5);
 
     geomTag->Clear();
@@ -1632,10 +1682,10 @@ void MeshGraphHDF5::v_WriteGeometry(
     {
         TiXmlElement *expTag = new TiXmlElement("EXPANSIONS");
 
-        for (auto it = m_meshComposites.begin(); it != m_meshComposites.end();
-             it++)
+        for (auto it = meshComposites.begin(); it != meshComposites.end(); it++)
         {
-            if (it->second->m_geomVec[0]->GetShapeDim() == m_meshDimension)
+            if (it->second->m_geomVec[0]->GetShapeDim() ==
+                m_meshGraph->GetMeshDimension())
             {
                 TiXmlElement *exp = new TiXmlElement("E");
                 exp->SetAttribute(
@@ -1651,9 +1701,10 @@ void MeshGraphHDF5::v_WriteGeometry(
         root->LinkEndChild(expTag);
     }
 
-    if (m_movement)
+    auto movement = m_meshGraph->GetMovement();
+    if (movement)
     {
-        m_movement->WriteMovement(root);
+        movement->WriteMovement(root);
     }
 
     doc->SaveFile(filenameXml);
@@ -1674,31 +1725,31 @@ void MeshGraphHDF5::v_WriteGeometry(
     m_mesh = hdfRoot2->CreateGroup("MESH");
     m_maps = hdfRoot2->CreateGroup("MAPS");
 
-    WriteGeometryMap(m_vertSet, "VERT");
-    WriteGeometryMap(m_segGeoms, "SEG");
-    if (m_meshDimension > 1)
+    WriteGeometryMap(vertSet, "VERT");
+    WriteGeometryMap(segGeoms, "SEG");
+    if (m_meshGraph->GetMeshDimension() > 1)
     {
-        WriteGeometryMap(m_triGeoms, "TRI");
-        WriteGeometryMap(m_quadGeoms, "QUAD");
+        WriteGeometryMap(triGeoms, "TRI");
+        WriteGeometryMap(quadGeoms, "QUAD");
     }
-    if (m_meshDimension > 2)
+    if (m_meshGraph->GetMeshDimension() > 2)
     {
-        WriteGeometryMap(m_tetGeoms, "TET");
-        WriteGeometryMap(m_pyrGeoms, "PYR");
-        WriteGeometryMap(m_prismGeoms, "PRISM");
-        WriteGeometryMap(m_hexGeoms, "HEX");
+        WriteGeometryMap(tetGeoms, "TET");
+        WriteGeometryMap(pyrGeoms, "PYR");
+        WriteGeometryMap(prismGeoms, "PRISM");
+        WriteGeometryMap(hexGeoms, "HEX");
     }
 
     // Write curves
     int ptOffset = 0, newIdx = 0;
     MeshCurvedPts curvePts;
-    WriteCurveMap(m_curvedEdges, "CURVE_EDGE", curvePts, ptOffset, newIdx);
-    WriteCurveMap(m_curvedFaces, "CURVE_FACE", curvePts, ptOffset, newIdx);
+    WriteCurveMap(curvedEdges, "CURVE_EDGE", curvePts, ptOffset, newIdx);
+    WriteCurveMap(curvedFaces, "CURVE_FACE", curvePts, ptOffset, newIdx);
     WriteCurvePoints(curvePts);
 
     // Write composites and domain.
-    WriteComposites(m_meshComposites);
-    WriteDomain(m_domain);
+    WriteComposites(meshComposites);
+    WriteDomain(domain);
 }
 
 } // namespace Nektar::SpatialDomains
