@@ -126,32 +126,56 @@ struct IProductTemplate
 
         std::vector<vec_t, allocator<vec_t>> tmpIn(nqTot), tmpOut(m_nmTot);
 
-        vec_t *jac_ptr;
+        vec_t *jac_ptr = &((*this->m_jac)[0]);
 
-        for (int e = 0; e < this->m_nBlocks; ++e)
+        // temporary aligned storage for local fields
+        NekDouble *locField = static_cast<NekDouble *>(::operator new[](
+            nqBlocks * sizeof(NekDouble), std::align_val_t(vec_t::alignment)));
+
+        for (int e = 0; e < this->m_nBlocks - 1; ++e)
         {
-            if (DEFORMED)
-            {
-                jac_ptr = &((*this->m_jac)[e * nqTot]);
-            }
-            else
-            {
-                jac_ptr = &((*this->m_jac)[e]);
-            }
-
-            // Load and transpose data
-            load_interleave(inptr, nqTot, tmpIn);
+            // Load data to aligned storage and interleave it
+            // std::copy(inptr, inptr + nqBlocks, locField);
+            // load_interleave(locField, nqTot, tmpIn);
+            load_unalign_interleave(inptr, nqTot, tmpIn);
 
             IProduct1DKernel<SHAPE_TYPE, false, false, DEFORMED>(
                 nm0, nq0, tmpIn, this->m_bdata[0], this->m_w[0], jac_ptr,
                 tmpOut);
 
             // de-interleave and store data
-            deinterleave_store(tmpOut, m_nmTot, outptr);
+            // deinterleave_store(tmpOut, m_nmTot, locField);
+            // std::copy(locField, locField + nmBlocks, outptr);
+            deinterleave_unalign_store(tmpOut, m_nmTot, outptr);
 
             inptr += nqBlocks;
             outptr += nmBlocks;
+            if constexpr (DEFORMED)
+            {
+                jac_ptr += nqTot;
+            }
+            else
+            {
+                ++jac_ptr;
+            }
         }
+        // last block
+        {
+            int acturalSize = nqBlocks - this->m_nPads * nqTot;
+            std::copy(inptr, inptr + acturalSize, locField);
+            load_interleave(locField, nqTot, tmpIn);
+
+            IProduct1DKernel<SHAPE_TYPE, false, false, DEFORMED>(
+                nm0, nq0, tmpIn, this->m_bdata[0], this->m_w[0], jac_ptr,
+                tmpOut);
+
+            // de-interleave and store data
+            deinterleave_store(tmpOut, m_nmTot, locField);
+            acturalSize = nmBlocks - this->m_nPads * m_nmTot;
+            std::copy(locField, locField + acturalSize, outptr);
+        }
+        // free aligned memory
+        ::operator delete[](locField, std::align_val_t(vec_t::alignment));
     }
 
     // Size based template version.
@@ -168,31 +192,52 @@ struct IProductTemplate
 
         std::vector<vec_t, allocator<vec_t>> tmpIn(nqTot), tmpOut(m_nmTot);
 
-        vec_t *jac_ptr;
+        vec_t *jac_ptr = &((*this->m_jac)[0]);
 
-        for (int e = 0; e < this->m_nBlocks; ++e)
+        // temporary aligned storage for local fields
+        alignas(vec_t::alignment) NekDouble locField[nqBlocks];
+
+        for (int e = 0; e < this->m_nBlocks - 1; ++e)
         {
-            if (DEFORMED)
-            {
-                jac_ptr = &((*this->m_jac)[e * nqTot]);
-            }
-            else
-            {
-                jac_ptr = &((*this->m_jac)[e]);
-            }
-
-            // Load and transpose data
-            load_interleave(inptr, nqTot, tmpIn);
+            // Load data to aligned storage and interleave it
+            // std::copy(inptr, inptr + nqBlocks, locField);
+            // load_interleave(locField, nqTot, tmpIn);
+            load_unalign_interleave(inptr, nqTot, tmpIn);
 
             IProduct1DKernel<SHAPE_TYPE, false, false, DEFORMED>(
                 nm0, nq0, tmpIn, this->m_bdata[0], this->m_w[0], jac_ptr,
                 tmpOut);
 
             // de-interleave and store data
-            deinterleave_store(tmpOut, m_nmTot, outptr);
+            // deinterleave_store(tmpOut, m_nmTot, locField);
+            // std::copy(locField, locField + nmBlocks, outptr);
+            deinterleave_unalign_store(tmpOut, m_nmTot, outptr);
 
             inptr += nqBlocks;
             outptr += nmBlocks;
+            if constexpr (DEFORMED)
+            {
+                jac_ptr += nqTot;
+            }
+            else
+            {
+                ++jac_ptr;
+            }
+        }
+        // last block
+        {
+            int acturalSize = nqBlocks - this->m_nPads * nqTot;
+            std::copy(inptr, inptr + acturalSize, locField);
+            load_interleave(locField, nqTot, tmpIn);
+
+            IProduct1DKernel<SHAPE_TYPE, false, false, DEFORMED>(
+                nm0, nq0, tmpIn, this->m_bdata[0], this->m_w[0], jac_ptr,
+                tmpOut);
+
+            // de-interleave and store data
+            deinterleave_store(tmpOut, m_nmTot, locField);
+            acturalSize = nmBlocks - this->m_nPads * m_nmTot;
+            std::copy(locField, locField + acturalSize, outptr);
         }
     }
 
@@ -225,21 +270,18 @@ struct IProductTemplate
         std::vector<vec_t, allocator<vec_t>> wsp0(wsp0Size), tmpIn(nqTot),
             tmpOut(m_nmTot);
 
-        vec_t *jac_ptr;
+        vec_t *jac_ptr = &((*this->m_jac)[0]);
 
-        for (int e = 0; e < this->m_nBlocks; ++e)
+        // temporary aligned storage for local fields
+        NekDouble *locField = static_cast<NekDouble *>(::operator new[](
+            nqBlocks * sizeof(NekDouble), std::align_val_t(vec_t::alignment)));
+
+        for (int e = 0; e < this->m_nBlocks - 1; ++e)
         {
-            if (DEFORMED)
-            {
-                jac_ptr = &((*this->m_jac)[nqTot * e]);
-            }
-            else
-            {
-                jac_ptr = &((*this->m_jac)[e]);
-            }
-
-            // Load and transpose data
-            load_interleave(inptr, nqTot, tmpIn);
+            // Load data to aligned storage and interleave it
+            // std::copy(inptr, inptr + nqBlocks, locField);
+            // load_interleave(locField, nqTot, tmpIn);
+            load_unalign_interleave(inptr, nqTot, tmpIn);
 
             IProduct2DKernel<SHAPE_TYPE, false, false, DEFORMED>(
                 nm0, nm1, nq0, nq1, correct, tmpIn, this->m_bdata[0],
@@ -247,11 +289,39 @@ struct IProductTemplate
                 tmpOut);
 
             // de-interleave and store data
-            deinterleave_store(tmpOut, m_nmTot, outptr);
+            // deinterleave_store(tmpOut, m_nmTot, locField);
+            // std::copy(locField, locField + nmBlocks, outptr);
+            deinterleave_unalign_store(tmpOut, m_nmTot, outptr);
 
             inptr += nqBlocks;
             outptr += nmBlocks;
+            if constexpr (DEFORMED)
+            {
+                jac_ptr += nqTot;
+            }
+            else
+            {
+                ++jac_ptr;
+            }
         }
+        // last block
+        {
+            int acturalSize = nqBlocks - this->m_nPads * nqTot;
+            std::copy(inptr, inptr + acturalSize, locField);
+            load_interleave(locField, nqTot, tmpIn);
+
+            IProduct2DKernel<SHAPE_TYPE, false, false, DEFORMED>(
+                nm0, nm1, nq0, nq1, correct, tmpIn, this->m_bdata[0],
+                this->m_bdata[1], this->m_w[0], this->m_w[1], jac_ptr, wsp0,
+                tmpOut);
+
+            // de-interleave and store data
+            deinterleave_store(tmpOut, m_nmTot, locField);
+            acturalSize = nmBlocks - this->m_nPads * m_nmTot;
+            std::copy(locField, locField + acturalSize, outptr);
+        }
+        // free aligned memory
+        ::operator delete[](locField, std::align_val_t(vec_t::alignment));
     }
 
     // Size based template version.
@@ -276,21 +346,17 @@ struct IProductTemplate
         std::vector<vec_t, allocator<vec_t>> wsp0(wsp0Size), tmpIn(nqTot),
             tmpOut(m_nmTot);
 
-        vec_t *jac_ptr;
+        vec_t *jac_ptr = &((*this->m_jac)[0]);
 
-        for (int e = 0; e < this->m_nBlocks; ++e)
+        // temporary aligned storage for local fields
+        alignas(vec_t::alignment) NekDouble locField[nqBlocks];
+
+        for (int e = 0; e < this->m_nBlocks - 1; ++e)
         {
-            if (DEFORMED)
-            {
-                jac_ptr = &((*this->m_jac)[nqTot * e]);
-            }
-            else
-            {
-                jac_ptr = &((*this->m_jac)[e]);
-            }
-
-            // Load and transpose data
-            load_interleave(inptr, nqTot, tmpIn);
+            // Load data to aligned storage and interleave it
+            // std::copy(inptr, inptr + nqBlocks, locField);
+            // load_interleave(locField, nqTot, tmpIn);
+            load_unalign_interleave(inptr, nqTot, tmpIn);
 
             IProduct2DKernel<SHAPE_TYPE, false, false, DEFORMED>(
                 nm0, nm1, nq0, nq1, correct, tmpIn, this->m_bdata[0],
@@ -298,10 +364,36 @@ struct IProductTemplate
                 tmpOut);
 
             // de-interleave and store data
-            deinterleave_store(tmpOut, m_nmTot, outptr);
+            // deinterleave_store(tmpOut, m_nmTot, locField);
+            // std::copy(locField, locField + nmBlocks, outptr);
+            deinterleave_unalign_store(tmpOut, m_nmTot, outptr);
 
             inptr += nqBlocks;
             outptr += nmBlocks;
+            if constexpr (DEFORMED)
+            {
+                jac_ptr += nqTot;
+            }
+            else
+            {
+                ++jac_ptr;
+            }
+        }
+        // last block
+        {
+            int acturalSize = nqBlocks - this->m_nPads * nqTot;
+            std::copy(inptr, inptr + acturalSize, locField);
+            load_interleave(locField, nqTot, tmpIn);
+
+            IProduct2DKernel<SHAPE_TYPE, false, false, DEFORMED>(
+                nm0, nm1, nq0, nq1, correct, tmpIn, this->m_bdata[0],
+                this->m_bdata[1], this->m_w[0], this->m_w[1], jac_ptr, wsp0,
+                tmpOut);
+
+            // de-interleave and store data
+            deinterleave_store(tmpOut, m_nmTot, locField);
+            acturalSize = nmBlocks - this->m_nPads * m_nmTot;
+            std::copy(locField, locField + acturalSize, outptr);
         }
     }
 
@@ -337,21 +429,18 @@ struct IProductTemplate
         std::vector<vec_t, allocator<vec_t>> wsp0(wsp0Size), wsp1(wsp1Size),
             wsp2(wsp2Size), tmpIn(nqTot), tmpOut(m_nmTot);
 
-        vec_t *jac_ptr;
+        vec_t *jac_ptr = &((*this->m_jac)[0]);
 
-        for (int e = 0; e < this->m_nBlocks; ++e)
+        // temporary aligned storage for local fields
+        NekDouble *locField = static_cast<NekDouble *>(::operator new[](
+            nqBlocks * sizeof(NekDouble), std::align_val_t(vec_t::alignment)));
+
+        for (int e = 0; e < this->m_nBlocks - 1; ++e)
         {
-            if (DEFORMED)
-            {
-                jac_ptr = &((*this->m_jac)[nqTot * e]);
-            }
-            else
-            {
-                jac_ptr = &((*this->m_jac)[e]);
-            }
-
-            // Load and transpose data
-            load_interleave(inptr, nqTot, tmpIn);
+            // Load data to aligned storage and interleave it
+            // std::copy(inptr, inptr + nqBlocks, locField);
+            // load_interleave(locField, nqTot, tmpIn);
+            load_unalign_interleave(inptr, nqTot, tmpIn);
 
             IProduct3DKernel<SHAPE_TYPE, false, false, DEFORMED>(
                 nm0, nm1, nm2, nq0, nq1, nq2, correct, tmpIn, this->m_bdata[0],
@@ -359,11 +448,39 @@ struct IProductTemplate
                 this->m_w[2], jac_ptr, wsp0, wsp1, wsp2, tmpOut);
 
             // de-interleave and store data
-            deinterleave_store(tmpOut, m_nmTot, outptr);
+            // deinterleave_store(tmpOut, m_nmTot, locField);
+            // std::copy(locField, locField + nmBlocks, outptr);
+            deinterleave_unalign_store(tmpOut, m_nmTot, outptr);
 
             inptr += nqBlocks;
             outptr += nmBlocks;
+            if constexpr (DEFORMED)
+            {
+                jac_ptr += nqTot;
+            }
+            else
+            {
+                ++jac_ptr;
+            }
         }
+        // last block
+        {
+            int acturalSize = nqBlocks - this->m_nPads * nqTot;
+            std::copy(inptr, inptr + acturalSize, locField);
+            load_interleave(locField, nqTot, tmpIn);
+
+            IProduct3DKernel<SHAPE_TYPE, false, false, DEFORMED>(
+                nm0, nm1, nm2, nq0, nq1, nq2, correct, tmpIn, this->m_bdata[0],
+                this->m_bdata[1], this->m_bdata[2], this->m_w[0], this->m_w[1],
+                this->m_w[2], jac_ptr, wsp0, wsp1, wsp2, tmpOut);
+
+            // de-interleave and store data
+            deinterleave_store(tmpOut, m_nmTot, locField);
+            acturalSize = nmBlocks - this->m_nPads * m_nmTot;
+            std::copy(locField, locField + acturalSize, outptr);
+        }
+        // free aligned memory
+        ::operator delete[](locField, std::align_val_t(vec_t::alignment));
     }
 
     // Size based template version.
@@ -389,21 +506,17 @@ struct IProductTemplate
         std::vector<vec_t, allocator<vec_t>> wsp0(wsp0Size), wsp1(wsp1Size),
             wsp2(wsp2Size), tmpIn(nqTot), tmpOut(m_nmTot);
 
-        vec_t *jac_ptr;
+        vec_t *jac_ptr = &((*this->m_jac)[0]);
 
-        for (int e = 0; e < this->m_nBlocks; ++e)
+        // temporary aligned storage for local fields
+        alignas(vec_t::alignment) NekDouble locField[nqBlocks];
+
+        for (int e = 0; e < this->m_nBlocks - 1; ++e)
         {
-            if (DEFORMED)
-            {
-                jac_ptr = &((*this->m_jac)[nqTot * e]);
-            }
-            else
-            {
-                jac_ptr = &((*this->m_jac)[e]);
-            }
-
-            // Load and transpose data
-            load_interleave(inptr, nqTot, tmpIn);
+            // Load data to aligned storage and interleave it
+            // std::copy(inptr, inptr + nqBlocks, locField);
+            // load_interleave(locField, nqTot, tmpIn);
+            load_unalign_interleave(inptr, nqTot, tmpIn);
 
             IProduct3DKernel<SHAPE_TYPE, false, false, DEFORMED>(
                 nm0, nm1, nm2, nq0, nq1, nq2, correct, tmpIn, this->m_bdata[0],
@@ -411,10 +524,36 @@ struct IProductTemplate
                 this->m_w[2], jac_ptr, wsp0, wsp1, wsp2, tmpOut);
 
             // de-interleave and store data
-            deinterleave_store(tmpOut, m_nmTot, outptr);
+            // deinterleave_store(tmpOut, m_nmTot, locField);
+            // std::copy(locField, locField + nmBlocks, outptr);
+            deinterleave_unalign_store(tmpOut, m_nmTot, outptr);
 
             inptr += nqBlocks;
             outptr += nmBlocks;
+            if constexpr (DEFORMED)
+            {
+                jac_ptr += nqTot;
+            }
+            else
+            {
+                ++jac_ptr;
+            }
+        }
+        // last block
+        {
+            int acturalSize = nqBlocks - this->m_nPads * nqTot;
+            std::copy(inptr, inptr + acturalSize, locField);
+            load_interleave(locField, nqTot, tmpIn);
+
+            IProduct3DKernel<SHAPE_TYPE, false, false, DEFORMED>(
+                nm0, nm1, nm2, nq0, nq1, nq2, correct, tmpIn, this->m_bdata[0],
+                this->m_bdata[1], this->m_bdata[2], this->m_w[0], this->m_w[1],
+                this->m_w[2], jac_ptr, wsp0, wsp1, wsp2, tmpOut);
+
+            // de-interleave and store data
+            deinterleave_store(tmpOut, m_nmTot, locField);
+            acturalSize = nmBlocks - this->m_nPads * m_nmTot;
+            std::copy(locField, locField + acturalSize, outptr);
         }
     }
 

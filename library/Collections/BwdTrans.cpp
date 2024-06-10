@@ -155,7 +155,7 @@ OperatorKey BwdTrans_StdMat::m_typeArr[] = {
  * @brief Backward transform operator using matrix free operators.
  */
 class BwdTrans_MatrixFree final : virtual public Operator,
-                                  MatrixFreeOneInOneOut,
+                                  MatrixFreeBase,
                                   virtual public BwdTrans_Helper
 {
 public:
@@ -169,19 +169,7 @@ public:
                     [[maybe_unused]] Array<OneD, NekDouble> &output2,
                     [[maybe_unused]] Array<OneD, NekDouble> &wsp) final
     {
-        if (m_isPadded)
-        {
-            // copy into padded vector
-            Vmath::Vcopy(m_nIn, input, 1, m_input, 1);
-            // call op
-            (*m_oper)(m_input, m_output);
-            // copy out of padded vector
-            Vmath::Vcopy(m_nOut, m_output, 1, output0, 1);
-        }
-        else
-        {
-            (*m_oper)(input, output0);
-        }
+        (*m_oper)(input, output0);
     }
 
     void operator()([[maybe_unused]] int dir,
@@ -200,9 +188,9 @@ private:
                         CoalescedGeomDataSharedPtr pGeomData,
                         StdRegions::FactorMap factors)
         : Operator(pCollExp, pGeomData, factors), BwdTrans_Helper(),
-          MatrixFreeOneInOneOut(pCollExp[0]->GetStdExp()->GetNcoeffs(),
-                                pCollExp[0]->GetStdExp()->GetTotPoints(),
-                                pCollExp.size())
+          MatrixFreeBase(pCollExp[0]->GetStdExp()->GetNcoeffs(),
+                         pCollExp[0]->GetStdExp()->GetTotPoints(),
+                         pCollExp.size())
     {
         // Basis vector.
         const auto dim = pCollExp[0]->GetStdExp()->GetShapeDimension();
@@ -219,7 +207,7 @@ private:
         std::string op_string = "BwdTrans";
         op_string += MatrixFree::GetOpstring(shapeType, false);
         auto oper = MatrixFree::GetOperatorFactory().CreateInstance(
-            op_string, basis, m_nElmtPad);
+            op_string, basis, pCollExp.size());
 
         m_oper = std::dynamic_pointer_cast<MatrixFree::BwdTrans>(oper);
         ASSERTL0(m_oper, "Failed to cast pointer.");

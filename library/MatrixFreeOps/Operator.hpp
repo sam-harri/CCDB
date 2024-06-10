@@ -472,13 +472,18 @@ protected:
     Helper(std::vector<LibUtilities::BasisSharedPtr> basis, int nElmt)
         : Operator()
     {
-        // Sanity check: no padding yet!
-        ASSERTL1(nElmt % vec_t::width == 0,
-                 "Number of elements not divisible by vector "
-                 "width, padding not yet implemented.");
-
-        // Calculate number of 'blocks', i.e. meta-elements
-        m_nBlocks = nElmt / vec_t::width;
+        if (nElmt % vec_t::width == 0) // No padding or already padded
+        {
+            // Calculate number of 'blocks', i.e. meta-elements
+            m_nBlocks = nElmt / vec_t::width;
+            m_nPads   = 0;
+        }
+        else // Need padding internally
+        {
+            // Calculate number of 'blocks', i.e. meta-elements
+            m_nBlocks = nElmt / vec_t::width + 1;
+            m_nPads   = vec_t::width - (nElmt % vec_t::width);
+        }
 
         // Depending on element dimension, set up basis information, quadrature,
         // etc, inside vectorised environment.
@@ -552,6 +557,7 @@ protected:
     }
 
     int m_nBlocks;
+    int m_nPads;
     std::array<int, DIM> m_nm, m_nq;
     std::array<std::vector<vec_t, tinysimd::allocator<vec_t>>, DIM> m_bdata;
     std::array<std::vector<vec_t, tinysimd::allocator<vec_t>>, DIM> m_dbdata;
