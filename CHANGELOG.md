@@ -39,6 +39,7 @@ v5.6.0
 - Fix MPI communicator for Parallel-in-Time (!1801)
 - Fix warnings issued by MSVC compiler in LibUtilities and StdRegions (!1740)
 - Fix Parareal convergence monitoring (!1802)
+- Avoid copying input/output to/from padded aligned arrays in MatrixFree operators(!1783)
 
 **CompressibleFlowSolver**
 - Complete second Frechet derivative implementation (!1761)

@@ -187,69 +187,58 @@ struct HelmholtzTemplate
         std::vector<vec_t, allocator<vec_t>> bwd(nqTot), deriv0(nqTot),
             deriv1(nqTot);
 
-        const vec_t *jac_ptr = {};
-        const vec_t *df_ptr  = {};
+        // temporary aligned storage for local fields
+        NekDouble *locField = static_cast<NekDouble *>(::operator new[](
+            nmBlocks * sizeof(NekDouble), std::align_val_t(vec_t::alignment)));
 
-        // Get size of derivative factor block
-        auto dfSize = ndf;
-        if (DEFORMED)
+        const vec_t *jac_ptr = &((*this->m_jac)[0]);
+        const vec_t *df_ptr  = &((*this->m_df)[0]);
+
+        const auto dfSize = ndf * nqTot;
+
+        for (int e = 0; e < this->m_nBlocks - 1; e++)
         {
-            dfSize *= nqTot;
-        }
+            // Load data to aligned storage and interleave it
+            // std::copy(inptr, inptr + nmBlocks, locField);
+            // load_interleave(locField, m_nmTot, tmpIn);
+            load_unalign_interleave(inptr, m_nmTot, tmpIn);
 
-        for (int e = 0; e < this->m_nBlocks; e++)
-        {
-            df_ptr = &((*this->m_df)[e * dfSize]);
-
-            // Load and transpose data
-            load_interleave(inptr, m_nmTot, tmpIn);
-
-            if (!DEFORMED)
-            {
-                jac_ptr = &((*this->m_jac)[e]);
-            }
-            else
-            {
-                jac_ptr = &((*this->m_jac)[e * nqTot]);
-            }
-
-            // Step 1: BwdTrans
-            BwdTrans2DKernel<SHAPE_TYPE>(nm0, nm1, nq0, nq1, correct, tmpIn,
-                                         this->m_bdata[0], this->m_bdata[1],
-                                         wsp0, bwd);
-
-            // Step 2: inner product for mass matrix operation
-            IProduct2DKernel<SHAPE_TYPE, true, false, DEFORMED>(
-                nm0, nm1, nq0, nq1, correct, bwd, this->m_bdata[0],
-                this->m_bdata[1], this->m_w[0], this->m_w[1], jac_ptr, wsp0,
-                tmpOut, m_lambda);
-
-            // Step 3: take derivatives in collapsed coordinate space
-            PhysDerivTensor2DKernel(nq0, nq1, bwd, this->m_D[0], this->m_D[1],
-                                    deriv0, deriv1);
-
-            DiffusionCoeff2DKernel<SHAPE_TYPE, DEFORMED>(
-                nq0, nq1, this->m_isConstVarDiff, this->m_constVarDiff,
-                this->m_isVarDiff, this->m_varD00, this->m_varD01,
-                this->m_varD11, df_ptr, this->m_h0, this->m_h1, deriv0, deriv1);
-
-            // Step 4: Apply Laplacian metrics & inner product
-            IProduct2DKernel<SHAPE_TYPE, false, true, DEFORMED>(
-                nm0, nm1, nq0, nq1, correct, deriv0, this->m_dbdata[0],
-                this->m_bdata[1], this->m_w[0], this->m_w[1], jac_ptr, wsp0,
-                tmpOut);
-
-            IProduct2DKernel<SHAPE_TYPE, false, true, DEFORMED>(
-                nm0, nm1, nq0, nq1, correct, deriv1, this->m_bdata[0],
-                this->m_dbdata[1], this->m_w[0], this->m_w[1], jac_ptr, wsp0,
-                tmpOut);
+            fusedKernel2D(nm0, nm1, nq0, nq1, correct, jac_ptr, df_ptr, tmpIn,
+                          tmpOut, wsp0, bwd, deriv0, deriv1);
 
             // de-interleave and store data
-            deinterleave_store(tmpOut, m_nmTot, outptr);
+            // deinterleave_store(tmpOut, m_nmTot, locField);
+            // std::copy(locField, locField + nmBlocks, outptr);
+            deinterleave_unalign_store(tmpOut, m_nmTot, outptr);
 
             inptr += nmBlocks;
             outptr += nmBlocks;
+            if constexpr (DEFORMED)
+            {
+                jac_ptr += nqTot;
+                df_ptr += dfSize;
+            }
+            else
+            {
+                ++jac_ptr;
+                df_ptr += ndf;
+            }
         }
+        // last block
+        {
+            int acturalSize = nmBlocks - this->m_nPads * m_nmTot;
+            std::copy(inptr, inptr + acturalSize, locField);
+            load_interleave(locField, m_nmTot, tmpIn);
+
+            fusedKernel2D(nm0, nm1, nq0, nq1, correct, jac_ptr, df_ptr, tmpIn,
+                          tmpOut, wsp0, bwd, deriv0, deriv1);
+
+            // de-interleave and store data
+            deinterleave_store(tmpOut, m_nmTot, locField);
+            std::copy(locField, locField + acturalSize, outptr);
+        }
+        // free aligned memory
+        ::operator delete[](locField, std::align_val_t(vec_t::alignment));
     }
 
     // Size based template version.
@@ -279,69 +268,97 @@ struct HelmholtzTemplate
         std::vector<vec_t, allocator<vec_t>> bwd(nqTot), deriv0(nqTot),
             deriv1(nqTot);
 
-        const vec_t *jac_ptr = {};
-        const vec_t *df_ptr  = {};
+        // temporary aligned storage for local fields
+        alignas(vec_t::alignment) NekDouble locField[nqTot * vec_t::width];
 
-        // Get size of derivative factor block
-        auto dfSize = ndf;
-        if (DEFORMED)
+        const vec_t *jac_ptr = &((*this->m_jac)[0]);
+        const vec_t *df_ptr  = &((*this->m_df)[0]);
+
+        constexpr auto dfSize = ndf * nqTot;
+
+        for (int e = 0; e < this->m_nBlocks - 1; e++)
         {
-            dfSize *= nqTot;
-        }
+            // Load data to aligned storage and interleave it
+            // std::copy(inptr, inptr + nmBlocks, locField);
+            // load_interleave(locField, m_nmTot, tmpIn);
+            load_unalign_interleave(inptr, m_nmTot, tmpIn);
 
-        for (int e = 0; e < this->m_nBlocks; e++)
-        {
-            df_ptr = &((*this->m_df)[e * dfSize]);
-
-            // Load and transpose data
-            load_interleave(inptr, m_nmTot, tmpIn);
-
-            if (!DEFORMED)
-            {
-                jac_ptr = &((*this->m_jac)[e]);
-            }
-            else
-            {
-                jac_ptr = &((*this->m_jac)[e * nqTot]);
-            }
-
-            // Step 1: BwdTrans
-            BwdTrans2DKernel<SHAPE_TYPE>(nm0, nm1, nq0, nq1, correct, tmpIn,
-                                         this->m_bdata[0], this->m_bdata[1],
-                                         wsp0, bwd);
-
-            // Step 2: inner product for mass matrix operation
-            IProduct2DKernel<SHAPE_TYPE, true, false, DEFORMED>(
-                nm0, nm1, nq0, nq1, correct, bwd, this->m_bdata[0],
-                this->m_bdata[1], this->m_w[0], this->m_w[1], jac_ptr, wsp0,
-                tmpOut, m_lambda);
-
-            // Step 3: take derivatives in collapsed coordinate space
-            PhysDerivTensor2DKernel(nq0, nq1, bwd, this->m_D[0], this->m_D[1],
-                                    deriv0, deriv1);
-
-            DiffusionCoeff2DKernel<SHAPE_TYPE, DEFORMED>(
-                nq0, nq1, this->m_isConstVarDiff, this->m_constVarDiff,
-                this->m_isVarDiff, this->m_varD00, this->m_varD01,
-                this->m_varD11, df_ptr, this->m_h0, this->m_h1, deriv0, deriv1);
-
-            // Step 4: Apply Laplacian metrics & inner product
-            IProduct2DKernel<SHAPE_TYPE, false, true, DEFORMED>(
-                nm0, nm1, nq0, nq1, correct, deriv0, this->m_dbdata[0],
-                this->m_bdata[1], this->m_w[0], this->m_w[1], jac_ptr, wsp0,
-                tmpOut);
-
-            IProduct2DKernel<SHAPE_TYPE, false, true, DEFORMED>(
-                nm0, nm1, nq0, nq1, correct, deriv1, this->m_bdata[0],
-                this->m_dbdata[1], this->m_w[0], this->m_w[1], jac_ptr, wsp0,
-                tmpOut);
+            fusedKernel2D(nm0, nm1, nq0, nq1, correct, jac_ptr, df_ptr, tmpIn,
+                          tmpOut, wsp0, bwd, deriv0, deriv1);
 
             // de-interleave and store data
-            deinterleave_store(tmpOut, m_nmTot, outptr);
+            // deinterleave_store(tmpOut, m_nmTot, locField);
+            // std::copy(locField, locField + nmBlocks, outptr);
+            deinterleave_unalign_store(tmpOut, m_nmTot, outptr);
 
             inptr += nmBlocks;
             outptr += nmBlocks;
+            if constexpr (DEFORMED)
+            {
+                jac_ptr += nqTot;
+                df_ptr += dfSize;
+            }
+            else
+            {
+                ++jac_ptr;
+                df_ptr += ndf;
+            }
         }
+        // last block
+        {
+            int acturalSize = nmBlocks - this->m_nPads * m_nmTot;
+            std::copy(inptr, inptr + acturalSize, locField);
+            load_interleave(locField, m_nmTot, tmpIn);
+
+            fusedKernel2D(nm0, nm1, nq0, nq1, correct, jac_ptr, df_ptr, tmpIn,
+                          tmpOut, wsp0, bwd, deriv0, deriv1);
+
+            // de-interleave and store data
+            deinterleave_store(tmpOut, m_nmTot, locField);
+            std::copy(locField, locField + acturalSize, outptr);
+        }
+    }
+
+    NEK_FORCE_INLINE void fusedKernel2D(
+        const size_t nm0, const size_t nm1, const size_t nq0, const size_t nq1,
+        const bool correct, const vec_t *jac_ptr, const vec_t *df_ptr,
+        const std::vector<vec_t, allocator<vec_t>> &tmpIn,
+        std::vector<vec_t, allocator<vec_t>> &tmpOut,
+        std::vector<vec_t, allocator<vec_t>> &wsp0,
+        std::vector<vec_t, allocator<vec_t>> &bwd,
+        std::vector<vec_t, allocator<vec_t>> &deriv0,
+        std::vector<vec_t, allocator<vec_t>> &deriv1)
+    {
+        // Step 1: BwdTrans
+        BwdTrans2DKernel<SHAPE_TYPE>(nm0, nm1, nq0, nq1, correct, tmpIn,
+                                     this->m_bdata[0], this->m_bdata[1], wsp0,
+                                     bwd);
+
+        // Step 2: inner product for mass matrix operation
+        IProduct2DKernel<SHAPE_TYPE, true, false, DEFORMED>(
+            nm0, nm1, nq0, nq1, correct, bwd, this->m_bdata[0],
+            this->m_bdata[1], this->m_w[0], this->m_w[1], jac_ptr, wsp0, tmpOut,
+            m_lambda);
+
+        // Step 3: take derivatives in collapsed coordinate space
+        PhysDerivTensor2DKernel(nq0, nq1, bwd, this->m_D[0], this->m_D[1],
+                                deriv0, deriv1);
+
+        DiffusionCoeff2DKernel<SHAPE_TYPE, DEFORMED>(
+            nq0, nq1, this->m_isConstVarDiff, this->m_constVarDiff,
+            this->m_isVarDiff, this->m_varD00, this->m_varD01, this->m_varD11,
+            df_ptr, this->m_h0, this->m_h1, deriv0, deriv1);
+
+        // Step 4: Apply Laplacian metrics & inner product
+        IProduct2DKernel<SHAPE_TYPE, false, true, DEFORMED>(
+            nm0, nm1, nq0, nq1, correct, deriv0, this->m_dbdata[0],
+            this->m_bdata[1], this->m_w[0], this->m_w[1], jac_ptr, wsp0,
+            tmpOut);
+
+        IProduct2DKernel<SHAPE_TYPE, false, true, DEFORMED>(
+            nm0, nm1, nq0, nq1, correct, deriv1, this->m_bdata[0],
+            this->m_dbdata[1], this->m_w[0], this->m_w[1], jac_ptr, wsp0,
+            tmpOut);
     }
 
 #elif defined(SHAPE_DIMENSION_3D)
@@ -383,78 +400,60 @@ struct HelmholtzTemplate
         std::vector<vec_t, allocator<vec_t>> deriv0(nqTot), deriv1(nqTot),
             deriv2(nqTot);
 
-        const vec_t *jac_ptr = {};
-        const vec_t *df_ptr  = {};
+        // temporary aligned storage for local fields
+        NekDouble *locField = static_cast<NekDouble *>(::operator new[](
+            nmBlocks * sizeof(NekDouble), std::align_val_t(vec_t::alignment)));
 
-        // Get size of derivative factor block
-        auto dfSize = ndf;
-        if (DEFORMED)
+        const vec_t *jac_ptr = &((*this->m_jac)[0]);
+        const vec_t *df_ptr  = &((*this->m_df)[0]);
+
+        const auto dfSize = ndf * nqTot;
+
+        for (int e = 0; e < this->m_nBlocks - 1; e++)
         {
-            dfSize *= nqTot;
-        }
+            // Load data to aligned storage and interleave it
+            // std::copy(inptr, inptr + nmBlocks, locField);
+            // load_interleave(locField, m_nmTot, tmpIn);
+            load_unalign_interleave(inptr, m_nmTot, tmpIn);
 
-        for (int e = 0; e < this->m_nBlocks; e++)
-        {
-            df_ptr = &((*this->m_df)[e * dfSize]);
-
-            // Load and transpose data
-            load_interleave(inptr, m_nmTot, tmpIn);
-
-            if (!DEFORMED)
-            {
-                jac_ptr = &((*this->m_jac)[e]);
-            }
-            else
-            {
-                jac_ptr = &((*this->m_jac)[e * nqTot]);
-            }
-
-            // Step 1: BwdTrans
-            BwdTrans3DKernel<SHAPE_TYPE>(
-                nm0, nm1, nm2, nq0, nq1, nq2, correct, tmpIn, this->m_bdata[0],
-                this->m_bdata[1], this->m_bdata[2], wsp0, wsp1, bwd);
-
-            // // Step 2: inner product for mass matrix operation
-            IProduct3DKernel<SHAPE_TYPE, true, false, DEFORMED>(
-                nm0, nm1, nm2, nq0, nq1, nq2, correct, bwd, this->m_bdata[0],
-                this->m_bdata[1], this->m_bdata[2], this->m_w[0], this->m_w[1],
-                this->m_w[2], jac_ptr, wsp0, wsp1, wsp2, tmpOut, m_lambda);
-
-            // Step 3: take derivatives in standard space
-            PhysDerivTensor3DKernel(nq0, nq1, nq2, bwd, this->m_D[0],
-                                    this->m_D[1], this->m_D[2], deriv0, deriv1,
-                                    deriv2);
-
-            // Step 4: Apply Laplacian metrics & inner product
-            DiffusionCoeff3DKernel<SHAPE_TYPE, DEFORMED>(
-                nq0, nq1, nq2, this->m_isConstVarDiff, this->m_constVarDiff,
-                this->m_isVarDiff, this->m_varD00, this->m_varD01,
-                this->m_varD11, this->m_varD02, this->m_varD12, this->m_varD22,
-                df_ptr, this->m_h0, this->m_h1, this->m_h2, this->m_h3, deriv0,
-                deriv1, deriv2);
-
-            IProduct3DKernel<SHAPE_TYPE, false, true, DEFORMED>(
-                nm0, nm1, nm2, nq0, nq1, nq2, correct, deriv0,
-                this->m_dbdata[0], this->m_bdata[1], this->m_bdata[2],
-                this->m_w[0], this->m_w[1], this->m_w[2], jac_ptr, wsp0, wsp1,
-                wsp2, tmpOut);
-
-            IProduct3DKernel<SHAPE_TYPE, false, true, DEFORMED>(
-                nm0, nm1, nm2, nq0, nq1, nq2, correct, deriv1, this->m_bdata[0],
-                this->m_dbdata[1], this->m_bdata[2], this->m_w[0], this->m_w[1],
-                this->m_w[2], jac_ptr, wsp0, wsp1, wsp2, tmpOut);
-
-            IProduct3DKernel<SHAPE_TYPE, false, true, DEFORMED>(
-                nm0, nm1, nm2, nq0, nq1, nq2, correct, deriv2, this->m_bdata[0],
-                this->m_bdata[1], this->m_dbdata[2], this->m_w[0], this->m_w[1],
-                this->m_w[2], jac_ptr, wsp0, wsp1, wsp2, tmpOut);
+            fusedKernel3D(nm0, nm1, nm2, nq0, nq1, nq2, correct, jac_ptr,
+                          df_ptr, tmpIn, tmpOut, wsp0, wsp1, wsp2, bwd, deriv0,
+                          deriv1, deriv2);
 
             // de-interleave and store data
-            deinterleave_store(tmpOut, m_nmTot, outptr);
+            // deinterleave_store(tmpOut, m_nmTot, locField);
+            // std::copy(locField, locField + nmBlocks, outptr);
+            deinterleave_unalign_store(tmpOut, m_nmTot, outptr);
 
             inptr += nmBlocks;
             outptr += nmBlocks;
+            if constexpr (DEFORMED)
+            {
+                jac_ptr += nqTot;
+                df_ptr += dfSize;
+            }
+            else
+            {
+                ++jac_ptr;
+                df_ptr += ndf;
+            }
         }
+        // last block
+        {
+            int acturalSize = nmBlocks - this->m_nPads * m_nmTot;
+            std::copy(inptr, inptr + acturalSize, locField);
+            load_interleave(locField, m_nmTot, tmpIn);
+
+            fusedKernel3D(nm0, nm1, nm2, nq0, nq1, nq2, correct, jac_ptr,
+                          df_ptr, tmpIn, tmpOut, wsp0, wsp1, wsp2, bwd, deriv0,
+                          deriv1, deriv2);
+
+            // de-interleave and store data
+            deinterleave_store(tmpOut, m_nmTot, locField);
+            std::copy(locField, locField + acturalSize, outptr);
+        }
+        // free aligned memory
+        ::operator delete[](locField, std::align_val_t(vec_t::alignment));
     }
 
     // Size based template version.
@@ -487,78 +486,109 @@ struct HelmholtzTemplate
         std::vector<vec_t, allocator<vec_t>> deriv0(nqTot), deriv1(nqTot),
             deriv2(nqTot);
 
-        const vec_t *jac_ptr = {};
-        const vec_t *df_ptr  = {};
+        // temporary aligned storage for local fields
+        alignas(vec_t::alignment) NekDouble locField[nqTot * vec_t::width];
 
-        // Get size of derivative factor block
-        auto dfSize = ndf;
-        if (DEFORMED)
+        const vec_t *jac_ptr = &((*this->m_jac)[0]);
+        const vec_t *df_ptr  = &((*this->m_df)[0]);
+
+        constexpr auto dfSize = ndf * nqTot;
+
+        for (int e = 0; e < this->m_nBlocks - 1; e++)
         {
-            dfSize *= nqTot;
-        }
+            // Load data to aligned storage and interleave it
+            // std::copy(inptr, inptr + nmBlocks, locField);
+            // load_interleave(locField, m_nmTot, tmpIn);
+            load_unalign_interleave(inptr, m_nmTot, tmpIn);
 
-        for (int e = 0; e < this->m_nBlocks; e++)
-        {
-            df_ptr = &((*this->m_df)[e * dfSize]);
-
-            // Load and transpose data
-            load_interleave(inptr, m_nmTot, tmpIn);
-
-            if (!DEFORMED)
-            {
-                jac_ptr = &((*this->m_jac)[e]);
-            }
-            else
-            {
-                jac_ptr = &((*this->m_jac)[e * nqTot]);
-            }
-
-            // Step 1: BwdTrans
-            BwdTrans3DKernel<SHAPE_TYPE>(
-                nm0, nm1, nm2, nq0, nq1, nq2, correct, tmpIn, this->m_bdata[0],
-                this->m_bdata[1], this->m_bdata[2], wsp0, wsp1, bwd);
-
-            // // Step 2: inner product for mass matrix operation
-            IProduct3DKernel<SHAPE_TYPE, true, false, DEFORMED>(
-                nm0, nm1, nm2, nq0, nq1, nq2, correct, bwd, this->m_bdata[0],
-                this->m_bdata[1], this->m_bdata[2], this->m_w[0], this->m_w[1],
-                this->m_w[2], jac_ptr, wsp0, wsp1, wsp2, tmpOut, m_lambda);
-
-            // Step 3: take derivatives in standard space
-            PhysDerivTensor3DKernel(nq0, nq1, nq2, bwd, this->m_D[0],
-                                    this->m_D[1], this->m_D[2], deriv0, deriv1,
-                                    deriv2);
-
-            // Step 4: Apply Laplacian metrics & inner product
-            DiffusionCoeff3DKernel<SHAPE_TYPE, DEFORMED>(
-                nq0, nq1, nq2, this->m_isConstVarDiff, this->m_constVarDiff,
-                this->m_isVarDiff, this->m_varD00, this->m_varD01,
-                this->m_varD11, this->m_varD02, this->m_varD12, this->m_varD22,
-                df_ptr, this->m_h0, this->m_h1, this->m_h2, this->m_h3, deriv0,
-                deriv1, deriv2);
-
-            IProduct3DKernel<SHAPE_TYPE, false, true, DEFORMED>(
-                nm0, nm1, nm2, nq0, nq1, nq2, correct, deriv0,
-                this->m_dbdata[0], this->m_bdata[1], this->m_bdata[2],
-                this->m_w[0], this->m_w[1], this->m_w[2], jac_ptr, wsp0, wsp1,
-                wsp2, tmpOut);
-
-            IProduct3DKernel<SHAPE_TYPE, false, true, DEFORMED>(
-                nm0, nm1, nm2, nq0, nq1, nq2, correct, deriv1, this->m_bdata[0],
-                this->m_dbdata[1], this->m_bdata[2], this->m_w[0], this->m_w[1],
-                this->m_w[2], jac_ptr, wsp0, wsp1, wsp2, tmpOut);
-
-            IProduct3DKernel<SHAPE_TYPE, false, true, DEFORMED>(
-                nm0, nm1, nm2, nq0, nq1, nq2, correct, deriv2, this->m_bdata[0],
-                this->m_bdata[1], this->m_dbdata[2], this->m_w[0], this->m_w[1],
-                this->m_w[2], jac_ptr, wsp0, wsp1, wsp2, tmpOut);
+            fusedKernel3D(nm0, nm1, nm2, nq0, nq1, nq2, correct, jac_ptr,
+                          df_ptr, tmpIn, tmpOut, wsp0, wsp1, wsp2, bwd, deriv0,
+                          deriv1, deriv2);
 
             // de-interleave and store data
-            deinterleave_store(tmpOut, m_nmTot, outptr);
+            // deinterleave_store(tmpOut, m_nmTot, locField);
+            // std::copy(locField, locField + nmBlocks, outptr);
+            deinterleave_unalign_store(tmpOut, m_nmTot, outptr);
 
             inptr += nmBlocks;
             outptr += nmBlocks;
+            if constexpr (DEFORMED)
+            {
+                jac_ptr += nqTot;
+                df_ptr += dfSize;
+            }
+            else
+            {
+                ++jac_ptr;
+                df_ptr += ndf;
+            }
         }
+        // last block
+        {
+            int acturalSize = nmBlocks - this->m_nPads * m_nmTot;
+            std::copy(inptr, inptr + acturalSize, locField);
+            load_interleave(locField, m_nmTot, tmpIn);
+
+            fusedKernel3D(nm0, nm1, nm2, nq0, nq1, nq2, correct, jac_ptr,
+                          df_ptr, tmpIn, tmpOut, wsp0, wsp1, wsp2, bwd, deriv0,
+                          deriv1, deriv2);
+
+            // de-interleave and store data
+            deinterleave_store(tmpOut, m_nmTot, locField);
+            std::copy(locField, locField + acturalSize, outptr);
+        }
+    }
+
+    NEK_FORCE_INLINE void fusedKernel3D(
+        const size_t nm0, const size_t nm1, const size_t nm2, const size_t nq0,
+        const size_t nq1, const size_t nq2, const bool correct,
+        const vec_t *jac_ptr, const vec_t *df_ptr,
+        const std::vector<vec_t, allocator<vec_t>> &tmpIn,
+        std::vector<vec_t, allocator<vec_t>> &tmpOut,
+        std::vector<vec_t, allocator<vec_t>> &wsp0,
+        std::vector<vec_t, allocator<vec_t>> &wsp1,
+        std::vector<vec_t, allocator<vec_t>> &wsp2,
+        std::vector<vec_t, allocator<vec_t>> &bwd,
+        std::vector<vec_t, allocator<vec_t>> &deriv0,
+        std::vector<vec_t, allocator<vec_t>> &deriv1,
+        std::vector<vec_t, allocator<vec_t>> &deriv2)
+    {
+        // Step 1: BwdTrans
+        BwdTrans3DKernel<SHAPE_TYPE>(nm0, nm1, nm2, nq0, nq1, nq2, correct,
+                                     tmpIn, this->m_bdata[0], this->m_bdata[1],
+                                     this->m_bdata[2], wsp0, wsp1, bwd);
+
+        // Step 2: inner product for mass matrix operation
+        IProduct3DKernel<SHAPE_TYPE, true, false, DEFORMED>(
+            nm0, nm1, nm2, nq0, nq1, nq2, correct, bwd, this->m_bdata[0],
+            this->m_bdata[1], this->m_bdata[2], this->m_w[0], this->m_w[1],
+            this->m_w[2], jac_ptr, wsp0, wsp1, wsp2, tmpOut, m_lambda);
+
+        // Step 3: take derivatives in standard space
+        PhysDerivTensor3DKernel(nq0, nq1, nq2, bwd, this->m_D[0], this->m_D[1],
+                                this->m_D[2], deriv0, deriv1, deriv2);
+
+        // Step 4: Apply Laplacian metrics & inner product
+        DiffusionCoeff3DKernel<SHAPE_TYPE, DEFORMED>(
+            nq0, nq1, nq2, this->m_isConstVarDiff, this->m_constVarDiff,
+            this->m_isVarDiff, this->m_varD00, this->m_varD01, this->m_varD11,
+            this->m_varD02, this->m_varD12, this->m_varD22, df_ptr, this->m_h0,
+            this->m_h1, this->m_h2, this->m_h3, deriv0, deriv1, deriv2);
+
+        IProduct3DKernel<SHAPE_TYPE, false, true, DEFORMED>(
+            nm0, nm1, nm2, nq0, nq1, nq2, correct, deriv0, this->m_dbdata[0],
+            this->m_bdata[1], this->m_bdata[2], this->m_w[0], this->m_w[1],
+            this->m_w[2], jac_ptr, wsp0, wsp1, wsp2, tmpOut);
+
+        IProduct3DKernel<SHAPE_TYPE, false, true, DEFORMED>(
+            nm0, nm1, nm2, nq0, nq1, nq2, correct, deriv1, this->m_bdata[0],
+            this->m_dbdata[1], this->m_bdata[2], this->m_w[0], this->m_w[1],
+            this->m_w[2], jac_ptr, wsp0, wsp1, wsp2, tmpOut);
+
+        IProduct3DKernel<SHAPE_TYPE, false, true, DEFORMED>(
+            nm0, nm1, nm2, nq0, nq1, nq2, correct, deriv2, this->m_bdata[0],
+            this->m_bdata[1], this->m_dbdata[2], this->m_w[0], this->m_w[1],
+            this->m_w[2], jac_ptr, wsp0, wsp1, wsp2, tmpOut);
     }
 
 #endif // SHAPE_DIMENSION
