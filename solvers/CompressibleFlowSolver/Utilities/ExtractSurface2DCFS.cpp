@@ -250,7 +250,7 @@ int main(int argc, char *argv[])
         if (fld->GetGraph()->GetMovement() != nullptr)
         {
             fld->GetGraph()->GetMovement()->PerformMovement(
-                boost::lexical_cast<NekDouble>(fieldMetaDataMap["Time"]));
+                std::stod(fieldMetaDataMap["Time"]));
             fld->Reset();
             fld->SetUpPhysNormals();
         }

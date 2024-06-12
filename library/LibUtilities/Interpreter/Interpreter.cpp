@@ -737,8 +737,7 @@ public:
         {
             ASSERTL1(num_children == 0,
                      "Illegal children under number node: " + valueStr);
-            return std::make_pair(
-                true, boost::lexical_cast<NekDouble>(valueStr.c_str()));
+            return std::make_pair(true, std::stod(valueStr.c_str()));
         }
         else if (parserID == AnalyticExpression::variableID)
         {

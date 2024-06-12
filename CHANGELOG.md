@@ -1,16 +1,12 @@
 Changelog
 =========
 v5.7.0
-------
-**Library**
-- Separate MeshGraph input/output functions into a new class (!1778)
-
-v5.7.0
 -----
 **Library**
 - Modified MatrixFreeOp library  switch initialisation to use BOOST_PP (!1794)
 - Fix memory-leak with LowEnergyBlock preconditioner for time-updated matrices (!1627)
 - Fix Fourier expansion integration weights are related test (!1803)
+- Separate MeshGraph input/output functions into a new class (!1778)
 
 **IncNavierStokesSolver**
 - Fix initial and boundary conditions in the moving reference frame (!1692)
@@ -18,6 +14,9 @@ v5.7.0
 
 **ShallowWaterSolver**
 - Implement implicit time-discritization (!1784)
+
+**Miscellaneous**
+- Use std::stod instead of boost::lexical_cast<NekDouble> (!1819)
 
 v5.6.0
 ------

@@ -2049,8 +2049,7 @@ void SessionReader::ReadTimeIntScheme(TiXmlElement *conditions)
         {
             try
             {
-                m_timeIntScheme.freeParams[i] =
-                    boost::lexical_cast<NekDouble>(pSplit[i]);
+                m_timeIntScheme.freeParams[i] = std::stod(pSplit[i]);
             }
             catch (...)
             {
@@ -2524,7 +2523,7 @@ void SessionReader::CmdLineOverride()
 
             try
             {
-                m_parameters[lhsUpper] = boost::lexical_cast<NekDouble>(rhs);
+                m_parameters[lhsUpper] = std::stod(rhs);
             }
             catch (...)
             {

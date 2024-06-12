@@ -2738,7 +2738,7 @@ void MeshGraph::ReadRefinementInfo()
                 ASSERTL0(radiusStr, "RADIUS was not defined in REFINEMENT "
                                     "section of input");
 
-                NekDouble radius = boost::lexical_cast<NekDouble>(radiusStr);
+                NekDouble radius = std::stod(radiusStr);
 
                 // Extract Coordinate 1
                 const char *c1Str = refinement->Attribute("COORDINATE1");
