@@ -912,8 +912,7 @@ void ForcingMovingReferenceFrame::SetInitialConditions()
                 {
                     if (fieldMetaDataMap.find("Time") != fieldMetaDataMap.end())
                     {
-                        time = boost::lexical_cast<NekDouble>(
-                            fieldMetaDataMap["Time"]);
+                        time = std::stod(fieldMetaDataMap["Time"]);
                     }
                     fileData.clear();
                     for (auto &var : strFrameData)
@@ -921,8 +920,7 @@ void ForcingMovingReferenceFrame::SetInitialConditions()
                         if (fieldMetaDataMap.find(var) !=
                             fieldMetaDataMap.end())
                         {
-                            fileData[var] = boost::lexical_cast<NekDouble>(
-                                fieldMetaDataMap[var]);
+                            fileData[var] = std::stod(fieldMetaDataMap[var]);
                         }
                     }
                     if (fileData.size() == strFrameData.size())

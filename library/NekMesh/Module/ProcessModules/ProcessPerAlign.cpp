@@ -266,9 +266,9 @@ void ProcessPerAlign::Process()
         }
         else if (tmp1.size() == 3)
         {
-            alignDir[0] = boost::lexical_cast<NekDouble>(tmp1[0]);
-            alignDir[1] = boost::lexical_cast<NekDouble>(tmp1[1]);
-            alignDir[2] = boost::lexical_cast<NekDouble>(tmp1[2]);
+            alignDir[0] = std::stod(tmp1[0]);
+            alignDir[1] = std::stod(tmp1[1]);
+            alignDir[2] = std::stod(tmp1[2]);
         }
         else
         {
@@ -343,8 +343,8 @@ void ProcessPerAlign::Process()
 
             bool found           = false;
             unsigned int tolFact = LibUtilities::checked_cast<unsigned int>(
-                boost::lexical_cast<NekDouble>(toleranceFact));
-            NekDouble absTol = boost::lexical_cast<NekDouble>(absoluteTol);
+                std::stod(toleranceFact));
+            NekDouble absTol = std::stod(absoluteTol);
             for (auto &it : centroidMap)
             {
                 if (elmtDone.count(it.first) > 0)

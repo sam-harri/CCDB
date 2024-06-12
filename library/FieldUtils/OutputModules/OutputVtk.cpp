@@ -1619,8 +1619,7 @@ void OutputVtk::v_OutputFromExp(po::variables_map &vm)
         if (!m_f->m_fieldMetaDataMap["Time"].empty())
         {
             m_f->m_graph->GetMovement()->PerformMovement(
-                boost::lexical_cast<NekDouble>(
-                    m_f->m_fieldMetaDataMap["Time"]));
+                std::stod(m_f->m_fieldMetaDataMap["Time"]));
             for (auto &i : m_f->m_exp)
             {
                 i->Reset();
