@@ -36,7 +36,6 @@
 #define NEKTAR_SOLVERUTILS_FORCINGINCNSSYNTHETICEDDY
 
 #include <SolverUtils/Forcing/Forcing.h>
-#include <boost/core/ignore_unused.hpp>
 #include <string>
 
 namespace Nektar::SolverUtils

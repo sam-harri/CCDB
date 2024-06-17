@@ -37,8 +37,6 @@
 #include <fstream>
 #include <iomanip>
 
-using namespace std;
-
 namespace Nektar::SolverUtils
 {
 
@@ -65,10 +63,9 @@ ForcingIncNSSyntheticEddy::ForcingIncNSSyntheticEddy(
  */
 void ForcingIncNSSyntheticEddy::v_InitObject(
     const Array<OneD, MultiRegions::ExpListSharedPtr> &pFields,
-    const unsigned int &pNumForcingFields, const TiXmlElement *pForce)
+    [[maybe_unused]] const unsigned int &pNumForcingFields, 
+    [[maybe_unused]] const TiXmlElement *pForce)
 {
-    boost::ignore_unused(pNumForcingFields, pForce);
-
     // Space dimension
     m_spacedim = pFields[0]->GetGraph()->GetMeshDimension();
 
@@ -168,11 +165,11 @@ void ForcingIncNSSyntheticEddy::v_InitObject(
             boxStream >> boxStr;
             if (i < m_spacedim)
             {
-                m_rc[i] = boost::lexical_cast<NekDouble>(boxStr);
+                m_rc[i] = std::stod(boxStr);
             }
             else
             {
-                m_lyz[i - m_spacedim] = boost::lexical_cast<NekDouble>(boxStr);
+                m_lyz[i - m_spacedim] = std::stod(boxStr);
             }
             countVar += 1;
         }
@@ -188,14 +185,14 @@ void ForcingIncNSSyntheticEddy::v_InitObject(
     ASSERTL0(elmtInfTurb,
              "Unable to find Sigma tag. in SyntheticTurbulence forcing");
     std::string sigmaStr = elmtInfTurb->GetText();
-    m_sigma              = boost::lexical_cast<NekDouble>(sigmaStr);
+    m_sigma              = std::stod(sigmaStr);
 
     // Read bulk velocity
     elmtInfTurb = pForce->FirstChildElement("BulkVelocity");
     ASSERTL0(elmtInfTurb,
              "Unable to find BulkVelocity tag. in SyntheticTurbulence forcing");
     std::string bVelStr = elmtInfTurb->GetText();
-    m_Ub                = boost::lexical_cast<NekDouble>(bVelStr);
+    m_Ub                = std::stod(bVelStr);
 
     // Read flag to check if the run is a test case
     elmtInfTurb          = pForce->FirstChildElement("TestCase");
@@ -256,11 +253,10 @@ void ForcingIncNSSyntheticEddy::v_InitObject(
  */
 void ForcingIncNSSyntheticEddy::v_Apply(
     const Array<OneD, MultiRegions::ExpListSharedPtr> &pFields,
-    const Array<OneD, Array<OneD, NekDouble>> &inarray,
-    Array<OneD, Array<OneD, NekDouble>> &outarray, const NekDouble &time)
+    [[maybe_unused]] const Array<OneD, Array<OneD, NekDouble>> &inarray,
+    Array<OneD, Array<OneD, NekDouble>> &outarray, 
+    [[maybe_unused]] const NekDouble &time)
 {
-    boost::ignore_unused(inarray, time);
-
     // Number of Variables
     int nVars = pFields.size();
     // Total number of coefficients
