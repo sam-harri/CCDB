@@ -383,24 +383,57 @@ void CFSImplicit::DoImplicitSolve(
     Array<OneD, NekDouble> inarray(ntotal);
     Array<OneD, NekDouble> outarray(ntotal);
     Array<OneD, NekDouble> tmpArray;
-
+    Array<OneD, Array<OneD, NekDouble>> tmpIn(nvariables);
+    Array<OneD, Array<OneD, NekDouble>> tmpOut(nvariables);
+    Array<OneD, Array<OneD, NekDouble>> tmpoutarray(nvariables);
     // Switch flag to make sure the physical shock capturing AV is updated
     m_updateShockCaptPhys = true;
-
+    if (m_ALESolver)
+    {
+        ALEHelper::ALEDoElmtInvMassBwdTrans(inpnts, tmpIn);
+    }
+    else
+    {
+        tmpIn = inpnts;
+    }
     for (int i = 0; i < nvariables; ++i)
     {
         int noffset = i * ncoeffs;
         tmpArray    = inarray + noffset;
-        m_fields[i]->FwdTrans(inpnts[i], tmpArray);
+        m_fields[i]->FwdTrans(tmpIn[i], tmpArray);
     }
 
-    DoImplicitSolveCoeff(inpnts, inarray, outarray, time, lambda);
+    DoImplicitSolveCoeff(tmpIn, inarray, outarray, time, lambda);
 
-    for (int i = 0; i < nvariables; ++i)
+    if (m_ALESolver)
     {
-        int noffset = i * ncoeffs;
-        tmpArray    = outarray + noffset;
-        m_fields[i]->BwdTrans(tmpArray, outpnt[i]);
+
+        for (int i = 0; i < nvariables; ++i)
+        {
+            tmpOut[i]      = Array<OneD, NekDouble>(tmpIn[0].size(), 0.0);
+            tmpoutarray[i] = Array<OneD, NekDouble>(ncoeffs, 0.0);
+        }
+        for (int i = 0; i < nvariables; ++i)
+        {
+            int noffset = i * ncoeffs;
+            tmpArray    = outarray + noffset;
+            m_fields[i]->BwdTrans(tmpArray, tmpOut[i]);
+        }
+        MultiRegions::GlobalMatrixKey mkey(StdRegions::eMass);
+        for (int i = 0; i < nvariables; ++i)
+        {
+            m_fields[i]->FwdTrans(tmpOut[i], tmpoutarray[i]);
+            m_fields[i]->GeneralMatrixOp(mkey, tmpoutarray[i], outpnt[i]);
+        }
+    }
+    else
+    {
+        for (int i = 0; i < nvariables; ++i)
+        {
+            int noffset = i * ncoeffs;
+            tmpArray    = outarray + noffset;
+            m_fields[i]->BwdTrans(tmpArray, outpnt[i]);
+        }
     }
 }
 
@@ -1983,6 +2016,28 @@ bool CFSImplicit::v_UpdateTimeStepCheck()
         (m_checktime && m_time + m_timestep - m_lastCheckTime >= m_checktime);
     return flag || m_preconCfs->UpdatePreconMatCheck(NullNekDouble1DArray,
                                                      m_TimeIntegLambda);
+}
+
+void CFSImplicit::v_ALEInitObject(
+    int spaceDim, Array<OneD, MultiRegions::ExpListSharedPtr> &fields)
+{
+    m_ImplicitALESolver = true;
+    fields[0]->GetGraph()->GetMovement()->SetImplicitALEFlag(
+        m_ImplicitALESolver);
+    m_spaceDim  = spaceDim;
+    m_fieldsALE = fields;
+
+    // Initialise grid velocities as 0s
+    m_gridVelocity      = Array<OneD, Array<OneD, NekDouble>>(m_spaceDim);
+    m_gridVelocityTrace = Array<OneD, Array<OneD, NekDouble>>(m_spaceDim);
+    for (int i = 0; i < spaceDim; ++i)
+    {
+        m_gridVelocity[i] =
+            Array<OneD, NekDouble>(fields[0]->GetTotPoints(), 0.0);
+        m_gridVelocityTrace[i] =
+            Array<OneD, NekDouble>(fields[0]->GetTrace()->GetTotPoints(), 0.0);
+    }
+    ALEHelper::InitObject(spaceDim, fields);
 }
 
 } // namespace Nektar

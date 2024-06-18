@@ -46,6 +46,7 @@
 #include <LocalRegions/TriExp.h>
 #include <MultiRegions/ContField.h>
 #include <MultiRegions/ExpList.h>
+#include <SpatialDomains/MeshGraphIO.h>
 #include <boost/lexical_cast.hpp>
 #include <tinyxml.h>
 
@@ -190,13 +191,13 @@ int main(int argc, char *argv[])
     LibUtilities::SessionReaderSharedPtr vSession =
         LibUtilities::SessionReader::CreateInstance(2, argv);
     SpatialDomains::MeshGraphSharedPtr graphShPt =
-        SpatialDomains::MeshGraph::Read(vSession);
+        SpatialDomains::MeshGraphIO::Read(vSession);
     //----------------------------------------------
 
     if (argc == 6 && vSession->DefinesSolverInfo("INTERFACE") &&
         vSession->GetSolverInfo("INTERFACE") == "phase")
     {
-        cr   = boost::lexical_cast<NekDouble>(argv[argc - 1]);
+        cr   = std::stod(argv[argc - 1]);
         argc = 5;
     }
 
@@ -219,7 +220,7 @@ int main(int argc, char *argv[])
 
     // store the value of alpha
     string charalp(argv[argc - 1]);
-    // NekDouble alpha = boost::lexical_cast<NekDouble>(charalp);
+    // NekDouble alpha = std::stod(charalp);
     cout << "read alpha=" << charalp << endl;
 
     //---------------------------------------------

@@ -583,7 +583,7 @@ OperatorKey Helmholtz_IterPerExp::m_typeArr[] = {
  * @brief Helmholtz operator using matrix free operators.
  */
 class Helmholtz_MatrixFree final : virtual public Operator,
-                                   MatrixFreeOneInOneOut,
+                                   MatrixFreeBase,
                                    Helmholtz_Helper
 {
 public:
@@ -597,17 +597,7 @@ public:
                     [[maybe_unused]] Array<OneD, NekDouble> &output2,
                     [[maybe_unused]] Array<OneD, NekDouble> &wsp) final
     {
-        if (m_isPadded)
-        {
-            // copy into padded vector
-            Vmath::Vcopy(m_nmtot, input, 1, m_input, 1);
-            (*m_oper)(m_input, m_output);
-            Vmath::Vcopy(m_nmtot, m_output, 1, output0, 1);
-        }
-        else
-        {
-            (*m_oper)(input, output0);
-        }
+        (*m_oper)(input, output0);
     }
 
     void operator()([[maybe_unused]] int dir,
@@ -723,9 +713,9 @@ private:
                          CoalescedGeomDataSharedPtr pGeomData,
                          StdRegions::FactorMap factors)
         : Operator(pCollExp, pGeomData, factors),
-          MatrixFreeOneInOneOut(pCollExp[0]->GetStdExp()->GetNcoeffs(),
-                                pCollExp[0]->GetStdExp()->GetNcoeffs(),
-                                pCollExp.size()),
+          MatrixFreeBase(pCollExp[0]->GetStdExp()->GetNcoeffs(),
+                         pCollExp[0]->GetStdExp()->GetNcoeffs(),
+                         pCollExp.size()),
           Helmholtz_Helper()
     {
 
@@ -747,7 +737,7 @@ private:
         std::string op_string = "Helmholtz";
         op_string += MatrixFree::GetOpstring(shapeType, m_isDeformed);
         auto oper = MatrixFree::GetOperatorFactory().CreateInstance(
-            op_string, basis, m_nElmtPad);
+            op_string, basis, pCollExp.size());
 
         // Set Jacobian
         oper->SetJac(pGeomData->GetJacInterLeave(pCollExp, m_nElmtPad));

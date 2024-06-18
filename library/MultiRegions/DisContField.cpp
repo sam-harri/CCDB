@@ -141,7 +141,7 @@ DisContField::DisContField(const LibUtilities::SessionReaderSharedPtr &pSession,
             if ((ProjectStr == "MixedCGDG") ||
                 (ProjectStr == "Mixed_CG_Discontinuous"))
             {
-                SetUpDG();
+                SetUpDG(variable);
             }
             else
             {
@@ -719,7 +719,7 @@ DisContField::DisContField(const DisContField &In,
                     if ((ProjectStr == "MixedCGDG") ||
                         (ProjectStr == "Mixed_CG_Discontinuous"))
                     {
-                        SetUpDG();
+                        SetUpDG(variable);
                     }
                     else
                     {
@@ -1655,8 +1655,7 @@ void DisContField::FindPeriodicTraces(
                         {
                             try
                             {
-                                RotInfo.m_tol =
-                                    boost::lexical_cast<NekDouble>(tmpstr[3]);
+                                RotInfo.m_tol = std::stod(tmpstr[3]);
                             }
                             catch (...)
                             {
@@ -2816,6 +2815,11 @@ ExpListSharedPtr &DisContField::v_GetTrace()
 AssemblyMapDGSharedPtr &DisContField::v_GetTraceMap(void)
 {
     return m_traceMap;
+}
+
+InterfaceMapDGSharedPtr &DisContField::v_GetInterfaceMap(void)
+{
+    return m_interfaceMap;
 }
 
 const LocTraceToTraceMapSharedPtr &DisContField::v_GetLocTraceToTraceMap(

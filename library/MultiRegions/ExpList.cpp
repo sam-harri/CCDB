@@ -54,8 +54,9 @@
 #include <LocalRegions/SegExp.h>
 #include <LocalRegions/TetExp.h>
 #include <LocalRegions/TriExp.h>
-#include <MultiRegions/AssemblyMap/AssemblyMapCG.h> // for AssemblyMapCG, etc
-#include <MultiRegions/AssemblyMap/AssemblyMapDG.h> // for AssemblyMapCG, etc
+#include <MultiRegions/AssemblyMap/AssemblyMapCG.h>  // for AssemblyMapCG, etc
+#include <MultiRegions/AssemblyMap/AssemblyMapDG.h>  // for AssemblyMapDG, etc
+#include <MultiRegions/AssemblyMap/InterfaceMapDG.h> // for InterfaceMapDG, etc
 #include <MultiRegions/ExpList.h>
 #include <MultiRegions/GlobalLinSys.h>
 #include <MultiRegions/GlobalLinSysKey.h> // for GlobalLinSysKey
@@ -4607,6 +4608,14 @@ std::shared_ptr<AssemblyMapDG> &ExpList::v_GetTraceMap()
     NEKERROR(ErrorUtil::efatal,
              "This method is not defined or valid for this class type");
     static std::shared_ptr<AssemblyMapDG> result;
+    return result;
+}
+
+std::shared_ptr<InterfaceMapDG> &ExpList::v_GetInterfaceMap()
+{
+    NEKERROR(ErrorUtil::efatal,
+             "This method is not defined or valid for this class type");
+    static std::shared_ptr<InterfaceMapDG> result;
     return result;
 }
 

@@ -1,5 +1,22 @@
 Changelog
 =========
+v5.7.0
+-----
+**Library**
+- Modified MatrixFreeOp library  switch initialisation to use BOOST_PP (!1794)
+- Fix memory-leak with LowEnergyBlock preconditioner for time-updated matrices (!1627)
+- Fix Fourier expansion integration weights are related test (!1803)
+- Separate MeshGraph input/output functions into a new class (!1778)
+
+**IncNavierStokesSolver**
+- Fix initial and boundary conditions in the moving reference frame (!1692)
+- Fix memory-leak for the Mixed_CG_Discontinuous projection when initializing the traceMep (!1806)
+
+**ShallowWaterSolver**
+- Implement implicit time-discritization (!1784)
+
+**Miscellaneous**
+- Use std::stod instead of boost::lexical_cast<NekDouble> (!1819)
 
 v5.6.0
 ------
@@ -15,6 +32,13 @@ v5.6.0
 - Further tidy-up in linear solver (!1761)
 - Use FwdTrans in UnsteadySystem when using Parareal (!1785)
 - Automate deployment of README.md to dockerhub (!1786)
+- Fix memory leak with Block preconditioner for time-updated matrices (!1737)
+- Support for implicit sliding meshes (!1787)
+- Fix compilation issue with OpenCASCADE 7.8.0 (!1799)
+- Fix MPI communicator for Parallel-in-Time (!1801)
+- Fix warnings issued by MSVC compiler in LibUtilities and StdRegions (!1740)
+- Fix Parareal convergence monitoring (!1802)
+- Avoid copying input/output to/from padded aligned arrays in MatrixFree operators(!1783)
 
 **CompressibleFlowSolver**
 - Complete second Frechet derivative implementation (!1761)
@@ -45,10 +69,14 @@ v5.6.0
 - Add feature for r-adaption on user-defined CAD curves (!1349)
 - Add unit testing infrustructure and initial example (!1753)
 - Added a custom cmake cache file to load defaults for building only NekMesh without the solvers (!1641)
-
+- Extend peralign module to all types of meshes (!1702)
 
 **IncNavierStokesSolver**
 - Matrix-Free LinearADR operator for VCSImplicit and others (!1627)
+- Make substepping normal velocity evaluation more efficient (!1795)
+
+**FieldConvert**
+- Add range function as an option in Xml Input, align python usage and start depracation of -r option (!1791) 
 
 v5.5.0
 ------
@@ -226,6 +254,8 @@ v5.4.0
 - Remove useless ReadExpressions and SubstituteExpressions function in sessionReader (!1608)
 - Corrected workspace size in triangle BwdTrans (!1610)
 - Reactivate Reactivate Movement_fixed_3D_stacked_cylinders_curved_hdf5_par test except on ARM MacOS (!1536)
+- Updated the PETSc version to v3.19.3 for THIRDPARTY_USE_PETSC, enabled local PETSc version usage (!1618)
+
 - Rename communicator in LinearAlgebra (!1612)
 - Add IProductWRTDerivBase operator for 3DH1D problems (!1483)
 - Full support of mixed-order elements in DG (!1606)

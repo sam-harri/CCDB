@@ -776,9 +776,9 @@ LibUtilities::Interpolator ProcessVarOpti::GetScalingFieldFromFile(string file)
         }
 
         vector<NekDouble> tmpD;
-        tmpD.push_back(boost::lexical_cast<NekDouble>(tmp[0])); // x
-        tmpD.push_back(boost::lexical_cast<NekDouble>(tmp[1])); // y
-        tmpD.push_back(boost::lexical_cast<NekDouble>(tmp[3])); // scaling
+        tmpD.push_back(std::stod(tmp[0])); // x
+        tmpD.push_back(std::stod(tmp[1])); // y
+        tmpD.push_back(std::stod(tmp[3])); // scaling
 
         data.push_back(tmpD);
     }

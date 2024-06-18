@@ -55,6 +55,7 @@ public:
         p->InitObject();
         return p;
     }
+
     /// Name of class
     static std::string className;
 
@@ -66,18 +67,22 @@ protected:
 
     void v_InitObject(bool DeclareFields = true) override;
 
-    void v_GenerateSummary(SolverUtils::SummaryList &s) override;
+    void v_DoOdeRhs(const Array<OneD, const Array<OneD, NekDouble>> &inarray,
+                    Array<OneD, Array<OneD, NekDouble>> &outarray,
+                    const NekDouble time) override;
 
-    void DoOdeRhs(const Array<OneD, const Array<OneD, NekDouble>> &inarray,
-                  Array<OneD, Array<OneD, NekDouble>> &outarray,
-                  const NekDouble time);
+    void v_GenerateSummary(SolverUtils::SummaryList &s) override;
 
     void GetFluxVector(
         const Array<OneD, const Array<OneD, NekDouble>> &physfield,
         Array<OneD, Array<OneD, Array<OneD, NekDouble>>> &flux);
 
-    void GetVelocityVector(const Array<OneD, Array<OneD, NekDouble>> &physfield,
-                           Array<OneD, Array<OneD, NekDouble>> &velocity);
+    void GetVelocityVector(
+        const Array<OneD, const Array<OneD, NekDouble>> &physfield,
+        Array<OneD, Array<OneD, NekDouble>> &velocity);
+
+    void CopyBoundaryTrace(const Array<OneD, const NekDouble> &Fwd,
+                           Array<OneD, NekDouble> &Bwd);
 
     const Array<OneD, NekDouble> &GetDepthFwd()
     {

@@ -220,6 +220,13 @@ IF (${CMAKE_COMPILER_IS_GNUCXX})
     MARK_AS_ADVANCED(NEKTAR_ENABLE_PROFILE)
 ENDIF (${CMAKE_COMPILER_IS_GNUCXX})
 
+# Automatic Switch generation range
+SET(NEKTAR_SWITCH_MIN 2 CACHE STRING "Set min range of auto generated switch")
+MARK_AS_ADVANCED(NEKTAR_SWITCH_MIN)
+
+SET(NEKTAR_SWITCH_MAX 8 CACHE STRING "Set max range of auto generated switch")
+MARK_AS_ADVANCED(NEKTAR_SWITCH_MAX)
+
 # Memory pools
 OPTION(NEKTAR_USE_MEMORY_POOLS
     "Use memory pools to accelerate memory allocation." ON)

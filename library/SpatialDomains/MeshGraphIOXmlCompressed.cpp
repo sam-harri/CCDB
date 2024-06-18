@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-//  File: MeshGraphXmlCompressed.cpp
+//  File: MeshGraphIOXmlCompressed.cpp
 //
 //  For more information, please see: http://www.nektar.info/
 //
@@ -33,7 +33,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-#include "MeshGraphXmlCompressed.h"
+#include "MeshGraphIOXmlCompressed.h"
 
 #include <LibUtilities/BasicUtils/CompressData.h>
 #include <LibUtilities/BasicUtils/Filesystem.hpp>
@@ -59,13 +59,16 @@ using namespace std;
 namespace Nektar::SpatialDomains
 {
 
-std::string MeshGraphXmlCompressed::className =
-    GetMeshGraphFactory().RegisterCreatorFunction(
-        "XmlCompressed", MeshGraphXmlCompressed::create,
-        "IO with Xml geometry");
+std::string MeshGraphIOXmlCompressed::className =
+    GetMeshGraphIOFactory().RegisterCreatorFunction(
+        "XmlCompressed", MeshGraphIOXmlCompressed::create,
+        "IO with compressed Xml geometry");
 
-void MeshGraphXmlCompressed::v_ReadVertices()
+void MeshGraphIOXmlCompressed::v_ReadVertices()
 {
+    PointGeomMap &vertSet = m_meshGraph->GetAllPointGeoms();
+    int spaceDimension    = m_meshGraph->GetSpaceDimension();
+
     // Now read the vertices
     TiXmlElement *element = m_xmlGeom->FirstChildElement("VERTEX");
     ASSERTL0(element, "Unable to find mesh VERTEX tag in file.");
@@ -187,10 +190,10 @@ void MeshGraphXmlCompressed::v_ReadVertices()
             zval = zval * zscale + zmove;
 
             PointGeomSharedPtr vert(MemoryManager<PointGeom>::AllocateSharedPtr(
-                m_spaceDimension, indx, xval, yval, zval));
+                spaceDimension, indx, xval, yval, zval));
 
             vert->SetGlobalID(indx);
-            m_vertSet[indx] = vert;
+            vertSet[indx] = vert;
         }
     }
     else
@@ -201,8 +204,12 @@ void MeshGraphXmlCompressed::v_ReadVertices()
     }
 }
 
-void MeshGraphXmlCompressed::v_ReadCurves()
+void MeshGraphIOXmlCompressed::v_ReadCurves()
 {
+    auto &curvedEdges  = m_meshGraph->GetCurvedEdges();
+    auto &curvedFaces  = m_meshGraph->GetCurvedFaces();
+    int spaceDimension = m_meshGraph->GetSpaceDimension();
+
     // check to see if any scaling parameters are in
     // attributes and determine these values
     TiXmlElement *element = m_xmlGeom->FirstChildElement("VERTEX");
@@ -416,12 +423,12 @@ void MeshGraphXmlCompressed::v_ReadCurves()
             int idx = cpts.index[offset + j];
 
             PointGeomSharedPtr vert(MemoryManager<PointGeom>::AllocateSharedPtr(
-                m_spaceDimension, edginfo[i].id, cpts.pts[idx].x,
-                cpts.pts[idx].y, cpts.pts[idx].z));
+                spaceDimension, edginfo[i].id, cpts.pts[idx].x, cpts.pts[idx].y,
+                cpts.pts[idx].z));
             curve->m_points.push_back(vert);
         }
 
-        m_curvedEdges[edgeid] = curve;
+        curvedEdges[edgeid] = curve;
     }
 
     for (int i = 0; i < facinfo.size(); ++i)
@@ -438,17 +445,21 @@ void MeshGraphXmlCompressed::v_ReadCurves()
             int idx = cpts.index[offset + j];
 
             PointGeomSharedPtr vert(MemoryManager<PointGeom>::AllocateSharedPtr(
-                m_spaceDimension, facinfo[i].id, cpts.pts[idx].x,
-                cpts.pts[idx].y, cpts.pts[idx].z));
+                spaceDimension, facinfo[i].id, cpts.pts[idx].x, cpts.pts[idx].y,
+                cpts.pts[idx].z));
             curve->m_points.push_back(vert);
         }
 
-        m_curvedFaces[faceid] = curve;
+        curvedFaces[faceid] = curve;
     }
 }
 
-void MeshGraphXmlCompressed::v_ReadEdges()
+void MeshGraphIOXmlCompressed::v_ReadEdges()
 {
+    auto &segGeoms     = m_meshGraph->GetAllSegGeoms();
+    auto &curvedEdges  = m_meshGraph->GetCurvedEdges();
+    int spaceDimension = m_meshGraph->GetSpaceDimension();
+
     CurveMap::iterator it;
 
     /// Look for elements in ELEMENT block.
@@ -482,27 +493,32 @@ void MeshGraphXmlCompressed::v_ReadEdges()
     for (int i = 0; i < edgeData.size(); ++i)
     {
         indx                           = edgeData[i].id;
-        PointGeomSharedPtr vertices[2] = {GetVertex(edgeData[i].v0),
-                                          GetVertex(edgeData[i].v1)};
+        PointGeomSharedPtr vertices[2] = {
+            m_meshGraph->GetVertex(edgeData[i].v0),
+            m_meshGraph->GetVertex(edgeData[i].v1)};
         SegGeomSharedPtr edge;
 
-        it = m_curvedEdges.find(indx);
-        if (it == m_curvedEdges.end())
+        it = curvedEdges.find(indx);
+        if (it == curvedEdges.end())
         {
             edge = MemoryManager<SegGeom>::AllocateSharedPtr(
-                indx, m_spaceDimension, vertices);
+                indx, spaceDimension, vertices);
         }
         else
         {
             edge = MemoryManager<SegGeom>::AllocateSharedPtr(
-                indx, m_spaceDimension, vertices, it->second);
+                indx, spaceDimension, vertices, it->second);
         }
-        m_segGeoms[indx] = edge;
+        segGeoms[indx] = edge;
     }
 }
 
-void MeshGraphXmlCompressed::v_ReadFaces()
+void MeshGraphIOXmlCompressed::v_ReadFaces()
 {
+    auto &curvedFaces = m_meshGraph->GetCurvedFaces();
+    auto &triGeoms    = m_meshGraph->GetAllTriGeoms();
+    auto &quadGeoms   = m_meshGraph->GetAllQuadGeoms();
+
     /// Look for elements in FACE block.
     TiXmlElement *field = m_xmlGeom->FirstChildElement("FACE");
 
@@ -555,15 +571,16 @@ void MeshGraphXmlCompressed::v_ReadFaces()
                 indx = faceData[i].id;
 
                 /// See if this face has curves.
-                it = m_curvedFaces.find(indx);
+                it = curvedFaces.find(indx);
 
                 /// Create a TriGeom to hold the new definition.
                 SegGeomSharedPtr edges[TriGeom::kNedges] = {
-                    GetSegGeom(faceData[i].e[0]), GetSegGeom(faceData[i].e[1]),
-                    GetSegGeom(faceData[i].e[2])};
+                    m_meshGraph->GetSegGeom(faceData[i].e[0]),
+                    m_meshGraph->GetSegGeom(faceData[i].e[1]),
+                    m_meshGraph->GetSegGeom(faceData[i].e[2])};
 
                 TriGeomSharedPtr trigeom;
-                if (it == m_curvedFaces.end())
+                if (it == curvedFaces.end())
                 {
                     trigeom =
                         MemoryManager<TriGeom>::AllocateSharedPtr(indx, edges);
@@ -574,7 +591,7 @@ void MeshGraphXmlCompressed::v_ReadFaces()
                         indx, edges, it->second);
                 }
                 trigeom->SetGlobalID(indx);
-                m_triGeoms[indx] = trigeom;
+                triGeoms[indx] = trigeom;
             }
         }
         else if (elementType == "Q")
@@ -588,15 +605,17 @@ void MeshGraphXmlCompressed::v_ReadFaces()
                 indx = faceData[i].id;
 
                 /// See if this face has curves.
-                it = m_curvedFaces.find(indx);
+                it = curvedFaces.find(indx);
 
                 /// Create a QuadGeom to hold the new definition.
                 SegGeomSharedPtr edges[QuadGeom::kNedges] = {
-                    GetSegGeom(faceData[i].e[0]), GetSegGeom(faceData[i].e[1]),
-                    GetSegGeom(faceData[i].e[2]), GetSegGeom(faceData[i].e[3])};
+                    m_meshGraph->GetSegGeom(faceData[i].e[0]),
+                    m_meshGraph->GetSegGeom(faceData[i].e[1]),
+                    m_meshGraph->GetSegGeom(faceData[i].e[2]),
+                    m_meshGraph->GetSegGeom(faceData[i].e[3])};
 
                 QuadGeomSharedPtr quadgeom;
-                if (it == m_curvedFaces.end())
+                if (it == curvedFaces.end())
                 {
                     quadgeom =
                         MemoryManager<QuadGeom>::AllocateSharedPtr(indx, edges);
@@ -607,7 +626,7 @@ void MeshGraphXmlCompressed::v_ReadFaces()
                         indx, edges, it->second);
                 }
                 quadgeom->SetGlobalID(indx);
-                m_quadGeoms[indx] = quadgeom;
+                quadGeoms[indx] = quadgeom;
             }
         }
         /// Keep looking
@@ -615,8 +634,12 @@ void MeshGraphXmlCompressed::v_ReadFaces()
     }
 }
 
-void MeshGraphXmlCompressed::v_ReadElements1D()
+void MeshGraphIOXmlCompressed::v_ReadElements1D()
 {
+    auto &curvedEdges  = m_meshGraph->GetCurvedEdges();
+    auto &segGeoms     = m_meshGraph->GetAllSegGeoms();
+    int spaceDimension = m_meshGraph->GetSpaceDimension();
+
     TiXmlElement *field = nullptr;
 
     /// Look for elements in ELEMENT block.
@@ -662,34 +685,39 @@ void MeshGraphXmlCompressed::v_ReadElements1D()
             indx = data[i].id;
 
             /// See if this face has curves.
-            it = m_curvedEdges.find(indx);
+            it = curvedEdges.find(indx);
 
-            PointGeomSharedPtr vertices[2] = {GetVertex(data[i].v0),
-                                              GetVertex(data[i].v1)};
+            PointGeomSharedPtr vertices[2] = {
+                m_meshGraph->GetVertex(data[i].v0),
+                m_meshGraph->GetVertex(data[i].v1)};
             SegGeomSharedPtr seg;
 
-            if (it == m_curvedEdges.end())
+            if (it == curvedEdges.end())
             {
                 seg = MemoryManager<SegGeom>::AllocateSharedPtr(
-                    indx, m_spaceDimension, vertices);
+                    indx, spaceDimension, vertices);
                 seg->SetGlobalID(indx); // Set global mesh id
             }
             else
             {
                 seg = MemoryManager<SegGeom>::AllocateSharedPtr(
-                    indx, m_spaceDimension, vertices, it->second);
+                    indx, spaceDimension, vertices, it->second);
                 seg->SetGlobalID(indx); // Set global mesh id
             }
             seg->SetGlobalID(indx);
-            m_segGeoms[indx] = seg;
+            segGeoms[indx] = seg;
         }
         /// Keep looking for additional segments
         segment = segment->NextSiblingElement("S");
     }
 }
 
-void MeshGraphXmlCompressed::v_ReadElements2D()
+void MeshGraphIOXmlCompressed::v_ReadElements2D()
 {
+    auto &curvedFaces = m_meshGraph->GetCurvedFaces();
+    auto &triGeoms    = m_meshGraph->GetAllTriGeoms();
+    auto &quadGeoms   = m_meshGraph->GetAllQuadGeoms();
+
     /// Look for elements in ELEMENT block.
     TiXmlElement *field = m_xmlGeom->FirstChildElement("ELEMENT");
 
@@ -744,15 +772,16 @@ void MeshGraphXmlCompressed::v_ReadElements2D()
                 indx = faceData[i].id;
 
                 /// See if this face has curves.
-                it = m_curvedFaces.find(indx);
+                it = curvedFaces.find(indx);
 
                 /// Create a TriGeom to hold the new definition.
                 SegGeomSharedPtr edges[TriGeom::kNedges] = {
-                    GetSegGeom(faceData[i].e[0]), GetSegGeom(faceData[i].e[1]),
-                    GetSegGeom(faceData[i].e[2])};
+                    m_meshGraph->GetSegGeom(faceData[i].e[0]),
+                    m_meshGraph->GetSegGeom(faceData[i].e[1]),
+                    m_meshGraph->GetSegGeom(faceData[i].e[2])};
 
                 TriGeomSharedPtr trigeom;
-                if (it == m_curvedFaces.end())
+                if (it == curvedFaces.end())
                 {
                     trigeom =
                         MemoryManager<TriGeom>::AllocateSharedPtr(indx, edges);
@@ -763,7 +792,7 @@ void MeshGraphXmlCompressed::v_ReadElements2D()
                         indx, edges, it->second);
                 }
                 trigeom->SetGlobalID(indx);
-                m_triGeoms[indx] = trigeom;
+                triGeoms[indx] = trigeom;
             }
         }
         else if (elementType == "Q")
@@ -777,15 +806,17 @@ void MeshGraphXmlCompressed::v_ReadElements2D()
                 indx = faceData[i].id;
 
                 /// See if this face has curves.
-                it = m_curvedFaces.find(indx);
+                it = curvedFaces.find(indx);
 
                 /// Create a QuadGeom to hold the new definition.
                 SegGeomSharedPtr edges[QuadGeom::kNedges] = {
-                    GetSegGeom(faceData[i].e[0]), GetSegGeom(faceData[i].e[1]),
-                    GetSegGeom(faceData[i].e[2]), GetSegGeom(faceData[i].e[3])};
+                    m_meshGraph->GetSegGeom(faceData[i].e[0]),
+                    m_meshGraph->GetSegGeom(faceData[i].e[1]),
+                    m_meshGraph->GetSegGeom(faceData[i].e[2]),
+                    m_meshGraph->GetSegGeom(faceData[i].e[3])};
 
                 QuadGeomSharedPtr quadgeom;
-                if (it == m_curvedFaces.end())
+                if (it == curvedFaces.end())
                 {
                     quadgeom =
                         MemoryManager<QuadGeom>::AllocateSharedPtr(indx, edges);
@@ -796,7 +827,7 @@ void MeshGraphXmlCompressed::v_ReadElements2D()
                         indx, edges, it->second);
                 }
                 quadgeom->SetGlobalID(indx);
-                m_quadGeoms[indx] = quadgeom;
+                quadGeoms[indx] = quadgeom;
             }
         }
         /// Keep looking
@@ -804,8 +835,13 @@ void MeshGraphXmlCompressed::v_ReadElements2D()
     }
 }
 
-void MeshGraphXmlCompressed::v_ReadElements3D()
+void MeshGraphIOXmlCompressed::v_ReadElements3D()
 {
+    auto &tetGeoms   = m_meshGraph->GetAllTetGeoms();
+    auto &pyrGeoms   = m_meshGraph->GetAllPyrGeoms();
+    auto &prismGeoms = m_meshGraph->GetAllPrismGeoms();
+    auto &hexGeoms   = m_meshGraph->GetAllHexGeoms();
+
     /// Look for elements in ELEMENT block.
     TiXmlElement *field = m_xmlGeom->FirstChildElement("ELEMENT");
 
@@ -858,14 +894,15 @@ void MeshGraphXmlCompressed::v_ReadElements3D()
                 indx = data[i].id;
                 for (int j = 0; j < 4; ++j)
                 {
-                    Geometry2DSharedPtr face = GetGeometry2D(data[i].f[j]);
+                    Geometry2DSharedPtr face =
+                        m_meshGraph->GetGeometry2D(data[i].f[j]);
                     tfaces[j] = static_pointer_cast<TriGeom>(face);
                 }
 
                 TetGeomSharedPtr tetgeom(
                     MemoryManager<TetGeom>::AllocateSharedPtr(indx, tfaces));
-                m_tetGeoms[indx] = tetgeom;
-                PopulateFaceToElMap(tetgeom, 4);
+                tetGeoms[indx] = tetgeom;
+                m_meshGraph->PopulateFaceToElMap(tetgeom, 4);
             }
         }
         else if (elementType == "P")
@@ -880,7 +917,8 @@ void MeshGraphXmlCompressed::v_ReadElements3D()
                 int Nqfaces = 0;
                 for (int j = 0; j < 5; ++j)
                 {
-                    Geometry2DSharedPtr face = GetGeometry2D(data[i].f[j]);
+                    Geometry2DSharedPtr face =
+                        m_meshGraph->GetGeometry2D(data[i].f[j]);
 
                     if (face == Geometry2DSharedPtr() ||
                         (face->GetShapeType() != LibUtilities::eTriangle &&
@@ -911,8 +949,8 @@ void MeshGraphXmlCompressed::v_ReadElements3D()
                 PyrGeomSharedPtr pyrgeom(
                     MemoryManager<PyrGeom>::AllocateSharedPtr(indx, faces));
 
-                m_pyrGeoms[indx] = pyrgeom;
-                PopulateFaceToElMap(pyrgeom, 5);
+                pyrGeoms[indx] = pyrgeom;
+                m_meshGraph->PopulateFaceToElMap(pyrgeom, 5);
             }
         }
         else if (elementType == "R")
@@ -927,7 +965,8 @@ void MeshGraphXmlCompressed::v_ReadElements3D()
                 int Nqfaces = 0;
                 for (int j = 0; j < 5; ++j)
                 {
-                    Geometry2DSharedPtr face = GetGeometry2D(data[i].f[j]);
+                    Geometry2DSharedPtr face =
+                        m_meshGraph->GetGeometry2D(data[i].f[j]);
                     if (face == Geometry2DSharedPtr() ||
                         (face->GetShapeType() != LibUtilities::eTriangle &&
                          face->GetShapeType() != LibUtilities::eQuadrilateral))
@@ -957,8 +996,8 @@ void MeshGraphXmlCompressed::v_ReadElements3D()
                 PrismGeomSharedPtr prismgeom(
                     MemoryManager<PrismGeom>::AllocateSharedPtr(indx, faces));
 
-                m_prismGeoms[indx] = prismgeom;
-                PopulateFaceToElMap(prismgeom, 5);
+                prismGeoms[indx] = prismgeom;
+                m_meshGraph->PopulateFaceToElMap(prismgeom, 5);
             }
         }
         else if (elementType == "H")
@@ -972,14 +1011,15 @@ void MeshGraphXmlCompressed::v_ReadElements3D()
                 indx = data[i].id;
                 for (int j = 0; j < 6; ++j)
                 {
-                    Geometry2DSharedPtr face = GetGeometry2D(data[i].f[j]);
+                    Geometry2DSharedPtr face =
+                        m_meshGraph->GetGeometry2D(data[i].f[j]);
                     faces[j] = static_pointer_cast<QuadGeom>(face);
                 }
 
                 HexGeomSharedPtr hexgeom(
                     MemoryManager<HexGeom>::AllocateSharedPtr(indx, faces));
-                m_hexGeoms[indx] = hexgeom;
-                PopulateFaceToElMap(hexgeom, 6);
+                hexGeoms[indx] = hexgeom;
+                m_meshGraph->PopulateFaceToElMap(hexgeom, 6);
             }
         }
         /// Keep looking
@@ -987,8 +1027,8 @@ void MeshGraphXmlCompressed::v_ReadElements3D()
     }
 }
 
-void MeshGraphXmlCompressed::v_WriteVertices(TiXmlElement *geomTag,
-                                             PointGeomMap &verts)
+void MeshGraphIOXmlCompressed::v_WriteVertices(TiXmlElement *geomTag,
+                                               PointGeomMap &verts)
 {
     if (verts.size() == 0)
     {
@@ -1022,16 +1062,17 @@ void MeshGraphXmlCompressed::v_WriteVertices(TiXmlElement *geomTag,
     geomTag->LinkEndChild(vertTag);
 }
 
-void MeshGraphXmlCompressed::v_WriteEdges(TiXmlElement *geomTag,
-                                          SegGeomMap &edges)
+void MeshGraphIOXmlCompressed::v_WriteEdges(TiXmlElement *geomTag,
+                                            SegGeomMap &edges)
 {
+    int meshDimension = m_meshGraph->GetMeshDimension();
+
     if (edges.size() == 0)
     {
         return;
     }
 
-    TiXmlElement *edgeTag =
-        new TiXmlElement(m_meshDimension == 1 ? "S" : "EDGE");
+    TiXmlElement *edgeTag = new TiXmlElement(meshDimension == 1 ? "S" : "EDGE");
 
     vector<MeshEdge> edgeInfo;
 
@@ -1054,7 +1095,7 @@ void MeshGraphXmlCompressed::v_WriteEdges(TiXmlElement *geomTag,
 
     edgeTag->LinkEndChild(new TiXmlText(edgeStr));
 
-    if (m_meshDimension == 1)
+    if (meshDimension == 1)
     {
         TiXmlElement *tmp = new TiXmlElement("ELEMENT");
         tmp->LinkEndChild(edgeTag);
@@ -1066,8 +1107,8 @@ void MeshGraphXmlCompressed::v_WriteEdges(TiXmlElement *geomTag,
     }
 }
 
-void MeshGraphXmlCompressed::v_WriteTris(TiXmlElement *faceTag,
-                                         TriGeomMap &tris)
+void MeshGraphIOXmlCompressed::v_WriteTris(TiXmlElement *faceTag,
+                                           TriGeomMap &tris)
 {
     if (tris.size() == 0)
     {
@@ -1101,8 +1142,8 @@ void MeshGraphXmlCompressed::v_WriteTris(TiXmlElement *faceTag,
     faceTag->LinkEndChild(x);
 }
 
-void MeshGraphXmlCompressed::v_WriteQuads(TiXmlElement *faceTag,
-                                          QuadGeomMap &quads)
+void MeshGraphIOXmlCompressed::v_WriteQuads(TiXmlElement *faceTag,
+                                            QuadGeomMap &quads)
 {
     if (quads.size() == 0)
     {
@@ -1137,8 +1178,8 @@ void MeshGraphXmlCompressed::v_WriteQuads(TiXmlElement *faceTag,
     faceTag->LinkEndChild(x);
 }
 
-void MeshGraphXmlCompressed::v_WriteHexs(TiXmlElement *elmtTag,
-                                         HexGeomMap &hexs)
+void MeshGraphIOXmlCompressed::v_WriteHexs(TiXmlElement *elmtTag,
+                                           HexGeomMap &hexs)
 {
     if (hexs.size() == 0)
     {
@@ -1175,8 +1216,8 @@ void MeshGraphXmlCompressed::v_WriteHexs(TiXmlElement *elmtTag,
     elmtTag->LinkEndChild(x);
 }
 
-void MeshGraphXmlCompressed::v_WritePrisms(TiXmlElement *elmtTag,
-                                           PrismGeomMap &pris)
+void MeshGraphIOXmlCompressed::v_WritePrisms(TiXmlElement *elmtTag,
+                                             PrismGeomMap &pris)
 {
     if (pris.size() == 0)
     {
@@ -1212,8 +1253,8 @@ void MeshGraphXmlCompressed::v_WritePrisms(TiXmlElement *elmtTag,
     elmtTag->LinkEndChild(x);
 }
 
-void MeshGraphXmlCompressed::v_WritePyrs(TiXmlElement *elmtTag,
-                                         PyrGeomMap &pyrs)
+void MeshGraphIOXmlCompressed::v_WritePyrs(TiXmlElement *elmtTag,
+                                           PyrGeomMap &pyrs)
 {
     if (pyrs.size() == 0)
     {
@@ -1249,8 +1290,8 @@ void MeshGraphXmlCompressed::v_WritePyrs(TiXmlElement *elmtTag,
     elmtTag->LinkEndChild(x);
 }
 
-void MeshGraphXmlCompressed::v_WriteTets(TiXmlElement *elmtTag,
-                                         TetGeomMap &tets)
+void MeshGraphIOXmlCompressed::v_WriteTets(TiXmlElement *elmtTag,
+                                           TetGeomMap &tets)
 {
     if (tets.size() == 0)
     {
@@ -1285,8 +1326,8 @@ void MeshGraphXmlCompressed::v_WriteTets(TiXmlElement *elmtTag,
     elmtTag->LinkEndChild(x);
 }
 
-void MeshGraphXmlCompressed::v_WriteCurves(TiXmlElement *geomTag,
-                                           CurveMap &edges, CurveMap &faces)
+void MeshGraphIOXmlCompressed::v_WriteCurves(TiXmlElement *geomTag,
+                                             CurveMap &edges, CurveMap &faces)
 {
     if (edges.size() == 0 && faces.size() == 0)
     {

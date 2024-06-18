@@ -137,7 +137,7 @@ struct PhysDerivTemplate
         }
 
         // Call 1D kernel
-        const vec_t *df_ptr   = {};
+        const vec_t *df_ptr   = &((*this->m_df)[0]);
         vec_t df_tmp[max_ndf] = {}; // max_ndf is a constexpr
 
         std::vector<vec_t, allocator<vec_t>> tmpIn(nqTot), tmpOut[max_ndf];
@@ -149,12 +149,16 @@ struct PhysDerivTemplate
             out_ptr[d] = &output[d][0];
         }
 
-        for (int e = 0; e < this->m_nBlocks; ++e)
-        {
-            df_ptr = &((*this->m_df)[dfSize * e]);
+        // temporary aligned storage for local fields
+        NekDouble *locField = static_cast<NekDouble *>(::operator new[](
+            nqBlocks * sizeof(NekDouble), std::align_val_t(vec_t::alignment)));
 
-            // Load and transpose data
-            load_interleave(inptr, nqTot, tmpIn);
+        for (int e = 0; e < this->m_nBlocks - 1; ++e)
+        {
+            // Load data to aligned storage and interleave it
+            // std::copy(inptr, inptr + nqBlocks, locField);
+            // load_interleave(locField, nqTot, tmpIn);
+            load_unalign_interleave(inptr, nqTot, tmpIn);
 
             // Get the basic derivative
             PhysDerivTensor1DKernel(nq0, tmpIn, this->m_D[0], tmpOut[0]);
@@ -165,12 +169,38 @@ struct PhysDerivTemplate
             // De-interleave and store data
             for (int d = 0; d < ndf; ++d)
             {
-                deinterleave_store(tmpOut[d], nqTot, out_ptr[d]);
+                // de-interleave and store data
+                // deinterleave_store(tmpOut[d], nqTot, locField);
+                // std::copy(locField, locField + nqBlocks, out_ptr[d]);
+                deinterleave_unalign_store(tmpOut[d], nqTot, out_ptr[d]);
                 out_ptr[d] += nqBlocks;
             }
 
             inptr += nqBlocks;
+            df_ptr += dfSize;
         }
+        // last block
+        {
+            int acturalSize = nqBlocks - this->m_nPads * nqTot;
+            std::copy(inptr, inptr + acturalSize, locField);
+            load_interleave(locField, nqTot, tmpIn);
+
+            // Get the basic derivative
+            PhysDerivTensor1DKernel(nq0, tmpIn, this->m_D[0], tmpOut[0]);
+
+            // Calculate physical derivative
+            PhysDeriv1DKernel<DEFORMED>(nq0, ndf, df_ptr, df_tmp, tmpOut);
+
+            // De-interleave and store data
+            for (int d = 0; d < ndf; ++d)
+            {
+                // de-interleave and store data
+                deinterleave_store(tmpOut[d], nqTot, locField);
+                std::copy(locField, locField + acturalSize, out_ptr[d]);
+            }
+        }
+        // free aligned memory
+        ::operator delete[](locField, std::align_val_t(vec_t::alignment));
     }
 
     // Size based template version.
@@ -202,7 +232,7 @@ struct PhysDerivTemplate
         PhysDeriv1DWorkspace<SHAPE_TYPE>(nq0);
 
         // Call 1D kernel
-        const vec_t *df_ptr   = {};
+        const vec_t *df_ptr   = &((*this->m_df)[0]);
         vec_t df_tmp[max_ndf] = {}; // max_ndf is a constexpr
 
         std::vector<vec_t, allocator<vec_t>> tmpIn(nqTot), tmpOut[max_ndf];
@@ -214,12 +244,15 @@ struct PhysDerivTemplate
             out_ptr[d] = &output[d][0];
         }
 
-        for (int e = 0; e < this->m_nBlocks; ++e)
-        {
-            df_ptr = &((*this->m_df)[dfSize * e]);
+        // temporary aligned storage for local fields
+        alignas(vec_t::alignment) NekDouble locField[nqBlocks];
 
-            // Load and transpose data
-            load_interleave(inptr, nqTot, tmpIn);
+        for (int e = 0; e < this->m_nBlocks - 1; ++e)
+        {
+            // Load data to aligned storage and interleave it
+            // std::copy(inptr, inptr + nqBlocks, locField);
+            // load_interleave(locField, nqTot, tmpIn);
+            load_unalign_interleave(inptr, nqTot, tmpIn);
 
             // Get the basic derivative
             PhysDerivTensor1DKernel(nq0, tmpIn, this->m_D[0], tmpOut[0]);
@@ -230,11 +263,35 @@ struct PhysDerivTemplate
             // De-interleave and store data
             for (int d = 0; d < ndf; ++d)
             {
-                deinterleave_store(tmpOut[d], nqTot, out_ptr[d]);
+                // de-interleave and store data
+                // deinterleave_store(tmpOut[d], nqTot, locField);
+                // std::copy(locField, locField + nqBlocks, out_ptr[d]);
+                deinterleave_unalign_store(tmpOut[d], nqTot, out_ptr[d]);
                 out_ptr[d] += nqBlocks;
             }
 
             inptr += nqBlocks;
+            df_ptr += dfSize;
+        }
+        // last block
+        {
+            int acturalSize = nqBlocks - this->m_nPads * nqTot;
+            std::copy(inptr, inptr + acturalSize, locField);
+            load_interleave(locField, nqTot, tmpIn);
+
+            // Get the basic derivative
+            PhysDerivTensor1DKernel(nq0, tmpIn, this->m_D[0], tmpOut[0]);
+
+            // Calculate physical derivative
+            PhysDeriv1DKernel<DEFORMED>(nq0, ndf, df_ptr, df_tmp, tmpOut);
+
+            // De-interleave and store data
+            for (int d = 0; d < ndf; ++d)
+            {
+                // de-interleave and store data
+                deinterleave_store(tmpOut[d], nqTot, locField);
+                std::copy(locField, locField + acturalSize, out_ptr[d]);
+            }
         }
     }
 
@@ -279,15 +336,19 @@ struct PhysDerivTemplate
             dfSize *= nqTot;
         }
 
-        const vec_t *df_ptr   = {};
+        const vec_t *df_ptr   = &((*this->m_df)[0]);
         vec_t df_tmp[max_ndf] = {}; // max_ndf is a constexpr
 
-        for (int e = 0; e < this->m_nBlocks; ++e)
-        {
-            df_ptr = &((*this->m_df)[dfSize * e]);
+        // temporary aligned storage for local fields
+        NekDouble *locField = static_cast<NekDouble *>(::operator new[](
+            nqBlocks * sizeof(NekDouble), std::align_val_t(vec_t::alignment)));
 
-            // Load and transpose data
-            load_interleave(inptr, nqTot, tmpIn);
+        for (int e = 0; e < this->m_nBlocks - 1; ++e)
+        {
+            // Load data to aligned storage and interleave it
+            // std::copy(inptr, inptr + nqBlocks, locField);
+            // load_interleave(locField, nqTot, tmpIn);
+            load_unalign_interleave(inptr, nqTot, tmpIn);
 
             // Results written to out_d0, out_d1
             PhysDerivTensor2DKernel(nq0, nq1, tmpIn, this->m_D[0], this->m_D[1],
@@ -297,14 +358,40 @@ struct PhysDerivTemplate
                                         this->m_Z[1], df_ptr, df_tmp, tmpOut);
 
             inptr += nqBlocks;
-
+            df_ptr += dfSize;
             // de-interleave and store data
             for (int d = 0; d < outdim; ++d)
             {
-                deinterleave_store(tmpOut[d], nqTot, out_ptr[d]);
+                // de-interleave and store data
+                // deinterleave_store(tmpOut[d], nqTot, locField);
+                // std::copy(locField, locField + nqBlocks, out_ptr[d]);
+                deinterleave_unalign_store(tmpOut[d], nqTot, out_ptr[d]);
                 out_ptr[d] += nqBlocks;
             }
         }
+        // last block
+        {
+            int acturalSize = nqBlocks - this->m_nPads * nqTot;
+            std::copy(inptr, inptr + acturalSize, locField);
+            load_interleave(locField, nqTot, tmpIn);
+
+            // Results written to out_d0, out_d1
+            PhysDerivTensor2DKernel(nq0, nq1, tmpIn, this->m_D[0], this->m_D[1],
+                                    tmpOut[0], tmpOut[1]);
+            // Calculate physical derivative
+            PhysDeriv2DKernel<DEFORMED>(nq0, nq1, outdim, this->m_Z[0],
+                                        this->m_Z[1], df_ptr, df_tmp, tmpOut);
+
+            // De-interleave and store data
+            for (int d = 0; d < outdim; ++d)
+            {
+                // de-interleave and store data
+                deinterleave_store(tmpOut[d], nqTot, locField);
+                std::copy(locField, locField + acturalSize, out_ptr[d]);
+            }
+        }
+        // free aligned memory
+        ::operator delete[](locField, std::align_val_t(vec_t::alignment));
     }
 
     // Size based template version.
@@ -344,15 +431,18 @@ struct PhysDerivTemplate
             dfSize *= nqTot;
         }
 
-        const vec_t *df_ptr   = {};
+        const vec_t *df_ptr   = &((*this->m_df)[0]);
         vec_t df_tmp[max_ndf] = {}; // max_ndf is a constexpr
 
-        for (int e = 0; e < this->m_nBlocks; ++e)
-        {
-            df_ptr = &((*this->m_df)[dfSize * e]);
+        // temporary aligned storage for local fields
+        alignas(vec_t::alignment) NekDouble locField[nqBlocks];
 
-            // Load and transpose data
-            load_interleave(inptr, nqTot, tmpIn);
+        for (int e = 0; e < this->m_nBlocks - 1; ++e)
+        {
+            // Load data to aligned storage and interleave it
+            // std::copy(inptr, inptr + nqBlocks, locField);
+            // load_interleave(locField, nqTot, tmpIn);
+            load_unalign_interleave(inptr, nqTot, tmpIn);
 
             // Results written to out_d0, out_d1
             PhysDerivTensor2DKernel(nq0, nq1, tmpIn, this->m_D[0], this->m_D[1],
@@ -362,12 +452,36 @@ struct PhysDerivTemplate
                                         this->m_Z[1], df_ptr, df_tmp, tmpOut);
 
             inptr += nqBlocks;
-
+            df_ptr += dfSize;
             // de-interleave and store data
             for (int d = 0; d < outdim; ++d)
             {
-                deinterleave_store(tmpOut[d], nqTot, out_ptr[d]);
+                // de-interleave and store data
+                // deinterleave_store(tmpOut[d], nqTot, locField);
+                // std::copy(locField, locField + nqBlocks, out_ptr[d]);
+                deinterleave_unalign_store(tmpOut[d], nqTot, out_ptr[d]);
                 out_ptr[d] += nqBlocks;
+            }
+        }
+        // last block
+        {
+            int acturalSize = nqBlocks - this->m_nPads * nqTot;
+            std::copy(inptr, inptr + acturalSize, locField);
+            load_interleave(locField, nqTot, tmpIn);
+
+            // Results written to out_d0, out_d1
+            PhysDerivTensor2DKernel(nq0, nq1, tmpIn, this->m_D[0], this->m_D[1],
+                                    tmpOut[0], tmpOut[1]);
+            // Calculate physical derivative
+            PhysDeriv2DKernel<DEFORMED>(nq0, nq1, outdim, this->m_Z[0],
+                                        this->m_Z[1], df_ptr, df_tmp, tmpOut);
+
+            // De-interleave and store data
+            for (int d = 0; d < outdim; ++d)
+            {
+                // de-interleave and store data
+                deinterleave_store(tmpOut[d], nqTot, locField);
+                std::copy(locField, locField + acturalSize, out_ptr[d]);
             }
         }
     }
@@ -409,15 +523,19 @@ struct PhysDerivTemplate
         std::vector<vec_t, allocator<vec_t>> wsp0(wsp0Size), wsp1(wsp1Size),
             tmpIn(nqTot), tmpd0(nqTot), tmpd1(nqTot), tmpd2(nqTot);
 
-        const vec_t *df_ptr = {};
+        const vec_t *df_ptr = &((*this->m_df)[0]);
         vec_t df_tmp[ndf]   = {}; // ndf is a constexpr
 
-        for (int e = 0; e < this->m_nBlocks; ++e)
-        {
-            df_ptr = &((*this->m_df)[dfSize * e]);
+        // temporary aligned storage for local fields
+        NekDouble *locField = static_cast<NekDouble *>(::operator new[](
+            nqBlocks * sizeof(NekDouble), std::align_val_t(vec_t::alignment)));
 
-            // Load and transpose data
-            load_interleave(inptr, nqTot, tmpIn);
+        for (int e = 0; e < this->m_nBlocks - 1; ++e)
+        {
+            // Load data to aligned storage and interleave it
+            // std::copy(inptr, inptr + nqBlocks, locField);
+            // load_interleave(locField, nqTot, tmpIn);
+            load_unalign_interleave(inptr, nqTot, tmpIn);
 
             // Results written to out_d0, out_d1, out_d2
             PhysDerivTensor3DKernel(nq0, nq1, nq2, tmpIn, this->m_D[0],
@@ -429,15 +547,41 @@ struct PhysDerivTemplate
                 df_tmp, wsp0, wsp1, tmpd0, tmpd1, tmpd2);
 
             // de-interleave and store data
-            deinterleave_store(tmpd0, nqTot, outptr_d0);
-            deinterleave_store(tmpd1, nqTot, outptr_d1);
-            deinterleave_store(tmpd2, nqTot, outptr_d2);
+            deinterleave_unalign_store(tmpd0, nqTot, outptr_d0);
+            deinterleave_unalign_store(tmpd1, nqTot, outptr_d1);
+            deinterleave_unalign_store(tmpd2, nqTot, outptr_d2);
 
             inptr += nqBlocks;
+            df_ptr += dfSize;
             outptr_d0 += nqBlocks;
             outptr_d1 += nqBlocks;
             outptr_d2 += nqBlocks;
         }
+        // last block
+        {
+            int acturalSize = nqBlocks - this->m_nPads * nqTot;
+            std::copy(inptr, inptr + acturalSize, locField);
+            load_interleave(locField, nqTot, tmpIn);
+
+            // Results written to out_d0, out_d1, out_d2
+            PhysDerivTensor3DKernel(nq0, nq1, nq2, tmpIn, this->m_D[0],
+                                    this->m_D[1], this->m_D[2], tmpd0, tmpd1,
+                                    tmpd2);
+            // Calculate physical derivative
+            PhysDeriv3DKernel<DEFORMED>(
+                nq0, nq1, nq2, this->m_Z[0], this->m_Z[1], this->m_Z[2], df_ptr,
+                df_tmp, wsp0, wsp1, tmpd0, tmpd1, tmpd2);
+
+            // De-interleave and store data
+            deinterleave_store(tmpd0, nqTot, locField);
+            std::copy(locField, locField + acturalSize, outptr_d0);
+            deinterleave_store(tmpd1, nqTot, locField);
+            std::copy(locField, locField + acturalSize, outptr_d1);
+            deinterleave_store(tmpd2, nqTot, locField);
+            std::copy(locField, locField + acturalSize, outptr_d2);
+        }
+        // free aligned memory
+        ::operator delete[](locField, std::align_val_t(vec_t::alignment));
     }
 
     // Size based template version.
@@ -472,15 +616,18 @@ struct PhysDerivTemplate
         std::vector<vec_t, allocator<vec_t>> tmpIn(nqTot), tmpd0(nqTot),
             tmpd1(nqTot), tmpd2(nqTot), wsp0(wsp0Size), wsp1(wsp1Size);
 
-        const vec_t *df_ptr = {};
+        const vec_t *df_ptr = &((*this->m_df)[0]);
         vec_t df_tmp[ndf]   = {}; // ndf is a constexpr
 
-        for (int e = 0; e < this->m_nBlocks; ++e)
-        {
-            df_ptr = &((*this->m_df)[dfSize * e]);
+        // temporary aligned storage for local fields
+        alignas(vec_t::alignment) NekDouble locField[nqBlocks];
 
-            // Load and transpose data
-            load_interleave(inptr, nqTot, tmpIn);
+        for (int e = 0; e < this->m_nBlocks - 1; ++e)
+        {
+            // Load data to aligned storage and interleave it
+            // std::copy(inptr, inptr + nqBlocks, locField);
+            // load_interleave(locField, nqTot, tmpIn);
+            load_unalign_interleave(inptr, nqTot, tmpIn);
 
             // Results written to out_d0, out_d1, out_d2
             PhysDerivTensor3DKernel(nq0, nq1, nq2, tmpIn, this->m_D[0],
@@ -492,14 +639,38 @@ struct PhysDerivTemplate
                 df_tmp, wsp0, wsp1, tmpd0, tmpd1, tmpd2);
 
             // de-interleave and store data
-            deinterleave_store(tmpd0, nqTot, outptr_d0);
-            deinterleave_store(tmpd1, nqTot, outptr_d1);
-            deinterleave_store(tmpd2, nqTot, outptr_d2);
+            deinterleave_unalign_store(tmpd0, nqTot, outptr_d0);
+            deinterleave_unalign_store(tmpd1, nqTot, outptr_d1);
+            deinterleave_unalign_store(tmpd2, nqTot, outptr_d2);
 
             inptr += nqBlocks;
+            df_ptr += dfSize;
             outptr_d0 += nqBlocks;
             outptr_d1 += nqBlocks;
             outptr_d2 += nqBlocks;
+        }
+        // last block
+        {
+            int acturalSize = nqBlocks - this->m_nPads * nqTot;
+            std::copy(inptr, inptr + acturalSize, locField);
+            load_interleave(locField, nqTot, tmpIn);
+
+            // Results written to out_d0, out_d1, out_d2
+            PhysDerivTensor3DKernel(nq0, nq1, nq2, tmpIn, this->m_D[0],
+                                    this->m_D[1], this->m_D[2], tmpd0, tmpd1,
+                                    tmpd2);
+            // Calculate physical derivative
+            PhysDeriv3DKernel<DEFORMED>(
+                nq0, nq1, nq2, this->m_Z[0], this->m_Z[1], this->m_Z[2], df_ptr,
+                df_tmp, wsp0, wsp1, tmpd0, tmpd1, tmpd2);
+
+            // De-interleave and store data
+            deinterleave_store(tmpd0, nqTot, locField);
+            std::copy(locField, locField + acturalSize, outptr_d0);
+            deinterleave_store(tmpd1, nqTot, locField);
+            std::copy(locField, locField + acturalSize, outptr_d1);
+            deinterleave_store(tmpd2, nqTot, locField);
+            std::copy(locField, locField + acturalSize, outptr_d2);
         }
     }
 

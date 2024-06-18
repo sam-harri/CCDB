@@ -66,6 +66,7 @@ public:
         p->InitObject();
         return p;
     }
+
     /// Name of class
     static std::string className;
 
@@ -77,15 +78,15 @@ protected:
 
     void v_InitObject(bool DeclareFields = true) override;
 
-    void v_GenerateSummary(SolverUtils::SummaryList &s) override;
-
     void v_SetInitialConditions(NekDouble initialtime      = 0.0,
                                 bool dumpInitialConditions = true,
                                 const int domain           = 0) override;
 
-    void DoOdeRhs(const Array<OneD, const Array<OneD, NekDouble>> &inarray,
-                  Array<OneD, Array<OneD, NekDouble>> &outarray,
-                  const NekDouble time);
+    void v_DoOdeRhs(const Array<OneD, const Array<OneD, NekDouble>> &inarray,
+                    Array<OneD, Array<OneD, NekDouble>> &outarray,
+                    const NekDouble time) override;
+
+    void v_GenerateSummary(SolverUtils::SummaryList &s) override;
 
     void LaitoneSolitaryWave(NekDouble amp, NekDouble d, NekDouble time,
                              NekDouble x_offset);
@@ -93,32 +94,29 @@ protected:
     // Dispersive parts
     void WCESolve(Array<OneD, NekDouble> &fce, NekDouble lambda);
 
-    void NumericalFluxForcing(
-        const Array<OneD, const Array<OneD, NekDouble>> &inarray,
-        Array<OneD, NekDouble> &numfluxX, Array<OneD, NekDouble> &numfluxY);
-
     void SetBoundaryConditionsForcing(
         Array<OneD, Array<OneD, NekDouble>> &inarray, NekDouble time);
 
     void WallBoundaryForcing(int bcRegion, int cnt,
                              Array<OneD, Array<OneD, NekDouble>> &inarray);
 
-    void SetBoundaryConditionsContVariables(Array<OneD, NekDouble> &inarray,
-                                            NekDouble time);
+    void NumericalFluxForcing(
+        const Array<OneD, const Array<OneD, NekDouble>> &inarray,
+        Array<OneD, NekDouble> &numfluxX, Array<OneD, NekDouble> &numfluxY);
+
+    void SetBoundaryConditionsContVariables(
+        const Array<OneD, const NekDouble> &inarray, NekDouble time);
 
     void WallBoundaryContVariables(int bcRegion, int cnt,
-                                   Array<OneD, NekDouble> &inarray);
+                                   const Array<OneD, const NekDouble> &inarray);
 
-    void NumericalFluxConsVariables(Array<OneD, NekDouble> &physfield,
-                                    Array<OneD, NekDouble> &outX,
-                                    Array<OneD, NekDouble> &outY);
+    void NumericalFluxConsVariables(
+        const Array<OneD, const NekDouble> &physfield,
+        Array<OneD, NekDouble> &outX, Array<OneD, NekDouble> &outY);
 
 private:
     StdRegions::ConstFactorMap m_factors;
-
-    ///< problem type selector
     ProblemType m_problemType;
-
     NekDouble m_const_depth;
 };
 

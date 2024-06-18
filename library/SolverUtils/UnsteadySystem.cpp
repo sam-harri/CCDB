@@ -728,13 +728,13 @@ void UnsteadySystem::CheckForRestartTime(NekDouble &time, int &nchk)
                     auto iter = m_fieldMetaDataMap.find("Time");
                     if (iter != m_fieldMetaDataMap.end())
                     {
-                        time = boost::lexical_cast<NekDouble>(iter->second);
+                        time = std::stod(iter->second);
                     }
 
                     iter = m_fieldMetaDataMap.find("ChkFileNum");
                     if (iter != m_fieldMetaDataMap.end())
                     {
-                        nchk = boost::lexical_cast<NekDouble>(iter->second);
+                        nchk = std::stod(iter->second);
                     }
                 }
 
@@ -744,7 +744,7 @@ void UnsteadySystem::CheckForRestartTime(NekDouble &time, int &nchk)
     }
     if (m_session->DefinesCmdLineArgument("set-start-time"))
     {
-        time = boost::lexical_cast<NekDouble>(
+        time = std::stod(
             m_session->GetCmdLineArgument<std::string>("set-start-time")
                 .c_str());
     }

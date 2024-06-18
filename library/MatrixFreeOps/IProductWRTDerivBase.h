@@ -150,8 +150,8 @@ struct IProductWRTDerivBaseTemplate
             tmpIn[max_ndf]; // max_ndf is a constexpr
         std::vector<vec_t, allocator<vec_t>> tmp0(nqTot), tmpOut(m_nmTot);
 
-        const vec_t *jac_ptr;
-        const vec_t *df_ptr;
+        const vec_t *jac_ptr = &((*this->m_jac)[0]);
+        const vec_t *df_ptr  = &((*this->m_df)[0]);
         vec_t df_tmp[max_ndf];     // max_ndf is a constexpr
         NekDouble *inptr[max_ndf]; // max_ndf is a constexpr
 
@@ -161,18 +161,19 @@ struct IProductWRTDerivBaseTemplate
             inptr[d] = const_cast<NekDouble *>(input[d].data());
         }
 
-        for (int e = 0; e < this->m_nBlocks; ++e)
+        // temporary aligned storage for local fields
+        NekDouble *locField = static_cast<NekDouble *>(::operator new[](
+            nqBlocks * sizeof(NekDouble), std::align_val_t(vec_t::alignment)));
+
+        for (int e = 0; e < this->m_nBlocks - 1; ++e)
         {
-            // Jacobian
-            jac_ptr = &((*this->m_jac)[dJSize * e]);
-
-            // Derivative factor
-            df_ptr = &((*this->m_df)[dfSize * e]);
-
             // Load and transpose data
             for (int d = 0; d < ndf; ++d)
             {
-                load_interleave(inptr[d], nqTot, tmpIn[d]);
+                // Load data to aligned storage and interleave it
+                // std::copy(inptr[d], inptr[d] + nqBlocks, locField);
+                // load_interleave(locField, nqTot, tmpIn[d]);
+                load_unalign_interleave(inptr[d], nqTot, tmpIn[d]);
             }
 
             IProductWRTDerivBase1DKernel<SHAPE_TYPE, DEFORMED>(
@@ -184,15 +185,42 @@ struct IProductWRTDerivBaseTemplate
                 tmpOut);
 
             // de-interleave and store data
-            deinterleave_store(tmpOut, m_nmTot, outptr);
+            // deinterleave_store(tmpOut, m_nmTot, locField);
+            // std::copy(locField, locField + nmBlocks, outptr);
+            deinterleave_unalign_store(tmpOut, m_nmTot, outptr);
 
             for (int d = 0; d < ndf; ++d)
             {
                 inptr[d] += nqBlocks;
             }
-
             outptr += nmBlocks;
+            df_ptr += dfSize;
+            jac_ptr += dJSize;
         }
+        // last block
+        {
+            int acturalSize = nqBlocks - this->m_nPads * nqTot;
+            for (int d = 0; d < ndf; ++d)
+            {
+                std::copy(inptr[d], inptr[d] + acturalSize, locField);
+                load_interleave(locField, nqTot, tmpIn[d]);
+            }
+
+            IProductWRTDerivBase1DKernel<SHAPE_TYPE, DEFORMED>(
+                nqTot, ndf, df_ptr, df_tmp, tmpIn, tmp0);
+
+            // IP DB0
+            IProduct1DKernel<SHAPE_TYPE, false, false, DEFORMED>(
+                nm0, nq0, tmp0, this->m_dbdata[0], this->m_w[0], jac_ptr,
+                tmpOut);
+
+            // de-interleave and store data
+            deinterleave_store(tmpOut, m_nmTot, locField);
+            acturalSize = nmBlocks - this->m_nPads * m_nmTot;
+            std::copy(locField, locField + acturalSize, outptr);
+        }
+        // free aligned memory
+        ::operator delete[](locField, std::align_val_t(vec_t::alignment));
     }
 
     // Size based template version.
@@ -231,8 +259,8 @@ struct IProductWRTDerivBaseTemplate
             tmpIn[max_ndf]; // max_ndf is a constexpr
         std::vector<vec_t, allocator<vec_t>> tmp0(nqTot), tmpOut(m_nmTot);
 
-        const vec_t *jac_ptr;
-        const vec_t *df_ptr;
+        const vec_t *jac_ptr = &((*this->m_jac)[0]);
+        const vec_t *df_ptr  = &((*this->m_df)[0]);
         vec_t df_tmp[max_ndf];     // max_ndf is a constexpr
         NekDouble *inptr[max_ndf]; // max_ndf is a constexpr
 
@@ -242,18 +270,18 @@ struct IProductWRTDerivBaseTemplate
             inptr[d] = const_cast<NekDouble *>(input[d].data());
         }
 
-        for (int e = 0; e < this->m_nBlocks; ++e)
+        // temporary aligned storage for local fields
+        alignas(vec_t::alignment) NekDouble locField[nqTot * vec_t::width];
+
+        for (int e = 0; e < this->m_nBlocks - 1; ++e)
         {
-            // Jacobian
-            jac_ptr = &((*this->m_jac)[dJSize * e]);
-
-            // Derivative factor
-            df_ptr = &((*this->m_df)[dfSize * e]);
-
             // Load and transpose data
             for (int d = 0; d < ndf; ++d)
             {
-                load_interleave(inptr[d], nqTot, tmpIn[d]);
+                // Load data to aligned storage and interleave it
+                // std::copy(inptr[d], inptr[d] + nqBlocks, locField);
+                // load_interleave(locField, nqTot, tmpIn[d]);
+                load_unalign_interleave(inptr[d], nqTot, tmpIn[d]);
             }
 
             IProductWRTDerivBase1DKernel<SHAPE_TYPE, DEFORMED>(
@@ -265,14 +293,39 @@ struct IProductWRTDerivBaseTemplate
                 tmpOut);
 
             // de-interleave and store data
-            deinterleave_store(tmpOut, m_nmTot, outptr);
+            // deinterleave_store(tmpOut, m_nmTot, locField);
+            // std::copy(locField, locField + nmBlocks, outptr);
+            deinterleave_unalign_store(tmpOut, m_nmTot, outptr);
 
             for (int d = 0; d < ndf; ++d)
             {
                 inptr[d] += nqBlocks;
             }
-
             outptr += nmBlocks;
+            df_ptr += dfSize;
+            jac_ptr += dJSize;
+        }
+        // last block
+        {
+            int acturalSize = nqBlocks - this->m_nPads * nqTot;
+            for (int d = 0; d < ndf; ++d)
+            {
+                std::copy(inptr[d], inptr[d] + acturalSize, locField);
+                load_interleave(locField, nqTot, tmpIn[d]);
+            }
+
+            IProductWRTDerivBase1DKernel<SHAPE_TYPE, DEFORMED>(
+                nqTot, ndf, df_ptr, df_tmp, tmpIn, tmp0);
+
+            // IP DB0
+            IProduct1DKernel<SHAPE_TYPE, false, false, DEFORMED>(
+                nm0, nq0, tmp0, this->m_dbdata[0], this->m_w[0], jac_ptr,
+                tmpOut);
+
+            // de-interleave and store data
+            deinterleave_store(tmpOut, m_nmTot, locField);
+            acturalSize = nmBlocks - this->m_nPads * m_nmTot;
+            std::copy(locField, locField + acturalSize, outptr);
         }
     }
 
@@ -336,51 +389,60 @@ struct IProductWRTDerivBaseTemplate
 
         std::vector<vec_t, allocator<vec_t>> wsp0(wsp0Size);
 
-        const vec_t *jac_ptr;
-        const vec_t *df_ptr;
+        const vec_t *jac_ptr = &((*this->m_jac)[0]);
+        const vec_t *df_ptr  = &((*this->m_df)[0]);
         vec_t df_tmp[max_ndf]; // max_ndf is a constexpr
 
-        std::vector<vec_t, allocator<vec_t>> &Z0 = this->m_Z[0];
-        std::vector<vec_t, allocator<vec_t>> &Z1 = this->m_Z[1];
+        // temporary aligned storage for local fields
+        NekDouble *locField = static_cast<NekDouble *>(::operator new[](
+            nqBlocks * sizeof(NekDouble), std::align_val_t(vec_t::alignment)));
 
-        for (int e = 0; e < this->m_nBlocks; ++e)
+        for (int e = 0; e < this->m_nBlocks - 1; ++e)
         {
-            // Jacobian
-            jac_ptr = &((*this->m_jac)[dJSize * e]);
-
-            // Derivative factor
-            df_ptr = &((*this->m_df)[dfSize * e]);
-
             // Load and transpose data
             for (int d = 0; d < indim; ++d)
             {
-                load_interleave(inptr[d], nqTot, tmpIn[d]);
+                // Load data to aligned storage and interleave it
+                // std::copy(inptr[d], inptr[d] + nqBlocks, locField);
+                // load_interleave(locField, nqTot, tmpIn[d]);
+                load_unalign_interleave(inptr[d], nqTot, tmpIn[d]);
             }
 
-            IProductWRTDerivBase2DKernel<SHAPE_TYPE, DEFORMED>(
-                nq0, nq1, indim, df_ptr, df_tmp, Z0, Z1, tmpIn, tmp0, tmp1);
-
-            // IP DB0 B1
-            IProduct2DKernel<SHAPE_TYPE, false, false, DEFORMED>(
-                nm0, nm1, nq0, nq1, correct, tmp0, this->m_dbdata[0],
-                this->m_bdata[1], this->m_w[0], this->m_w[1], jac_ptr, wsp0,
-                tmpOut);
-
-            // IP DB1 B0
-            IProduct2DKernel<SHAPE_TYPE, false, true, DEFORMED>(
-                nm0, nm1, nq0, nq1, correct, tmp1, this->m_bdata[0],
-                this->m_dbdata[1], this->m_w[0], this->m_w[1], jac_ptr, wsp0,
-                tmpOut);
+            fusedKernel2D(nm0, nm1, nq0, nq1, indim, correct, jac_ptr, df_ptr,
+                          tmpIn, df_tmp, tmp0, tmp1, wsp0, tmpOut);
 
             // de-interleave and store data
-            deinterleave_store(tmpOut, m_nmTot, outptr);
+            // deinterleave_store(tmpOut, m_nmTot, locField);
+            // std::copy(locField, locField + nmBlocks, outptr);
+            deinterleave_unalign_store(tmpOut, m_nmTot, outptr);
 
             for (int d = 0; d < indim; ++d)
             {
                 inptr[d] += nqBlocks;
             }
             outptr += nmBlocks;
+            df_ptr += dfSize;
+            jac_ptr += dJSize;
         }
+        // last block
+        {
+            int acturalSize = nqBlocks - this->m_nPads * nqTot;
+            for (int d = 0; d < indim; ++d)
+            {
+                std::copy(inptr[d], inptr[d] + acturalSize, locField);
+                load_interleave(locField, nqTot, tmpIn[d]);
+            }
+
+            fusedKernel2D(nm0, nm1, nq0, nq1, indim, correct, jac_ptr, df_ptr,
+                          tmpIn, df_tmp, tmp0, tmp1, wsp0, tmpOut);
+
+            // de-interleave and store data
+            deinterleave_store(tmpOut, m_nmTot, locField);
+            acturalSize = nmBlocks - this->m_nPads * m_nmTot;
+            std::copy(locField, locField + acturalSize, outptr);
+        }
+        // free aligned memory
+        ::operator delete[](locField, std::align_val_t(vec_t::alignment));
     }
 
     // Size based template version.
@@ -436,51 +498,83 @@ struct IProductWRTDerivBaseTemplate
 
         std::vector<vec_t, allocator<vec_t>> wsp0(wsp0Size);
 
-        const vec_t *jac_ptr;
-        const vec_t *df_ptr;
+        const vec_t *jac_ptr = &((*this->m_jac)[0]);
+        const vec_t *df_ptr  = &((*this->m_df)[0]);
         vec_t df_tmp[max_ndf]; // max_ndf is a constexpr
 
-        std::vector<vec_t, allocator<vec_t>> &Z0 = this->m_Z[0];
-        std::vector<vec_t, allocator<vec_t>> &Z1 = this->m_Z[1];
+        // temporary aligned storage for local fields
+        alignas(vec_t::alignment) NekDouble locField[nqTot * vec_t::width];
 
-        for (int e = 0; e < this->m_nBlocks; ++e)
+        for (int e = 0; e < this->m_nBlocks - 1; ++e)
         {
-            // Jacobian
-            jac_ptr = &((*this->m_jac)[dJSize * e]);
-
-            // Derivative factor
-            df_ptr = &((*this->m_df)[dfSize * e]);
-
             // Load and transpose data
             for (int d = 0; d < indim; ++d)
             {
-                load_interleave(inptr[d], nqTot, tmpIn[d]);
+                // Load data to aligned storage and interleave it
+                // std::copy(inptr[d], inptr[d] + nqBlocks, locField);
+                // load_interleave(locField, nqTot, tmpIn[d]);
+                load_unalign_interleave(inptr[d], nqTot, tmpIn[d]);
             }
 
-            IProductWRTDerivBase2DKernel<SHAPE_TYPE, DEFORMED>(
-                nq0, nq1, indim, df_ptr, df_tmp, Z0, Z1, tmpIn, tmp0, tmp1);
-
-            // IP DB0 B1
-            IProduct2DKernel<SHAPE_TYPE, false, false, DEFORMED>(
-                nm0, nm1, nq0, nq1, correct, tmp0, this->m_dbdata[0],
-                this->m_bdata[1], this->m_w[0], this->m_w[1], jac_ptr, wsp0,
-                tmpOut);
-
-            // IP DB1 B0
-            IProduct2DKernel<SHAPE_TYPE, false, true, DEFORMED>(
-                nm0, nm1, nq0, nq1, correct, tmp1, this->m_bdata[0],
-                this->m_dbdata[1], this->m_w[0], this->m_w[1], jac_ptr, wsp0,
-                tmpOut);
+            fusedKernel2D(nm0, nm1, nq0, nq1, indim, correct, jac_ptr, df_ptr,
+                          tmpIn, df_tmp, tmp0, tmp1, wsp0, tmpOut);
 
             // de-interleave and store data
-            deinterleave_store(tmpOut, m_nmTot, outptr);
+            // deinterleave_store(tmpOut, m_nmTot, locField);
+            // std::copy(locField, locField + nmBlocks, outptr);
+            deinterleave_unalign_store(tmpOut, m_nmTot, outptr);
 
             for (int d = 0; d < indim; ++d)
             {
                 inptr[d] += nqBlocks;
             }
             outptr += nmBlocks;
+            df_ptr += dfSize;
+            jac_ptr += dJSize;
         }
+        // last block
+        {
+            int acturalSize = nqBlocks - this->m_nPads * nqTot;
+            for (int d = 0; d < indim; ++d)
+            {
+                std::copy(inptr[d], inptr[d] + acturalSize, locField);
+                load_interleave(locField, nqTot, tmpIn[d]);
+            }
+
+            fusedKernel2D(nm0, nm1, nq0, nq1, indim, correct, jac_ptr, df_ptr,
+                          tmpIn, df_tmp, tmp0, tmp1, wsp0, tmpOut);
+
+            // de-interleave and store data
+            deinterleave_store(tmpOut, m_nmTot, locField);
+            acturalSize = nmBlocks - this->m_nPads * m_nmTot;
+            std::copy(locField, locField + acturalSize, outptr);
+        }
+    }
+
+    NEK_FORCE_INLINE void fusedKernel2D(
+        const size_t nm0, const size_t nm1, const size_t nq0, const size_t nq1,
+        const size_t indim, const bool correct, const vec_t *jac_ptr,
+        const vec_t *df_ptr, const std::vector<vec_t, allocator<vec_t>> *tmpIn,
+        vec_t *df_tmp, std::vector<vec_t, allocator<vec_t>> &tmp0,
+        std::vector<vec_t, allocator<vec_t>> &tmp1,
+        std::vector<vec_t, allocator<vec_t>> &wsp0,
+        std::vector<vec_t, allocator<vec_t>> &tmpOut)
+    {
+        IProductWRTDerivBase2DKernel<SHAPE_TYPE, DEFORMED>(
+            nq0, nq1, indim, df_ptr, df_tmp, this->m_Z[0], this->m_Z[1], tmpIn,
+            tmp0, tmp1);
+
+        // IP DB0 B1
+        IProduct2DKernel<SHAPE_TYPE, false, false, DEFORMED>(
+            nm0, nm1, nq0, nq1, correct, tmp0, this->m_dbdata[0],
+            this->m_bdata[1], this->m_w[0], this->m_w[1], jac_ptr, wsp0,
+            tmpOut);
+
+        // IP DB1 B0
+        IProduct2DKernel<SHAPE_TYPE, false, true, DEFORMED>(
+            nm0, nm1, nq0, nq1, correct, tmp1, this->m_bdata[0],
+            this->m_dbdata[1], this->m_w[0], this->m_w[1], jac_ptr, wsp0,
+            tmpOut);
     }
 
 #elif defined(SHAPE_DIMENSION_3D)
@@ -533,56 +627,60 @@ struct IProductWRTDerivBaseTemplate
             wsp2(wsp2Size), tmpIn0(nqTot), tmpIn1(nqTot), tmpIn2(nqTot),
             tmp0(nqTot), tmp1(nqTot), tmp2(nqTot), tmpOut(m_nmTot);
 
-        const vec_t *jac_ptr;
-        const vec_t *df_ptr;
+        const vec_t *jac_ptr = &((*this->m_jac)[0]);
+        const vec_t *df_ptr  = &((*this->m_df)[0]);
 
-        std::vector<vec_t, allocator<vec_t>> &Z0 = this->m_Z[0];
-        std::vector<vec_t, allocator<vec_t>> &Z1 = this->m_Z[1];
-        std::vector<vec_t, allocator<vec_t>> &Z2 = this->m_Z[2];
+        // temporary aligned storage for local fields
+        NekDouble *locField = static_cast<NekDouble *>(::operator new[](
+            nqBlocks * sizeof(NekDouble), std::align_val_t(vec_t::alignment)));
 
-        for (int e = 0; e < this->m_nBlocks; ++e)
+        for (int e = 0; e < this->m_nBlocks - 1; ++e)
         {
-            // Jacobian
-            jac_ptr = &((*this->m_jac)[dJSize * e]);
+            // Load data to aligned storage and interleave it
+            // load_interleave(inptr0, nqTot, tmpIn0);
+            // load_interleave(inptr1, nqTot, tmpIn1);
+            // load_interleave(inptr2, nqTot, tmpIn2);
+            load_unalign_interleave(inptr0, nqTot, tmpIn0);
+            load_unalign_interleave(inptr1, nqTot, tmpIn1);
+            load_unalign_interleave(inptr2, nqTot, tmpIn2);
 
-            // Derivative factor
-            df_ptr = &((*this->m_df)[dfSize * e]);
-
-            // Load and transpose data
-            load_interleave(inptr0, nqTot, tmpIn0);
-            load_interleave(inptr1, nqTot, tmpIn1);
-            load_interleave(inptr2, nqTot, tmpIn2);
-
-            IProductWRTDerivBase3DKernel<SHAPE_TYPE, DEFORMED>(
-                nq0, nq1, nq2, df_ptr, Z0, Z1, Z2, tmpIn0, tmpIn1, tmpIn2, tmp0,
-                tmp1, tmp2);
-
-            // IP DB0 B1 B2
-            IProduct3DKernel<SHAPE_TYPE, false, false, DEFORMED>(
-                nm0, nm1, nm2, nq0, nq1, nq2, correct, tmp0, this->m_dbdata[0],
-                this->m_bdata[1], this->m_bdata[2], this->m_w[0], this->m_w[1],
-                this->m_w[2], jac_ptr, wsp0, wsp1, wsp2, tmpOut);
-
-            // IP B0 DB1 B2
-            IProduct3DKernel<SHAPE_TYPE, false, true, DEFORMED>(
-                nm0, nm1, nm2, nq0, nq1, nq2, correct, tmp1, this->m_bdata[0],
-                this->m_dbdata[1], this->m_bdata[2], this->m_w[0], this->m_w[1],
-                this->m_w[2], jac_ptr, wsp0, wsp1, wsp2, tmpOut);
-
-            // IP B0 B1 DB2
-            IProduct3DKernel<SHAPE_TYPE, false, true, DEFORMED>(
-                nm0, nm1, nm2, nq0, nq1, nq2, correct, tmp2, this->m_bdata[0],
-                this->m_bdata[1], this->m_dbdata[2], this->m_w[0], this->m_w[1],
-                this->m_w[2], jac_ptr, wsp0, wsp1, wsp2, tmpOut);
+            fusedKernel3D(nm0, nm1, nm2, nq0, nq1, nq2, correct, jac_ptr,
+                          df_ptr, tmpIn0, tmpIn1, tmpIn2, tmp0, tmp1, tmp2,
+                          wsp0, wsp1, wsp2, tmpOut);
 
             // de-interleave and store data
-            deinterleave_store(tmpOut, m_nmTot, outptr);
+            // deinterleave_store(tmpOut, m_nmTot, locField);
+            // std::copy(locField, locField + nmBlocks, outptr);
+            deinterleave_unalign_store(tmpOut, m_nmTot, outptr);
 
             inptr0 += nqBlocks;
             inptr1 += nqBlocks;
             inptr2 += nqBlocks;
             outptr += nmBlocks;
+            df_ptr += dfSize;
+            jac_ptr += dJSize;
         }
+        // last block
+        {
+            int acturalSize = nqBlocks - this->m_nPads * nqTot;
+            std::copy(inptr0, inptr0 + acturalSize, locField);
+            load_interleave(locField, nqTot, tmpIn0);
+            std::copy(inptr1, inptr1 + acturalSize, locField);
+            load_interleave(locField, nqTot, tmpIn1);
+            std::copy(inptr2, inptr2 + acturalSize, locField);
+            load_interleave(locField, nqTot, tmpIn2);
+
+            fusedKernel3D(nm0, nm1, nm2, nq0, nq1, nq2, correct, jac_ptr,
+                          df_ptr, tmpIn0, tmpIn1, tmpIn2, tmp0, tmp1, tmp2,
+                          wsp0, wsp1, wsp2, tmpOut);
+
+            // de-interleave and store data
+            deinterleave_store(tmpOut, m_nmTot, locField);
+            acturalSize = nmBlocks - this->m_nPads * m_nmTot;
+            std::copy(locField, locField + acturalSize, outptr);
+        }
+        // free aligned memory
+        ::operator delete[](locField, std::align_val_t(vec_t::alignment));
     }
 
     // Size based template version.
@@ -626,56 +724,95 @@ struct IProductWRTDerivBaseTemplate
             wsp2(wsp2Size), tmpIn0(nqTot), tmpIn1(nqTot), tmpIn2(nqTot),
             tmp0(nqTot), tmp1(nqTot), tmp2(nqTot), tmpOut(m_nmTot);
 
-        const vec_t *jac_ptr;
-        const vec_t *df_ptr;
+        const vec_t *jac_ptr = &((*this->m_jac)[0]);
+        const vec_t *df_ptr  = &((*this->m_df)[0]);
 
-        std::vector<vec_t, allocator<vec_t>> &Z0 = this->m_Z[0];
-        std::vector<vec_t, allocator<vec_t>> &Z1 = this->m_Z[1];
-        std::vector<vec_t, allocator<vec_t>> &Z2 = this->m_Z[2];
+        // temporary aligned storage for local fields
+        alignas(vec_t::alignment) NekDouble locField[nqTot * vec_t::width];
 
-        for (int e = 0; e < this->m_nBlocks; ++e)
+        for (int e = 0; e < this->m_nBlocks - 1; ++e)
         {
-            // Jacobian
-            jac_ptr = &((*this->m_jac)[dJSize * e]);
-
-            // Derivative factor
-            df_ptr = &((*this->m_df)[dfSize * e]);
-
             // Load and transpose data
-            load_interleave(inptr0, nqTot, tmpIn0);
-            load_interleave(inptr1, nqTot, tmpIn1);
-            load_interleave(inptr2, nqTot, tmpIn2);
+            // load_interleave(inptr0, nqTot, tmpIn0);
+            // load_interleave(inptr1, nqTot, tmpIn1);
+            // load_interleave(inptr2, nqTot, tmpIn2);
+            load_unalign_interleave(inptr0, nqTot, tmpIn0);
+            load_unalign_interleave(inptr1, nqTot, tmpIn1);
+            load_unalign_interleave(inptr2, nqTot, tmpIn2);
 
-            IProductWRTDerivBase3DKernel<SHAPE_TYPE, DEFORMED>(
-                nq0, nq1, nq2, df_ptr, Z0, Z1, Z2, tmpIn0, tmpIn1, tmpIn2, tmp0,
-                tmp1, tmp2);
-
-            // IP DB0 B1 B2
-            IProduct3DKernel<SHAPE_TYPE, false, false, DEFORMED>(
-                nm0, nm1, nm2, nq0, nq1, nq2, correct, tmp0, this->m_dbdata[0],
-                this->m_bdata[1], this->m_bdata[2], this->m_w[0], this->m_w[1],
-                this->m_w[2], jac_ptr, wsp0, wsp1, wsp2, tmpOut);
-
-            // IP B0 DB1 B2
-            IProduct3DKernel<SHAPE_TYPE, false, true, DEFORMED>(
-                nm0, nm1, nm2, nq0, nq1, nq2, correct, tmp1, this->m_bdata[0],
-                this->m_dbdata[1], this->m_bdata[2], this->m_w[0], this->m_w[1],
-                this->m_w[2], jac_ptr, wsp0, wsp1, wsp2, tmpOut);
-
-            // IP B0 B1 DB2
-            IProduct3DKernel<SHAPE_TYPE, false, true, DEFORMED>(
-                nm0, nm1, nm2, nq0, nq1, nq2, correct, tmp2, this->m_bdata[0],
-                this->m_bdata[1], this->m_dbdata[2], this->m_w[0], this->m_w[1],
-                this->m_w[2], jac_ptr, wsp0, wsp1, wsp2, tmpOut);
+            fusedKernel3D(nm0, nm1, nm2, nq0, nq1, nq2, correct, jac_ptr,
+                          df_ptr, tmpIn0, tmpIn1, tmpIn2, tmp0, tmp1, tmp2,
+                          wsp0, wsp1, wsp2, tmpOut);
 
             // de-interleave and store data
-            deinterleave_store(tmpOut, m_nmTot, outptr);
+            // deinterleave_store(tmpOut, m_nmTot, locField);
+            // std::copy(locField, locField + nmBlocks, outptr);
+            deinterleave_unalign_store(tmpOut, m_nmTot, outptr);
 
             inptr0 += nqBlocks;
             inptr1 += nqBlocks;
             inptr2 += nqBlocks;
             outptr += nmBlocks;
+            df_ptr += dfSize;
+            jac_ptr += dJSize;
         }
+        // last block
+        {
+            int acturalSize = nqBlocks - this->m_nPads * nqTot;
+            std::copy(inptr0, inptr0 + acturalSize, locField);
+            load_interleave(locField, nqTot, tmpIn0);
+            std::copy(inptr1, inptr1 + acturalSize, locField);
+            load_interleave(locField, nqTot, tmpIn1);
+            std::copy(inptr2, inptr2 + acturalSize, locField);
+            load_interleave(locField, nqTot, tmpIn2);
+
+            fusedKernel3D(nm0, nm1, nm2, nq0, nq1, nq2, correct, jac_ptr,
+                          df_ptr, tmpIn0, tmpIn1, tmpIn2, tmp0, tmp1, tmp2,
+                          wsp0, wsp1, wsp2, tmpOut);
+
+            // de-interleave and store data
+            deinterleave_store(tmpOut, m_nmTot, locField);
+            acturalSize = nmBlocks - this->m_nPads * m_nmTot;
+            std::copy(locField, locField + acturalSize, outptr);
+        }
+    }
+
+    NEK_FORCE_INLINE void fusedKernel3D(
+        const size_t nm0, const size_t nm1, const size_t nm2, const size_t nq0,
+        const size_t nq1, const size_t nq2, const bool correct,
+        const vec_t *jac_ptr, const vec_t *df_ptr,
+        const std::vector<vec_t, allocator<vec_t>> &tmpIn0,
+        const std::vector<vec_t, allocator<vec_t>> &tmpIn1,
+        const std::vector<vec_t, allocator<vec_t>> &tmpIn2,
+        std::vector<vec_t, allocator<vec_t>> &tmp0,
+        std::vector<vec_t, allocator<vec_t>> &tmp1,
+        std::vector<vec_t, allocator<vec_t>> &tmp2,
+        std::vector<vec_t, allocator<vec_t>> &wsp0,
+        std::vector<vec_t, allocator<vec_t>> &wsp1,
+        std::vector<vec_t, allocator<vec_t>> &wsp2,
+        std::vector<vec_t, allocator<vec_t>> &tmpOut)
+    {
+        IProductWRTDerivBase3DKernel<SHAPE_TYPE, DEFORMED>(
+            nq0, nq1, nq2, df_ptr, this->m_Z[0], this->m_Z[1], this->m_Z[2],
+            tmpIn0, tmpIn1, tmpIn2, tmp0, tmp1, tmp2);
+
+        // IP DB0 B1 B2
+        IProduct3DKernel<SHAPE_TYPE, false, false, DEFORMED>(
+            nm0, nm1, nm2, nq0, nq1, nq2, correct, tmp0, this->m_dbdata[0],
+            this->m_bdata[1], this->m_bdata[2], this->m_w[0], this->m_w[1],
+            this->m_w[2], jac_ptr, wsp0, wsp1, wsp2, tmpOut);
+
+        // IP B0 DB1 B2
+        IProduct3DKernel<SHAPE_TYPE, false, true, DEFORMED>(
+            nm0, nm1, nm2, nq0, nq1, nq2, correct, tmp1, this->m_bdata[0],
+            this->m_dbdata[1], this->m_bdata[2], this->m_w[0], this->m_w[1],
+            this->m_w[2], jac_ptr, wsp0, wsp1, wsp2, tmpOut);
+
+        // IP B0 B1 DB2
+        IProduct3DKernel<SHAPE_TYPE, false, true, DEFORMED>(
+            nm0, nm1, nm2, nq0, nq1, nq2, correct, tmp2, this->m_bdata[0],
+            this->m_bdata[1], this->m_dbdata[2], this->m_w[0], this->m_w[1],
+            this->m_w[2], jac_ptr, wsp0, wsp1, wsp2, tmpOut);
     }
 
 #endif // SHAPE_DIMENSION

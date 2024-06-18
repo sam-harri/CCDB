@@ -33,6 +33,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include <SolverUtils/Driver.h>
+#include <SpatialDomains/MeshGraphIO.h>
 
 using namespace std;
 
@@ -174,7 +175,7 @@ void Driver::v_InitObject(ostream &out)
                     1, argv, LinNSFilename, m_comm);
 
                 SpatialDomains::MeshGraphSharedPtr graph_linns =
-                    SpatialDomains::MeshGraph::Read(session_LinNS);
+                    SpatialDomains::MeshGraphIO::Read(session_LinNS);
 
                 // For running stability analysis
                 session_LinNS->SetTag("AdvectiveType", "Linearised");
