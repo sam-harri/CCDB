@@ -11,6 +11,7 @@ v5.7.0
 **IncNavierStokesSolver**
 - Fix initial and boundary conditions in the moving reference frame (!1692)
 - Fix memory-leak for the Mixed_CG_Discontinuous projection when initializing the traceMep (!1806)
+- Add synthetic turbulence generation for the incompressible solver (!1664) 
 
 **ShallowWaterSolver**
 - Implement implicit time-discritization (!1784)
@@ -144,7 +145,6 @@ v5.5.0
 **IncNavierStokesSolver**
 - Save BndElmtExpansion and avoid re-building (!1648)
 - Add Simo-advection and a switch for Simo-/Dong-advection to VCSImplicit (!1630)
-- Add synthetic turbulence generation for the incompressible solver (!1664) 
 - Add a new feature of elasticaly mounted object using the moving reference frame (!1495)
 - Some tidy-up (!1693)
 - Fix memory leak in VCSImplicit due to matrix updating (!1688)
