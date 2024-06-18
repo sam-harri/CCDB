@@ -63,7 +63,7 @@ ForcingIncNSSyntheticEddy::ForcingIncNSSyntheticEddy(
  */
 void ForcingIncNSSyntheticEddy::v_InitObject(
     const Array<OneD, MultiRegions::ExpListSharedPtr> &pFields,
-    [[maybe_unused]] const unsigned int &pNumForcingFields, 
+    [[maybe_unused]] const unsigned int &pNumForcingFields,
     [[maybe_unused]] const TiXmlElement *pForce)
 {
     // Space dimension
@@ -254,7 +254,7 @@ void ForcingIncNSSyntheticEddy::v_InitObject(
 void ForcingIncNSSyntheticEddy::v_Apply(
     const Array<OneD, MultiRegions::ExpListSharedPtr> &pFields,
     [[maybe_unused]] const Array<OneD, Array<OneD, NekDouble>> &inarray,
-    Array<OneD, Array<OneD, NekDouble>> &outarray, 
+    Array<OneD, Array<OneD, NekDouble>> &outarray,
     [[maybe_unused]] const NekDouble &time)
 {
     // Number of Variables
