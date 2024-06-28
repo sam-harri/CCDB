@@ -18,6 +18,9 @@ v5.7.0
 **Miscellaneous**
 - Use std::stod instead of boost::lexical_cast<NekDouble> (!1819)
 
+**Documentation**
+- Add initial documentation for the IncNavierStokesSolver (!1822)
+
 v5.6.0
 ------
 **Library**
