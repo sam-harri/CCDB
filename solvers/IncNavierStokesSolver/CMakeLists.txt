@@ -34,6 +34,7 @@ IF( NEKTAR_SOLVER_INCNAVIERSTOKES )
         ./Filters/FilterReynoldsStresses.cpp
         ./Filters/FilterMovingBody.cpp
         ./Filters/FilterAeroForcesSPM.cpp
+	./Forcing/ForcingIncNSSyntheticEddy.cpp
         ./Forcing/ForcingMovingBody.cpp
         ./Forcing/ForcingStabilityCoupledLNS.cpp
         ./BoundaryConditions/IncBoundaryConditions.cpp
@@ -100,6 +101,7 @@ IF( NEKTAR_SOLVER_INCNAVIERSTOKES )
     ADD_NEKTAR_TEST(2DFlow_lineforcing_bcfromfile)
     ADD_NEKTAR_TEST(BercovierEngelman)
     ADD_NEKTAR_TEST(ChanFlow2D_bcsfromfiles)
+    ADD_NEKTAR_TEST(ChanFlow3D_infTurb)
     ADD_NEKTAR_TEST(ChanFlow_3DH1D_bcsfromfiles)
     ADD_NEKTAR_TEST(ChannelFlowQuasi3D LENGTHY)
     ADD_NEKTAR_TEST(ChanFlow_3DH2D_MVM LENGTHY)
