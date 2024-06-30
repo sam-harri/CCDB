@@ -22,6 +22,9 @@ v5.7.0
 **Documentation**
 - Add initial documentation for the IncNavierStokesSolver (!1822)
 
+**FieldConvert**
+- Add a module to transform coordinates and vectors for the moving reference frame method (!1830)
+
 v5.6.0
 ------
 **Library**
