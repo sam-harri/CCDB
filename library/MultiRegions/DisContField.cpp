@@ -1655,8 +1655,7 @@ void DisContField::FindPeriodicTraces(
                         {
                             try
                             {
-                                RotInfo.m_tol =
-                                    boost::lexical_cast<NekDouble>(tmpstr[3]);
+                                RotInfo.m_tol = std::stod(tmpstr[3]);
                             }
                             catch (...)
                             {
