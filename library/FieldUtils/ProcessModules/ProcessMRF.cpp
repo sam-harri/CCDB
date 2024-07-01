@@ -58,6 +58,7 @@ ProcessMRF::~ProcessMRF()
 void ProcessMRF::v_Process(po::variables_map &vm)
 {
     m_f->SetUpExp(vm);
+    ReadMRFData();
 
     // Skip in case of empty partition
     if (m_f->m_exp[0]->GetNumElmts() == 0)
@@ -67,7 +68,6 @@ void ProcessMRF::v_Process(po::variables_map &vm)
 
     // Determine dimensions
     m_spacedim = m_f->m_graph->GetMeshDimension() + m_f->m_numHomogeneousDir;
-    ReadMRFData();
 
     // transform coordinates
     int nfields          = m_f->m_variables.size();
@@ -192,6 +192,7 @@ void ProcessMRF::TransformVector(std::vector<Array<OneD, NekDouble>> &data)
     for (int i = 0; i < dim; ++i)
     {
         tmp[i] = Array<OneD, NekDouble>(npoint);
+        Vmath::Vcopy(npoint, data[i], 1, tmp[i], 1);
     }
     Vmath::Svtsvtp(npoint, cz, tmp[0], 1, -sz, tmp[1], 1, data[0], 1);
     Vmath::Svtsvtp(npoint, sz, tmp[0], 1, cz, tmp[1], 1, data[1], 1);
