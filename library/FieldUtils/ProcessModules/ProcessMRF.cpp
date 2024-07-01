@@ -79,7 +79,7 @@ void ProcessMRF::v_Process(po::variables_map &vm)
         m_f->m_variables.push_back(fieldNames[i]);
     }
     m_f->m_exp.resize(nfields + addfields);
-    std::vector<Array<OneD, NekDouble>> coords(m_spacedim);
+    vector<Array<OneD, NekDouble>> coords(m_spacedim);
     for (int i = 0; i < m_spacedim; ++i)
     {
         coords[i] = Array<OneD, NekDouble>(npoints);
@@ -117,8 +117,8 @@ void ProcessMRF::v_Process(po::variables_map &vm)
     }
 
     // tranform vectors
-    std::vector<Array<OneD, NekDouble>> data(m_spacedim);
-    std::vector<int> vars;
+    vector<Array<OneD, NekDouble>> data(m_spacedim);
+    vector<int> vars;
     if (m_config["vectors"].as<string>().compare("NotSet"))
     {
         ParseUtils::GenerateVariableVector(m_config["vectors"].as<string>(),
@@ -145,40 +145,44 @@ void ProcessMRF::v_Process(po::variables_map &vm)
 
 void ProcessMRF::ReadMRFData()
 {
-    std::vector<std::string> strOrigin = {"X", "Y", "Z"};
-    std::vector<std::string> strTheta  = {"Theta_x", "Theta_y", "Theta_z"};
-    std::vector<std::string> strPivot  = {"X0", "Y0", "Z0"};
+    vector<string> strOrigin = {"X", "Y", "Z"};
+    vector<string> strTheta  = {"Theta_x", "Theta_y", "Theta_z"};
+    vector<string> strPivot  = {"X0", "Y0", "Z0"};
     m_origin.resize(3, 0.);
-    m_theta.resize(3, 0.);
     m_pivot.resize(3, 0.);
     for (size_t i = 0; i < strOrigin.size(); ++i)
     {
         if (m_f->m_fieldMetaDataMap.count(strOrigin[i]))
         {
-            m_origin[i] = boost::lexical_cast<NekDouble>(
-                m_f->m_fieldMetaDataMap[strOrigin[i]]);
+            m_origin[i] = stod(m_f->m_fieldMetaDataMap[strOrigin[i]]);
         }
     }
     for (size_t i = 0; i < strTheta.size(); ++i)
     {
         if (m_f->m_fieldMetaDataMap.count(strTheta[i]))
         {
-            m_theta[i] = boost::lexical_cast<NekDouble>(
-                m_f->m_fieldMetaDataMap[strTheta[i]]);
+            if (m_theta.size() < 3)
+            {
+                m_theta.resize(3, 0.);
+            }
+            m_theta[i] = stod(m_f->m_fieldMetaDataMap[strTheta[i]]);
         }
     }
     for (size_t i = 0; i < strPivot.size(); ++i)
     {
         if (m_f->m_fieldMetaDataMap.count(strPivot[i]))
         {
-            m_pivot[i] = boost::lexical_cast<NekDouble>(
-                m_f->m_fieldMetaDataMap[strPivot[i]]);
+            m_pivot[i] = stod(m_f->m_fieldMetaDataMap[strPivot[i]]);
         }
     }
 }
 
-void ProcessMRF::TransformVector(std::vector<Array<OneD, NekDouble>> &data)
+void ProcessMRF::TransformVector(vector<Array<OneD, NekDouble>> &data)
 {
+    if (m_theta.size() < 3)
+    {
+        return;
+    }
     if (data.size() < m_spacedim)
     {
         NEKERROR(ErrorUtil::efatal,
