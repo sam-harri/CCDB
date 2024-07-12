@@ -18,6 +18,8 @@ v5.7.0
 
 **NekMesh**
 - Added revolve module (!1825)
+**FieldConvert**
+- Add vortexinducedvelocity module to compute the vortex-induced velocity (!1824)
 
 **Miscellaneous**
 - Use std::stod instead of boost::lexical_cast<NekDouble> (!1819)
