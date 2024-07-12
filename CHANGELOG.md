@@ -16,6 +16,9 @@ v5.7.0
 **ShallowWaterSolver**
 - Implement implicit time-discritization (!1784)
 
+**NekMesh**
+- Added revolve module (!1825)
+
 **Miscellaneous**
 - Use std::stod instead of boost::lexical_cast<NekDouble> (!1819)
 
