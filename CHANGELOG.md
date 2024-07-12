@@ -7,6 +7,7 @@ v5.7.0
 - Fix memory-leak with LowEnergyBlock preconditioner for time-updated matrices (!1627)
 - Fix Fourier expansion integration weights are related test (!1803)
 - Separate MeshGraph input/output functions into a new class (!1778)
+- Fix AdaptiveSFD for MPI (!1821)
 
 **IncNavierStokesSolver**
 - Fix initial and boundary conditions in the moving reference frame (!1692)
