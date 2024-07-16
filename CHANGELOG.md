@@ -7,6 +7,7 @@ v5.7.0
 - Fix memory-leak with LowEnergyBlock preconditioner for time-updated matrices (!1627)
 - Fix Fourier expansion integration weights are related test (!1803)
 - Separate MeshGraph input/output functions into a new class (!1778)
+- Fix AdaptiveSFD for MPI (!1821)
 
 **IncNavierStokesSolver**
 - Fix initial and boundary conditions in the moving reference frame (!1692)
@@ -16,14 +17,18 @@ v5.7.0
 **ShallowWaterSolver**
 - Implement implicit time-discritization (!1784)
 
+**NekMesh**
+- Added revolve module (!1825)
+
+**FieldConvert**
+- Add vortexinducedvelocity module to compute the vortex-induced velocity (!1824)
+- Add a module to transform coordinates and vectors for the moving reference frame method (!1830)
+
 **Miscellaneous**
 - Use std::stod instead of boost::lexical_cast<NekDouble> (!1819)
 
 **Documentation**
 - Add initial documentation for the IncNavierStokesSolver (!1822)
-
-**FieldConvert**
-- Add a module to transform coordinates and vectors for the moving reference frame method (!1830)
 
 v5.6.0
 ------
