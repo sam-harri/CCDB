@@ -13,7 +13,7 @@ v5.7.0
 - Fix AdaptiveSFD for MPI (!1821)
 
 **IncNavierStokesSolver**
-- Fix initial and boundary conditions in the moving reference frame (!1692)
+- Fix initial and boundary conditions in the moving reference frame (!1692, !1820)
 - Fix memory-leak for the Mixed_CG_Discontinuous projection when initializing the traceMep (!1806)
 - Add synthetic turbulence generation for the incompressible solver (!1664) 
 
