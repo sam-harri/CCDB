@@ -12,6 +12,7 @@ v5.7.0
 - Fix numerical precision issues with filters OutputStartTime (!1789)
 - Fix AdaptiveSFD for MPI (!1821)
 - Fix IterativeStaticCond when using absolute tolerance (!1850)
+- Fix deadlock by scotch with multi-threading support (!1853)
 
 **IncNavierStokesSolver**
 - Fix initial and boundary conditions in the moving reference frame (!1692, !1820)
