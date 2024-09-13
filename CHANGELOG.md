@@ -6,6 +6,7 @@ v5.7.0
 - Modified MatrixFreeOp library  switch initialisation to use BOOST_PP (!1794)
 - Fix memory-leak with LowEnergyBlock preconditioner for time-updated matrices (!1627)
 - Fix Fourier expansion integration weights are related test (!1803)
+- Introduced the MatrixFree implementation for the PhysInterp1DScaled operator and tidying up MatrixFreeOps (!1812) 
 - Separate MeshGraph input/output functions into a new class (!1778)
 - Added checkpoint file writing start time in the fieldconvert filter (!1789)
 - Fix fieldconvert filter incorrect boundary values (!1789)

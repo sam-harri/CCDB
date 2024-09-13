@@ -6008,6 +6008,7 @@ void ExpList::v_PhysInterp1DScaled([[maybe_unused]] const NekDouble scale,
         m_collections[i].UpdateFactors(Collections::ePhysInterp1DScaled,
                                        factors);
     }
+
     LIKWID_MARKER_START("v_PhysInterp1DScaled");
     timer.Start();
     Array<OneD, NekDouble> tmp;
