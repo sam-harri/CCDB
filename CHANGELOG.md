@@ -20,6 +20,7 @@ v5.7.0
 - Fix initial and boundary conditions in the moving reference frame (!1692, !1820)
 - Fix memory-leak for the Mixed_CG_Discontinuous projection when initializing the traceMep (!1806)
 - Add synthetic turbulence generation for the incompressible solver (!1664) 
+- Fix a uninitialized parameter in VCS (!1880)
 
 **ShallowWaterSolver**
 - Implement implicit time-discritization (!1784)
