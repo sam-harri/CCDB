@@ -15,6 +15,7 @@ v5.7.0
 - Fix IterativeStaticCond when using absolute tolerance (!1850)
 - Fix deadlock by scotch with multi-threading support (!1853)
 - Fixed L2norm for FilterError (!1871)
+- Fix variable p in tetrahedrons (!1881)
 
 **IncNavierStokesSolver**
 - Fix initial and boundary conditions in the moving reference frame (!1692, !1820)
