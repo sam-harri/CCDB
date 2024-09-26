@@ -16,6 +16,7 @@ v5.7.0
 - Fix deadlock by scotch with multi-threading support (!1853)
 - Fixed L2norm for FilterError (!1871)
 - Fix variable p in tetrahedrons (!1881)
+- Fix BwdTrans for Pyr with var P (!1886)
 
 **IncNavierStokesSolver**
 - Fix initial and boundary conditions in the moving reference frame (!1692, !1820)
