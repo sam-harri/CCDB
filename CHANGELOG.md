@@ -12,6 +12,7 @@ v5.7.0
 - Fix fieldconvert filter incorrect boundary values (!1789)
 - Fix numerical precision issues with filters OutputStartTime (!1789)
 - Fix AdaptiveSFD for MPI (!1821)
+- Fix interpolation on manifold (!1840)
 - Fix IterativeStaticCond when using absolute tolerance (!1850)
 - Fix deadlock by scotch with multi-threading support (!1853)
 - Fixed L2norm for FilterError (!1871)
