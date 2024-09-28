@@ -29,6 +29,9 @@ v5.7.0
 **ShallowWaterSolver**
 - Implement implicit time-discritization (!1784)
 
+**CompressibleSolver**
+- Add synthetic turbulence generator for the compressible solver (!1859)
+
 **NekMesh**
 - Added revolve module (!1825)
 
