@@ -29,6 +29,8 @@ BuildRequires:  tetgen-devel
 BuildRequires:  tinyxml-devel
 BuildRequires:  zlib-devel
 
+%global source_date_epoch_from_changelog 0
+
 %description
 Nektar++ is a C++ framework for the development of computational solvers for
 partial differential equations based on the spectral/hp element method.
@@ -446,9 +448,6 @@ cd serial && cmake -DNEKTAR_BUILD_DOC=ON .
 make user-guide-pdf developer-guide-pdf doc
 cd ..
 
-# Make sure module paths are loaded
-. /etc/profile.d/modules.sh;
-
 # Build OpenMPI version
 %{_openmpi_load}
 MPI_ON=ON NEKTAR_LIBDIR=lib NEKTAR_INCLUDE_ROOT=%{_prefix}/include/$MPI_COMPILER INSTALL_PREFIX=%{_prefix}/lib64/openmpi %dobuild
@@ -467,9 +466,6 @@ make -C serial install DESTDIR=%{buildroot} INSTALL="install -p" CPPROG="cp -p"
 cd serial/python
 %{__python3} setup.py install --root=%{buildroot} --install-purelib=%{python3_sitearch}
 cd ../..
-
-# Make sure module paths are loaded, again.
-. /etc/profile.d/modules.sh;
 
 # Install OpenMPI version
 %{_openmpi_load}

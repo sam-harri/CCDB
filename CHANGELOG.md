@@ -1,5 +1,6 @@
 Changelog
 =========
+
 v5.7.0
 -----
 **Library**
@@ -51,6 +52,9 @@ v5.7.0
 
 **CI and Packaging**
 - Debian 10 (BUSTER) is no longer supported (!1902)
+
+**Packaging**
+- Removed Fedora 35/36, added Fedora 39/40 (!1909)
 
 v5.6.0
 ------
