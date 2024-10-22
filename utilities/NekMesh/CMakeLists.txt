@@ -5,6 +5,7 @@ ADD_UTILITIES_EXECUTABLE(NekMesh COMPONENT nekmesh
     DEPENDS libNekMesh)
 
 # Nektar++
+ADD_NEKTAR_TEST(Nektar++/3d_sphere)
 ADD_NEKTAR_TEST(Nektar++/bl_quad)
 ADD_NEKTAR_TEST(Nektar++/bl_tube)
 ADD_NEKTAR_TEST(Nektar++/extract_curved_edge)
