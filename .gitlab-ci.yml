@@ -49,6 +49,9 @@ include:
       - .gitmodules
       - .gitlab-ci.yml
       - CMakeLists.txt
+  except:
+    refs:
+      - /^pkg\/.*$/
 
 .build-env-template: &build-env-template
   <<: *execution-conditions
