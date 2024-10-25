@@ -20,6 +20,7 @@ v5.7.0
 - Fix variable p in tetrahedrons (!1881)
 - Fix BwdTrans for Pyr with var P (!1886)
 - Allow wrapper array around a existing raw pointer (!1848)
+- Tweaked some long tests to make them faster (!!1918)
 
 **IncNavierStokesSolver**
 - Fix initial and boundary conditions in the moving reference frame (!1692, !1820)
