@@ -36,6 +36,7 @@ v5.7.0
 **NekMesh**
 - Added revolve module (!1825)
 - Extend quality measures in ProcessJac and add histogram generation(!1751)
+- Reducing run time of some tests in NekMesh(!1922)
 
 **FieldConvert**
 - Add vortexinducedvelocity module to compute the vortex-induced velocity (!1824)
