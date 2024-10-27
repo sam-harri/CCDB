@@ -56,6 +56,10 @@ v5.7.0
 - Debian 10 (BUSTER) is no longer supported (!1902)
 
 **Packaging**
+
+**CI and Packaging**
+- Debian 10 (BUSTER) is no longer supported (!1902)
+- Support is added for Ubuntu Noble Numbat and droped for Bionic Beaver (!1910)
 - Removed Fedora 35/36, added Fedora 39/40 (!1909)
 
 v5.6.0
