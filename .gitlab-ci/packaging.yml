@@ -473,6 +473,38 @@ package-debian-bullseye-deploy:
     - package-debian-bullseye-build
 
 ##
+## Ubuntu noble
+##
+package-ubuntu-noble-env:
+  <<: *package-env-build
+
+package-ubuntu-noble-build:
+  <<: *package-deb-build
+  needs: ["package-ubuntu-noble-env"]
+  variables:
+    image_name: pkg/ubuntu-noble
+
+package-ubuntu-noble-test:
+  <<: *package-deb-test
+  needs: ["package-ubuntu-noble-build"]
+  dependencies:
+    - package-ubuntu-noble-build
+  variables:
+    image_name: ubuntu:noble
+
+package-ubuntu-noble-deploy-dev:
+  <<: *package-deb-deploy-dev
+  needs: ["package-ubuntu-noble-build", "package-ubuntu-noble-test"]
+  dependencies:
+    - package-ubuntu-noble-build
+
+package-ubuntu-noble-deploy:
+  <<: *package-deb-deploy
+  needs: ["package-ubuntu-noble-build", "package-ubuntu-noble-deploy-dev"]
+  dependencies:
+    - package-ubuntu-noble-build
+
+##
 ## Ubuntu jammy
 ##
 package-ubuntu-jammy-env:
@@ -536,39 +568,6 @@ package-ubuntu-focal-deploy:
   needs: ["package-ubuntu-focal-build", "package-ubuntu-focal-deploy-dev"]
   dependencies:
     - package-ubuntu-focal-build
-
-##
-## Ubuntu bionic
-##
-package-ubuntu-bionic-env:
-  <<: *package-env-build
-
-package-ubuntu-bionic-build:
-  <<: *package-deb-build
-  needs: ["package-ubuntu-bionic-env"]
-  variables:
-    image_name: pkg/ubuntu-bionic
-
-package-ubuntu-bionic-test:
-  <<: *package-deb-test
-  needs: ["package-ubuntu-bionic-build"]
-  dependencies:
-    - package-ubuntu-bionic-build
-  variables:
-    image_name: ubuntu:bionic
-
-package-ubuntu-bionic-deploy-dev:
-  <<: *package-deb-deploy-dev
-  needs: ["package-ubuntu-bionic-build", "package-ubuntu-bionic-test"]
-  dependencies:
-    - package-ubuntu-bionic-build
-
-package-ubuntu-bionic-deploy:
-  <<: *package-deb-deploy
-  needs: ["package-ubuntu-bionic-build", "package-ubuntu-bionic-deploy-dev"]
-  dependencies:
-    - package-ubuntu-bionic-build
-
 
 ##
 ## Fedora 39

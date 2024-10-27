@@ -1,6 +1,8 @@
 ccache
+clang-18
 cmake
 g++
+lcov
 libboost-iostreams-dev
 libboost-program-options-dev
 libboost-system-dev
