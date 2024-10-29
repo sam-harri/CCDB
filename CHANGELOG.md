@@ -39,6 +39,9 @@ v5.7.0
 - Fix Prism Reordering in Process PerAlign (!1899)
 - Extend quality measures in ProcessJac and add histogram generation(!1751)
 - Reducing run time of some tests in NekMesh(!1922)
+- Extend quality measures in ProcessJac and add histogram generation (!1751)
+- Reducing run time of some tests in NekMesh (!1922)
+- Added a reader for the CGNS input format (!1889)
 
 **FieldConvert**
 - Add vortexinducedvelocity module to compute the vortex-induced velocity (!1824)
