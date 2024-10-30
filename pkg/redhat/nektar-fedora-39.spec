@@ -206,6 +206,7 @@ BuildRequires:  graphviz
 BuildRequires:  texlive texlive-import texlive-lstaddons texlive-bclogo
 BuildRequires:  texlive-mdframed texlive-standalone texlive-environ
 BuildRequires:  texlive-multirow texlive-dirtree
+BuildRequires:  texlive-tikz-3dplot texlive-caption texlive-algorithm2e
 %description doc
 Documentation for Nektar++
 
