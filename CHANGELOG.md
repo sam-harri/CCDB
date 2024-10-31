@@ -1,6 +1,12 @@
 Changelog
 =========
 
+v5.8.0
+------
+**Library**
+- Use GLL quadrature points on Tri Dirichlet BCs with CG (!1895)
+
+
 v5.7.0
 -----
 **Library**
@@ -55,11 +61,6 @@ v5.7.0
 - Updated the supported packages in Userguid (!1904)
 - Added a example for RayleighBenardConvection in the user-guide for IncNS (!1919)
 - Fix some typos in tutorials (!1929)
-
-**CI and Packaging**
-- Debian 10 (BUSTER) is no longer supported (!1902)
-
-**Packaging**
 
 **CI and Packaging**
 - Debian 10 (BUSTER) is no longer supported (!1902)

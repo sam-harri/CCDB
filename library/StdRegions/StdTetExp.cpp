@@ -1130,7 +1130,8 @@ int StdTetExp::v_CalcNumberOfCoefficients(
 }
 
 const LibUtilities::BasisKey StdTetExp::v_GetTraceBasisKey(const int i,
-                                                           const int k) const
+                                                           const int k,
+                                                           bool UseGLL) const
 {
     ASSERTL2(i >= 0 && i <= 4, "face id is out of range");
     ASSERTL2(k == 0 || k == 1, "face direction out of range");
@@ -1152,7 +1153,7 @@ const LibUtilities::BasisKey StdTetExp::v_GetTraceBasisKey(const int i,
 
     return EvaluateTriFaceBasisKey(k, m_base[dir]->GetBasisType(),
                                    m_base[dir]->GetNumPoints(),
-                                   m_base[dir]->GetNumModes());
+                                   m_base[dir]->GetNumModes(), UseGLL);
 }
 
 void StdTetExp::v_GetCoords(Array<OneD, NekDouble> &xi_x,

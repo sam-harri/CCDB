@@ -992,7 +992,8 @@ int StdPyrExp::v_GetEdgeNcoeffs(const int i) const
 }
 
 const LibUtilities::BasisKey StdPyrExp::v_GetTraceBasisKey(const int i,
-                                                           const int k) const
+                                                           const int k,
+                                                           bool UseGLL) const
 {
     ASSERTL2(i >= 0 && i <= 4, "face id is out of range");
     ASSERTL2(k >= 0 && k <= 1, "basis key id is out of range");
@@ -1008,16 +1009,16 @@ const LibUtilities::BasisKey StdPyrExp::v_GetTraceBasisKey(const int i,
         case 1:
         case 3:
         {
-            return EvaluateTriFaceBasisKey(k, m_base[2 * k]->GetBasisType(),
-                                           m_base[2 * k]->GetNumPoints(),
-                                           m_base[2 * k]->GetNumModes());
+            return EvaluateTriFaceBasisKey(
+                k, m_base[2 * k]->GetBasisType(), m_base[2 * k]->GetNumPoints(),
+                m_base[2 * k]->GetNumModes(), UseGLL);
         }
         case 2:
         case 4:
         {
-            return EvaluateTriFaceBasisKey(k, m_base[k + 1]->GetBasisType(),
-                                           m_base[k + 1]->GetNumPoints(),
-                                           m_base[k + 1]->GetNumModes());
+            return EvaluateTriFaceBasisKey(
+                k, m_base[k + 1]->GetBasisType(), m_base[k + 1]->GetNumPoints(),
+                m_base[k + 1]->GetNumModes(), UseGLL);
         }
     }
 
