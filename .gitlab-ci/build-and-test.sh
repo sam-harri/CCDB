@@ -40,12 +40,12 @@ elif [[ $BUILD_TYPE == "full" ]]; then
                "-DNEKTAR_CCMIO_URL=https://www.nektar.info/ccmio/libccmio-2.6.1.tar.gz"
                "-DNEKTAR_USE_CWIPI:BOOL=ON"
                "-DNEKTAR_USE_VTK:BOOL=ON"
+	       "-DNEKTAR_USE_LST:BOOL=ON"
                "-DNEKTAR_BUILD_PYTHON:BOOL=ON"
                "-DNEKTAR_TEST_USE_HOSTFILE=ON"
                "-DNEKTAR_UTILITY_EXTRAS=ON"
                "-DNEKTAR_ERROR_ON_WARNINGS=OFF"
               )
-
 
     if [[ $BUILD_SIMD == "avx2" ]]; then
         CMAKEARGS+=("-DNEKTAR_ENABLE_SIMD_AVX2:BOOL=ON")
