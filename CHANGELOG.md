@@ -8,6 +8,8 @@ v5.8.0
 - Add FieldConvert module to perform local stability analysis for compressible flows (!1319)
 - Remove get() accessor from Array data structure (!1937)
 
+**CI**
+-- fix CubeAllElements performance test tolerance (!1943)
 
 v5.7.0
 -----
