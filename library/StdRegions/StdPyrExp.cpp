@@ -292,9 +292,9 @@ void StdPyrExp::v_BwdTrans_SumFacKernel(
         {
             int ijmax = max(i, j);
             Blas::Dgemv('N', nquad2, order2 - ijmax, 1.0,
-                        base2.get() + mode * nquad2, nquad2,
-                        inarray.get() + mode1, 1, 0.0, tmp.get() + cnt * nquad2,
-                        1);
+                        base2.data() + mode * nquad2, nquad2,
+                        inarray.data() + mode1, 1, 0.0,
+                        tmp.data() + cnt * nquad2, 1);
             mode += order2 - ijmax;
             mode1 += order2 - ijmax;
         }
@@ -314,15 +314,15 @@ void StdPyrExp::v_BwdTrans_SumFacKernel(
 
         // Not sure why we could not use basis as 1.0
         // top singular vertex - (1+c)/2 x (1+b)/2 x (1-a)/2 component
-        Blas::Daxpy(nquad2, inarray[1], base2.get() + nquad2, 1,
+        Blas::Daxpy(nquad2, inarray[1], base2.data() + nquad2, 1,
                     &tmp[0] + nquad2, 1);
 
         // top singular vertex - (1+c)/2 x (1-b)/2 x (1+a)/2 component
-        Blas::Daxpy(nquad2, inarray[1], base2.get() + nquad2, 1,
+        Blas::Daxpy(nquad2, inarray[1], base2.data() + nquad2, 1,
                     &tmp[0] + order1 * nquad2, 1);
 
         // top singular vertex - (1+c)/2 x (1+b)/2 x (1+a)/2 component
-        Blas::Daxpy(nquad2, inarray[1], base2.get() + nquad2, 1,
+        Blas::Daxpy(nquad2, inarray[1], base2.data() + nquad2, 1,
                     &tmp[0] + order1 * nquad2 + nquad2, 1);
     }
 
@@ -330,15 +330,15 @@ void StdPyrExp::v_BwdTrans_SumFacKernel(
     mode = 0;
     for (i = 0; i < order0; ++i)
     {
-        Blas::Dgemm('N', 'T', nquad1, nquad2, order1, 1.0, base1.get(), nquad1,
-                    tmp.get() + mode * nquad2, nquad2, 0.0,
-                    tmp1.get() + i * nquad1 * nquad2, nquad1);
+        Blas::Dgemm('N', 'T', nquad1, nquad2, order1, 1.0, base1.data(), nquad1,
+                    tmp.data() + mode * nquad2, nquad2, 0.0,
+                    tmp1.data() + i * nquad1 * nquad2, nquad1);
         mode += order1;
     }
 
     // Perform summation over '0' direction
-    Blas::Dgemm('N', 'T', nquad0, nquad1 * nquad2, order0, 1.0, base0.get(),
-                nquad0, tmp1.get(), nquad1 * nquad2, 0.0, outarray.get(),
+    Blas::Dgemm('N', 'T', nquad0, nquad1 * nquad2, order0, 1.0, base0.data(),
+                nquad0, tmp1.data(), nquad1 * nquad2, 0.0, outarray.data(),
                 nquad0);
 }
 
@@ -461,15 +461,16 @@ void StdPyrExp::v_IProductWRTBase_SumFacKernel(
     int i, j, mode, mode1, cnt;
 
     // Inner product with respect to the '0' direction
-    Blas::Dgemm('T', 'N', nquad1 * nquad2, order0, nquad0, 1.0, inarray.get(),
-                nquad0, base0.get(), nquad0, 0.0, tmp1.get(), nquad1 * nquad2);
+    Blas::Dgemm('T', 'N', nquad1 * nquad2, order0, nquad0, 1.0, inarray.data(),
+                nquad0, base0.data(), nquad0, 0.0, tmp1.data(),
+                nquad1 * nquad2);
 
     // Inner product with respect to the '1' direction
     for (mode = i = 0; i < order0; ++i)
     {
         Blas::Dgemm('T', 'N', nquad2, order1, nquad1, 1.0,
-                    tmp1.get() + i * nquad1 * nquad2, nquad1, base1.get(),
-                    nquad1, 0.0, tmp2.get() + mode * nquad2, nquad2);
+                    tmp1.data() + i * nquad1 * nquad2, nquad1, base1.data(),
+                    nquad1, 0.0, tmp2.data() + mode * nquad2, nquad2);
         mode += order1;
     }
 
@@ -482,9 +483,9 @@ void StdPyrExp::v_IProductWRTBase_SumFacKernel(
             int ijmax = max(i, j);
 
             Blas::Dgemv('T', nquad2, order2 - ijmax, 1.0,
-                        base2.get() + mode * nquad2, nquad2,
-                        tmp2.get() + cnt * nquad2, 1, 0.0,
-                        outarray.get() + mode1, 1);
+                        base2.data() + mode * nquad2, nquad2,
+                        tmp2.data() + cnt * nquad2, 1, 0.0,
+                        outarray.data() + mode1, 1);
             mode += order2 - ijmax;
             mode1 += order2 - ijmax;
         }
@@ -503,14 +504,14 @@ void StdPyrExp::v_IProductWRTBase_SumFacKernel(
     {
         // add in (1+c)/2 (1+b)/2 (1-a)/2  component
         outarray[1] +=
-            Blas::Ddot(nquad2, base2.get() + nquad2, 1, &tmp2[nquad2], 1);
+            Blas::Ddot(nquad2, base2.data() + nquad2, 1, &tmp2[nquad2], 1);
 
         // add in (1+c)/2 (1-b)/2 (1+a)/2 component
-        outarray[1] += Blas::Ddot(nquad2, base2.get() + nquad2, 1,
+        outarray[1] += Blas::Ddot(nquad2, base2.data() + nquad2, 1,
                                   &tmp2[nquad2 * order1], 1);
 
         // add in (1+c)/2 (1+b)/2 (1+a)/2 component
-        outarray[1] += Blas::Ddot(nquad2, base2.get() + nquad2, 1,
+        outarray[1] += Blas::Ddot(nquad2, base2.data() + nquad2, 1,
                                   &tmp2[nquad2 * order1 + nquad2], 1);
     }
 }
@@ -605,8 +606,8 @@ void StdPyrExp::v_IProductWRTDerivBase_SumFac(
             // Scale eta_1 derivative by gfac0
             for (i = 0; i < nquad1 * nquad2; ++i)
             {
-                Vmath::Vmul(nquad0, tmp0.get() + i * nquad0, 1, gfac0.get(), 1,
-                            tmp0.get() + i * nquad0, 1);
+                Vmath::Vmul(nquad0, tmp0.data() + i * nquad0, 1, gfac0.data(),
+                            1, tmp0.data() + i * nquad0, 1);
             }
             IProductWRTBase_SumFacKernel(
                 m_base[0]->GetDbdata(), m_base[1]->GetBdata(),
@@ -1381,7 +1382,7 @@ void StdPyrExp::v_GetElmtTraceToTraceMap(const unsigned int fid,
     }
     else
     {
-        fill(signarray.get(), signarray.get() + nFaceCoeffs, 1);
+        fill(signarray.data(), signarray.data() + nFaceCoeffs, 1);
     }
 
     // triangular faces
@@ -1615,7 +1616,7 @@ void StdPyrExp::v_GetEdgeInteriorToElementMap(
     }
     else
     {
-        fill(signarray.get(), signarray.get() + nEdgeIntCoeffs, 1);
+        fill(signarray.data(), signarray.data() + nEdgeIntCoeffs, 1);
     }
 
     // If edge is oriented backwards, change sign of modes which have
@@ -1714,7 +1715,7 @@ void StdPyrExp::v_GetTraceInteriorToElementMap(
     }
     else
     {
-        fill(signarray.get(), signarray.get() + nFaceIntCoeffs, 1);
+        fill(signarray.data(), signarray.data() + nFaceIntCoeffs, 1);
     }
 
     // Set up an array indexing for quad faces, since the ordering may
@@ -1954,8 +1955,8 @@ void StdPyrExp::v_MultiplyByStdQuadratureMetric(
     // Multiply by integration constants in x-direction
     for (i = 0; i < nquad1 * nquad2; ++i)
     {
-        Vmath::Vmul(nquad0, inarray.get() + i * nquad0, 1, w0.get(), 1,
-                    outarray.get() + i * nquad0, 1);
+        Vmath::Vmul(nquad0, inarray.data() + i * nquad0, 1, w0.data(), 1,
+                    outarray.data() + i * nquad0, 1);
     }
 
     // Multiply by integration constants in y-direction
