@@ -6,6 +6,7 @@ v5.8.0
 **Library**
 - Use GLL quadrature points on Tri Dirichlet BCs with CG (!1895)
 - Add FieldConvert module to perform local stability analysis for compressible flows (!1319)
+- Remove get() accessor from Array data structure (!1937)
 
 
 v5.7.0

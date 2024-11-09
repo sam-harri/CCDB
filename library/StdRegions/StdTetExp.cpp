@@ -350,9 +350,9 @@ void StdTetExp::v_BwdTrans_SumFacKernel(
         for (j = 0; j < order1 - i; ++j, ++cnt)
         {
             Blas::Dgemv('N', nquad2, order2 - i - j, 1.0,
-                        base2.get() + mode * nquad2, nquad2,
-                        inarray.get() + mode1, 1, 0.0, tmp.get() + cnt * nquad2,
-                        1);
+                        base2.data() + mode * nquad2, nquad2,
+                        inarray.data() + mode1, 1, 0.0,
+                        tmp.data() + cnt * nquad2, 1);
             mode += order2 - i - j;
             mode1 += order2 - i - j;
         }
@@ -369,11 +369,11 @@ void StdTetExp::v_BwdTrans_SumFacKernel(
     if (m_base[0]->GetBasisType() == LibUtilities::eModified_A)
     {
         // top singular vertex - (1+c)/2 x (1+b)/2 x (1-a)/2 component
-        Blas::Daxpy(nquad2, inarray[1], base2.get() + nquad2, 1,
+        Blas::Daxpy(nquad2, inarray[1], base2.data() + nquad2, 1,
                     &tmp[0] + nquad2, 1);
 
         // top singular vertex - (1+c)/2 x (1-b)/2 x (1+a)/2 component
-        Blas::Daxpy(nquad2, inarray[1], base2.get() + nquad2, 1,
+        Blas::Daxpy(nquad2, inarray[1], base2.data() + nquad2, 1,
                     &tmp[0] + order1 * nquad2, 1);
     }
 
@@ -382,9 +382,9 @@ void StdTetExp::v_BwdTrans_SumFacKernel(
     for (i = 0; i < order0; ++i)
     {
         Blas::Dgemm('N', 'T', nquad1, nquad2, order1 - i, 1.0,
-                    base1.get() + mode * nquad1, nquad1,
-                    tmp.get() + mode * nquad2, nquad2, 0.0,
-                    tmp1.get() + i * nquad1 * nquad2, nquad1);
+                    base1.data() + mode * nquad1, nquad1,
+                    tmp.data() + mode * nquad2, nquad2, 0.0,
+                    tmp1.data() + i * nquad1 * nquad2, nquad1);
         mode += order1 - i;
     }
 
@@ -397,14 +397,14 @@ void StdTetExp::v_BwdTrans_SumFacKernel(
         // singular edge components with (1+b)/2 (1+a)/2 form
         for (i = 0; i < nquad2; ++i)
         {
-            Blas::Daxpy(nquad1, tmp[nquad2 + i], base1.get() + nquad1, 1,
+            Blas::Daxpy(nquad1, tmp[nquad2 + i], base1.data() + nquad1, 1,
                         &tmp1[nquad1 * nquad2] + i * nquad1, 1);
         }
     }
 
     // Perform summation over '0' direction
-    Blas::Dgemm('N', 'T', nquad0, nquad1 * nquad2, order0, 1.0, base0.get(),
-                nquad0, tmp1.get(), nquad1 * nquad2, 0.0, outarray.get(),
+    Blas::Dgemm('N', 'T', nquad0, nquad1 * nquad2, order0, 1.0, base0.data(),
+                nquad0, tmp1.data(), nquad1 * nquad2, 0.0, outarray.data(),
                 nquad0);
 }
 
@@ -544,16 +544,17 @@ void StdTetExp::v_IProductWRTBase_SumFacKernel(
     int i, j, mode, mode1, cnt;
 
     // Inner product with respect to the '0' direction
-    Blas::Dgemm('T', 'N', nquad1 * nquad2, order0, nquad0, 1.0, inarray.get(),
-                nquad0, base0.get(), nquad0, 0.0, tmp1.get(), nquad1 * nquad2);
+    Blas::Dgemm('T', 'N', nquad1 * nquad2, order0, nquad0, 1.0, inarray.data(),
+                nquad0, base0.data(), nquad0, 0.0, tmp1.data(),
+                nquad1 * nquad2);
 
     // Inner product with respect to the '1' direction
     for (mode = i = 0; i < order0; ++i)
     {
         Blas::Dgemm('T', 'N', nquad2, order1 - i, nquad1, 1.0,
-                    tmp1.get() + i * nquad1 * nquad2, nquad1,
-                    base1.get() + mode * nquad1, nquad1, 0.0,
-                    tmp2.get() + mode * nquad2, nquad2);
+                    tmp1.data() + i * nquad1 * nquad2, nquad1,
+                    base1.data() + mode * nquad1, nquad1, 0.0,
+                    tmp2.data() + mode * nquad2, nquad2);
         mode += order1 - i;
     }
 
@@ -562,8 +563,8 @@ void StdTetExp::v_IProductWRTBase_SumFacKernel(
     {
         // base singular vertex and singular edge (1+b)/2
         //(1+a)/2 components (makes tmp[nquad2] entry into (1+b)/2)
-        Blas::Dgemv('T', nquad1, nquad2, 1.0, tmp1.get() + nquad1 * nquad2,
-                    nquad1, base1.get() + nquad1, 1, 1.0, tmp2.get() + nquad2,
+        Blas::Dgemv('T', nquad1, nquad2, 1.0, tmp1.data() + nquad1 * nquad2,
+                    nquad1, base1.data() + nquad1, 1, 1.0, tmp2.data() + nquad2,
                     1);
     }
 
@@ -574,9 +575,9 @@ void StdTetExp::v_IProductWRTBase_SumFacKernel(
         for (j = 0; j < order1 - i; ++j, ++cnt)
         {
             Blas::Dgemv('T', nquad2, order2 - i - j, 1.0,
-                        base2.get() + mode * nquad2, nquad2,
-                        tmp2.get() + cnt * nquad2, 1, 0.0,
-                        outarray.get() + mode1, 1);
+                        base2.data() + mode * nquad2, nquad2,
+                        tmp2.data() + cnt * nquad2, 1, 0.0,
+                        outarray.data() + mode1, 1);
             mode += order2 - i - j;
             mode1 += order2 - i - j;
         }
@@ -593,10 +594,10 @@ void StdTetExp::v_IProductWRTBase_SumFacKernel(
     {
         // add in (1+c)/2 (1+b)/2   component
         outarray[1] +=
-            Blas::Ddot(nquad2, base2.get() + nquad2, 1, &tmp2[nquad2], 1);
+            Blas::Ddot(nquad2, base2.data() + nquad2, 1, &tmp2[nquad2], 1);
 
         // add in (1+c)/2 (1-b)/2 (1+a)/2 component
-        outarray[1] += Blas::Ddot(nquad2, base2.get() + nquad2, 1,
+        outarray[1] += Blas::Ddot(nquad2, base2.data() + nquad2, 1,
                                   &tmp2[nquad2 * order1], 1);
     }
 }
@@ -1516,7 +1517,7 @@ void StdTetExp::v_GetElmtTraceToTraceMap(const unsigned int fid,
     }
     else
     {
-        fill(signarray.get(), signarray.get() + nFaceCoeffs, 1);
+        fill(signarray.data(), signarray.data() + nFaceCoeffs, 1);
     }
 
     // zero signmap and set maparray to zero if elemental
@@ -1595,7 +1596,7 @@ void StdTetExp::v_GetEdgeInteriorToElementMap(
     }
     else
     {
-        fill(maparray.get(), maparray.get() + nEdgeIntCoeffs, 0);
+        fill(maparray.data(), maparray.data() + nEdgeIntCoeffs, 0);
     }
 
     if (signarray.size() != nEdgeIntCoeffs)
@@ -1604,7 +1605,7 @@ void StdTetExp::v_GetEdgeInteriorToElementMap(
     }
     else
     {
-        fill(signarray.get(), signarray.get() + nEdgeIntCoeffs, 1);
+        fill(signarray.data(), signarray.data() + nEdgeIntCoeffs, 1);
     }
 
     switch (eid)
@@ -1715,7 +1716,7 @@ void StdTetExp::v_GetTraceInteriorToElementMap(
     }
     else
     {
-        fill(signarray.get(), signarray.get() + nFaceIntCoeffs, 1);
+        fill(signarray.data(), signarray.data() + nFaceIntCoeffs, 1);
     }
 
     switch (fid)
@@ -1968,7 +1969,7 @@ void StdTetExp::v_MultiplyByStdQuadratureMetric(
     // multiply by integration constants
     for (i = 0; i < nquad1 * nquad2; ++i)
     {
-        Vmath::Vmul(nquad0, (NekDouble *)&inarray[0] + i * nquad0, 1, w0.get(),
+        Vmath::Vmul(nquad0, (NekDouble *)&inarray[0] + i * nquad0, 1, w0.data(),
                     1, &outarray[0] + i * nquad0, 1);
     }
 

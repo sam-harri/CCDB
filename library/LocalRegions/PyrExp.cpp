@@ -425,17 +425,17 @@ void PyrExp::v_AlignVectorToCollapsedDir(
 
     if (m_metricinfo->GetGtype() == SpatialDomains::eDeformed)
     {
-        Vmath::Vmul(nqtot, &df[3 * dir][0], 1, tmp1.get(), 1, tmp2.get(), 1);
-        Vmath::Vmul(nqtot, &df[3 * dir + 1][0], 1, tmp1.get(), 1, tmp3.get(),
+        Vmath::Vmul(nqtot, &df[3 * dir][0], 1, tmp1.data(), 1, tmp2.data(), 1);
+        Vmath::Vmul(nqtot, &df[3 * dir + 1][0], 1, tmp1.data(), 1, tmp3.data(),
                     1);
-        Vmath::Vmul(nqtot, &df[3 * dir + 2][0], 1, tmp1.get(), 1, tmp4.get(),
+        Vmath::Vmul(nqtot, &df[3 * dir + 2][0], 1, tmp1.data(), 1, tmp4.data(),
                     1);
     }
     else
     {
-        Vmath::Smul(nqtot, df[3 * dir][0], tmp1.get(), 1, tmp2.get(), 1);
-        Vmath::Smul(nqtot, df[3 * dir + 1][0], tmp1.get(), 1, tmp3.get(), 1);
-        Vmath::Smul(nqtot, df[3 * dir + 2][0], tmp1.get(), 1, tmp4.get(), 1);
+        Vmath::Smul(nqtot, df[3 * dir][0], tmp1.data(), 1, tmp2.data(), 1);
+        Vmath::Smul(nqtot, df[3 * dir + 1][0], tmp1.data(), 1, tmp3.data(), 1);
+        Vmath::Smul(nqtot, df[3 * dir + 2][0], tmp1.data(), 1, tmp4.data(), 1);
     }
 
     // set up geometric factor: (1+z0)/2
@@ -1344,10 +1344,12 @@ void PyrExp::v_LaplacianMatrixOp_MatFree_Kernel(
                                  false, true, true);
     IProductWRTBase_SumFacKernel(base0, dbase1, base2, wsp4, wsp2, wsp0, true,
                                  false, true);
-    Vmath::Vadd(m_ncoeffs, wsp2.get(), 1, outarray.get(), 1, outarray.get(), 1);
+    Vmath::Vadd(m_ncoeffs, wsp2.data(), 1, outarray.data(), 1, outarray.data(),
+                1);
     IProductWRTBase_SumFacKernel(base0, base1, dbase2, wsp5, wsp2, wsp0, true,
                                  true, false);
-    Vmath::Vadd(m_ncoeffs, wsp2.get(), 1, outarray.get(), 1, outarray.get(), 1);
+    Vmath::Vadd(m_ncoeffs, wsp2.data(), 1, outarray.data(), 1, outarray.data(),
+                1);
 }
 
 /** @brief: This method gets all of the factors which are
