@@ -6,6 +6,8 @@ v5.8.0
 **Library**
 - Use GLL quadrature points on Tri Dirichlet BCs with CG (!1895)
 
+**CI**
+-- fix CubeAllElements performance test tolerance (!1943)
 
 v5.7.0
 -----
