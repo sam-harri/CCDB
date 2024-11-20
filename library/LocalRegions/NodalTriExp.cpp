@@ -742,5 +742,4 @@ void NodalTriExp::v_GetTracePhysVals(
     }
 }
 
-
 } // namespace Nektar::LocalRegions
