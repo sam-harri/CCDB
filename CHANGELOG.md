@@ -13,6 +13,9 @@ v5.8.0
 **CI**
 -- fix CubeAllElements performance test tolerance (!1943)
 
+**NekMesh**
+- Add high-order pyramid and prism support from gmsh (!1956)
+
 v5.7.0
 -----
 **Library**
