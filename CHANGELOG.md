@@ -11,7 +11,8 @@ v5.8.0
 - Fix issue with `NodalTriExp::v_GetTracePhysVals` (!1951)
 
 **CI**
--- fix CubeAllElements performance test tolerance (!1943)
+- Fix CubeAllElements performance test tolerance (!1943)
+- Remove `allow_failure` from compiler warnings and formatting (!1958, !1966)
 
 **NekMesh**
 - Add high-order pyramid and prism support from gmsh (!1956)
