@@ -9,6 +9,7 @@ v5.8.0
 - Remove get() accessor from Array data structure (!1937)
 - Fix issue with `StdTetExp::v_LocCollapsedToLocCoord` (!1946)
 - Fix issue with `NodalTriExp::v_GetTracePhysVals` (!1951)
+- Fix issue with Dirichlet BCs when using variable P (!1972)
 
 **CI**
 - Fix CubeAllElements performance test tolerance (!1943)
