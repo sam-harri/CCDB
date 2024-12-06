@@ -10,6 +10,7 @@ v5.8.0
 - Fix issue with `StdTetExp::v_LocCollapsedToLocCoord` (!1946)
 - Fix issue with `NodalTriExp::v_GetTracePhysVals` (!1951)
 - Fix issue with Dirichlet BCs when using variable P (!1972)
+- Patch for implicit-function error in scotch-6.0.4 (!1938)
 
 **CI**
 - Fix CubeAllElements performance test tolerance (!1943)
