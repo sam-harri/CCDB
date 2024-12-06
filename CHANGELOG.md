@@ -5,6 +5,7 @@ v5.8.0
 ------
 **Library**
 - Use GLL quadrature points on Tri Dirichlet BCs with CG (!1895)
+- Patch for implicit-function error in scotch-6.0.4 (!1938)
 
 
 v5.7.0
