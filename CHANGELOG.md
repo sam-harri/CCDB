@@ -19,6 +19,9 @@ v5.8.0
 **NekMesh**
 - Add high-order pyramid and prism support from gmsh (!1956)
 
+**Python**
+- Transition bindings to use pybind11 (!1950)
+
 v5.7.0
 -----
 **Library**
