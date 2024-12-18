@@ -9,6 +9,7 @@ v5.8.0
 - Remove get() accessor from Array data structure (!1937)
 - Fix issue with `StdTetExp::v_LocCollapsedToLocCoord` (!1946)
 - Fix issue with `NodalTriExp::v_GetTracePhysVals` (!1951)
+- Remove deprecated version of v_SetCoeffsToOrientation functions (!1954)
 - Fix issue with Dirichlet BCs when using variable P (!1972)
 - Patch for implicit-function error in scotch-6.0.4 (!1938)
 
