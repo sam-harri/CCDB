@@ -12,6 +12,7 @@ v5.8.0
 - Remove deprecated version of v_SetCoeffsToOrientation functions (!1954)
 - Fix issue with Dirichlet BCs when using variable P (!1972)
 - Patch for implicit-function error in scotch-6.0.4 (!1938)
+- Tidy virtual inheritance in NodalTriExp (!1979)
 - Fix partial overload virtual function in AssemblyMap, StdRegions, and LocalRegions (!1978)
 
 **CI**
