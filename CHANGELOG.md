@@ -16,6 +16,7 @@ v5.8.0
 - Fix partial overload virtual function in AssemblyMap, StdRegions, and LocalRegions (!1978)
 - Fix partial overload virtual function v_PhysEvaluate (!1980)
 - Matrix free ops shape cleanup (!1735) 
+- Fix NodalTri processing and static condensation matrix release (!1989)
 
 **CI**
 - Fix CubeAllElements performance test tolerance (!1943)
