@@ -15,6 +15,7 @@ v5.8.0
 - Tidy virtual inheritance in NodalTriExp (!1979)
 - Fix partial overload virtual function in AssemblyMap, StdRegions, and LocalRegions (!1978)
 - Fix partial overload virtual function v_PhysEvaluate (!1980)
+- Matrix free ops shape cleanup (!1735) 
 
 **CI**
 - Fix CubeAllElements performance test tolerance (!1943)
