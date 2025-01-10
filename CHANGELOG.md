@@ -30,6 +30,10 @@ v5.8.0
 **Python**
 - Transition bindings to use pybind11 (!1950)
 
+**Documentation**
+- Updated the User-guide with additional inofrmation for outflow BC, addressing the issue #103 (!1990)
+
+
 v5.7.0
 -----
 **Library**
