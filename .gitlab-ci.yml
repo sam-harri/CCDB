@@ -261,6 +261,8 @@ debian-bookworm-default-build-and-test:
 debian-bookworm-full-build-and-test:
   <<: *build-and-test-template
   needs: ["debian-bookworm-full-build-env"]
+  variables:
+    GIT_SUBMODULE_STRATEGY: recursive
 
 debian-bookworm-full-avx2-build-and-test:
   <<: *build-and-test-template

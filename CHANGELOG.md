@@ -22,6 +22,7 @@ v5.8.0
 - Fix CubeAllElements performance test tolerance (!1943)
 - Remove `allow_failure` from compiler warnings and formatting (!1958, !1966)
 - remove CI image tag when dockerhub deploy completes (!1960)
+- Use recursive strategy for submodule (!1997)
 
 **NekMesh**
 - Add high-order pyramid and prism support from gmsh (!1956)
