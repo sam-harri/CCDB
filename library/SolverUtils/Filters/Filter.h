@@ -37,6 +37,7 @@
 
 #include <LibUtilities/BasicUtils/NekFactory.hpp>
 #include <LibUtilities/BasicUtils/SessionReader.h>
+#include <LibUtilities/Communication/Comm.h>
 #include <MultiRegions/ExpList.h>
 #include <SolverUtils/EquationSystem.h>
 
@@ -78,6 +79,10 @@ public:
         const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
         const NekDouble &time);
     SOLVER_UTILS_EXPORT inline bool IsTimeDependent();
+    SOLVER_UTILS_EXPORT inline std::string SetupOutput(const std::string ext,
+                                                       const ParamMap &pParams);
+    SOLVER_UTILS_EXPORT inline std::string SetupOutput(
+        const std::string ext, const std::string inname);
 
 protected:
     LibUtilities::SessionReaderSharedPtr m_session;
@@ -93,6 +98,10 @@ protected:
         const Array<OneD, const MultiRegions::ExpListSharedPtr> &pFields,
         const NekDouble &time)       = 0;
     virtual bool v_IsTimeDependent() = 0;
+    SOLVER_UTILS_EXPORT virtual std::string v_SetupOutput(
+        const std::string ext, const ParamMap &pParams);
+    SOLVER_UTILS_EXPORT virtual std::string v_SetupOutput(
+        const std::string ext, const std::string inname);
 };
 
 inline void Filter::Initialise(
@@ -119,6 +128,17 @@ inline void Filter::Finalise(
 inline bool Filter::IsTimeDependent()
 {
     return v_IsTimeDependent();
+}
+
+inline std::string Filter::SetupOutput(const std::string ext,
+                                       const ParamMap &pParams)
+{
+    return v_SetupOutput(ext, pParams);
+}
+inline std::string Filter::SetupOutput(const std::string ext,
+                                       const std::string inname)
+{
+    return v_SetupOutput(ext, inname);
 }
 } // namespace Nektar::SolverUtils
 #endif /* NEKTAR_SOLVERUTILS_FILTER_FILTER_H */

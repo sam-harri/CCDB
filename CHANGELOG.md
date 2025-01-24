@@ -19,6 +19,7 @@ v5.8.0
 - Fix NodalTri processing and static condensation matrix release (!1989)
 - Fix third-party Scotch patch (!1998)
 - Fixed Modified Arnoldi driver to remove discontinuities from random vectors (!2002)
+- Addedd support for backing up filters output when the file name have already existis (!2006)
 
 **CI**
 - Fix CubeAllElements performance test tolerance (!1943)
@@ -34,6 +35,7 @@ v5.8.0
 - Transition bindings to use pybind11 (!1950)
 
 **Documentation**
+- Updated the User-guide with additional inofrmation for outflow BC, addressing the issue #103 (!1988)
 - Updated the User-guide with additional inofrmation for outflow BC, addressing the issue #103 (!1990)
 
 
