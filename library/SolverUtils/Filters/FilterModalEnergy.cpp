@@ -55,24 +55,11 @@ FilterModalEnergy::FilterModalEnergy(
     : Filter(pSession, pEquation)
 {
     // OutputFile
-    auto it = pParams.find("OutputFile");
-    if (it == pParams.end())
-    {
-        m_outputFile = m_session->GetSessionName();
-    }
-    else
-    {
-        ASSERTL0(it->second.length() > 0, "Missing parameter 'OutputFile'.");
-        m_outputFile = it->second;
-    }
-    if (!(m_outputFile.length() >= 4 &&
-          m_outputFile.substr(m_outputFile.length() - 4) == ".mdl"))
-    {
-        m_outputFile += ".mdl";
-    }
+    std::string ext = ".mdl";
+    m_outputFile    = Filter::SetupOutput(ext, pParams);
 
     // OutputFrequency
-    it = pParams.find("OutputFrequency");
+    auto it = pParams.find("OutputFrequency");
     if (it == pParams.end())
     {
         m_outputFrequency = 1;

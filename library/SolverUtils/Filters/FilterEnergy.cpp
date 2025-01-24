@@ -51,19 +51,8 @@ FilterEnergy::FilterEnergy(const LibUtilities::SessionReaderSharedPtr &pSession,
     : Filter(pSession, pEquation), m_index(-1), m_homogeneous(false), m_planes()
 {
     std::string outName;
-
-    // OutputFile
-    auto it = pParams.find("OutputFile");
-    if (it == pParams.end())
-    {
-        outName = m_session->GetSessionName();
-    }
-    else
-    {
-        ASSERTL0(it->second.length() > 0, "Missing parameter 'OutputFile'.");
-        outName = it->second;
-    }
-    outName += ".eny";
+    std::string ext = ".eny";
+    outName         = Filter::SetupOutput(ext, pParams);
 
     m_comm = pSession->GetComm();
     if (m_comm->GetRank() == 0)
@@ -79,7 +68,7 @@ FilterEnergy::FilterEnergy(const LibUtilities::SessionReaderSharedPtr &pSession,
     pSession->LoadParameter("LZ", m_homogeneousLength, 0.0);
 
     // OutputFrequency
-    it = pParams.find("OutputFrequency");
+    auto it = pParams.find("OutputFrequency");
     ASSERTL0(it != pParams.end(), "Missing parameter 'OutputFrequency'.");
     LibUtilities::Equation equ(m_session->GetInterpreter(), it->second);
     m_outputFrequency = round(equ.Evaluate());

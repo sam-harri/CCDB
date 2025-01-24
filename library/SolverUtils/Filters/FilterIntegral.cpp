@@ -55,22 +55,11 @@ FilterIntegral::FilterIntegral(
     : Filter(pSession, pEquation)
 {
     std::string outName;
-
-    // OutputFile
-    auto it = pParams.find("OutputFile");
-    if (it == pParams.end())
-    {
-        outName = m_session->GetSessionName();
-    }
-    else
-    {
-        ASSERTL0(it->second.length() > 0, "Empty parameter 'OutputFile'.");
-        outName = it->second;
-    }
-    outName += ".int";
+    std::string ext = ".int";
+    outName         = Filter::SetupOutput(ext, pParams);
 
     // Composites (to calculate integrals on)
-    it = pParams.find("Composites");
+    auto it = pParams.find("Composites");
     ASSERTL0(it != pParams.end(), "Missing parameter 'Composites'.");
     ASSERTL0(it->second.length() > 0, "Empty parameter 'Composites'.");
 
