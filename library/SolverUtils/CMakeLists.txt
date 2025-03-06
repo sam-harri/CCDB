@@ -26,6 +26,7 @@ SET(SOLVER_UTILS_SOURCES
   DriverStandard.cpp
   DriverSteadyState.cpp	
   EquationSystem.cpp
+  Filters/FilterDissip.cpp
   Filters/Filter.cpp
   Filters/FilterAeroForces.cpp
   Filters/FilterAverageFields.cpp
@@ -86,6 +87,7 @@ SET(SOLVER_UTILS_HEADERS
   DriverStandard.h
   DriverSteadyState.h
   EquationSystem.h
+  Filters/FilterDissip.h
   Filters/Filter.h
   Filters/FilterAeroForces.h
   Filters/FilterAverageFields.h
