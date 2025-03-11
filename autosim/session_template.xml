@@ -5,7 +5,7 @@
     <E COMPOSITE="C[1]" NUMMODES="2" FIELDS="p" TYPE="MODIFIEDQUADPLUS1"/>
   </EXPANSIONS>
   <FILTERS>
-  <FILTER TYPE="Energy">
+  	<FILTER TYPE="Energy">
         <PARAM NAME="OutputFile">stage_{{ stage }}/KineticE</PARAM>	
         <PARAM NAME="OutputFrequency">50</PARAM>
       </FILTER>
@@ -28,19 +28,19 @@
   </FILTERS>
   <CONDITIONS>
   	<PARAMETERS>
-       <P> TimeStep      = 6.25e-7            </P> <!-- dt for sim-->
+      <P> TimeStep = {{ timestep }} </P>
        <P> RunTime		 = 0.03  			</P>
        <P> NumSteps      = RunTime/TimeStep  </P>
        <P> IO_CheckSteps = NumSteps/25       </P>
        <P> IO_InfoSteps  = 50               </P>
-       <P> IO_CFLSteps   = 5               </P>
+       <P> IO_CFLSteps   = 50               </P>
        <P> mu 			 = 0.89e-3 		   </P> <!-- dyn visc water at 25degC-->
        <P> rhoInf 	     = 997 	           </P> <!-- water density 25degC-->
        <P> Kinvis        = mu/rhoInf       </P>
-       <P> Re            = 10               </P>
-       <P> FlowRate      = 0.446          </P>
-       <P> NoiseInit     = FlowRate*rhoInf*1e-4/TimeStep*1e-3 </P> <!-- numerical instability -->
-       <P> tau_penalty   = 0.8*(3+1)^(-4) </P>   <!-- stablization scheme based on num fields-->
+       <P> Re            = 10               </P> <!-- Doesnt actually do anything (DUmmy var)-->
+       <P> FlowRate      = 0.446          </P> <!-- -->
+       <P> NoiseInit     = FlowRate*rhoInf*1e-4/TimeStep*1e-3 </P> <!-- dummy var-->
+       <P> tau_penalty   = 0.8*(3)^(-4) </P>   <!-- 0.8*({velocity_num_modes})^(-4)-->
     </PARAMETERS>
     <VARIABLES>
        <V ID="0"> u </V>
@@ -65,7 +65,7 @@
 		    	<I PROPERTY="IterativeSolverTolerance"	VALUE="1e-6" />
 		    </V>
 		    <V VAR="p">
-		    	<I PROPERTY="Preconditioner" 		VALUE="FullLinearSpaceWithLowEnergyBlock"  /> <!--Use LowEnergyBlock only when using multiple nodes (communication is slow for FullLinearSpace)-->
+		    	<I PROPERTY="Preconditioner" 		VALUE="LowEnergyBlock"  /> <!-- if num_modes > 1, full linear space not ideal cause comm bottleneck-->
 		    	<I PROPERTY="IterativeSolverTolerance"	VALUE="1e-4" />
 		    </V>
         </GLOBALSYSSOLNINFO>
@@ -81,7 +81,7 @@
         <P VAR="v" VALUE="[1]"/>
         <P VAR="w" VALUE="[1]"/>
         <P VAR="p" VALUE="[1]"/>
-      </REGION>
+      </REGION> 
       <REGION REF="1">
         <P VAR="u" VALUE="[0]" USERDEFINEDTYPE="Flowrate"/>
         <P VAR="v" VALUE="[0]" />
