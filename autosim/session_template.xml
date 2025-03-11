@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<NEKTAR>
+  <EXPANSIONS>
+    <E COMPOSITE="C[1]" NUMMODES="3" FIELDS="u,v,w" TYPE="MODIFIED"/>
+    <E COMPOSITE="C[1]" NUMMODES="2" FIELDS="p" TYPE="MODIFIEDQUADPLUS1"/>
+  </EXPANSIONS>
+  <FILTERS>
+  <FILTER TYPE="Energy">
+        <PARAM NAME="OutputFile">stage_{{ stage }}/KineticE</PARAM>	
+        <PARAM NAME="OutputFrequency">50</PARAM>
+      </FILTER>
+      <FILTER TYPE="Error">
+        <PARAM NAME="OutputFile">stage_{{ stage }}/ErrorFile</PARAM>	
+        <PARAM NAME="OutputFrequency">100</PARAM>
+      </FILTER>
+      <FILTER TYPE="ReynoldsStresses">
+        <PARAM NAME="OutputFile">stage_{{ stage }}/AvgFields</PARAM>	
+        <PARAM NAME="OutputFrequency">5000</PARAM>
+      </FILTER>
+      <FILTER TYPE="FieldConvert">
+        <PARAM NAME="OutputFile">stage_{{ stage }}/print.plt</PARAM>
+        <PARAM NAME="OutputFrequency">5000</PARAM>
+      </FILTER>
+      <FILTER TYPE="Dissipation">
+        <PARAM NAME="OutputFile">stage_{{ stage }}/Dissip</PARAM>	
+        <PARAM NAME="OutputFrequency">50</PARAM>
+      </FILTER>
+  </FILTERS>
+  <CONDITIONS>
+  	<PARAMETERS>
+       <P> TimeStep      = 6.25e-7            </P> <!-- dt for sim-->
+       <P> RunTime		 = 0.03  			</P>
+       <P> NumSteps      = RunTime/TimeStep  </P>
+       <P> IO_CheckSteps = NumSteps/25       </P>
+       <P> IO_InfoSteps  = 50               </P>
+       <P> IO_CFLSteps   = 5               </P>
+       <P> mu 			 = 0.89e-3 		   </P> <!-- dyn visc water at 25degC-->
+       <P> rhoInf 	     = 997 	           </P> <!-- water density 25degC-->
+       <P> Kinvis        = mu/rhoInf       </P>
+       <P> Re            = 10               </P>
+       <P> FlowRate      = 0.446          </P>
+       <P> NoiseInit     = FlowRate*rhoInf*1e-4/TimeStep*1e-3 </P> <!-- numerical instability -->
+       <P> tau_penalty   = 0.8*(3+1)^(-4) </P>   <!-- stablization scheme based on num fields-->
+    </PARAMETERS>
+    <VARIABLES>
+       <V ID="0"> u </V>
+       <V ID="1"> v </V>
+       <V ID="2"> w </V>
+       <V ID="3"> p </V>
+    </VARIABLES>
+	<SOLVERINFO>
+            <I PROPERTY="SolverType"            VALUE="VCSWeakPressure" />
+            <I PROPERTY="EQTYPE"                VALUE="UnsteadyNavierStokes" />
+            <I PROPERTY="GlobalSysSoln"         VALUE="IterativeStaticCond" />
+            <I PROPERTY="AdvectionForm"         VALUE="Convective" />
+            <I PROPERTY="Projection"            VALUE="Continuous" />
+            <I PROPERTY="TimeIntegrationMethod" VALUE="IMEXOrder2" />
+        	<I PROPERTY="AbsoluteTolerance"		VALUE="True" />
+        	<I PROPERTY="SuccessiveRHS"			VALUE="-6" />
+        	<I PROPERTY="GJPStabilisation"      VALUE="SemiImplicit" />
+        	<I PROPERTY="GJPJumpScale"          VALUE="tau_penalty" />
+        <GLOBALSYSSOLNINFO>
+		    <V VAR="u,v,w">
+		    	<I PROPERTY="Preconditioner" 		VALUE="LowEnergyBlock"  />
+		    	<I PROPERTY="IterativeSolverTolerance"	VALUE="1e-6" />
+		    </V>
+		    <V VAR="p">
+		    	<I PROPERTY="Preconditioner" 		VALUE="FullLinearSpaceWithLowEnergyBlock"  /> <!--Use LowEnergyBlock only when using multiple nodes (communication is slow for FullLinearSpace)-->
+		    	<I PROPERTY="IterativeSolverTolerance"	VALUE="1e-4" />
+		    </V>
+        </GLOBALSYSSOLNINFO>
+    </SOLVERINFO>
+    <BOUNDARYREGIONS>
+    	<B ID="0"> C[2] </B>	<!--Inlet-->
+    	<B ID="1"> C[3] </B> 	<!--Oulet-->
+    	<B ID="2"> C[4] </B>	<!--Walls-->
+    </BOUNDARYREGIONS>
+    <BOUNDARYCONDITIONS>
+      <REGION REF="0">
+        <P VAR="u" VALUE="[1]"/>
+        <P VAR="v" VALUE="[1]"/>
+        <P VAR="w" VALUE="[1]"/>
+        <P VAR="p" VALUE="[1]"/>
+      </REGION>
+      <REGION REF="1">
+        <P VAR="u" VALUE="[0]" USERDEFINEDTYPE="Flowrate"/>
+        <P VAR="v" VALUE="[0]" />
+        <P VAR="w" VALUE="[0]" />
+        <P VAR="p" VALUE="[0]"/>
+      </REGION>
+      <REGION REF="2">
+        <D VAR="u" VALUE="0" />
+        <D VAR="v" VALUE="0" />
+        <D VAR="w" VALUE="0" />
+        <N VAR="p" USERDEFINEDTYPE="H" VALUE="0" />
+      </REGION>
+    </BOUNDARYCONDITIONS>
+    <FUNCTION NAME="FlowrateForce">
+        <E VAR="ForceX" VALUE="1.0" />
+        <E VAR="ForceY" VALUE="0.0" />
+        <E VAR="ForceZ" VALUE="0.0" />
+    </FUNCTION>
+    <FUNCTION NAME="InitialConditions">
+         <E VAR="u" VALUE="0" />
+         <E VAR="v" VALUE="0" />
+         <E VAR="w" VALUE="0" />
+         <E VAR="p" VALUE="0" />
+        {% if restart_file %}
+        <F VAR="u,v,w,p" FILE="{{ restart_file }}" />
+        {% endif %}
+    </FUNCTION>
+  </CONDITIONS>
+</NEKTAR>
