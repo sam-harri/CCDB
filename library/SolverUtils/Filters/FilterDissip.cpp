@@ -63,7 +63,7 @@ FilterDissip::FilterDissip(const LibUtilities::SessionReaderSharedPtr &pSession,
         ASSERTL0(it->second.length() > 0, "Missing parameter 'OutputFile'.");
         outName = it->second;
     }
-    outName += ".eny";
+    outName += ".csv";
 
     m_comm = pSession->GetComm();
     if (m_comm->GetRank() == 0)
@@ -71,9 +71,7 @@ FilterDissip::FilterDissip(const LibUtilities::SessionReaderSharedPtr &pSession,
         m_outFile.open(outName.c_str());
         ASSERTL0(m_outFile.good(), "Unable to open: '" + outName + "'");
         m_outFile.setf(ios::scientific, ios::floatfield);
-        m_outFile << "# Time                Dissipation rate" << endl
-                  << "# ---------------------------------------------"
-                  << "--------------" << endl;
+        m_outFile << "Time, Dissipation rate" << endl;
     }
     pSession->LoadParameter("LZ", m_homogeneousLength, 0.0);
 
@@ -223,8 +221,7 @@ void FilterDissip::v_Update(
 
     if (m_comm->GetRank() == 0)
     {
-        m_outFile << setw(17) << setprecision(8) << time << setw(22)
-                  << setprecision(11) << Ek << endl;
+        m_outFile << time << "," << Ek << endl;
     }
 }
 

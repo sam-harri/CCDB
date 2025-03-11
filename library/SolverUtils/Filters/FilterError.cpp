@@ -45,7 +45,7 @@ FilterError::FilterError(const LibUtilities::SessionReaderSharedPtr &pSession,
     : Filter(pSession, pEquation)
 {
     std::string outName;
-    std::string ext = ".err";
+    std::string ext = ".csv";
     outName         = Filter::SetupOutput(ext, pParams);
 
     // Lock equation system pointer
@@ -62,11 +62,12 @@ FilterError::FilterError(const LibUtilities::SessionReaderSharedPtr &pSession,
         m_outFile.setf(std::ios::scientific, std::ios::floatfield);
 
         m_outFile << "Time";
+
         for (size_t i = 0; i < m_numVariables; ++i)
         {
             std::string varName = equationSys->GetVariable(i);
-            m_outFile << " " + varName + "_L2"
-                      << " " + varName + "_Linf";
+            m_outFile << "," << varName << "_L2"
+                    << "," << varName << "_Linf";
         }
 
         m_outFile << std::endl;
@@ -143,7 +144,7 @@ void FilterError::v_Update(
 
         if (m_comm->GetRank() == 0)
         {
-            m_outFile << " " << vL2Error << " " << vLinfError;
+            m_outFile << "," << vL2Error << "," << vLinfError;
 
             if (m_consoleOutput)
             {
