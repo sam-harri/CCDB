@@ -1,37 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <NEKTAR>
   <EXPANSIONS>
-    <E COMPOSITE="C[1]" NUMMODES="3" FIELDS="u,v,w" TYPE="MODIFIED"/>
-    <E COMPOSITE="C[1]" NUMMODES="2" FIELDS="p" TYPE="MODIFIEDQUADPLUS1"/>
+    <E COMPOSITE="C[1]" NUMMODES="{{ velocity_num_modes }}" FIELDS="u,v,w" TYPE="MODIFIED"/>
+    <E COMPOSITE="C[1]" NUMMODES="{{ pressure_num_modes }}" FIELDS="p" TYPE="MODIFIEDQUADPLUS1"/>
   </EXPANSIONS>
   <FILTERS>
   	<FILTER TYPE="Energy">
-        <PARAM NAME="OutputFile">stage_{{ stage }}/KineticE</PARAM>	
-        <PARAM NAME="OutputFrequency">50</PARAM>
+        <PARAM NAME="OutputFile">KineticE</PARAM>	
+        <PARAM NAME="OutputFrequency">1</PARAM>
       </FILTER>
       <FILTER TYPE="Error">
-        <PARAM NAME="OutputFile">stage_{{ stage }}/ErrorFile</PARAM>	
-        <PARAM NAME="OutputFrequency">100</PARAM>
+        <PARAM NAME="OutputFile">ErrorFile</PARAM>	
+        <PARAM NAME="OutputFrequency">1</PARAM>
       </FILTER>
       <FILTER TYPE="ReynoldsStresses">
-        <PARAM NAME="OutputFile">stage_{{ stage }}/AvgFields</PARAM>	
+        <PARAM NAME="OutputFile">AvgFields</PARAM>	
         <PARAM NAME="OutputFrequency">5000</PARAM>
       </FILTER>
       <FILTER TYPE="FieldConvert">
-        <PARAM NAME="OutputFile">stage_{{ stage }}/print.plt</PARAM>
+        <PARAM NAME="OutputFile">print.plt</PARAM>
         <PARAM NAME="OutputFrequency">5000</PARAM>
       </FILTER>
       <FILTER TYPE="Dissipation">
-        <PARAM NAME="OutputFile">stage_{{ stage }}/Dissip</PARAM>	
-        <PARAM NAME="OutputFrequency">50</PARAM>
+        <PARAM NAME="OutputFile">Dissip</PARAM>	
+        <PARAM NAME="OutputFrequency">1</PARAM>
       </FILTER>
   </FILTERS>
   <CONDITIONS>
   	<PARAMETERS>
-      <P> TimeStep = {{ timestep }} </P>
-       <P> RunTime		 = 0.03  			</P>
-       <P> NumSteps      = RunTime/TimeStep  </P>
-       <P> IO_CheckSteps = NumSteps/25       </P>
+      <P> TimeStep = {{ "%.5e"|format(timestep) }} </P>
+       <P> RunTime = {{ "%.5e"|format(runtime) }} </P>
+       <P> NumSteps = {{ num_steps }} </P>
+       <P> IO_CheckSteps = NumSteps/25 </P>
        <P> IO_InfoSteps  = 50               </P>
        <P> IO_CFLSteps   = 50               </P>
        <P> mu 			 = 0.89e-3 		   </P> <!-- dyn visc water at 25degC-->
@@ -40,7 +40,7 @@
        <P> Re            = 10               </P> <!-- Doesnt actually do anything (DUmmy var)-->
        <P> FlowRate      = 0.446          </P> <!-- -->
        <P> NoiseInit     = FlowRate*rhoInf*1e-4/TimeStep*1e-3 </P> <!-- dummy var-->
-       <P> tau_penalty   = 0.8*(3)^(-4) </P>   <!-- 0.8*({velocity_num_modes})^(-4)-->
+       <P> tau_penalty   = 0.8*({velocity_num_modes})^(-4) </P>   <!-- 0.8*({velocity_num_modes})^(-4)-->
     </PARAMETERS>
     <VARIABLES>
        <V ID="0"> u </V>
@@ -105,8 +105,8 @@
          <E VAR="v" VALUE="0" />
          <E VAR="w" VALUE="0" />
          <E VAR="p" VALUE="0" />
-        {% if restart_file %}
-        <F VAR="u,v,w,p" FILE="{{ restart_file }}" />
+        {% if initial_conditions_file %}
+        <F VAR="u,v,w,p" FILE="{{ initial_conditions_file }}" />
         {% endif %}
     </FUNCTION>
   </CONDITIONS>

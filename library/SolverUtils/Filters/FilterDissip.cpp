@@ -71,7 +71,7 @@ FilterDissip::FilterDissip(const LibUtilities::SessionReaderSharedPtr &pSession,
         m_outFile.open(outName.c_str());
         ASSERTL0(m_outFile.good(), "Unable to open: '" + outName + "'");
         m_outFile.setf(ios::scientific, ios::floatfield);
-        m_outFile << "Time, Dissipation rate" << endl;
+        m_outFile << "time,dissipation_rate" << endl;
     }
     pSession->LoadParameter("LZ", m_homogeneousLength, 0.0);
 

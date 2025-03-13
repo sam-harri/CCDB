@@ -80,15 +80,18 @@ bool AdvectionSystem::v_PostIntegrate(int step)
 
         if (m_cflsteps && !((step + 1) % m_cflsteps) && m_comm->GetRank() == 0)
         {
+            std::cout << "{";
+
             if (m_HomogeneousType == eNotHomogeneous)
             {
-                std::cout << "CFL: ";
+                std::cout << "\"CFL\": " << cfl;
             }
             else
             {
-                std::cout << "CFL (zero plane): ";
+                std::cout << "\"CFL_zeroplane\": " << cfl;
             }
-            std::cout << cfl << " (in elmt " << elmtid << ")" << std::endl;
+        
+            std::cout << ", \"element\": " << elmtid << "}" << std::endl;
         }
 
         // At each timestep, if cflWriteFld is set check if cfl is above

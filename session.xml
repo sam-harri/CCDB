@@ -6,34 +6,34 @@
   </EXPANSIONS>
   <FILTERS>
     <FILTER TYPE="Energy">
-      <PARAM NAME="OutputFile">stage_{{ stage }}/KineticE</PARAM>
-      <PARAM NAME="OutputFrequency">50</PARAM>
-    </FILTER>
-    <FILTER TYPE="Error">
-      <PARAM NAME="OutputFile">stage_{{ stage }}/ErrorFile</PARAM>
+      <PARAM NAME="OutputFile">KineticE</PARAM>
       <PARAM NAME="OutputFrequency">100</PARAM>
     </FILTER>
+    <FILTER TYPE="Error">
+      <PARAM NAME="OutputFile">ErrorFile</PARAM>
+      <PARAM NAME="OutputFrequency">1</PARAM>
+    </FILTER>
     <FILTER TYPE="ReynoldsStresses">
-      <PARAM NAME="OutputFile">stage_{{ stage }}/AvgFields</PARAM>
+      <PARAM NAME="OutputFile">AvgFields</PARAM>
       <PARAM NAME="OutputFrequency">5000</PARAM>
     </FILTER>
     <FILTER TYPE="FieldConvert">
-      <PARAM NAME="OutputFile">stage_{{ stage }}/print.plt</PARAM>
+      <PARAM NAME="OutputFile">print.plt</PARAM>
       <PARAM NAME="OutputFrequency">5000</PARAM>
     </FILTER>
     <FILTER TYPE="Dissipation">
-      <PARAM NAME="OutputFile">stage_{{ stage }}/Dissip</PARAM>
-      <PARAM NAME="OutputFrequency">50</PARAM>
+      <PARAM NAME="OutputFile">Dissip</PARAM>
+      <PARAM NAME="OutputFrequency">1</PARAM>
     </FILTER>
   </FILTERS>
   <CONDITIONS>
     <PARAMETERS>
-      <P> TimeStep = {{ timestep }} </P> <!-- dt for sim-->
+      <P> TimeStep = 6.25e-6 </P> <!-- dt for sim-->
       <P> RunTime = 0.03 </P>
       <P> NumSteps = RunTime/TimeStep </P>
       <P> IO_CheckSteps = NumSteps/25 </P>
       <P> IO_InfoSteps = 50 </P>
-      <P> IO_CFLSteps = 5 </P>
+      <P> IO_CFLSteps = 1 </P>
       <P> mu = 0.89e-3 </P> <!-- dyn visc water at 25degC-->
       <P> rhoInf = 997 </P> <!-- water density 25degC-->
       <P> Kinvis = mu/rhoInf </P>
@@ -107,9 +107,6 @@
       <E VAR="v" VALUE="0" />
       <E VAR="w" VALUE="0" />
       <E VAR="p" VALUE="0" />
-      <!--<F
-      VAR="u,v,w,p" FILE="SZ_35.rst" />--> <!--restart
-      from .rst file-->
     </FUNCTION>
   </CONDITIONS>
 </NEKTAR>
